@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 68).
+  (ultima versione pubblicata: 69).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
