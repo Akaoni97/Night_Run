@@ -1,5 +1,8 @@
 # Night Run · guida per gli assistenti (Kimi, Claude e altri)
 
+Stato del lavoro, lavori aperti e procedure (artifact, nuovi disegni di auto): vedi `PASSAGGIO.md`.
+Gli strumenti per trasformare i disegni in auto del gioco sono in `strumenti/`.
+
 Gioco di guida notturna nel browser, in italiano, fatto per due persone (il proprietario del repository e suo
 cognato). Si gioca da GitHub Pages: https://akaoni97.github.io/RandomEgg-s/ (la radice rimanda a `motori/`).
 Il resto del repository (server/, public/, dist/, scripts/) è un altro progetto: **non toccarlo**.
