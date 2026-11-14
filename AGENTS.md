@@ -21,6 +21,8 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `intro.js` | Sigla in 2D. |
 | `radio.js` | Radio. |
 | `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia, gare. |
+| `viaggio.js` | Il Viaggio (modalità principale): tappe, paesaggi, bisogni del guidatore, Motel Ovunque e la cassa, lavori, autostoppisti, capitoli ed eventi strani. Si aggancia a `StreetGame`; stato in `game.s.vg`. |
+| `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
 | `audio/`, `models/` | Suoni e modelli 3D liberi già nel progetto. |
@@ -46,7 +48,7 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
-  Oggi passano 24 test su 26. I 2 che falliscono erano già rotti prima:
+  Oggi passano 24 test su 26 (i test caricano anche `viaggio.js`). I 2 che falliscono erano già rotti prima:
   "prestazioni realistiche della configurazione originale" (lo 0-100 della prova è 6,28 s, il test vuole meno di 6)
   e "officina: si compra solo con i soldi sufficienti". Non peggiorare il conteggio.
 - Nel browser: dalla cartella `motori/` lancia `python3 -m http.server 8765` e apri

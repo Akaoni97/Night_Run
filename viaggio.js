@@ -218,7 +218,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (v.pax.length) return { ok: false, why: 'Hai ancora passeggeri a bordo' };
       if ((this.s.trunk || []).some((it) => it.kind === 'scatola' || it.kind === 'bancale' || it.kind === 'pacco')) return { ok: false, why: 'Prima consegna la merce che hai a bordo' };
     }
-    return sc.call(this, id);
+    const ins = this.inside; this.inside = null;              // al motel si è "dentro", ma il cambio si fa nel parcheggio
+    const r = sc.call(this, id); this.inside = ins; return r;
   };
   // oggetti nuovi: cibo, bevande, salviette; la valigia non si butta
   const ui = P.useItem;

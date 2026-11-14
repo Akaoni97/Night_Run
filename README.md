@@ -347,3 +347,31 @@ rifiutata dal sincronizzatore.
 benzinaio, Luca, Niko e Neon Kustom), Wangan · Bayshore Route (autostrada sopraelevata sulla baia), Hakone Turnpike
 (montagna, il Fuji all'orizzonte), Positano (mare, il paese sulla roccia), Bassa Reggiana (pianura, pioppi e nebbia),
 San Gimignano (paese, le torri), Route 66 ad Amboy nel Mojave (deserto, mesas e motel). Si parte da fermi.
+
+## Il Viaggio (modalità principale)
+
+Si parte dal **km 0 sotto casa** con una V40 di serie, € 450, un panino e una bottiglia d'acqua. L'autostrada va
+solo avanti: tutti dicono che da qualche parte si arriva, nessuno sa dove. La carriera resta (pulsante *Carriera*),
+con salvataggio e pezzi separati.
+
+- **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Niko,
+  Da Luca Tuning, Neon Kustom e il **Motel Ovunque**. Il paesaggio cambia da solo: la città di casa, la Bassa,
+  San Gimignano, la costiera, Hakone, il Wangan, la Route 66, e poi ancora. Cippi chilometrici ogni km.
+- **Il guidatore.** Fame, sete, sonno e igiene calano coi km e col tempo. Col sonno basso la vista si stringe e
+  arrivano i colpi di sonno (schermo nero, sbandata di corsia); con fame e sete a zero il gas va e viene; sporco,
+  i passeggeri danno meno mancia. Tasti rapidi: **1** mangia, **2** bevi, **3** caffè o bibita energetica,
+  **4** salviette (dal bagagliaio). Al bar caffè, cornetto, panino; all'autogrill pasti e docce.
+- **Motel Ovunque.** Stanza 7, sempre. Dormire (salva il viaggio), doccia, cena. **La cassa**: quello che ci lasci
+  lo ritrovi al prossimo Motel Ovunque, è il vanto della catena. Nel parcheggio si cambia mezzo e c'è la
+  concessionaria: rimorchietto, furgone, patenti, camion, autobus e le auto sportive usate.
+- **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
+  Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
+  col furgone, bancali col camion; con l'autobus le linee notturne con passeggeri a ogni fermata.
+  Furgone, camion (12 marce, limitato a 90) e autobus si guidano davvero, con fisica e suono diesel
+  (`viaggio.js`, disegni `img/van|truck|bus*.png` ricavati da quelli del traffico).
+- **La storia e quello che non torna.** Capitoli ai chilometri (0, 1, 10, 25, 50, 100, 200, 350, 500, 750, 1000)
+  e una ventina di eventi rari che diventano più frequenti coi km e col sonno: il benzinaio che non ha mai visto
+  un'autocisterna, il barista che sa «il solito», la cassa arrivata prima di te, cartelli scritti a mano,
+  uscite murate, cippi sbagliati, la radio che legge la tua targa, autostoppisti che scompaiono o tornano.
+  Testi e soglie sono in `VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` (facili da cambiare).
+
