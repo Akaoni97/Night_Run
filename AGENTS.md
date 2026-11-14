@@ -21,6 +21,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `samples.js` | Lettore di campioni audio caricati dall'utente (solo Supra). |
 | `car3d.js`, `street3d.js` | Vista 3D. |
 | `street2d.js` | Tutta la grafica 2D in pixel art (classe `Street2D`), sfondi dei luoghi (`drawScenery`, `drawNearSide`), traffico, radar delle corsie. |
+| `effetti2d.js` | Effetti del 2D (si aggancia a `Street2D`, va caricato dopo `street2d.js`): fumo a sbuffi, fiammata dello scarico, scintille, ombre proiettate, fascio dei fari, luci sulla carrozzeria (`fxCar`, `fxParts`, `fxFlame`, `fxShadow`, `fxBeam`, `fxBodyLight`), mattonella dell'asfalto (`roadTile`). |
 | `intro.js` | Sigla in 2D. |
 | `radio.js` | Radio. |
 | `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia, gare. |

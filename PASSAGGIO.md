@@ -37,6 +37,9 @@ gioco fa, sezione per sezione).
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
   limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 5),
   consumo e autonomia, fisica con beccheggio e wheel hop.
+- **Effetti del 2D** (`effetti2d.js`): fumo, fiammate, scintille, ombre proiettate, fari, luci sulla carrozzeria,
+  asfalto. `street2d.js` li chiama da `update()`; per provarli senza guidare si forzano `flame`, `spin`, `brake`
+  nello stato passato a `view2d.update`.
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.

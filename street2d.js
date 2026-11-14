@@ -1759,8 +1759,8 @@ class Street2D {
     if (game && game.s && game.s.vg && this.drawKmPosts) this.drawKmPosts(g, wx, visFrom, visTo);   // cippi del viaggio
     // ---- carreggiata
     g.fillStyle = C.road2; g.fillRect(0, 232, W, 4);
-    const rt = this.roadTile(), ro = ((dist * PPM) % 256 + 256) % 256;
-    for (let x = -ro; x < W; x += 256) g.drawImage(rt, Math.round(x), 236);
+    const rt = this.roadTile(), ro = ((dist * PPM) % rt.width + rt.width) % rt.width;
+    for (let x = -ro; x < W; x += rt.width) g.drawImage(rt, Math.round(x), 236);
     for (let m = Math.ceil(visFrom / 47) * 47; m < visTo; m += 47) { const x = wx(m); g.fillStyle = '#14172a'; g.fillRect(x, 236, 3, 104); g.fillStyle = '#3a3f58'; g.fillRect(x + 3, 236, 1, 104); }
     const urban = bg === 'city' || bg === 'village';
     for (let m = Math.ceil(visFrom / 61) * 61 + 20; urban && m < visTo; m += 61) {                       // tombini fumanti
@@ -1818,7 +1818,8 @@ class Street2D {
     // ---- segni di gomma sull'asfalto (restano dove sono stati lasciati)
     for (const mk of this.marks) {
       const x = wx(mk.m); if (x < -40 || x > W + 40) continue;
-      g.fillStyle = `rgba(6,6,10,${mk.a})`; g.fillRect(x, mk.y, Math.max(1, Math.round(mk.len * PPM) + 1), 2);
+      const mw = Math.max(1, Math.round(mk.len * PPM) + 1);
+      g.fillStyle = `rgba(6,6,10,${mk.a})`; g.fillRect(x, mk.y, mw, 2); g.fillStyle = `rgba(6,6,10,${mk.a * 0.4})`; g.fillRect(x, mk.y - 1, mw, 1); g.fillRect(x, mk.y + 2, mw, 1);
     }
     this.marks = this.marks.filter((mk) => wx(mk.m) > -60).slice(-400);
 
@@ -1887,8 +1888,10 @@ class Street2D {
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
-      this.shadow(g, x, y, w * 0.45, 4);
+      this.fxShadow(g, spr, left, y, (GG.wy + GG.wr) * k + 1, x, lampX);
+      if ((this.day || 0) < 0.6 && this.quality !== 'bassa' && !e.hazard) this.fxBeam(g, left + w - 4, sy + T0 + 36 * k, 110 * k, 16 * k, (0.3 + (this.rainOn ? 0.2 : 0)) * (1 - (this.day || 0)));
       g.drawImage(spr, left, sy);
+      if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
       const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
       for (const ax of GG.ax) {
         const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
@@ -1937,15 +1940,10 @@ class Street2D {
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
     // fascio dei fari nell'aria, di notte e sotto la pioggia
     if (s.ign && (this.day || 0) < 0.6) {
-      const fx = left + SW - 4, fy = y0 - 22 * k, len = s.high ? 260 : 170, a2 = (0.09 + (this.rainOn ? 0.06 : 0)) * (1 - (this.day || 0));
-      g.save(); g.globalCompositeOperation = 'lighter';
-      for (let b = 0; b < 4; b++) {
-        const t2 = (b + 1) / 4; g.fillStyle = `rgba(255,240,200,${a2 * (1 - t2 * 0.6)})`;
-        g.beginPath(); g.moveTo(fx, fy - 2); g.lineTo(fx + len * t2, fy - 6 * t2 - 2); g.lineTo(fx + len * t2, fy + (y0 - fy) * 0.9 * t2 + 4); g.lineTo(fx, fy + 2); g.closePath(); g.fill();
-      }
-      g.restore();
+      const fx = left + SW - 4, fy = y0 - 22 * k;
+      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)));
     }
-    this.shadow(g, carX + entDX, y0, SW * 0.46, 5);
+    this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
     const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
@@ -1960,6 +1958,7 @@ class Street2D {
     const skew = -st.pitch * 0.8;
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;
+    this.fxParts(g, dt, wx, W, 0);                                             // fumo e vapore dietro l'auto
     g.save();
     g.imageSmoothingEnabled = false;
     g.setTransform(1, skew, 0, 1 - squash, left, top - skew * SW / 2 - (spr.img ? k : 0));
@@ -1972,6 +1971,12 @@ class Street2D {
       g.globalAlpha = 0.55 * night * (1 - ph); g.drawImage(this.rimOf(spr, '#4fe6ff'), 0, 0);
       g.globalAlpha = 0.25 * (1 - night * 0.7); g.drawImage(this.rimOf(spr, '#fff6e0'), 0, 0);
       g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+      // lampioni che scorrono sulla lamiera, rosso degli stop, arancio della fiammata
+      const bl = [], nt2 = 1 - (this.day || 0);
+      for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -50 && dx < SW + 50) bl.push({ x: dx, w: 44 * k, a: 0.32 * nt2 }); }
+      if (s.brake > 0.05) bl.push({ x: GE.tail[0] * k, y: (GE.tail[1] + 3) * k, r: 26 * k, col: '255,40,40', a: 0.5 });
+      if (st.flame > 0.05) bl.push({ x: GE.ex[0] * k, y: GE.ex[1] * k, r: 60 * k, col: '255,130,40', a: 0.75 * Math.min(1, st.flame) });
+      this.fxBodyLight(g, spr, bl);
     }
     if (spr.img) g.translate(0, k);
     // pilota (dietro al montante): va indietro in accelerazione, avanti in frenata
@@ -2001,8 +2006,6 @@ class Street2D {
       if (dmg > 0.5) P(C.ink, 188, 46, 10, 6);                                                            // paraurti sfondato
     }
     g.restore();
-    // luce dei lampioni che scorre sulla carrozzeria passando sotto
-    for (const lx of lampX) { const dx = lx + 18 - (left + SW / 2); if (Math.abs(dx) < SW * 0.7) this.light(g, lx + 18, top + 16 * k, 26, 12, '#ffd59a', 0.2 * (1 - Math.abs(dx) / (SW * 0.7)) * (1 - (this.day || 0)), 3); }
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
     if (s.ign) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
@@ -2035,86 +2038,8 @@ class Street2D {
     }
     // ---- effetti
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));
-    if (((s.skid || 0) > 0.18 && Math.abs(s.v) > 0.3) || (s.brake > 0.9 && Math.abs(s.v) > 8)) {
-      const mRear = dist + (left + 1 + 48 * k - carX) / PPM, len = Math.max(0.15, Math.abs(s.v) * dt * 1.05 + 0.05), a = Math.min(0.7, 0.25 + (s.skid || 0.5));
-      this.marks.push({ m: mRear - len, y: y0 - 1, len, a }, { m: mRear - len, y: y0 - 4, len, a: a * 0.6 });
-    }
-    // spruzzi solo passando sulle pozzanghere (un tratto di 5 m ogni 61), non per tutto il viaggio
-    const wet = ((dist % 61) + 61) % 61 < 5;
-    if (wet && Math.abs(s.v) > 12) for (let q = 0; q < 2; q++) if (Math.random() < Math.min(0.8, (Math.abs(s.v) - 12) / 25)) {
-      const wxm = Math.random() < 0.5 ? 48 : 158;
-      this.parts.push({ k: 'spray', m: dist + (left + 1 + wxm * k - 14 * k - carX) / PPM, y: y0 - 2 - Math.random() * 4, vy: -14 - Math.random() * 18, dx: s.v * 0.6 - 4 - Math.random() * 6, r: 1, life: 1 });
-    }
-    if (game) for (const f of game.fx) if (f.k === 'crash') this.sparkT = 0.35;
-    if (this.sparkT > 0) {
-      this.sparkT -= dt;
-      for (let q = 0; q < 5; q++) this.parts.push({ k: 'spark', m: dist + (left + SW - carX) / PPM, y: y0 - 10 - Math.random() * 20, vy: -40 - Math.random() * 60, dx: 6 + Math.random() * 10, r: 1, life: 1 });
-    }
-    if (s.spin > 0.25 && Math.random() < s.spin * 0.9) this.parts.push({ k: 'smoke', m: dist + (left + 48 * k - carX) / PPM, y: y0 - 8, vy: -12 - Math.random() * 16, r: 4, life: 1, dx: -20 });
-    // scoppiettii: ogni scoppio è una fiammata a strati con una palla di fuoco, braci, fumo e un lampo sulla strada
-    st.flame = Math.max(0, st.flame - dt * 8);
-    st.popFlash = Math.max(0, (st.popFlash || 0) - dt * 6);
-    if (s.flame && Math.random() < s.flame * dt * 22) {
-      const big = Math.random() < 0.35 + s.flame * 0.3;
-      st.flame = big ? 1.1 + Math.random() * 0.4 : 0.6 + Math.random() * 0.4; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
-      for (let q = 0; q < (big ? 9 : 4); q++) this.parts.push({ k: 'spark', m: dist + (rx - carX) / PPM, y: exY + (Math.random() - 0.5) * 4, vy: -20 - Math.random() * 50, dx: -30 - Math.random() * 50, r: 1, life: 1 });
-      this.parts.push({ k: 'smoke', m: dist + (rx - 14 - carX) / PPM, y: exY - 2, vy: -8 - Math.random() * 8, r: 3, life: 0.8, dx: -14 });
-    }
-    if (st.flame > 0.05) {
-      // fiammata a tre strati che esce dalla bocca: rosso-arancio fuori, giallo in mezzo, nucleo bianco-azzurro;
-      // tremola, si gonfia a metà e sale un po' verso la coda
-      const fl = Math.min(1.5, st.flame), L = Math.round((16 + fl * 40) * k), H0 = (2.6 + fl * 3.2) * k, seed = Math.floor(st.t * 30);
-      g.save(); g.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < L; i++) {
-        const u = i / L, rise = -u * u * 7 * k;
-        const wob = (Math.sin(i * 0.7 + st.t * 50) * 1.4 + Math.sin(i * 0.31 + st.t * 23) * 0.8) * u * k;
-        const half = H0 * (0.5 + Math.sin(Math.min(1, u * 1.4) * Math.PI) * 0.9) * (1 - u * 0.3) * (0.8 + 0.4 * Street2D.rnd(i + seed));
-        const X = rx - 1 - i, yc = exY + rise + wob;
-        g.fillStyle = `rgba(255,${70 + (1 - u) * 70 | 0},20,${0.85 * (1 - u)})`; g.fillRect(X, Math.round(yc - half), 1, Math.max(1, Math.round(half * 2)));
-        const hm = half * 0.62 * (1 - u * 0.7); if (hm > 0.4) { g.fillStyle = `rgba(255,${200 + (1 - u) * 40 | 0},70,${0.9 * (1 - u * 0.9)})`; g.fillRect(X, Math.round(yc - hm), 1, Math.max(1, Math.round(hm * 2))); }
-        const hc = half * 0.32 * (1 - u * 1.5); if (hc > 0.3) { g.fillStyle = u < 0.15 ? 'rgba(255,255,255,.95)' : 'rgba(170,225,255,.9)'; g.fillRect(X, Math.round(yc - hc), 1, Math.max(1, Math.round(hc * 2))); }
-        // lingue che si staccano dal bordo
-        if (u > 0.45 && Street2D.rnd(i * 3 + seed) < 0.12) { g.fillStyle = 'rgba(255,120,30,.7)'; g.fillRect(X, Math.round(yc - half - 2 * k), 1, Math.max(1, Math.round(2 * k))); }
-      }
-      g.restore();
-      if (fl > 0.9) {                                                                       // palla di fuoco a un terzo
-        const R = Math.round((3 + (fl - 0.9) * 10) * k), fx = rx - L * 0.38, fy = exY - 2 * k;
-        g.fillStyle = '#ff5a1a'; this.span(g, fx, fy, R + 1, R); g.fillStyle = '#ffb000'; this.span(g, fx, fy, R, R - 1); g.fillStyle = '#fff6d0'; this.span(g, fx + 1, fy - 1, R * 0.55, R * 0.5);
-      }
-      if (Math.random() < fl * 0.8) this.parts.push({ k: 'fire', m: dist + (rx - L * (0.3 + Math.random() * 0.5) - carX) / PPM, y: exY - Math.random() * 3 * k, vy: -14 - Math.random() * 18, dx: -30 - Math.random() * 40, r: 1.5 + Math.random() * 2 * k, life: 1 });
-      this.light(g, rx - L / 2, exY, L * 1.1, 14, '#ff9a20', 0.22 * Math.min(1, fl), 3);
-      this.light(g, rx + 10 * k, exY - 6 * k, 18 * k, 8 * k, '#ff7a20', 0.18 * Math.min(1, fl), 3);   // riverbero sul paraurti
-    }
-    // anello d'urto alla bocca negli scoppi grossi; la punta cromata si arroventa
-    st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
-    if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
-    if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
-    if (st.tipHeat > 0.03) { g.fillStyle = `rgba(255,${120 + (1 - st.tipHeat) * 80 | 0},40,${st.tipHeat * 0.8})`; g.fillRect(rx, exY - Math.round(k), Math.max(2, Math.round(5 * k)), Math.max(1, Math.round(2 * k))); }
-    if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, '#ff8a20', 0.25 * st.popFlash, 3);   // lampo sull'asfalto
-    if (s.running && Math.random() < dt * (s.rpm < 1500 ? 2.5 : 0.6)) this.parts.push({ k: 'puff', m: dist + (rx - carX) / PPM, y: exY, vy: -6, r: 2, life: 1, dx: -8 });
-    for (const p of this.parts) {
-      if (p.k === 'spray' || p.k === 'spark') {
-        p.life -= dt * (p.k === 'spray' ? 2.6 : 1.8); p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy += (p.k === 'spark' ? 160 : 90) * dt;
-        const X = wx(p.m), Y = Math.round(p.y);
-        if (p.k === 'spark') { g.fillStyle = p.life > 0.5 ? '#fff2a0' : '#ff8a20'; g.fillRect(X, Y, 2, 1); g.fillStyle = 'rgba(255,140,40,.5)'; g.fillRect(X - 2, Y, 2, 1); }
-        else { g.fillStyle = `rgba(190,215,255,${0.55 * p.life})`; g.fillRect(X, Y, 2, 2); g.fillStyle = `rgba(255,255,255,${0.4 * p.life})`; g.fillRect(X, Y, 1, 1); }
-        continue;
-      }
-      if (p.k === 'fire') {                                                                // pallina di fuoco: gialla, arancio, rossa, poi fumo
-        p.life -= dt * 3.2; p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.r += dt * 7;
-        const X = wx(p.m), L2 = Math.max(0, p.life);
-        if (L2 > 0.35) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = L2 > 0.75 ? 'rgba(255,230,140,.9)' : L2 > 0.55 ? 'rgba(255,150,40,.85)' : 'rgba(220,60,20,.7)'; this.span(g, X, p.y, p.r, p.r); g.restore(); }
-        else { g.fillStyle = `rgba(90,92,104,${L2 * 1.2})`; this.span(g, X, p.y, p.r + 1, p.r + 1); }
-        continue;
-      }
-      p.life -= dt * (p.k === 'smoke' ? 0.8 : p.k === 'steam' ? 0.6 : 1.5);
-      p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.r += dt * (p.k === 'smoke' ? 18 : 6);
-      const r = Math.round(p.r), cx = wx(p.m), a = Math.max(0, p.life) * (p.k === 'steam' ? 0.35 : p.k === 'smoke' ? 0.7 : 0.5);
-      const col = p.k === 'puff' ? '107,112,133' : '217,221,232';
-      g.fillStyle = `rgba(${col},${a})`; this.span(g, cx, p.y, r, r);
-      g.fillStyle = `rgba(255,255,255,${a * 0.4})`; this.span(g, cx - r * 0.3, p.y - r * 0.3, r * 0.5, r * 0.5);
-    }
-    this.parts = this.parts.filter((p) => p.life > 0 && wx(p.m) > -60 && wx(p.m) < W + 60);
+    // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
+    this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
     if (s.v > 16) {
       // linee di velocità affusolate (più fitte e lunghe con la velocità)
       const n = Math.min(30, (s.v - 16) * 1.2), fr = Math.floor(st.t * 24);
@@ -2134,7 +2059,6 @@ class Street2D {
         g.beginPath(); g.moveTo(cxL + Math.cos(a) * R1, cyL + Math.sin(a) * R1 * 0.6); g.lineTo(cxL + Math.cos(a + w2) * r0, cyL + Math.sin(a + w2) * r0 * 0.6); g.lineTo(cxL + Math.cos(a - w2) * r0, cyL + Math.sin(a - w2) * r0 * 0.6); g.closePath(); g.fill();
       }
       g.restore();
-      if (st.launch > 0.6 && Math.random() < 0.5) this.parts.push({ k: 'smoke', m: dist + (left + 40 * k - carX) / PPM, y: y0 - 4, vy: -6 - Math.random() * 10, r: 5, life: 1, dx: -40 - Math.random() * 30 });
     }
 
     for (const e of front) drawEnt(e);
@@ -2283,7 +2207,7 @@ class Street2D {
       if (!this.bl) { this.bl = document.createElement('canvas'); }
       if (this.bl.width !== bw) { this.bl.width = bw; this.bl.height = bh; }
       const b = this.bl.getContext('2d');
-      b.filter = 'brightness(0.6) contrast(3.4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0], src[1], src[2], src[3], 0, 0, bw, bh); b.filter = 'none';
+      b.filter = 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0], src[1], src[2], src[3], 0, 0, bw, bh); b.filter = 'none';
       c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.62 - (this.day || 0) * 0.35;
       c.drawImage(this.bl, 0, 0, this.canvas.width, this.canvas.height); c.restore();
     }

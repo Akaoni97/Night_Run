@@ -213,6 +213,17 @@ ruote; in velocità lo sfondo lascia una scia e arrivano le linee di velocità. 
 magenta/ciano dei neon sull'auto, striscia anamorfica dei fari, scie rosse dei fanali, stelle sui lampioni, bagliore
 più forte e colori con ombre ciano e luci magenta.
 
+**Effetti del 2D (`effetti2d.js`).** Il fumo delle gomme è fatto di sbuffi in pixel art a tre toni che escono
+dalle ruote motrici (davanti sulle trazioni anteriori), restano sulla strada mentre l'auto se ne va e prendono la
+luce di lampioni, stop e fiammate; a ruote bloccate fumano tutti e due gli assi, sotto la pioggia le ruote alzano
+nebbiolina. La fiammata dello scarico è a bande piene (rosso, arancio, giallo, bianco, radice azzurra negli scoppi
+grossi) con le lingue che scorrono verso la punta, palline di fuoco, scintille che rimbalzano sull'asfalto e uno
+sbuffo di fuliggine. Ogni auto ha l'ombra della sua sagoma proiettata dai lampioni (gira e si allunga passandoci
+sotto), dal sole di giorno e dalla luna fuori città. Il fascio dei fari è un cono sfumato a retino; lampioni, stop
+e fiammata illuminano solo la lamiera (luce ritagliata sulla sagoma). L'asfalto ha grana a più toni, tracce delle
+ruote, rattoppi, crepe e macchie d'olio. Con qualità *bassa* ombre proiettate e luci sulla carrozzeria si spengono
+e le particelle si dimezzano.
+
 ## Gomme, rapporti e trazione
 
 - **Gomme a mescola:** ogni gomma ha la sua curva di aderenza (formula di Pacejka) e la sua temperatura ideale.
