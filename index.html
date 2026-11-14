@@ -269,9 +269,9 @@ body.inplace .lanebtn { display: none; }
 .km-perks { display: flex; flex-wrap: wrap; gap: 6px; } .km-perks span { font: 400 12px/1.2 var(--f-data); padding: 4px 8px; color: var(--muted); box-shadow: inset 0 0 0 1px #2a251d; }
 .km-perks span b { font-weight: 400; margin-right: 6px; } .km-perks span.on { color: #141a04; background: var(--lime); box-shadow: none; }
 .kmbox p.hint { margin: 0; } .kmbox p.hint b { font-weight: 400; color: var(--fg); }
-#hudP { position: absolute; right: 12px; bottom: 60px; width: clamp(300px, 35%, 480px); aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
+#hudP { position: absolute; left: 12px; bottom: 74px; width: clamp(270px, 30%, 420px); aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
 body.inplace #hudP { display: none; }
-@media (max-width: 600px) { #hudP { width: min(96vw, 380px); right: 50%; transform: translateX(50%); bottom: auto; top: 4px; } }
+@media (max-width: 600px) { #hudP { width: min(70vw, 300px); left: 6px; bottom: 64px; } }
 #hudG { position: absolute; right: 12px; bottom: 70px; width: clamp(190px, 26%, 320px); aspect-ratio: 160 / 84; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 10px rgba(255,46,136,.25)); }
 .anime-shift { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; opacity: 0; z-index: 4; overflow: hidden; }
 .anime-shift > * { grid-area: 1 / 1; }
@@ -2867,7 +2867,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     readPad(); updateInputs(dt);
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;
-    if (game.blocked) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, 0.18); }
+    if (game.blocked) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, game.blockBrake || 0.18); }
     if (game.mode === 'free') sim.fuel = Math.max(sim.fuel, 0.5);
     sim.update(dt);
     // sterzo da tasti progressivo: un tocco corregge appena, tenendo premuto la sterzata cresce fino al massimo;

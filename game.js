@@ -11,9 +11,10 @@ const GAME_RIVALS = [
 ];
 const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a, 0xb38b2d];
 // traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
+// velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
 const GAME_TRAFFIC = [
-  { vt: 'sedan', len: 4.6, v: [18, 28], w: 30 }, { vt: 'kei', len: 3.4, v: [15, 22], w: 14 }, { vt: 'taxi', len: 4.7, v: [17, 25], w: 10 },
-  { vt: 'van', len: 4.9, v: [16, 24], w: 12 }, { vt: 'truck', len: 8.4, v: [13, 19], w: 8 }, { vt: 'bus', len: 11, v: [11, 16], w: 5 },
+  { vt: 'sedan', len: 4.6, kmh: [110, 135], w: 30 }, { vt: 'kei', len: 3.4, kmh: [100, 120], w: 14 }, { vt: 'taxi', len: 4.7, kmh: [105, 130], w: 10 },
+  { vt: 'van', len: 4.9, kmh: [100, 125], w: 12 }, { vt: 'truck', len: 8.4, kmh: [85, 92], w: 8 }, { vt: 'bus', len: 11, kmh: [90, 100], w: 5 },
 ];
 // luoghi della mappa del mondo: posti veri, ognuno con il suo sfondo 2D e il suo traffico
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
@@ -176,15 +177,39 @@ class StreetGame {
   steerHold(x) { this.steerIn = Math.max(-1, Math.min(1, x || 0)); }
 
   // tamponamento: la Supra rallenta di colpo, l'altra auto viene spinta avanti, si pagano i danni
-  crash(e) {
-    const sim = this.sim, dv = sim.v - e.v, dmg = Math.min(0.45, 0.05 + dv * 0.025);
-    sim.v = Math.max(0, e.v * 0.85); sim.ww = sim.v / sim.P.r; sim.wo = sim.ww; sim.phi = 0;
+  // urto con un altro veicolo: quantità di moto divisa secondo le masse, danni secondo la differenza di velocità
+  crash(e, kind = 'front') {
+    const sim = this.sim, m1 = sim.P.mass, m2 = e.vt === 'truck' || e.vt === 'bus' ? 11000 : e.vt === 'kei' ? 850 : 1400;
+    const dv = Math.abs(sim.v - e.v), I = Math.min(1.5, dv / 10);
+    e.hitT = 1.2;
+    if (kind === 'side') {
+      // strisciata: si torna nella corsia da cui si veniva, un po' di velocità persa da entrambi
+      const back = this.prevLaneSafe || (this.lane === 1 ? 2 : this.lane - 1);
+      this.lane = this.laneZ > (e._gz ?? GAME_LANE_Z[e.lane]) ? Math.max(1, Math.min(3, (e.lane || 2) - 1)) : Math.max(1, Math.min(3, (e.lane || 2) + 1));
+      if (this.lane === e.lane) this.lane = back;
+      sim.v *= 0.94; e.v *= 0.97; this.manualT = 1.2; this.free = false;
+      sim.damage = Math.min(1, sim.damage + 0.04 + dv * 0.004);
+      sim.events.push({ type: 'crash', I: 0.5 }); this.fx.push({ k: 'scrape', I: 0.5 });
+      this.say(`Strisciata contro ${e.vt === 'truck' ? 'il camion' : e.vt === 'bus' ? 'l\'autobus' : 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
+      this.s.crashes = (this.s.crashes || 0) + 1; return;
+    }
+    // urto quasi anelastico (restituzione 0,2)
+    const vc = (m1 * sim.v + m2 * e.v) / (m1 + m2), r = 0.2;
+    const v1 = vc - r * m2 * (sim.v - e.v) / (m1 + m2), v2 = vc + r * m1 * (sim.v - e.v) / (m1 + m2);
+    sim.v = Math.max(0, v1); sim.ww = sim.v / sim.P.r; sim.wo = sim.ww; sim.phi = 0;
     if (sim.gear > 0 && sim.lock) sim.we = Math.max(sim.we * 0.6, sim.wo * sim.ratio(sim.gear));
-    e.v += Math.min(6, dv * 0.4); e.x = this.s.dist + 5.2;
-    sim.damage = Math.min(1, sim.damage + dmg); this.s.crashes = (this.s.crashes || 0) + 1;
-    sim.events.push({ type: 'crash', I: Math.min(1.5, dv / 10) });
-    this.fx.push({ k: 'crash', I: Math.min(1.5, dv / 10) });
-    this.say(`Tamponamento a ${Math.round(dv * 3.6)} km/h di differenza: carrozzeria al ${Math.round(sim.damage * 100)} % di danni`, 'police');
+    e.v = Math.max(0, v2);
+    const half = ((e.len || 4.6) + 4.4) / 2 + 0.25;
+    e.x = this.s.dist + (kind === 'front' ? half : -half);                 // si separano: niente urti ripetuti
+    // un colpetto a pochi km/h (spingere chi sta davanti) lascia appena un graffio; un tamponamento vero fa male
+    const soft = dv < 2.5;
+    const dmg = soft ? 0.004 + dv * 0.004 : Math.min(0.45, (kind === 'front' ? 0.05 : 0.03) + dv * (kind === 'front' ? 0.022 : 0.012) * Math.min(2, m2 / 1400));
+    sim.damage = Math.min(1, sim.damage + dmg);
+    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I });
+    if (soft) return;
+    this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I });
+    this.say(kind === 'rear' ? `Ti hanno tamponato a ${Math.round(dv * 3.6)} km/h di differenza: danni al ${Math.round(sim.damage * 100)} %`
+      : `Tamponamento a ${Math.round(dv * 3.6)} km/h di differenza: carrozzeria al ${Math.round(sim.damage * 100)} % di danni`, 'police');
   }
 
   // ------------------------------------------------------------ luoghi (benzinaio, officina, estetica)
@@ -453,7 +478,9 @@ class StreetGame {
     lane = lane || (heavy ? (r() < 0.8 ? 1 : 2) : r() < 0.5 ? 1 : r() < 0.6 ? 2 : 3);
     if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 14 + (o.len || 4.6))) return null;
     const cols = T.vt === 'taxi' ? [0xf0b020, 0x2f6d3a, 0xe8e6df] : T.vt === 'bus' ? [0x2f8d5a, 0x2b5cae, 0xc8c2b0] : T.vt === 'truck' ? [0xe8e6df, 0x3a5a9a, 0xb03020] : GAME_COLORS;
-    const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v: T.v[0] + r() * (T.v[1] - T.v[0]), color: cols[Math.floor(r() * cols.length)] };
+    const hw = !!(this.s && this.s.vg) || (this.loc && this.loc.bg === 'highway'), kv = hw ? 1 : 0.5;
+    const v = (T.kmh[0] + r() * (T.kmh[1] - T.kmh[0])) * kv / 3.6;
+    const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: cols[Math.floor(r() * cols.length)] };
     this.ents.push(e); return e;
   }
 
@@ -624,7 +651,11 @@ class StreetGame {
     // traffico continuo (città e luoghi della mappa): densità secondo il luogo
     if (this.track === 'city' && !this.race && !this.ap && !this.inside && this.trafficOn !== false && d > (this.nextTraffic || 0)) {
       const dens = (this.loc && this.loc.traffic) || 1;
-      if (this.ents.filter((e) => e.kind === 'traffic' && e.x - d > -60 && e.x - d < 700).length < 3 + dens * 5) this.spawnTraffic(d + 240 + this.rnd() * 260);
+      if (this.ents.filter((e) => e.kind === 'traffic' && e.x - d > -60 && e.x - d < 700).length < 3 + dens * 5) {
+        // se andiamo più piano del traffico qualcuno arriva da dietro e ci sorpassa
+        if (sim.v < 29 && this.rnd() < 0.45) { const e = this.spawnTraffic(d - 140 - this.rnd() * 80, this.rnd() < 0.6 ? 2 : 3); if (e && e.v < sim.v + 3) e.v = e.vT = e.vBase = sim.v + 4 + this.rnd() * 6; }
+        else this.spawnTraffic(d + 240 + this.rnd() * 260);
+      }
       this.nextTraffic = d + (40 + this.rnd() * 90) / dens;
     }
     if (this.mode === 'career' && sim.running && !this.race && !this.ap && d > this.nextSpawn) {
@@ -647,12 +678,22 @@ class StreetGame {
       // traffico vivo: ogni tanto cambia corsia (con la freccia prima), e suona se gli stai attaccato
       if (e.kind === 'traffic') {
         // coda: chi raggiunge un veicolo più lento nella sua corsia rallenta e prima o poi mette la freccia
-        const lead = this.ents.find((o) => o !== e && o.kind === 'traffic' && o.lane === e.lane && o.x > e.x && o.x - e.x < 9 + ((o.len || 4.6) + (e.len || 4.6)) / 2);
-        if (lead && e.v > lead.v) { e.v0 = e.v0 || e.v; e.v = lead.v; } else if (e.v0 && !lead) { e.v += (e.v0 - e.v) * Math.min(1, dt * 0.4); if (Math.abs(e.v - e.v0) < 0.2) e.v0 = 0; }
-        if (e.sig > 0) { e.sig -= dt; if (e.sig <= 0 && e.to) { e.lane = e.to; e.to = 0; } }
-        else if ((rel > 30 || rel < -15) && Math.random() < dt * (lead ? 0.4 : 0.05)) {
+        // ogni guidatore cambia un po' andatura nel tempo; accelera e frena con dei limiti, non a scatti
+        e.driftT = (e.driftT || 0) - dt;
+        if (e.driftT <= 0 && e.vBase) { e.driftT = 6 + Math.random() * 10; e.vT = e.vBase * (0.93 + Math.random() * 0.12); }
+        const gapNeed = 10 + e.v * 0.9;
+        const lead = this.ents.find((o) => o !== e && o.kind === 'traffic' && o.lane === e.lane && o.x > e.x && o.x - e.x < gapNeed + ((o.len || 4.6) + (e.len || 4.6)) / 2);
+        // anche il giocatore conta: chi ci arriva dietro nella stessa corsia rallenta (e prima o poi cambia corsia)
+        const meAhead = Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && d > e.x && d - e.x < gapNeed + ((e.len || 4.6) + 4.5) / 2;
+        let want = e.vT || e.v;
+        if (lead) want = Math.min(want, lead.v - (lead.x - e.x < 8 + ((lead.len || 4.6) + (e.len || 4.6)) / 2 ? 1.5 : 0));
+        if (meAhead) want = Math.min(want, Math.max(0, sim.v - 0.5));
+        e.v += Math.max(-4 * dt, Math.min(1.4 * dt, want - e.v));
+        if (e.sig > 0) { e.sig -= dt; if (e.sig <= 0 && e.to) { if (!(Math.abs(this.laneZ - GAME_LANE_Z[e.to]) < 1.7 && Math.abs(d - e.x) < 14 + Math.abs(sim.v - e.v) * 2)) e.lane = e.to; e.to = 0; } }
+        else if ((rel > 30 || rel < -15) && Math.random() < dt * (lead || meAhead ? 0.5 : 0.05)) {
           const to = e.lane + (e.lane === 1 ? 1 : e.lane === 3 ? -1 : Math.random() < 0.5 ? 1 : -1);
-          if (!this.ents.some((o) => o !== e && o.kind === 'traffic' && (o.lane === to || o.to === to) && Math.abs(o.x - e.x) < 14)) { e.to = to; e.sig = 1.6; }
+          if (!this.ents.some((o) => o !== e && o.kind === 'traffic' && (o.lane === to || o.to === to) && Math.abs(o.x - e.x) < 14 + Math.abs(o.v - e.v) * 2)
+            && !(Math.abs(this.laneZ - GAME_LANE_Z[to]) < 1.7 && Math.abs(d - e.x) < 22 + Math.abs(sim.v - e.v) * 2.5)) { e.to = to; e.sig = 1.6; }   // non ci taglia la strada
         }
         // passaggio accanto: suono con effetto doppler
         if (e.prevRel !== undefined && Math.sign(e.prevRel) !== Math.sign(rel) && Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 5 && Math.abs(sim.v - (e.v || 0)) > 4)
@@ -689,24 +730,43 @@ class StreetGame {
     if (this.job) this.job.t += dt;
     this.ents = this.ents.filter((e) => !e.done && (e.chase || e.kind === 'drop' || (e.x - d > -220 && e.x - d < 1500)));
 
-    // sorpasso automatico: resta a destra, sposta a sinistra solo se c'è qualcuno più lento davanti
-    const ahead = (lane, from, to) => this.ents.some((e) => (e.kind === 'traffic' || (e.kind === 'police' && e.v > 0)) && e.lane === lane && e.x - d > from && e.x - d < to);
+    // sorpasso automatico: resta a destra; se davanti c'è qualcuno più lento guarda la corsia accanto (prima a sinistra,
+    // poi a destra) tenendo conto delle velocità: davanti deve esserci spazio per sorpassare, dietro nessuno che arriva forte
+    const moving = (e) => e.kind === 'traffic' || (e.kind === 'police' && e.v > 0 && !e.chase);
+    const laneFree = (lane, back, front) => !this.ents.some((e) => moving(e) && (e.lane === lane || e.to === lane) && (() => {
+      const rel = e.x - d, half = ((e.len || 4.6) + 4.5) / 2, dv = sim.v - e.v;
+      // davanti: spazio che serve per non raggiungerlo durante il cambio; dietro: chi è più veloce ci arriverebbe addosso
+      return rel > -half - back - Math.max(0, -dv) * 2.2 && rel < half + front + Math.max(0, dv) * 1.6;
+    })());
     this.laneT = Math.max(0, this.laneT - dt);
     this.manualT = Math.max(0, this.manualT - dt);
     this.blocked = false;
     if (!this.race && !this.ap && this.autoLane && this.manualT === 0) {
-      const look = 18 + sim.v * 1.6, L = this.lane;
-      const slower = this.ents.some((e) => e.kind === 'traffic' && e.lane === L && e.x - d > -5 && e.x - d < look && e.v < sim.v - 0.3);
-      if (slower && L < 3 && !ahead(L + 1, -10, 25)) { this.lane = L + 1; this.laneT = 1.2; }
-      else if (!slower && L > 1 && this.laneT === 0 && !ahead(L - 1, -14, 22 + sim.v * 0.8)) this.lane = L - 1;
-      // nessuno spazio: rallenta dietro (frenata dolce)
-      this.blocked = slower && (L === 3 || ahead(L + 1, -10, 25)) && this.ents.some((e) => e.kind === 'traffic' && e.lane === L && e.x - d > 0 && e.x - d < 14 + sim.v * 0.6);
+      const look = 22 + sim.v * 2.4, L = this.lane;
+      const lead = this.ents.filter((e) => moving(e) && e.lane === L && e.x - d > -2 && e.x - d < look && e.v < sim.v - 0.2).sort((a, b) => a.x - b.x)[0];
+      if (lead && this.laneT === 0) {
+        if (L < 3 && laneFree(L + 1, 6, 10)) { this.lane = L + 1; this.laneT = 1.4; }
+        else if (L > 1 && laneFree(L - 1, 6, 10)) { this.lane = L - 1; this.laneT = 1.4; }
+      } else if (!lead && L > 1 && this.laneT === 0 && laneFree(L - 1, 10, 25 + sim.v * 1.2)) { this.lane = L - 1; this.laneT = 2.2; }
+      // nessuno spazio: si accoda dietro a chi è più lento (frenata dolce, più decisa se si è vicini)
+      this.blockBrake = 0;
+      if (lead && this.lane === L) {
+        const gap = lead.x - d - ((lead.len || 4.6) + 4.5) / 2, dv = sim.v - lead.v;
+        this.blocked = gap < 10 + dv * 2.2 + sim.v * 0.5;
+        // frenata che serve per non arrivargli addosso (più forte quanto più si è vicini e veloci)
+        if (this.blocked) this.blockBrake = Math.min(1, 0.12 + Math.max(0, dv) * Math.max(0, dv) / (2 * Math.max(1.5, gap - 4)) / 9 + (gap < 6 ? 0.3 : 0));
+      }
     }
-    // tamponamenti: stessa corsia, muso contro coda
+    // contatti: tamponi (muso contro coda), vieni tamponato (coda contro muso), strisciate di fianco in cambio corsia
     if (!this.race) for (const e of this.ents) {
-      if (!(e.kind === 'traffic' || (e.kind === 'police' && e.v > 0 && !e.chase))) continue;
-      const rel = e.x - d;
-      if (rel > 0.5 && rel < 2.3 + (e.len || 4.4) / 2 && Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && sim.v > e.v + 1) this.crash(e);
+      if (!moving(e)) continue;
+      if ((e.hitT || 0) > 0) { e.hitT -= dt; continue; }
+      const rel = e.x - d, half = ((e.len || 4.6) + 4.4) / 2, dz = Math.abs(this.laneZ - (e._gz ?? GAME_LANE_Z[e.lane]));
+      if (Math.abs(rel) > half) continue;
+      if (dz < 1.6) {
+        if (rel > 0 && sim.v > e.v + 0.5) this.crash(e, 'front');
+        else if (rel <= 0 && e.v > sim.v + 0.5) this.crash(e, 'rear');
+      } else if (dz < 2.6 && Math.abs(rel) < half - 0.6) this.crash(e, 'side');
     }
     // frecce: lampeggiano qualche secondo quando cambia la corsia scelta
     if (this.prevLane !== undefined && this.lane !== this.prevLane) this.signal = { dir: this.lane > this.prevLane ? 'L' : 'R', t: 2.6 };
@@ -792,7 +852,8 @@ class StreetGame {
     } else {
       this.latV = 0;
       const zT = GAME_LANE_Z[this.lane];
-      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 1.6 + Math.min(1.2, sim.v * 0.03) : 0.6));
+      // cambio corsia deciso: ~0,7 s a velocità d'autostrada, più morbido da fermi
+      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));
     }
 
     this.updateRace(dt, d0);

@@ -1627,7 +1627,7 @@ class Street2D {
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
     // in accelerazione resta un attimo indietro, in frenata va avanti
-    const camT = 0.38 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
+    const camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
     const PPM = 30, carX = Math.round(W * st.cam), K0 = 0.78;
     const kq = (y) => Math.round(K0 * this.laneS(y) / 0.04) * 0.04;   // scala quantizzata: pochi sprite in cache
@@ -1811,7 +1811,10 @@ class Street2D {
       e._z = e._z === undefined ? GAME_LANE_Z[e.lane] : e._z + (GAME_LANE_Z[e.lane] - e._z) * Math.min(1, dt * 1.8);   // cambio corsia morbido
       return e._z;
     };
-    items.sort((a, b) => zOf(a) - zOf(b));
+    // profondità = altezza sullo schermo: chi sta più in alto (più lontano) si disegna prima
+    const yOf = (e) => this.laneY(zOf(e));
+    for (const e of items) e._y = yOf(e);
+    items.sort((a, b) => a._y - b._y);
     const front = [];
     const drawEnt = (e) => {
       const x = wx(e.x);
@@ -1840,7 +1843,7 @@ class Street2D {
         }
         return;
       }
-      const y = this.laneY(zOf(e)), k = kq(y), spr = this.otherSprite(e.kind, e.color, k, e.vt), sc = k;
+      const y = e._y ?? this.laneY(zOf(e)), k = kq(y), spr = this.otherSprite(e.kind, e.color, k, e.vt), sc = k;
       const w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - 57 * k - 1) - Math.round((spr.geo.top || 0) * k);
       const T0 = Math.round((spr.geo.top || 0) * k);
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
@@ -1866,7 +1869,8 @@ class Street2D {
       }
     };
     const myZ = st.lz;
-    for (const e of items) if (zOf(e) > myZ + 0.01) drawEnt(e); else front.push(e);
+    const myY = this.laneY(myZ);
+    for (const e of items) if (e._y < myY - 0.01) drawEnt(e); else front.push(e);   // dietro di noi chi è più lontano, davanti chi è più vicino
 
     // ---- la Supra
     const IN = game && game.inside;
@@ -2107,7 +2111,7 @@ class Street2D {
       if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
       if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
     }
-    if (game) for (const f of game.fx) if (f.k === 'crash') this.comic('CRASH!', left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f');
+    if (game) for (const f of game.fx) { if (f.k === 'crash') this.comic('CRASH!', left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); else if (f.k === 'scrape') this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); }
     if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
     if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
     if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
