@@ -52,9 +52,11 @@ Object.assign(INV, {
   scatola: { name: 'Scatola da consegnare', kg: 20, price: 0, note: 'Va lasciata al locale scritto sull\'etichetta.' },
   bancale: { name: 'Bancale', kg: 1000, price: 0, note: 'Merce su bancale per il camion.' },
   foto: { name: 'Vecchia fotografia', kg: 0.05, price: 0, note: 'La tua auto davanti a un Motel Ovunque. Sul retro una data di trent\'anni fa.' },
+  bomboletta: { name: 'Bomboletta gonfia e ripara', kg: 0.5, price: 18, note: 'Rigonfia la gomma bucata a 1,9 bar e tappa quasi tutto il buco. Arrivi al prossimo gommista.' },
+  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Niko te la ripara e torna a essere la ruota di scorta.' },
   valigia: { name: 'Valigia della signora', kg: 12, price: 0, note: 'Chiusa. Non è tua. «Me la riporti quando torni indietro.»' },
 });
-const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette'];
+const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette', 'bomboletta', 'scorta'];
 
 // ---------------------------------------------------------------- mezzi: posti, carico, prezzi (concessionaria del Motel Ovunque)
 const VG_SEATS = { v40: 4, supra: 1, r5: 1, b2002: 3, e30: 3, e36: 3, e34: 4, van: 2, truck: 1, bus: 40 };
@@ -62,11 +64,6 @@ const VG_CARGO = { van: { kg: 900, slots: 24 }, truck: { kg: 9000, slots: 18 }, 
 const VG_TRAILER = { kg: 300, slots: 10, mass: 320 };
 const VG_SHOP = [
   { id: 'trailer', name: 'Gancio e rimorchietto', price: 1600, km: 20, note: 'Dieci posti e 300 kg in più per le scatole. Più peso, frenate lunghe e sopra i 110 km/h il rimorchio comincia a sbandare.' },
-  { id: 'van', name: 'Furgone 2.5 turbodiesel', price: 9500, km: 70, note: 'Cassone da 900 kg: consegne vere. Due posti davanti.' },
-  { id: 'licC', name: 'Patente C (camion)', price: 2200, km: 180, note: 'Serve per guidare il camion.' },
-  { id: 'truck', name: 'Camion 12 t', price: 38000, km: 200, need: 'licC', note: 'Bancali da una tonnellata, paghe da adulti. Lento, pesante, dodici marce.' },
-  { id: 'licD', name: 'Patente D (autobus)', price: 3000, km: 350, note: 'Serve per l\'autobus di linea.' },
-  { id: 'bus', name: 'Autobus di linea', price: 52000, km: 380, need: 'licD', note: 'Quaranta posti: fermate, biglietti, e passeggeri che ti guardano guidare.' },
   { id: 'b2002', name: 'BMW 2002 Turbo (usata)', price: 16000, km: 60, car: true, note: 'Turbo anni \'70 e un ritardo leggendario.' },
   { id: 'e30', name: 'BMW M3 E30 (usata)', price: 24000, km: 120, car: true, note: 'Quattro farfalle e un cambio dogleg.' },
   { id: 'e36', name: 'BMW M3 E36 (usata)', price: 21000, km: 120, car: true, note: 'Sei in linea che urla.' },
@@ -225,6 +222,13 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   const ui = P.useItem;
   P.useItem = function (i) {
     const it = this.s.trunk[i], d = it && INV[it.kind];
+    if (it && it.kind === 'bomboletta') {
+      const T = this.tyres(), k = T.p.indexOf(Math.min(...T.p));
+      if (T.p[k] > 1.9 && !T.leak[k]) return { ok: false, why: 'Nessuna gomma da gonfiare' };
+      if (Math.abs(this.sim.v) > 0.5) return { ok: false, why: 'Fermati prima' };
+      T.p[k] = Math.max(T.p[k], 1.9); T.leak[k] *= 0.08; this.s.trunk.splice(i, 1); this.applyMass();
+      this.say('Schiuma nella gomma: tiene, fino al prossimo gommista', 'buy'); return { ok: true };
+    }
     if (it && d && (d.food || d.water || d.sleep || d.wash)) {
       const v = this.s.vg; if (!v) return { ok: false, why: 'Lo tieni per il viaggio' };
       if (d.wash && Math.abs(this.sim.v) > 0.5) return { ok: false, why: 'Le salviette si usano da fermi' };
@@ -263,7 +267,67 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     sp.call(this);
   };
   const up = P.update;
-  P.update = function (dt) { up.call(this, dt); if (vgOn(this)) this.vgUpdate(dt); };
+  P.update = function (dt) { const d0 = this.s.dist; up.call(this, dt); this.tyreUpdate(dt, Math.abs(this.s.dist - d0) / 1000); if (vgOn(this)) this.vgUpdate(dt); };
+
+  // ------------------------------------------------------------ gomme (pressione, forature) e consumo medio: in tutte le modalità
+  const TYRE_P = 2.3, TYRE_NAMES = ['anteriore sinistra', 'anteriore destra', 'posteriore sinistra', 'posteriore destra'];
+  P.tyres = function () {
+    const t = this.s.tyres;
+    if (!t || !Array.isArray(t.p)) this.s.tyres = { p: [TYRE_P, TYRE_P, TYRE_P, TYRE_P], leak: [0, 0, 0, 0] };
+    return this.s.tyres;
+  };
+  P.tyreUpdate = function (dt, dkm) {
+    const T = this.tyres(), sim = this.sim;
+    for (let i = 0; i < 4; i++) if (T.leak[i] > 0) T.p[i] = Math.max(0.1, T.p[i] - T.leak[i] * dt * (Math.abs(sim.v) > 1 ? 1 : 0.4));
+    // forature: solo nel viaggio, rare, più probabili con le gomme consumate e dopo le botte
+    if (vgOn(this) && dkm > 0 && Math.random() < dkm / 260 * (1 + 2 * (sim.tireWear || 0))) {
+      const i = Math.floor(Math.random() * 4); if (!T.leak[i]) {
+        const fast = Math.random() < 0.3; T.leak[i] = fast ? 0.22 : 0.01 + Math.random() * 0.02;
+        this.say(fast ? `Foratura! Gomma ${TYRE_NAMES[i]} a terra: fermati e cambiala (5)` : `La gomma ${TYRE_NAMES[i]} perde pressione piano piano`, 'bad');
+      }
+    }
+    // effetto sulla guida: meno aderenza e più attrito di rotolamento; a terra in velocità si rovina il cerchio
+    const f = (q) => Math.max(0.3, Math.min(1, (q - 0.3) / 1.6));
+    const drive = sim.P.fwd ? [0, 1] : [2, 3];
+    sim.tyreK = Math.pow(Math.min(f(T.p[drive[0]]), f(T.p[drive[1]])), 0.7) * Math.pow(Math.min(...T.p.map(f)), 0.25);
+    sim.crrK = 1 + T.p.reduce((a, q) => a + Math.max(0, 2.1 - q), 0) * 0.6;
+    if (Math.min(...T.p) < 0.5 && Math.abs(sim.v) > 14) { sim.damage = Math.min(1, sim.damage + dt * 0.004); if (!this.rimWarn) { this.rimWarn = true; this.say('Stai correndo sul cerchione: fermati!', 'bad'); } } else this.rimWarn = false;
+    // consumo medio sugli ultimi ~60 km
+    const c = this.s.cons || (this.s.cons = { l: 0, km: 0 });
+    c.l += (sim.fuelRate || 0) * dt; c.km += dkm;
+    if (c.km > 60) { c.l *= 60 / c.km; c.km = 60; }
+  };
+  P.consumption = function () {
+    const c = this.s.cons || { l: 0, km: 0 }, tank = this.sim.fuel * this.sim.P.tank;
+    if (c.km < 0.3) return { per100: null, range: null };
+    const per100 = c.l / c.km * 100;
+    return { per100, range: per100 > 0.1 ? tank / per100 * 100 : null };
+  };
+  // cambio gomma con la ruota di scorta (da fermi, ci vuole un po')
+  P.changeTyre = function () {
+    const T = this.tyres(), sim = this.sim, i = T.p.indexOf(Math.min(...T.p));
+    if (T.p[i] > 1.9 && !T.leak[i]) return { ok: false, why: 'Le gomme sono a posto' };
+    if (Math.abs(sim.v) > 0.5) return { ok: false, why: 'Fermati per cambiare la gomma' };
+    const si = this.s.trunk.findIndex((it) => it.kind === 'scorta');
+    if (si < 0) return { ok: false, why: 'Non hai la ruota di scorta: bomboletta, soccorso, o la compri al benzinaio' };
+    if (this.ap) return { ok: false, why: 'Aspetta' };
+    this.s.trunk.splice(si, 1); this.say('Crick, bulloni, ruota di scorta…', 'buy');
+    this.stopAt(null, () => {});
+    const ap = this.ap; ap.tick = () => {
+      if (ap.t > 14 && this.ap === ap) {
+        T.p[i] = TYRE_P; T.leak[i] = 0; this.ap = null;
+        if (!this.addItem('forata')) this.say('La gomma forata non ci sta nel bagagliaio: la lasci sul ciglio della strada');
+        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Niko.`, 'buy');
+      }
+    };
+    return { ok: true };
+  };
+  P.inflate = function () { const T = this.tyres(); for (let i = 0; i < 4; i++) if (T.leak[i] < 0.05) T.p[i] = TYRE_P; return { ok: true }; };
+  P.repairTyre = function () {
+    const i = this.s.trunk.findIndex((it) => it.kind === 'forata'); if (i < 0) return { ok: false, why: 'Non hai gomme forate da riparare' };
+    if (this.s.money < 25) return { ok: false, why: 'Costa € 25' };
+    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Niko ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
+  };
 
   // ------------------------------------------------------------ ciclo del viaggio
   P.vgUpdate = function (dt) {

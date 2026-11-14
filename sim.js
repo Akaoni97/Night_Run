@@ -72,7 +72,7 @@ class SupraSim {
     const ty = this.tune.tyre || {}, d = (this.tireT - (ty.opt || 90)) / (ty.win || 65);
     const cooked = this.tireT > 110 ? (this.tireT - 110) * 0.004 : 0;
     // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1)
-    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * (this.wet || 0));
+    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * (this.wet || 0)) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
   }
   get rpm() { return Math.max(0, this.we) * 9.5493; }
   get kmh() { return Math.abs(this.v) * 3.6; }
@@ -377,7 +377,7 @@ class SupraSim {
     if (pads < 0.1 && I.brake > 0.3 && Math.abs(this.v) > 3 && Math.random() < h * 3) this.events.push({ type: 'grind' });   // ferro su ferro
     this.abs = Fb > gripAll * 0.97 && Math.abs(this.v) > 1.5;
     if (this.abs) { this.absPh = ((this.absPh || 0) + h * 14) % 1; Fb = gripAll * (this.absPh < 0.7 ? 0.97 : 0.8); }
-    const Froll = P.crr * (1 + Math.abs(this.v) / 120) * P.mass * 9.81;
+    const Froll = P.crr * (1 + Math.abs(this.v) / 120) * P.mass * 9.81 * (this.crrK ?? 1);
     if (Math.abs(this.v) < 0.03) {
       const Fs = Fb + Froll;
       if (Math.abs(Ft) <= Fs) this.v = 0;

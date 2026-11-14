@@ -363,15 +363,26 @@ con salvataggio e pezzi separati.
   **4** salviette (dal bagagliaio). Al bar caffè, cornetto, panino; all'autogrill pasti e docce.
 - **Motel Ovunque.** Stanza 7, sempre. Dormire (salva il viaggio), doccia, cena. **La cassa**: quello che ci lasci
   lo ritrovi al prossimo Motel Ovunque, è il vanto della catena. Nel parcheggio si cambia mezzo e c'è la
-  concessionaria: rimorchietto, furgone, patenti, camion, autobus e le auto sportive usate.
+  concessionaria: rimorchietto e le auto sportive usate (furgone, camion e autobus arriveranno coi disegni del giocatore).
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
-  col furgone, bancali col camion; con l'autobus le linee notturne con passeggeri a ogni fermata.
-  Furgone, camion (12 marce, limitato a 90) e autobus si guidano davvero, con fisica e suono diesel
-  (`viaggio.js`, disegni `img/van|truck|bus*.png` ricavati da quelli del traffico).
+  col rimorchio. La logica per furgone, camion e autobus (carichi, linee, fisica e suono diesel, limitatore di
+  velocità) è pronta in `viaggio.js`, `sim.js` e `dsp.js`: si attiva quando arrivano i disegni dei mezzi.
 - **La storia e quello che non torna.** Capitoli ai chilometri (0, 1, 10, 25, 50, 100, 200, 350, 500, 750, 1000)
   e una ventina di eventi rari che diventano più frequenti coi km e col sonno: il benzinaio che non ha mai visto
   un'autocisterna, il barista che sa «il solito», la cassa arrivata prima di te, cartelli scritti a mano,
   uscite murate, cippi sbagliati, la radio che legge la tua targa, autostoppisti che scompaiono o tornano.
   Testi e soglie sono in `VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` (facili da cambiare).
+
+**Modalità.** *Il Viaggio* è la modalità principale; *Sfide in città*, *Città libera* e *Montagna* sono le
+modalità libere.
+
+**Cruscotto in gioco (J).** In alta definizione, nello stile del quadro di ogni auto: tachimetro con la benzina,
+contagiri con la temperatura dell'acqua, display con km dell'auto, km del viaggio, autonomia e consumo medio
+(sugli ultimi 60 km), pressione delle quattro gomme, cinque luci della cambiata e fino a quattro strumenti tuning
+a scelta nelle impostazioni (turbo se c'è, olio, acqua, pressione olio, volt, AFR). `hudpro.js`.
+
+**Gomme.** Nel viaggio ogni tanto si fora (più facile con le gomme consumate): la pressione cala piano o di colpo,
+l'auto tiene meno e frena di più; sul cerchione si rovina. Si cambia con la ruota di scorta (tasto **5**, da
+fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Niko si ripara la forata.
 

@@ -1482,7 +1482,7 @@ class Street2D {
   drawLaneRadar(g, game, dist, t) {
     const W = this.LW, w = 116, h = 44, x0 = W - w - 8, y0 = 60, from = -40, to = 160;
     const mx = (m) => Math.round(x0 + 4 + (m - from) / (to - from) * (w - 8));
-    const ly = (z) => Math.round(y0 + 9 + (3.5 - Math.max(-3.5, Math.min(3.5, z))) / 7 * 22);   // corsia 3 in alto, 1 in basso
+    const ly = (z) => Math.round(y0 + 9 + (Math.max(-3.5, Math.min(3.5, z)) + 3.5) / 7 * 22);   // come sullo schermo: la corsia 1 (la più vicina) in basso, la 3 in alto
     g.fillStyle = 'rgba(8,9,16,.72)'; g.fillRect(x0, y0, w, h); g.fillStyle = '#3a3f58'; g.fillRect(x0, y0, w, 1); g.fillRect(x0, y0 + h - 1, w, 1);
     g.fillStyle = '#1a1d2c'; g.fillRect(x0 + 3, y0 + 4, w - 6, 32);
     g.fillStyle = '#cfcab9'; g.fillRect(x0 + 3, y0 + 4, w - 6, 1); g.fillRect(x0 + 3, y0 + 35, w - 6, 1);
@@ -1644,8 +1644,11 @@ class Street2D {
     // e dalla rigidità dell'assetto montato; in partenza la coda si siede e il muso si alza
     const susp = (this.carLook && this.carLook.susp) || 1, kP = 300 / (0.55 + 0.45 * susp), cP = 2 * 0.92 * Math.sqrt(kP);
     const tgtP = Math.max(-0.1, Math.min(0.1, (s.pz ?? s.acc ?? 0) * 0.0105 * susp)) + (bF - bR) * 0.0035;
-    st.pv += ((tgtP - st.pitch) * kP - st.pv * cP) * dt; st.pitch += st.pv * dt;
-    st.hv += (((bF + bR) / 2 * 0.7 - st.heave) * 340 - st.hv * 2 * 0.9 * Math.sqrt(340)) * dt; st.heave += st.hv * dt;
+    // molle della cassa a passi piccoli: stabili anche quando un fotogramma dura tanto (telefoni lenti)
+    for (let n = Math.max(1, Math.ceil(dt / 0.008)), q = 0, h = dt / n; q < n; q++) {
+      st.pv += ((tgtP - st.pitch) * kP - st.pv * cP) * h; st.pitch += st.pv * h;
+      st.hv += (((bF + bR) / 2 * 0.7 - st.heave) * 340 - st.hv * 2 * 0.9 * Math.sqrt(340)) * h; st.heave += st.hv * h;
+    }
     // partenza e velocità: lancio (spinta forte da quasi fermi), zoom della ripresa
     const launching = (s.acc || 0) > 3.2 && Math.abs(s.v) < 30 && s.thr > 0.5;
     st.launch = launching ? Math.min(1, (st.launch || 0) + dt * 5) : Math.max(0, (st.launch || 0) - dt * 1.4);
@@ -1655,7 +1658,7 @@ class Street2D {
       this.fxZoom = st.fz;
       if (this.carPos) { const fT = { x: this.carPos.x + 40 + spk * 30, y: this.carPos.y - 30 }; this.fxFocus = this.fxFocus ? { x: this.fxFocus.x + (fT.x - this.fxFocus.x) * Math.min(1, dt * 4), y: this.fxFocus.y + (fT.y - this.fxFocus.y) * Math.min(1, dt * 4) } : fT; }
     } else this.fxZoom = 1;
-    st.hdv += ((Math.max(-5, Math.min(5, -s.acc * 0.6)) - st.head) * 90 - st.hdv * 8) * dt; st.head += st.hdv * dt;
+    for (let n = Math.max(1, Math.ceil(dt / 0.008)), q = 0, h = dt / n; q < n; q++) { st.hdv += ((Math.max(-5, Math.min(5, -s.acc * 0.6)) - st.head) * 90 - st.hdv * 8) * h; st.head += st.hdv * h; }
     st.spin += s.ww * dt; st.front += s.v / 0.322 * dt;
     const idleShake = s.running ? Math.sin(st.t * Math.max(s.rpm, 120) / 60 * 3 * Math.PI * 2) * (s.rpm < 1600 ? 1.2 + 2.4 * (s.lope || 0) : 0.5) : 0;
 

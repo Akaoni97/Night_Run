@@ -91,6 +91,10 @@ h1 span { color: var(--amber); }
 .modesw { display: flex; background: var(--panel); border: 1px solid var(--line); padding: 3px; gap: 3px; }
 .modesw button { border: 0; background: transparent; padding: 7px 12px; font: 400 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .modesw button[aria-pressed="true"] { background: var(--amber); color: #1a1206; }
+.modesw { align-items: center; flex-wrap: wrap; }
+.modesw .mode-main { font-size: 15px; color: var(--fg); box-shadow: inset 0 0 0 1px #ff5fa8; padding: 8px 16px; }
+.modesw .mode-main[aria-pressed="true"] { background: #ff5fa8; color: #14060e; }
+.modesw .mode-sep { font: 500 10px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 4px 0 10px; opacity: .8; }
 .linkbtn { border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; padding: 4px; }
 .career.free .chip { opacity: .35; }
 .audio-state {
@@ -265,6 +269,9 @@ body.inplace .lanebtn { display: none; }
 .km-perks { display: flex; flex-wrap: wrap; gap: 6px; } .km-perks span { font: 400 12px/1.2 var(--f-data); padding: 4px 8px; color: var(--muted); box-shadow: inset 0 0 0 1px #2a251d; }
 .km-perks span b { font-weight: 400; margin-right: 6px; } .km-perks span.on { color: #141a04; background: var(--lime); box-shadow: none; }
 .kmbox p.hint { margin: 0; } .kmbox p.hint b { font-weight: 400; color: var(--fg); }
+#hudP { position: absolute; right: 12px; bottom: 60px; width: clamp(300px, 35%, 480px); aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
+body.inplace #hudP { display: none; }
+@media (max-width: 600px) { #hudP { width: min(96vw, 380px); right: 50%; transform: translateX(50%); bottom: auto; top: 4px; } }
 #hudG { position: absolute; right: 12px; bottom: 70px; width: clamp(190px, 26%, 320px); aspect-ratio: 160 / 84; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 10px rgba(255,46,136,.25)); }
 .anime-shift { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; opacity: 0; z-index: 4; overflow: hidden; }
 .anime-shift > * { grid-area: 1 / 1; }
@@ -640,9 +647,10 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       <div class="chip"><b>Ricercato</b><div class="heat" id="hudHeat"><i></i><i></i><i></i><i></i><i></i></div></div>
       <label class="carsel"><b>Auto</b><select id="carSw" aria-label="Auto in garage (si cambia da fermi)"></select></label>
       <div class="modesw" id="modeSw" role="group" aria-label="Modalità">
-        <button type="button" data-m="trip">Viaggio</button>
-        <button type="button" data-m="career">Carriera</button>
-        <button type="button" data-m="free">Libera</button>
+        <button type="button" data-m="trip" class="mode-main">Il Viaggio</button>
+        <span class="mode-sep">modalità libere</span>
+        <button type="button" data-m="career">Sfide in città</button>
+        <button type="button" data-m="free">Città libera</button>
         <button type="button" data-m="mountain">Montagna</button>
       </div>
       <button class="linkbtn" type="button" id="btnNew">Nuova carriera</button>
@@ -721,6 +729,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       </div>
       <div class="toasts" id="toasts" aria-live="polite"></div>
       <canvas id="hudG" aria-hidden="true"></canvas>
+      <canvas id="hudP" aria-hidden="true"></canvas>
       <div class="anime-shift" id="animeShift" aria-hidden="true"><i class="as-lines"></i><b class="as-main">PERFETTA!</b><span class="as-sub">シフト完璧!</span></div>
       <button class="fsbtn" type="button" id="fsBtn" aria-label="Schermo intero (tasto Z)" title="Schermo intero (Z)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
       <button class="enterbtn" type="button" id="enterBtn" hidden></button>
@@ -847,6 +856,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
         <div class="vol"><input type="range" id="lchRpm" min="2500" max="6500" step="100" value="4300" aria-label="Giri del 2-step e dello stutter box"><output id="lchOut">4300</output></div>
       </div>
       <p class="hint" id="limHint"></p>
+      <div class="field"><span>Strumenti tuning</span><div class="toggles" id="podSel"></div></div>
       <p class="hint" id="ecuHint"></p>
     </div>
   </section>
@@ -1000,6 +1010,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
 <script src="street3d.js"></script>
 <script src="street2d.js"></script>
 <script src="viaggio2d.js"></script>
+<script src="hudpro.js"></script>
 <script src="intro.js"></script>
 <script src="radio.js"></script>
 <script src="game.js"></script>
@@ -1294,9 +1305,10 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
     else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
+    else if (k === '5') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') { const st = S.hudG === false ? 0 : S.hudStyle === 'anime' ? 2 : 1, nx = (st + 1) % 3; S.hudG = nx !== 0; S.hudStyle = nx === 2 ? 'anime' : 'orig';
-      flash(nx === 0 ? 'Strumenti in gioco: spenti' : nx === 1 ? 'Strumenti in gioco: quadro originale dell\'auto' : 'Strumenti in gioco: stile anime', 1.4); try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } }
+      flash(nx === 0 ? 'Strumenti in gioco: spenti' : nx === 1 ? 'Strumenti in gioco: cruscotto dell\'auto' : 'Strumenti in gioco: stile anime', 1.4); try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } }
     else if (k === 'k') cycleMeteo();
     else if (k === 'g') openShowroom();
     else if (k === 'x') takePhoto();
@@ -2258,6 +2270,8 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       note(sim.damage > 0.2 ? 'Niko: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Niko: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Niko: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Niko: «Tutto in ordine. Controllo veloce e vai.»');
       move(document.querySelector('section.panel.tuning .services'));
       renderServices();
+      { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Ripara la gomma forata (€ 25)'; b.addEventListener('click', () => { const r = game.repairTyre(); if (!r.ok) flash(r.why, 2); renderTrunk(); renderPlaceCash(); }); body.appendChild(b);
+        const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Niko: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
     } else if (I.id === 'fuel') {
       const f = document.createElement('div'); f.className = 'fuelbox'; f.id = 'fuelBox';
       f.innerHTML = '<div><b id="fuelL">—</b> <span class="hint" id="fuelSt"></span></div><div class="fuelgauge"><i id="fuelBar"></i></div>'
@@ -2267,6 +2281,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
         const r = game.startFill(b.dataset.l ? 999 : +b.dataset.e / GAME_FUEL_PRICE); if (!r.ok && r.why) flash(r.why, 2);
       }));
       note('Nel market: taniche, attrezzi e altro per il bagagliaio.');
+      { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Gonfia le gomme (gratis)'; b.addEventListener('click', () => { game.inflate(); flash('Gomme a 2,3 bar', 1.6); }); body.appendChild(b); }
       move($('shop')); renderTrunk();
     } else {
       note(`Tocca per provare: la ${CARS[game.car].short} mostra subito il ritocco. Tocca di nuovo per comprarlo. Quello che compri resta tuo e puoi rimetterlo gratis.`);
@@ -2382,12 +2397,13 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   function shiftZone() { const lim = sim.P.limiter || 7000; return { lim, lo: lim - 420, hi: lim - 30 }; }
   function drawHudG(dt) {
     const c = hudG.c, show = S.hudG !== false && S.look !== 'cockpit' && !game.inside && !rp.on;
-    c.hidden = !show; document.querySelector('.hud-l').classList.toggle('hasg', show); if (!show) return;
+    c.hidden = !show; document.querySelector('.hud-l').classList.toggle('hasg', show); if (!show) { $('hudP').hidden = true; return; }
     hudG.t += dt;
     if (c.width !== hudG.W) { c.width = hudG.W; c.height = hudG.H; }
     const g = c.getContext('2d'), W = hudG.W, H = hudG.H, lit = sim.ign, t = hudG.t;
     g.clearRect(0, 0, W, H);
-    if (S.hudStyle !== 'anime') { drawHudOrig(g, W, H, lit, t); return; }
+    if (S.hudStyle !== 'anime') { c.hidden = true; drawHudPro(); return; }
+    $('hudP').hidden = true;
     // pannello inclinato con ombra a fumetto e retino
     const poly = (ox, oy, col) => { g.fillStyle = col; g.beginPath(); g.moveTo(8 + ox, 6 + oy); g.lineTo(W - 2 + ox, 6 + oy); g.lineTo(W - 8 + ox, H - 2 + oy); g.lineTo(2 + ox, H - 2 + oy); g.closePath(); g.fill(); };
     poly(2, 2, HG.pink); poly(-1, -1, HG.ink); poly(0, 0, HG.panel);
@@ -2451,68 +2467,48 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   }
 
 
-  // ---------------------------------------------------------------- strumenti in gioco nello stile del quadro originale dell'auto
-  function drawHudOrig(g, W, H, lit, t) {
-    const cl = (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, rpm = lit ? sim.rpm : 0, kmh = Math.abs(sim.v) * 3.6;
-    const blink = Math.floor(t * 14) % 2 === 0, z = shiftZone();
+  // ---------------------------------------------------------------- cruscotto in alta definizione (hudpro.js)
+  function hudData() {
+    const lit = sim.ign, cl = (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, z = shiftZone(), rpm = lit ? sim.rpm : 0;
     const over = lit && (sim.cut === 2 || rpm >= z.hi), inZone = lit && !over && rpm >= z.lo && sim.gear > 0 && sim.gear < sim.topGear();
-    // cruscotto: palpebra scura con il bordo del colore del quadro
-    g.fillStyle = 'rgba(0,0,0,.55)'; g.beginPath(); g.roundRect ? g.roundRect(1, 12, W - 2, H - 13, 10) : g.rect(1, 12, W - 2, H - 13); g.fill();
-    g.strokeStyle = cl.bez[0]; g.lineWidth = 1; g.stroke();
+    const blink = Math.floor(performance.now() / 70) % 2 === 0;
+    const lights = [0, 1, 2, 3, 4].map((i) => { const on = lit && rpm >= z.lo - (4 - i) * 260; return over ? (blink ? '#ff3a3a' : null) : inZone ? (blink ? '#b8ff3a' : '#e8ffb0') : on ? (i < 4 ? '#4fbf2a' : '#b8ff3a') : null; });
+    const c = game.consumption(), T = game.tyres(), heat = 1 + Math.max(0, sim.tireT - 24) * 0.0015;
+    const turbo = (TP.sim.turbo && TP.sim.turbo.max > 0);
+    const afr = sim.cut ? 22.4 : (sim.pipeP > 0.12 || sim.air > 0.85) ? 11.6 - 0.6 * Math.min(1, sim.pipeP) : 14.7;
+    const val = { boost: sim.pipeP, oilT: sim.oilT, waterT: sim.waterT, oilP: sim.oilP, volt: sim.volt, afr };
+    const want = Array.isArray(S.pods) ? S.pods : HUD_PODS_DEFAULT;
+    const pods = want.filter((id) => id !== 'boost' || turbo).slice(0, 4).map((id) => ({ id, v: val[id] ?? 0, on: id !== 'boost' || sim.running }));
+    const trip = game.s.vg ? game.s.dist / 1000 : sim.trip;
     const red = cl.varRed ? (sim.oilT < 50 ? 4.5 : sim.oilT < 65 ? 5.5 : sim.oilT < 78 ? 6.5 : cl.red) : cl.red;
-    const dial = (cx, cy, R, max, redAt, val, labels, every, title) => {
-      const a0 = Math.PI * 0.75, sw = Math.PI * 1.5, A = (v) => a0 + sw * Math.min(1, Math.max(0, v / max));
-      g.fillStyle = cl.bez[2]; g.beginPath(); g.arc(cx, cy, R + 2, 0, 7); g.fill();
-      g.fillStyle = cl.chrome ? '#b8bec8' : cl.bez[0]; g.beginPath(); g.arc(cx, cy, R + 1, 0, 7); g.fill();
-      g.fillStyle = cl.face[0]; g.beginPath(); g.arc(cx, cy, R, 0, 7); g.fill();
-      if (lit) { const gl = g.createRadialGradient(cx, cy + R * 0.4, 1, cx, cy, R); gl.addColorStop(0, cl.glow); gl.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gl; g.fillRect(cx - R, cy - R, R * 2, R * 2); }
-      const num = lit ? cl.num : '#3a3d42';
-      if (redAt) for (let v = redAt; v <= max; v += max / 80) { const a = A(v); g.fillStyle = lit ? '#ff3a24' : '#4a1612'; g.fillRect(Math.round(cx + Math.cos(a) * (R - 2)), Math.round(cy + Math.sin(a) * (R - 2)), 2, 2); }
-      for (let v = 0; v <= max + 1e-6; v += every / 2) {
-        const a = A(v), maj = Math.abs(v / every - Math.round(v / every)) < 1e-6, r0 = R - (maj ? 4 : 2);
-        g.fillStyle = redAt && v >= redAt ? (lit ? '#ff5a3a' : '#4a1612') : num;
-        for (let r = r0; r < R - 0.5; r++) g.fillRect(Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r), 1, 1);
-        if (maj && labels && (R > 24 || Math.round(v / every) % 2 === 0)) { const l = String(Math.round(v / labels)), rr = R - 9; pxText(g, l, Math.round(cx + Math.cos(a) * rr - pxW(l, 1) / 2), Math.round(cy + Math.sin(a) * rr - 2), redAt && v >= redAt ? (lit ? '#ff5a3a' : '#4a1612') : num, 1); }
-      }
-      if (title) pxText(g, title, Math.round(cx - pxW(title, 1) / 2), R > 24 ? cy - Math.round(R * 0.36) : cy + 5, lit ? cl.num : '#3a3d42', 1);
-      // lancetta a pixel con alone
-      const a = A(val), L = R - 3;
-      for (let r = -3; r < L; r += 0.5) { const x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + Math.sin(a) * r); g.fillStyle = lit ? cl.needle : '#6a2a14'; g.fillRect(x, y, r < L * 0.7 ? 2 : 1, r < L * 0.7 ? 2 : 1); }
-      g.fillStyle = '#2a2b2e'; g.fillRect(cx - 2, cy - 2, 4, 4); g.fillStyle = '#0a0a0b'; g.fillRect(cx - 1, cy - 1, 2, 2);
-    };
-    const lcdBox = (x, y, w, txt, col) => { g.fillStyle = '#050506'; g.fillRect(x, y, w, 8); g.fillStyle = '#2a2b2e'; g.fillRect(x, y + 8, w, 1); pxText(g, txt, x + w - 1 - pxW(txt, 1), y + 2, lit ? col : '#2a2b2e', 1); };
-    const spEvery = cl.speed <= 200 ? 20 : 40, gearTxt = sim.gear === 0 ? 'N' : sim.gear === -1 ? 'R' : String(sim.gear);
-    let tachC;
-    if (cl.tachMid) {
-      dial(30, 54, 21, cl.speed, 0, kmh, 1, 30, 'KM/H');
-      tachC = { x: 80, y: 50, R: 30 }; dial(tachC.x, tachC.y, tachC.R, cl.tach * 1000, red * 1000, rpm, 1000, 1000, cl.brand.split(' ')[0]);
-      const bmax = Math.max(0.5, (TP.sim.turbo && TP.sim.turbo.max) || 1);
-      dial(130, 54, 21, bmax * 1.4, bmax * 1.2, lit ? Math.max(0, sim.pipeP) : 0, 0, bmax * 0.35, 'BAR');
-      lcdBox(4, 70, 22, String(Math.round(kmh)), cl.lcd);
-    } else {
-      dial(42, 50, 30, cl.speed, 0, kmh, 1, spEvery, cl.brand.split(' ')[0]);
-      tachC = { x: 118, y: 50, R: 30 }; dial(tachC.x, tachC.y, tachC.R, cl.tach * 1000, red * 1000, rpm, 1000, 1000, 'X1000');
-      lcdBox(30, 64, 24, String(Math.round(kmh)), cl.lcd);
-      if (cl.m) for (const [k, col] of [[-1, '#5bc0ff'], [0, '#1a3d9a'], [1, '#e8282b']]) { g.fillStyle = col; g.fillRect(tachC.x - 1 + k * 4, tachC.y + 5, 3, 2); }
-    }
-    // marcia nel contagiri e chilometri sotto
-    g.fillStyle = '#050506'; g.fillRect(tachC.x - 6, tachC.y + 9, 12, 12);
-    pxText(g, gearTxt, tachC.x - 3, tachC.y + 11, over && blink ? '#ff3a24' : inZone && blink ? '#b8ff3a' : lit ? cl.lcd : '#2a2b2e', 2);
-    pxText(g, 'ODO ' + Math.floor(game.odo), Math.round(W / 2 - pxW('ODO ' + Math.floor(game.odo), 1) / 2), H - 7, lit ? cl.lcd : '#2a2b2e', 1);
-    // le 5 luci della cambiata, in alto
-    for (let i = 0; i < 5; i++) {
-      const thr = z.lo - (4 - i) * 260, on = lit && rpm >= thr, x = W / 2 - 37 + i * 15;
-      let col = '#1a1c20';
-      if (over) col = blink ? '#ff3a3a' : '#5a1020'; else if (inZone) col = blink ? '#b8ff3a' : '#e8ffb0'; else if (on) col = i < 4 ? '#4fbf2a' : '#b8ff3a';
-      g.fillStyle = '#050506'; g.fillRect(x - 1, 0, 13, 11); g.fillStyle = col;
-      for (let r = 0; r < 9; r++) { const w = 1 + (4 - Math.abs(r - 4)) * 2; g.fillRect(x + 1, 1 + r, w, 1); }
-    }
-    // spie
-    if (sim.tcAct) pxText(g, 'TRC', 4, 14, blink ? '#ffe14d' : '#ffb000', 1);
-    else if (sim.abs && blink) pxText(g, 'ABS', 4, 14, '#ffb000', 1);
-    if (lit && sim.cut === 2 && blink) pxText(g, 'LIMIT', W - 26, 14, '#ff3a24', 1);
-    else if (lit && sim.cut === 3 && blink) pxText(g, sim.flatCut ? '3STEP' : '2STEP', W - 26, 14, '#2ee6ff', 1);
+    const L = sim.fuel * sim.P.tank;
+    return { lit, kmh: Math.abs(sim.v) * 3.6, rpm, red, gear: sim.gear === 0 ? 'N' : sim.gear === -1 ? 'R' : String(sim.gear), over, shiftNow: inZone && blink, lights,
+      odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
+      range: c.range !== null ? fmt(c.range, 0) + ' km' : '—', cons: c.per100 !== null ? fmt(c.per100, 1) + ' L/100' : '—',
+      fuel: sim.fuel, liters: fmt(L, 1) + ' L', tyres: T.p.map((p) => p * heat), waterT: sim.waterT, pods,
+      warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3], ['GOMME', '#ff3a24', Math.min(...T.p) < 1.6], ['RISERVA', '#ffb000', sim.fuel < 0.12]] };
   }
+  function drawHudPro() {
+    const c = $('hudP'); c.hidden = false;
+    const dpr = Math.min(2.5, window.devicePixelRatio || 1), W = 560, H = 240;
+    if (c.width !== Math.round(W * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+    const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    HudPro.draw(g, W, H, hudData(), (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, dpr);
+  }
+  // strumenti tuning da mostrare (fino a quattro)
+  (function buildPods() {
+    const box = $('podSel'); if (!box) return;
+    for (const [id, P] of Object.entries(HUD_PODS)) {
+      const l = document.createElement('label'); l.className = 'tg';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.checked = (Array.isArray(S.pods) ? S.pods : HUD_PODS_DEFAULT).includes(id);
+      i.addEventListener('change', () => {
+        let cur = Array.isArray(S.pods) ? S.pods.slice() : HUD_PODS_DEFAULT.slice();
+        if (i.checked) { if (cur.length >= 4) { i.checked = false; flash('Al massimo quattro strumenti', 1.6); return; } cur.push(id); } else cur = cur.filter((x) => x !== id);
+        S.pods = cur; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
+      });
+      l.appendChild(i); l.appendChild(document.createTextNode(P.name + (id === 'boost' ? ' (se c\'è il turbo)' : ''))); box.appendChild(l);
+    }
+  })();
   // ---------------------------------------------------------------- cambiata perfetta anche in guida normale
   // In gara il voto conta per il risultato; fuori dalla gara la perfetta dà comunque il cambio rapido e la scritta.
   let comboN = 0, animeT = null;
