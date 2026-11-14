@@ -272,11 +272,12 @@ class StreetGame {
     try { const o = JSON.parse(json); if (o && o.s) { Object.assign(this.s, o.s); this.mode = o.mode === 'free' ? 'free' : 'career'; this.loc = GAME_LOCS.find((l) => l.id === this.s.loc) || GAME_LOCS[0]; } } catch (e) { /* salvataggio illeggibile */ }
     if (!Array.isArray(this.s.trunk)) this.s.trunk = [];
     // contachilometri per auto (i salvataggi vecchi partono dalla distanza già percorsa)
-    if (!this.s.cars || !this.s.cars.supra) this.s.cars = { supra: { km: Math.max(0, (this.s.dist || 0) / 1000) } };
-    if (!Array.isArray(this.s.perks)) this.s.perks = GAME_KM_PERKS.filter((p) => this.s.cars.supra.km >= p.km).map((p) => p.id);
+    if (!this.s.cars || (!this.s.cars.supra && !this.s.vg)) this.s.cars = { supra: { km: Math.max(0, (this.s.dist || 0) / 1000) } };
+    if (!Array.isArray(this.s.perks)) this.s.perks = GAME_KM_PERKS.filter((p) => ((this.s.cars.supra || {}).km || 0) >= p.km).map((p) => p.id);
     // ogni auto ha i suoi traguardi; la Volvo arriva nel garage con i salvataggi vecchi
-    if (!Array.isArray(this.s.cars.supra.perks)) this.s.cars.supra.perks = this.s.perks.slice();
+    if (this.s.cars.supra && !Array.isArray(this.s.cars.supra.perks)) this.s.cars.supra.perks = this.s.perks.slice();
     if (!this.s.cars.v40) this.s.cars.v40 = { km: 0, perks: [], up: 0, fuel: 0.55 };
+    if (this.s.vg && !CARS[this.s.carId]) this.s.carId = 'v40';
     if (!CARS[this.s.carId]) this.s.carId = 'supra';
     this.applyMass();
   }

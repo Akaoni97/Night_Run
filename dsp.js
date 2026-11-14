@@ -154,7 +154,7 @@ class EngineDSP {
     else { this.nCyl = 6; [0, 4, 2, 5, 1, 3].forEach((c, k) => { this.cyl[c].off = k * 120; }); }
     // carattere del singolo motore (auto da disegno): collettori, durata degli impulsi, farfalle singole, urlo metallico
     const v = t.voice || {};
-    this.vc = { pulse: v.pulse || 1, rough: v.rough || 0, howl: v.howl || 0, metal: v.metal || 0, boomRpm: v.boomRpm || 3300, hiRpm: v.hiRpm || 6800 };
+    this.vc = { diesel: v.diesel || 0, pulse: v.pulse || 1, rough: v.rough || 0, howl: v.howl || 0, metal: v.metal || 0, boomRpm: v.boomRpm || 3300, hiRpm: v.hiRpm || 6800 };
     const L = v.mani || (this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
     const split = v.split != null ? v.split : twin ? 0.22 : 0;
     this.cyl.forEach((cy, i) => {
@@ -236,7 +236,7 @@ class EngineDSP {
       c.tp = (11 + 15 * Math.max(0, 1 - Math.min(ch, 1))) * (1 + this.g() * 0.035) * this.vc.pulse;
       c.j = this.g() * (0.5 + 2.8 * low);                                   // scoppio un po' in anticipo o in ritardo
       c.nz = 0.22 + 0.32 * Math.min(ch, 1.6);
-      this.knock += comb * 0.5;
+      this.knock += comb * 0.5 * (1 + 4 * this.vc.diesel);   // gasolio: il ticchettio della combustione
     } else {
       c.tp = 28; c.nz = 0.12;
     }
@@ -550,7 +550,7 @@ class EngineDSP {
       // ---- mix per punto d'ascolto ---------------------------------------------------------
       const side = exhR * M.exh - exh * M.exh;   // differenza tra i terminali → immagine stereo
       const cabK = this.cfg.view === 0 ? (tn.cabin || 1) : 1;   // abitacolo alleggerito: rimbomba di più
-      let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech + turbo * M.turbo * this.fxT + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
+      let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech * (1 + 5 * this.vc.diesel) + turbo * M.turbo * this.fxT + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
         + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump;
       out += 1e-18;
 

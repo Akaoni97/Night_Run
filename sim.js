@@ -219,6 +219,8 @@ class SupraSim {
     this.launchArmed = cfg.launch && tn.ecuLaunch && this.running && this.gear >= 1 && Math.abs(this.v) < 1.5 &&
       (cfg.autoClutch ? I.brake > 0.25 : clutchPos > 0.5);
 
+    // limitatore di velocità (camion, autobus): oltre la soglia il gas non c'è più
+    if (P.vmax && Math.abs(this.v) * 3.6 > P.vmax - 1) thrCmd *= SIM_CLAMP((P.vmax + 1 - Math.abs(this.v) * 3.6) / 2, 0, 1);
     // ---- farfalla e aria ------------------------------------------------------------
     // esitazione: gas spalancato di colpo ai bassi giri, la miscela si smagrisce per un attimo e il motore "si siede"
     const dThr = thrCmd - this.thr;
@@ -327,12 +329,13 @@ class SupraSim {
     this.hopPh = ((this.hopPh || 0) + h * 10.5) % 1;
     const hopF = 1 + 0.26 * this.hopE * Math.sin(this.hopPh * 6.2832);
     if (this.hopE > 0.3 && this.hopPh < h * 10.5) this.events.push({ type: 'bump', I: 0.25 * this.hopE });
-    const Nr = SIM_CLAMP((P.mass * 9.81 * P.rearW + (P.fwd ? -1 : 1) * P.mass * this.pz * P.cgH / P.wb) * hopF, 2500, 12000);
+    const Nr0 = P.mass * 9.81 * P.rearW;
+    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * P.mass * this.pz * P.cgH / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
     // differenziale: aperto (la ruota scarica gira a vuoto), Torsen (ripartisce), autobloccante (blocca)
     const dk = tn.diff === 'lsd' ? 1 : tn.diff === 'torsen' ? 0.96 : 0.87;
     // assetto: in partenza un posteriore che si "siede" (o un anteriore che non si alza) carica le ruote motrici
     const launchK = 1 + (((tn.susp || {}).launch || 1) - 1) * (1 - SIM_SS(4, 22, Math.abs(this.v)));
-    const Fmax = P.mu * Nr * (1 - 0.08 * (Nr / 7260 - 1)) * this.tireGrip() * dk * launchK;
+    const Fmax = P.mu * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK;
     // gomma: lo slittamento "visto" dal battistrada segue quello reale con un ritardo (lunghezza di rilassamento ~0,3 m),
     // poi curva di Pacejka della mescola: picco, e oltre la forza cala più o meno in fretta
     const ty = tn.tyre || { B: 20, C: 1.42, E: 0.1 };
@@ -347,7 +350,7 @@ class SupraSim {
     // ---- frizione: coppia trasmessa (aggancio implicito, stabile) ------------------------------
     const G = this.ratio(this.gear);
     // semiassi e albero di trasmissione elastici: oscillazione di 3–5 Hz su attacco e stacco del gas
-    const Ig = 0.5, Ks = 16000, Cs = 260;
+    const Ig = 0.5 * (P.Ks ? P.Ks / 16000 : 1), Ks = P.Ks || 16000, Cs = 260 * (P.Ks ? Math.sqrt(P.Ks / 16000) : 1);
     const Ts = Ks * this.phi + Cs * (this.wo - this.ww);
     const cap = P.clutchMax * SIM_SS(0.15, 0.85, 1 - clutchPos);
     let Tc = 0;

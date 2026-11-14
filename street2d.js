@@ -9,7 +9,7 @@ const PX_FONT = {
   A: '010101111101101', B: '110101110101110', C: '011100100100011', D: '110101101101110', E: '111100110100111',
   F: '111100110100100', G: '011100101101011', H: '101101111101101', I: '111010010010111', J: '001001001101010',
   K: '101101110101101', L: '100100100100111', M: '101111111101101', N: '110101101101101', O: '010101101101010',
-  P: '110101110100100', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111',
+  P: '110101110100100', Q: '111101101111001', R: '110101110101101', S: '011100010001110', T: '111010010010010', U: '101101101101111',
   V: '101101101101010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111',
   3: '110001010001110', 4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010',
   8: '111101111101111', 9: '111101111001110', ',': '000000000010100', '.': '000000000000010', '€': '011110100110011',
@@ -1389,6 +1389,7 @@ class Street2D {
     const want = mine || (near && game && game.nearPlace() && Math.abs(game.sim.v) < 9) ? 1 : 0;
     st.doors[key] = (st.doors[key] || 0) + (want - (st.doors[key] || 0)) * 0.08;
     const open = st.doors[key];
+    if (this.drawTripPlace && this.drawTripPlace(g, e, x, st, near, open)) return;   // locali del viaggio (viaggio2d.js)
     if (e.id === 'fuel') { this.drawStation(g, x); this.placeTag(g, x, 96, 'BENZINA', '#2ee6ff', near); return; }
     const L = x - 132, R = x + 132, top = 104;
     // passo carrabile sul marciapiede
@@ -1479,7 +1480,7 @@ class Street2D {
   // radar delle corsie: tre strisce viste dall'alto, l'auto del giocatore, il traffico da −40 a +160 m;
   // in rosso chi è vicino nella stessa corsia e va più piano (rischio tamponamento)
   drawLaneRadar(g, game, dist, t) {
-    const W = this.LW, w = 116, h = 44, x0 = 8, y0 = 84, from = -40, to = 160;
+    const W = this.LW, w = 116, h = 44, x0 = W - w - 8, y0 = 60, from = -40, to = 160;
     const mx = (m) => Math.round(x0 + 4 + (m - from) / (to - from) * (w - 8));
     const ly = (z) => Math.round(y0 + 9 + (3.5 - Math.max(-3.5, Math.min(3.5, z))) / 7 * 22);   // corsia 3 in alto, 1 in basso
     g.fillStyle = 'rgba(8,9,16,.72)'; g.fillRect(x0, y0, w, h); g.fillStyle = '#3a3f58'; g.fillRect(x0, y0, w, 1); g.fillRect(x0, y0 + h - 1, w, 1);
@@ -1491,7 +1492,7 @@ class Street2D {
     g.fillStyle = Math.floor(t * 4) % 2 || Math.abs(game.laneZ - (GAME_LANE_Z[game.lane] ?? 3.5)) < 0.3 ? 'rgba(184,255,58,.16)' : 'rgba(184,255,58,.3)'; g.fillRect(x0 + 4, tl - 4, w - 8, 9);
     const sim = game.sim, myV = sim ? sim.v : 0;
     for (const e of game.ents) {
-      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'rival')) continue;
+      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'rival' || e.kind === 'ghost')) continue;
       const rel = e.x - dist; if (rel < from || rel > to || e.lane === 0) continue;
       const z = e._z ?? GAME_LANE_Z[e.lane], len = Math.max(3, Math.round((e.len || 4.6) / (to - from) * (w - 8) * 1.6));
       const same = Math.abs(z - game.laneZ) < 1.7, warn = same && rel > 0 && rel < 14 + myV * 1.2 && myV > (e.v || 0) + 1;
@@ -1582,6 +1583,8 @@ class Street2D {
       for (let r = 0; r < 6; r++) { const yy = 240 + r * 20, sz = 20 + r * 4; for (let xx = -((r * 7) % sz); xx < W; xx += sz) { g.fillStyle = ((xx / sz + r) | 0) % 2 ? '#1a1030' : '#08060f'; g.fillRect(Math.round(xx), yy, Math.ceil(sz), 20); } }
       this.light(g, cx, 120, 140, 150, '#fff2e0', 0.05, 4);                                        // faro sulla macchina
       this.light(g, cx, gy, 170, 16, '#b07bff', 0.12, 4);
+    } else if (this.drawTripInterior && this.drawTripInterior(g, I, W, t)) {
+      // bar, autogrill, motel (viaggio2d.js)
     } else {
       // distributore: pensilina di notte, colonnina accanto alla Supra
       const gr = g.createLinearGradient(0, 0, 0, 240); gr.addColorStop(0, '#0a0922'); gr.addColorStop(1, '#2e2662'); g.fillStyle = gr; g.fillRect(0, 0, W, 240);
@@ -1610,7 +1613,7 @@ class Street2D {
     this.shadow(g, cx, gy, 120, 6);
     if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
     g.imageSmoothingEnabled = false; g.drawImage(spr, left, top);
-    if (spr.img) { const wf = this.wheelFn(); const wyI = gy - lift - GI.wr * K; wf(g, left + GI.ax[0] * K, wyI, K, 0, 0, true); wf(g, left + GI.ax[1] * K, wyI, K, 0, 0, false); }
+    if (spr.img) { const wf = this.wheelFn(); const wyI = gy - lift - GI.wr * K; wf(g, left + GI.ax[0] * K, wyI, K, 0, 0, true); wf(g, left + GI.ax[1] * K, wyI, K, 0, 0, false); for (let q = 2; q < GI.ax.length; q++) wf(g, left + GI.ax[q] * K, wyI, K, 0, 0, false); }
     if (I.id === 'style') this.light(g, cx + 20, top + 10, 60, 10, '#ffffff', 0.04 + 0.03 * Math.sin(t * 2), 3);   // riflesso che scorre
     if (I.id === 'shop' || I.id === 'niko') this.person(g, Math.max(14, cx - 100 * K - 40), gy, I.id, t);
     // titolo
@@ -1711,6 +1714,7 @@ class Street2D {
       if (k === 2) { g.fillStyle = C.ink; g.fillRect(X + (dir > 0 ? 6 : -4), 212, 3, 6); g.fillStyle = '#b8ff3a'; g.fillRect(X + (dir > 0 ? 6 : -4), 213, 2, 4); }   // sacchetto
     }
     }
+    if (game && game.s && game.s.vg && this.drawKmPosts) this.drawKmPosts(g, wx, visFrom, visTo);   // cippi del viaggio
     // ---- carreggiata
     g.fillStyle = C.road2; g.fillRect(0, 232, W, 4);
     const rt = this.roadTile(), ro = ((dist * PPM) % 256 + 256) % 256;
@@ -1809,6 +1813,7 @@ class Street2D {
     const drawEnt = (e) => {
       const x = wx(e.x);
       if (x < -300 || x > W + 300) return;
+      if (this.drawTripEnt && this.drawTripEnt(g, e, x, st)) return;
       if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); return; }
       if (e.kind === 'station') { this.drawStation(g, x); return; }
       if (e.kind === 'drop') {
@@ -1869,6 +1874,7 @@ class Street2D {
     const entDX = IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
     const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
     const spr = this.carSprite(k), SW = spr.width, left = Math.round(carX + entDX - SW / 2);
+    if (game && game.s && game.s.vg && game.s.vg.trailerOn && this.drawTrailer && !(typeof VG_CARGO !== 'undefined' && VG_CARGO[game.car])) this.drawTrailer(g, left, y0, k, s, st);
     g.globalAlpha = entA;
     this.carPos = { x: left + SW / 2, y: y0 - 22 * k, k };
     const GE0 = this.geo();
@@ -1951,6 +1957,7 @@ class Street2D {
       const wfn = this.wheelFn();
       wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, st.spin, Math.abs(s.ww * 0.322), true);
       wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4), k, st.front, Math.abs(s.v), false);
+      for (let q = 2; q < GE.ax.length; q++) wfn(g, left + GE.ax[q] * k, y0 - wr - Math.max(0, bF * 0.4), k, st.front, Math.abs(s.v), false);   // camion a tre assi
     } else {
       this.wheel(g, left + 1 + 48 * k, y0 - wr - Math.max(0, bR * 0.4), wr, -st.spin, Math.abs(s.ww * 0.322));
       this.wheel(g, left + 1 + 158 * k, y0 - wr - Math.max(0, bF * 0.4), wr, -st.front, Math.abs(s.v));
@@ -2180,6 +2187,7 @@ class Street2D {
     }
 
     // ---- segnalatore della corsia (radar delle tre corsie)
+    if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
     if (game && game.track === 'city' && !game.inside && this.laneRadar !== false) this.drawLaneRadar(g, game, dist, st.t);
 
     // ---- su schermo
