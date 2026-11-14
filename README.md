@@ -392,6 +392,16 @@ marce e sorpassa; al primo tasto (gas, freno, marce, sterzo) torni a guidare tu 
 pronti (gas, freno, sterzo). Inquadratura: vicina da fermi, si allarga a 10-20 km/h e in velocità mostra tutta la
 strada. Il pilota è un'ombra che va avanti e indietro con accelerazione e frenata.
 
-**Traffico.** Solo le auto disegnate dal giocatore (E36, E34, E30, 2002, R5), riverniciate con la maschera; le
-volanti sono la M5 E34 blu coi lampeggianti. Camion, furgoni e autobus arriveranno coi disegni del giocatore.
+**Traffico.** Solo i veicoli disegnati dal giocatore, coi loro colori: Panda, Punto, Polo, Corsa, Clio, 308, A3,
+Audi 80, 206 GTI, Volvo 850 R, Golf GTI, 205 GTI, Clio Williams, A112 Abarth, le BMW, la R5, taxi, Doblò, furgone,
+autobus urbano, ambulanza e auto della polizia (`img/<id>.png`, ruote trovate in automatico, scala sul passo vero).
+Tutte si possono anche comprare alla concessionaria del Motel Ovunque, con motore, peso e marce veri.
+Il traffico tiene la destra, sorpassa i più lenti, si sposta per tempo davanti agli ostacoli.
+
+**Strada viva (`strada.js`).** In prima corsia ogni tanto: un incidente (due auto ferme con le quattro frecce) o la
+polizia che ha fermato qualcuno. Con **F** (o il pulsante FARI) sfanali chi ti sta davanti: o si sposta e ti fa
+passare, o risponde e parte la **sfida di 2 km** (chi è davanti alla fine vince, senza premio in soldi). Le
+sportive accettano più spesso; autobus, furgoni, taxi e ambulanze mai; una volante sfanalata ti multa.
+**Reputazione**: +3 a vittoria (+5 contro una sportiva), −1 a sconfitta. A 5 rispetto (accettano di più), a 12
++3 % di potenza, a 25 +3 % di aderenza, a 45 sconto del 15 % da Luca e Niko, a 70 altri +4 % di potenza.
 

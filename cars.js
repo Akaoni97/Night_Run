@@ -304,6 +304,64 @@ const GEN_CARS = [
 ];
 
 
+// ---------------------------------------------------------------- il pacchetto di auto del giocatore (traffico e concessionaria)
+Object.assign(GEN_DATA, {"a80": {"tq": [], "sprite": {"w": 204, "h": 69, "wy": 31.7, "wr": 18.7, "ax": [45.4, 160.2], "head": [193, 40], "tail": [7, 33, 5, 5], "ex": [3, 55], "hx": 94, "hy": -1, "refL": 61.8, "slots": {"st_door": [112, 33, 30, 14], "st_rear": [45, 21, 26, 13], "st_glass": [50, 13, 26, 8]}, "ws": 20}}, "a3": {"tq": [], "sprite": {"w": 196, "h": 66, "wy": 35.2, "wr": 15.2, "ax": [37.6, 153.8], "head": [181, 37], "tail": [12, 28, 5, 5], "ex": [3, 54], "hx": 88, "hy": -1, "refL": 51.8, "slots": {"st_door": [107, 36, 29, 12], "st_rear": [37, 26, 21, 10], "st_glass": [47, 13, 21, 6]}, "ws": 17}}, "a112": {"tq": [], "sprite": {"w": 145, "h": 67, "wy": 42.4, "wr": 12.4, "ax": [24.3, 114.0], "head": [138, 37], "tail": [9, 30, 5, 5], "ex": [3, 58], "hx": 69, "hy": 0, "refL": 58.0, "slots": {"st_door": [79, 43, 21, 9], "st_rear": [24, 35, 17, 8], "st_glass": [45, 14, 17, 5]}, "ws": 14}}, "bus": {"tq": [], "sprite": {"w": 531, "h": 158, "wy": 102.5, "wr": 27.4, "ax": [132.7, 392.3], "head": [503, 104], "tail": [30, 86, 5, 5], "ex": [3, 137], "hx": 327, "hy": 28, "refL": 209.0, "slots": {"st_door": [292, 105, 79, 21], "st_rear": [132, 87, 38, 19], "st_glass": [157, 42, 38, 12]}, "ws": 29}}, "doblo": {"tq": [], "sprite": {"w": 196, "h": 96, "wy": 61.4, "wr": 17.0, "ax": [32.5, 153.5], "head": [179, 63], "tail": [5, 39, 5, 5], "ex": [3, 83], "hx": 97, "hy": 11, "refL": 122.8, "slots": {"st_door": [107, 63, 29, 13], "st_rear": [32, 52, 23, 11], "st_glass": [53, 25, 23, 7]}, "ws": 19}}, "panda": {"tq": [], "sprite": {"w": 156, "h": 80, "wy": 51.1, "wr": 14.2, "ax": [24.3, 125.5], "head": [146, 45], "tail": [7, 31, 5, 5], "ex": [3, 69], "hx": 76, "hy": 7, "refL": 128.3, "slots": {"st_door": [85, 52, 23, 11], "st_rear": [24, 43, 19, 9], "st_glass": [42, 21, 19, 6]}, "ws": 16}}, "punto": {"tq": [], "sprite": {"w": 172, "h": 81, "wy": 49.1, "wr": 15.9, "ax": [26.2, 136.7], "head": [159, 45], "tail": [10, 23, 5, 5], "ex": [3, 69], "hx": 87, "hy": 5, "refL": 94.3, "slots": {"st_door": [94, 50, 25, 12], "st_rear": [26, 40, 22, 11], "st_glass": [55, 19, 22, 7]}, "ws": 17}}, "golf": {"tq": [], "sprite": {"w": 178, "h": 61, "wy": 25.8, "wr": 17.6, "ax": [31.7, 137.3], "head": [174, 27], "tail": [4, 24, 5, 5], "ex": [3, 48], "hx": 76, "hy": -6, "refL": 70.7, "slots": {"st_door": [97, 27, 26, 14], "st_rear": [31, 16, 24, 12], "st_glass": [40, 8, 24, 7]}, "ws": 19}}, "corsa": {"tq": [], "sprite": {"w": 180, "h": 83, "wy": 51.3, "wr": 15.9, "ax": [29.9, 140.3], "head": [169, 53], "tail": [11, 34, 5, 5], "ex": [3, 71], "hx": 85, "hy": 7, "refL": 213.7, "slots": {"st_door": [99, 52, 27, 12], "st_rear": [29, 42, 22, 11], "st_glass": [44, 21, 22, 7]}, "ws": 17}}, "p205": {"tq": [], "sprite": {"w": 167, "h": 64, "wy": 30.9, "wr": 16.4, "ax": [27.5, 134.0], "head": [158, 37], "tail": [3, 30, 5, 5], "ex": [3, 51], "hx": 75, "hy": -3, "refL": 51.3, "slots": {"st_door": [91, 32, 25, 13], "st_rear": [27, 21, 22, 11], "st_glass": [40, 11, 22, 7]}, "ws": 18}}, "p206": {"tq": [], "sprite": {"w": 174, "h": 70, "wy": 37.6, "wr": 16.1, "ax": [29.1, 136.5], "head": [161, 42], "tail": [9, 29, 5, 5], "ex": [3, 58], "hx": 92, "hy": 0, "refL": 67.3, "slots": {"st_door": [95, 39, 26, 12], "st_rear": [29, 28, 22, 11], "st_glass": [48, 14, 22, 7]}, "ws": 18}}, "p308": {"tq": [], "sprite": {"w": 189, "h": 81, "wy": 41.2, "wr": 19.8, "ax": [32.6, 147.9], "head": [174, 45], "tail": [10, 34, 5, 5], "ex": [3, 66], "hx": 87, "hy": 3, "refL": 41.0, "slots": {"st_door": [103, 43, 28, 15], "st_rear": [32, 30, 27, 13], "st_glass": [44, 17, 27, 8]}, "ws": 21}}, "clio": {"tq": [], "sprite": {"w": 179, "h": 81, "wy": 45.9, "wr": 17.6, "ax": [29.6, 143.6], "head": [165, 45], "tail": [9, 34, 5, 5], "ex": [3, 68], "hx": 100, "hy": 2, "refL": 81.3, "slots": {"st_door": [98, 47, 26, 14], "st_rear": [29, 36, 24, 12], "st_glass": [50, 16, 24, 7]}, "ws": 19}}, "williams": {"tq": [], "sprite": {"w": 175, "h": 79, "wy": 42.9, "wr": 17.7, "ax": [28.7, 137.4], "head": [164, 47], "tail": [4, 42, 5, 5], "ex": [3, 65], "hx": 90, "hy": 2, "refL": 75.0, "slots": {"st_door": [96, 44, 26, 14], "st_rear": [28, 33, 24, 12], "st_glass": [46, 16, 24, 7]}, "ws": 19}}, "taxi": {"tq": [], "sprite": {"w": 200, "h": 71, "wy": 41.0, "wr": 14.9, "ax": [43.4, 162.2], "head": [186, 41], "tail": [11, 45, 5, 5], "ex": [3, 60], "hx": 97, "hy": 4, "refL": 133.0, "slots": {"st_door": [110, 42, 30, 11], "st_rear": [43, 32, 20, 10], "st_glass": [70, 18, 20, 6]}, "ws": 16}}, "v850": {"tq": [], "sprite": {"w": 213, "h": 71, "wy": 38.8, "wr": 15.8, "ax": [51.7, 168.8], "head": [198, 39], "tail": [8, 21, 5, 5], "ex": [3, 59], "hx": 123, "hy": -4, "refL": 30.0, "slots": {"st_door": [117, 40, 31, 12], "st_rear": [51, 30, 22, 11], "st_glass": [62, 10, 22, 7]}, "ws": 17}}, "polo": {"tq": [], "sprite": {"w": 175, "h": 80, "wy": 48.7, "wr": 15.7, "ax": [30.4, 139.1], "head": [161, 44], "tail": [9, 32, 5, 5], "ex": [3, 68], "hx": 90, "hy": 2, "refL": 113.0, "slots": {"st_door": [96, 50, 26, 12], "st_rear": [30, 40, 21, 10], "st_glass": [49, 16, 21, 7]}, "ws": 17}}, "van": {"tq": [], "sprite": {"w": 192, "h": 91, "wy": 59.1, "wr": 16.0, "ax": [34.0, 152.8], "head": [178, 53], "tail": [6, 38, 5, 5], "ex": [3, 79], "hx": 108, "hy": 0, "refL": 198.2, "slots": {"st_door": [105, 60, 28, 12], "st_rear": [33, 50, 22, 11], "st_glass": [51, 14, 22, 7]}, "ws": 18}}, "ambulanza": {"tq": [], "sprite": {"w": 267, "h": 129, "wy": 88.1, "wr": 20.2, "ax": [54.4, 215.9], "head": [249, 81], "tail": [14, 76, 5, 5], "ex": [3, 113], "hx": 136, "hy": -3, "refL": 198.5, "slots": {"st_door": [146, 90, 40, 16], "st_rear": [54, 76, 28, 14], "st_glass": [66, 11, 28, 9]}, "ws": 22}}, "polizia": {"tq": [], "sprite": {"w": 193, "h": 77, "wy": 45.3, "wr": 15.8, "ax": [36.6, 151.9], "head": [180, 48], "tail": [8, 34, 5, 5], "ex": [3, 65], "hx": 108, "hy": -7, "refL": 121.2, "slots": {"st_door": [106, 46, 28, 12], "st_rear": [36, 36, 22, 11], "st_glass": [55, 7, 22, 7]}, "ws": 17}}});
+
+// coppia indicata da potenza e coppia vere (le perdite interne del modello si aggiungono, così i numeri netti tornano)
+function genTq(hp, rpmHp, nm, rpmNm, lim) {
+  const fr = (r) => 16 + 0.0035 * r + 0.9e-6 * r * r, nHp = hp * 7023 / rpmHp, out = [];
+  for (let r = 0; r <= 7500; r += 500) {
+    let t;
+    if (r <= rpmNm) t = nm * (0.55 + 0.45 * Math.min(1, r / Math.max(1, rpmNm)));
+    else if (r <= rpmHp) t = nm + (nHp - nm) * (r - rpmNm) / Math.max(1, rpmHp - rpmNm);
+    else t = nHp * Math.max(0.35, 1 - (r - rpmHp) / Math.max(800, (lim + 900 - rpmHp)) * 0.55);
+    out.push([r, Math.round(t + fr(r))]);
+  }
+  return out;
+}
+const G5 = [0, 3.55, 1.95, 1.32, 1.03, 0.82], G6 = [0, 3.77, 2.12, 1.36, 1.03, 0.81, 0.65];
+// [id, nome, nome corto, marca, motore, kg, trazione anteriore, cilindri, CV, giri CV, Nm, giri Nm, limitatore, minimo, marce, finale, raggio ruota, cd, area, prezzo, km, diesel]
+const GEN_NEW = [
+  ['a80', 'Audi 80 Avant 2.0', 'Audi 80', 'Audi', '2.0 aspirato', 1250, true, 4, 115, 5400, 168, 3200, 6300, 800, G5, 4.1, 0.30, 0.33, 2.0, 3500, 0],
+  ['a3', 'Audi A3 Sportback 1.5 TFSI', 'A3', 'Audi', '1.5 TFSI turbo', 1300, true, 4, 150, 5000, 250, 2000, 6200, 750, G6, 3.6, 0.315, 0.30, 2.15, 17000, 60],
+  ['a112', 'Autobianchi A112 Abarth', 'A112', 'Autobianchi', '1050 Abarth', 700, true, 4, 70, 6600, 86, 4200, 7000, 900, [0, 3.58, 2.24, 1.48, 1.04, 0.86], 4.07, 0.27, 0.40, 1.6, 9000, 40],
+  ['bus', 'Autobus urbano', 'Autobus', 'Autobus', '9 litri turbodiesel', 11500, false, 6, 300, 2000, 1250, 1100, 2300, 600, [0, 3.4, 1.9, 1.4, 1.0, 0.75, 0.65], 5.4, 0.5, 0.65, 8.5, 48000, 300, 1],
+  ['doblo', 'Fiat Doblò 1.6 Multijet', 'Doblò', 'Fiat', '1.6 Multijet', 1500, true, 4, 105, 4000, 290, 1500, 4800, 780, G6, 3.8, 0.31, 0.35, 2.9, 11000, 50, 1],
+  ['panda', 'Fiat Panda 1.2', 'Panda', 'Fiat', '1.2 8V', 940, true, 4, 69, 5500, 102, 3000, 6300, 800, G5, 4.07, 0.28, 0.32, 2.1, 2800, 0],
+  ['punto', 'Fiat Grande Punto 1.4', 'Punto', 'Fiat', '1.4 8V', 1100, true, 4, 77, 6000, 115, 3000, 6500, 800, G5, 3.9, 0.29, 0.33, 2.1, 3500, 0],
+  ['golf', 'Volkswagen Golf GTI', 'Golf GTI', 'Volkswagen', '1.8 GTI', 860, true, 4, 112, 5800, 157, 3500, 6800, 850, G5, 3.9, 0.28, 0.42, 1.8, 12000, 80],
+  ['corsa', 'Opel Corsa 1.2', 'Corsa', 'Opel', '1.2 16V', 1100, true, 4, 70, 5600, 115, 4000, 6400, 800, G5, 3.9, 0.29, 0.33, 2.1, 4000, 0],
+  ['p205', 'Peugeot 205 GTI 1.9', '205 GTI', 'Peugeot', '1.9 GTI', 880, true, 4, 130, 6000, 164, 4750, 6900, 850, G5, 4.06, 0.28, 0.35, 1.75, 14000, 120],
+  ['p206', 'Peugeot 206 GTI 2.0', '206 GTI', 'Peugeot', '2.0 16V', 1100, true, 4, 136, 6000, 190, 4100, 6800, 800, G5, 4.0, 0.30, 0.33, 2.0, 7000, 40],
+  ['p308', 'Peugeot 308 1.2 PureTech', '308', 'Peugeot', '1.2 PureTech turbo', 1200, true, 4, 130, 5500, 230, 1750, 6000, 750, G6, 3.6, 0.31, 0.29, 2.2, 15000, 60],
+  ['clio', 'Renault Clio 0.9 TCe', 'Clio', 'Renault', '0.9 TCe turbo', 1050, true, 4, 90, 5250, 140, 2500, 6200, 780, G5, 4.0, 0.30, 0.32, 2.1, 9000, 20],
+  ['williams', 'Renault Clio Williams', 'Williams', 'Renault', '2.0 16V F7R', 990, true, 4, 150, 6100, 175, 4500, 6800, 850, G5, 4.07, 0.29, 0.34, 1.9, 18000, 150],
+  ['taxi', 'Taxi 2.0 diesel', 'Taxi', 'Taxi', '2.0 turbodiesel', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.29, 2.2, 8000, 30, 1],
+  ['v850', 'Volvo 850 R', '850 R', 'Volvo', '2.3 cinque cilindri turbo', 1520, true, 6, 250, 5400, 350, 2500, 6500, 800, G5, 3.6, 0.31, 0.33, 2.1, 16000, 120],
+  ['polo', 'Volkswagen Polo 1.0', 'Polo', 'Volkswagen', '1.0 MPI', 1080, true, 4, 75, 6200, 95, 3000, 6500, 800, G5, 3.9, 0.29, 0.32, 2.1, 5000, 0],
+  ['van', 'Furgone 1.5 dCi', 'Furgone', 'Furgone', '1.5 dCi', 1400, true, 4, 90, 4000, 200, 1750, 4600, 780, G5, 4.0, 0.31, 0.36, 3.0, 9000, 60, 1],
+  ['ambulanza', 'Ambulanza 2.1 CDI', 'Ambulanza', 'Ambulanza', '2.1 CDI', 2900, false, 4, 163, 3800, 360, 1400, 4500, 750, G6, 3.9, 0.35, 0.40, 4.5, 22000, 200, 1],
+  ['polizia', 'Auto della polizia (dismessa)', 'Ex polizia', 'Polizia', '2.0 TDI', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.31, 2.2, 12000, 150, 1],
+];
+for (const q of GEN_NEW) {
+  const [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
+  GEN_DATA[id].tq = genTq(hp, rH, nm, rN, lim);
+  const heavy = mass > 5000;
+  const voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
+    : { pulse: hp > 120 ? 0.85 : 1.05, rough: hp < 80 ? 0.2 : 0.1, metal: hp > 120 ? 0.35 : 0, boomRpm: lim * 0.5, hiRpm: lim };
+  GEN_CARS.push({
+    id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
+    shiftK: heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: diesel ? 0.15 : 0.3, voice, buy: { price, km },
+    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: diesel ? GEN_EX.diesel : cyl === 6 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
+    P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : 0.14 + mass / 12000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
+      heavy ? { Iw: 36, Ks: 240000, vmax: 90 } : {}),
+    turbo: null,
+    boost: [KIT_SC('sc', 'Rotrex', 'Compressore volumetrico (0,5 bar)', 0.5, Math.round(2500 + price * 0.1), 30, 'Più spinta coi giri: +35 %.'),
+      KIT_T('turbo', 'Garrett', 'Kit turbo (0,9 bar)', 0.9, 2600, 3800, Math.round(4000 + price * 0.15), 45, 'Il kit grosso: servono centralina e intercooler.', 'TURBO')],
+    diff0: { name: 'Aperto', note: 'Di serie.', diff: 'open' }, priceK: heavy ? 3 : 1,
+  });
+}
+
 const CARS = {
   supra: {
     id: 'supra', name: 'Toyota Supra RZ', short: 'Supra', tag: 'Toyota Supra RZ · JZA80 · sei in linea biturbo · Getrag V160',
@@ -356,6 +414,12 @@ const CLUSTERS = {
   e34: { brand: 'BMW M', model: 'S38B36 · M POWER', speed: 280, tach: 8, red: 7.0, m: true, face: ['#121214', '#060607'], num: '#ff8a2a', needle: '#ff4a1a', glow: 'rgba(255,120,30,.3)', lcd: '#ff8a2a', bez: ['#303034', '#0c0c0e', '#202024'], aux: 'ÖL', font: '"Barlow Semi Condensed", "Arial Narrow", sans-serif' },
 };
 for (const id in CLUSTERS) if (CARS[id]) CARS[id].cluster = CLUSTERS[id];
+// quadro di serie per le auto del pacchetto: scala secondo motore, colori sobri
+for (const id of CAR_IDS) if (!CARS[id].cluster) {
+  const c = CARS[id], lim = c.P.limiter, diesel = lim < 5200;
+  CARS[id].cluster = { brand: c.make.toUpperCase(), model: c.engine.toUpperCase(), speed: c.mass > 5000 ? 125 : (c.P.tq ? 200 : 220), tach: lim < 3000 ? 3 : diesel ? 5 : lim > 6600 ? 8 : 7, red: Math.round((lim - 300) / 100) / 10,
+    face: ['#121316', '#060708'], num: '#eef0f2', needle: diesel ? '#ffb000' : '#ff5a1e', glow: 'rgba(200,220,255,.14)', lcd: '#ffcf7a', bez: ['#3a3c40', '#121315', '#26282c'], aux: 'TURBO', font: '"Barlow Semi Condensed", "Arial Narrow", sans-serif' };
+}
 
 
 // rende attivo il catalogo dell'auto: TUNING e TUNING_PRESETS (usati dall'officina) puntano a quelli dell'auto

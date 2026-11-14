@@ -489,8 +489,9 @@ class Street2D {
 
   // traffico, polizia e rivali: solo le auto disegnate dal giocatore (cars.js, img/<auto>.png), riverniciate con la maschera
   otherSprite(kind, color, k, vt) {
-    const id = kind === 'police' ? 'e34' : (vt && typeof CARS !== 'undefined' && CARS[vt] && CARS[vt].sprite) ? vt : 'e36';
-    const hex = kind === 'police' ? '#1c2c5c' : '#' + (color || 0x777777).toString(16).padStart(6, '0');
+    const id = kind === 'police' ? 'polizia' : (vt && typeof CARS !== 'undefined' && CARS[vt] && CARS[vt].sprite) ? vt : 'panda';
+    // il traffico tiene i colori dei disegni; solo l'auto "gemella" degli eventi strani prende il colore del giocatore
+    const hex = color === 'orig' || kind === 'police' || kind === 'traffic' && !color ? 'orig' : '#' + (color || 0x777777).toString(16).padStart(6, '0');
     return this.trafficSprite(id, hex, k);
   }
   trafImgs(id) {
@@ -510,7 +511,7 @@ class Street2D {
     if (!base) {
       base = document.createElement('canvas'); base.width = D.w; base.height = D.h;
       const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(G.img, 0, 0);
-      if (G.paint.width) {
+      if (G.paint.width && hex !== 'orig') {
         const m = document.createElement('canvas'); m.width = D.w; m.height = D.h; const mx = m.getContext('2d', { willReadFrequently: true }); mx.drawImage(G.paint, 0, 0);
         const d = x.getImageData(0, 0, D.w, D.h), p = d.data, mk = mx.getImageData(0, 0, D.w, D.h).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
         for (let i = 0; i < p.length; i += 4) {
@@ -1895,10 +1896,14 @@ class Street2D {
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
       this.light(g, left + 3, sy + T0 + 35 * k, 8, 6, '#ff2a2a', 0.15, 2);
+      if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce
+        g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3);
+        this.light(g, left + 4, sy + T0 + 39 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + T0 + 37 * k, 12, 7, '#ffa020', 0.35, 3);
+      }
       if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3); this.light(g, left + 4, sy + T0 + 39 * k, 9, 6, '#ffa020', 0.3, 3); }
       if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
       if (e.kind === 'police') {
-        const on = e.chase || e.v > 0 || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
+        const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
         const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
         g.fillStyle = on && ph ? '#ff2e4d' : '#4a1020'; g.fillRect(lx, ly, Math.round(13 * sc), 3);
         if (on) { this.light(g, lx + 14 * sc, ly, 120, 60, ph ? '#ff2e4d' : '#4f7bff', 0.16, 4); this.light(g, lx + 14 * sc, y, 160, 14, ph ? '#ff2e4d' : '#4f7bff', 0.12, 3); }
@@ -2155,7 +2160,7 @@ class Street2D {
       if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
       if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
     }
-    if (game) for (const f of game.fx) { if (f.k === 'crash') this.comic('CRASH!', left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); else if (f.k === 'scrape') this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); }
+    if (game) for (const f of game.fx) { if (f.k === 'challenge') this.comic('SFIDA! 2 KM', carX + 40, carTop - 30, '#ff2e88', 4, '#ffd23f'); else if (f.k === 'streetWin') this.comic('VINTA!', carX + 40, carTop - 30, '#b8ff3a', 5); else if (f.k === 'streetLose') this.comic('PERSA...', carX + 40, carTop - 30, '#8a93b0', 4); if (f.k === 'crash') this.comic('CRASH!', left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); else if (f.k === 'scrape') this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); }
     if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
     if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
     if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
@@ -2239,6 +2244,16 @@ class Street2D {
 
     // ---- segnalatore della corsia (radar delle tre corsie)
     if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
+    if (game && game.street) {   // sfida in corsa: barra dei 2 km con le due auto
+      const R = game.street, bx = Math.round(W * 0.3), bw = Math.round(W * 0.4), by = 46, f = (m) => Math.max(0, Math.min(1, m / ST_RACE_M));
+      g.fillStyle = 'rgba(8,8,14,.78)'; g.fillRect(bx - 6, by - 6, bw + 12, 26);
+      g.fillStyle = '#3a3f58'; g.fillRect(bx, by + 3, bw, 2);
+      for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : C.ink; g.fillRect(bx + bw - 3 + (q % 2) * 3, by - 2 + Math.floor(q / 2) * 4, 3, 4); }
+      const mk = (m, col) => { const xx = bx + Math.round(f(m) * bw); g.fillStyle = C.ink; g.fillRect(xx - 4, by - 1, 9, 8); g.fillStyle = col; g.fillRect(xx - 3, by, 7, 6); };
+      mk(R.e.x - R.x0, '#b8b8c8'); mk(dist - R.x0, this.paintHex || '#ff5a3a');
+      const gap = Math.round(-(R.gap || 0)), txt = (gap >= 0 ? '+' : '') + gap + ' M · ' + Math.max(0, Math.round((ST_RACE_M - (dist - R.x0)) / 10) * 10) + ' M ALLA FINE';
+      this.text(g, txt, bx, by + 10, gap >= 0 ? '#b8ff3a' : '#ff5a3a');
+    }
     if (game && game.track === 'city' && !game.inside && this.laneRadar !== false) this.drawLaneRadar(g, game, dist, st.t);
 
     // ---- su schermo

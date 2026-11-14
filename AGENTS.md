@@ -22,6 +22,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `radio.js` | Radio. |
 | `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia, gare. |
 | `viaggio.js` | Il Viaggio (modalità principale): tappe, paesaggi, bisogni del guidatore, Motel Ovunque e la cassa, lavori, autostoppisti, capitoli ed eventi strani. Si aggancia a `StreetGame`; stato in `game.s.vg`. |
+| `strada.js` | Sfide lanciate con gli abbaglianti (2 km), reputazione e vantaggi, eventi in prima corsia, comportamento del traffico. |
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
