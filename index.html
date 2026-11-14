@@ -269,9 +269,16 @@ body.inplace .lanebtn { display: none; }
 .km-perks { display: flex; flex-wrap: wrap; gap: 6px; } .km-perks span { font: 400 12px/1.2 var(--f-data); padding: 4px 8px; color: var(--muted); box-shadow: inset 0 0 0 1px #2a251d; }
 .km-perks span b { font-weight: 400; margin-right: 6px; } .km-perks span.on { color: #141a04; background: var(--lime); box-shadow: none; }
 .kmbox p.hint { margin: 0; } .kmbox p.hint b { font-weight: 400; color: var(--fg); }
-#hudP { position: absolute; left: 12px; bottom: 74px; width: clamp(270px, 30%, 420px); aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
-body.inplace #hudP { display: none; }
-@media (max-width: 600px) { #hudP { width: min(70vw, 300px); left: 6px; bottom: 64px; } }
+
+.dash { position: absolute; left: 12px; bottom: 72px; width: clamp(220px, 23%, 330px); display: grid; gap: 5px; z-index: 3; }
+.dash-btns { display: flex; gap: 4px; }
+.dash-btns button { flex: 1; border: 0; padding: 5px 0; font: 600 10px/1 var(--f-data); letter-spacing: .08em; color: var(--muted); background: rgba(10,10,12,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); border-radius: 6px; cursor: pointer; }
+.dash-btns button[aria-pressed="true"] { color: #0b0a08; background: var(--amber); }
+.dash-btns button.hot { background: #b8ff3a; box-shadow: 0 0 10px rgba(184,255,58,.6); }
+.dash-btns button:disabled { opacity: .35; cursor: default; }
+#hudP { width: 100%; aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
+body.inplace .dash { display: none; }
+@media (max-width: 600px) { .dash { width: min(64vw, 260px); left: 6px; bottom: 60px; } .dash-btns button { font-size: 9px; } }
 #hudG { position: absolute; right: 12px; bottom: 70px; width: clamp(190px, 26%, 320px); aspect-ratio: 160 / 84; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 10px rgba(255,46,136,.25)); }
 .anime-shift { position: absolute; inset: 0; pointer-events: none; display: grid; place-items: center; opacity: 0; z-index: 4; overflow: hidden; }
 .anime-shift > * { grid-area: 1 / 1; }
@@ -729,7 +736,16 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       </div>
       <div class="toasts" id="toasts" aria-live="polite"></div>
       <canvas id="hudG" aria-hidden="true"></canvas>
-      <canvas id="hudP" aria-hidden="true"></canvas>
+      <div class="dash" id="dash">
+        <div class="dash-btns" role="group" aria-label="Comandi di guida">
+          <button type="button" id="dbAuto" title="Guida automatica: parte dopo 3 secondi senza toccare tasti">AUTO</button>
+          <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
+          <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
+          <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
+          <button type="button" id="dbMap" title="Mappa del mondo (T)">MAPPA</button>
+        </div>
+        <canvas id="hudP" aria-hidden="true"></canvas>
+      </div>
       <div class="anime-shift" id="animeShift" aria-hidden="true"><i class="as-lines"></i><b class="as-main">PERFETTA!</b><span class="as-sub">シフト完璧!</span></div>
       <button class="fsbtn" type="button" id="fsBtn" aria-label="Schermo intero (tasto Z)" title="Schermo intero (Z)"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
       <button class="enterbtn" type="button" id="enterBtn" hidden></button>
@@ -840,7 +856,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
         <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
         <label class="tg"><input type="checkbox" id="tLaunch"><span id="tLaunchL">Launch control 4300</span></label>
-        <label class="tg"><input type="checkbox" id="tLane">Sorpasso automatico</label>
+        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (dopo 3 s senza tasti)</label>
         <label class="tg"><input type="checkbox" id="tTc">Controllo di trazione</label>
       </div>
       <div class="field"><span>Volume</span>
@@ -1307,8 +1323,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
     else if (k === '5') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
-    else if (k === 'j') { const st = S.hudG === false ? 0 : S.hudStyle === 'anime' ? 2 : 1, nx = (st + 1) % 3; S.hudG = nx !== 0; S.hudStyle = nx === 2 ? 'anime' : 'orig';
-      flash(nx === 0 ? 'Strumenti in gioco: spenti' : nx === 1 ? 'Strumenti in gioco: cruscotto dell\'auto' : 'Strumenti in gioco: stile anime', 1.4); try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } }
+    else if (k === 'j') cycleHud();
     else if (k === 'k') cycleMeteo();
     else if (k === 'g') openShowroom();
     else if (k === 'x') takePhoto();
@@ -1370,8 +1385,8 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       // semaforo da tastiera: W tenuto fa salire i giri, rilasciato li fa scendere piano (si dosa a colpetti)
       revT = Math.max(sim.P.idle, Math.min(sim.P.limiter - 200, revT + (k('w') ? 2600 : -1300) * dt));
       inp.thr = Math.max(0, Math.min(1, 0.08 + (revT - sim.rpm) / 1400));
-    } else { revT = sim.rpm; inp.thr = ramp(inp.thr, tThr, 10, 14); }
-    inp.brake = ramp(inp.brake, tgt('brake', k('s')), 8, 10);
+    } else { revT = sim.rpm; inp.thr = ramp(inp.thr, tThr, 18, 22); }
+    inp.brake = ramp(inp.brake, tgt('brake', k('s')), 14, 16);
     inp.clutch = ramp(inp.clutch, tgt('clutch', k(' ')), 9, 2.3);
     if (game.s.vg && game.s.vg.weak) inp.thr *= 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 170));   // fame e sete: le mani non rispondono
     sim.in.thr = inp.thr; sim.in.brake = inp.brake; sim.in.clutch = S.autoClutch ? 0 : inp.clutch;
@@ -2093,6 +2108,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     if (open) { const L = game.loc || GAME_LOCS[0]; wm.sel = wm.sel || L.id; wm.view = wm.view || (L.lon > 120 ? 'giappone' : L.lon < -60 ? 'usa' : 'italia'); wmRender(); }
   }
   function travelTo(id) {
+    if (game.s.vg) { flash('Nel viaggio si va solo avanti: la mappa ti mostra dove sei', 2.2); return; }
     if (Math.abs(sim.v) > 0.8) { flash('Fermati prima di partire: l\'auto va caricata sulla bisarca', 2.2); return; }
     if (game.race) { flash('Prima finisci la gara', 1.6); return; }
     const L = GAME_LOCS.find((l) => l.id === id); if (!L) return;
@@ -2467,6 +2483,46 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   }
 
 
+
+  // ---------------------------------------------------------------- guida automatica: parte dopo 3 s senza toccare niente,
+  // si spegne al primo tasto (gas, freno, marce, sterzo). Tiene la velocità a cui l'hai lasciata, cambia le marce e sorpassa.
+  const auto = { on: false, last: performance.now(), v: 0 };
+  function autoDrive(dt) {
+    const now = performance.now();
+    const touching = keys.size > 0 || btnSteer.L || btnSteer.R || inp.touch.thr !== null || inp.touch.brake !== null || inp.touch.clutch !== null
+      || (inp.pad.thr || 0) > 0.02 || (inp.pad.brake || 0) > 0.02 || Math.abs(inp.pad.steer || 0) > 0.12;
+    if (touching) auto.last = now;
+    const can = S.autoLane !== false && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > 4 && !game.race && !game.ap && !game.inside && game.track === 'city' && !rp.on;
+    const want = can && now - auto.last > 3000;
+    if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`Guida automatica: ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
+    if (!want && auto.on && touching) flash('Guidi tu', 0.8);
+    auto.on = want;
+    game.autoLane = auto.on;                 // i cambi di corsia automatici solo quando guida lei: mai mentre guidi tu
+    if (!auto.on) { game.blocked = false; return; }
+    game.manualT = 0;
+    sim.in.thr = clamp(0.22 + (auto.v - sim.v) * 0.3, 0, 1); sim.in.brake = 0;
+    if (!sim.shiftSeq) {
+      const z = shiftZone();
+      if (sim.rpm > z.lo && sim.gear < sim.topGear()) shiftUp();
+      else if (sim.rpm < Math.max(1800, sim.P.idle * 2.2) && sim.gear > 1) shiftDown();
+    }
+  }
+  function cycleHud() {
+    const st = S.hudG === false ? 0 : S.hudStyle === 'anime' ? 2 : 1, nx = (st + 1) % 3; S.hudG = nx !== 0; S.hudStyle = nx === 2 ? 'anime' : 'orig';
+    flash(nx === 0 ? 'Strumenti in gioco: spenti' : nx === 1 ? 'Strumenti in gioco: cruscotto dell\'auto' : 'Strumenti in gioco: stile anime', 1.4);
+    try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
+  }
+  // pulsanti accanto al cruscotto
+  function dashBtns() {
+    const set = (id, on, hot) => { const b = $(id); if (!b) return; b.setAttribute('aria-pressed', String(!!on)); b.classList.toggle('hot', !!hot); };
+    set('dbAuto', S.autoLane !== false, auto.on); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
+    $('dbLaunch').disabled = !TP.sim.ecuLaunch;
+  }
+  $('dbAuto').addEventListener('click', () => { S.autoLane = S.autoLane === false; applySettings(); flash(S.autoLane ? 'Guida automatica: parte dopo 3 secondi senza tasti' : 'Guida automatica spenta', 1.8); });
+  $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });
+  $('dbLaunch').addEventListener('click', () => { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); });
+  $('dbHud').addEventListener('click', cycleHud);
+  $('dbMap').addEventListener('click', () => toggleWorldMap());
   // ---------------------------------------------------------------- cruscotto in alta definizione (hudpro.js)
   function hudData() {
     const lit = sim.ign, cl = (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, z = shiftZone(), rpm = lit ? sim.rpm : 0;
@@ -2665,7 +2721,8 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     $('hudRep').textContent = fmt(s.rep);
     heatPips.forEach((p, i) => p.classList.toggle('on', s.heat > i + 0.05));
     $('hudDist').textContent = fmt(s.dist / 1000, 1);
-    renderTrip(); game.paintHex = carPaint();
+    renderTrip(); game.paintHex = carPaint(); dashBtns();
+    { const pro = !$('hudP').hidden; $('hudDist').parentElement.hidden = pro; $('hudFuelTag').hidden = pro; }   // km e benzina sono già nel cruscotto
     const liters = sim.fuel * sim.P.tank;
     $('hudFuel').textContent = fmt(liters, 1) + ' L' + (sim.fuelRate > 0.0008 ? ` · ${fmt(sim.fuelRate * 3600, 0)} L/h` : '');
     $('hudFuelTag').classList.toggle('fuel-low', sim.fuel < 0.15);
@@ -2865,15 +2922,17 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     }
     if (intro && intro.handback) { intro.handback = false; if (audio.ready) audio.send({ p: sim.audioParams(), ev: [] }); }
     readPad(); updateInputs(dt);
+    autoDrive(dt);
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;
     if (game.blocked) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, game.blockBrake || 0.18); }
     if (game.mode === 'free') sim.fuel = Math.max(sim.fuel, 0.5);
     sim.update(dt);
+    if (auto.on) keyAxis = 0;
     // sterzo da tasti progressivo: un tocco corregge appena, tenendo premuto la sterzata cresce fino al massimo;
     // al rilascio torna dritto in fretta. La levetta del pad resta analogica e diretta.
-    const keyT = (keys.has('a') ? 1 : 0) - (keys.has('d') ? 1 : 0) + btnSteer.L - btnSteer.R;
-    keyAxis += (keyT - keyAxis) * Math.min(1, dt * (keyT === 0 ? 16 : Math.sign(keyT) !== Math.sign(keyAxis) ? 12 : 4.5));
+    const keyT = auto.on ? 0 : (keys.has('a') ? 1 : 0) - (keys.has('d') ? 1 : 0) + btnSteer.L - btnSteer.R;
+    keyAxis += (keyT - keyAxis) * Math.min(1, dt * (keyT === 0 ? 18 : Math.sign(keyT) !== Math.sign(keyAxis) ? 16 : 7.5));
     if (Math.abs(keyAxis) < 0.01 && keyT === 0) keyAxis = 0;
     game.steerHold(clamp(keyAxis + (inp.pad.steer || 0), -1, 1));
     game.update(dt);

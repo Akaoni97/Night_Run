@@ -386,3 +386,12 @@ a scelta nelle impostazioni (turbo se c'è, olio, acqua, pressione olio, volt, A
 l'auto tiene meno e frena di più; sul cerchione si rovina. Si cambia con la ruota di scorta (tasto **5**, da
 fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Niko si ripara la forata.
 
+**Guida e schermata.** Accanto al cruscotto (in basso a sinistra) ci sono i pulsanti AUTO, TC, LAUNCH, STRUMENTI e
+MAPPA. La **guida automatica** parte da sola dopo 3 secondi senza toccare niente: tiene la velocità, cambia le
+marce e sorpassa; al primo tasto (gas, freno, marce, sterzo) torni a guidare tu e lei non sterza più. Comandi più
+pronti (gas, freno, sterzo). Inquadratura: vicina da fermi, si allarga a 10-20 km/h e in velocità mostra tutta la
+strada. Il pilota è un'ombra che va avanti e indietro con accelerazione e frenata.
+
+**Traffico.** Solo le auto disegnate dal giocatore (E36, E34, E30, 2002, R5), riverniciate con la maschera; le
+volanti sono la M5 E34 blu coi lampeggianti. Camion, furgoni e autobus arriveranno coi disegni del giocatore.
+

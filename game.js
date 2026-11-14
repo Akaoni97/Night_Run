@@ -13,8 +13,8 @@ const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a,
 // traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
 // velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
 const GAME_TRAFFIC = [
-  { vt: 'sedan', len: 4.6, kmh: [110, 135], w: 30 }, { vt: 'kei', len: 3.4, kmh: [100, 120], w: 14 }, { vt: 'taxi', len: 4.7, kmh: [105, 130], w: 10 },
-  { vt: 'van', len: 4.9, kmh: [100, 125], w: 12 }, { vt: 'truck', len: 8.4, kmh: [85, 92], w: 8 }, { vt: 'bus', len: 11, kmh: [90, 100], w: 5 },
+  { vt: 'e36', len: 4.4, kmh: [110, 135], w: 24 }, { vt: 'e34', len: 4.7, kmh: [110, 135], w: 20 }, { vt: 'e30', len: 4.3, kmh: [105, 130], w: 18 },
+  { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 14 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 10 },
 ];
 // luoghi della mappa del mondo: posti veri, ognuno con il suo sfondo 2D e il suo traffico
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
@@ -179,7 +179,7 @@ class StreetGame {
   // tamponamento: la Supra rallenta di colpo, l'altra auto viene spinta avanti, si pagano i danni
   // urto con un altro veicolo: quantità di moto divisa secondo le masse, danni secondo la differenza di velocità
   crash(e, kind = 'front') {
-    const sim = this.sim, m1 = sim.P.mass, m2 = e.vt === 'truck' || e.vt === 'bus' ? 11000 : e.vt === 'kei' ? 850 : 1400;
+    const sim = this.sim, m1 = sim.P.mass, m2 = (typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].mass) || 1400;
     const dv = Math.abs(sim.v - e.v), I = Math.min(1.5, dv / 10);
     e.hitT = 1.2;
     if (kind === 'side') {
@@ -190,7 +190,7 @@ class StreetGame {
       sim.v *= 0.94; e.v *= 0.97; this.manualT = 1.2; this.free = false;
       sim.damage = Math.min(1, sim.damage + 0.04 + dv * 0.004);
       sim.events.push({ type: 'crash', I: 0.5 }); this.fx.push({ k: 'scrape', I: 0.5 });
-      this.say(`Strisciata contro ${e.vt === 'truck' ? 'il camion' : e.vt === 'bus' ? 'l\'autobus' : 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
+      this.say(`Strisciata contro ${(typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].short) || 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
       this.s.crashes = (this.s.crashes || 0) + 1; return;
     }
     // urto quasi anelastico (restituzione 0,2)
@@ -474,10 +474,10 @@ class StreetGame {
     const tot = GAME_TRAFFIC.reduce((a, t) => a + t.w * (mix[t.vt] ?? 1), 0);
     let k = r() * tot, T = GAME_TRAFFIC[0];
     for (const t of GAME_TRAFFIC) { if ((k -= t.w * (mix[t.vt] ?? 1)) < 0) { T = t; break; } }
-    const heavy = T.vt === 'truck' || T.vt === 'bus';
+    const heavy = false;
     lane = lane || (heavy ? (r() < 0.8 ? 1 : 2) : r() < 0.5 ? 1 : r() < 0.6 ? 2 : 3);
     if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 14 + (o.len || 4.6))) return null;
-    const cols = T.vt === 'taxi' ? [0xf0b020, 0x2f6d3a, 0xe8e6df] : T.vt === 'bus' ? [0x2f8d5a, 0x2b5cae, 0xc8c2b0] : T.vt === 'truck' ? [0xe8e6df, 0x3a5a9a, 0xb03020] : GAME_COLORS;
+    const cols = GAME_COLORS;
     const hw = !!(this.s && this.s.vg) || (this.loc && this.loc.bg === 'highway'), kv = hw ? 1 : 0.5;
     const v = (T.kmh[0] + r() * (T.kmh[1] - T.kmh[0])) * kv / 3.6;
     const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: cols[Math.floor(r() * cols.length)] };
@@ -833,11 +833,11 @@ class StreetGame {
     if (freeOK && Math.abs(this.steerIn) > 0.05) {
       this.free = true; this.manualT = this.autoLane ? 5 : 1e9;
       // più reattivo: la velocità laterale arriva quasi subito e cresce con la velocità dell'auto
-      const vmax = 1.6 + Math.min(3.6, sim.v * 0.12);
+      const vmax = 2.4 + Math.min(4.6, sim.v * 0.15);
       // risposta un po' non lineare: piccole correzioni morbide, sterzata piena decisa
       const k = Math.sign(this.steerIn) * Math.pow(Math.abs(this.steerIn), 1.4);
-      this.latV += (-k * vmax - this.latV) * Math.min(1, dt * 11);
-    } else this.latV += (0 - this.latV) * Math.min(1, dt * 12);
+      this.latV += (-k * vmax - this.latV) * Math.min(1, dt * 16);
+    } else this.latV += (0 - this.latV) * Math.min(1, dt * 16);
     if (!freeOK || (this.manualT === 0 && Math.abs(this.steerIn) <= 0.05)) this.free = false;
     if (this.free) {
       this.laneZ = Math.max(GAME_LANE_Z[3] - 1.4, Math.min(GAME_LANE_Z[1] + 1.4, this.laneZ + this.latV * dt));

@@ -487,9 +487,45 @@ class Street2D {
     g.restore();
   }
 
+  // traffico, polizia e rivali: solo le auto disegnate dal giocatore (cars.js, img/<auto>.png), riverniciate con la maschera
   otherSprite(kind, color, k, vt) {
-    const hex = kind === 'police' ? '#163a8c' : '#' + (color || 0x777777).toString(16).padStart(6, '0');
-    return this.vehicle(kind === 'rival' ? 'coupe' : kind === 'police' ? 'police' : vt && Street2D.GEO[vt] ? vt : 'sedan', hex, k);
+    const id = kind === 'police' ? 'e34' : (vt && typeof CARS !== 'undefined' && CARS[vt] && CARS[vt].sprite) ? vt : 'e36';
+    const hex = kind === 'police' ? '#1c2c5c' : '#' + (color || 0x777777).toString(16).padStart(6, '0');
+    return this.trafficSprite(id, hex, k);
+  }
+  trafImgs(id) {
+    Street2D.tg = Street2D.tg || {};
+    if (Street2D.tg[id]) return Street2D.tg[id];
+    const D = CARS[id].sprite, G = { n: 0, ready: false };
+    const done = () => { if (++G.n === 3) { G.ready = true; } };
+    for (const k of ['img', 'wheel', 'paint']) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
+    return (Street2D.tg[id] = G);
+  }
+  trafficSprite(id, hex, k) {
+    const key = 'traf' + id + hex + k;
+    if (this.spr[key]) return this.spr[key];
+    const G = this.trafImgs(id), D = CARS[id].sprite;
+    if (!G.ready || !G.img.width) return null;
+    const bk = 'trafb' + id + hex; let base = this.spr[bk];
+    if (!base) {
+      base = document.createElement('canvas'); base.width = D.w; base.height = D.h;
+      const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(G.img, 0, 0);
+      if (G.paint.width) {
+        const m = document.createElement('canvas'); m.width = D.w; m.height = D.h; const mx = m.getContext('2d', { willReadFrequently: true }); mx.drawImage(G.paint, 0, 0);
+        const d = x.getImageData(0, 0, D.w, D.h), p = d.data, mk = mx.getImageData(0, 0, D.w, D.h).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
+        for (let i = 0; i < p.length; i += 4) {
+          if (mk[i + 3] < 128 || !p[i + 3]) continue;
+          const kk = Math.max(0.15, Math.min(1.9, ((p[i] + p[i + 1] + p[i + 2]) / 3) / D.refL)), lift = kk > 1 ? (kk - 1) * 0.6 : 0;
+          p[i] = Math.min(255, R * Math.min(kk, 1.1) + (255 - R) * lift); p[i + 1] = Math.min(255, Gc * Math.min(kk, 1.1) + (255 - Gc) * lift); p[i + 2] = Math.min(255, B * Math.min(kk, 1.1) + (255 - B) * lift);
+        }
+        x.putImageData(d, 0, 0);
+      }
+      this.spr[bk] = base;
+    }
+    const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
+    const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx }; c.wheelImg = G.wheel; c.k = k;
+    return (this.spr[key] = c);
   }
 
   vehicle(type, P, k) {
@@ -1653,8 +1689,10 @@ class Street2D {
     const launching = (s.acc || 0) > 3.2 && Math.abs(s.v) < 30 && s.thr > 0.5;
     st.launch = launching ? Math.min(1, (st.launch || 0) + dt * 5) : Math.max(0, (st.launch || 0) - dt * 1.4);
     if (this.camFx && game) {
-      const spk = Math.min(1, Math.abs(s.v) / 45), tz = 1 + 0.06 * st.launch + 0.04 * (1 - spk);
-      st.fz = (st.fz ?? tz) + (tz - (st.fz ?? tz)) * Math.min(1, dt * (tz > (st.fz ?? tz) ? 7 : 1.2));
+      // inquadratura: da fermi vicina sull'auto, a 10-20 km/h si allarga, in velocità tutta la strada
+      const kmh = Math.abs(s.v) * 3.6, spk = Math.min(1, Math.abs(s.v) / 45);
+      const tz = (kmh < 15 ? 1.3 - kmh / 15 * 0.16 : kmh < 60 ? 1.14 - (kmh - 15) / 45 * 0.12 : Math.max(1, 1.02 - (kmh - 60) / 100 * 0.02)) + 0.03 * st.launch;
+      st.fz = (st.fz ?? tz) + (tz - (st.fz ?? tz)) * Math.min(1, dt * (tz > (st.fz ?? tz) ? 0.9 : 1.6));
       this.fxZoom = st.fz;
       if (this.carPos) { const fT = { x: this.carPos.x + 40 + spk * 30, y: this.carPos.y - 30 }; this.fxFocus = this.fxFocus ? { x: this.fxFocus.x + (fT.x - this.fxFocus.x) * Math.min(1, dt * 4), y: this.fxFocus.y + (fT.y - this.fxFocus.y) * Math.min(1, dt * 4) } : fT; }
     } else this.fxZoom = 1;
@@ -1844,19 +1882,24 @@ class Street2D {
         return;
       }
       const y = e._y ?? this.laneY(zOf(e)), k = kq(y), spr = this.otherSprite(e.kind, e.color, k, e.vt), sc = k;
-      const w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - 57 * k - 1) - Math.round((spr.geo.top || 0) * k);
-      const T0 = Math.round((spr.geo.top || 0) * k);
+      if (!spr) return;                                                           // disegno non ancora caricato
+      const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
+      const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
       this.shadow(g, x, y, w * 0.45, 4);
       g.drawImage(spr, left, sy);
-      const ang = -(e.x / 0.32);
-      for (const ax of spr.geo.ax) this.wheel(g, left + 1 + ax * k, sy + T0 + 1 + 42 * k, Math.max(6, Math.round((spr.geo.wr || 15) * k)), ang, e.v || 0);
+      const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
+      for (const ax of GG.ax) {
+        const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
+        if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
+        else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
+      }
       this.light(g, left + 3, sy + T0 + 35 * k, 8, 6, '#ff2a2a', 0.15, 2);
       if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3); this.light(g, left + 4, sy + T0 + 39 * k, 9, 6, '#ffa020', 0.3, 3); }
       if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
       if (e.kind === 'police') {
         const on = e.chase || e.v > 0 || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
-        const lx = Math.round(left + 82 * k), ly = sy + Math.round(5 * k);
+        const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
         g.fillStyle = on && ph ? '#ff2e4d' : '#4a1020'; g.fillRect(lx, ly, Math.round(13 * sc), 3);
         if (on) { this.light(g, lx + 14 * sc, ly, 120, 60, ph ? '#ff2e4d' : '#4f7bff', 0.16, 4); this.light(g, lx + 14 * sc, y, 160, 14, ph ? '#ff2e4d' : '#4f7bff', 0.12, 3); }
         g.fillStyle = on && !ph ? '#4f7bff' : '#101a4a'; g.fillRect(lx + Math.round(15 * sc), ly, Math.round(13 * sc), 3);
@@ -1929,11 +1972,12 @@ class Street2D {
     // pilota (dietro al montante): va indietro in accelerazione, avanti in frenata
     const P = (col, xx, yy, w, h) => { g.fillStyle = col; g.fillRect(Math.round(xx * k) + 1, Math.round(yy * k) + 1, Math.max(1, Math.round(w * k)), Math.max(1, Math.round(h * k))); };
     const hx = (spr.img ? GE.hx : 108) + st.head * 0.8, hy = GE.hy;
-    P('#14102a', hx - 2, 14 + hy, 6, 9);
-    P(C.ink, hx - 2, 12 + hy, 11, 11); P(C.skin, hx, 14 + hy, 7, 7); P(Street2D.shade(C.skin, -0.25), hx, 19 + hy, 7, 2);
-    P(C.ink, hx + 2, 16 + hy, 6, 2); P('#2ee6ff', hx + 4, 16 + hy, 2, 1);
-    P('#ff2e88', hx - 1, 12 + hy, 8, 3); P('#ff2e88', hx + 5, 14 + hy, 4, 1);
-    P('#2a1f4f', hx - 1, 22 + hy, 9, 2);
+    // il pilota è solo un'ombra controluce: la testa va indietro in accelerazione e avanti in frenata, il poggiatesta resta fermo
+    const hx0 = hx - st.head * 0.8, sh = 'rgba(4,5,12,.82)', sh2 = 'rgba(4,5,12,.55)';
+    P(sh2, hx0 - 6, 13 + hy, 4, 10);                                          // poggiatesta
+    P(sh, hx - 1, 13 + hy, 8, 9); P(sh, hx, 12 + hy, 6, 1); P(sh, hx + 7, 16 + hy, 1, 3);   // testa (naso appena accennato)
+    P(sh, hx + 1, 22 + hy, 5, 2); P(sh, hx - 3, 24 + hy, 13, 6);               // collo e spalle
+    P(sh2, hx + 9, 25 + hy, 6, 2);                                            // braccio verso il volante
     if (this.carId !== 'v40') for (let n = 0; n < 6; n++) P('rgba(111,216,255,.55)', 121 + n, 14 + n, 1, 1);
     if (s.brake > 0.05) { if (spr.img) { P('#ff2a2a', GE.tail[0], GE.tail[1], GE.tail[2], GE.tail[3]); P('#ffd0c8', GE.tail[0] + 1, GE.tail[1] + 1, 2, 2); } else { P('#ff2a2a', 1, 31, 5, 7); P('#ffd0c8', 2, 32, 2, 2); } }
     const blinkOn = s.signal && Math.floor(st.t * 3) % 2 === 0;

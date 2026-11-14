@@ -580,7 +580,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (o.ghost) { this.ents.push({ id: this.id++, kind: 'ghost', lane: 1 + Math.floor(Math.random() * 3), x: d + 40 + Math.random() * 60, v: Math.max(0, this.sim.v), ttl: 6 }); return; }
     if (o.sign || o.cippo) this.ents.push({ id: this.id++, kind: 'vgsign', lane: 0, x: d + 240, v: 0, text: o.sign || 'KM 9', cippo: !!o.cippo, wall: o.id === 'ultimaUscita' });
     if (o.parked) for (let q = 0; q < 6; q++) this.ents.push({ id: this.id++, kind: 'parked', lane: 0, x: d + 220 + q * 7, v: 0, color: GAME_COLORS[q % GAME_COLORS.length] });
-    if (o.twin) { const e = this.spawnTraffic(d - 30, this.lane === 1 ? 2 : 1); if (e) { e.vt = 'sedan'; e.twin = true; e.v = this.sim.v + 9; e.color = parseInt(String(this.paintHex || '#c81d11').slice(1), 16); } }
+    if (o.twin) { const e = this.spawnTraffic(d - 30, this.lane === 1 ? 2 : 1); if (e) { e.vt = CARS[this.car] && CARS[this.car].sprite ? this.car : 'e36'; e.len = 4.5; e.twin = true; e.v = this.sim.v + 9; e.color = parseInt(String(this.paintHex || '#c81d11').slice(1), 16); } }
     if (o.gives) v.cassa.push({ kind: o.gives, kg: INV[o.gives].kg });
     const text = o.text.replace('{km10}', Math.floor(km) + 10).replace('{km}', Math.floor(km));
     if (where === 'road' && (o.sign || o.cippo || o.parked)) { setTimeout(() => this.ask({ kind: 'odd', title: o.title, text, time: 18, options: [{ label: '…' }] }), 6000); return; }
