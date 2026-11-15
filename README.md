@@ -244,6 +244,18 @@ cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo
 Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
 e, in orizzontale, testata e riquadri si rimpiccioliscono.
 
+**Luci (`luci2d.js`).** Di notte strada, marciapiedi e auto vanno in penombra bluastra e restano chiare solo le
+pozze di luce vere: sotto i lampioni (col cono nell'aria e un po' di pulviscolo, più fitto sotto la pioggia), davanti
+alle vetrine e ai locali, davanti ai fari (tuoi e del traffico, più lunghi con gli abbaglianti), dietro agli stop,
+attorno alle fiammate e ai lampeggianti della polizia. La tua auto ha una luce di riempimento, così resta leggibile.
+Il bagliore è a due livelli: uno stretto sulle luci e uno largo e morbido (che si spegne da solo sui dispositivi
+lenti). Con qualità *bassa* niente penombra né coni.
+
+**Icone degli oggetti (`icone.js`).** Ogni oggetto ha la sua icona in pixel art 32×32 (tanica, kit, ruota di
+scorta, gomma forata, pacchi, bancale, il lavoro sigillato, trofeo, sacco di sabbia, panino, acqua, thermos, bibita,
+salviette, foto, bomboletta, valigia) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
+si vedono nel bagagliaio, nel negozio, al bancone, nella bacheca e nella cassa del motel.
+
 **Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
 (il colore tinge titoli, pulsanti e cursori della sezione); a destra la testata e i pannelli arrotondati. La sezione
 *Partita* apre con il riassunto: la tua auto disegnata, contanti, km, reputazione, lavori fatti, guadagnato e il

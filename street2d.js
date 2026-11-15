@@ -1745,7 +1745,7 @@ class Street2D {
     g.fillStyle = '#353a55'; for (let x = -((dist * PPM) % 32); x < W; x += 32) g.fillRect(Math.round(x), 216, 1, 16);
     g.fillRect(0, 222, W, 1);
     g.fillStyle = '#4a5070'; g.fillRect(0, 230, W, 2);
-    for (const sh of shops) this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3);
+    for (const sh of shops) { this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3); if (this.lightAdd) this.lightAdd(sh.x, 232, sh.w * 0.9 + 20, 30, Street2D.rgb(sh.col), 0.5); }
     for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
       const span = W + 120, walkX = ((k * 157 + st.t * (14 + k * 5) * (k % 2 ? 1 : -1) - dist * PPM * 0.22) % span + span) % span - 60;
       const legs = Math.floor(st.t * 7 + k) % 2, X = Math.round(walkX), dir = k % 2 ? 1 : -1;
@@ -1835,13 +1835,15 @@ class Street2D {
       const x = wx(lm), bro = !!DM && Street2D.rnd(lm * 0.77 + 3) < DM.broken, on = !bro || Math.sin(st.t * 23 + lm) + Math.sin(st.t * 7.3 + lm * 2) > 1.55;   // rotto: si accende a scatti
       lampAll.push([x, on]); if (!on) continue;
       lampX.push(x);
+      if (this.lampCone) this.lampCone(g, x, lampCol, st.t, this.rainOn);
+      if (this.lightAdd) { this.lightAdd(x + 18, 296, 160, 70, lampRgb, 0.85); this.lightAdd(x + 18, 228, 90, 18, lampRgb, 0.6); }
       this.light(g, x + 18, 252, 70, 13, lampCol, 0.07, 4);                 // pozza sull'asfalto, corsia lontana
       this.light(g, x + 18, 226, 46, 6, lampCol, 0.08, 3);                  // pozza sul marciapiede
       g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${lampRgb},.05)`;
       for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
       g.restore();
     }
-    if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) lampX.push(wx(m) - 18);   // le luci della volta scorrono sulla carrozzeria
+    if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) { lampX.push(wx(m) - 18); if (this.lightAdd) this.lightAdd(wx(m), 290, 110, 70, '255,179,71', 0.55); }   // le luci della volta scorrono sulla carrozzeria
     for (const [x, on] of lampAll) {
       g.fillStyle = C.ink; g.fillRect(x - 2, 118, 5, 112); g.fillRect(x, 118, 24, 5); g.fillRect(x - 4, 222, 9, 8); g.fillRect(x - 3, 214, 7, 4);
       g.fillStyle = '#4a5070'; g.fillRect(x - 1, 120, 2, 108); g.fillRect(x + 1, 119, 21, 2); g.fillStyle = '#5c6386'; g.fillRect(x - 3, 223, 7, 1);
@@ -1870,7 +1872,7 @@ class Street2D {
       const x = wx(e.x);
       if (x < -300 || x > W + 300) return;
       if (this.drawTripEnt && this.drawTripEnt(g, e, x, st)) return;
-      if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); return; }
+      if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); if (this.lightAdd) { this.lightAdd(x, 240, 170, 60, '255,214,150', 0.6); this.lightAdd(x, 300, 140, 40, e.col ? Street2D.rgb(e.col) : '255,200,120', 0.3); } return; }
       if (e.kind === 'station') { this.drawStation(g, x); return; }
       if (e.kind === 'drop') {
         for (const p of [-36, 32]) { g.fillStyle = C.ink; g.fillRect(x + p - 2, 184, 9, 148); g.fillStyle = '#b8ff3a'; g.fillRect(x + p, 186, 5, 144); g.fillStyle = '#e8ffb0'; g.fillRect(x + p, 186, 1, 144); }
@@ -1913,6 +1915,7 @@ class Street2D {
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
       this.light(g, left + 3, sy + T0 + 35 * k, 8, 6, '#ff2a2a', 0.15, 2);
+      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + T0 + 35 * k, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
       if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce
         g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3);
         this.light(g, left + 4, sy + T0 + 39 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + T0 + 37 * k, 12, 7, '#ffa020', 0.35, 3);
@@ -1923,6 +1926,7 @@ class Street2D {
         const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
         const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
         g.fillStyle = on && ph ? '#ff2e4d' : '#4a1020'; g.fillRect(lx, ly, Math.round(13 * sc), 3);
+        if (on && this.lightAdd) this.lightAdd(lx + 14 * sc, y - 20, 160, 60, ph ? '255,46,77' : '79,123,255', 0.7);
         if (on) { this.light(g, lx + 14 * sc, ly, 120, 60, ph ? '#ff2e4d' : '#4f7bff', 0.16, 4); this.light(g, lx + 14 * sc, y, 160, 14, ph ? '#ff2e4d' : '#4f7bff', 0.12, 3); }
         g.fillStyle = on && !ph ? '#4f7bff' : '#101a4a'; g.fillRect(lx + Math.round(15 * sc), ly, Math.round(13 * sc), 3);
         if (on) {
@@ -1952,6 +1956,11 @@ class Street2D {
     this.carPos = { x: left + SW / 2, y: y0 - 22 * k, k };
     const GE0 = this.geo();
     if (s.ign) this.light(g, left + SW + (s.high ? 110 : 60) * k, y0 - 2, s.high ? 150 : 80, s.high ? 9 : 7, '#fff2c4', s.high ? 0.1 : 0.08, 4);   // pozza dei fari (più lunga con gli abbaglianti)
+    if (this.lightAdd) {
+      if (s.ign) { this.lightAdd(left + SW + (s.high ? 160 : 100) * k, y0 - 6, (s.high ? 230 : 150) * k, 24, '255,244,214', 0.85 * (typeof hlK === 'number' ? hlK : 1)); }
+      this.lightAdd(left + SW / 2, y0 - 24 * k, SW * 0.75, 44 * k, '225,225,255', 0.38);          // luce di riempimento: il protagonista resta leggibile
+      this.lightAdd(left, y0 - 18 * k, 50, 22, '255,40,40', s.brake > 0.05 ? 0.7 : s.ign ? 0.25 : 0);
+    }
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
     // fascio dei fari nell'aria, di notte e sotto la pioggia
     if (s.ign && (this.day || 0) < 0.6) {
@@ -2051,6 +2060,7 @@ class Street2D {
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));
     // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
     this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
+    if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02)) this.lightAdd(rx - 20, exY, 90, 40, '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0)) * 0.9);
     if (s.v > 16) {
       // linee di velocità affusolate (più fitte e lunghe con la velocità)
       const n = Math.min(30, (s.v - 16) * 1.2), fr = Math.floor(st.t * 24);
@@ -2103,7 +2113,6 @@ class Street2D {
     if (game && game.siren && !st.prevSiren) this.comic('ALT! POLIZIA', carX + 40, carTop - 30, '#4f7bff', 3);
     if (game && game.race && game.race.phase === 'run' && game.race.tt < 0.05 && cd('go', 2)) this.comic('VIA!', carX + 80, carTop - 30, '#b8ff3a', 6, '#163a8c');
     st.prevV = s.v; st.prevFlame = st.flame; st.prevSiren = !!(game && game.siren);
-    this.drawComics(g, dt);
     // ---- marciapiede vicino con oggetti in primo piano (fuori città: barriera, guardrail, roccia, erba o sabbia)
     if (!urban) this.drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, st.t);
     else {
@@ -2121,6 +2130,8 @@ class Street2D {
     }
     }
 
+    if (this.lightPass) this.lightPass(g, W, 1 - (this.day || 0), this.rainOn);   // penombra notturna e pozze di luce (luci2d.js)
+    this.drawComics(g, dt);
     // ---- linee di velocità sopra i 90 km/h circa
     if (Math.abs(s.v) > 25) {
       const k2 = Math.min(1, (Math.abs(s.v) - 25) / 25);
@@ -2219,8 +2230,9 @@ class Street2D {
       src = [sx, sy, sw, sh];
       c.drawImage(this.lo, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);
     } else c.drawImage(this.lo, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
-    // bagliore: copia ridotta, tenute solo le parti luminose, ingrandita e sommata (neon, fari, fiamme, lampioni)
-    if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {
+    // bagliore a due livelli (luci2d.js); senza il file resta quello semplice
+    if (this.glowPass) this.glowPass(c, src, SS);
+    else if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {
       const bw = Math.max(1, Math.round(this.LW / 4)), bh = 90;
       if (!this.bl) { this.bl = document.createElement('canvas'); }
       if (this.bl.width !== bw) { this.bl.width = bw; this.bl.height = bh; }

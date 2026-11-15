@@ -473,7 +473,7 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .slot.full { border-style: solid; border-color: var(--line); cursor: pointer; }
 .slot.full:hover { border-color: #4a4234; }
 .slot.sel { border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber), 0 0 14px rgba(255,179,71,.2); }
-.slot canvas { width: 48px; height: 32px; image-rendering: pixelated; }
+.slot canvas { width: 48px; height: 48px; image-rendering: pixelated; filter: drop-shadow(0 3px 4px rgba(0,0,0,.45)); }
 .slot b { font: 600 13px/1.15 var(--f-body); overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .slot small { font: 400 11.5px/1 var(--f-data); color: var(--muted); }
 .trunk-act { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -803,6 +803,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   .gm-head { padding: 10px 14px 9px; } .gm-head p { display: none; } .gm-body { padding: 12px; }
   .gm-summary { grid-template-columns: minmax(0, 1fr); padding: 12px; } .gs-car { min-height: 0; } .gs-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+.kbtn:has(> .ico) { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 8px; align-items: center; text-align: left; }
+.kbtn > .ico { grid-row: 1 / span 2; width: 30px; height: 30px; image-rendering: pixelated; filter: drop-shadow(0 2px 2px rgba(0,0,0,.5)); }
+.kbtn:has(> .ico) small { grid-column: 2; margin-top: 1px; }
 </style>
 </head>
 <body>
@@ -1209,10 +1212,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="quartieri2d.js"></script>
 <script src="pilota2d.js"></script>
 <script src="galleria2d.js"></script>
+<script src="luci2d.js"></script>
 <script src="effetti2d.js"></script>
 <script src="dettagli2d.js"></script>
 <script src="viaggio2d.js"></script>
 <script src="hudpro.js"></script>
+<script src="icone.js"></script>
 <script src="intro.js"></script>
 <script src="radio.js"></script>
 <script src="game.js"></script>
@@ -2042,7 +2047,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('btnTires').addEventListener('click', () => { if (!game.canMount()) { flash('Le gomme si cambiano da fermi', 2); return; } if (game.needsNiko()) { flash('Le gomme le cambia Niko: la sua officina è sulla mappa (N)', 2.6); return; } game.tireId = S.tune.tires; const r = game.newTires(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
   // ---------------------------------------------------------------- bagagliaio
   const ICON_CACHE = {};
+  const IC = (k) => (window.NR_ICON_TAG ? window.NR_ICON_TAG(k) : '');   // icona per i pulsanti (icone.js)
   function itemIcon(kind) {
+    if (window.NR_ICON) return window.NR_ICON(kind);
     if (ICON_CACHE[kind]) return ICON_CACHE[kind];
     const c = document.createElement('canvas'); c.width = 24; c.height = 16; const g = c.getContext('2d');
     const p = (col, x, y, w = 1, h = 1) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
@@ -2065,7 +2072,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       d.className = 'slot' + (it ? ' full' : '') + (i === selItem && it ? ' sel' : '');
       if (it) {
         d.type = 'button';
-        const cv = document.createElement('canvas'); cv.width = 24; cv.height = 16; cv.getContext('2d').drawImage(itemIcon(it.kind), 0, 0);
+        const ic = itemIcon(it.kind), cv = document.createElement('canvas'); cv.width = ic.width; cv.height = ic.height; cv.getContext('2d').drawImage(ic, 0, 0);
         d.append(cv);
         const nm = document.createElement('b'); nm.textContent = game.itemName(it); d.append(nm);
         const kg = document.createElement('small'); kg.textContent = `${fmt(it.kg)} kg${it.uses ? ` · ${it.uses} usi` : ''}`; d.append(kg);
@@ -2085,7 +2092,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         shop.append(b);
       }
     }
-    shop.querySelectorAll('button').forEach((b) => { const I = INV[b.dataset.k]; b.innerHTML = `${I.name}<small>${game.mode === 'career' ? '€ ' + fmt(I.price) + ' · ' : ''}${I.kg} kg</small>`; });
+    shop.querySelectorAll('button').forEach((b) => { const I = INV[b.dataset.k]; b.innerHTML = `${IC(b.dataset.k)}${I.name}<small>${game.mode === 'career' ? '€ ' + fmt(I.price) + ' · ' : ''}${I.kg} kg</small>`; });
   }
   $('itemUse').addEventListener('click', () => { const r = game.useItem(selItem); if (!r.ok) flash(r.why, 2.4); selItem = -1; renderTrunk(); saveGame(); });
   $('itemDrop').addEventListener('click', () => { if (Math.abs(sim.v) > 0.5) { flash('Per svuotare il bagagliaio fermati', 2); return; } const r = game.dropItem(selItem); if (!r.ok && r.why) flash(r.why, 2.4); selItem = -1; renderTrunk(); saveGame(); });
@@ -2367,29 +2374,29 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (I.id === 'bar') {
       note(VG_RUMORS[Math.floor(Math.random() * VG_RUMORS.length)]);
       const r = group('Al bancone');
-      r.appendChild(row('Caffè <small>€ 1,20</small>', svc(1.2, 'Caffè', { sleep: 0.12, water: 0.05 })));
-      r.appendChild(row('Cornetto <small>€ 1,50</small>', svc(1.5, 'Cornetto', { food: 0.2 })));
-      r.appendChild(row('Panino <small>€ 4,50</small>', svc(4.5, 'Panino', { food: 0.5 })));
-      r.appendChild(row('Acqua <small>€ 1</small>', svc(1, 'Acqua', { water: 0.5 })));
-      r.appendChild(row('Lavarsi le mani <small>gratis</small>', svc(0, '', { wash: 0.1 })));
+      r.appendChild(row(IC('tazzina') + 'Caffè <small>€ 1,20</small>', svc(1.2, 'Caffè', { sleep: 0.12, water: 0.05 })));
+      r.appendChild(row(IC('cornetto') + 'Cornetto <small>€ 1,50</small>', svc(1.5, 'Cornetto', { food: 0.2 })));
+      r.appendChild(row(IC('panino') + 'Panino <small>€ 4,50</small>', svc(4.5, 'Panino', { food: 0.5 })));
+      r.appendChild(row(IC('acqua') + 'Acqua <small>€ 1</small>', svc(1, 'Acqua', { water: 0.5 })));
+      r.appendChild(row(IC('sapone') + 'Lavarsi le mani <small>gratis</small>', svc(0, '', { wash: 0.1 })));
     } else if (I.id === 'grill') {
       note('Sosta 24: pasti caldi, docce, un market. Le luci al neon non si spengono mai.');
       const r = group('Servizi');
-      r.appendChild(row('Pasto completo <small>€ 12</small>', svc(12, 'Pasto completo', { food: 1, water: 0.6 })));
-      r.appendChild(row('Doccia <small>€ 6</small>', () => game.vgShower(6)));
-      r.appendChild(row('Caffè lungo <small>€ 1,80</small>', svc(1.8, 'Caffè lungo', { sleep: 0.14, water: 0.08 })));
+      r.appendChild(row(IC('pasto') + 'Pasto completo <small>€ 12</small>', svc(12, 'Pasto completo', { food: 1, water: 0.6 })));
+      r.appendChild(row(IC('doccia') + 'Doccia <small>€ 6</small>', () => game.vgShower(6)));
+      r.appendChild(row(IC('tazzina') + 'Caffè lungo <small>€ 1,80</small>', svc(1.8, 'Caffè lungo', { sleep: 0.14, water: 0.08 })));
     } else if (I.id === 'motel') {
       note('Motel Ovunque. «La sua cassa è già in camera.» Qui si dorme, ci si lava, si lasciano le cose nella cassa e si cambia mezzo.');
       const r = group('La stanza 7');
-      r.appendChild(row('Dormire <small>€ 45 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
-      r.appendChild(row('Doccia <small>compresa</small>', () => game.vgShower(0)));
+      r.appendChild(row(IC('letto') + 'Dormire <small>€ 45 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
+      r.appendChild(row(IC('doccia') + 'Doccia <small>compresa</small>', () => game.vgShower(0)));
       r.appendChild(row('Cena <small>€ 9</small>', svc(9, 'Cena del motel', { food: 0.8, water: 0.4 })));
       // la cassa
       const cr = group(`La tua cassa (${v.cassa.length} oggetti)`);
       if (!v.cassa.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Vuota. Lascia qui quello che non ti serve in viaggio: la ritroverai al prossimo Motel Ovunque.'; cr.appendChild(p); }
-      v.cassa.forEach((it, i) => cr.appendChild(row(`↑ ${game.itemName(it)} <small>${fmt(it.kg, 1)} kg</small>`, () => { const q = game.vgFromCassa(i); if (q.ok) openPlace(I); return q; })));
+      v.cassa.forEach((it, i) => cr.appendChild(row(`${IC(it.kind)}↑ ${game.itemName(it)} <small>${fmt(it.kg, 1)} kg</small>`, () => { const q = game.vgFromCassa(i); if (q.ok) openPlace(I); return q; })));
       const tr = group('Dal bagagliaio alla cassa');
-      game.s.trunk.forEach((it, i) => { if (it.kind !== 'scatola' && it.kind !== 'bancale') tr.appendChild(row(`↓ ${game.itemName(it)}`, () => { const q = game.vgToCassa(i); if (q.ok) openPlace(I); return q; })); });
+      game.s.trunk.forEach((it, i) => { if (it.kind !== 'scatola' && it.kind !== 'bancale') tr.appendChild(row(`${IC(it.kind)}↓ ${game.itemName(it)}`, () => { const q = game.vgToCassa(i); if (q.ok) openPlace(I); return q; })); });
       // parcheggio: i tuoi mezzi
       const pr = group('Parcheggio: i tuoi mezzi');
       for (const id of v.garage) pr.appendChild(row(`${id === game.car ? '● ' : ''}${CARS[id].name}`, () => { if (id === game.car) return { ok: false, why: 'Ci sei già sopra' }; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); openPlace(I); return { ok: true }; }));
@@ -2409,7 +2416,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       jr.appendChild(row(v.line ? `Linea in corso: ${v.line.onboard} a bordo` : 'Prendi la linea notturna <small>8 fermate</small>', () => (v.line ? { ok: false, why: 'Hai già una linea' } : game.vgStartLine(n))));
     } else for (const o of game.vgOffers(n)) {
       const taken = v.taken && v.taken[n + ':' + o.k];
-      const b = row(o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : o.mission ? `${taken ? '✓ ' : '★ '}${o.title} per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}${o.kg >= 50 ? ` · ${fmt(o.kg, 0)} kg` : ''}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`, () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
+      const b = row(IC(o.first || o.mission ? 'missione' : o.kind) + (o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : o.mission ? `${taken ? '✓ ' : '★ '}${o.title} per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}${o.kg >= 50 ? ` · ${fmt(o.kg, 0)} kg` : ''}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`), () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
       if ((o.first || o.mission) && !taken) b.classList.add('first');
       if (o.give) b.title = o.give;
       jr.appendChild(b);
@@ -2417,7 +2424,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // market (bar, autogrill): cose da tenere nel bagagliaio
     if (I.id === 'grill' || I.id === 'bar') {
       const mr = group('Da portare via');
-      for (const k of VG_FOODS) mr.appendChild(row(`${INV[k].name} <small>€ ${fmt(INV[k].price, INV[k].price % 1 ? 2 : 0)}</small>`, () => { const q = game.buyItem(k); renderTrunk(); return q; }));
+      for (const k of VG_FOODS) mr.appendChild(row(`${IC(k)}${INV[k].name} <small>€ ${fmt(INV[k].price, INV[k].price % 1 ? 2 : 0)}</small>`, () => { const q = game.buyItem(k); renderTrunk(); return q; }));
     }
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
