@@ -237,6 +237,13 @@ poi il muso che si accartoccia e si accorcia, il faro rotto (la luce resta debol
 crepato, la fuliggine sul cofano; da metà danno esce vapore dal cofano, fumo nero quando è quasi distrutta. Anche le
 auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 
+**Schermata di gioco (`menu.js`).** La strada riempie tutta la finestra, sopra c'è solo una barra sottile con
+contanti, reputazione, ricercato e il pulsante **MENU** (o tasto **Tab**; **Esc** o Tab per tornare in strada). Nel
+menu, a schede: Partita (modalità, auto, nuova carriera), Officina, Bagagliaio (anche col tasto B), Guida (pedali e
+cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo, qualità, stile del quadro),
+Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
+e, in orizzontale, testata e riquadri si rimpiccioliscono.
+
 **Il protagonista (`pilota2d.js`).** Dentro l'auto c'è il guidatore di profilo, col giubbotto e il cappellino rosso,
 la mano sul volante: va indietro in accelerazione e avanti in frenata, prende la luce ambra del cruscotto e quella
 dei lampioni quando ci passa sotto, si vede solo attraverso i vetri (i montanti e i sedili del disegno lo coprono)

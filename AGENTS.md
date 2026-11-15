@@ -32,6 +32,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `viaggio.js` | Il Viaggio (modalità principale): tappe, paesaggi, bisogni del guidatore, Motel Ovunque e la cassa, lavori, autostoppisti, capitoli ed eventi strani. Si aggancia a `StreetGame`; stato in `game.s.vg`. |
 | `strada.js` | Sfide lanciate con gli abbaglianti (2 km), reputazione e vantaggi, eventi in prima corsia, comportamento del traffico. |
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
+| `menu.js` | Schermata di gioco compatta (dopo lo script principale): sposta i pannelli della pagina in un menu a schede (Tab o pulsante MENU, Esc chiude), messaggi sopra la strada, pedali GAS/FRENO al tocco. `window.gameMenu.open('bagagliaio')`. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
 | `audio/`, `models/` | Suoni e modelli 3D liberi già nel progetto. |
@@ -67,6 +68,6 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
   "prestazioni realistiche della configurazione originale" (lo 0-100 della prova è 6,28 s, il test vuole meno di 6)
   e "officina: si compra solo con i soldi sufficienti". Non peggiorare il conteggio.
 - Nel browser: dalla cartella `motori/` lancia `python3 -m http.server 8765` e apri
-  http://localhost:8765/index.html. Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
+  http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.
 - Alla fine scrivi un riassunto breve: cosa hai cambiato e dove, cosa hai provato, cosa non hai potuto provare.
