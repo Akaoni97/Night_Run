@@ -31,6 +31,8 @@ gioco fa, sezione per sezione).
 - **Auto**: Supra, V40 e 25 veicoli dai disegni del giocatore (`cars.js`, `GEN_DATA` + `GEN_CARS`, immagini in
   `img/<id>.png`, `_wheel.png`, `_paint.png`). Tutti con motore, peso e marce veri; si comprano alla concessionaria
   del Motel Ovunque. Il traffico usa solo questi disegni, coi loro colori (`GAME_TRAFFIC` in `game.js`).
+- **Primo lavoro**: pacco dal primo locale (km 1,8) alla tappa dopo (km 5) per € 10.000, obiettivo a schermo
+  (`VG_FIRST`, `vgGoal`, test nel file dei test).
 - **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta o accetta una sfida di
   2 km), reputazione con vinte/perse e vantaggi (`ST_REP_PERKS`), incidenti e controlli della polizia in prima
   corsia, traffico che tiene la destra.
@@ -60,7 +62,7 @@ gioco fa, sezione per sezione).
 - La vista 3D non ha i luoghi, le auto nuove né gli eventi.
 - Gli **sticker** del giocatore: `img/stickers/manifest.json` è vuoto, arriveranno.
 - Due test falliscono da prima di tutto questo lavoro (0-100 della Supra di serie: 6,3 s contro meno di 6 attesi;
-  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 24 su 26.
+  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 25 su 27.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 

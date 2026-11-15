@@ -101,7 +101,7 @@ const VG_RUMORS = [
 
 // capitoli: si leggono al passaggio dei chilometri
 const VG_CHAPTERS = [
-  { km: 0, title: 'Km 0', text: 'Sotto casa, il motore acceso. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Tutti dicono la stessa cosa: l\'autostrada va solo avanti, e da qualche parte si arriva. Nessuno sa dove. Nessuno è mai tornato a raccontarlo. Metti la prima.' },
+  { km: 0, title: 'Km 0', text: 'Sotto casa, il motore acceso. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Tutti dicono la stessa cosa: l\'autostrada va solo avanti, e da qualche parte si arriva. Nessuno sa dove. Nessuno è mai tornato a raccontarlo. Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
   { km: 1, title: 'Il primo cartello', text: 'Un cartello verde, appena fuori dalla città: «AUTOSTRADA · SOLO AVANTI». Sotto, qualcuno ha scritto a pennarello: «buon viaggio».' },
   { km: 10, title: 'Dieci', text: 'Dieci chilometri. Lo specchietto mostra la città, piccola. Poi una curva, e la città non c\'è più.' },
   { km: 25, title: 'La catena', text: 'Hai già visto due cartelli dei Motel Ovunque. «La tua cassa ti aspetta in camera». Dicono che sia il loro vanto: lasci le tue cose in un motel, le ritrovi nel prossimo. Come facciano, nessuno lo chiede.' },
@@ -470,8 +470,9 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const v = this.s.vg;
     v.stops++; if (pl.id === 'fuel') v.fuelStops++;
     // consegne: la merce con questa tappa come destinazione
-    let got = 0, n = 0;
-    this.s.trunk = this.s.trunk.filter((it) => { if ((it.kind === 'scatola' || it.kind === 'bancale') && it.to === pl.n) { got += it.pay || 0; n++; return false; } return true; });
+    let got = 0, n = 0, first = false;
+    this.s.trunk = this.s.trunk.filter((it) => { if ((it.kind === 'scatola' || it.kind === 'bancale') && it.to === pl.n) { got += it.pay || 0; n++; if (it.first) first = true; return false; } return true; });
+    if (first) { v.firstDone = true; this.fx.push({ k: 'missionDone', pay: VG_FIRST.pay }); this.say(`Primo lavoro fatto! Il benzinaio firma senza guardarti in faccia e ti conta i soldi sul cofano: + € ${VG_FIRST.pay.toLocaleString('it-IT')}. Adesso puoi comprare pezzi, benzina, un'altra auto.`, 'money'); }
     if (n) { this.applyMass(); this.s.money += got; v.earned += got; v.jobs += n; this.say(`Consegnato: ${n} ${n === 1 ? 'collo' : 'colli'} a ${pl.name}, + € ${got}`, 'money'); }
     // la valigia torna sempre
     if (pl.id === 'motel' && v.valigiaBack) { v.valigiaBack = false; v.cassa.push({ kind: 'valigia', kg: 12 }); this.say('Nella cassa c\'è la valigia della signora. Non ricordi di avercela messa.', 'bad'); }
@@ -481,8 +482,24 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 
   // ------------------------------------------------------------ lavori: bacheca dei locali
+  // prima missione: al primo locale c'è un pacco da portare alla tappa dopo, paga € 10.000 (soldi da spendere subito)
+  const VG_FIRST = { pay: 10000, kg: 4, from: 0, to: 1 };
+  P.vgFirstOffer = function () {
+    const dest = VG.stop(VG_FIRST.to);
+    return { k: 'primo', kind: 'scatola', kg: VG_FIRST.kg, to: VG_FIRST.to, toName: dest.name, kmTo: Math.round(dest.x / 100) / 10, pay: VG_FIRST.pay, first: true };
+  };
+  // obiettivo da mostrare a schermo finché la prima missione non è finita
+  P.vgGoal = function () {
+    const v = this.s.vg; if (!v || v.firstDone) return null;
+    const km = vgKm(this), carried = this.s.trunk.some((it) => it.first), A = VG.stop(VG_FIRST.from), B = VG.stop(VG_FIRST.to);
+    const at = carried ? B : A, left = Math.max(0, at.x / 1000 - km);
+    return carried
+      ? { title: 'Consegna il pacco', text: `${B.name} · km ${(B.x / 1000).toFixed(1).replace('.', ',')}`, left, pay: VG_FIRST.pay, x: B.x }
+      : { title: 'Primo lavoro', text: `Ritira il pacco a ${A.name} (bacheca)`, left, pay: VG_FIRST.pay, x: A.x };
+  };
   P.vgOffers = function (n) {
     const car = this.car, offers = [], h = (k) => VG.hash(n * 13 + k);
+    if (n === VG_FIRST.from && !this.s.vg.firstDone) offers.push(this.vgFirstOffer());
     const kind = car === 'truck' ? 'bancale' : 'scatola';
     const base = car === 'truck' ? 1000 : car === 'van' ? 120 : this.s.vg.trailerOn ? 40 : 10;
     for (let k = 0; k < 3; k++) {
@@ -498,9 +515,10 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const key = n + ':' + o.k; if (v.taken[key]) return { ok: false, why: 'Già presa' };
     if (!this.trunkFits(o.kg)) return { ok: false, why: this.car === 'truck' || this.car === 'van' || v.trailerOn ? 'Non ci sta: il carico è pieno' : 'Non ci sta nel bagagliaio: serve il rimorchietto o un furgone' };
     v.taken[key] = true;
-    this.s.trunk.push({ kind: o.kind, kg: o.kg, to: o.to, pay: o.pay, name: `${INV[o.kind].name} per ${o.toName} (km ${o.kmTo})` });
+    this.s.trunk.push({ kind: o.kind, kg: o.kg, to: o.to, pay: o.pay, first: !!o.first, name: o.first ? `Il pacco sigillato per ${o.toName} (km ${o.kmTo})` : `${INV[o.kind].name} per ${o.toName} (km ${o.kmTo})` });
     this.applyMass();
-    this.say(`Carico ${o.kg} kg per ${o.toName}, km ${o.kmTo}: € ${o.pay} alla consegna`, 'job');
+    if (o.first) { this.say(`Il barista ti dà un pacco sigillato, pesante il giusto. «Portalo a ${o.toName}, al km ${o.kmTo}. Ti pagano lì.»`, 'job'); this.fx.push({ k: 'mission' }); }
+    else this.say(`Carico ${o.kg} kg per ${o.toName}, km ${o.kmTo}: € ${o.pay} alla consegna`, 'job');
     return { ok: true };
   };
   // autobus: si prende una linea al motel o all'autogrill; a ogni locale salgono e scendono persone

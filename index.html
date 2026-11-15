@@ -159,6 +159,12 @@ h1 span { color: var(--amber); }
 .vgbars i.low { background: linear-gradient(90deg, rgba(255,58,58,.75) calc(var(--f) * 100%), rgba(255,255,255,.08) 0); animation: vgblink 1s steps(2) infinite; }
 @keyframes vgblink { 50% { opacity: .55; } }
 .hud-vg span { font-size: 11px; color: var(--muted); }
+.hud-goal { border-left-color: #b8ff3a; display: grid; gap: 2px; max-width: 260px; animation: goalIn .4s ease-out; }
+.hud-goal b { color: #b8ff3a; letter-spacing: .08em; }
+.hud-goal span { font-size: 12px; color: var(--fg); }
+.hud-goal em { font-style: normal; font-size: 11px; color: #ffd23f; }
+@keyframes goalIn { from { transform: translateX(-12px); opacity: 0; } }
+.kbtn.first { background: linear-gradient(180deg, #4a6a12, #2a3e08); color: #f4ffd8; box-shadow: 0 0 14px rgba(184,255,58,.45); }
 #promptText { white-space: pre-line; }
 .rep { font-size: 12px; padding: 3px 6px; opacity: .45; } .rep.on { opacity: 1; color: var(--lime); } .rep b { display: inline-block; min-width: 26px; } .rep small { color: var(--muted); }
 .vg-group h4 { margin: 6px 0 4px; font: 600 12px/1 var(--f-data); letter-spacing: .08em; text-transform: uppercase; color: var(--place-col, var(--amber)); }
@@ -705,6 +711,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
         <div class="hud-tag" id="hudFuelTag"><b>BENZINA</b><span id="hudFuel">—</span></div>
         <div class="hud-tag"><b>ORA</b><span id="hudClock">23:00</span></div>
         <div class="hud-tag" id="hudJob" hidden></div>
+        <div class="hud-tag hud-goal" id="hudGoal" hidden><b id="goalTitle">PRIMO LAVORO</b><span id="goalText"></span><em id="goalLeft"></em></div>
         <div class="hud-tag hud-vg" id="hudVg" hidden>
           <div class="vgbars"><i id="vgFood" title="Fame (1)">🍞</i><i id="vgWater" title="Sete (2)">💧</i><i id="vgSleep" title="Sonno (3)">☾</i><i id="vgWash" title="Igiene (4)">✦</i></div>
           <span id="vgInfo"></span>
@@ -2157,6 +2164,9 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
     vgBar('vgFood', v.needs.food); vgBar('vgWater', v.needs.water); vgBar('vgSleep', v.needs.sleep); vgBar('vgWash', v.needs.wash);
     const pax = v.pax.filter((p) => p.name);
     $('vgInfo').textContent = (pax.length ? `${pax.length}/${v.seats} a bordo · ` : '') + `carico ${fmt(v.kg, 0)}/${fmt(v.cap.kg, 0)} kg` + (v.line ? ` · linea: ${v.line.onboard} passeggeri` : '');
+    // obiettivo della prima missione
+    const G = game.vgGoal && game.vgGoal(), gb = $('hudGoal'); gb.hidden = !G;
+    if (G) { $('goalTitle').textContent = G.title.toUpperCase(); $('goalText').textContent = G.text; $('goalLeft').textContent = (G.left > 0.05 ? `tra ${fmt(G.left, 1)} km · ` : 'sei arrivato · ') + `paga € ${fmt(G.pay)}`; }
   }
   // tasti rapidi: 1 mangia, 2 bevi, 3 caffè o bibita energetica, 4 salviette
   function vgQuick(n) {
@@ -2215,7 +2225,9 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
       jr.appendChild(row(v.line ? `Linea in corso: ${v.line.onboard} a bordo` : 'Prendi la linea notturna <small>8 fermate</small>', () => (v.line ? { ok: false, why: 'Hai già una linea' } : game.vgStartLine(n))));
     } else for (const o of game.vgOffers(n)) {
       const taken = v.taken && v.taken[n + ':' + o.k];
-      jr.appendChild(row(`${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`, () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; }));
+      const b = row(o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`, () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
+      if (o.first && !taken) b.classList.add('first');
+      jr.appendChild(b);
     }
     // market (bar, autogrill): cose da tenere nel bagagliaio
     if (I.id === 'grill' || I.id === 'bar') {

@@ -399,6 +399,9 @@ con salvataggio e pezzi separati.
 - **Motel Ovunque.** Stanza 7, sempre. Dormire (salva il viaggio), doccia, cena. **La cassa**: quello che ci lasci
   lo ritrovi al prossimo Motel Ovunque, è il vanto della catena. Nel parcheggio si cambia mezzo e c'è la
   concessionaria: rimorchietto e le auto sportive usate (furgone, camion e autobus arriveranno coi disegni del giocatore).
+- **Primo lavoro.** Si guadagna subito: alla bacheca del primo locale (Bar Sport, km 1,8) c'è un pacco sigillato da
+  portare alla tappa dopo (Benzina 24H, km 5): alla consegna € 10.000. L'obiettivo resta a schermo in alto a sinistra
+  finché il lavoro non è fatto (`vgGoal` e `VG_FIRST` in `viaggio.js`).
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
   col rimorchio. La logica per furgone, camion e autobus (carichi, linee, fisica e suono diesel, limitatore di
