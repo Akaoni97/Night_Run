@@ -89,7 +89,10 @@ Gli strumenti sono in `motori/strumenti/` (Python con Pillow e NumPy):
 4. `python3 -I disegni_auto.py motori/img <anteprime> ruote.json <disegni> elenco.json` con
    `elenco.json = { id: [file, passo vero in metri] }`: crea `img/<id>.png`, `_wheel.png`, `_paint.png` e
    `<anteprime>/meta.json` coi dati dello sprite.
-5. In `cars.js` aggiungi lo sprite a `GEN_DATA` e una riga a `GEN_NEW` (nome, motore, peso, CV, coppia, giri,
+5. Poi `python3 -I strumenti/ripara_ruote.py .` (da `motori/`): ricentra la ruota sul cerchione, la rifà tonda
+   senza pezzi di parafango e richiude il passaruota (le ruote ritagliate a mano saltellavano). Va lanciato dopo
+   aver messo lo sprite in `GEN_DATA`; le auto già riparate hanno `"fixed": 1` e vengono saltate.
+6. In `cars.js` aggiungi lo sprite a `GEN_DATA` e una riga a `GEN_NEW` (nome, motore, peso, CV, coppia, giri,
    limitatore, marce, finale, prezzo, km di sblocco, diesel): coppia, voce del motore, quadro e catalogo dei pezzi
    si costruiscono da lì. Poi aggiungilo a `GAME_TRAFFIC` (velocità tipiche e frequenza) e, se ha posti diversi,
    a `VG_SEATS` in `viaggio.js`. Controlla lo 0-100 con una prova veloce della fisica.
