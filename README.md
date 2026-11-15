@@ -244,6 +244,12 @@ cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo
 Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
 e, in orizzontale, testata e riquadri si rimpiccioliscono.
 
+**Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
+(il colore tinge titoli, pulsanti e cursori della sezione); a destra la testata e i pannelli arrotondati. La sezione
+*Partita* apre con il riassunto: la tua auto disegnata, contanti, km, reputazione, lavori fatti, guadagnato e il
+lavoro in corso. *Rivali* compare solo nelle sfide in città. Sul telefono le sezioni diventano una fila di icone in
+alto. Anche i pannelli dei locali e la schermata iniziale (che ora presenta il Viaggio) hanno lo stesso stile.
+
 **Il protagonista (`pilota2d.js`).** Dentro l'auto c'è il guidatore di profilo, col giubbotto e il cappellino rosso,
 la mano sul volante: va indietro in accelerazione e avanti in frenata, prende la luce ambra del cruscotto e quella
 dei lampioni quando ci passa sotto, si vede solo attraverso i vetri (i montanti e i sedili del disegno lo coprono)

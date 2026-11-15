@@ -662,25 +662,6 @@ html.game #g2d, html.game #g3d { width: 100%; height: 100%; aspect-ratio: auto; 
 html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 .menubtn { border: 0; padding: 8px 14px 7px; font: 400 14px/1 var(--f-display); letter-spacing: .08em; color: #1a1206; background: var(--amber); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); white-space: nowrap; }
 .menubtn kbd { margin-left: 6px; background: transparent; border-color: rgba(0,0,0,.3); color: #1a1206; }
-.gamemenu { position: fixed; inset: 0; z-index: 50; display: grid; grid-template-columns: 1fr min(860px, 100%); background: rgba(4,4,8,.55); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
-.gamemenu[hidden] { display: none; }
-.gm-side { grid-column: 2; display: grid; grid-template-rows: auto auto minmax(0, 1fr); min-height: 0; background: linear-gradient(180deg, #17150f, #0c0b09); box-shadow: -20px 0 50px rgba(0,0,0,.6), inset 3px 0 0 var(--amber); animation: gmIn .18s ease-out; }
-@keyframes gmIn { from { transform: translateX(30px); opacity: 0; } }
-.gm-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px 8px; }
-.gm-head h2 { margin: 0; flex: 1; font: 400 22px/1 var(--f-display); letter-spacing: .08em; font-style: italic; color: var(--amber); }
-.gm-head small { color: var(--muted); font: 400 12px/1 var(--f-data); }
-.gm-tabs { display: flex; gap: 4px; padding: 0 12px 10px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
-.gm-tabs button { flex: none; border: 0; padding: 8px 12px; font: 400 13px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: #1d1a15; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
-.gm-tabs button[aria-selected="true"] { background: var(--amber); color: #1a1206; }
-.gm-body { overflow-y: auto; padding: 12px; min-height: 0; overscroll-behavior: contain; }
-.gm-page { display: grid; gap: 12px; }
-.gm-page[hidden] { display: none; }
-.gm-page .deck, .gm-page .extras { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
-.gm-page .panel { min-width: 0; overflow: hidden; }
-.gm-page .tele { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.gm-page .roadbar { border: 0; background: none; padding: 0; }
-.gm-page .cutbox { clip-path: none; }
-.gm-page .top-moved { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .touchpedals { position: absolute; right: 12px; bottom: 72px; display: none; gap: 8px; z-index: 4; }
 .touchpedals button { width: 64px; height: 64px; border: 0; border-radius: 10px; font: 400 13px/1 var(--f-display); color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.18); }
 .touchpedals .tp-gas { background: rgba(80,140,30,.72); } .touchpedals .tp-brk { background: rgba(160,40,30,.72); }
@@ -706,7 +687,122 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   .touchpedals { bottom: 52px; right: 8px; } .touchpedals button { width: 52px; height: 52px; font-size: 11px; }
   html.game #hudG { display: none; }
 }
-@media (max-width: 700px) { html.game .chip:not(.money), html.game .audio-state { display: none; } html.game h1 { font-size: 18px; } .gamemenu { grid-template-columns: 0 1fr; } }
+@media (max-width: 700px) { html.game .chip:not(.money), html.game .audio-state { display: none; } html.game h1 { font-size: 18px; } }
+
+/* ==== Menu di pausa (menu.js): barra laterale con le sezioni, testata, contenuto a schede ==== */
+.gamemenu { --acc: #ffb347; position: fixed; inset: 0; z-index: 50; display: grid; place-items: stretch;
+  background: radial-gradient(1200px 700px at 78% -10%, color-mix(in srgb, var(--acc) 22%, transparent), transparent 60%), radial-gradient(900px 600px at -10% 110%, rgba(90,60,200,.25), transparent 60%), rgba(5,5,10,.72);
+  backdrop-filter: blur(6px) saturate(.8); -webkit-backdrop-filter: blur(6px) saturate(.8); animation: gmFade .18s ease-out; }
+.gamemenu[hidden] { display: none; }
+.gamemenu::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px); }
+@keyframes gmFade { from { opacity: 0; } }
+.gm-shell { position: relative; display: grid; grid-template-columns: 270px minmax(0, 1fr); width: min(1320px, 100%); height: 100%; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); gap: 14px; min-height: 0; }
+.gm-rail { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 12px; min-height: 0; padding: 14px 10px; border-radius: 14px; background: linear-gradient(180deg, rgba(22,20,32,.92), rgba(10,9,16,.94)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), 0 20px 50px rgba(0,0,0,.5); animation: gmRail .22s ease-out; }
+@keyframes gmRail { from { transform: translateX(-16px); opacity: 0; } }
+.gm-logo { padding: 4px 10px 10px; font: 400 30px/1 var(--f-display); font-style: italic; letter-spacing: .03em; text-transform: uppercase; color: #fff; text-shadow: 0 0 18px color-mix(in srgb, var(--acc) 60%, transparent), 2px 2px 0 #241d30; border-bottom: 1px solid rgba(255,255,255,.07); }
+.gm-logo em { color: var(--acc); font-style: italic; transition: color .25s; }
+.gm-logo small { display: block; margin-top: 6px; font: 500 11px/1 var(--f-data); letter-spacing: .3em; color: var(--muted); font-style: normal; text-shadow: none; }
+.gm-tabs { display: grid; align-content: start; gap: 4px; overflow-y: auto; scrollbar-width: none; min-height: 0; }
+.gm-tabs button { --tc: #ffb347; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: center; text-align: left; border: 0; padding: 9px 10px; border-radius: 10px; background: transparent; color: var(--fg); position: relative; transition: background .15s, transform .15s; }
+.gm-tabs button[hidden] { display: none; }
+.gm-tabs button svg { width: 34px; height: 34px; padding: 6px; border-radius: 9px; fill: none; stroke: var(--tc); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; background: color-mix(in srgb, var(--tc) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc) 30%, transparent); }
+.gm-tabs button b { display: block; font: 400 15px/1.1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+.gm-tabs button small { display: block; margin-top: 2px; font: 500 11.5px/1.2 var(--f-body); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gm-tabs button:hover { background: rgba(255,255,255,.04); transform: translateX(2px); }
+.gm-tabs button[aria-selected="true"] { background: linear-gradient(90deg, color-mix(in srgb, var(--tc) 22%, transparent), color-mix(in srgb, var(--tc) 4%, transparent)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc) 35%, transparent); }
+.gm-tabs button[aria-selected="true"]::before { content: ""; position: absolute; left: -10px; top: 10px; bottom: 10px; width: 4px; border-radius: 0 4px 4px 0; background: var(--tc); box-shadow: 0 0 12px var(--tc); }
+.gm-tabs button[aria-selected="true"] svg { background: var(--tc); stroke: #0c0a10; }
+.gm-tabs button[aria-selected="true"] b { color: var(--tc); }
+.gm-back { display: flex; align-items: center; gap: 6px; border: 0; padding: 12px 14px; border-radius: 10px; background: var(--acc); color: #120d06; box-shadow: 0 8px 24px color-mix(in srgb, var(--acc) 35%, transparent); transition: background .25s, transform .12s; }
+.gm-back b { flex: 1; text-align: left; font: 400 15px/1 var(--f-display); letter-spacing: .06em; text-transform: uppercase; }
+.gm-back kbd { background: rgba(0,0,0,.12); border-color: rgba(0,0,0,.25); color: #120d06; }
+.gm-back:hover { transform: translateY(-1px); }
+.gm-main { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; border-radius: 14px; background: linear-gradient(180deg, rgba(18,16,26,.9), rgba(9,8,14,.93)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), 0 20px 50px rgba(0,0,0,.5); overflow: hidden; }
+.gm-head { position: relative; padding: 18px 22px 14px; border-bottom: 1px solid rgba(255,255,255,.06); background: linear-gradient(90deg, color-mix(in srgb, var(--acc) 16%, transparent), transparent 60%); }
+.gm-head::after { content: ""; position: absolute; left: 22px; bottom: -1px; width: 80px; height: 3px; border-radius: 3px; background: var(--acc); box-shadow: 0 0 14px var(--acc); }
+.gm-head h2 { margin: 0; font: 400 clamp(24px, 3vw, 34px)/1 var(--f-display); font-style: italic; letter-spacing: .04em; text-transform: uppercase; color: #fff; }
+.gm-head p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.gm-body { overflow-y: auto; padding: 18px 22px 26px; min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--acc) 50%, transparent) transparent; }
+.gm-page { display: grid; gap: 14px; animation: gmPage .2s ease-out; }
+@keyframes gmPage { from { transform: translateY(6px); opacity: 0; } }
+.gm-page[hidden] { display: none; }
+/* i pannelli dentro il menu: schede arrotondate, testate col colore della sezione */
+.gm-page .panel, .gm-page .cluster { clip-path: none; border-radius: 12px; padding: 16px 18px; background: linear-gradient(180deg, rgba(34,30,46,.7), rgba(18,16,26,.75)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), inset 0 1px 0 rgba(255,255,255,.06), 0 10px 26px rgba(0,0,0,.28); min-width: 0; overflow: hidden; }
+.gm-page .panel > h2, .gm-page .panel h2 { font-size: 17px; color: #fff; padding-left: 12px; position: relative; }
+.gm-page .panel > h2::before { content: ""; position: absolute; left: 0; top: 1px; bottom: 1px; width: 4px; border-radius: 3px; background: var(--acc); }
+.gm-page .panel h2 em { color: var(--acc); }
+.gm-page .deck, .gm-page .extras { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; }
+.gm-page .tele { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gm-page .tele .t { border-radius: 10px; clip-path: none; background: rgba(255,255,255,.035); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.gm-page .roadbar { border: 0; background: none; padding: 0; }
+.gm-page .cutbox { clip-path: none; }
+.gm-page .top-moved { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.gm-page .top-moved h2 { flex-basis: 100%; }
+.gm-page .svc, .gm-page .part, .gm-page .slot, .gm-page .gearbox, .gm-page .kmbox, .gm-page .ups .up, .gm-page .pedal, .gm-page .seg, .gm-page .rv { border-radius: 9px; }
+.gm-page .svc, .gm-page .part, .gm-page .slot { background: rgba(0,0,0,.28); border-color: rgba(255,255,255,.07); }
+.gm-page .presets button[aria-pressed="true"], .gm-page .seg button[aria-pressed="true"] { background: var(--acc); color: #120d06; box-shadow: none; }
+.gm-page .stats .st .sb i, .gm-page .svc .bar i { background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 40%, #fff)); }
+.gm-page .tg input:checked { background: var(--acc); box-shadow: 0 0 10px color-mix(in srgb, var(--acc) 50%, transparent); }
+.gm-page input[type=range] { accent-color: var(--acc); }
+.gm-page .hint { font-size: 13.5px; }
+/* riassunto della partita */
+.gm-summary { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; border-radius: 14px; padding: 18px; position: relative; overflow: hidden;
+  background: radial-gradient(600px 260px at 20% 110%, color-mix(in srgb, var(--acc) 25%, transparent), transparent 70%), linear-gradient(180deg, #1b1830, #0e0c18); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 16px 40px rgba(0,0,0,.4); }
+.gm-summary::before { content: ""; position: absolute; left: 0; right: 0; bottom: 34%; height: 2px; background: repeating-linear-gradient(90deg, rgba(255,255,255,.18) 0 26px, transparent 26px 52px); opacity: .5; }
+.gs-car { display: grid; align-content: end; gap: 10px; position: relative; min-height: 170px; }
+.gs-car canvas { width: 100%; max-width: 440px; image-rendering: pixelated; filter: drop-shadow(0 14px 10px rgba(0,0,0,.55)) drop-shadow(0 0 22px color-mix(in srgb, var(--acc) 25%, transparent)); }
+.gs-car small { display: block; font: 500 11px/1 var(--f-data); letter-spacing: .2em; text-transform: uppercase; color: var(--acc); }
+.gs-car b { display: block; margin-top: 4px; font: 400 26px/1 var(--f-display); font-style: italic; text-transform: uppercase; color: #fff; }
+.gs-car span { display: block; margin-top: 4px; color: var(--muted); font-size: 13.5px; }
+.gs-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; position: relative; }
+.gs-stat { padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.32); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+.gs-stat small { display: block; font: 500 10.5px/1 var(--f-data); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.gs-stat b { display: block; margin-top: 5px; font: 400 22px/1 var(--f-display); color: #fff; font-variant-numeric: tabular-nums; }
+.gs-stat.money b { color: var(--lime); text-shadow: 0 0 12px rgba(201,221,90,.35); }
+.gs-goal { grid-column: 1 / -1; padding: 12px 14px; border-radius: 10px; position: relative; background: linear-gradient(90deg, rgba(184,255,58,.14), rgba(184,255,58,.03)); box-shadow: inset 3px 0 0 #b8ff3a, inset 0 0 0 1px rgba(184,255,58,.2); }
+.gs-goal small { font: 500 11px/1 var(--f-data); letter-spacing: .16em; text-transform: uppercase; color: #b8ff3a; }
+.gs-goal b { display: block; margin-top: 4px; font: 600 16px/1.25 var(--f-body); color: #fff; }
+.gs-goal span { display: block; margin-top: 3px; color: #ffd23f; font: 500 13px/1.2 var(--f-data); }
+/* pulsante MENU nella barra in alto */
+.menubtn { display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; clip-path: none; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 6px 18px rgba(255,179,71,.3); }
+.menubtn i { width: 14px; height: 10px; background: linear-gradient(#1a1206 0 2px, transparent 2px 4px, #1a1206 4px 6px, transparent 6px 8px, #1a1206 8px 10px); }
+html.game .top { padding: 0 6px; border-radius: 10px; background: linear-gradient(90deg, rgba(255,179,71,.06), transparent 40%); }
+html.game .chip { border-radius: 8px; clip-path: none; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+html.game h1 { text-shadow: 0 0 14px rgba(255,179,71,.45), 2px 2px 0 #2a2216; }
+html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.45); }
+/* pannelli dei locali */
+.place { border-radius: 16px 0 0 16px; background: radial-gradient(500px 240px at 100% 0, color-mix(in srgb, var(--place-col, var(--amber)) 18%, transparent), transparent 70%), linear-gradient(180deg, rgba(20,18,28,.97), rgba(9,8,14,.98)); box-shadow: -24px 0 50px rgba(0,0,0,.55), inset 3px 0 0 var(--place-col, var(--amber)); }
+.place-head { background: transparent; border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: 12px; }
+.place-head h3 { font-size: 26px; text-shadow: 0 0 16px color-mix(in srgb, var(--place-col, var(--amber)) 45%, transparent); }
+.place-cash { padding: 6px 10px; border-radius: 8px; background: rgba(184,255,58,.08); box-shadow: inset 0 0 0 1px rgba(184,255,58,.2); }
+.vg-group { padding: 12px; border-radius: 12px; background: rgba(255,255,255,.03); box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); }
+.vg-group h4 { margin-top: 0; }
+.place .kbtn { border-radius: 8px; clip-path: none; background: linear-gradient(180deg, #2a2633, #1a1722); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+.place .kbtn:hover { background: linear-gradient(180deg, #353042, #211d2b); }
+.place .kbtn.first { background: linear-gradient(180deg, #4f7a14, #2c460a); box-shadow: 0 0 16px rgba(184,255,58,.35), inset 0 0 0 1px rgba(184,255,58,.45); }
+/* schermata iniziale */
+.intro .intro-menu { border-radius: 16px; clip-path: none; background: linear-gradient(180deg, rgba(24,20,34,.92), rgba(8,7,14,.95)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 24px 60px rgba(0,0,0,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.intro-menu h2 { margin: 0; font: 400 26px/1 var(--f-display); font-style: italic; text-transform: uppercase; color: #fff; text-shadow: 0 0 16px rgba(255,95,168,.45); }
+.intro-menu h2 em { color: #ff5fa8; font-style: italic; }
+.intro-menu ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.intro-menu li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; color: #e6dccb; font-size: 14.5px; line-height: 1.35; }
+.intro-menu li i { font-style: normal; width: 26px; height: 26px; display: grid; place-items: center; border-radius: 7px; background: rgba(255,255,255,.06); font-size: 14px; }
+.intro-menu .keys { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 12.5px; color: var(--muted); }
+.intro-menu .keys span { white-space: nowrap; }
+.gate .go { border-radius: 10px; clip-path: none; box-shadow: 0 10px 28px rgba(184,255,58,.3); }
+/* telefono: la barra delle sezioni diventa una fila di icone in alto */
+@media (max-width: 760px), (max-height: 520px) {
+  .gm-shell { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 8px; padding: 8px; }
+  .gm-rail { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: none; align-items: center; padding: 6px 8px; gap: 8px; }
+  .gm-logo { font-size: 18px; padding: 0 6px 0 2px; border: 0; } .gm-logo small { display: none; }
+  .gm-tabs { display: flex; overflow-x: auto; gap: 2px; }
+  .gm-tabs button { grid-template-columns: 30px; padding: 4px; } .gm-tabs button span { display: none; }
+  .gm-tabs button svg { width: 30px; height: 30px; padding: 5px; }
+  .gm-tabs button[aria-selected="true"]::before { left: 6px; right: 6px; top: auto; bottom: -5px; width: auto; height: 3px; border-radius: 3px; }
+  .gm-back { padding: 8px 10px; } .gm-back kbd { display: none; } .gm-back b { font-size: 12px; }
+  .gm-head { padding: 10px 14px 9px; } .gm-head p { display: none; } .gm-body { padding: 12px; }
+  .gm-summary { grid-template-columns: minmax(0, 1fr); padding: 12px; } .gs-car { min-height: 0; } .gs-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 </style>
 </head>
 <body>
@@ -1074,10 +1170,15 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   </div>
   <button class="intro-press" id="introPress" type="button">Premi per iniziare<small>Invio · Spazio · tocca</small></button>
   <div class="card intro-menu" id="introMenu">
-    <p>Hai una Supra di serie, € 3.000 in tasca e il serbatoio a tre quarti. Fai soldi con sfide e consegne, monta pezzi in officina e stai lontano dalla polizia in sesta.</p>
-    <p><kbd>I</kbd> quadro, <kbd>Invio</kbd> tenuto premuto per avviare, <kbd>E</kbd> prima marcia, <kbd>W</kbd> gas, <kbd>A</kbd> <kbd>D</kbd> sterzo, <kbd>C</kbd> telecamere. Meglio con le cuffie.</p>
+    <h2>Il <em>Viaggio</em></h2>
+    <ul>
+      <li><i aria-hidden="true">🏠</i><span>Si parte dal km 0 sotto casa, con una Volvo V40 di serie e € 450 in tasca. L'autostrada va solo avanti.</span></li>
+      <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 10.000.</span></li>
+      <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel Ovunque. E se qualcosa non torna, continua a guidare.</span></li>
+    </ul>
+    <div class="keys"><span><kbd>I</kbd> quadro</span><span><kbd>Invio</kbd> tenuto: avvia</span><span><kbd>E</kbd> marcia</span><span><kbd>W</kbd> gas</span><span><kbd>A</kbd><kbd>D</kbd> corsie</span><span><kbd>U</kbd> entra</span><span><kbd>Tab</kbd> menu</span></div>
     <button class="go" id="goBtn" type="button">Accendi e parti</button>
-    <small>La carriera si salva in questo browser. In modalità libera è tutto sbloccato e non ci sono eventi.</small>
+    <small>Il viaggio si salva in questo browser. Dal menu (Tab) ci sono anche le modalità libere: sfide in città, città libera, montagna.</small>
   </div>
   <div class="intro-ui">
     <button type="button" id="introMute" aria-label="Musica sì o no (M)"><span class="on">♪ Musica</span><span class="off">♪ Muta</span></button>
@@ -1897,7 +1998,7 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   function renderKm() {
     const odo = game.odo, np = game.nextPerk(), prev = np ? (GAME_KM_PERKS[GAME_KM_PERKS.indexOf(np) - 1] || { km: 0 }).km : 0;
     const f = np ? Math.min(1, (odo - prev) / (np.km - prev)) : 1;
-    const html = `<div class="km-head"><b>Supra JZA80</b><span>${fmt(odo, 1)} km percorsi</span></div>`
+    const html = `<div class="km-head"><b>${(CARS[game.car] && CARS[game.car].name) || 'La tua auto'}</b><span>${fmt(odo, 1)} km percorsi</span></div>`
       + `<div class="km-bar"><i style="width:${(f * 100).toFixed(1)}%"></i></div>`
       + `<p class="hint">${np ? `Prossimo traguardo a ${fmt(np.km)} km: <b>${np.name}</b> (${np.note}). I pezzi si sbloccano anche con i chilometri, non solo coi soldi.` : 'Tutti i traguardi raggiunti.'}</p>`
       + `<div class="km-perks">${GAME_KM_PERKS.map((p) => `<span class="${game.hasPerk(p.id) ? 'on' : ''}" title="${p.note}"><b>${fmt(p.km)} km</b>${p.name}</span>`).join('')}</div>`;

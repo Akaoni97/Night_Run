@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 76).
+  (ultima versione pubblicata: 77).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -50,6 +50,8 @@ gioco fa, sezione per sezione).
   nello stato passato a `view2d.update`.
 - **Interfaccia** (`menu.js`): schermata di gioco a tutta finestra, menu a schede con Tab. I pannelli restano quelli
   di `index.html` (stessi id), spostati nelle schede all'avvio: se aggiungi un pannello, aggiungilo anche a `TABS`.
+  Menu di pausa con sezioni a icone e colori (`ICO`, `TABS` in `menu.js`; stile in fondo allo `<style>` di
+  `index.html`, blocco "Menu di pausa"), riassunto della partita (`summary()`).
 - **Gallerie** (`galleria2d.js`) dove cambia il paesaggio; **guidatore** visibile nei vetri (`pilota2d.js`).
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
