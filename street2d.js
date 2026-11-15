@@ -1895,6 +1895,10 @@ class Street2D {
       this.fxShadow(g, spr, left, y, (GG.wy + GG.wr) * k + 1, x, lampX);
       if ((this.day || 0) < 0.6 && this.quality !== 'bassa' && !e.hazard) this.fxBeam(g, left + w - 4, sy + T0 + 36 * k, 110 * k, 16 * k, (0.3 + (this.rainOn ? 0.2 : 0)) * (1 - (this.day || 0)));
       this.body(g, spr, left, sy);
+      if (this.hazeOf && this.quality !== 'bassa') {                              // velo di foschia: più forte nelle corsie lontane
+        const hzA = (0.07 + Math.max(0, Math.min(1, (318 - y) / 44)) * 0.2) * (1 - 0.5 * (this.day || 0));
+        g.save(); g.globalAlpha = hzA; g.drawImage(this.hazeOf(spr, DM ? DM.haze.map((v) => Math.min(255, v + 40)).join(',') : '110,100,150'), left, sy); g.restore();
+      }
       if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
       const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
       for (const ax of GG.ax) {
@@ -1967,6 +1971,7 @@ class Street2D {
     g.save();
     g.imageSmoothingEnabled = false;
     this.tf(g, 1, skew, 0, 1 - squash, left, top - skew * SW / 2 - (spr.img ? k : 0));
+    if (this.heroOutline && this.quality !== 'bassa') this.heroOutline(g, spr);   // il protagonista si stacca dallo sfondo
     this.body(g, spr, 0, 0);
     // luce di contorno: magenta e ciano dei neon che si alternano lungo la strada, bianca di giorno
     if (spr.getContext && this.quality !== 'bassa') {
@@ -1984,17 +1989,23 @@ class Street2D {
       if (st.flame > 0.05) bl.push({ x: GE.ex[0] * k, y: GE.ex[1] * k, r: 60 * k, col: '255,130,40', a: 0.75 * Math.min(1, st.flame) });
       this.fxBodyLight(g, spr, bl);
     }
+    // il guidatore dentro l'abitacolo (pilota2d.js): luce dei lampioni che gli passano sopra, riflessi sul vetro che scorrono
+    st.reflOff = (st.reflOff || 0) + Math.abs(s.v) * dt * 30 * 0.9;
+    if (spr.hd && this.drawDriver && this.quality !== 'bassa') {
+      const dxw = left + (GE.hx ?? 108) * k; let lmp = 0;
+      for (const lx of lampX) lmp = Math.max(lmp, 1 - Math.abs(lx + 18 - dxw) / 70);
+      this._drvLamp = lmp * (1 - (this.day || 0));
+      this.drawDriver(g, spr, GE, st, s, k);
+    }
     if (spr.img) g.translate(0, k);
-    // pilota (dietro al montante): va indietro in accelerazione, avanti in frenata
     const P = (col, xx, yy, w, h) => { g.fillStyle = col; g.fillRect(Math.round(xx * k) + 1, Math.round(yy * k) + 1, Math.max(1, Math.round(w * k)), Math.max(1, Math.round(h * k))); };
-    const hx = (spr.img ? GE.hx : 108) + st.head * 0.8, hy = GE.hy;
-    // il pilota è solo un'ombra controluce: la testa va indietro in accelerazione e avanti in frenata, il poggiatesta resta fermo
-    const hx0 = hx - st.head * 0.8, sh = 'rgba(4,5,12,.82)', sh2 = 'rgba(4,5,12,.55)';
-    P(sh2, hx0 - 6, 13 + hy, 4, 10);                                          // poggiatesta
-    P(sh, hx - 1, 13 + hy, 8, 9); P(sh, hx, 12 + hy, 6, 1); P(sh, hx + 7, 16 + hy, 1, 3);   // testa (naso appena accennato)
-    P(sh, hx + 1, 22 + hy, 5, 2); P(sh, hx - 3, 24 + hy, 13, 6);               // collo e spalle
-    P(sh2, hx + 9, 25 + hy, 6, 2);                                            // braccio verso il volante
-    if (this.carId !== 'v40') for (let n = 0; n < 6; n++) P('rgba(111,216,255,.55)', 121 + n, 14 + n, 1, 1);
+    if (!spr.hd || !this.drawDriver || this.quality === 'bassa') {
+      // qualità bassa: il pilota è solo un'ombra controluce
+      const hx = (spr.img ? GE.hx : 108) + st.head * 0.8, hy = GE.hy, hx0 = hx - st.head * 0.8, sh = 'rgba(4,5,12,.82)', sh2 = 'rgba(4,5,12,.55)';
+      P(sh2, hx0 - 6, 13 + hy, 4, 10); P(sh, hx - 1, 13 + hy, 8, 9); P(sh, hx, 12 + hy, 6, 1); P(sh, hx + 7, 16 + hy, 1, 3);
+      P(sh, hx + 1, 22 + hy, 5, 2); P(sh, hx - 3, 24 + hy, 13, 6); P(sh2, hx + 9, 25 + hy, 6, 2);
+    }
+    if (this.carId === 'supra' && !spr.hd) for (let n = 0; n < 6; n++) P('rgba(111,216,255,.55)', 121 + n, 14 + n, 1, 1);
     if (s.brake > 0.05) { if (spr.img) { P('#ff2a2a', GE.tail[0], GE.tail[1], GE.tail[2], GE.tail[3]); P('#ffd0c8', GE.tail[0] + 1, GE.tail[1] + 1, 2, 2); } else { P('#ff2a2a', 1, 31, 5, 7); P('#ffd0c8', 2, 32, 2, 2); } }
     const blinkOn = s.signal && Math.floor(st.t * 3) % 2 === 0;
     if (blinkOn) { P('#ffa020', GE.blinkF[0], GE.blinkF[1], GE.blinkF[2], GE.blinkF[3]); P('#ffe0a0', GE.blinkF[0] + 2, GE.blinkF[1], 3, 1); if (spr.img) P('#ffa020', GE.blinkR[0], GE.blinkR[1], GE.blinkR[2], GE.blinkR[3]); else P('#ffa020', 2, 39, 4, 3); }

@@ -237,6 +237,13 @@ poi il muso che si accartoccia e si accorcia, il faro rotto (la luce resta debol
 crepato, la fuliggine sul cofano; da metà danno esce vapore dal cofano, fumo nero quando è quasi distrutta. Anche le
 auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 
+**Il protagonista (`pilota2d.js`).** Dentro l'auto c'è il guidatore di profilo, col giubbotto e il cappellino rosso,
+la mano sul volante: va indietro in accelerazione e avanti in frenata, prende la luce ambra del cruscotto e quella
+dei lampioni quando ci passa sotto, si vede solo attraverso i vetri (i montanti e i sedili del disegno lo coprono)
+e sul vetro scorrono i riflessi della strada. La figura si adatta all'altezza del finestrino di ogni auto. L'auto
+del giocatore ha un contorno scuro netto e il traffico un velo di foschia, più forte nelle corsie lontane, così il
+protagonista si stacca dal resto. Con qualità *bassa* torna l'ombra semplice.
+
 **Quartieri (`quartieri2d.js`).** La città cambia lungo la strada, un quartiere ogni chilometro circa, e poi
 ricomincia: *Quartiere di casa* (casette, giardini, poche insegne), *Centro · Le luci* (neon ovunque, uffici, la
 ruota panoramica in fondo), *I Bassifondi* (baracche di lamiera coi panni stesi e il bidone col fuoco, condomini
