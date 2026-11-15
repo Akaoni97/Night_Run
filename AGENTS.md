@@ -26,6 +26,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `galleria2d.js` | Gallerie del Viaggio dove cambia il paesaggio (`VG_ROUTE`): `tunnelSpan`, `drawTunnelBack` (volta, piastrelle, luci, imbocchi nella montagna), `drawTunnelFront` (bordo vicino e penombra). |
 | `effetti2d.js` | Effetti del 2D (si aggancia a `Street2D`, va caricato dopo `street2d.js`): fumo a sbuffi, fiammata dello scarico, scintille, ombre proiettate, fascio dei fari, luci sulla carrozzeria (`fxCar`, `fxParts`, `fxFlame`, `fxShadow`, `fxBeam`, `fxBodyLight`), mattonella dell'asfalto (`roadTile`). |
 | `dettagli2d.js` | Dettagli a densità doppia (dopo `effetti2d.js`): `tileHD` porta le tessere dei palazzi a 720 righe (spigoli arrotondati con Scale2x, grana, mattoni, riflessi sui vetri); `damaged` costruisce i danni sul disegno dell'auto. |
+| `icone.js` | Icone degli oggetti in pixel art 32×32 (`NR_ICON(kind)`, `NR_ICON_TAG(kind)`): bagagliaio, negozio, locali, bacheca. Un oggetto nuovo vuole una voce in `DRAW` con lo stesso nome di `INV`. |
 | `intro.js` | Sigla in 2D. |
 | `radio.js` | Radio. |
 | `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia, gare. |

@@ -244,6 +244,11 @@ cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo
 Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
 e, in orizzontale, testata e riquadri si rimpiccioliscono.
 
+**Icone degli oggetti (`icone.js`).** Ogni oggetto ha la sua icona in pixel art 32×32 (tanica, kit, ruota di
+scorta, gomma forata, pacchi, bancale, il lavoro sigillato, trofeo, sacco di sabbia, panino, acqua, thermos, bibita,
+salviette, foto, bomboletta, valigia) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
+si vedono nel bagagliaio, nel negozio, al bancone, nella bacheca e nella cassa del motel.
+
 **Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
 (il colore tinge titoli, pulsanti e cursori della sezione); a destra la testata e i pannelli arrotondati. La sezione
 *Partita* apre con il riassunto: la tua auto disegnata, contanti, km, reputazione, lavori fatti, guadagnato e il
