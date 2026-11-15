@@ -8,7 +8,7 @@ const SIM_SS = (a, b, x) => { const t = SIM_CLAMP((x - a) / (b - a), 0, 1); retu
 class SupraSim {
   constructor() {
     this.P = {
-      idle: 750, limiter: 7000, limHyst: 130, launchRpm: 4300,
+      idle: 750, limiter: 7000, limHyst: 300, launchRpm: 4300,
       Ie: 0.21, Iw: 3.0, mass: 1570, r: 0.322, cd: 0.31, A: 1.95, crr: 0.012, mu: 1.1, cgH: 0.48, wb: 2.55, rearW: 0.47,
       tank: 70, gears: [0, 3.827, 2.360, 1.685, 1.312, 1.000, 0.793], rev: -3.280, fd: 3.133, clutchMax: 820,
       // coppia indicata a pieno carico atmosferico (Nm) — il turbo la moltiplica
