@@ -1699,7 +1699,8 @@ class Street2D {
     } else this.fxZoom = 1;
     for (let n = Math.max(1, Math.ceil(dt / 0.008)), q = 0, h = dt / n; q < n; q++) { st.hdv += ((Math.max(-5, Math.min(5, -s.acc * 0.6)) - st.head) * 90 - st.hdv * 8) * h; st.head += st.hdv * h; }
     st.spin += s.ww * dt; st.front += s.v / 0.322 * dt;
-    const idleShake = s.running ? Math.sin(st.t * Math.max(s.rpm, 120) / 60 * 3 * Math.PI * 2) * (s.rpm < 1600 ? 1.2 + 2.4 * (s.lope || 0) : 0.5) : 0;
+    // vibrazione al minimo: un fremito di un pixel ogni tanto (più fitto con le camme spinte), non un tremito continuo
+    const idleShake = s.running && s.rpm < 1600 && (st.t * (2.2 + 5 * (s.lope || 0))) % 1 < 0.2 ? 1.7 : 0;
 
     if (game && game.inside && game.inside.phase === 'shop') { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
     // ---- sfondo: cielo, tre piani di città, foschia
