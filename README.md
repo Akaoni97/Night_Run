@@ -383,6 +383,11 @@ d'accensione (il motore galleggia contro il limite ronzando); MSD 6AL hard cut (
 MSD 6AL-2 col 2-step (launch da fermo, turbo carico); Holley EFI 2-step + 3-step (flat shift: in salita si cambia
 col gas a fondo, la pressione resta); stutter box "brap-brap" (da fermo taglia a tempo, regolare). Nelle impostazioni
 si regolano i giri del limitatore (fino al massimo della centralina) e del launch, per ogni auto.
+La **cadenza del taglio** si sceglie con due cursori, per ogni auto: *Discesa al taglio* (di quanti giri scendere prima
+che la benzina riparta, 0–800) e *Durata del taglio* (millisecondi minimi di taglio, 0–400). Il taglio finisce quando i
+giri sono scesi abbastanza e il tempo è passato: discesa 0 dà una cadenza fissa a tempo, durata 0 un rimbalzo deciso solo
+dai giri. In seconda marcia a 7000 giri: 130 giri → circa 25 tagli al secondo; 300 → 12; 300 giri e 150 ms → 5; 0 giri e
+250 ms → 3. Il soft cut non taglia a colpi e ignora i due cursori. Parametri della fisica: `P.limDrop`, `P.limMs`.
 
 **Quadro originale.** Lo stile "Originale dell'auto" (predefinito) ridisegna il quadro in alto come quello vero:
 Toyota col contagiri al centro e scala a 180, Volvo, Jaeger della R5 con luce verde, BMW anni '70 cromata, BMW M con

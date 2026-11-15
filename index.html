@@ -941,6 +941,12 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
       <div class="field"><span>Limitatore</span>
         <div class="vol"><input type="range" id="limRpm" min="4500" max="9000" step="100" value="7000" aria-label="Giri del limitatore"><output id="limOut">7000</output></div>
       </div>
+      <div class="field"><span>Discesa al taglio</span>
+        <div class="vol"><input type="range" id="limDrop" min="0" max="800" step="50" value="300" aria-label="Di quanti giri scendere al taglio del limitatore"><output id="limDropOut">300 giri</output></div>
+      </div>
+      <div class="field"><span>Durata del taglio</span>
+        <div class="vol"><input type="range" id="limMs" min="0" max="400" step="10" value="0" aria-label="Millisecondi minimi prima che la benzina riparta"><output id="limMsOut">solo giri</output></div>
+      </div>
       <div class="field"><span>Giri del launch</span>
         <div class="vol"><input type="range" id="lchRpm" min="2500" max="6500" step="100" value="4300" aria-label="Giri del 2-step e dello stutter box"><output id="lchOut">4300</output></div>
       </div>
@@ -1263,10 +1269,17 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
     TP.sim.limiter = limR;
     sim.setTune(TP.sim);
     sim.P.launchRpm = clamp(S.lchRpm[carId] || (CARS[carId].P || {}).launchRpm || 4300, 2500, limR - 400);
+    // cadenza del limitatore: di quanti giri scendere e per quanti ms resta il taglio (per auto, vuoto = valori del limitatore montato)
+    S.limDrop = S.limDrop || {}; S.limMs = S.limMs || {};
+    sim.P.limDrop = S.limDrop[carId] != null ? S.limDrop[carId] : undefined; sim.P.limMs = S.limMs[carId] || 0;
     { const li = tuningItemOf(TUNING, 'limiter', S.tune.limiter), lt = TP.sim.limType;
+      const dDef = lt === 'spark' || lt === 'stutter' ? 240 : sim.P.limHyst, soft = lt === 'soft', dNow = sim.P.limDrop != null ? sim.P.limDrop : dDef;
+      $('limDrop').value = dNow; $('limDropOut').textContent = soft ? 'dal soft cut' : dNow + ' giri';
+      $('limMs').value = sim.P.limMs; $('limMsOut').textContent = soft ? 'dal soft cut' : sim.P.limMs ? sim.P.limMs + ' ms' : 'solo giri';
+      $('limDrop').disabled = $('limMs').disabled = soft;
       $('limRpm').max = limMax; $('limRpm').value = limR; $('limOut').textContent = limR; $('lchRpm').max = limR - 400; $('lchRpm').value = sim.P.launchRpm; $('lchOut').textContent = sim.P.launchRpm;
       $('tLaunchL').textContent = `${lt === 'stutter' ? 'Stutter box' : 'Launch control'} ${sim.P.launchRpm}`;
-      $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : ''); }
+      $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : '') + (lt === 'soft' ? ' Il soft cut non taglia a colpi: discesa e durata non servono.' : ' Discesa e durata: la benzina riparte quando i giri sono scesi e il tempo è passato. Discesa 0 = cadenza fissa a tempo; durata “solo giri” = rimbalzo deciso dai giri.'); }
     Object.assign(sim.cfg, { pops: S.pops && TP.sim.ecuPops, launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
     if (garage) { garage.setTips(TP.dsp.ex.tips); garage.setPaint(S.paint); }
     if (street2d) { street2d.setCosmetics(cosView()); street2d.setCar(carId, TP.look, carPaint()); }
@@ -1306,6 +1319,8 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   $('tLane').addEventListener('change', (e) => { S.autoLane = e.target.checked; game.manualT = 0; applySettings(); flash(S.autoLane ? 'Sorpasso automatico: la Supra cambia corsia da sola' : 'Guida a mano: tieni premuto A o D e sterzi dove vuoi. Occhio ai tamponamenti', 2.4); });
   $('tLaunch').addEventListener('change', (e) => { S.launch = e.target.checked; applySettings(); if (S.launch) flash(S.autoClutch ? 'Launch: in 1ª tieni il freno, gas a fondo, poi molla il freno' : 'Launch: frizione giù, gas a fondo, poi rilascia la frizione'); });
   $('limRpm').addEventListener('input', (e) => { S.limRpm = S.limRpm || {}; S.limRpm[game.car] = +e.target.value; applySettings(); });
+  $('limDrop').addEventListener('input', (e) => { S.limDrop = S.limDrop || {}; S.limDrop[game.car] = +e.target.value; applySettings(); });
+  $('limMs').addEventListener('input', (e) => { S.limMs = S.limMs || {}; S.limMs[game.car] = +e.target.value; applySettings(); });
   $('lchRpm').addEventListener('input', (e) => { S.lchRpm = S.lchRpm || {}; S.lchRpm[game.car] = +e.target.value; applySettings(); });
   $('vol').addEventListener('input', (e) => { S.vol = +e.target.value; S.muted = false; applySettings(); });
   if (radio) {

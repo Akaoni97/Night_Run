@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 74).
+  (ultima versione pubblicata: 75).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -65,7 +65,7 @@ gioco fa, sezione per sezione).
 - La vista 3D non ha i luoghi, le auto nuove né gli eventi.
 - Gli **sticker** del giocatore: `img/stickers/manifest.json` è vuoto, arriveranno.
 - Due test falliscono da prima di tutto questo lavoro (0-100 della Supra di serie: 6,3 s contro meno di 6 attesi;
-  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 25 su 27.
+  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 26 su 28.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 
