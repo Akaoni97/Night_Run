@@ -81,7 +81,15 @@ class Street2D {
   }
   // luce che si somma: ellissi concentriche a bande (posterizzate, niente rumore)
   light(g, cx, cy, rx, ry, hex, a, bands = 4) {
+    if (rx < 1 || ry < 1) return;
     g.save(); g.globalCompositeOperation = 'lighter';
+    if ((this.SS || 1) > 1) {
+      // densità doppia: alone sfumato (stessa energia delle bande: pieno al centro, tenue al bordo)
+      const A = Math.min(1, a * bands), c = Street2D.rgb(hex), gr = g.createRadialGradient(0, 0, 0, 0, 0, rx);
+      gr.addColorStop(0, `rgba(${c},${A})`); gr.addColorStop(0.25, `rgba(${c},${A})`); gr.addColorStop(0.85, `rgba(${c},${Math.min(A, a * 1.2)})`); gr.addColorStop(1, `rgba(${c},0)`);
+      g.translate(cx, cy); g.scale(1, ry / rx); g.fillStyle = gr; g.fillRect(-rx, -rx, rx * 2, rx * 2);
+      g.restore(); return;
+    }
     g.fillStyle = `rgba(${Street2D.rgb(hex)},${a})`;
     for (let k = 0; k < bands; k++) { const f = 1 - k / bands * 0.75; this.span(g, cx, cy, rx * f, ry * f); }
     g.restore();
@@ -170,7 +178,7 @@ class Street2D {
     if (this.spr[key]) return this.spr[key];
     const D = this.genDef(), b = this.genBase(), c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax }; c.img = true;
+    c.geo = { w: D.w, ax: D.ax }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
   // ruota del disegno che gira: i vuoti scuri tra le razze diventano trasparenti (dietro c'è il freno), colore cerchi a scelta
@@ -307,7 +315,7 @@ class Street2D {
     if (this.spr[key]) return this.spr[key];
     const b = this.v40Base(), c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(71 * k);
     const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
-    c.geo = { w: 200, ax: [41, 156] }; c.img = true;
+    c.geo = { w: 200, ax: [41, 156] }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
   // ruote della V40: copricerchi di serie (come nell'illustrazione) o cerchi in lega a cinque razze con freno dietro
@@ -375,7 +383,7 @@ class Street2D {
     if (this.spr[key]) return this.spr[key];
     const c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(58 * k);
     const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(this.supraBase(hex), 0, 0, c.width, c.height);
-    c.geo = Street2D.GEO.supra; c.img = true;
+    c.geo = Street2D.GEO.supra; c.img = true; c.hd = this.supraBase(hex);
     return (this.spr[key] = c);
   }
   // ruota dell'illustrazione che gira; la pinza rossa resta ferma sopra
@@ -525,7 +533,7 @@ class Street2D {
     }
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx }; c.wheelImg = G.wheel; c.k = k;
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx }; c.wheelImg = G.wheel; c.k = k; c.hd = base;
     return (this.spr[key] = c);
   }
 
@@ -668,10 +676,24 @@ class Street2D {
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
     this.LW = Math.round(this.LH * w / h);
-    this.lo.width = this.LW; this.lo.height = this.LH;
+    this.fitLo();
     this.skyCache = null;
   }
 
+  // Tela interna: le coordinate restano quelle di sempre (360 righe), ma con qualità alta ogni unità vale
+  // 2×2 pixel veri (720 righe): gli sprite di prima si vedono uguali, il resto si può disegnare più fine.
+  fitLo() {
+    const SS = this.SS = this.quality === 'bassa' || this.slow ? 1 : 2;
+    if (this.lo.width !== this.LW * SS || this.lo.height !== this.LH * SS) { this.lo.width = this.LW * SS; this.lo.height = this.LH * SS; this.skyCache = null; }
+    this.g.setTransform(SS, 0, 0, SS, 0, 0); this.g.imageSmoothingEnabled = false;
+  }
+  // trasformazione in coordinate logiche (al posto di setTransform, che cancellerebbe la densità doppia)
+  tf(g, a, b, c, d, e, f) { const S = this.SS || 1; g.setTransform(a * S, b * S, c * S, d * S, e * S, f * S); }
+  // carrozzeria: con la densità doppia si pesca dal disegno a grandezza piena invece che dalla copia rimpicciolita
+  body(g, spr, x, y) {
+    if (spr.hd && this.SS > 1) { const q = g.imageSmoothingQuality; g.imageSmoothingEnabled = !!Street2D.hdSmooth; g.imageSmoothingQuality = 'high'; g.drawImage(spr.hd, 0, 0, spr.hd.width, spr.hd.height, x, y, spr.width, spr.height); g.imageSmoothingEnabled = false; g.imageSmoothingQuality = q; }
+    else g.drawImage(spr, x, y);
+  }
   laneY(z) { return z > 5 ? 226 : 320 - (3.5 - z) / 3.5 * 40; }
   laneS(y) { return 0.72 + (y - 226) / 94 * 0.28; }
 
@@ -717,47 +739,8 @@ class Street2D {
 
   // ---------------------------------------------------------------- cielo (in cache), nuvole, aereo
   drawSky(g, t, dist) {
-    const W = this.LW, b = this.C.sky;
-    if (!this.skyCache || this.skyCache.width !== W) {
-      const c = document.createElement('canvas'); c.width = W; c.height = 224; const x = c.getContext('2d');
-      const bh = 224 / b.length;
-      for (let i = 0; i < b.length; i++) { x.fillStyle = b[i]; x.fillRect(0, Math.floor(i * bh), W, Math.ceil(bh)); }
-      for (let i = 0; i < b.length - 1; i++) for (let y = 0; y < 6; y++) for (let xx = 0; xx < W; xx++) if (Street2D.bayer(xx, y) < (y + 1) / 7) { x.fillStyle = b[i + 1]; x.fillRect(xx, Math.floor((i + 1) * bh) - 6 + y, 1, 1); }
-      const mx = W - 90, my = 48;
-      x.save(); x.globalCompositeOperation = 'lighter';
-      for (let k = 0; k < 4; k++) { x.fillStyle = 'rgba(90,70,140,.12)'; this.span(x, mx, my, 44 - k * 6, 44 - k * 6); }
-      x.restore();
-      for (let y = -23; y <= 23; y++) for (let xx = -23; xx <= 23; xx++) {
-        const q = xx * xx + y * y; if (q > 530) continue;
-        const crater = (xx + 8) ** 2 + (y + 6) ** 2 < 36 || (xx - 8) ** 2 + (y - 10) ** 2 < 18 || (xx - 10) ** 2 + (y + 11) ** 2 < 10 || (xx + 3) ** 2 + (y - 14) ** 2 < 8;
-        x.fillStyle = q > 480 ? this.C.ink : crater ? '#e2cf9e' : xx + y > 16 ? '#ecdab0' : xx + y < -20 ? '#fffaf0' : this.C.moon;
-        x.fillRect(mx + xx, my + y, 1, 1);
-      }
-      this.skyCache = c;
-    }
-    g.drawImage(this.skyCache, 0, 0);
-    // pioggia: nuvole basse e cupe coprono luna e stelle
-    if (this.rainOn) {
-      g.fillStyle = '#1a1c2c'; g.fillRect(0, 0, W, 224);
-      for (let i = 0; i < 18; i++) { const cx = ((i * 97 + t * 4) % (W + 160)) - 80, cy = 30 + (i % 5) * 26; g.fillStyle = i % 2 ? '#22253a' : '#262a40'; this.span(g, cx, cy, 70 + (i % 3) * 20, 16 + (i % 4) * 4); }
-    }
-    for (let i = 0; i < (this.rainOn ? 0 : 150); i++) {
-      const x = Math.floor(Street2D.rnd(i) * W), y = Math.floor(Street2D.rnd(i + 50) * 160);
-      const tw = Math.sin(t * (2 + Street2D.rnd(i + 9) * 3) + i) > 0.55;
-      g.fillStyle = tw ? '#ffffff' : '#7f88d8'; g.fillRect(x, y, 1, 1);
-      if (tw && i % 11 === 0) { g.fillStyle = '#c9d0ff'; g.fillRect(x - 2, y, 5, 1); g.fillRect(x, y - 2, 1, 5); }
-    }
-    if (!this.spr.clouds) {
-      this.spr.clouds = [0, 1, 2].map((k) => this.sprite(96 + k * 22, 26, (x) => {
-        x.fillStyle = '#332e6a';
-        for (let i = 0; i < 7; i++) { x.beginPath(); x.arc(12 + i * (13 + k * 3), 15 - Math.sin(i * 1.7 + k) * 5, 9 + Street2D.rnd(i + k * 7) * 4, 0, Math.PI * 2); x.fill(); }
-        x.fillStyle = '#4c4590'; for (let i = 0; i < 5; i++) { x.beginPath(); x.arc(14 + i * (13 + k * 3), 9 - Math.sin(i * 1.7 + k) * 4, 5, Math.PI, 0); x.fill(); }
-      }, false));
-    }
-    this.spr.clouds.forEach((c, k) => {
-      const span = W + 240, x = ((-(t * (3 + k * 2)) - dist * 0.04 + k * 311) % span + span) % span - 120;
-      g.drawImage(c, Math.round(x), 30 + k * 26);
-    });
+    const W = this.LW;
+    this.skyHD(g, t, dist);                                                    // fondo, stelle, luna e nuvole: effetti2d.js
     const ax = ((t * 12) % (W + 80)) - 40, ay = 22 + Math.sin(t * 0.2) * 3;
     g.fillStyle = '#2a2850'; g.fillRect(Math.round(ax), Math.round(ay), 8, 2); g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 2, 6);
     if (Math.floor(t * 2) % 2) { g.fillStyle = '#ff3b3b'; g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 1, 1); } else { g.fillStyle = '#ffffff'; g.fillRect(Math.round(ax) + 7, Math.round(ay), 1, 1); }
@@ -1649,7 +1632,7 @@ class Street2D {
     const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     this.shadow(g, cx, gy, 120, 6);
     if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
-    g.imageSmoothingEnabled = false; g.drawImage(spr, left, top);
+    g.imageSmoothingEnabled = false; this.body(g, spr, left, top);
     if (spr.img) { const wf = this.wheelFn(); const wyI = gy - lift - GI.wr * K; wf(g, left + GI.ax[0] * K, wyI, K, 0, 0, true); wf(g, left + GI.ax[1] * K, wyI, K, 0, 0, false); for (let q = 2; q < GI.ax.length; q++) wf(g, left + GI.ax[q] * K, wyI, K, 0, 0, false); }
     if (I.id === 'style') this.light(g, cx + 20, top + 10, 60, 10, '#ffffff', 0.04 + 0.03 * Math.sin(t * 2), 3);   // riflesso che scorre
     if (I.id === 'shop' || I.id === 'niko') this.person(g, Math.max(14, cx - 100 * K - 40), gy, I.id, t);
@@ -1660,6 +1643,10 @@ class Street2D {
 
   update(dt, s, game) {
     const st = this.st, g = this.g, W = this.LW, C = this.C;
+    this.fitLo(); const SS = this.SS;
+    // dispositivo lento: se il disegno a densità doppia resta sopra i 30 ms per tre secondi, si torna a quella semplice
+    const tStart = performance.now();
+    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) this.slow = true; }
     st.t += dt;
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
@@ -1735,7 +1722,12 @@ class Street2D {
     } else this.drawScenery(g, dist, st.t, bg, { wx, visFrom, visTo });
     // velocità: lo sfondo lascia una scia (copie spostate e trasparenti), più lunga quanto più si va forte
     const smear = Math.min(1, Math.max(0, (Math.abs(s.v) - 12) / 40));
-    if (smear > 0.02 && this.quality !== 'bassa') { g.save(); for (const [o, a] of [[5, 0.32], [11, 0.2], [18, 0.12]]) { g.globalAlpha = a * smear; g.drawImage(this.lo, 0, 40, W, 192, -o * (0.5 + smear), 40, W, 192); } g.restore(); }
+    if (smear > 0.02 && this.quality !== 'bassa') {
+      // una sola copia dello sfondo a risoluzione logica (la scia è comunque sfocata), poi tre passate spostate
+      const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W) { sm.width = W; sm.height = 192; }
+      const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W, 192);
+      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[5, 0.32], [11, 0.2], [18, 0.12]]) { g.globalAlpha = a * smear; g.drawImage(sm, -o * (0.5 + smear), 40, W, 192); } g.restore();
+    }
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
     if (bg === 'city' || bg === 'village') {
@@ -1806,7 +1798,7 @@ class Street2D {
     if (wetA > 0.02) {
       if (!this.rf) this.rf = document.createElement('canvas');
       if (this.rf.width !== W) { this.rf.width = W; this.rf.height = 106; }
-      const rg = this.rf.getContext('2d'); rg.clearRect(0, 0, W, 106); rg.drawImage(this.lo, 0, 110, W, 106, 0, 0, W, 106);
+      const rg = this.rf.getContext('2d'); rg.clearRect(0, 0, W, 106); rg.drawImage(this.lo, 0, 110 * SS, W * SS, 106 * SS, 0, 0, W, 106);
       g.save(); g.globalCompositeOperation = 'lighter';
       for (let r = 0; r < 90; r++) {
         const srcY = 105 - Math.floor(r / 0.85), wob = Math.round(Math.sin(r * 0.55 + st.t * 6) * (1 + r * 0.03) * (this.rainOn ? 1.6 : 0.8));
@@ -1891,7 +1883,7 @@ class Street2D {
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
       this.fxShadow(g, spr, left, y, (GG.wy + GG.wr) * k + 1, x, lampX);
       if ((this.day || 0) < 0.6 && this.quality !== 'bassa' && !e.hazard) this.fxBeam(g, left + w - 4, sy + T0 + 36 * k, 110 * k, 16 * k, (0.3 + (this.rainOn ? 0.2 : 0)) * (1 - (this.day || 0)));
-      g.drawImage(spr, left, sy);
+      this.body(g, spr, left, sy);
       if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
       const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
       for (const ax of GG.ax) {
@@ -1952,7 +1944,7 @@ class Street2D {
     if (this.rainOn && spr.img) {
       const hgt = spr.height;
       g.save(); g.globalAlpha = 0.2; g.imageSmoothingEnabled = false;
-      g.setTransform(1, 0, 0, -0.55, left, y0 + hgt * 0.55 + 2); g.drawImage(spr, 0, 0); g.restore();
+      this.tf(g, 1, 0, 0, -0.55, left, y0 + hgt * 0.55 + 2); this.body(g, spr, 0, 0); g.restore();
     }
     st.popJolt = Math.max(0, (st.popJolt || 0) - dt * 10);
     const heave = Math.round(-st.heave + idleShake * 0.6 - (st.popJolt > 0.3 ? 1 : 0) + (s.hop || 0) * 1.6);   // saltellamento dell'assale
@@ -1962,8 +1954,8 @@ class Street2D {
     this.fxParts(g, dt, wx, W, 0);                                             // fumo e vapore dietro l'auto
     g.save();
     g.imageSmoothingEnabled = false;
-    g.setTransform(1, skew, 0, 1 - squash, left, top - skew * SW / 2 - (spr.img ? k : 0));
-    g.drawImage(spr, 0, 0);
+    this.tf(g, 1, skew, 0, 1 - squash, left, top - skew * SW / 2 - (spr.img ? k : 0));
+    this.body(g, spr, 0, 0);
     // luce di contorno: magenta e ciano dei neon che si alternano lungo la strada, bianca di giorno
     if (spr.getContext && this.quality !== 'bassa') {
       const night = 1 - (this.day || 0) * 0.8, ph = 0.5 + 0.5 * Math.sin(dist / 23);
@@ -2186,11 +2178,12 @@ class Street2D {
     const shake = Math.round((bF + bR) * 0.05 + (st.popJolt > 0.8 ? (Math.random() < 0.5 ? -1 : 1) : 0));
     const shakeX = st.popJolt > 0.8 ? Math.round((Math.random() - 0.5) * 3) : 0;
     this.present(shake, shakeX);
+    this.tPrev = performance.now() - tStart;
   }
 
   present(shake, shakeX) {
     if (!this.visible) return;
-    const c = this.ctx; c.imageSmoothingEnabled = false;
+    const c = this.ctx, SS = this.SS || 1; c.imageSmoothingEnabled = false;
     c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height);
     // inquadratura: zoom su un punto (sigla) o scena intera
     const z = Math.max(1, (this.zoom || 1) * (this.fxZoom || 1)), pad = this.padBottom || 0;
@@ -2200,7 +2193,7 @@ class Street2D {
       const sw = this.LW / z, sh = this.LH / z, f = this.zoomFocus || this.fxFocus || { x: this.LW / 2, y: this.LH / 2 };
       const sx = Math.max(0, Math.min(this.LW - sw, f.x - sw / 2)), sy = Math.max(0, Math.min(this.LH - sh + pad, f.y - sh / 2));
       src = [sx, sy, sw, sh];
-      c.drawImage(this.lo, sx + shakeX / z, sy + shake / z, sw, sh, 0, 0, this.canvas.width, this.canvas.height);
+      c.drawImage(this.lo, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);
     } else c.drawImage(this.lo, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
     // bagliore: copia ridotta, tenute solo le parti luminose, ingrandita e sommata (neon, fari, fiamme, lampioni)
     if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {
@@ -2208,7 +2201,7 @@ class Street2D {
       if (!this.bl) { this.bl = document.createElement('canvas'); }
       if (this.bl.width !== bw) { this.bl.width = bw; this.bl.height = bh; }
       const b = this.bl.getContext('2d');
-      b.filter = 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0], src[1], src[2], src[3], 0, 0, bw, bh); b.filter = 'none';
+      b.filter = 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0] * SS, src[1] * SS, src[2] * SS, src[3] * SS, 0, 0, bw, bh); b.filter = 'none';
       c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.62 - (this.day || 0) * 0.35;
       c.drawImage(this.bl, 0, 0, this.canvas.width, this.canvas.height); c.restore();
     }

@@ -187,7 +187,7 @@
     const cast = (sx, sy, a) => {
       if (a < 0.03) return;
       g.save(); g.globalAlpha = a; g.imageSmoothingEnabled = false;
-      g.setTransform(1, 0, -sx, -sy, left + sx * hg, y0 + sy * hg); g.drawImage(sil, 0, 0); g.restore();
+      this.tf(g, 1, 0, -sx, -sy, left + sx * hg, y0 + sy * hg); g.drawImage(sil, 0, 0); g.restore();
     };
     if (day > 0.05) cast(0.5, 0.16, 0.36 * day * (this.rainOn ? 0.4 : 1));
     let any = false;
@@ -299,6 +299,96 @@
     // luci che il fumo può prendere: fiammata e stop
     this.fxEnv = { lampX: c.lampX, fx: rx - 18, fy: exY, fa: Math.max(st.popFlash || 0, st.flame > 0.05 ? Math.min(1, st.flame) : 0), bx: left, by: top + 30 * k, ba: s.brake > 0.05 ? 1 : s.ign ? 0.3 : 0 };
     this.fxParts(g, dt, c.wx, c.W, 1);
+  };
+
+  // ---------------------------------------------------------------- cielo
+  // Il fondo si calcola una volta sola alla densità della tela: sfumatura a retino fine, velo di nebulosa,
+  // stelle di grandezze e tinte diverse (più rade verso l'orizzonte, dove la città schiarisce il cielo),
+  // luna con mari, crateri in rilievo e alone. Poi, a ogni fotogramma: stelle che brillano e nuvole a più piani.
+  const SKY = [[0, 6, 6, 24], [0.35, 16, 14, 48], [0.62, 34, 26, 84], [0.82, 60, 40, 108], [1, 90, 56, 124]];
+  const CRATERS = [[-0.35, -0.26, 0.26], [0.35, 0.43, 0.18], [0.43, -0.48, 0.13], [-0.13, 0.6, 0.12], [0.1, -0.05, 0.1], [-0.6, 0.3, 0.09], [0.62, 0.05, 0.08], [-0.05, -0.68, 0.08], [0.2, 0.76, 0.06]];
+  S.skyBuild = function (W, H, SS, key) {
+    const w = W * SS, h = H * SS, c = document.createElement('canvas'); c.width = w; c.height = h; c._k = key;
+    const x = c.getContext('2d'), im = x.createImageData(w, h), d = im.data;
+    const mx = (W - 90) * SS, my = 48 * SS, MR = 23 * SS;
+    for (let py = 0; py < h; py++) {
+      const t = py / (h - 1); let q = 0; while (q < SKY.length - 2 && t > SKY[q + 1][0]) q++;
+      const A = SKY[q], B = SKY[q + 1], f = (t - A[0]) / (B[0] - A[0]), r0 = A[1] + (B[1] - A[1]) * f, g0 = A[2] + (B[2] - A[2]) * f, b0 = A[3] + (B[3] - A[3]) * f;
+      const ly = py / SS;
+      for (let px = 0; px < w; px++) {
+        const lx = px / SS, by = Street2D.bayer(px, py);
+        const dn = (ly - (36 + lx * 0.11)) / 34, neb = Math.exp(-dn * dn) * (0.25 + 0.75 * vn2(lx / 46, ly / 24, 64)) * (1 - t * 0.7);
+        const md = Math.hypot(px - mx, py - my) / (62 * SS), halo = md < 1 ? (1 - md) * (1 - md) : 0;
+        const i = (py * w + px) * 4, dq = (v) => Math.floor(v / 4 + by) * 4;             // retino fine: niente gradini
+        d[i] = dq(r0 + neb * 16 + halo * 44); d[i + 1] = dq(g0 + neb * 10 + halo * 38); d[i + 2] = dq(b0 + neb * 34 + halo * 76); d[i + 3] = 255;
+      }
+    }
+    // stelle fisse
+    const N = Math.round(W * 1.1);
+    for (let n = 0; n < N; n++) {
+      const sx = Math.floor(rnd(n * 1.7 + 3) * w), sy = Math.floor(Math.pow(rnd(n * 2.3 + 11), 1.6) * 176 * SS), br = rnd(n * 3.1 + 7), tint = rnd(n * 5.3 + 1);
+      if (Math.hypot(sx - mx, sy - my) < MR + 3 * SS) continue;
+      const k = (0.3 + 0.7 * br * br) * (1 - sy / (200 * SS)), col = tint < 0.25 ? [170, 185, 255] : tint > 0.85 ? [255, 222, 190] : [226, 230, 255];
+      const put = (xx, yy, kk) => { if (xx < 0 || yy < 0 || xx >= w || yy >= h) return; const i = (yy * w + xx) * 4; for (let ch = 0; ch < 3; ch++) d[i + ch] = Math.min(255, d[i + ch] + col[ch] * kk); };
+      put(sx, sy, k);
+      if (br > 0.93 && SS > 1) { put(sx + 1, sy, k * 0.5); put(sx - 1, sy, k * 0.5); put(sx, sy + 1, k * 0.5); put(sx, sy - 1, k * 0.5); }
+    }
+    // luna
+    for (let yy = -MR; yy <= MR; yy++) for (let xx = -MR; xx <= MR; xx++) {
+      const nx = xx / MR, ny = yy / MR, rr = nx * nx + ny * ny; if (rr > 1) continue;
+      let L = 1 - 0.16 * rr - clamp((nx + ny) * 0.5 + 0.15, 0, 1) * 0.2, R = 255, G = 243, B = 206;
+      if (vn2(nx * 2.6 + 9, ny * 2.6 + 4, 64) > 0.55) { L *= 0.9; G -= 6; B -= 14; }                    // mari
+      for (const cr of CRATERS) {
+        const dx = nx - cr[0], dy = ny - cr[1], dd = Math.hypot(dx, dy) / cr[2];
+        if (dd < 1) { L *= dd > 0.72 ? ((dx + dy) > 0 ? 1.07 : 0.84) : 0.9; }                             // bordo in luce e in ombra, fondo più scuro
+      }
+      if (rr > 0.93) L *= 0.86;
+      L = Math.round(L * 12) / 12;                                                                        // pochi toni netti
+      const i = ((my + yy) * w + mx + xx) * 4; if (i < 0 || mx + xx < 0 || mx + xx >= w) continue;
+      d[i] = clamp(R * L, 0, 255); d[i + 1] = clamp(G * L, 0, 255); d[i + 2] = clamp(B * L, 0, 255);
+    }
+    x.putImageData(im, 0, 0);
+    return c;
+  };
+  // nuvola a tre toni: corpo scuro, dorso schiarito dalla luna, pancia tinta dalle luci della città
+  S.cloudHD = function (k, SS) {
+    const w = 96 + k * 26, hh = 30;
+    return this.sprite(w * SS, hh * SS, (x) => {
+      x.scale(SS, SS);
+      // cumulo: base piatta, gobbe più alte al centro; il ritaglio taglia tutto quello che scende sotto la base
+      x.beginPath(); x.rect(0, 0, w, 25); x.clip();
+      const n = 8 + k, hump = (col, dy, rs, sd) => { x.fillStyle = col; for (let i = 0; i < n; i++) { const m = Math.sin(Math.PI * (i + 0.5) / n), r = (4 + 9 * m * (0.7 + 0.6 * rnd(i * 3 + k * 7 + sd))) * rs; x.beginPath(); x.arc(10 + i * ((w - 20) / (n - 1)), 23 - r * 0.55 + dy, r, 0, Math.PI * 2); x.fill(); } };
+      hump('#2c2862', 0, 1, 0); hump('#3a3580', -2.2, 0.74, 0); hump('#5650a2', -4.6, 0.42, 0);
+      x.fillStyle = '#4a316e'; x.fillRect(8, 22, w - 16, 3);                                 // pancia tinta dalla città
+      x.fillStyle = '#2c2862'; for (let i = 0; i < w - 16; i += 2) if (rnd(i + k) > 0.5) x.fillRect(8 + i, 22, 2, 1);
+    }, false);
+  };
+  S.skyHD = function (g, t, dist) {
+    const W = this.LW, SS = this.SS || 1, H = 224, key = W + '_' + SS, u = 1 / SS;
+    if (!this.skyCache || this.skyCache._k !== key) this.skyCache = this.skyBuild(W, H, SS, key);
+    g.drawImage(this.skyCache, 0, 0, W, H);
+    if (this.rainOn) {
+      // pioggia: nuvole basse e cupe coprono luna e stelle
+      g.fillStyle = '#1a1c2c'; g.fillRect(0, 0, W, H);
+      for (let i = 0; i < 18; i++) { const cx = ((i * 97 + t * 4) % (W + 160)) - 80, cy = 30 + (i % 5) * 26; g.fillStyle = i % 2 ? '#22253a' : '#262a40'; this.span(g, cx, cy, 70 + (i % 3) * 20, 16 + (i % 4) * 4); }
+    } else {
+      // stelle che brillano: un punto fine che si accende e ogni tanto fa la croce
+      for (let i = 0; i < 70; i++) {
+        const sx = Math.floor(rnd(i) * W), sy = Math.floor(rnd(i + 50) * 150), ph = Math.sin(t * (1.5 + rnd(i + 9) * 3) + i);
+        if (ph < 0.3) continue;
+        g.fillStyle = ph > 0.8 ? '#ffffff' : '#aab4f0'; g.fillRect(sx, sy, u, u);
+        if (ph > 0.8 && i % 6 === 0) { g.fillStyle = 'rgba(200,210,255,.7)'; g.fillRect(sx - 2, sy, 4 + u, u); g.fillRect(sx, sy - 2, u, 4 + u); }
+      }
+    }
+    const ck = 'cloudsHD' + SS;
+    if (!this.spr[ck]) this.spr[ck] = [0, 1, 2, 3].map((k) => this.cloudHD(k, SS));
+    // nuvole su più piani: le lontane piccole, lente e sbiadite, le vicine grandi
+    const lay = [[3, 22, 0.5, 2, 0.55], [1, 44, 0.62, 3, 0.7], [0, 30, 0.8, 4, 0.85], [2, 66, 1, 5.5, 1], [1, 98, 0.9, 7, 0.9], [3, 120, 0.7, 4.5, 0.6]];
+    lay.forEach(([k, y, sc, sp, al], n) => {
+      const c = this.spr[ck][k], cw = c.width / SS * sc, span = W + 300, cx = ((-(t * sp) - dist * 0.03 * sc + n * 233) % span + span) % span - 150;
+      g.globalAlpha = al * (this.rainOn ? 0.5 : 1); g.drawImage(c, Math.round(cx), y, cw, c.height / SS * sc);
+    });
+    g.globalAlpha = 1;
   };
 
   // ---------------------------------------------------------------- asfalto

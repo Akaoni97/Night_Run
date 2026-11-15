@@ -224,6 +224,12 @@ e fiammata illuminano solo la lamiera (luce ritagliata sulla sagoma). L'asfalto 
 ruote, rattoppi, crepe e macchie d'olio. Con qualità *bassa* ombre proiettate e luci sulla carrozzeria si spengono
 e le particelle si dimezzano.
 
+**Alta definizione (720 righe).** Con qualità alta la scena 2D si disegna a densità doppia: i disegni delle auto
+si vedono a grandezza piena invece che rimpiccioliti, gli aloni di lampioni, fari, stop e neon sono sfumati, il
+cielo ha una sfumatura a retino fine, stelle di grandezze e tinte diverse, una luna con mari e crateri e nuvole su
+più piani. Città, strada, fumo e fiamme sono ancora quelli a 360 righe (ingranditi): si rifaranno un pezzo alla
+volta. Se il dispositivo non regge (disegno sopra i 30 ms per tre secondi) il gioco torna da solo a 360 righe.
+
 ## Gomme, rapporti e trazione
 
 - **Gomme a mescola:** ogni gomma ha la sua curva di aderenza (formula di Pacejka) e la sua temperatura ideale.

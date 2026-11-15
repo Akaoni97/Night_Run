@@ -32,6 +32,12 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
 | `audio/`, `models/` | Suoni e modelli 3D liberi già nel progetto. |
 
+Densità doppia: con qualità alta la tela interna è a 720 righe (`Street2D.SS = 2`, `fitLo()`), ma le coordinate
+di disegno restano quelle a 360: ogni unità vale 2×2 pixel veri. Quindi: niente `g.setTransform` diretto sulla tela
+(usa `this.tf(g, ...)`), le carrozzerie si disegnano con `this.body(g, spr, x, y)` (pesca dal disegno a grandezza
+piena), per un dettaglio fine si disegna a mezze unità (`1 / this.SS`), e chi copia dalla tela `this.lo` deve
+moltiplicare le coordinate sorgente per `SS`. Con qualità bassa, o se il dispositivo è lento (`this.slow`), `SS` è 1.
+
 Convenzioni della grafica 2D: canvas logico alto 360 px, strada tra y 236 e 336, 30 px per metro (`PPM`),
 `Street2D.rnd(n)` per il caso deterministico (niente `Math.random` per ciò che deve restare fermo), testi a pixel
 solo in maiuscolo ASCII (`PX_FONT`). Le auto guardano a destra.
