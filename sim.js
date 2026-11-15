@@ -245,14 +245,18 @@ class SupraSim {
     const lt = tn.limType || (tn.sparkCut ? 'spark' : 'fuel');
     this.softK = 1;
     if (this.running) {
-      const lim = P.limiter, hyst = lt === 'spark' || lt === 'stutter' ? 240 : lt === 'soft' ? 60 : P.limHyst;
+      // discesa (giri) e durata minima (ms) del taglio sono scelte dal pilota (P.limDrop, P.limMs); se non le ha toccate
+      // restano i valori del tipo di limitatore. Il taglio finisce quando i giri sono scesi abbastanza E il tempo è passato:
+      // discesa 0 = cadenza fissa a tempo, durata 0 = rimbalzo deciso solo dai giri
+      const lim = P.limiter, hyst = P.limDrop != null && lt !== 'soft' ? P.limDrop : lt === 'spark' || lt === 'stutter' ? 240 : lt === 'soft' ? 60 : P.limHyst;
+      const holdT = lt === 'soft' ? 0 : (P.limMs || 0) / 1000;
       if (lt === 'soft') {
         // toglie anticipo negli ultimi 300 giri: la coppia sparisce senza strappi e il motore "galleggia" vibrando
         this.softK = 1 - 0.95 * SIM_SS(lim - 300, lim + 40, rpm);
         if (this.softK < 0.9 && Math.random() < h * 60 * (1 - this.softK)) this.misT = Math.max(this.misT || 0, 0.012);
         const hard = lim + 140;
         if (this.cutLim) { if (rpm < hard - 100) this.cutLim = false; } else if (rpm > hard) this.cutLim = true;
-      } else if (this.cutLim) { if (rpm < lim - hyst) this.cutLim = false; } else if (rpm > lim) this.cutLim = true;
+      } else if (this.cutLim) { this.cutT = (this.cutT || 0) + h; if (rpm < lim - hyst && this.cutT >= holdT) this.cutLim = false; } else if (rpm > lim) { this.cutLim = true; this.cutT = 0; }
       // stutter box: da fermo (o in folle) limita ai giri di launch con un taglio a tempo, regolare come una mitragliatrice
       this.stutter = lt === 'stutter' && Math.abs(this.v) < 1.5 && (this.gear === 0 || this.launchArmed) && I.thr > 0.5;
       if (this.stutter) { this.stuT = ((this.stuT || 0) + h) % 0.13; this.cutLaunch = rpm > P.launchRpm - 350 && (this.stuT < 0.065 || rpm > P.launchRpm); }
