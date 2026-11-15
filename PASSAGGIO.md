@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 71).
+  (ultima versione pubblicata: 72).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -45,9 +45,9 @@ gioco fa, sezione per sezione).
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
 
 ## Lavori aperti e idee in sospeso
-- **Alta definizione a 720 righe** (vedi AGENTS.md, "Densità doppia"): fatti tela interna, cielo, luci sfumate e
-  carrozzerie a grandezza piena. Da fare, un pezzo alla volta: palazzi e insegne, marciapiedi e asfalto, fumo e
-  fiamme più fini, pedoni e oggetti, luoghi del viaggio. Il proprietario vuole un pixel "più moderno, senza esagerare".
+- **Alta definizione a 720 righe** (vedi AGENTS.md, "Densità doppia"): fatti tela interna, cielo, luci sfumate,
+  carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
+  (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
 - Manca il disegno di un **camion** (traffico lento a 90 km/h, lavori pesanti: la logica c'è, serve il disegno).
 - La **reputazione** sblocca solo vantaggi meccanici: il giocatore potrebbe volere anche premi estetici.
 - Sulle auto molto scure (Golf GTI, 205 GTI) il cambio di vernice prende poco (maschera povera).

@@ -40,15 +40,15 @@
     mist: { rate: 1.7, gr: 20, a: 0.2, rise: -5, drag: 2.6, tone: 'mist' },
   };
   S.puffSprite = function (tone, r, v) {
-    const rq = Math.max(1, Math.min(34, r < 8 ? Math.round(r) : Math.round(r / 2) * 2)), key = tone + rq + '_' + v;
+    const SS = this.SS || 1, rq = Math.max(1, Math.min(34, r < 8 ? Math.round(r) : Math.round(r / 2) * 2)), key = tone + rq + '_' + v + '_' + SS;
     const P = Street2D._puffs || (Street2D._puffs = {});
     if (P[key]) return P[key];
-    const N = rq * 2 + 3, c = document.createElement('canvas'); c.width = N; c.height = N;
+    const N = (rq * 2 + 3) * SS, RR = rq * SS, c = document.createElement('canvas'); c.width = N; c.height = N; c.lw = rq * 2 + 3;
     const x = c.getContext('2d'), im = x.createImageData(N, N), d = im.data, T = TONES[tone] || TONES.tyre, cx = N / 2 - 0.5;
     // nuvoletta: un cerchio centrale e sei lobi attorno, diversi per ogni variante
-    const lobes = [[0, 0, rq * 0.68]];
+    const lobes = [[0, 0, RR * 0.68]];
     for (let i = 0; i < 6 && rq > 2; i++) {
-      const a = i / 6 * Math.PI * 2 + rnd(v * 17 + i) * 0.9, lr = rq * (0.32 + rnd(v * 7 + i * 3) * 0.2), dd = Math.min(rq - lr, rq * (0.4 + rnd(v * 31 + i) * 0.22));
+      const a = i / 6 * Math.PI * 2 + rnd(v * 17 + i) * 0.9, lr = RR * (0.32 + rnd(v * 7 + i * 3) * 0.2), dd = Math.min(RR - lr, RR * (0.4 + rnd(v * 31 + i) * 0.22));
       lobes.push([Math.cos(a) * dd, Math.sin(a) * dd, lr]);
     }
     for (let py = 0; py < N; py++) for (let px = 0; px < N; px++) {
@@ -56,8 +56,8 @@
       for (const l of lobes) e = Math.max(e, l[2] - Math.hypot(dx - l[0], dy - l[1]));
       if (e < 0) continue;
       const by = Street2D.bayer(px, py);
-      if (rq > 3 && e < 1.3 && by < 0.42) continue;                         // bordo a retino, più morbido
-      const sv = dy / rq * 0.85 + dx / rq * 0.2 + (by - 0.5) * 0.34;         // luce dall'alto
+      if (rq > 3 && e < 1.3 * SS && by < 0.42) continue;                         // bordo a retino, più morbido
+      const sv = dy / RR * 0.85 + dx / RR * 0.2 + (by - 0.5) * 0.34;         // luce dall'alto
       const col = T[sv < -0.22 ? 2 : sv < 0.3 ? 1 : 0], i = (py * N + px) * 4;
       d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255;
     }
@@ -110,22 +110,22 @@
           const pal = L > 0.7 ? ['#ff7a14', '#ffc832', '#fff4cc'] : L > 0.45 ? ['#e8380c', '#ff7a14', '#ffc832'] : ['#8a1c0c', '#e8380c', null];
           g.fillStyle = pal[0]; this.span(g, X, Y, p.r, p.r); g.fillStyle = pal[1]; this.span(g, X, Y, p.r * 0.62, p.r * 0.62);
           if (pal[2]) { g.fillStyle = pal[2]; this.span(g, X, Y, p.r * 0.3, p.r * 0.3); }
-        } else { g.globalAlpha = Math.min(0.5, L * 3); const sp = this.puffSprite('soot', p.r + 1, 0); g.drawImage(sp, X - (sp.width >> 1), Y - (sp.height >> 1)); g.globalAlpha = 1; }
+        } else { g.globalAlpha = Math.min(0.5, L * 3); const sp = this.puffSprite('soot', p.r + 1, 0); g.drawImage(sp, X - (sp.lw >> 1), Y - (sp.lw >> 1), sp.lw, sp.lw); g.globalAlpha = 1; }
         continue;
       }
       const K = KIND[p.k] || KIND.tyre, v = p.v || 0;
       const a = Math.min(1, (1 - L) * 9 + 0.3) * Math.min(1, L * 1.7) * (p.a ?? K.a);
       if (a < 0.012) continue;
       const Xw = X + Math.round(Math.sin(t * 1.6 + p.m * 2.3) * Math.min(3, p.r * 0.12));     // l'aria lo muove appena
-      const sp = this.puffSprite(K.tone, p.r, v), dx0 = Xw - (sp.width >> 1), dy0 = Y - (sp.height >> 1);
-      g.globalAlpha = a; g.drawImage(sp, dx0, dy0);
+      const sp = this.puffSprite(K.tone, p.r, v), dx0 = Xw - (sp.lw >> 1), dy0 = Y - (sp.lw >> 1), lw0 = sp.lw;
+      g.globalAlpha = a; g.drawImage(sp, dx0, dy0, lw0, lw0);
       if (!low && p.r >= 3) {
         // il fumo prende la luce di quello che ha vicino
         let lw = 0; for (const lx of lamps) lw = Math.max(lw, 1 - Math.abs(Xw - (lx + 18)) / 80);
         lw *= night * 0.55 * clamp((250 - Y) / 60 + 0.9, 0.5, 1);
-        if (lw > 0.04) { g.globalAlpha = a * lw; g.drawImage(this.puffSprite('lit_warm', p.r, v), dx0, dy0); }
-        if (E.fa > 0.05) { const f = (1 - Math.hypot(Xw - E.fx, (Y - E.fy) * 1.4) / 80) * Math.min(1, E.fa); if (f > 0.04) { g.globalAlpha = Math.min(1, a * f * 1.5); g.drawImage(this.puffSprite('lit_fire', p.r, v), dx0, dy0); } }
-        if (E.ba > 0.05) { const f = (1 - Math.hypot(Xw - E.bx, (Y - E.by) * 1.3) / 60) * E.ba * night; if (f > 0.04) { g.globalAlpha = a * f * 0.8; g.drawImage(this.puffSprite('lit_red', p.r, v), dx0, dy0); } }
+        if (lw > 0.04) { g.globalAlpha = a * lw; g.drawImage(this.puffSprite('lit_warm', p.r, v), dx0, dy0, lw0, lw0); }
+        if (E.fa > 0.05) { const f = (1 - Math.hypot(Xw - E.fx, (Y - E.fy) * 1.4) / 80) * Math.min(1, E.fa); if (f > 0.04) { g.globalAlpha = Math.min(1, a * f * 1.5); g.drawImage(this.puffSprite('lit_fire', p.r, v), dx0, dy0, lw0, lw0); } }
+        if (E.ba > 0.05) { const f = (1 - Math.hypot(Xw - E.bx, (Y - E.by) * 1.3) / 60) * E.ba * night; if (f > 0.04) { g.globalAlpha = a * f * 0.8; g.drawImage(this.puffSprite('lit_red', p.r, v), dx0, dy0, lw0, lw0); } }
       }
       g.globalAlpha = 1;
     }
@@ -137,31 +137,32 @@
   S.fxFlame = function (g, rx, exY, k, fl, y0) {
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
     const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)))), H0 = (3.4 + f * 4.2) * k, fr = Math.floor(t * 30);
+    const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;                   // densità doppia: colonne e altezze a mezze unità
     const cols = [];
-    for (let i = 0; i < L; i++) {
+    for (let i = 0; i < L; i += u1) {
       const u = i / L, env = (u < 0.14 ? 0.55 + u / 0.14 * 0.45 : 1) * Math.pow(1 - u, 0.7);
       const half = H0 * env * (0.78 + 0.44 * vn(i * 0.2 - t * 15));
       cols.push([rx - 1 - i, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
         half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u]);
     }
     g.fillStyle = 'rgba(110,18,8,.7)';                                           // contorno scuro: stacca la fiamma dallo sfondo
-    for (const c of cols) { const y1 = Math.round(c[1] - c[2]), y2 = Math.round(c[1] + c[3]); if (y2 - y1 >= 2) g.fillRect(c[0], y1 - 1, 1, y2 - y1 + 2); }
+    for (const c of cols) { const y1 = rq(c[1] - c[2]), y2 = rq(c[1] + c[3]); if (y2 - y1 >= 2) g.fillRect(c[0], y1 - u1, u1, y2 - y1 + 2 * u1); }
     const band = (col, sz, taper) => {
       g.fillStyle = col;
       for (const c of cols) {
-        const m = sz * Math.max(0, 1 - c[4] * taper), y1 = Math.round(c[1] - c[2] * m), y2 = Math.round(c[1] + c[3] * m);
-        if (y2 - y1 >= 1) g.fillRect(c[0], y1, 1, y2 - y1);
-        else if (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) g.fillRect(c[0], y1, 1, 1);    // punta sfrangiata
+        const m = sz * Math.max(0, 1 - c[4] * taper), y1 = rq(c[1] - c[2] * m), y2 = rq(c[1] + c[3] * m);
+        if (y2 - y1 >= u1) g.fillRect(c[0], y1, u1, y2 - y1);
+        else if (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) g.fillRect(c[0], y1, u1, u1);    // punta sfrangiata
       }
     };
     band('#e8380c', 1, 0); band('#ff7a14', 0.74, 0.25); band('#ffc832', 0.5, 0.6); band('#fff4cc', 0.27, 1.1);
     if (big) {
       // scoppi grossi: radice azzurra alla bocca e nodi bianchi lungo il getto
-      g.fillStyle = '#a8e4ff'; for (const c of cols) if (c[4] < 0.16) g.fillRect(c[0], Math.round(c[1]), 1, 1);
-      g.fillStyle = '#ffffff'; for (let n = 1; n <= 3; n++) { const c = cols[Math.round(n * 6.5 * k)]; if (c && c[4] < 0.6) g.fillRect(c[0], Math.round(c[1]) - 1, 2, 2); }
+      g.fillStyle = '#a8e4ff'; for (const c of cols) if (c[4] < 0.16) g.fillRect(c[0], rq(c[1]), u1, 1);
+      g.fillStyle = '#ffffff'; for (let n = 1; n <= 3; n++) { const c = cols[Math.round(n * 6.5 * k * SS)]; if (c && c[4] < 0.6) g.fillRect(c[0], rq(c[1]) - 1, 2, 2); }
     }
     for (const c of cols) if (c[4] > 0.35 && rnd(c[0] * 1.7 + fr * 3) < 0.13) {      // lingue che si staccano sopra
-      g.fillStyle = c[4] > 0.7 ? '#e8380c' : '#ff7a14'; g.fillRect(c[0], Math.round(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), 1, 1);
+      g.fillStyle = c[4] > 0.7 ? '#e8380c' : '#ff7a14'; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
     }
     const a = Math.min(1, f);
     this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, '#ff7a20', 0.13 * a, 3);        // alone
@@ -202,18 +203,18 @@
   // Cono di luce a cinque livelli con retino: forte al faro, si spegne in lunghezza e ai bordi.
   S.beamSprite = function (len, up, dn) {
     len = Math.round(len / 10) * 10; up = Math.round(up); dn = Math.round(dn);
-    const key = 'beam' + len + '_' + up + '_' + dn, B = Street2D._beams || (Street2D._beams = {});
+    const SS = this.SS || 1, key = 'beam' + len + '_' + up + '_' + dn + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
     if (B[key]) return B[key];
-    const H = up + dn + 6, c = document.createElement('canvas'); c.width = len; c.height = H; c.oy = up + 3;
-    const x = c.getContext('2d'), im = x.createImageData(len, H), d = im.data;
-    for (let px = 0; px < len; px++) {
-      const u = px / len, top = c.oy - 2 - up * u, bot = c.oy + 2 + dn * u;
-      for (let py = Math.max(0, Math.floor(top)); py < Math.min(H, bot); py++) {
-        const v = (py - top) / (bot - top), e = Math.min(v, 1 - v) * 2, soft = e < 0.5 ? (e / 0.5) * (e / 0.5) * (3 - 2 * e / 0.5) : 1;
+    const H = up + dn + 6, c = document.createElement('canvas'); c.width = len * SS; c.height = H * SS; c.oy = up + 3; c.lw = len; c.lh = H;
+    const x = c.getContext('2d'), im = x.createImageData(len * SS, H * SS), d = im.data;
+    for (let px = 0; px < len * SS; px++) {
+      const u = px / (len * SS), top = c.oy - 2 - up * u, bot = c.oy + 2 + dn * u;
+      for (let py = Math.max(0, Math.floor(top * SS)); py < Math.min(H, bot) * SS; py++) {
+        const v = (py / SS - top) / (bot - top), e = Math.min(v, 1 - v) * 2, soft = e < 0.5 ? (e / 0.5) * (e / 0.5) * (3 - 2 * e / 0.5) : 1;
         const I = Math.pow(1 - u, 1.25) * soft * (0.6 + 0.4 * (1 - v));
         const q = Math.min(5, Math.floor(I * 5 + Street2D.bayer(px, py)));
         if (!q) continue;
-        const i = (py * len + px) * 4; d[i] = 255; d[i + 1] = 240; d[i + 2] = 200; d[i + 3] = q * 36;
+        const i = (py * len * SS + px) * 4; d[i] = 255; d[i + 1] = 240; d[i + 2] = 200; d[i + 3] = q * 36;
       }
     }
     x.putImageData(im, 0, 0);
@@ -222,7 +223,7 @@
   S.fxBeam = function (g, fx, fy, len, dn, a) {
     if (a < 0.02) return;
     const sp = this.beamSprite(len, 5, dn);
-    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a); g.drawImage(sp, Math.round(fx), Math.round(fy) - sp.oy); g.restore();
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a); g.drawImage(sp, Math.round(fx), Math.round(fy) - sp.oy, sp.lw, sp.lh); g.restore();
   };
 
   // ---------------------------------------------------------------- luci sulla carrozzeria
@@ -241,7 +242,7 @@
         x.fillStyle = gr; x.fillRect(l.x - l.r, l.y - l.r, l.r * 2, l.r * 2);
       } else {
         // riflesso del lampione: una fascia larga e tenue su tutta la fiancata e una lama stretta sul tetto e sui vetri
-        const band = (hw, a, y1) => { const gr = x.createLinearGradient(l.x - hw, 0, l.x + hw, 0); gr.addColorStop(0, 'rgba(255,214,150,0)'); gr.addColorStop(0.5, `rgba(255,214,150,${a})`); gr.addColorStop(1, 'rgba(255,214,150,0)'); x.fillStyle = gr; x.fillRect(l.x - hw, 0, hw * 2, y1); };
+        const lc = l.col || '255,214,150', band = (hw, a, y1) => { const gr = x.createLinearGradient(l.x - hw, 0, l.x + hw, 0); gr.addColorStop(0, `rgba(${lc},0)`); gr.addColorStop(0.5, `rgba(${lc},${a})`); gr.addColorStop(1, `rgba(${lc},0)`); x.fillStyle = gr; x.fillRect(l.x - hw, 0, hw * 2, y1); };
         band(l.w, l.a * 0.5, h); band(l.w * 0.3, l.a, h * 0.5);
       }
     }
@@ -296,6 +297,9 @@
     if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));
+    // auto molto danneggiata: vapore dal cofano, fumo nero quando è quasi distrutta
+    const dmg = s.damage || 0;
+    if (dmg > 0.45 && s.running && GE.head) emit('eSteam', (dmg - 0.35) * (low ? 8 : 16), () => this.parts.push({ k: dmg > 0.8 && R() < 0.6 ? 'soot' : 'steam', m: mOf(left + (GE.head[0] - 12 - R() * 14) * k), y: top + (GE.head[1] - 6) * k, vy: -12 - R() * 10, dx: v * PPM * 0.12, r: 2 + R() * 2, gr: 12, a: 0.42, life: 1, v: (R() * 3) | 0 }));
     // luci che il fumo può prendere: fiammata e stop
     this.fxEnv = { lampX: c.lampX, fx: rx - 18, fy: exY, fa: Math.max(st.popFlash || 0, st.flame > 0.05 ? Math.min(1, st.flame) : 0), bx: left, by: top + 30 * k, ba: s.brake > 0.05 ? 1 : s.ign ? 0.3 : 0 };
     this.fxParts(g, dt, c.wx, c.W, 1);
@@ -395,23 +399,24 @@
   // Mattonella 512×104: grana a più toni, chiazze, tracce lisce e scure delle ruote in ogni corsia, colature
   // d'olio al centro, rattoppi, crepe sigillate col catrame e sassolini chiari che brillano.
   S.roadTile = function () {
-    if (this.spr.road) return this.spr.road;
-    const TW = 512, TH = 104, c = document.createElement('canvas'); c.width = TW; c.height = TH;
-    const x = c.getContext('2d'), im = x.createImageData(TW, TH), d = im.data;
+    const SS = this.SS || 1, rk = 'road' + SS;
+    if (this.spr[rk]) return this.spr[rk];
+    const TW = 512, TH = 104, c = document.createElement('canvas'); c.width = TW * SS; c.height = TH * SS; c.lw = TW;
+    const x = c.getContext('2d'), im = x.createImageData(TW * SS, TH * SS), d = im.data;
     const n0 = parseInt(this.C.road.slice(1), 16), R0 = n0 >> 16, G0 = (n0 >> 8) & 255, B0 = n0 & 255;
     const lanes = [14, 45, 82];                                              // centro delle tre corsie nella mattonella
-    for (let y = 0; y < TH; y++) for (let px = 0; px < TW; px++) {
-      const depth = y / TH; let f = 1.1 - 0.14 * depth, smooth = 0;
+    for (let hy = 0; hy < TH * SS; hy++) for (let hx = 0; hx < TW * SS; hx++) {
+      const y = hy / SS, px = hx / SS, depth = y / TH; let f = 1.1 - 0.14 * depth, smooth = 0;
       for (const lc of lanes) for (const sgn of [-1, 1]) { const dd = Math.abs(y - (lc + sgn * (7 + depth * 2))); if (dd < 2.6) { const w = 1 - dd / 2.6; f -= 0.11 * w; smooth = Math.max(smooth, w); } }
       for (const lc of lanes) if (Math.abs(y - lc) < 2) f -= 0.07 * vn2(px / 8, lc, 64);
       f += (vn2(px / 16, y / 7, 32) - 0.5) * 0.2;                          // chiazze larghe
-      const gr = rnd(px * 12.9898 + y * 78.233), amp = 1 - smooth * 0.6;
+      const gr = rnd(hx * 12.9898 + hy * 78.233), amp = (1 - smooth * 0.6) * (SS > 1 ? 0.8 : 1);
       if (gr < 0.11) f -= 0.17 * amp; else if (gr > 0.89) f += 0.15 * amp;
-      if (gr > 0.993) f += 0.6;                                             // sassolino chiaro
-      const i = (y * TW + px) * 4;
+      if (gr > 0.9955) f += 0.6;                                            // sassolino chiaro
+      const i = (hy * TW * SS + hx) * 4;
       d[i] = clamp(R0 * f, 0, 255); d[i + 1] = clamp(G0 * f, 0, 255); d[i + 2] = clamp(B0 * f + (1 - depth) * 4, 0, 255); d[i + 3] = 255;
     }
-    x.putImageData(im, 0, 0);
+    x.putImageData(im, 0, 0); x.scale(SS, SS);
     // rattoppi: asfalto più nuovo e più scuro, bordo sigillato
     const patch = (px, py, w, h, sd) => {
       x.fillStyle = '#1b1e30'; x.fillRect(px, py, w, h);
@@ -434,6 +439,6 @@
     const stain = (cx, cy, rx2, ry2) => { x.fillStyle = 'rgba(8,9,16,.55)'; for (let yy = -ry2; yy <= ry2; yy++) for (let xx = -rx2; xx <= rx2; xx++) { const e = (xx * xx) / (rx2 * rx2) + (yy * yy) / (ry2 * ry2); if (e < 1 && Street2D.bayer(cx + xx, cy + yy) > e * 0.9) x.fillRect(cx + xx, cy + yy, 1, 1); } };
     stain(96, 45, 9, 3); stain(286, 14, 7, 2); stain(430, 82, 11, 3); stain(214, 82, 6, 2);
     x.fillStyle = 'rgba(80,100,160,.08)'; x.fillRect(0, 0, TW, 4);
-    return (this.spr.road = c);
+    return (this.spr[rk] = c);
   };
 })();

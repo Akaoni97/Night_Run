@@ -227,8 +227,15 @@ e le particelle si dimezzano.
 **Alta definizione (720 righe).** Con qualità alta la scena 2D si disegna a densità doppia: i disegni delle auto
 si vedono a grandezza piena invece che rimpiccioliti, gli aloni di lampioni, fari, stop e neon sono sfumati, il
 cielo ha una sfumatura a retino fine, stelle di grandezze e tinte diverse, una luna con mari e crateri e nuvole su
-più piani. Città, strada, fumo e fiamme sono ancora quelli a 360 righe (ingranditi): si rifaranno un pezzo alla
-volta. Se il dispositivo non regge (disegno sopra i 30 ms per tre secondi) il gioco torna da solo a 360 righe.
+più piani. I palazzi passano a 720 righe con spigoli e diagonali arrotondati, grana, mattoni sui muri e riflessi
+sui vetri; fumo, fiamme, fascio dei fari e asfalto sono a grana fine; le vetrine si riflettono sulla carrozzeria.
+Marciapiedi, pedoni, oggetti e luoghi del viaggio sono ancora quelli a 360 righe (ingranditi). Se il dispositivo non regge (disegno sopra i 30 ms per tre secondi) il gioco torna da solo a 360 righe.
+
+**Danni (`dettagli2d.js`).** I danni si costruiscono sul disegno dell'auto e crescono in dieci gradini: graffi
+chiari spezzati sulla fiancata, ammaccature con l'orlo in luce e in ombra, vernice saltata (fondo, lamiera, ruggine),
+poi il muso che si accartoccia e si accorcia, il faro rotto (la luce resta debole e tremolante), il parabrezza
+crepato, la fuliggine sul cofano; da metà danno esce vapore dal cofano, fumo nero quando è quasi distrutta. Anche le
+auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 
 ## Gomme, rapporti e trazione
 

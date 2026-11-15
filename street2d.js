@@ -684,7 +684,7 @@ class Street2D {
   // 2×2 pixel veri (720 righe): gli sprite di prima si vedono uguali, il resto si può disegnare più fine.
   fitLo() {
     const SS = this.SS = this.quality === 'bassa' || this.slow ? 1 : 2;
-    if (this.lo.width !== this.LW * SS || this.lo.height !== this.LH * SS) { this.lo.width = this.LW * SS; this.lo.height = this.LH * SS; this.skyCache = null; }
+    if (this.lo.width !== this.LW * SS || this.lo.height !== this.LH * SS) { this.lo.width = this.LW * SS; this.lo.height = this.LH * SS; this.skyCache = null; this.tiles.clear(); }
     this.g.setTransform(SS, 0, 0, SS, 0, 0); this.g.imageSmoothingEnabled = false;
   }
   // trasformazione in coordinate logiche (al posto di setTransform, che cancellerebbe la densità doppia)
@@ -1289,7 +1289,8 @@ class Street2D {
     for (let i = i0; i < i1; i++) {
       const b = this.building(layer, i), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
       if (x > this.LW || x + b.w < 0) continue;
-      g.drawImage(b.c, x, y);
+      if (this.SS > 1 && !b.hd && this.tileHD) this.tileHD(b, layer);
+      g.drawImage(b.c, x, y, b.w, b.h);
       for (const s of b.signs) {
         const on = !s.flick || Math.sin(t * 13 + i) > -0.6 || Math.sin(t * 2.3 + i) > 0.3;
         const w = this.textW(s.word, s.sc), hh = 5 * s.sc;
@@ -1752,8 +1753,8 @@ class Street2D {
     if (game && game.s && game.s.vg && this.drawKmPosts) this.drawKmPosts(g, wx, visFrom, visTo);   // cippi del viaggio
     // ---- carreggiata
     g.fillStyle = C.road2; g.fillRect(0, 232, W, 4);
-    const rt = this.roadTile(), ro = ((dist * PPM) % rt.width + rt.width) % rt.width;
-    for (let x = -ro; x < W; x += rt.width) g.drawImage(rt, Math.round(x), 236);
+    const rt = this.roadTile(), ro = ((dist * PPM) % rt.lw + rt.lw) % rt.lw;
+    for (let x = -ro; x < W; x += rt.lw) g.drawImage(rt, Math.round(x), 236, rt.lw, 104);
     for (let m = Math.ceil(visFrom / 47) * 47; m < visTo; m += 47) { const x = wx(m); g.fillStyle = '#14172a'; g.fillRect(x, 236, 3, 104); g.fillStyle = '#3a3f58'; g.fillRect(x + 3, 236, 1, 104); }
     const urban = bg === 'city' || bg === 'village';
     for (let m = Math.ceil(visFrom / 61) * 61 + 20; urban && m < visTo; m += 61) {                       // tombini fumanti
@@ -1876,7 +1877,7 @@ class Street2D {
         }
         return;
       }
-      const y = e._y ?? this.laneY(zOf(e)), k = kq(y), spr = this.otherSprite(e.kind, e.color, k, e.vt), sc = k;
+      const y = e._y ?? this.laneY(zOf(e)), k = kq(y), spr0 = this.otherSprite(e.kind, e.color, k, e.vt), spr = spr0 && e.dent && spr0.hd ? this.damaged(spr0, 0.75, spr0.geo) : spr0, sc = k;
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
@@ -1924,7 +1925,8 @@ class Street2D {
     const entA = IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
     const entDX = IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
     const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
-    const spr = this.carSprite(k), SW = spr.width, left = Math.round(carX + entDX - SW / 2);
+    const spr0 = this.carSprite(k), spr = (s.damage || 0) > 0.01 ? this.damaged(spr0, s.damage, this.geo()) : spr0, SW = spr.width, left = Math.round(carX + entDX - SW / 2);
+    const hlK = (s.damage || 0) > 0.35 ? (Math.sin(st.t * 37) + Math.sin(st.t * 13.7) > 0.3 ? 0.45 : 0.12) : 1;   // faro rotto: debole e tremolante
     if (game && game.s && game.s.vg && game.s.vg.trailerOn && this.drawTrailer && !(typeof VG_CARGO !== 'undefined' && VG_CARGO[game.car])) this.drawTrailer(g, left, y0, k, s, st);
     g.globalAlpha = entA;
     this.carPos = { x: left + SW / 2, y: y0 - 22 * k, k };
@@ -1934,7 +1936,7 @@ class Street2D {
     // fascio dei fari nell'aria, di notte e sotto la pioggia
     if (s.ign && (this.day || 0) < 0.6) {
       const fx = left + SW - 4, fy = y0 - 22 * k;
-      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)));
+      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)) * hlK);
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
@@ -1967,6 +1969,7 @@ class Street2D {
       // lampioni che scorrono sulla lamiera, rosso degli stop, arancio della fiammata
       const bl = [], nt2 = 1 - (this.day || 0);
       for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -50 && dx < SW + 50) bl.push({ x: dx, w: 44 * k, a: 0.32 * nt2 }); }
+      for (const sh of shops) { const dx = sh.x - left; if (dx > -30 && dx < SW + 30) bl.push({ x: dx, w: Math.min(60, sh.w * 0.6) * k, a: 0.22 * nt2, col: Street2D.rgb(sh.col) }); }   // vetrine e insegne
       if (s.brake > 0.05) bl.push({ x: GE.tail[0] * k, y: (GE.tail[1] + 3) * k, r: 26 * k, col: '255,40,40', a: 0.5 });
       if (st.flame > 0.05) bl.push({ x: GE.ex[0] * k, y: GE.ex[1] * k, r: 60 * k, col: '255,130,40', a: 0.75 * Math.min(1, st.flame) });
       this.fxBodyLight(g, spr, bl);
@@ -1985,19 +1988,7 @@ class Street2D {
     if (s.brake > 0.05) { if (spr.img) { P('#ff2a2a', GE.tail[0], GE.tail[1], GE.tail[2], GE.tail[3]); P('#ffd0c8', GE.tail[0] + 1, GE.tail[1] + 1, 2, 2); } else { P('#ff2a2a', 1, 31, 5, 7); P('#ffd0c8', 2, 32, 2, 2); } }
     const blinkOn = s.signal && Math.floor(st.t * 3) % 2 === 0;
     if (blinkOn) { P('#ffa020', GE.blinkF[0], GE.blinkF[1], GE.blinkF[2], GE.blinkF[3]); P('#ffe0a0', GE.blinkF[0] + 2, GE.blinkF[1], 3, 1); if (spr.img) P('#ffa020', GE.blinkR[0], GE.blinkR[1], GE.blinkR[2], GE.blinkR[3]); else P('#ffa020', 2, 39, 4, 3); }
-    // danni: muso ammaccato, graffi chiari, vernice saltata
-    const dmg = s.damage || 0;
-    if (dmg > 0.01) {
-      const n = Math.round(dmg * 80);
-      for (let q = 0; q < n; q++) {
-        const r1 = Street2D.rnd(q * 3.3), r2 = Street2D.rnd(q * 7.1 + 1);
-        if (q % 3 === 0) P('rgba(8,10,16,.75)', 170 + r1 * 26, 30 + r2 * 18, 3, 2);                       // ammaccature sul muso
-        else if (q % 3 === 1) { const len = 6 + r1 * 12; P('rgba(220,226,234,.8)', 120 + r2 * 60, 30 + r1 * 14, len, 1); }   // graffi
-        else P('#6a6f7a', 150 + r1 * 44, 36 + r2 * 12, 2, 2);                                               // vernice saltata
-      }
-      if (dmg > 0.35) { P(C.ink, 182, 31, 11, 3); P('#5a5e66', 184, 32, 5, 1); }                          // faro rotto
-      if (dmg > 0.5) P(C.ink, 188, 46, 10, 6);                                                            // paraurti sfondato
-    }
+    // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
     if (s.ign) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
@@ -2021,8 +2012,8 @@ class Street2D {
       const GH = this.geo(), hx2 = left + GH.head[0] * k, hy2 = top + GH.head[1] * k, nt = 1 - (this.day || 0) * 0.75, tlx = left + (GH.tail[0] + 2) * k, tly = top + (GH.tail[1] + 3) * k;
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
-      fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt, 1);
-      g.fillStyle = `rgba(255,255,255,${0.6 * nt})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
+      fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
+      g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
       const br = s.brake > 0.05 ? 1 : 0.45;
       fl(tlx, tly, 26 * br * nt + 6, '255,40,60', 0.5 * br * nt, 2);
       const spd = Math.abs(s.v);
