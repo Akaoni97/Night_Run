@@ -244,6 +244,12 @@ e sul vetro scorrono i riflessi della strada. La figura si adatta all'altezza de
 del giocatore ha un contorno scuro netto e il traffico un velo di foschia, più forte nelle corsie lontane, così il
 protagonista si stacca dal resto. Con qualità *bassa* torna l'ombra semplice.
 
+**Gallerie (`galleria2d.js`).** Nel Viaggio, dove il paesaggio cambia (dalla città alla Bassa, dalla Bassa a San
+Gimignano e così via) la strada entra in una galleria di circa 360 m: imbocco in cemento nella montagna col nome
+(*Galleria della Bassa*, *del Mare*, *del Passo*...), dentro volta scura, piastrelle con la fascia blu, luci al sodio
+che scorrono sulla carrozzeria, ventole, nicchie SOS e cartelli verdi delle uscite; non piove e la luce è calda.
+Il paesaggio cambia mentre si è dentro e all'uscita se ne trova uno nuovo.
+
 **Quartieri (`quartieri2d.js`).** La città cambia lungo la strada, un quartiere ogni chilometro circa, e poi
 ricomincia: *Quartiere di casa* (casette, giardini, poche insegne), *Centro · Le luci* (neon ovunque, uffici, la
 ruota panoramica in fondo), *I Bassifondi* (baracche di lamiera coi panni stesi e il bidone col fuoco, condomini

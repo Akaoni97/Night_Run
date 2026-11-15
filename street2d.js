@@ -1717,6 +1717,7 @@ class Street2D {
     // luogo della mappa del mondo: la città di sempre o uno sfondo dedicato
     const bg = (game && game.loc && game.loc.bg) || this.bg || 'city';
     let shops = [];
+    const TUN = this.tunnelSpan ? this.tunnelSpan(game, visFrom, visTo) : null;   // galleria tra due paesaggi (galleria2d.js)
     const DM = bg === 'city' && this.districtMix ? this.districtMix(dist) : null, lampCol = DM ? DM.lamp : '#ffcf7a';
     if (bg === 'city') {
       const hz = DM ? DM.haze.join(',') : '70,50,114', hzA = DM ? DM.hazeA : 1, nt0 = 1 - (this.day || 0);
@@ -1757,6 +1758,7 @@ class Street2D {
       if (k === 2) { g.fillStyle = C.ink; g.fillRect(X + (dir > 0 ? 6 : -4), 212, 3, 6); g.fillStyle = '#b8ff3a'; g.fillRect(X + (dir > 0 ? 6 : -4), 213, 2, 4); }   // sacchetto
     }
     }
+    if (TUN) this.drawTunnelBack(g, TUN, wx, W, st.t);
     if (game && game.s && game.s.vg && this.drawKmPosts) this.drawKmPosts(g, wx, visFrom, visTo);   // cippi del viaggio
     // ---- carreggiata
     g.fillStyle = C.road2; g.fillRect(0, 232, W, 4);
@@ -1766,6 +1768,7 @@ class Street2D {
     const urban = bg === 'city' || bg === 'village';
     for (let m = Math.ceil(visFrom / 61) * 61 + 20; urban && m < visTo; m += 61) {                       // tombini fumanti
       const x = wx(m);
+      if (TUN && m > TUN.a - 40 && m < TUN.b + 20) continue;
       g.fillStyle = C.ink; this.span(g, x, 282, 14, 4); g.fillStyle = '#2a2f40'; this.span(g, x, 282, 12, 3);
       g.fillStyle = '#14172a'; for (let k = -10; k <= 10; k += 3) g.fillRect(x + k, 280, 1, 5);
       if (Math.random() < dt * 4) this.parts.push({ k: 'steam', m: m + (Math.random() - 0.5) * 0.6, y: 278, vy: -18 - Math.random() * 10, r: 2, life: 1, dx: 0 });
@@ -1780,6 +1783,7 @@ class Street2D {
     // incroci: strisce pedonali ogni 260 m (il semaforo si disegna davanti, alla fine)
     for (let m = Math.floor((visFrom - 140) / 260) * 260 + 130; urban && m < visTo + 10; m += 260) {
       const x = wx(m);
+      if (TUN && m > TUN.a - 40 && m < TUN.b + 20) continue;
       for (let yy = 242; yy < 334; yy += 8) { g.fillStyle = 'rgba(216,212,198,.82)'; g.fillRect(x, yy, 4 * PPM, 5); g.fillStyle = 'rgba(120,118,110,.5)'; g.fillRect(x, yy + 5, 4 * PPM, 1); }
       g.fillStyle = 'rgba(232,228,214,.9)'; g.fillRect(x - 12, 242, 3, 92);                    // linea d'arresto
     }
@@ -1827,6 +1831,7 @@ class Street2D {
     // ---- lampioni: alone piccolo, pozza a terra, riflesso sul bagnato (niente fasci)
     const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
     for (let lm = Math.floor(visFrom / (lampSp || 1)) * lampSp; lampSp && lm < visTo + lampSp; lm += lampSp) {
+      if (TUN && lm > TUN.a - 30 && lm < TUN.b + 4) continue;                  // in galleria niente lampioni
       const x = wx(lm), bro = !!DM && Street2D.rnd(lm * 0.77 + 3) < DM.broken, on = !bro || Math.sin(st.t * 23 + lm) + Math.sin(st.t * 7.3 + lm * 2) > 1.55;   // rotto: si accende a scatti
       lampAll.push([x, on]); if (!on) continue;
       lampX.push(x);
@@ -1836,6 +1841,7 @@ class Street2D {
       for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
       g.restore();
     }
+    if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) lampX.push(wx(m) - 18);   // le luci della volta scorrono sulla carrozzeria
     for (const [x, on] of lampAll) {
       g.fillStyle = C.ink; g.fillRect(x - 2, 118, 5, 112); g.fillRect(x, 118, 24, 5); g.fillRect(x - 4, 222, 9, 8); g.fillRect(x - 3, 214, 7, 4);
       g.fillStyle = '#4a5070'; g.fillRect(x - 1, 120, 2, 108); g.fillRect(x + 1, 119, 21, 2); g.fillStyle = '#5c6386'; g.fillRect(x - 3, 223, 7, 1);
@@ -2069,6 +2075,7 @@ class Street2D {
     for (const e of front) drawEnt(e);
     // semafori degli incroci, in primo piano sul marciapiede vicino: verde, giallo, rosso a ciclo
     for (let m = Math.floor((visFrom - 140) / 260) * 260 + 130; bg === 'city' && m < visTo + 20; m += 260) {
+      if (TUN && m > TUN.a - 40 && m < TUN.b + 20) continue;
       const px2 = wx(m) + 4 * PPM + 10, ph = ((st.t + m * 0.013) % 14 + 14) % 14, light = ph < 8 ? 2 : ph < 10 ? 1 : 0;
       const ax = px2 - 120;
       g.fillStyle = C.ink; g.fillRect(px2 - 2, 108, 6, 252); g.fillRect(ax, 108, px2 - ax + 2, 5);
@@ -2135,6 +2142,7 @@ class Street2D {
     }
     // ---- pioggia: trattini a pixel inclinati con la velocità, schizzi sull'asfalto, velo più scuro
     if (this.rainOn) {
+      g.save(); if (TUN) { g.beginPath(); g.rect(0, 0, W, 360); g.rect(wx(TUN.a), 0, wx(TUN.b) - wx(TUN.a), 360); g.clip('evenodd'); }   // in galleria non piove
       g.fillStyle = 'rgba(10,14,28,.18)'; g.fillRect(0, 0, W, 360);
       const sl = Math.min(6, Math.abs(s.v) * 0.12), n = 260;
       g.fillStyle = 'rgba(170,190,230,.45)';
@@ -2145,7 +2153,9 @@ class Street2D {
       }
       g.fillStyle = 'rgba(190,210,240,.55)';
       for (let i = 0; i < 26; i++) { const x = Street2D.rnd(i + Math.floor(st.t * 9) * 31) * W, y = 230 + Street2D.rnd(i * 7 + Math.floor(st.t * 9)) * 110; g.fillRect(Math.round(x) - 1, Math.round(y), 3, 1); g.fillRect(Math.round(x), Math.round(y) - 1, 1, 1); }
+      g.restore();
     }
+    if (TUN) this.drawTunnelFront(g, TUN, wx, W);
 
     // ---- gara: semaforo da drag grande, barra di avanzamento, striscione a scacchi
     if (game && game.race) {
