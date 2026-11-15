@@ -58,6 +58,7 @@ class Street2D {
     return '#' + [f(n >> 16), f((n >> 8) & 255), f(n & 255)].map((v) => v.toString(16).padStart(2, '0')).join('');
   }
   static rgb(hex) { const n = parseInt(hex.slice(1), 16); return `${n >> 16},${(n >> 8) & 255},${n & 255}`; }
+  static GEO_KINDS = new Set(['house', 'konbini', 'office', 'shrine', 'park', 'warehouse', 'ramen', 'parking']);
   static bayer(x, y) { const m = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]; return m[(x & 3) + (y & 3) * 4] / 16; }
 
   text(g, str, x, y, color, sc = 1) {
@@ -802,14 +803,16 @@ class Street2D {
   }
 
   // ---------------------------------------------------------------- palazzi (cache per tessera)
-  building(layer, i) {
+  building(layer, i, D) {
+    D = D || (Street2D.DISTRICTS ? Street2D.DISTRICTS[1] : { kinds: { apt: 1 }, mid: this.C.mid, far: ['#171640', '#1c1a4a', '#141338', '#1e1844'], farH: 1, dark: 0.3, farDark: 0.62, signP: 0.6, flick: 0.2, words: ['BAR', '24H', 'CAFE'], neon: this.C.neon, landP: 0 });
     const key = layer + ':' + i;
     let t = this.tiles.get(key);
     if (t) return t;
     const far = layer !== 'mid', haze = layer === 'haze';
     const r = (k) => Street2D.rnd(i * 13.7 + (haze ? 5 : far ? 1 : 77) + k);
     const w = haze ? 30 + Math.floor(r(1) * 40) : far ? 40 + Math.floor(r(1) * 36) : 50 + Math.floor(r(1) * 38);
-    const h = haze ? 70 + Math.floor(r(2) * 80) : far ? 46 + Math.floor(r(2) * 70) : 64 + Math.floor(r(2) * 92);
+    const h = haze ? Math.round((70 + Math.floor(r(2) * 80)) * (0.6 + 0.4 * D.farH)) : far ? Math.round((46 + Math.floor(r(2) * 70)) * D.farH) : 64 + Math.floor(r(2) * 92);
+    if (far && !haze && D.land && this.landmark && r(41) < D.landP) { t = this.landmark(D.land, r, D); this.tiles.set(key, t); return t; }   // punto di riferimento del quartiere
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + 26;
     const x = c.getContext('2d'), top = 25;
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(xx, yy, ww, hh); };
@@ -823,10 +826,10 @@ class Street2D {
     if (!far) {
       // quartiere vario: condomini, case con tetto a falde, konbini, uffici di vetro, santuari, giardinetti,
       // magazzini, banchi di ramen, parcheggi a piani
-      const q = r(20), kind = q < 0.3 ? 'apt' : q < 0.42 ? 'house' : q < 0.52 ? 'konbini' : q < 0.62 ? 'office' : q < 0.68 ? 'shrine' : q < 0.76 ? 'park' : q < 0.84 ? 'warehouse' : q < 0.92 ? 'ramen' : 'parking';
-      if (kind !== 'apt') { t = this.buildingKind(kind, r); this.tiles.set(key, t); if (this.tiles.size > 260) this.tiles.delete(this.tiles.keys().next().value); return t; }
+      const kind = this.pickKind ? this.pickKind(D, r(20)) : 'apt';
+      if (kind !== 'apt') { t = Street2D.GEO_KINDS.has(kind) ? this.buildingKind(kind, r) : this.kindExtra(kind, r, D); this.tiles.set(key, t); if (this.tiles.size > 260) this.tiles.delete(this.tiles.keys().next().value); return t; }
     }
-    const base = far ? ['#171640', '#1c1a4a', '#141338', '#1e1844'][Math.floor(r(4) * 4)] : this.C.mid[Math.floor(r(4) * this.C.mid.length)];
+    const base = far ? D.far[Math.floor(r(4) * D.far.length)] : D.mid[Math.floor(r(4) * D.mid.length)], WIN = D.win || this.C.win;
     px(this.C.ink, 0, top - 1, w + 2, h + 1);
     if (far && r(30) < 0.35) {                                                                       // sagome lontane più varie: gradoni e guglie
       const sw2 = Math.floor(w * 0.5), sx2 = Math.floor((w - sw2) / 2);
@@ -844,10 +847,10 @@ class Street2D {
     const ww = far ? 4 : 6, wh = far ? 4 : 7, stepX = far ? 7 : 10, stepY = far ? 9 : 12, yEnd = top + h - (far ? 6 : 22);
     for (let yy = top + 6; yy < yEnd; yy += stepY) for (let xx = 6; xx < w - ww - 3; xx += stepX) {
       const q = r(xx * 0.31 + yy * 1.7);
-      if (far) { if (q < 0.62) continue; px(q > 0.92 ? '#8a86d0' : q > 0.8 ? '#e0b86a' : '#4b468f', xx, yy, ww, wh - 1); continue; }
+      if (far) { if (q < D.farDark) continue; px(q > 0.92 ? '#8a86d0' : q > 0.8 ? '#e0b86a' : '#4b468f', xx, yy, ww, wh - 1); continue; }
       px('#0b0f1c', xx - 1, yy - 1, ww + 2, wh + 2);
-      if (q < 0.3) { px('#0d1426', xx, yy, ww, wh); px('#1a2440', xx, yy, 1, wh); continue; }
-      const col = this.C.win[Math.floor(r(xx + yy) * this.C.win.length)];
+      if (q < D.dark) { px('#0d1426', xx, yy, ww, wh); px('#1a2440', xx, yy, 1, wh); continue; }
+      const col = WIN[Math.floor(r(xx + yy) * WIN.length)];
       px(col, xx, yy, ww, wh);
       px(Street2D.shade(col, 0.4), xx, yy, ww, 1);
       const v = r(xx * 2.1 + yy);
@@ -900,12 +903,13 @@ class Street2D {
         for (let k = 0; k < 3; k++) px(this.C.neon[Math.floor(r(19 + k) * 5)], 8 + k * 9, gy + 9 + (k % 2) * 2, 7, 3);
       }
     }
-    if (!far && r(6) < 0.6) {                                                                     // insegna al neon
-      const words = ['RAMEN', 'BAR', '24H', 'HOTEL', 'GARAGE', 'SUSHI', 'MOTEL', 'AUTO', 'DISCO', 'GOMME', 'PIZZA', 'CAFE', 'KARAOKE', 'TATTOO'];
+    if (!far && D.decay && this.decayTile) this.decayTile(x, r, w, h, top);
+    if (!far && r(6) < D.signP) {                                                                 // insegna al neon
+      const words = D.words;
       let word = words[Math.floor(r(7) * words.length)];
       const sc = this.textW(word, 2) <= w - 14 ? 2 : 1;
       while (this.textW(word, sc) > w - 10) word = word.slice(0, -1);
-      meta.signs.push({ word, sc, x: Math.round((w + 2 - this.textW(word, sc)) / 2), y: top + 10 + Math.floor(r(8) * 18), col: this.C.neon[Math.floor(r(9) * this.C.neon.length)], flick: r(10) < 0.2 });
+      meta.signs.push({ word, sc, x: Math.round((w + 2 - this.textW(word, sc)) / 2), y: top + 10 + Math.floor(r(8) * 18), col: D.neon[Math.floor(r(9) * D.neon.length)], flick: r(10) < D.flick });
     }
     t = { c, ...meta };
     this.tiles.set(key, t);
@@ -1283,11 +1287,11 @@ class Street2D {
   }
 
   drawCity(g, dist, t, layer, speed, baseY, tileW) {
-    const off = dist * speed;
+    const off = dist * 30 * speed;                                             // 30 px per metro, per la profondità del piano
     const i0 = Math.floor(off / tileW) - 2, i1 = i0 + Math.ceil(this.LW / tileW) + 4;
     const shops = [];
     for (let i = i0; i < i1; i++) {
-      const b = this.building(layer, i), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
+      const b = this.building(layer, i, this.districtAt ? this.districtAt((i * tileW - 260) / (30 * speed)) : undefined), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
       if (x > this.LW || x + b.w < 0) continue;
       if (this.SS > 1 && !b.hd && this.tileHD) this.tileHD(b, layer);
       g.drawImage(b.c, x, y, b.w, b.h);
@@ -1713,12 +1717,15 @@ class Street2D {
     // luogo della mappa del mondo: la città di sempre o uno sfondo dedicato
     const bg = (game && game.loc && game.loc.bg) || this.bg || 'city';
     let shops = [];
+    const DM = bg === 'city' && this.districtMix ? this.districtMix(dist) : null, lampCol = DM ? DM.lamp : '#ffcf7a';
     if (bg === 'city') {
+      const hz = DM ? DM.haze.join(',') : '70,50,114', hzA = DM ? DM.hazeA : 1, nt0 = 1 - (this.day || 0);
+      if (DM && DM.glowA > 0.01 && !this.rainOn) { const gr = g.createLinearGradient(0, 96, 0, 216); gr.addColorStop(0, `rgba(${DM.glow.join(',')},0)`); gr.addColorStop(1, `rgba(${DM.glow.join(',')},${DM.glowA * nt0})`); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = gr; g.fillRect(0, 96, W, 120); g.restore(); }   // chiarore del quartiere sull'orizzonte
       this.drawCity(g, dist, st.t, 'haze', 0.025, 188, 50);
-      g.fillStyle = 'rgba(70,50,114,.35)'; g.fillRect(0, 150, W, 40);
+      g.fillStyle = `rgba(${hz},${Math.min(0.7, 0.35 * hzA)})`; g.fillRect(0, 150, W, 40);
       this.drawCity(g, dist, st.t, 'far', 0.07, 200, 52);
-      g.fillStyle = 'rgba(70,50,114,.22)'; g.fillRect(0, 168, W, 34);
-      this.drawTrain(g, dist, st.t);
+      g.fillStyle = `rgba(${DM ? DM.haze.join(',') : '70,50,114'},${Math.min(0.5, 0.22 * (DM ? DM.hazeA : 1))})`; g.fillRect(0, 168, W, 34);
+      if (!DM || DM.A.id === 'centro' || DM.A.id === 'casa') this.drawTrain(g, dist, st.t);
       shops = this.drawCity(g, dist, st.t, 'mid', 0.22, 216, 72);
     } else this.drawScenery(g, dist, st.t, bg, { wx, visFrom, visTo });
     // velocità: lo sfondo lascia una scia (copie spostate e trasparenti), più lunga quanto più si va forte
@@ -1738,10 +1745,10 @@ class Street2D {
     g.fillRect(0, 222, W, 1);
     g.fillStyle = '#4a5070'; g.fillRect(0, 230, W, 2);
     for (const sh of shops) this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3);
-    for (let k = 0; k < (bg === 'city' ? 6 : 2); k++) {
+    for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
       const span = W + 120, walkX = ((k * 157 + st.t * (14 + k * 5) * (k % 2 ? 1 : -1) - dist * PPM * 0.22) % span + span) % span - 60;
       const legs = Math.floor(st.t * 7 + k) % 2, X = Math.round(walkX), dir = k % 2 ? 1 : -1;
-      const coat = ['#2a1f4f', '#123049', '#3a1f2e', '#1f3a2e', '#4a2a1a', '#2a2a3a'][k], hair = ['#1a1010', '#3a2010', '#d9c08a', '#0a0a0a', '#7a3a1a', '#c0c0c0'][k];
+      const coat = ['#2a1f4f', '#123049', '#3a1f2e', '#1f3a2e', '#4a2a1a', '#2a2a3a'][k % 6], hair = ['#1a1010', '#3a2010', '#d9c08a', '#0a0a0a', '#7a3a1a', '#c0c0c0'][(k * 5) % 6];
       g.fillStyle = 'rgba(4,5,12,.4)'; g.fillRect(X - 3, 230, 9, 2);
       g.fillStyle = C.ink; g.fillRect(X - 1, 203, 7, 27);
       g.fillStyle = coat; g.fillRect(X, 210, 5, 10); g.fillStyle = Street2D.shade(coat, 0.3); g.fillRect(X, 210, 1, 10);
@@ -1818,22 +1825,25 @@ class Street2D {
     this.marks = this.marks.filter((mk) => wx(mk.m) > -60).slice(-400);
 
     // ---- lampioni: alone piccolo, pozza a terra, riflesso sul bagnato (niente fasci)
-    const lampX = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40 }[bg] || 0;
+    const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
     for (let lm = Math.floor(visFrom / (lampSp || 1)) * lampSp; lampSp && lm < visTo + lampSp; lm += lampSp) {
-      const x = wx(lm); lampX.push(x);
-      this.light(g, x + 18, 252, 70, 13, '#ffcf7a', 0.07, 4);               // pozza sull'asfalto, corsia lontana
-      this.light(g, x + 18, 226, 46, 6, '#ffcf7a', 0.08, 3);                // pozza sul marciapiede
-      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(255,200,120,.05)';
+      const x = wx(lm), bro = !!DM && Street2D.rnd(lm * 0.77 + 3) < DM.broken, on = !bro || Math.sin(st.t * 23 + lm) + Math.sin(st.t * 7.3 + lm * 2) > 1.55;   // rotto: si accende a scatti
+      lampAll.push([x, on]); if (!on) continue;
+      lampX.push(x);
+      this.light(g, x + 18, 252, 70, 13, lampCol, 0.07, 4);                 // pozza sull'asfalto, corsia lontana
+      this.light(g, x + 18, 226, 46, 6, lampCol, 0.08, 3);                  // pozza sul marciapiede
+      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${lampRgb},.05)`;
       for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
       g.restore();
     }
-    for (const x of lampX) {
+    for (const [x, on] of lampAll) {
       g.fillStyle = C.ink; g.fillRect(x - 2, 118, 5, 112); g.fillRect(x, 118, 24, 5); g.fillRect(x - 4, 222, 9, 8); g.fillRect(x - 3, 214, 7, 4);
       g.fillStyle = '#4a5070'; g.fillRect(x - 1, 120, 2, 108); g.fillRect(x + 1, 119, 21, 2); g.fillStyle = '#5c6386'; g.fillRect(x - 3, 223, 7, 1);
       g.fillStyle = C.ink; g.fillRect(x + 12, 121, 14, 6);
-      g.fillStyle = '#ffcf7a'; g.fillRect(x + 13, 125, 12, 3); g.fillStyle = '#fff6d8'; g.fillRect(x + 15, 125, 8, 1);
-      if (!this.day || this.day < 0.5) { const tw = 0.6 + 0.4 * Math.sin(st.t * 3 + x * 0.1); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(255,236,190,${0.5 * tw})`; g.fillRect(x + 5, 126, 28, 1); g.fillRect(x + 18, 117, 1, 20); g.fillStyle = `rgba(255,236,190,${0.25 * tw})`; g.fillRect(x - 8, 126, 54, 1); g.restore(); }
-      this.light(g, x + 19, 127, 14, 8, '#ffcf7a', 0.1, 3);
+      if (!on) { g.fillStyle = '#2a2d3a'; g.fillRect(x + 13, 125, 12, 3); continue; }
+      g.fillStyle = lampCol; g.fillRect(x + 13, 125, 12, 3); g.fillStyle = '#fff6d8'; g.fillRect(x + 15, 125, 8, 1);
+      if (!this.day || this.day < 0.5) { const tw = 0.6 + 0.4 * Math.sin(st.t * 3 + x * 0.1); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${lampRgb},${0.5 * tw})`; g.fillRect(x + 5, 126, 28, 1); g.fillRect(x + 18, 117, 1, 20); g.fillStyle = `rgba(${lampRgb},${0.25 * tw})`; g.fillRect(x - 8, 126, 54, 1); g.restore(); }
+      this.light(g, x + 19, 127, 14, 8, lampCol, 0.1, 3);
     }
 
     // ---- entità (dalla più lontana)
@@ -2103,6 +2113,7 @@ class Street2D {
         g.fillRect(Math.round(x), Math.round(y), Math.round(len), 1);
       }
     }
+    if (DM && DM.gradeA > 0.01 && this.quality !== 'bassa') { g.save(); g.globalCompositeOperation = 'soft-light'; g.fillStyle = `rgba(${DM.grade.join(',')},${DM.gradeA * (1 - 0.6 * (this.day || 0))})`; g.fillRect(0, 0, W, 360); g.restore(); }   // tinta del quartiere
     if ((st.bolt || 0) > 0.05) { g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(150,170,220,${0.35 * st.bolt * st.bolt})`; g.fillRect(0, 0, W, 360); g.restore(); }
     // ---- luce del giorno su tutta la scena (le insegne restano accese ma perdono forza)
     if (dd > 0.01 || ss > 0.01) {
@@ -2150,6 +2161,7 @@ class Street2D {
       }
     }
 
+    if (DM && this.districtBanner && game && !game.inside) this.districtBanner(g, dist, dt);
     // ---- segnalatore della corsia (radar delle tre corsie)
     if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
     if (game && game.street) {   // sfida in corsa: barra dei 2 km con le due auto

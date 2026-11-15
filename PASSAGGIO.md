@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 72).
+  (ultima versione pubblicata: 73).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -37,6 +37,10 @@ gioco fa, sezione per sezione).
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
   limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 5),
   consumo e autonomia, fisica con beccheggio e wheel hop.
+- **Quartieri** (`quartieri2d.js`): la città (primi 12 km del viaggio e modalità in città) alterna sei quartieri
+  con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
+  Idee non fatte: oggetti e pedoni diversi per quartiere, strada più rovinata nei bassifondi, quartieri anche
+  negli altri paesaggi.
 - **Effetti del 2D** (`effetti2d.js`): fumo, fiammate, scintille, ombre proiettate, fari, luci sulla carrozzeria,
   asfalto. `street2d.js` li chiama da `update()`; per provarli senza guidare si forzano `flame`, `spin`, `brake`
   nello stato passato a `view2d.update`.

@@ -237,6 +237,17 @@ poi il muso che si accartoccia e si accorcia, il faro rotto (la luce resta debol
 crepato, la fuliggine sul cofano; da metà danno esce vapore dal cofano, fumo nero quando è quasi distrutta. Anche le
 auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 
+**Quartieri (`quartieri2d.js`).** La città cambia lungo la strada, un quartiere ogni chilometro circa, e poi
+ricomincia: *Quartiere di casa* (casette, giardini, poche insegne), *Centro · Le luci* (neon ovunque, uffici, la
+ruota panoramica in fondo), *I Bassifondi* (baracche di lamiera coi panni stesi e il bidone col fuoco, condomini
+con le finestre sbarrate, lampioni verdastri mezzi rotti, foschia sporca), *Quartiere alto* (grattacieli di vetro,
+boutique, grand hotel, luce fredda e pulita, la guglia col belvedere), *Zona del porto* (fabbriche con la ciminiera,
+container, luce arancione al sodio, le gru) e *Via delle lanterne* (mercato coperto, lanterne rosse, la pagoda).
+Ogni quartiere ha i suoi palazzi, i colori dei muri e delle finestre, le sue insegne, la foschia, il chiarore
+sull'orizzonte, il colore dei lampioni, una tinta su tutta la scena e il numero di pedoni; entrando compare il nome.
+I palazzi ora scorrono insieme al marciapiede lontano (prima erano quasi fermi). Per aggiungere un quartiere basta
+una voce in `Street2D.DISTRICTS`.
+
 ## Gomme, rapporti e trazione
 
 - **Gomme a mescola:** ogni gomma ha la sua curva di aderenza (formula di Pacejka) e la sua temperatura ideale.
