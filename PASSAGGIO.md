@@ -9,7 +9,7 @@ gioco fa, sezione per sezione).
 - Repository `akaoni97/RandomEgg-s`, ramo di lavoro **`claude/peaceful-goodall-tvifol`** (è anche quello pubblicato
   su Pages). Tutto il gioco è in `motori/`; il resto del repository è un altro progetto, non toccarlo.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 75).
+  (ultima versione pubblicata: 76).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -33,6 +33,8 @@ gioco fa, sezione per sezione).
   del Motel Ovunque. Il traffico usa solo questi disegni, coi loro colori (`GAME_TRAFFIC` in `game.js`).
 - **Primo lavoro**: pacco dal primo locale (km 1,8) alla tappa dopo (km 5) per € 10.000, obiettivo a schermo
   (`VG_FIRST`, `vgGoal`, test nel file dei test).
+- **Missioni** (`missioni.js`): catena di sei lavori con storia e regole, poi lavori generati senza fine.
+  Idee non fatte: mostrare la destinazione sulla mappa in basso, missioni che cambiano col paesaggio.
 - **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta o accetta una sfida di
   2 km), reputazione con vinte/perse e vantaggi (`ST_REP_PERKS`), incidenti e controlli della polizia in prima
   corsia, traffico che tiene la destra.
@@ -65,7 +67,7 @@ gioco fa, sezione per sezione).
 - La vista 3D non ha i luoghi, le auto nuove né gli eventi.
 - Gli **sticker** del giocatore: `img/stickers/manifest.json` è vuoto, arriveranno.
 - Due test falliscono da prima di tutto questo lavoro (0-100 della Supra di serie: 6,3 s contro meno di 6 attesi;
-  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 26 su 28.
+  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 27 su 29.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 

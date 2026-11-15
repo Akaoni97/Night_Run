@@ -1117,6 +1117,7 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 <script src="game.js"></script>
 <script src="viaggio.js"></script>
 <script src="strada.js"></script>
+<script src="missioni.js"></script>
 <script>
 (() => {
   'use strict';
@@ -2248,7 +2249,7 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
     $('vgInfo').textContent = (pax.length ? `${pax.length}/${v.seats} a bordo · ` : '') + `carico ${fmt(v.kg, 0)}/${fmt(v.cap.kg, 0)} kg` + (v.line ? ` · linea: ${v.line.onboard} passeggeri` : '');
     // obiettivo della prima missione
     const G = game.vgGoal && game.vgGoal(), gb = $('hudGoal'); gb.hidden = !G;
-    if (G) { $('goalTitle').textContent = G.title.toUpperCase(); $('goalText').textContent = G.text; $('goalLeft').textContent = (G.left > 0.05 ? `tra ${fmt(G.left, 1)} km · ` : 'sei arrivato · ') + `paga € ${fmt(G.pay)}`; }
+    if (G) { $('goalTitle').textContent = G.title.toUpperCase(); $('goalText').textContent = G.text; $('goalLeft').textContent = (G.left > 0.05 ? `tra ${fmt(G.left, 1)} km · ` : 'sei arrivato · ') + `paga € ${fmt(G.pay)}` + (G.note ? ` · ${G.note}` : ''); }
   }
   // tasti rapidi: 1 mangia, 2 bevi, 3 caffè o bibita energetica, 4 salviette
   function vgQuick(n) {
@@ -2307,8 +2308,9 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
       jr.appendChild(row(v.line ? `Linea in corso: ${v.line.onboard} a bordo` : 'Prendi la linea notturna <small>8 fermate</small>', () => (v.line ? { ok: false, why: 'Hai già una linea' } : game.vgStartLine(n))));
     } else for (const o of game.vgOffers(n)) {
       const taken = v.taken && v.taken[n + ':' + o.k];
-      const b = row(o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`, () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
-      if (o.first && !taken) b.classList.add('first');
+      const b = row(o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : o.mission ? `${taken ? '✓ ' : '★ '}${o.title} per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}${o.kg >= 50 ? ` · ${fmt(o.kg, 0)} kg` : ''}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`, () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
+      if ((o.first || o.mission) && !taken) b.classList.add('first');
+      if (o.give) b.title = o.give;
       jr.appendChild(b);
     }
     // market (bar, autogrill): cose da tenere nel bagagliaio

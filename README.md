@@ -427,6 +427,15 @@ con salvataggio e pezzi separati.
 - **Primo lavoro.** Si guadagna subito: alla bacheca del primo locale (Bar Sport, km 1,8) c'è un pacco sigillato da
   portare alla tappa dopo (Benzina 24H, km 5): alla consegna € 10.000. L'obiettivo resta a schermo in alto a sinistra
   finché il lavoro non è fatto (`vgGoal` e `VG_FIRST` in `viaggio.js`).
+- **Missioni (`missioni.js`).** Dopo il primo lavoro arriva una catena di sei lavori con una piccola storia: i
+  *Bicchieri di cristallo* per il motel (fragili: botte e frenate brusche abbassano la paga, € 6.000), *Le medicine*
+  per il benzinaio (a tempo, € 8.000), *Il notaio* da portare all'autogrill (passeggero: sotto i 120 km/h e guida
+  dolce, € 9.000), *La cassa del Maestro* per Luca (240 kg: serve il rimorchietto o un furgone, € 15.000), *La busta
+  della Golf* per Neon Kustom (prima vinci una sfida con gli abbaglianti, € 12.000) e *La chiave della stanza 7*
+  (€ 20.000). Poi lavori senza fine, con paghe che crescono. Il lavoro dopo si prende sempre alla bacheca del locale
+  successivo (in verde); se la salti lo trovi alla bacheca dopo. A schermo l'obiettivo con la distanza, la paga e lo
+  stato della regola (tempo che resta, integrità, soddisfazione del passeggero, sfida vinta). Testi e paghe in
+  `VG_MISSIONS`.
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
   col rimorchio. La logica per furgone, camion e autobus (carichi, linee, fisica e suono diesel, limitatore di
