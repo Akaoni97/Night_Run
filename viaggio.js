@@ -612,7 +612,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   // stato per l'interfaccia
   P.vgView = function () {
     const v = this.s.vg; if (!v) return null;
-    return { km: vgKm(this), needs: v.needs, pax: v.pax.map((p) => ({ name: p.gone ? '' : p.name, to: p.to })), seats: this.vgSeats(), blackout: v.blackout, glitch: v.glitch, mirror: v.mirror || 0, weak: v.weak, sway: v.sway || 0, cap: this.vgCap(), kg: this.trunkKg(), line: v.line };
+    return { km: vgKm(this), needs: v.needs, pax: v.pax.map((p) => ({ name: p.gone ? '' : p.name, to: p.to, gone: !!p.gone, n: (VG_STORY_PAX.find((q) => q.id === p.story) || {}).seats || 1 })), seats: this.vgSeats(), blackout: v.blackout, glitch: v.glitch, mirror: v.mirror || 0, weak: v.weak, sway: v.sway || 0, cap: this.vgCap(), kg: this.trunkKg(), line: v.line };
   };
 })();
 

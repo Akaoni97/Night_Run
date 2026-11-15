@@ -167,10 +167,77 @@
     this.wheel(g, X + Math.round(w * 0.5), y0 - Math.round(11 * k), Math.max(5, Math.round(11 * k)), -st.spin, Math.abs(s.v));
   };
 
+  // ---------------------------------------------------------------- specchietto retrovisore (in alto al centro)
+  // Dietro la lunetta si vedono il guidatore e chi è salito a bordo, come sagome controluce: un posto davanti e due dietro
+  // (una coppia siede dietro). Chi sparisce a metà strada sfuma piano e non torna. Con v.mirror (la coppia di «non guardare
+  // nello specchietto») i passeggeri dietro hanno gli occhi accesi.
+  S.drawMirror = function (g, game, v, t) {
+    const MW = 108, MH = 30, x = 4, y = 8, cx = x + MW / 2;   // coordinate nella tela dello specchietto (vedi paintMirror)
+    // chi c'è a bordo: slot 0 = davanti, 1 = dietro a destra, 2 = dietro a sinistra
+    const slots = [null, null, null];
+    for (const p of v.pax) if (p.n >= 2) { slots[1] = { gone: p.gone, eyes: v.mirror }; slots[2] = { gone: p.gone, eyes: v.mirror }; }
+    for (const p of v.pax) if (!(p.n >= 2)) { const i = slots.findIndex((q) => !q); if (i >= 0) slots[i] = { gone: p.gone, eyes: false }; }
+    // dissolvenze: entra in un attimo, esce subito se scende, sfuma in tre secondi se sparisce
+    const m = this._mir || (this._mir = { a: [0, 0, 0], t });
+    const dt = Math.min(0.1, Math.max(0, t - m.t)); m.t = t;
+    for (let i = 0; i < 3; i++) {
+      const q = slots[i], tgt = q && !q.gone ? 1 : 0, rate = tgt ? 1.6 : q ? 0.35 : 3;
+      m.a[i] += Math.sign(tgt - m.a[i]) * Math.min(Math.abs(tgt - m.a[i]), rate * dt);
+    }
+    const mono = '#04050a';
+    // cornice, attacco al tetto, vetro
+    g.fillStyle = '#06070c'; g.fillRect(cx - 4, 0, 8, y - 2); g.fillRect(x - 2, y - 3, MW + 4, MH + 6); g.fillRect(x - 3, y - 2, MW + 6, MH + 4);
+    g.fillStyle = '#272d42'; g.fillRect(x - 1, y - 3, MW + 2, 1);
+    g.save(); g.beginPath(); g.rect(x, y, MW, MH); g.clip();
+    const gr = g.createLinearGradient(0, y, 0, y + MH); gr.addColorStop(0, '#0d1424'); gr.addColorStop(1, '#05070d'); g.fillStyle = gr; g.fillRect(x, y, MW, MH);
+    // lunetta con il bagliore della strada dietro e i lampioni che si allontanano verso il centro
+    const wx = x + 12, ww = MW - 24, wy = y + 3, wh = 14;
+    const wg = g.createLinearGradient(0, wy, 0, wy + wh); wg.addColorStop(0, '#1b2444'); wg.addColorStop(1, '#4a3a6e'); g.fillStyle = wg; g.fillRect(wx, wy, ww, wh);
+    const d = (game.s.dist || 0) * 0.035;
+    for (let i = 0; i < 6; i++) {
+      const ph = (d + i / 6) % 1, r = 1 - ph, lx = Math.round(cx + (i % 2 ? 1 : -1) * (3 + r * (ww / 2 - 4))), ly = wy + wh - 4 - Math.round(r * 2);
+      g.fillStyle = `rgba(255,184,90,${0.15 + 0.6 * r})`; g.fillRect(lx, ly, r > 0.5 ? 2 : 1, 1);
+    }
+    g.fillStyle = '#080b16'; g.fillRect(x, y + 17, MW, MH - 17);                 // sedili e cappelliera
+    const head = (px, hy, w, a, eyes, cap) => {   // sagoma vista da dietro: testa a righe, collo, spalle (il guidatore ha il cappellino)
+      if (a < 0.02) return;
+      g.globalAlpha = a; g.fillStyle = mono;
+      g.fillRect(px - w / 2 + 1, hy, w - 2, 1); g.fillRect(px - w / 2, hy + 1, w, w - 2); g.fillRect(px - w / 2 + 1, hy + w - 1, w - 2, 1);
+      if (cap) { g.fillRect(px - w / 2 - 1, hy + 2, w + 2, 1); g.fillRect(px - w / 2 + 1, hy - 1, w - 2, 1); }
+      g.fillRect(px - 1, hy + w, 2, 2); g.fillRect(px - w, hy + w + 2, w * 2, 2); g.fillRect(px - w - 1, hy + w + 4, w * 2 + 2, 14);
+      if (eyes) { g.globalAlpha = a * (0.55 + 0.45 * Math.sin(t * 2.1)); g.fillStyle = '#dfe6ff'; g.fillRect(px - 2, hy + 3, 1, 1); g.fillRect(px + 1, hy + 3, 1, 1); }
+      g.globalAlpha = 1;
+    };
+    head(cx + 10, y + 7, 6, m.a[1], slots[1] && slots[1].eyes);                  // dietro a destra
+    head(cx - 10, y + 7, 6, m.a[2], slots[2] && slots[2].eyes);                  // dietro a sinistra
+    for (const px of [cx - 28, cx + 28]) { g.fillStyle = '#0c0f1b'; g.fillRect(px - 7, y + 9, 14, 10); }   // poggiatesta anteriori
+    head(cx - 28, y + 8, 8, 1, false, true);                                           // il guidatore c'è sempre
+    head(cx + 28, y + 8, 8, m.a[0], slots[0] && slots[0].eyes);                  // davanti, a destra
+    g.fillStyle = 'rgba(190,205,255,.05)'; g.fillRect(x, y, MW, 2);              // riflesso del vetro
+    g.restore();
+  };
+
+  // Lo specchietto sta fisso in alto sullo schermo, anche quando l'inquadratura si stringe: si disegna a parte, a pixel
+  // pieni, dopo lo zoom (present). drawTripFx lo prenota a ogni fotogramma.
+  S.paintMirror = function () {
+    const R = this._mirReq; this._mirReq = null; if (!R) return;
+    const MW = 108, MH = 30, CW = MW + 8, CH = MH + 14;
+    if (!this._mirCv) { this._mirCv = document.createElement('canvas'); this._mirCv.width = CW * 2; this._mirCv.height = CH * 2; }
+    const mg = this._mirCv.getContext('2d'); mg.setTransform(2, 0, 0, 2, 0, 0); mg.clearRect(0, 0, CW, CH);
+    this.drawMirror(mg, R.game, R.v, R.t);
+    const c = this.ctx, u = this.canvas.height / this.LH;
+    c.save(); c.imageSmoothingEnabled = false; c.globalAlpha = 1 - Math.min(1, (R.v.blackout || 0) * 1.3);
+    c.drawImage(this._mirCv, Math.round(this.canvas.width / 2 - CW * u / 2), 0, Math.round(CW * u), Math.round(CH * u));
+    c.restore();
+  };
+  const presentBase = S.present;
+  S.present = function (shake, shakeX) { presentBase.call(this, shake, shakeX); if (this.visible) this.paintMirror(); };
+
   // colpi di sonno, palpebre pesanti, chilometri che impazziscono
   S.drawTripFx = function (g, game, t) {
     const v = game.vgView && game.vgView(); if (!v) return;
     const W = this.LW, H = 360, sl = v.needs.sleep;
+    this._mirReq = game.inside ? null : { game, v, t };
     if (sl < 0.35) {   // vignetta che si stringe
       const a = Math.min(0.75, (0.35 - sl) * 2.2) * (0.75 + 0.25 * Math.sin(t * 1.3));
       const gr = g.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, W * 0.62); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`);
