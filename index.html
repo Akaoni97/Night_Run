@@ -214,6 +214,11 @@ h1 span { color: var(--amber); }
 .mm-pin { position: absolute; top: 2px; transform: translateX(-50%); min-width: 18px; height: 18px; padding: 0 3px; display: grid; place-items: center; font: 400 11px/1 var(--f-display); font-style: normal; color: #0a0d18; box-shadow: 0 0 0 1px #000; }
 .mm-pin.far { opacity: .55; }
 .mm-pin.police { color: #fff; background: linear-gradient(90deg, #c4001f, #1c3cff); }
+.mm-pin.cargo { z-index: 1; min-width: 11px; height: 11px; padding: 0 1px; top: 0; transform: translateX(45%); font-size: 8px; }
+.mm-goal { z-index: 2; top: 0; height: 22px; min-width: 20px; color: #141a04; background: var(--lime, #b8ff3a); font-size: 13px; box-shadow: 0 0 0 1px #000, 0 0 10px rgba(184,255,58,.8); animation: mmGoal 1.2s ease-in-out infinite; }
+.mm-goal.edge { transform: none; padding: 0 6px; font: 400 11px/22px var(--f-data); white-space: nowrap; }
+@keyframes mmGoal { 50% { box-shadow: 0 0 0 1px #000, 0 0 2px rgba(184,255,58,.3); } }
+@media (prefers-reduced-motion: reduce) { .mm-goal { animation: none; } }
 .mm-next { font: 400 12px/1.2 var(--f-data); color: #f7d9ad; text-align: center; text-shadow: 0 1px 0 #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mm-next b { font-weight: 400; }
 .enterbtn { position: absolute; left: 50%; bottom: 62px; transform: translateX(-50%) skewX(-8deg); border: 0; padding: 9px 16px; cursor: pointer; white-space: nowrap;
@@ -2472,6 +2477,22 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     for (const e of game.ents) {
       if (e.kind === 'drop' && e.x - d > -back) add(Math.min(e.x, d + ahead - 30), 'C', '#b8ff3a', '', 'Consegna');
       if (e.kind === 'police' && !e.chase && e.x - d > -back && e.x - d < 450) add(e.x, '!', null, 'police', 'Polizia');
+    }
+    // il Viaggio: la meta del lavoro in corso (bandierina che pulsa; oltre la barra resta sul bordo con la distanza)
+    // e le soste dove vanno consegnati scatole e bancali caricati
+    if (game.s.vg && typeof VG !== 'undefined') {
+      const seen = new Set();
+      for (const it of game.s.trunk || []) if ((it.kind === 'scatola' || it.kind === 'bancale') && !it.first && !seen.has(it.to)) {
+        seen.add(it.to); const x = VG.stop(it.to).x; if (x - d > -back && x - d < ahead - 60) add(x, 'P', '#2ee6ff', 'cargo', 'Consegna: ' + VG.stop(it.to).name);
+      }
+      const G = game.vgGoal && game.vgGoal();
+      if (G && Number.isFinite(G.x) && G.x - d > -back + 10) {               // superata: nel viaggio non si torna indietro
+        const far = G.x - d > ahead - 90, i = document.createElement('i');
+        i.className = 'mm-pin mm-goal' + (far ? ' edge' : ''); i.title = G.title + ': ' + G.text;
+        i.innerHTML = far ? '&#9873; ' + fmtDist(G.x - d) + ' &#9656;' : '&#9873;';
+        if (far) i.style.right = '2px'; else i.style.left = pos(G.x);
+        tr.appendChild(i);
+      }
     }
     const low = sim.fuel * sim.P.tank < 15;
     const parts = ['fuel', 'shop', 'niko', 'style'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
