@@ -472,7 +472,12 @@ class Street2D {
     g.fillStyle = '#7c828e'; g.beginPath(); g.arc(0, 0, R * 0.92, Math.PI * 1.1, Math.PI * 1.6); g.lineTo(0, 0); g.fill();
     g.fillStyle = '#2a2d34';
     for (let q = 0; q < 10; q++) { const a = ang + q * Math.PI / 5; g.fillRect(Math.round(Math.cos(a) * R * 0.68 - k * 0.6), Math.round(Math.sin(a) * R * 0.68 - k * 0.6), Math.max(1, Math.round(k * 1.2)), Math.max(1, Math.round(k * 1.2))); }
-    if (hot > 0.02) { g.fillStyle = `rgba(255,${110 - hot * 50 | 0},30,${Math.min(0.75, hot)})`; g.beginPath(); g.arc(0, 0, R * 0.93, 0, Math.PI * 2); g.arc(0, 0, R * 0.42, 0, Math.PI * 2, true); g.fill(); }
+    if (hot > 0.02) {
+      // colore del ferro caldo: rosso cupo → ciliegia → arancio; la pista frenante (corona) più calda del mozzo
+      const r = Math.round(150 + 105 * Math.min(1, hot * 1.6)), gg = Math.round(20 + 110 * Math.max(0, hot - 0.45)), a = Math.min(0.9, 0.3 + 0.65 * hot);
+      g.fillStyle = `rgba(${r},${gg},${Math.round(10 + 30 * hot)},${a})`; g.beginPath(); g.arc(0, 0, R * 0.93, 0, Math.PI * 2); g.arc(0, 0, R * 0.5, 0, Math.PI * 2, true); g.fill();
+      g.fillStyle = `rgba(${r},${gg},20,${a * 0.45})`; g.beginPath(); g.arc(0, 0, R * 0.5, 0, Math.PI * 2); g.arc(0, 0, R * 0.42, 0, Math.PI * 2, true); g.fill();
+    }
     g.fillStyle = '#1a1c22'; g.beginPath(); g.arc(0, 0, R * 0.4, 0, Math.PI * 2); g.fill();
     // pinza: settore curvo fermo in alto, dalla parte interna della ruota
     const col = this.cos && this.cos.caliper && this.cos.caliper !== 'none' ? this.cos.caliper : this.carId === 'supra' ? '#d9a82e' : '#d0141e';
@@ -1746,7 +1751,8 @@ class Street2D {
     g.fillRect(0, 222, W, 1);
     g.fillStyle = '#4a5070'; g.fillRect(0, 230, W, 2);
     for (const sh of shops) { this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3); if (this.lightAdd) this.lightAdd(sh.x, 232, sh.w * 0.9 + 20, 30, Street2D.rgb(sh.col), 0.5); }
-    for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
+    if (bg === 'city' && this.districtPeople) this.districtPeople(g, wx, visFrom, visTo, st.t);   // pedoni e oggetti del quartiere
+    else for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
       const span = W + 120, walkX = ((k * 157 + st.t * (14 + k * 5) * (k % 2 ? 1 : -1) - dist * PPM * 0.22) % span + span) % span - 60;
       const legs = Math.floor(st.t * 7 + k) % 2, X = Math.round(walkX), dir = k % 2 ? 1 : -1;
       const coat = ['#2a1f4f', '#123049', '#3a1f2e', '#1f3a2e', '#4a2a1a', '#2a2a3a'][k % 6], hair = ['#1a1010', '#3a2010', '#d9c08a', '#0a0a0a', '#7a3a1a', '#c0c0c0'][(k * 5) % 6];
@@ -2034,11 +2040,20 @@ class Street2D {
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
     const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
-      // freni roventi dopo frenate forti da velocità alta
-      this.brakeHot = Math.min(1, Math.max(0, (this.brakeHot || 0) - dt * 0.18) + (s.brake > 0.5 && Math.abs(s.v) > 15 ? dt * 0.25 * s.brake : 0));
+      // dischi roventi: la temperatura vera dei freni (sim.brakeT). Il ferro comincia a vedersi rosso cupo verso i 420 °C,
+      // ciliegia a 550, arancio oltre i 650; di notte si vede molto di più. Senza il dato, la vecchia stima dalle frenate.
+      if (s.brakeT != null) this.brakeHot = Math.max(0, Math.min(1, (s.brakeT - 400) / 330));
+      else this.brakeHot = Math.min(1, Math.max(0, (this.brakeHot || 0) - dt * 0.18) + (s.brake > 0.5 && Math.abs(s.v) > 15 ? dt * 0.25 * s.brake : 0));
       const wfn = this.wheelFn();
       wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, st.spin, Math.abs(s.ww * 0.322), true);
       wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4), k, st.front, Math.abs(s.v), false);
+      if (this.brakeHot > 0.05) {                                     // il disco rosso si vede tra i raggi (brake); qui il riflesso a terra
+        const hb = this.brakeHot, nt = 1 - (this.day || 0) * 0.8;
+        for (const [q, b] of [[0, bR], [1, bF]]) {
+          const wx = left + GE.ax[q] * k, f = q === 1 ? 1 : 0.75;   // davanti scaldano di più
+          if (this.lightAdd) this.lightAdd(wx, y0 + 2, wr * 1.4, 4, '255,80,30', 0.22 * hb * f * nt);   // riflesso rossastro a terra
+        }
+      }
       for (let q = 2; q < GE.ax.length; q++) wfn(g, left + GE.ax[q] * k, y0 - wr - Math.max(0, bF * 0.4), k, st.front, Math.abs(s.v), false);   // camion a tre assi
     } else {
       this.wheel(g, left + 1 + 48 * k, y0 - wr - Math.max(0, bR * 0.4), wr, -st.spin, Math.abs(s.ww * 0.322));

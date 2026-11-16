@@ -67,8 +67,14 @@ gioco fa, sezione per sezione).
   con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
   Ogni quartiere ha il suo asfalto (`districtRoad`): buche con l'acqua, rattoppi, strisce consumate e cartacce
   nei bassifondi; asfalto nuovo e catarifrangenti nel quartiere alto; binari e gasolio al porto; coriandoli in via
-  delle lanterne. Idee non fatte: oggetti e pedoni diversi per quartiere, quartieri anche negli altri paesaggi,
-  buche che si sentono guidando (oggi sono solo disegnate).
+  delle lanterne. Pedoni e oggetti del marciapiede per quartiere (`districtPeople`, tratti di 6 m col loro seme:
+  incappucciati, chi fuma, senzatetto e bidoni col fuoco nei bassifondi; completi, cappotti, fioriere e paletti nel
+  quartiere alto; operai, muletti, bancali e fusti al porto; bancarelle e vestiti della festa alle lanterne; spesa,
+  cani, bambini, telefoni, coppie in casa e in centro; ombrelli con la pioggia). Idee non fatte: quartieri anche negli
+  altri paesaggi, buche che si sentono guidando (oggi sono solo disegnate).
+- **Dettagli dell'auto nel 2D**: dischi dei freni che si arrossano con `sim.brakeT` (rosso cupo, ciliegia, arancio;
+  sotto i copricerchi solo un riflesso a terra), vetro del finestrino che scende con `sim.winPos` (bordo del
+  cristallo, interno più scuro sopra), aria calda che fa tremolare lo sfondo dietro lo scarico (`fxHaze`).
 - **Effetti del 2D** (`effetti2d.js`): fumo, fiammate, scintille, ombre proiettate, fari, luci sulla carrozzeria,
   asfalto. `street2d.js` li chiama da `update()`; per provarli senza guidare si forzano `flame`, `spin`, `brake`
   nello stato passato a `view2d.update`.

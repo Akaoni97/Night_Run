@@ -162,14 +162,34 @@
     // solo dentro i vetri
     x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-in';
     if (M.n > 12) x.drawImage(M.win, 0, 0); else { x.fillStyle = 'rgba(0,0,0,.85)'; x.fillRect(0, 0, L.width, L.height); }
+    // finestrino abbassato: dove non c'è più il vetro si vede l'interno, più scuro del cristallo azzurrino del disegno
+    // (sotto la figura: destination-over la lascia davanti)
+    if ((s.win || 0) > 0.01 && B) {
+      const ey = (B.top + (B.bot - B.top + 1) * Math.min(1, s.win) * 0.92) * F;
+      const Sh = this._drvS || (this._drvS = document.createElement('canvas'));
+      if (Sh.width !== L.width || Sh.height !== L.height) { Sh.width = L.width; Sh.height = L.height; }
+      const sx2 = Sh.getContext('2d'); sx2.globalCompositeOperation = 'source-over'; sx2.clearRect(0, 0, Sh.width, Sh.height);
+      sx2.fillStyle = `rgba(6,8,14,${0.5 + 0.2 * nt})`; sx2.fillRect(0, Math.max(0, B.top - 1) * F, Sh.width, ey - Math.max(0, B.top - 1) * F);
+      sx2.globalCompositeOperation = 'destination-in'; sx2.drawImage(M.win, 0, 0);
+      x.globalCompositeOperation = 'destination-over'; x.drawImage(Sh, 0, 0);
+    }
     // riflessi della strada sul vetro: due lame chiare inclinate che scorrono all'indietro
     x.globalCompositeOperation = 'source-over';
     const R = this._drvR || (this._drvR = document.createElement('canvas'));
     if (R.width !== L.width || R.height !== L.height) { R.width = L.width; R.height = L.height; }
     const rx = R.getContext('2d'); rx.globalCompositeOperation = 'source-over'; rx.clearRect(0, 0, R.width, R.height);
     const off = ((this.st.reflOff || 0) % (w * F) + w * F) % (w * F);
-    rx.fillStyle = `rgba(220,235,255,${(0.1 + 0.08 * nt) * (1 - 0.9 * (s.win || 0))})`;   // finestrino abbassato: niente riflessi
+    rx.fillStyle = `rgba(220,235,255,${0.1 + 0.08 * nt})`;
     for (const [o, wd] of [[0, 7], [w * F * 0.45, 3], [w * F * 0.7, 12]]) { const bx = (o - off + w * F) % (w * F); rx.beginPath(); rx.moveTo(bx, 0); rx.lineTo(bx + wd * F, 0); rx.lineTo(bx + wd * F - h * F * 0.5, h * F); rx.lineTo(bx - h * F * 0.5, h * F); rx.closePath(); rx.fill(); }
+    // finestrino che scende: sopra il bordo del cristallo non c'è più vetro (niente riflessi, il pilota si vede pulito);
+    // il bordo è una riga chiara con l'ombra sotto, e scende insieme al motorino
+    const wo = Math.max(0, Math.min(1, s.win || 0));
+    if (wo > 0.01 && B) {
+      const ey = (B.top + (B.bot - B.top + 1) * wo * 0.92) * F;
+      rx.clearRect(0, 0, R.width, ey);
+      rx.fillStyle = 'rgba(235,245,255,.75)'; rx.fillRect(0, ey, R.width, F * 0.7);
+      rx.fillStyle = 'rgba(10,14,24,.45)'; rx.fillRect(0, ey + F * 0.7, R.width, F * 0.6);
+    }
     rx.globalCompositeOperation = 'destination-in'; rx.drawImage(M.glass, 0, 0);
     x.drawImage(R, 0, 0);
     // sullo sprite: stessa trasformazione della carrozzeria

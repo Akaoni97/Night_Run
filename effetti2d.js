@@ -134,6 +134,30 @@
   // ---------------------------------------------------------------- fiammata dello scarico
   // Bande di colore piene (rosso, arancio, giallo, bianco) con il contorno che ondeggia: le lingue nascono
   // alla bocca e scorrono verso la punta, la fiamma sale un po' e si sfrangia in fondo.
+  // aria calda dietro la marmitta: lo sfondo tremola a righe (copiato e rimesso spostato di poco, riga per riga).
+  // Più forte a motore caldo e su di giri, al limitatore e con le fiammate; il vento della corsa la porta via.
+  S.fxHaze = function (g, rx, exY, s, st, k) {
+    if (!s.running) { st.haze = Math.max(0, (st.haze || 0) - 0.02); if (st.haze < 0.02) return; }
+    const v = Math.abs(s.v || 0), load = Math.min(1, (s.rpm || 0) / 6000) * (0.4 + 0.6 * (s.thr || 0));
+    const tgt = s.running ? (0.25 + 0.75 * load + Math.min(1, st.flame || 0)) * Math.max(0.15, 1 - v / 22) * ((s.waterT ?? 85) > 60 ? 1 : 0.5) : 0;
+    st.haze = (st.haze || 0) + (tgt - (st.haze || 0)) * 0.08;
+    const a = st.haze; if (a < 0.03) return;
+    const m = g.getTransform(), W = Math.round(46 * k), H = Math.round(18 * k), x0 = rx - W, y0 = exY - H + Math.round(3 * k);
+    const dx = Math.round(m.a * x0 + m.e), dy = Math.round(m.d * y0 + m.f), dw = Math.round(m.a * W), dh = Math.round(m.d * H);
+    if (dw < 4 || dh < 4 || dx < 0 || dy < 0 || dx + dw > g.canvas.width || dy + dh > g.canvas.height) return;
+    const T = this._hz || (this._hz = document.createElement('canvas'));
+    if (T.width !== dw || T.height !== dh) { T.width = dw; T.height = dh; }
+    const tx = T.getContext('2d'); tx.clearRect(0, 0, dw, dh); tx.drawImage(g.canvas, dx, dy, dw, dh, 0, 0, dw, dh);
+    const t = this.st.t, step = Math.max(1, Math.round(m.d)), amp = 1.6 * a * m.a;
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+    for (let y = 0; y < dh; y += step) {
+      const f = y / dh, ramp = Math.sin(Math.PI * f) * (0.4 + 0.6 * (1 - Math.abs((dw * 0.6) / dw - 0.6)));   // più forte al centro della colonna
+      const off = Math.round(Math.sin(t * 23 + y * 0.55 / step) * amp * ramp + Math.sin(t * 9 - y * 0.21 / step) * amp * 0.5 * ramp);
+      if (off) g.drawImage(T, 0, y, dw, step, dx + off, dy + y, dw, step);
+    }
+    g.restore();
+  };
+
   S.fxFlame = function (g, rx, exY, k, fl, y0) {
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
     const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)))), H0 = (3.4 + f * 4.2) * k, fr = Math.floor(t * 30);
@@ -295,6 +319,7 @@
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
     if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
     if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
+    if (!low) this.fxHaze(g, rx, exY, s, st, k);
     if (st.tipHeat > 0.03) { g.fillStyle = `rgba(255,${120 + (1 - st.tipHeat) * 80 | 0},40,${st.tipHeat * 0.8})`; g.fillRect(rx, exY - Math.round(k), Math.max(2, Math.round(5 * k)), Math.max(1, Math.round(2 * k))); }
     if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia

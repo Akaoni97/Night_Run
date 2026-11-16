@@ -6,6 +6,8 @@
 //  - kindExtra: i palazzi nuovi (baracca, grattacielo di vetro, boutique, hotel, fabbrica, container, mercato).
 //  - landmark: le sagome lontane (ruota panoramica, gru, ciminiere, guglia, cisterna, pagoda).
 //  - decayTile: il degrado dei condomini dei bassifondi.
+//  - districtPeople: pedoni e oggetti del marciapiede secondo il quartiere (incappucciati e bidoni col fuoco nei
+//    bassifondi, completi e fioriere nel quartiere alto, operai e muletti al porto, bancarelle in via delle lanterne...).
 //  - districtRoad: l'asfalto di ogni quartiere (buche e cartacce nei bassifondi, asfalto nuovo e catarifrangenti nel
 //    quartiere alto, binari e gasolio al porto, coriandoli della festa in via delle lanterne).
 //  Per aggiungere un quartiere basta una voce in DISTRICTS.
@@ -372,6 +374,143 @@
           px(['#ff3a2a', '#ffd23f', '#ff8a5a', '#f4f1e6'][q % 4], x0 + r(q + 130) * (x1 - x0), y, q % 3 ? 2 : 3, q % 2 ? 1 : 2);
         }
         if (r(9) < 0.3) { const x = x0 + r(10) * (x1 - x0); px('#c4241c', x, 328, 7, 4); px('#ffd23f', x + 2, 329, 3, 1); px('#7a1410', x, 331, 7, 1); }   // busta rossa caduta
+      }
+    }
+  };
+  // ---------------------------------------------------------------- pedoni e oggetti del marciapiede lontano
+  // Ogni tratto di 6 m ha il suo seme: chi ci passeggia e cosa c'è appoggiato al muro dipendono dal quartiere.
+  // Figura base (come i pedoni di sempre): testa 204-210, busto 210-220, gambe 220-229, piedi a 229.
+  const KINDS = {
+    casa: ['plain', 'plain', 'shopper', 'dog', 'kid'], centro: ['plain', 'phone', 'shopper', 'couple', 'plain', 'phone'],
+    bassi: ['hood', 'hood', 'smoker', 'sitter', 'plain'], ricco: ['suit', 'lady', 'suit', 'lady', 'plain'],
+    porto: ['worker', 'worker', 'forklift', 'worker'], lanterne: ['festive', 'festive', 'plain', 'couple'],
+  };
+  const PROPS = { casa: ['bike', 'bins'], centro: ['scooter', 'bins'], bassi: ['barrel', 'bags', 'cart', 'bags'], ricco: ['planter', 'bollards'], porto: ['pallets', 'drums'], lanterne: ['stall', 'stall'] };
+  S.districtPeople = function (g, wx, from, to, t) {
+    const C = this.C, ink = C.ink, SS = this.SS || 1, u = 1 / SS, night = 1 - (this.day || 0), rain = !!this.rainOn;
+    const R = (v) => Math.round(v * SS) / SS;
+    const px = (col, x, y, w = 1, h = 1) => { g.fillStyle = col; g.fillRect(R(x), R(y), w, h); };
+    const STEP = 6;
+    // una figura: o = { coat, legs (colore), hair, head ('hair'|'hood'|'helmet'|'hat'|'bun'), dir, walk, small, long, vest, item }
+    const fig = (X, o) => {
+      const s = o.small ? 0.72 : 1, top = 229 - 25 * s, dir = o.dir;
+      const Y = (v) => top + v * s;
+      const lg = o.walk ? Math.floor(t * 7 + X * 0.1) % 2 : 0;
+      px('rgba(4,5,12,.4)', X - 3, 229.5, 10 * s, 2);                                          // ombra
+      px(ink, X - 1, Y(-0.5), 7 * s + 0.5, 26 * s);                                              // contorno
+      // gambe (o veste lunga)
+      if (o.long) { px(o.coat, X, Y(6), 5 * s, 19 * s); px(Street2D.shade(o.coat, -0.3), X + (dir > 0 ? 0 : 4 * s), Y(6), 1 * s, 19 * s); }
+      else { px(o.legs || '#1a1a2a', X + (lg ? 0 : 1) * s, Y(15.5), 2 * s, 9 * s); px(o.legs || '#1a1a2a', X + (lg ? 3 : 2) * s, Y(15.5), 2 * s, 9 * s); }
+      // busto
+      px(o.coat, X, Y(5.5), 5 * s, 10.5 * s); px(Street2D.shade(o.coat, 0.3), X + (dir > 0 ? 4 * s : 0), Y(5.5), 1 * s, 10 * s);
+      if (o.vest) { px('#ff8a1a', X, Y(6), 5 * s, 7 * s); px('#e8f0f0', X, Y(9.5), 5 * s, 1 * s); }   // gilet ad alta visibilità
+      if (o.suit) { px('#e8e6e0', X + (dir > 0 ? 3 : 1) * s, Y(6), 1 * s, 4 * s); px('#7a1a24', X + (dir > 0 ? 3 : 1) * s, Y(7), 1 * s, 2 * s); }   // camicia e cravatta
+      // testa
+      px(C.skin, X, Y(0.5), 5 * s, 5 * s); px(Street2D.shade(C.skin, -0.25), X + (dir > 0 ? 0 : 4 * s), Y(0.5), 1 * s, 5 * s);
+      const hc = o.hair || '#1a1010';
+      if (o.head === 'hood') { px(o.coat, X - 0.5, Y(-0.5), 6 * s, 3 * s); px(o.coat, X + (dir > 0 ? -0.5 : 3.5 * s), Y(-0.5), 2 * s, 6 * s); px('#0a0a10', X + (dir > 0 ? 3 : 0) * s, Y(2), 2 * s, 3 * s); }
+      else if (o.head === 'helmet') { px('#ffd23f', X - 0.5, Y(-0.5), 6 * s, 2.5 * s); px('#fff3a0', X, Y(-0.5), 3 * s, 1 * s); }
+      else if (o.head === 'hat') { px('#14141c', X - 1, Y(0.5), 7 * s, 1 * s); px('#14141c', X, Y(-1.5), 5 * s, 2 * s); }
+      else if (o.head === 'bun') { px(hc, X, Y(-0.5), 5 * s, 2 * s); px(hc, X + (dir > 0 ? -1 : 4) * s, Y(-1.5), 2 * s, 2 * s); px(hc, X + (dir > 0 ? 0 : 4) * s, Y(1), 1 * s, 4 * s); }
+      else { px(hc, X, Y(-0.5), 5 * s, 2 * s); px(hc, dir > 0 ? X : X + 4 * s, Y(0.5), 1 * s, 3 * s); }
+      // oggetti in mano
+      const hx = X + (dir > 0 ? 5.5 : -2.5) * s;
+      if (o.item === 'bag') { px(ink, hx, Y(9), 3, 5); px(o.bagCol || '#d9c08a', hx, Y(9.5), 2, 4); }
+      else if (o.item === 'bags') { px(ink, hx, Y(9), 4, 6); px(o.bagCol || '#ff2e88', hx, Y(9.5), 3, 5); px('#f4f1e6', hx + 1, Y(9), 1, 1); }
+      else if (o.item === 'handbag') { px('#2a1810', hx, Y(9), 3, 3); px('#d9a85a', hx + 1, Y(8), 1, 1); }
+      else if (o.item === 'phone') { const c = '#bfe8ff'; px(c, hx - (dir > 0 ? 1 : -1), Y(5), 1, 2); if (night > 0.3) { this.light(g, hx, Y(5.5), 5, 4, '#9fd8ff', 0.12 * night, 2); if (this.lightAdd) this.lightAdd(hx, Y(4), 8, 8, '160,210,255', 0.6 * night); } }
+      else if (o.item === 'cig') { const on = Math.sin(t * 1.3 + X) > 0.2; px(on ? '#ff6a1a' : '#a04010', hx, Y(5), 1, 1); if (on && night > 0.3 && this.lightAdd) this.lightAdd(hx, Y(5), 4, 4, '255,110,30', 0.5 * night);
+        if (Math.floor(t * 2 + X) % 5 === 0) px('rgba(200,200,210,.35)', hx + 1, Y(2) - ((t * 6) % 6), 1, 2); }
+      else if (o.item === 'clip') { px('#d9c08a', hx, Y(8), 2, 3); }
+      if (rain && o.umbrella) { const uc = o.umbrella; px(ink, X - 4, Y(-4), 13 * s, 3); px(uc, X - 3.5, Y(-4), 12 * s, 2); px(Street2D.shade(uc, 0.3), X - 2, Y(-4.5), 8 * s, 1); px('#1a1a1a', X + 2, Y(-2), 1, 6); }
+    };
+    // oggetti del quartiere appoggiati al muro o sul bordo del marciapiede
+    const prop = (kind, X, r) => {
+      if (kind === 'barrel') {                       // bidone col fuoco: luce che balla sul muro e sui passanti
+        px(ink, X - 1, 218, 9, 12); px('#5a3a22', X, 219, 7, 10); px('#7a5032', X + 1, 219, 1, 10); px('#3a2414', X, 222, 7, 1); px('#3a2414', X, 226, 7, 1);
+        for (let q = 0; q < 4; q++) { const f = Math.sin(t * (9 + q * 3) + q * 2 + X) * 0.5 + 0.5; px(q % 2 ? '#ffd23f' : '#ff7a1a', X + 1 + q * 1.5, 218 - 2 - f * 4, 1.5, 2 + f * 3); }
+        const fl = 0.75 + 0.25 * Math.sin(t * 11 + X) * Math.sin(t * 7.3);
+        this.light(g, X + 3.5, 214, 22, 12, '#ff8a30', 0.06 * fl * (0.4 + night), 3);
+        if (this.lightAdd) this.lightAdd(X + 3.5, 218, 40 * fl, 16, '255,140,50', 0.95 * night * fl);
+      } else if (kind === 'bags') {
+        for (let q = 0; q < 3; q++) { const bx = X + q * 4, h = 5 + (q % 2) * 2; px(ink, bx - 1, 229 - h - 1, 6, h + 1); px('#14161c', bx, 229 - h, 4, h); px('#3a3e4a', bx + 1, 229 - h, 1, 2); }
+      } else if (kind === 'cart') {
+        px('#8a8f9e', X, 220, 12, 1); px('#8a8f9e', X, 220, 1, 6); px('#8a8f9e', X + 11, 220, 1, 6); px('#8a8f9e', X, 225, 12, 1);
+        for (let q = 2; q < 11; q += 2) px('#5c616c', X + q, 221, 1, 4); px('#8a8f9e', X - 2, 219, 3, 1); px(ink, X + 1, 228, 2, 2); px(ink, X + 9, 228, 2, 2);
+      } else if (kind === 'planter') {
+        px(ink, X - 1, 219, 12, 11); px('#9a958a', X, 224, 10, 6); px('#c8c2b4', X, 224, 10, 1);
+        px('#1f4a2a', X, 218, 10, 6); px('#2f6a3a', X + 1, 217, 8, 3); px('#4a8a52', X + 2, 217, 3, 1);
+      } else if (kind === 'bollards') {
+        for (let q = 0; q < 3; q++) { const bx = X + q * 9; px(ink, bx - 1, 221, 4, 9); px('#2a2e38', bx, 222, 2, 8); px('#ffe9b8', bx, 222, 2, 1); if (night > 0.3 && this.lightAdd) this.lightAdd(bx + 1, 226, 10, 6, '255,233,184', 0.7 * night); }
+      } else if (kind === 'pallets') {
+        for (let q = 0; q < 3; q++) { const py = 228 - q * 3; px(ink, X - 1, py - 1, 15, 3); px('#a07a44', X, py - 1, 13, 1); px('#6a4a24', X, py, 13, 1); for (let z = 0; z < 13; z += 5) px('#5a3a1a', X + z, py, 2, 1); }
+        if (r(9) < 0.5) { px(ink, X + 1, 213, 11, 7); px('#c8b48a', X + 2, 214, 9, 5); px('#8a7a5a', X + 2, 216, 9, 1); }   // scatolone sopra
+      } else if (kind === 'drums') {
+        for (let q = 0; q < 2; q++) { const bx = X + q * 7, c = q ? '#2a5aa8' : '#b8321e'; px(ink, bx - 1, 219, 7, 11); px(c, bx, 220, 5, 9); px(Street2D.shade(c, 0.35), bx + 1, 220, 1, 9); px(Street2D.shade(c, -0.4), bx, 223, 5, 1); }
+      } else if (kind === 'stall') {                 // bancarella: tendone a strisce, lanterna, vapore dalla pentola
+        px(ink, X - 1, 204, 22, 4); for (let q = 0; q < 20; q += 4) { px('#c4241c', X + q, 205, 2, 2); px('#f4f1e6', X + q + 2, 205, 2, 2); }
+        px('#3a2414', X, 207, 1, 22); px('#3a2414', X + 19, 207, 1, 22);
+        px(ink, X - 1, 220, 22, 9); px('#7a4a24', X, 221, 20, 8); px('#9a6a34', X, 221, 20, 1);
+        px('#2a2a30', X + 4, 218, 5, 3); for (let q = 0; q < 3; q++) px('rgba(230,230,240,.4)', X + 5 + Math.sin(t * 2 + q) * 1.5, 216 - ((t * 5 + q * 3) % 9), 1.5, 1.5);
+        px('#ff3a2a', X + 14, 209, 3, 4); px('#ffd23f', X + 15, 210, 1, 2);
+        if (this.lightAdd) this.lightAdd(X + 10, 216, 30, 14, '255,170,90', 0.85 * night);
+        this.light(g, X + 15, 211, 9, 7, '#ff6a3a', 0.06 * (0.4 + night), 2);
+      } else if (kind === 'bike') {
+        px(ink, X, 223, 1, 1); g.strokeStyle = '#2a2d34'; g.lineWidth = u * 1.5;
+        for (const cx of [X + 2, X + 12]) { g.beginPath(); g.arc(R(cx), 226, 3.4, 0, Math.PI * 2); g.stroke(); }
+        px('#b8321e', X + 2, 222, 10, 1); px('#b8321e', X + 7, 222, 1, 4); px('#14141c', X + 6, 221, 3, 1); px('#8a8f9e', X + 11, 220, 2, 1);
+      } else if (kind === 'bins') {
+        for (const [q, c] of [[0, '#2a6a3a'], [1, '#2a4a9a'], [2, '#d9b02a']]) { const bx = X + q * 6; px(ink, bx - 1, 220, 6, 10); px(c, bx, 221, 4, 9); px(Street2D.shade(c, -0.35), bx, 221, 4, 1); }
+      } else if (kind === 'scooter') {
+        px(ink, X, 219, 12, 10); px('#e8e4d4', X + 1, 220, 8, 4); px('#e8e4d4', X + 8, 218, 3, 6); px('#14141c', X + 9, 217, 3, 1);
+        px('#14141c', X + 1, 226, 3, 3); px('#14141c', X + 8, 226, 3, 3); px('#ffb000', X + 11, 220, 1, 1);
+      }
+    };
+    for (let j = Math.floor((from - 40) / STEP); j * STEP < to + 40; j++) {
+      const m0 = j * STEP, D = this.districtAt(m0 + STEP / 2), r = (o) => rnd(j * 13.37 + o * 7.1);
+      const Pk = PROPS[D.id], Kk = KINDS[D.id] || KINDS.casa;
+      if (Pk && r(1) < 0.3) prop(Pk[Math.floor(r(2) * Pk.length)], wx(m0 + 0.5 + r(3) * (STEP - 1.5)), r);
+      const dens = Math.min(1, (D.people || 4) / 5);
+      for (let n = 0; n < 2; n++) {
+        if (r(10 + n) > dens * (n ? 0.4 : 0.8)) continue;
+        const kind = Kk[Math.floor(r(20 + n) * Kk.length)], seed = r(30 + n);
+        const still = kind === 'smoker' || kind === 'sitter';
+        // a piedi: avanti e indietro lungo il proprio tratto (prima o poi si gira), ognuno col suo passo
+        const sp = kind === 'forklift' ? 1.1 : kind === 'kid' ? 1.6 : 1.1 + seed * 0.6, span = 8 + seed * 6;
+        const ph = t * sp / span + seed * 4, tri = 2 * Math.abs(ph % 2 - 1) - 1, goingRight = (ph % 2) < 1;
+        const mm = m0 + r(40 + n) * STEP + (still ? 0 : tri * span * 0.5), X = Math.round(wx(mm)), dir = still ? (seed < 0.5 ? 1 : -1) : goingRight ? -1 : 1;
+        if (X < -30 || X > this.LW + 30) continue;
+        const pal = (a) => a[Math.floor(seed * 97) % a.length];
+        const umbrella = pal(['#c4241c', '#1a2a6a', '#2a2a2a', '#d9b02a', '#3a7a4a']);
+        if (kind === 'forklift') {                       // muletto giallo con l'operaio e le forche alzate a metà
+          const lift = 3 + Math.sin(t * 0.7 + seed * 9) * 2, fx = dir > 0 ? X + 14 : X - 4;
+          px(ink, X - 1, 214, 16, 16); px('#e8b020', X, 220, 14, 7); px('#c89010', X, 225, 14, 2); px('#14141c', X + 3, 214, 1, 6); px('#14141c', X + 10, 214, 1, 6); px('#14141c', X + 3, 214, 8, 1);
+          px(C.skin, X + 5, 215, 3, 3); px('#ffd23f', X + 5, 214, 3, 1);
+          px('#3a3e4a', dir > 0 ? X + 14 : X - 2, 210, 2, 19); px('#8a8f9e', fx, 227 - lift, 5, 1);
+          px(ink, X + 1, 227, 4, 3); px(ink, X + 9, 227, 4, 3); px('#ffb000', dir > 0 ? X : X + 13, 219, 1, 1);
+          if (night > 0.3 && this.lightAdd) this.lightAdd(dir > 0 ? X + 18 : X - 6, 224, 16, 6, '255,220,150', 0.6 * night);
+          continue;
+        }
+        if (kind === 'sitter') {                          // seduto per terra contro il muro, con la coperta
+          px(ink, X - 1, 216, 10, 14); px('#4a3a2a', X, 222, 9, 7); px('#6a5a3a', X, 222, 9, 1); px('#2a2e3a', X + 1, 217, 5, 6);
+          px(C.skin, X + 1, 213, 4, 4); px('#3a2a1a', X + 1, 212, 4, 2); px('#8a7a5a', X + 7, 227, 3, 2);   // tazza per le monete
+          continue;
+        }
+        const base = { dir, walk: !still };
+        if (kind === 'plain') fig(X, { ...base, coat: pal(['#2a1f4f', '#123049', '#3a1f2e', '#1f3a2e', '#4a2a1a', '#2a2a3a']), hair: pal(['#1a1010', '#3a2010', '#d9c08a', '#0a0a0a', '#7a3a1a', '#c0c0c0']), umbrella, item: seed > 0.8 ? 'bag' : null });
+        else if (kind === 'shopper') fig(X, { ...base, coat: pal(['#7a2a4a', '#2a4a6a', '#5a4a2a']), hair: pal(['#3a2010', '#d9c08a', '#1a1010']), head: seed > 0.5 ? 'bun' : 'hair', item: D.id === 'casa' ? 'bag' : 'bags', bagCol: pal(['#ff2e88', '#2ee6ff', '#ffb000', '#f4f1e6']), umbrella });
+        else if (kind === 'phone') fig(X, { ...base, coat: pal(['#1a1a2a', '#3a1f4a', '#123049']), hair: pal(['#0a0a0a', '#7a3a1a']), item: 'phone', umbrella });
+        else if (kind === 'dog') { fig(X, { ...base, coat: pal(['#3a4a2a', '#4a2a1a']), hair: '#5a4a3a', umbrella });
+          const dx = X + (dir > 0 ? 9 : -9), lg = Math.floor(t * 9) % 2; px(ink, dx - 1, 223, 8, 6); px('#8a5a2a', dx, 224, 6, 3); px('#8a5a2a', dx + (dir > 0 ? 5 : -1), 222, 2, 3);
+          px('#5a3a1a', dx + 1 + lg, 227, 1, 2); px('#5a3a1a', dx + 4 - lg, 227, 1, 2); g.strokeStyle = '#1a1a1a'; g.lineWidth = u; g.beginPath(); g.moveTo(R(X + (dir > 0 ? 5 : 0)), 216); g.lineTo(R(dx + (dir > 0 ? 6 : 0)), 223); g.stroke(); }
+        else if (kind === 'kid') fig(X, { ...base, small: true, coat: pal(['#d9b02a', '#c4241c', '#2a8ad8']), hair: '#3a2010' });
+        else if (kind === 'couple') { const o2 = { ...base, coat: pal(['#5a1a2a', '#2a3a5a']), hair: '#1a1010', umbrella }; fig(X, o2); fig(X + (dir > 0 ? -7 : 7), { ...o2, coat: pal(['#d9c08a', '#3a5a3a', '#7a2a4a']), hair: pal(['#d9c08a', '#3a2010']), head: 'bun', umbrella: null }); }
+        else if (kind === 'hood') fig(X, { ...base, coat: pal(['#2a2e34', '#1f2a24', '#3a2e24', '#2a2a3a']), legs: '#2a3a5a', head: 'hood' });
+        else if (kind === 'smoker') fig(X, { ...base, coat: pal(['#3a2e24', '#2a2e34']), legs: '#2a2a3a', hair: '#1a1010', item: 'cig' });
+        else if (kind === 'suit') fig(X, { ...base, coat: pal(['#14161e', '#1a2030', '#2a2a30']), legs: '#14161e', hair: pal(['#1a1010', '#8a8a8a', '#3a2010']), suit: true, item: seed > 0.6 ? 'phone' : null, umbrella: '#14141c' });
+        else if (kind === 'lady') fig(X, { ...base, coat: pal(['#c8b48a', '#5a1a2a', '#1a1a1a', '#e8e4d4']), long: true, hair: pal(['#d9c08a', '#1a1010', '#7a3a1a']), head: seed > 0.4 ? 'bun' : 'hair', item: 'handbag', umbrella: '#14141c' });
+        else if (kind === 'worker') fig(X, { ...base, coat: '#2a3a5a', legs: '#2a3a5a', head: 'helmet', vest: true, item: seed > 0.6 ? 'clip' : null });
+        else if (kind === 'festive') fig(X, { ...base, coat: pal(['#c4241c', '#1a2a6a', '#5a2a6a', '#d9b02a']), long: true, hair: '#0a0a0a', head: 'bun', item: seed > 0.7 ? 'bag' : null });
       }
     }
   };
