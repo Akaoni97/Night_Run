@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · Le missioni del Viaggio (dopo viaggio.js e strada.js)
-//  Dopo il primo lavoro (VG_FIRST in viaggio.js) arriva una catena di lavori con una piccola storia, ognuno con una
+//  Dopo il primo lavoro (VG_FIRST in viaggio.js) arriva una catena di lavori, ognuno con una
 //  sua regola, e poi lavori senza fine con paghe che crescono. Il lavoro dopo si prende alla bacheca del locale
 //  successivo (bar, autogrill, motel); l'obiettivo resta a schermo (vgGoal) con lo stato della regola.
 //  Regole (kind): pacco (basta consegnare), fragile (botte e frenate brusche abbassano la paga), tempo (in ritardo
@@ -11,31 +11,31 @@
 const VG_BOARDS = ['bar', 'grill', 'motel'];               // locali con la bacheca
 const VG_MISSIONS = [
   { id: 'cristalli', kind: 'fragile', title: 'Bicchieri di cristallo', what: 'una cassetta di bicchieri', to: 'motel', kg: 8, pay: 6000,
-    give: 'La barista ti indica una cassetta piena di paglia: «Bicchieri di cristallo per il Motel Ovunque. Erano di mia madre. Se ne arriva uno rotto lo saprò.» Guida dolce: ogni botta e ogni frenata brusca si sentono.',
-    end: 'Il portiere apre la cassetta, conta i bicchieri uno per uno alla luce dell\'insegna. Poi annuisce.' },
+    give: 'La barista ti indica una cassetta piena di paglia: bicchieri di cristallo per il Motel Ovunque. Guida dolce: ogni botta e ogni frenata brusca si sentono.',
+    end: 'Il portiere apre la cassetta e conta i bicchieri uno per uno alla luce dell\'insegna. Tutto a posto.' },
   { id: 'medicine', kind: 'tempo', title: 'Le medicine', what: 'le medicine', to: 'fuel', kg: 1, pay: 8000,
-    give: '«Il benzinaio qui avanti ha la figlia con la febbre, e le medicine le avevamo noi. Corri: ha detto pochi minuti, e lui non esagera mai.» Un sacchetto bianco, leggero, sul sedile accanto.',
-    end: 'Il benzinaio prende il sacchetto senza dire niente e sparisce nel retro. Torna dopo un minuto, ti mette i soldi in mano e ti stringe la spalla.',
+    give: '«Il benzinaio qui avanti aspetta delle medicine. Corri: ha poco tempo.» Un sacchetto bianco, leggero, sul sedile accanto.',
+    end: 'Il benzinaio prende il sacchetto, ti mette i soldi in mano e ti stringe la spalla.',
     late: 'Il benzinaio ti aspetta sulla porta. «In ritardo.» Prende il sacchetto e ti paga lo stesso, ma meno.' },
-  { id: 'notaio', kind: 'calmo', pax: 'Il notaio Ottavio', title: 'Il notaio', to: 'grill', kg: 0, pay: 9000, max: 120,
-    give: 'Un signore in cappotto, con una valigetta stretta al petto, sale dietro: «Sosta 24, prego. E piano, ho il cuore delicato: sopra i 120 mi viene l\'ansia.»',
-    end: 'Il notaio scende, si sistema il cappotto, conta le banconote due volte. «Lei guida come mio padre.» Non capisci se è un complimento.' },
-  { id: 'cassa', kind: 'pesante', title: 'La cassa del Maestro', what: 'una cassa da 240 kg', to: 'shop', kg: 240, pay: 15000,
-    give: 'Una cassa di legno con scritto MAESTRO a vernice. Dentro c\'è un motore intero, quello che Luca aspetta da anni. Pesa 240 kg: serve il rimorchietto (concessionaria del Motel Ovunque) o un furgone.',
-    end: 'Luca apre la cassa con un piede di porco e resta zitto a guardare il motore per un minuto buono. Poi ride come un bambino.' },
-  { id: 'busta', kind: 'sfida', title: 'La busta della Golf', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 12000,
-    give: 'Un ragazzo con le chiavi di una Golf ti dà una busta: «Portala a Neon Kustom. Ma prima fammi vedere che sai guidare: vinci una sfida. Sfanala qualcuno con F.»',
-    end: 'Quelli di Neon Kustom aprono la busta: dentro c\'è una foto della tua auto, scattata stanotte, in corsa. Ti pagano e ti chiedono chi te l\'ha data.',
+  { id: 'signore', kind: 'calmo', pax: 'Il signore della valigetta', title: 'Il signore della valigetta', to: 'grill', kg: 0, pay: 9000, max: 120,
+    give: 'Un signore in giacca, con una valigetta stretta al petto, sale dietro: «Sosta 24, prego. E piano, ho il cuore delicato: sopra i 120 mi viene l\'ansia.»',
+    end: 'Il signore scende, si sistema la giacca e conta le banconote due volte.' },
+  { id: 'cassa', kind: 'pesante', title: 'La cassa pesante', what: 'una cassa da 240 kg', to: 'shop', kg: 240, pay: 15000,
+    give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (concessionaria del Motel Ovunque) o un furgone.',
+    end: 'Luca apre la cassa con un piede di porco e guarda il motore per un minuto buono. Poi ride.' },
+  { id: 'busta', kind: 'sfida', title: 'La busta', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 12000,
+    give: 'Un ragazzo ti dà una busta per Neon Kustom: «Ma prima fammi vedere che sai guidare: vinci una sfida. Sfanala qualcuno con F.»',
+    end: 'Quelli di Neon Kustom aprono la busta, annuiscono e ti pagano.',
     lost: 'Quelli di Neon Kustom leggono il biglietto nella busta e scuotono la testa. «Doveva portarla uno che vince.» Ti pagano poco.' },
-  { id: 'chiave', kind: 'pacco', title: 'La chiave della stanza 7', what: 'una chiave col portachiavi di legno', to: 'motel', kg: 0.1, pay: 20000,
-    give: 'Il barista ti dà una chiave con un portachiavi di legno: stanza 7. «Al motel la stanno aspettando.» Non ricordi di averla mai lasciata da nessuna parte.',
-    end: 'Alla reception guardano la chiave, poi te. «Stanza 7. È la sua, lo è sempre stata.» Ti danno una busta coi soldi a tuo nome, scritta a mano. La calligrafia è la tua.' },
+  { id: 'chiave', kind: 'pacco', title: 'La chiave del motel', what: 'una chiave col portachiavi di legno', to: 'motel', kg: 0.1, pay: 20000,
+    give: 'Il barista ti dà una chiave con un portachiavi di legno: «Portala al Motel Ovunque, la stanno aspettando.»',
+    end: 'Alla reception guardano la chiave e ti danno una busta coi soldi.' },
 ];
 // lavori senza fine dopo la catena: titoli e frasi a rotazione
 const VG_MIS_MORE = {
   kinds: ['pacco', 'fragile', 'tempo', 'calmo', 'pacco', 'sfida'],
   what: { pacco: ['un pacco sigillato', 'una scatola di dischi', 'un sacco di posta', 'una valigetta chiusa'], fragile: ['uno specchio antico', 'delle damigiane di vino', 'una lampada di vetro'], tempo: ['dei pezzi di ricambio urgenti', 'una torta di compleanno', 'dei documenti da firmare stanotte'], sfida: ['una scommessa', 'un trofeo da consegnare'] },
-  pax: ['Una cantante', 'Un vecchio camionista', 'Una sposa in ritardo', 'Un prete', 'Un turista giapponese'],
+  pax: ['Una cantante', 'Un pescatore', 'Una sposa in ritardo', 'Un prete', 'Un turista giapponese'],
 };
 
 (function missioni() {
