@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 80).
+  (ultima versione pubblicata: 81).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
