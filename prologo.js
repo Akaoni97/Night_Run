@@ -7,7 +7,7 @@
 //  Clic, Invio o Spazio vanno avanti; Esc o SALTA chiudono tutto. Si salta anche in automatico dalle partite già iniziate.
 //  Dal resto del gioco: NightPrologo.shouldPlay(game), NightPrologo.play({ onDone, ctx }), NightPrologo.jump(n).
 // ============================================================================
-const PRO_PARENTE = 'Remo';                      // il parente morto: SEGNAPOSTO, si cambia qui (e in telefono.js)
+const PRO_PARENTE = 'Claudio';                   // lo zio morto (anche in telefono.js)
 const PRO_LETTERA = [
   'STUDIO NOTARILE FERRI',
   'Via dei Cantieri 12',

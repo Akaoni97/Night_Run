@@ -442,8 +442,8 @@ test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e 
   // 2. a tempo: in orario paga piena
   t = take(); assert.ok(t.r.ok); assert.ok(game.vgMisState().lim > 30);
   game.vgMisState().t = game.vgMisState().lim - 1; assert.equal(deliver(), 8000);
-  // 3. il notaio: occupa un posto, troppa velocità abbassa la paga
-  t = take(); assert.ok(t.r.ok); assert.equal(game.vgSeats(), 3, 'un posto è del notaio');
+  // 3. il signore della valigetta: occupa un posto, troppa velocità abbassa la paga
+  t = take(); assert.ok(t.r.ok); assert.equal(game.vgSeats(), 3, 'un posto è del signore');
   game.vgMisState().over = 10; assert.equal(deliver(), 7200);
   // 4. la cassa da 240 kg: senza rimorchio non ci sta, col rimorchio sì
   t = take(); assert.ok(!t.r.ok && /rimorchietto/.test(t.r.why));

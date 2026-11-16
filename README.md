@@ -24,7 +24,7 @@ l'auto. Ma più chilometri fai, più la strada smette di tornare.
 
 - [`AGENTS.md`](AGENTS.md): com'è fatto il codice, le regole, come provare. Da leggere per primo.
 - [`PASSAGGIO.md`](PASSAGGIO.md): stato del gioco, lavori aperti, come pubblicare.
-- [`STORIA.md`](STORIA.md): la storia lunga del Viaggio (contiene il segreto: spoiler).
+- [`STORIA.md`](STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
 - Prove automatiche: `node --test test/motori.test.js` (Node 22 o più recente).
 - Si prova in locale con `python3 -m http.server 8765` dalla cartella del repository.
 
@@ -285,7 +285,7 @@ lenti). Con qualità *bassa* niente penombra né coni.
 
 **Icone degli oggetti (`icone.js`).** Ogni oggetto ha la sua icona in pixel art 32×32 (tanica, kit, ruota di
 scorta, gomma forata, pacchi, bancale, il lavoro sigillato, trofeo, sacco di sabbia, panino, acqua, thermos, bibita,
-salviette, foto, bomboletta, valigia) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
+salviette, bomboletta) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
 si vedono nel bagagliaio, nel negozio, al bancone, nella bacheca e nella cassa del motel.
 
 **Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
@@ -460,9 +460,10 @@ San Gimignano (paese, le torri), Route 66 ad Amboy nel Mojave (deserto, mesas e 
 
 ## Il Viaggio (modalità principale)
 
-Si parte dal **km 0 sotto casa** con una V40 di serie, € 450, un panino e una bottiglia d'acqua. L'autostrada va
-solo avanti: tutti dicono che da qualche parte si arriva, nessuno sa dove. La carriera resta (pulsante *Carriera*),
-con salvataggio e pezzi separati.
+Si parte dal **km 0** con la V40 di uno zio, € 450, un panino e una bottiglia d'acqua, dopo il **prologo** (`prologo.js`):
+una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloquio col notaio, la scelta dell'auto
+(per ora solo la Volvo) e l'ingresso in autostrada. L'autostrada va solo avanti. La carriera resta (pulsante
+*Carriera*), con salvataggio e pezzi separati.
 
 - **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Niko,
   Da Luca Tuning, Neon Kustom e il **Motel Ovunque**. Il paesaggio cambia da solo: la città di casa, la Bassa,
@@ -471,30 +472,31 @@ con salvataggio e pezzi separati.
   arrivano i colpi di sonno (schermo nero, sbandata di corsia); con fame e sete a zero il gas va e viene; sporco,
   i passeggeri danno meno mancia. Tasti rapidi: **1** mangia, **2** bevi, **3** caffè o bibita energetica,
   **4** salviette (dal bagagliaio). Al bar caffè, cornetto, panino; all'autogrill pasti e docce.
-- **Motel Ovunque.** Stanza 7, sempre. Dormire (salva il viaggio), doccia, cena. **La cassa**: quello che ci lasci
+- **Motel Ovunque.** Dormire (salva il viaggio), doccia, cena. **La cassa**: quello che ci lasci
   lo ritrovi al prossimo Motel Ovunque, è il vanto della catena. Nel parcheggio si cambia mezzo e c'è la
   concessionaria: rimorchietto e le auto sportive usate (furgone, camion e autobus arriveranno coi disegni del giocatore).
 - **Primo lavoro.** Si guadagna subito: alla bacheca del primo locale (Bar Sport, km 1,8) c'è un pacco sigillato da
   portare alla tappa dopo (Benzina 24H, km 5): alla consegna € 10.000. L'obiettivo resta a schermo in alto a sinistra
   finché il lavoro non è fatto (`vgGoal` e `VG_FIRST` in `viaggio.js`).
-- **Missioni (`missioni.js`).** Dopo il primo lavoro arriva una catena di sei lavori con una piccola storia: i
+- **Missioni (`missioni.js`).** Dopo il primo lavoro arriva una catena di sei lavori, ognuno con la sua regola: i
   *Bicchieri di cristallo* per il motel (fragili: botte e frenate brusche abbassano la paga, € 6.000), *Le medicine*
-  per il benzinaio (a tempo, € 8.000), *Il notaio* da portare all'autogrill (passeggero: sotto i 120 km/h e guida
-  dolce, € 9.000), *La cassa del Maestro* per Luca (240 kg: serve il rimorchietto o un furgone, € 15.000), *La busta
-  della Golf* per Neon Kustom (prima vinci una sfida con gli abbaglianti, € 12.000) e *La chiave della stanza 7*
-  (€ 20.000). Poi lavori senza fine, con paghe che crescono. Il lavoro dopo si prende sempre alla bacheca del locale
-  successivo (in verde); se la salti lo trovi alla bacheca dopo. A schermo l'obiettivo con la distanza, la paga e lo
-  stato della regola (tempo che resta, integrità, soddisfazione del passeggero, sfida vinta). Testi e paghe in
-  `VG_MISSIONS`.
+  per il benzinaio (a tempo, € 8.000), *Il signore della valigetta* da portare all'autogrill (passeggero: sotto i
+  120 km/h e guida dolce, € 9.000), *La cassa pesante* per Luca (240 kg: serve il rimorchietto o un furgone,
+  € 15.000), *La busta* per Neon Kustom (prima vinci una sfida con gli abbaglianti, € 12.000) e *La chiave del
+  motel* (€ 20.000). Poi lavori senza fine, con paghe che crescono. Il lavoro dopo si prende sempre alla bacheca del
+  locale successivo (in verde); se la salti lo trovi alla bacheca dopo. A schermo l'obiettivo con la distanza, la
+  paga e lo stato della regola (tempo che resta, integrità, soddisfazione del passeggero, sfida vinta). Testi e
+  paghe in `VG_MISSIONS`.
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
   col rimorchio. La logica per furgone, camion e autobus (carichi, linee, fisica e suono diesel, limitatore di
   velocità) è pronta in `viaggio.js`, `sim.js` e `dsp.js`: si attiva quando arrivano i disegni dei mezzi.
-- **La storia e quello che non torna.** Capitoli ai chilometri (0, 1, 10, 25, 50, 100, 200, 350, 500, 750, 1000)
-  e una ventina di eventi rari che diventano più frequenti coi km e col sonno: il benzinaio che non ha mai visto
-  un'autocisterna, il barista che sa «il solito», la cassa arrivata prima di te, cartelli scritti a mano,
-  uscite murate, cippi sbagliati, la radio che legge la tua targa, autostoppisti che scompaiono o tornano.
-  Testi e soglie sono in `VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` (facili da cambiare).
+- **Il telefono (`telefono.js`, tasto 0).** Uno smartphone sopra la strada. All'inizio ha solo Telefono, Messaggi,
+  Rubrica, Mappa, Foto e Orologio. Sull'autostrada compaiono cartelloni con una domanda («Portafoglio in lutto?»):
+  quando li superi spunta l'icona da scaricare (download finto) di Lavori, Passeggeri e Motel. Le app strane e le
+  chiamate strane compaiono da sole, con la storia. Messaggi e chiamate dipendono dai km (`TEL_SMS`, `TEL_ATTI`).
+- **La storia.** La nuova storia è in costruzione (`STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
+  strutture già pronte e vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` in `viaggio.js`) che aspettano i testi.
 
 **Modalità.** *Il Viaggio* è la modalità principale; *Sfide in città*, *Città libera* e *Montagna* sono le
 modalità libere.

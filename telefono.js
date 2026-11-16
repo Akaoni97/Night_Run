@@ -11,19 +11,19 @@
 const TEL_ATTI = [0, 150, 400];                       // km da cui comincia l'atto 0, 1, 2 (segnaposto)
 // messaggi: da chi, a che km arrivano, testo; dir 'o' = lo scrivi tu; bad = sporco (rosso)
 const TEL_SMS = [
-  { from: 'Studio Ferri', km: 0, text: 'Buonasera, siamo lo studio Ferri. L\'eredità di suo zio Remo è pronta.' },
+  { from: 'Studio Ferri', km: 0, text: 'Buonasera, siamo lo studio Ferri. L\'eredità di suo zio Claudio è pronta.' },
   { from: 'Studio Ferri', km: 0, text: 'Domani alle 9, via dei Cantieri 12. Porti un documento.' },
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
   { from: 'Officina Niko', km: 2, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
   { from: 'Motel Ovunque', km: 4, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
-  { from: 'Zio Remo', km: 150, bad: 1, text: 'Hai preso la Volvo. Giusto così.' },
-  { from: 'Zio Remo', km: 400, bad: 1, text: 'sei già passato di qui' },
-  { from: 'Zio Remo', km: 400.1, bad: 1, dir: 'o', text: 'chi sei' },
-  { from: 'Zio Remo', km: 400.2, bad: 1, text: 'non fermarti' },
+  { from: 'Zio Claudio', km: 150, bad: 1, text: 'Hai preso la Volvo. Giusto così.' },
+  { from: 'Zio Claudio', km: 400, bad: 1, text: 'sei già passato di qui' },
+  { from: 'Zio Claudio', km: 400.1, bad: 1, dir: 'o', text: 'chi sei' },
+  { from: 'Zio Claudio', km: 400.2, bad: 1, text: 'non fermarti' },
   { from: 'Sconosciuto', km: 401, bad: 1, text: 'l\'uscita 4 non c\'è mai stata' },
 ];
 // rubrica: nome, ruolo, atto da cui compare
-const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Remo', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
+const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
   ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
 // app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
 // (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
@@ -38,7 +38,7 @@ const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps 
 const telAtto = (km) => { let a = 0; for (let i = 0; i < TEL_ATTI.length; i++) if (km >= TEL_ATTI[i]) a = i; return a; };
 const telRecenti = (a) => {
   const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Niko', 'Persa', 'lun', 1]];
-  if (a >= 1) r.unshift(['Zio Remo', 'Chiamata in arrivo · 0:00', '01:12', 2]);
+  if (a >= 1) r.unshift(['Zio Claudio', 'Chiamata in arrivo · 0:00', '01:12', 2]);
   if (a >= 2) r.unshift(['Io', 'Chiamata in arrivo · 0:41', '03:07', 2], ['Sconosciuto', '14 chiamate perse', '03:07', 1]);
   return r;
 };
@@ -203,7 +203,7 @@ const telThreads = (km) => {
       return `<div class="view app">${nav('Passeggeri')}<div class="body"><div class="card"><div class="meta"><span>A bordo</span></div><h4 style="font-size:22px">${n ? n + (n === 1 ? ' persona' : ' persone') : 'Nessuno'}</h4><div class="meta"><span>Posti occupati: ${n + (a >= 2 ? 1 : 0)}${seats ? ' su ' + seats : ''}</span></div></div>${a >= 2 ? `<div class="row">${av('Nessuno')}<span class="tx"><b>Sedile dietro</b><small>occupato · non risulta salito</small></span></div><p class="cen" style="font-size:12px;margin-top:10px">Il conto non torna.</p>` : ''}</div></div>`;
     },
     ext() { return `<div class="view app">${nav('Ultima Uscita')}<div class="body"><div class="cd" id="cd">${ST.cd.toFixed(1)}</div><p class="cen">km all'uscita 4</p><p class="cen" style="font-size:12px;margin-top:22px">Il conto scende. Poi ricomincia.</p></div></div>`; },
-    vm() { return `<div class="view app">${nav('Segreteria')}<div class="body">${[['Zio Remo', '0:07', 'domani'], ['Sconosciuto', '0:00', '03:07'], ['Io', '0:19', 'ora']].map((v) => `<div class="card"><div style="display:flex;gap:10px;align-items:center"><span class="av bad">▶</span><span class="tx" style="flex:1"><b>${v[0]}</b><small style="display:block;color:var(--t2);font-size:12px">ricevuto: ${v[2]} · ${v[1]}</small></span></div><div class="bar">${Array.from({ length: 22 }, (_, i) => `<i style="height:${20 + ((i * 37) % 70)}%;animation-delay:${i * 40}ms"></i>`).join('')}</div></div>`).join('')}<p class="cen" style="font-size:12px">«…tieni le mani sul volante…»</p></div></div>`; },
+    vm() { return `<div class="view app">${nav('Segreteria')}<div class="body">${[['Zio Claudio', '0:07', 'domani'], ['Sconosciuto', '0:00', '03:07'], ['Io', '0:19', 'ora']].map((v) => `<div class="card"><div style="display:flex;gap:10px;align-items:center"><span class="av bad">▶</span><span class="tx" style="flex:1"><b>${v[0]}</b><small style="display:block;color:var(--t2);font-size:12px">ricevuto: ${v[2]} · ${v[1]}</small></span></div><div class="bar">${Array.from({ length: 22 }, (_, i) => `<i style="height:${20 + ((i * 37) % 70)}%;animation-delay:${i * 40}ms"></i>`).join('')}</div></div>`).join('')}<p class="cen" style="font-size:12px">«…tieni le mani sul volante…»</p></div></div>`; },
   };
   function callScreen() {
     const c = ST.call; if (!c) return '';
@@ -278,7 +278,7 @@ const telThreads = (km) => {
     const off = telNextOffer(k, t.apps);
     if (off && g.ents) { const x = g.s.dist + 260; t.apps[off.app] = { st: 'sign', x }; g.ents.push({ id: g.id++, kind: 'vgsign', lane: 0, x, v: 0, text: off.sign, app: true }); }
     for (const o of TEL_APP_OFFERS) { const p = t.apps[o.app]; if (p && p.st === 'sign' && g.s.dist >= p.x) { p.st = 'offer'; toast('Telefono', `Nuova app: ${o.name}. Tocca per scaricarla.`, 0, () => { setOpen(true); ST.view = 'home'; ST.stack = []; render(); }); if (ST.on && ST.view === 'home') render(); } }
-    const a = telAtto(k); if (a >= 1 && !t.rang[a] && ST.atto === null) { t.rang[a] = 1; if (a === 1) ring('Zio Remo'); }
+    const a = telAtto(k); if (a >= 1 && !t.rang[a] && ST.atto === null) { t.rang[a] = 1; if (a === 1) ring('Zio Claudio'); }
     if (seen !== a) { seen = a; if (ST.on && (ST.view === 'home' || ST.view === 'lock')) render(); }
     if (ST.on && ST.view === 'ext') { ST.cd = ST.cd <= 0.15 ? 3.2 : ST.cd - 0.1; const c = root.getElementById('cd'); if (c) c.textContent = ST.cd.toFixed(1); }
     if (ST.call && ST.call.live) { const ct = root.getElementById('ct'), s = Math.floor((performance.now() - ST.call.t0) / 1000); if (ct) ct.textContent = `${atto() > 0 ? 'in linea · nessuno parla' : 'in linea'} · 0:${String(s % 60).padStart(2, '0')}`; }

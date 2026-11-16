@@ -27,15 +27,16 @@ gioco fa, sezione per sezione).
 - **Il Viaggio** (modalità principale, `viaggio.js` + `viaggio2d.js`): autostrada infinita dal km 0 sotto casa con
   una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Niko, Da Luca Tuning, Neon
   Kustom, Motel Ovunque con la cassa che ti segue), paesaggi che cambiano coi km, bisogni del guidatore (fame,
-  sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), capitoli della storia ai km
-  e una ventina di eventi rari e inquietanti. Il finale provvisorio è al km 1000 (in `VG_CHAPTERS`).
+  sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), il prologo di apertura (`prologo.js`)
+  e il telefono (`telefono.js`). La storia dopo il km 0 è da scrivere: capitoli, eventi strani e passeggeri speciali
+  sono strutture vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX`).
 - **Modalità libere**: Sfide in città (la vecchia carriera), Città libera, Montagna (solo 3D).
 - **Auto**: Supra, V40 e 25 veicoli dai disegni del giocatore (`cars.js`, `GEN_DATA` + `GEN_CARS`, immagini in
   `img/<id>.png`, `_wheel.png`, `_paint.png`). Tutti con motore, peso e marce veri; si comprano alla concessionaria
   del Motel Ovunque. Il traffico usa solo questi disegni, coi loro colori (`GAME_TRAFFIC` in `game.js`).
 - **Primo lavoro**: pacco dal primo locale (km 1,8) alla tappa dopo (km 5) per € 10.000, obiettivo a schermo
   (`VG_FIRST`, `vgGoal`, test nel file dei test).
-- **Missioni** (`missioni.js`): catena di sei lavori con storia e regole, poi lavori generati senza fine.
+- **Missioni** (`missioni.js`): catena di sei lavori con le loro regole (testi neutri), poi lavori generati senza fine.
   La meta del lavoro in corso è una bandierina verde sulla mappa a barra in basso (oltre i 2,7 km resta sul bordo
   destro con la distanza); scatole e bancali caricati hanno una "P" sulla sosta di consegna (`renderMiniMap` in
   `index.html`). Idee non fatte: missioni che cambiano col paesaggio.
@@ -88,7 +89,7 @@ gioco fa, sezione per sezione).
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
 
 ## Lavori aperti e idee in sospeso
-- **Nuova storia (in corso, 17/11/2026)**: il proprietario vuole una nuova storia horror graduale che sostituisce `STORIA.md`: una lettera invita a prendere l'eredità di un parente morto, la E36 blu arriva a un edificio, un tizio offre 6 auto (per ora si può scegliere solo la Volvo), poi la Volvo imbocca l'autostrada. Fatto: il **telefono** (`telefono.js`) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada; testi segnaposto, capitolo km 0 riscritto). Da fare, in quest'ordine: nomi delle altre 5 auto e loro sblocco, pulizia della vecchia storia (`STORIA.md`, `VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX`, `missioni.js`, test collegati), nuova bibbia della storia.
+- **Nuova storia (in corso, dal 17/11/2026)**: il proprietario vuole una storia horror **graduale** (prima tutto tranquillo, poi una piccola cosa, poi il macabro). Fatti: il **telefono** (`telefono.js`: app normali, app da scaricare con i cartelloni sulla strada, app strane) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada). Il parente morto è **zio Claudio**. La **vecchia storia è stata cancellata** (era in `STORIA.md`, nei capitoli ed eventi di `viaggio.js` e nei testi di `missioni.js`): non rimetterla, se serve è nella cronologia git. Da fare: scrivere la storia vera (`STORIA.md` dice cosa è deciso e cosa manca), i nomi delle altre 5 auto del garage e il loro sblocco, gli effetti horror (bussare nel bagagliaio senza niente, chiamate strane, app che compaiono da sole).
 - **Alta definizione a 720 righe** (vedi AGENTS.md, "Densità doppia"): fatti tela interna, cielo, luci sfumate,
   carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
   (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
@@ -104,8 +105,8 @@ gioco fa, sezione per sezione).
 - Passano tutti i 29 test. I due vecchi fallimenti erano errori dei test, non del gioco: la prova dello 0-100 non
   montava la configurazione originale (con il Torsen di serie fa 5,6 s e 13,7 s sui 400 m) e quella dell'officina
   non sapeva che i pezzi si sbloccano anche coi chilometri.
-- **La storia del Viaggio (`STORIA.md`) la scrive e la carica il cognato**: non costruirla e non toccarla senza
-  che il proprietario lo chieda.
+- **La storia del Viaggio** si costruisce a sessioni con il proprietario e si annota in `STORIA.md`: non inventarla da soli
+  e non toccare `STORIA.md` senza che il proprietario lo chieda.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 

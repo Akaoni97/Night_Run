@@ -51,10 +51,8 @@ Object.assign(INV, {
   salviette: { name: 'Salviette', kg: 0.2, price: 3, wash: 0.3, note: 'Igiene +30 %. Da fermo.' },
   scatola: { name: 'Scatola da consegnare', kg: 20, price: 0, note: 'Va lasciata al locale scritto sull\'etichetta.' },
   bancale: { name: 'Bancale', kg: 1000, price: 0, note: 'Merce su bancale per il camion.' },
-  foto: { name: 'Vecchia fotografia', kg: 0.05, price: 0, note: 'La tua auto davanti a un Motel Ovunque. Sul retro una data di trent\'anni fa.' },
   bomboletta: { name: 'Bomboletta gonfia e ripara', kg: 0.5, price: 18, note: 'Rigonfia la gomma bucata a 1,9 bar e tappa quasi tutto il buco. Arrivi al prossimo gommista.' },
   forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Niko te la ripara e torna a essere la ruota di scorta.' },
-  valigia: { name: 'Valigia della signora', kg: 12, price: 0, note: 'Chiusa. Non è tua. «Me la riporti quando torni indietro.»' },
 });
 const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette', 'bomboletta', 'scorta'];
 
@@ -79,80 +77,36 @@ Object.assign(VG_SEATS, { a80: 4, a3: 4, a112: 3, panda: 4, punto: 4, golf: 4, c
 // ---------------------------------------------------------------- persone: autostoppisti normali e quelli che ricorderai
 const VG_NAMES = ['Marco', 'Giulia', 'Sergio', 'Elena', 'Tommaso', 'Rita', 'Kenji', 'Aiko', 'Bruno', 'Lucia', 'Dario', 'Nadia', 'Hiro', 'Ada', 'Walter', 'Sofia'];
 const VG_SMALLTALK = [
-  'Dice che sta andando a trovare sua sorella, «più avanti».',
+  'Dice che sta andando a trovare sua sorella.',
   'Racconta di aver lavorato tutta la vita in un autogrill. «Sempre lo stesso caffè, sempre la stessa gente.»',
-  'Ti chiede se hai mai visto la fine della strada. Ride prima che tu risponda.',
   'Dorme quasi subito, con la testa contro il finestrino.',
   'Accende la radio, cerca una stazione, la spegne. «Meglio il motore.»',
-  'Ti offre una caramella alla menta. È vecchissima.',
-  'Conta i cippi chilometrici a bassa voce.',
-  'Parla del tempo, della benzina che costa, della squadra del cuore. Una persona normale. Per fortuna.',
+  'Ti offre una caramella alla menta.',
+  'Parla del tempo, della benzina che costa, della squadra del cuore.',
 ];
 const VG_RUMORS = [
   '«Dicono che più avanti la strada si allarga e diventa a dieci corsie. Io non ci credo.»',
-  '«Mio nonno diceva che in fondo c\'è un casello. Uno solo. E non accetta contanti.»',
-  '«I camionisti vecchi non si fermano mai al motel due volte di fila. Chiedi a loro.»',
-  '«L\'autobus delle 4 passa sempre vuoto. Sempre. Ma si ferma lo stesso.»',
-  '«Hai notato che i Motel Ovunque hanno tutti la stessa moquette? Anche la stessa macchia davanti alla stanza 7.»',
-  '«C\'è chi giura di essere arrivato in fondo ed è tornato. Peccato che non si torni indietro.»',
-  '«La benzina più avanti c\'è sempre. Nessuno l\'ha mai vista arrivare.»',
-  '«Se di notte vedi un\'auto uguale alla tua, non sorpassarla.»',
+  '«Il caffè del Sosta 24 è il migliore della tratta. Chiedi la miscela della casa.»',
+  '«Ai Motel Ovunque la cassa arriva sempre prima di te. Sono organizzati, quelli.»',
+  '«Se hai fame fermati al prossimo autogrill: dopo c\'è un lungo tratto senza niente.»',
 ];
 
-// capitoli: si leggono al passaggio dei chilometri
+// capitoli: si leggono al passaggio dei chilometri. Per ora solo la partenza: il resto lo scrive la nuova storia
+// (km, title, text; ogni capitolo si legge una volta)
 const VG_CHAPTERS = [
   { km: 0, title: 'Km 0', text: 'La Volvo di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
-  { km: 1, title: 'Il primo cartello', text: 'Un cartello verde, appena fuori dalla città: «AUTOSTRADA · SOLO AVANTI». Sotto, qualcuno ha scritto a pennarello: «buon viaggio».' },
-  { km: 10, title: 'Dieci', text: 'Dieci chilometri. Lo specchietto mostra la città, piccola. Poi una curva, e la città non c\'è più.' },
-  { km: 25, title: 'La catena', text: 'Hai già visto due cartelli dei Motel Ovunque. «La tua cassa ti aspetta in camera». Dicono che sia il loro vanto: lasci le tue cose in un motel, le ritrovi nel prossimo. Come facciano, nessuno lo chiede.' },
-  { km: 50, title: 'Cinquanta', text: 'Ai bar ormai ti salutano. Qualcuno ti chiama per nome. Non ricordi di averlo detto.' },
-  { km: 100, title: 'Cento', text: 'Cento chilometri. Il contachilometri della tua auto e quello del viaggio non vanno più d\'accordo di qualche metro. Probabilmente è niente.' },
-  { km: 200, title: 'Chi guida da sempre', text: 'Al bar un camionista ti mostra le mani: «Trentotto anni di strada. Mai visto un incrocio. Mai vista un\'uscita aperta. Ma la paga arriva sempre.»' },
-  { km: 350, title: 'La mappa', text: 'Trovi una cartina nel cassetto di un motel. È tutta una linea dritta, con i motel segnati a matita. In fondo, dove dovrebbe finire, la carta è strappata.' },
-  { km: 500, title: 'Cinquecento', text: 'Mezzo migliaio di chilometri. Paesaggi che non dovrebbero stare uno dopo l\'altro: le risaie, la pianura col Po, il mare, i cedri, il deserto. Nessun confine. Nessuna dogana. Solo la linea bianca.' },
-  { km: 750, title: 'Le firme', text: 'Sul registro di un Motel Ovunque sfogli le pagine vecchie. Le firme sono tante, tutte diverse. Una però è la tua, con la tua calligrafia. Di vent\'anni fa.' },
-  { km: 1000, title: 'Mille', text: 'Al km 1000 c\'è un cartello nuovo, bianco, enorme: «BENTORNATO». La strada continua. Più avanti, a destra, una casa che conosci: la luce della cucina è accesa, e in strada c\'è un\'auto uguale alla tua, col motore caldo. Qualcuno sta per partire. Tu non ti fermi. La strada va solo avanti.' },
 ];
 
-// ---------------------------------------------------------------- quello che non torna (eventi rari, sempre più strani coi chilometri)
-// where: dove succede (fuel, bar, grill, motel, niko, road, radio, ride) · km: da quanti km in poi · once: una sola volta
-const VG_ODD = [
-  { id: 'benzina50', where: 'fuel', km: 12, minStops: 4, once: true, title: 'Il benzinaio', text: '«Ragazzo, ti sei mai chiesto perché più avanti c\'è sempre benzina? Chi ce la porta? Io guido da cinquant\'anni e un\'autocisterna non l\'ho mai vista.»' },
-  { id: 'solito', where: 'bar', km: 20, once: true, title: 'Il barista', text: 'Il barista ti vede entrare e prende già la tazzina. «Il solito?» Non sei mai stato qui.' },
-  { id: 'solito2', where: 'bar', km: 300, once: true, need: 'solito', title: 'Il barista', text: 'Stesso bancone, stessa macchia a forma di Italia, stessa faccia. Mille bar fa. «Il solito?»' },
-  { id: 'cassaPresto', where: 'motel', km: 40, once: true, title: 'Reception', text: '«La sua cassa è già in camera, è arrivata stamattina.» Hai deciso di fermarti dieci minuti fa.' },
-  { id: 'stanza7', where: 'motel', km: 120, once: true, title: 'Stanza 7', text: 'Anche stavolta ti danno la stanza 7. In ogni Motel Ovunque, da quando sei partito. Non l\'hai mai chiesta.' },
-  { id: 'registro', where: 'motel', km: 450, once: true, title: 'Il registro', text: 'Il registro degli ospiti è aperto sul bancone. La tua firma c\'è già. La data è di domani.' },
-  { id: 'foto', where: 'motel', km: 300, once: true, gives: 'foto', title: 'La cassa', text: 'Nella cassa c\'è una cosa che non hai messo tu: una vecchia fotografia della tua auto, parcheggiata davanti a questo stesso motel. Sul retro, una data di trent\'anni fa.' },
-  { id: 'pesante', where: 'motel', km: 520, once: true, title: 'La cassa', text: 'Stanotte la cassa pesa di più. La apri: dentro non c\'è niente di nuovo. La richiudi. Pesa ancora di più.' },
-  { id: 'nonDormire', where: 'grill', km: 80, once: true, title: 'Il vecchio', text: 'Un vecchio seduto al tavolo accanto ti afferra il polso: «Non dormire mai due notti di fila nello stesso motel. Non chiedermi perché. Fallo e basta.»' },
-  { id: 'pezzi', where: 'niko', km: 120, once: true, title: 'Il meccanico', text: 'Il meccanico gira intorno alla tua auto. «Questi pezzi li conosco. Li ho montati io, su un\'auto uguale. Tanti anni fa.» Si pulisce le mani e non dice altro.' },
-  { id: 'bambino', where: 'fuel', km: 250, once: true, title: 'Il bambino', text: 'Un bambino seduto sul bordo del marciapiede: «Papà dice che quando arriviamo in fondo la mamma ci aspetta.» Ti guardi intorno. Non c\'è nessun papà, non c\'è nessuna auto oltre la tua.' },
-  { id: 'ultimaUscita', where: 'road', km: 100, once: true, sign: 'ULTIMA USCITA', title: 'Ultima uscita', text: 'Un cartello: «ULTIMA USCITA». Lo svincolo è chiuso da un muro di mattoni, vecchio, coperto di muschio.' },
-  { id: 'scritta', where: 'road', km: 200, once: true, sign: 'SE LEGGI QUESTO SEI GIA PASSATO DI QUI', title: 'Il cartello', text: 'Un pezzo di cartone legato al guardrail, scritto a mano: «SE LEGGI QUESTO, SEI GIÀ PASSATO DI QUI».' },
-  { id: 'cippo', where: 'road', km: 180, once: true, cippo: true, title: 'Il cippo', text: 'Km 512, km 513… km 9. Poi km 515. Lo hai visto bene.' },
-  { id: 'areaVuota', where: 'road', km: 260, once: true, parked: true, title: 'L\'area di sosta', text: 'Un\'area di sosta piena di auto, tutte coi fari accesi. Dentro, nessuno.' },
-  { id: 'gemella', where: 'road', km: 350, once: true, twin: true, title: 'Nella corsia accanto', text: 'Ti affianca un\'auto del tuo stesso colore. Stessa auto. Stessi adesivi. Poi accelera e sparisce.' },
-  { id: 'targhe', where: 'radio', km: 150, once: true, title: 'Radio', text: 'Tra due canzoni, una voce piatta legge un elenco di targhe. Una dopo l\'altra. La quinta è la tua.' },
-  { id: 'incidente', where: 'radio', km: 500, once: true, title: 'Radio', text: 'Notiziario: «Incidente al chilometro {km10}, coinvolta un\'auto del colore della tua. Nessun ferito, nessun conducente trovato.» Sei al km {km}.' },
-  { id: 'motore', where: 'radio', km: 600, once: true, title: 'Radio', text: 'La radio trasmette solo il rumore di un motore. Lo riconosci: è il tuo. Spegni la radio. Il rumore resta lo stesso.' },
-  { id: 'odometro', where: 'road', km: 200, glitch: true, title: '', text: '' },
-  { id: 'fantasma', where: 'road', km: 40, ghost: true, sleepy: true, title: '', text: '' },
-];
+// ---------------------------------------------------------------- eventi strani (per ora vuoto: li scrive la nuova storia)
+// Ogni evento: id, where (dove succede: fuel, bar, grill, motel, niko, road, radio, ride), km (da quanti km in poi), once (una sola volta),
+// need (id di un evento già visto), title e text (il messaggio). Effetti già pronti: sign (cartello scritto a mano), cippo, parked, twin,
+// ghost, glitch, gives (un oggetto nella cassa del motel). Il testo può usare {km} e {km10}.
+const VG_ODD = [];
 
-// storie a bordo: autostoppisti particolari (compaiono una volta, in ordine di chilometri)
-const VG_STORY_PAX = [
-  { id: 'kmzero', km: 60, name: 'L\'uomo col cappotto', ask: '«Mi porti al km 0?» Gli dici che il km 0 è dietro. Lui sorride: «Più avanti.»', vanish: true,
-    end: 'Ti giri per dirgli che siete arrivati alla prossima uscita. Il sedile è vuoto. Sul cruscotto ci sono 60 euro, piegati in quattro.' },
-  { id: 'valigia', km: 140, name: 'La signora con la valigia', ask: 'Una signora elegante, una valigia rigida tra le ginocchia. Non la apre mai.', gives: 'valigia',
-    end: 'Scendendo ti mette in mano la valigia. «Me la riporti quando torni indietro.» Prima che tu possa dire che indietro non si torna, è già sparita dietro il guardrail.' },
-  { id: 'ragazzo', km: 220, name: 'Il ragazzo', ask: 'Un ragazzo con lo zaino. Sale e ti dice subito: «Sei al km {km}, vero? Io sono al 41.200. Tu sei appena partito.»',
-    end: 'Scende senza salutare. Sul sedile ha lasciato un biglietto: «Non fermarti al 1000».' },
-  { id: 'ritorno', km: 320, name: '{again}', ask: 'Sul ciglio della strada c\'è {again}. Lo stesso che hai lasciato trecento chilometri fa. Stessi vestiti. «Grazie per l\'altra volta.»',
-    end: '«Ci vediamo più avanti», dice scendendo. Ne sembra sicuro.' },
-  { id: 'coppia', km: 400, name: 'La coppia', seats: 2, ask: 'Una coppia giovane. Salgono dietro. «Per favore, non guardare nello specchietto finché non scendiamo.»', mirror: true,
-    end: 'Le portiere si chiudono. Guardi nello specchietto: il sedile dietro è pieno di sabbia.' },
-];
+// storie a bordo: autostoppisti particolari (per ora vuoto: li scrive la nuova storia)
+// Ogni passeggero: id, km (da quanti km compare, una volta), name, ask (cosa dice quando lo incontri), end (cosa succede quando scende),
+// e al bisogno vanish (sparisce a metà strada), gives (oggetto che lascia), seats (posti occupati), mirror (lo specchietto cambia).
+const VG_STORY_PAX = [];
 
 // ---------------------------------------------------------------- stato
 function vgFresh() {
@@ -222,7 +176,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const ins = this.inside; this.inside = null;              // al motel si è "dentro", ma il cambio si fa nel parcheggio
     const r = sc.call(this, id); this.inside = ins; return r;
   };
-  // oggetti nuovi: cibo, bevande, salviette; la valigia non si butta
+  // oggetti nuovi: cibo, bevande, salviette
   const ui = P.useItem;
   P.useItem = function (i) {
     const it = this.s.trunk[i], d = it && INV[it.kind];
@@ -250,10 +204,6 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   const di = P.dropItem;
   P.dropItem = function (i) {
     const it = this.s.trunk[i];
-    if (it && it.kind === 'valigia' && vgOn(this)) {
-      this.s.trunk.splice(i, 1); this.applyMass(); this.s.vg.valigiaBack = true;
-      this.say('Lasci la valigia sul ciglio della strada.'); return { ok: true };
-    }
     if (it && (it.kind === 'scatola' || it.kind === 'bancale') && vgOn(this)) return { ok: false, why: 'È merce da consegnare: se la butti la paghi tu' };
     return di.call(this, i);
   };
@@ -474,8 +424,6 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     this.s.trunk = this.s.trunk.filter((it) => { if ((it.kind === 'scatola' || it.kind === 'bancale') && it.to === pl.n) { got += it.pay || 0; n++; if (it.first) first = true; return false; } return true; });
     if (first) { v.firstDone = true; this.fx.push({ k: 'missionDone', pay: VG_FIRST.pay }); this.say(`Primo lavoro fatto! Il benzinaio firma senza guardarti in faccia e ti conta i soldi sul cofano: + € ${VG_FIRST.pay.toLocaleString('it-IT')}. Adesso puoi comprare pezzi, benzina, un'altra auto.`, 'money'); }
     if (n) { this.applyMass(); this.s.money += got; v.earned += got; v.jobs += n; this.say(`Consegnato: ${n} ${n === 1 ? 'collo' : 'colli'} a ${pl.name}, + € ${got}`, 'money'); }
-    // la valigia torna sempre
-    if (pl.id === 'motel' && v.valigiaBack) { v.valigiaBack = false; v.cassa.push({ kind: 'valigia', kg: 12 }); this.say('Nella cassa c\'è la valigia della signora. Non ricordi di avercela messa.', 'bad'); }
     // linea dell'autobus: alla fermata scendono e salgono
     if (this.car === 'bus' && v.line) this.vgBusStop(pl);
     this.vgOdd(pl.id, vgKm(this));
@@ -534,10 +482,6 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const pay = on * 6; L.earned += pay; this.s.money += pay; v.earned += pay;
     this.say(`Fermata ${pl.name}: scendono ${off}, salgono ${on} (+ € ${pay})${L.onboard ? `, a bordo ${L.onboard}` : ''}`, 'money');
     if (pl.n >= L.to) { this.say(`Fine linea: incassati € ${L.earned}`, 'money'); v.line = null; v.jobs++; }
-    if (Math.random() < 0.12 && !v.seen.busEmpty && vgKm(this) > 420) {
-      v.seen.busEmpty = true;
-      this.ask({ kind: 'story', title: 'L\'ultimo passeggero', text: 'Un passeggero sale, timbra il biglietto e va in fondo. Allo specchio il fondo dell\'autobus è vuoto. Il biglietto timbrato è sul cruscotto: «km 0».', time: 30, options: [{ label: 'Riparti' }] });
-    }
   };
 
   // ------------------------------------------------------------ servizi dei locali
@@ -552,13 +496,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgShower = function (eur) { const r = this.vgPay(eur, 'Doccia'); if (r.ok) this.s.vg.needs.wash = 1; return r; };
   P.vgSleep = function () {
     const v = this.s.vg, km = vgKm(this), n = this.inside ? VG.stopIndex(this.inside.x) : -1;
-    const r = this.vgPay(45, 'Notte al Motel Ovunque, stanza 7'); if (!r.ok) return r;
+    const r = this.vgPay(45, 'Notte al Motel Ovunque'); if (!r.ok) return r;
     v.needs.sleep = 1; v.needs.wash = Math.min(1, v.needs.wash + 0.2); v.needs.food = Math.max(0, v.needs.food - 0.15); v.needs.water = Math.max(0, v.needs.water - 0.2);
-    if (v.lastMotel === n - 6 && km > 60 && !v.seen.dueNotti) {   // il vecchio lo aveva detto
-      v.seen.dueNotti = true;
-      this.ask({ kind: 'story', title: 'Di notte', text: 'Ti svegli alle 3:33. Fuori dalla finestra, nel parcheggio, c\'è la tua auto coi fari accesi e qualcuno al volante. Ti riaddormenti senza volerlo. Al mattino il serbatoio ha qualche litro in meno.', time: 30, options: [{ label: 'Colazione' }] });
-      this.sim.fuel = Math.max(0.05, this.sim.fuel - 0.06);
-    }
     v.lastMotel = n; v.sleepAt = km;
     return r;
   };
