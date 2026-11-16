@@ -1023,10 +1023,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <h2>Ascolto e guida <em id="cfgName">originale</em></h2>
       <div class="field"><span>Ascolto</span>
         <div class="seg" data-k="view">
+          <button type="button" data-v="3" title="Abitacolo con la telecamera interna, esterno con le altre">Automatico</button>
           <button type="button" data-v="0">Abitacolo</button>
           <button type="button" data-v="1">Esterno</button>
           <button type="button" data-v="2">Vano motore</button>
         </div>
+        <p class="hint" id="viewHint"></p>
       </div>
       <div class="toggles">
         <label class="tg"><input type="checkbox" id="tAuto">Frizione automatica</label>
@@ -1134,7 +1136,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <h2>Comandi</h2>
       <div class="keys">
         <div><kbd>I</kbd> <kbd>Invio</kbd></div><div>Quadro · avviamento (tieni premuto)</div>
-        <div><kbd>W</kbd><kbd>↑</kbd> <kbd>S</kbd><kbd>↓</kbd></div><div>Gas · freno</div>
+        <div><kbd>W</kbd><kbd>↑</kbd> <kbd>S</kbd><kbd>↓</kbd></div><div>Gas · freno (sulle auto senza ABS — 2002, Golf GTI, 205 GTI, A112, R5 Turbo, Williams — a freno pieno le ruote si bloccano: frena a colpetti)</div>
         <div><kbd>E</kbd><kbd>→</kbd> <kbd>Q</kbd><kbd>←</kbd></div><div>Sali · scala marcia</div>
         <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div><div>Rispondi alle proposte (altrimenti: marcia diretta)</div>
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
@@ -1242,7 +1244,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let themeReady = false;
   try { const g = localStorage.getItem('nightrun'); if (g) { game.load(g); if (typeof game.s.fuel === 'number') sim.fuel = game.s.fuel; if (game.s.car) { sim.damage = game.s.car.damage || 0; sim.tireWear = game.s.car.tireWear || 0; } } } catch (e) { /* storage non disponibile */ }
   const saveGame = () => { game.s.fuel = sim.fuel; game.s.car = { damage: sim.damage, tireWear: sim.tireWear }; try { localStorage.setItem(game.s.vg ? 'nightrun-viaggio' : 'nightrun', game.save()); } catch (e) { /* ignora */ } };
-  const S = { tune: Object.assign({}, TUNING_PRESETS[0].sel), pops: false, launch: false, autoClutch: true, revMatch: true, view: 0, vol: 80, muted: false, mix: 70, paint: '#c81d11', look: '2d' };
+  const S = { tune: Object.assign({}, TUNING_PRESETS[0].sel), pops: false, launch: false, autoClutch: true, revMatch: true, view: 3, vol: 80, muted: false, mix: 70, paint: '#c81d11', look: '2d' };
   try {
     const saved = JSON.parse(localStorage.getItem('banco2jz') || '{}');
     delete saved.turbo; delete saved.exhaust; delete saved.valve;   // impostazioni della versione precedente
@@ -1303,11 +1305,22 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- audio
   const audio = { ctx: null, send: () => {}, ready: false, starting: null };
   let player = null;
+  // punto d'ascolto: 3 = automatico, segue la telecamera (interna → abitacolo, le altre → da fuori)
+  const viewNow = () => (+S.view === 3 ? (S.look === 'cockpit' ? 0 : 1) : +S.view);
+  // ambiente intorno all'auto per il suono: 0 strada aperta, 1 città tra i palazzi, 2 galleria
+  function envNow() {
+    const d = game.s.dist, v2 = S.look === '2d' ? street2d : null;
+    const T = v2 && v2.tunnelSpan ? v2.tunnelSpan(game, d, d) : null;
+    if (T && d > T.a + 4 && d < T.b - 4) return 2;
+    const bg = (game.loc && game.loc.bg) || 'city';
+    return game.track === 'city' && (bg === 'city' || bg === 'village') ? 1 : 0;
+  }
+  let sentView = -1, sentEnv = -1;
   function dspCfg() {
     const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && game.car === 'supra' && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops ? 1 : 0, view: +S.view, vol: S.muted ? 0 : S.vol / 100 * synth,
+    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth,
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {
@@ -1344,7 +1357,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         audio.send = (m) => node.port.postMessage(m);
       } catch (e) { console.warn("AudioWorklet non disponibile, uso ScriptProcessor:", e && e.message); fallback(); }
       audio.ready = true;
-      audio.send({ cfg: dspCfg() });
+      audio.send({ cfg: dspCfg() }); sentEnv = -1;   // il motore audio nuovo parte all'aperto: l'ambiente si rimanda al primo giro
       if (ctx.state !== 'running') await ctx.resume();
       $('audioState').classList.add('on');
       $('audioState').querySelector('span').textContent = 'Audio attivo · ' + (ctx.sampleRate / 1000) + ' kHz';
@@ -1401,6 +1414,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!S.autoClutch) sim.lock = false;
     if (themeReady && S.ui === 'orig' && TH.name !== 'Originale ' + carId) applyTheme('orig');   // quadro dell'auto appena scelta
     audio.send({ cfg: dspCfg() });
+    $('viewHint').textContent = [
+      'Dal sedile: lo scarico arriva attraverso la scocca, si sentono il rimbombo dell\'abitacolo, il cambio, il vento e la strada.',
+      'Da dietro l\'auto: lo scarico pieno, le gomme e l\'eco dell\'ambiente (asfalto, palazzi in città, pareti in galleria).',
+      'Col cofano aperto: aspirazione, turbo, valvola, punterie, cinghia e alternatore; lo scarico resta lontano.',
+      'Segue la telecamera: abitacolo con la vista interna, esterno con le altre.'][+S.view] || '';
     document.querySelectorAll('.seg[data-k]').forEach((seg) => {
       const k = seg.dataset.k;
       seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v) === String(S[k])));
@@ -1519,7 +1537,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'r') shiftTo(-1);
     else if (k === 'i') ignToggle();
     else if (k === 'o') engineOff();
-    else if (k === 'v') { S.view = (S.view + 1) % 3; applySettings(); flash('Ascolto: ' + ['abitacolo', 'esterno', 'vano motore'][S.view], 1.2); }
+    else if (k === 'v') { S.view = (+S.view + 1) % 4; applySettings(); flash('Ascolto: ' + ['abitacolo', 'esterno', 'vano motore', 'automatico (segue la telecamera)'][S.view], 1.2); }
     else if (k === 'c') nextCam();
     else if (k === 'f') sfanala();
     else if (k === 'h') hornOn();
@@ -2070,7 +2088,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let selItem = -1;
   function renderTrunk() {
     const items = game.s.trunk || [], grid = $('trunkGrid');
-    $('trunkSum').textContent = `${fmt(game.trunkKg())} / ${TRUNK_KG} kg · ${items.length} / ${TRUNK_SLOTS} posti · auto ${fmt(sim.P.mass)} kg`;
+    $('trunkSum').textContent = `${fmt(game.trunkKg())} / ${TRUNK_KG} kg · ${items.length} / ${TRUNK_SLOTS} posti · in marcia ${fmt(Math.round(sim.massNow() + (sim.trailerKg || 0)))} kg con pilota e benzina`;
     grid.innerHTML = '';
     for (let i = 0; i < TRUNK_SLOTS; i++) {
       const it = items[i], d = document.createElement(it ? 'button' : 'div');
@@ -2788,7 +2806,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
       range: c.range !== null ? fmt(c.range, 0) + ' km' : '—', cons: c.per100 !== null ? fmt(c.per100, 1) + ' L/100' : '—',
       fuel: sim.fuel, liters: fmt(L, 1) + ' L', tyres: T.p.map((p) => p * heat), waterT: sim.waterT, pods,
-      warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3], ['GOMME', '#ff3a24', Math.min(...T.p) < 1.6], ['RISERVA', '#ffb000', sim.fuel < 0.12]] };
+      warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3], ['GOMME', '#ff3a24', Math.min(...T.p) < 1.6], ['RISERVA', '#ffb000', sim.fuel < 0.12], ['FRENI', '#ff3a24', sim.brakeT > 480]] };
   }
   function drawHudPro() {
     const c = $('hudP'); c.hidden = false;
@@ -3198,6 +3216,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (wasRunning && !sim.running && sim.stalled) flash('Motore spento: stallo. Folle e riavvia', 3);
     wasRunning = sim.running;
     if (audio.ready) audio.send({ p: sim.audioParams(), ev });
+    if (audio.ready) {
+      const vn = viewNow(), en = envNow();
+      if (vn !== sentView) { sentView = vn; audio.send({ cfg: dspCfg() }); }
+      if (en !== sentEnv) { sentEnv = en; audio.send({ env: en }); }
+    }
     if (rainSnd.g) updateRainSound(); else if (S.rain && audio.ctx) rainSound(true);
     // tuono: arriva qualche istante dopo il lampo del 2D
     if (street2d && street2d.thunder && audio.ctx) { const delay = street2d.thunder; street2d.thunder = 0; setTimeout(() => thunderSound(), delay * 1000); }
@@ -3216,7 +3239,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : 0.38) * (1 - sim.ovr / liftT) * Math.min(1, sim.rpm / 4500) * TP.dsp.cat.pop : 0;
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
         ign: sim.ign, brake: sim.in.brake, flame: flameT, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
-        thr: sim.thr, events: ev, skid: sim.skid, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.high, fwd: !!sim.P.fwd };
+        thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.high, fwd: !!sim.P.fwd };
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
     }

@@ -45,6 +45,17 @@ gioco fa, sezione per sezione).
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
   limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 5),
   consumo e autonomia, fisica con beccheggio e wheel hop.
+- **Fisica** (`sim.js`): massa vera in marcia (`massNow`: auto + carico + pilota 75 kg + carburante a 0,74 kg/l),
+  inerzia delle ruote non motrici, portanza (`P.cl`). Freni per asse con trasferimento di carico e ripartizione
+  (`P.bf`), forza massima `P.bk` in g, ABS solo dove c'era (`P.abs`; tabella `CAR_BRAKES` in `cars.js`): senza ABS
+  l'asse oltre il limite si blocca e striscia al 75 % (`lockF`/`lockR`, segni e fumo veri nel 2D). Dischi che si
+  scaldano (`brakeT`) con fading oltre 380 °C, spia FRENI e avviso a 480 °C. Scia dietro il traffico (`sim.draft`,
+  la calcola `game.js`), rimorchio con le sue ruote (`sim.trailerKg`: spinge e frena con l'aria, non pesa sugli assi).
+  Banco di prova: 0-100, 400 m e frenate per auto (vedi i test "freni", "massa", "aria").
+- **Suono, punti d'ascolto** (`dsp.js`): abitacolo, esterno, vano motore e automatico (segue la telecamera, `viewNow`
+  in `index.html`). Ambiente (`setEnv`: 0 strada aperta, 1 città, 2 galleria, lo decide `envNow`): prime riflessioni
+  diverse a sinistra e a destra (stereo) e coda di riverbero lunga in galleria. Livelli per punto d'ascolto (`g`),
+  cinghia e alternatore nel vano motore.
 - **Quartieri** (`quartieri2d.js`): la città (primi 12 km del viaggio e modalità in città) alterna sei quartieri
   con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
   Ogni quartiere ha il suo asfalto (`districtRoad`): buche con l'acqua, rattoppi, strisce consumate e cartacce

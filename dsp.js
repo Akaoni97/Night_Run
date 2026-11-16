@@ -106,12 +106,18 @@ class EngineDSP {
 
     // riverbero (Schroeder/Freeverb ridotto)
     const sc = sr / 44100;
-    this.rv = [1116, 1188, 1277, 1356, 1139, 1211, 1300, 1379].map((l) => ({ b: new Float32Array(Math.round(l * sc * 0.55)), i: 0, f: 0 }));
+    // lunghezze base dei pettini; i buffer sono lunghi abbastanza per la galleria (2,6 volte), la parte usata cambia con l'ambiente
+    this.rvL = [1116, 1188, 1277, 1356, 1139, 1211, 1300, 1379].map((l) => l * sc);
+    this.rv = this.rvL.map((l) => ({ b: new Float32Array(Math.round(l * 2.6) + 2), i: 0, f: 0, n: Math.round(l * 0.55) }));
+    // prime riflessioni: una linea di ritardo da 70 ms letta in punti diversi a sinistra e a destra
+    this.erN = Math.round(sr * 0.07); this.erB = new Float32Array(this.erN); this.erI = 0;
+    this.rvFb = 0.78; this.rvDamp = 0.3; this.rvWet = 0.035; this.erG = 0; this.beltPh = 0; this.env = -1;
     this.ap = [556, 441, 579, 464].map((l) => ({ b: new Float32Array(Math.round(l * sc)), i: 0 }));
 
     this.dcL = 0; this.dcLy = 0;
     this.configure(this.cfg);
     this.mix = Object.assign({}, this.mixT);
+    this.setEnv(0);
     this.aRpm = 1 - Math.exp(-32 / (sr * 0.018));
     this.aFast = 1 - Math.exp(-32 / (sr * 0.03));
     this.aSlow = 1 - Math.exp(-32 / (sr * 0.12));
@@ -140,6 +146,7 @@ class EngineDSP {
   msg(m) {
     if (m.p) Object.assign(this.T, m.p);
     if (m.cfg) this.configure(Object.assign(this.cfg, m.cfg));
+    if (m.env !== undefined || m.cfg) this.setEnv(m.env !== undefined ? m.env : this.env);
     const fx = this.cfg.fx || {}; this.fxB = fx.bov ? 0 : 1; this.fxT = fx.turbo ? 0.25 : 1; this.fxS = fx.turbo ? 0 : 1;
     if (m.ev) for (const e of m.ev) this.event(e);
   }
@@ -180,12 +187,34 @@ class EngineDSP {
     this.tipBP.set('peak', 1250, 1.2, sr, 3);
     // valvola: 0 ricircolo OEM, 1 blow-off, 2 nessuna (flutter)
     // punto d'ascolto: 0 abitacolo, 1 esterno posteriore, 2 vano motore
+    // g: livello d'insieme (da fuori uno scarico si sente più forte che da dentro) · er: quanto arrivano le riflessioni
+    // dell'ambiente (in abitacolo poco, filtrate dai vetri) · belt: cinghia e alternatore (si sentono solo col cofano aperto)
     const V = [
-      { exh: 0.62, lp: 1300, boom: 0.9, intake: 0.5, mech: 0.12, turbo: 0.3, bov: 0.45, road: 1.0, wind: 0.9, tire: 0.55, gear: 1.0, starter: 0.55, pump: 1.0, rev: 0.14, width: 0.15 },
-      { exh: 1.0, lp: 14000, boom: 0.0, intake: 0.16, mech: 0.07, turbo: 0.32, bov: 0.6, road: 0.35, wind: 0.12, tire: 1.0, gear: 0.15, starter: 0.3, pump: 0.0, rev: 0.11, width: 1.0 },
-      { exh: 0.35, lp: 2600, boom: 0.0, intake: 1.0, mech: 1.0, turbo: 1.0, bov: 1.0, road: 0.15, wind: 0.1, tire: 0.3, gear: 0.45, starter: 1.0, pump: 0.25, rev: 0.08, width: 0.35 },
+      { exh: 0.62, lp: 1300, boom: 0.9, intake: 0.5, mech: 0.12, turbo: 0.3, bov: 0.45, road: 1.0, wind: 0.9, tire: 0.55, gear: 1.0, starter: 0.55, pump: 1.0, rev: 0.14, width: 0.15, g: 0.82, er: 0.12, belt: 0.04 },
+      { exh: 1.0, lp: 14000, boom: 0.0, intake: 0.16, mech: 0.07, turbo: 0.32, bov: 0.6, road: 0.35, wind: 0.12, tire: 1.0, gear: 0.15, starter: 0.3, pump: 0.0, rev: 0.11, width: 1.0, g: 1.8, er: 1.0, belt: 0.08 },
+      { exh: 0.35, lp: 2600, boom: 0.0, intake: 1.0, mech: 0.8, turbo: 1.0, bov: 1.0, road: 0.15, wind: 0.1, tire: 0.3, gear: 0.45, starter: 1.0, pump: 0.25, rev: 0.08, width: 0.35, g: 1.15, er: 0.45, belt: 1.0 },
     ];
     this.mixT = Object.assign({}, V[c.view]);
+  }
+
+  // ambiente intorno all'auto: 0 strada aperta (solo l'asfalto riflette), 1 città (i palazzi rimandano lo scarico),
+  // 2 galleria (pareti vicine e coda lunga). Le riflessioni arrivano prima a un orecchio e poi all'altro: è questo che apre
+  // lo stereo. In abitacolo la coda della galleria passa attraverso i vetri; la stanzetta dell'abitacolo resta corta.
+  setEnv(env) {
+    env = env === 1 || env === 2 ? env : 0; this.env = env;
+    const view = this.cfg.view | 0, sr = this.sr;
+    const E = [
+      { len: 0.5, fb: 0.55, damp: 0.35, wet: 0.08, L: [[1.3, 0.38]], R: [[1.75, 0.38]] },
+      { len: 1.0, fb: 0.7, damp: 0.4, wet: 0.3, L: [[1.3, 0.3], [19, 0.34], [41, 0.22]], R: [[1.75, 0.3], [27, 0.32], [53, 0.2]] },
+      { len: 2.4, fb: 0.86, damp: 0.5, wet: 0.75, L: [[1.3, 0.3], [8, 0.46], [23, 0.36], [47, 0.22]], R: [[1.75, 0.3], [11, 0.46], [29, 0.34], [61, 0.2]] },
+    ][env];
+    const cabin = view === 0 && env < 2;                   // in abitacolo (fuori dalla galleria) conta la stanzetta dell'abitacolo
+    const len = cabin ? 0.55 : E.len;
+    this.rv.forEach((cb, q) => { cb.n = Math.max(8, Math.min(cb.b.length - 1, Math.round(this.rvL[q] * len))); cb.i %= cb.n; });
+    this.rvFbT = cabin ? 0.78 : E.fb; this.rvDamp = E.damp;
+    this.rvWetT = (cabin ? 0.035 : 0) + E.wet * [0.22, 1, 0.55][view];
+    const tap = (a) => a.map(([ms, g]) => [Math.round(ms * sr / 1000), g]);
+    this.erTL = tap(E.L); this.erTR = tap(E.R);
   }
 
   event(e) {
@@ -501,6 +530,9 @@ class EngineDSP {
       const gr = Math.abs(S.gearRpm);
       this.gPh += gr / 60 * 31 / sr; if (this.gPh > 1) this.gPh -= 1;
       let gear = Math.sin(TAU * this.gPh) * (0.006 * Math.min(1, S.drive) + S.rev * 0.05 * Math.min(1, gr / 500));
+      // cinghia dei servizi: l'alternatore gira 2,7 volte l'albero, fischio sottile con una seconda armonica
+      this.beltPh += rn * 7000 / 60 * 2.7 / sr; if (this.beltPh > 1) this.beltPh -= 1;
+      const belt = S.running > 0.5 ? (Math.sin(TAU * this.beltPh) + 0.35 * Math.sin(2 * TAU * this.beltPh)) * (0.0022 + 0.003 * rn) : 0;
       if (this.grind > 1e-3) {
         this.grPh += 52 / sr; if (this.grPh > 1) this.grPh -= 1;
         gear += this.grBP.p(nz) * this.grind * (0.4 + 0.6 * this.grPh) * 0.5;
@@ -551,17 +583,23 @@ class EngineDSP {
       const side = exhR * M.exh - exh * M.exh;   // differenza tra i terminali → immagine stereo
       const cabK = this.cfg.view === 0 ? (tn.cabin || 1) : 1;   // abitacolo alleggerito: rimbomba di più
       let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech * (1 + 5 * this.vc.diesel) + turbo * M.turbo * this.fxT + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
-        + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump;
-      out += 1e-18;
+        + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt;
+      out = out * M.g + 1e-18;
 
-      // ---- riverbero corto (garage / abitacolo) -----------------------------------------------
-      const rin = out * 0.22;
+      // ---- ambiente: prime riflessioni (asfalto, palazzi, pareti) e coda di riverbero -------------------------------
+      this.rvFb += ((this.rvFbT ?? 0.78) - this.rvFb) * 0.0002; this.rvWet += ((this.rvWetT ?? 0.035) - this.rvWet) * 0.0002;
+      const eb = this.erB, en = this.erN; eb[this.erI] = out;
+      let el = 0, er = 0;
+      for (const [d, gg] of this.erTL) el += eb[(this.erI - d + en) % en] * gg;
+      for (const [d, gg] of this.erTR) er += eb[(this.erI - d + en) % en] * gg;
+      this.erI = (this.erI + 1) % en;
+      const rin = out * 0.22, fb = this.rvFb, dm = this.rvDamp;
       let wl = 0, wr = 0;
       for (let q = 0; q < 8; q++) {
         const cb = this.rv[q], buf = cb.b, o = buf[cb.i];
-        cb.f = o * 0.7 + cb.f * 0.3;
-        buf[cb.i] = rin + cb.f * 0.78;
-        cb.i = (cb.i + 1) % buf.length;
+        cb.f = o * (1 - dm) + cb.f * dm;
+        buf[cb.i] = rin + cb.f * fb;
+        cb.i = (cb.i + 1) % cb.n;
         if (q < 4) wl += o; else wr += o;
       }
       for (let q = 0; q < 4; q++) {
@@ -574,8 +612,8 @@ class EngineDSP {
       }
       const g = cfg.vol * 2.6;
       const w = side * 0.5 * M.width;
-      outL[i] = Math.tanh((out - w + wl * M.rev * 0.25) * g) * 0.9;
-      outR[i] = Math.tanh((out + w + wr * M.rev * 0.25) * g) * 0.9;
+      outL[i] = Math.tanh((out - w + el * M.er + wl * this.rvWet) * g) * 0.9;
+      outR[i] = Math.tanh((out + w + er * M.er + wr * this.rvWet) * g) * 0.9;
     }
   }
 }

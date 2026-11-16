@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG } =
-  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG };')();
+const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS } =
+  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS };')();
 
 function drive(sim, seconds, each) {
   for (let t = 0; t < seconds; t += 1 / 60) { each?.(sim, t); sim.update(1 / 60); sim.events.length = 0; }
@@ -148,7 +148,7 @@ const flatOut = (sim) => {
 test('polizia: passarle accanto in sesta costa una multa e alza il livello di ricercato', () => {
   const { sim, game } = career();
   sim.shift(1);
-  play(sim, game, 32, flatOut);
+  for (let k = 0; k < 60 && sim.gear < 6; k++) play(sim, game, 1, flatOut);   // fino alla sesta (la massa conta pilota e benzina)
   assert.equal(sim.gear, 6);
   game.ents.push({ id: 99, kind: 'police', lane: 0, x: game.s.dist + 60, v: 0 });
   const money = game.s.money;
@@ -455,4 +455,78 @@ test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e 
   t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 20000);
   t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 7000, 'i lavori dopo la catena pagano ancora');
   assert.equal(game.s.vg.misDone, 6);
+});
+
+// ---------------------------------------------------------------- fisica: masse, freni, aria
+function carSim(id) {
+  const c = CARS[id], sim = new SupraSim();
+  sim.setCar(id === 'supra' ? null : Object.assign({}, c.P));
+  sim.setTune(c.params(c.presets[0].sel).sim);
+  sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW;
+  startEngine(sim);
+  return sim;
+}
+// frenata a pedale pieno da v0 km/h, frizione aperta; ritorna metri, e se le ruote si sono bloccate o l'ABS ha lavorato
+function stop(sim, v0) {
+  sim.gear = 0; sim.v = v0 / 3.6; sim.ww = sim.v / sim.P.r; sim.wo = sim.ww;
+  let d = 0, locked = false, abs = false;
+  for (let t = 0; t < 20 && sim.v > 0.05; t += 1 / 240) { sim.in.thr = 0; sim.in.brake = 1; sim.update(1 / 240); d += sim.v / 240; locked ||= sim.locked; abs ||= sim.abs; sim.events.length = 0; }
+  return { d, locked, abs };
+}
+
+test('freni: con l\'ABS la Supra si ferma da 100 in meno di 42 m senza bloccare', () => {
+  const r = stop(carSim('supra'), 100);
+  assert.ok(r.abs && !r.locked, 'ABS sì, ruote bloccate no');
+  assert.ok(r.d > 33 && r.d < 42, `100-0 in ${r.d.toFixed(1)} m`);
+});
+
+test('freni: la BMW 2002 del 1973 non ha ABS, a pedale pieno blocca e frena più lunga', () => {
+  const old = stop(carSim('b2002'), 100), e36 = stop(carSim('e36'), 100);
+  assert.ok(old.locked && !old.abs, 'ruote bloccate, niente ABS');
+  assert.ok(old.d > e36.d + 6, `2002 ${old.d.toFixed(1)} m contro M3 E36 ${e36.d.toFixed(1)} m`);
+});
+
+test('freni: frenate ripetute scaldano i dischi e allungano lo spazio (fading)', () => {
+  const sim = carSim('supra'), first = stop(sim, 180).d;
+  let last = first;
+  for (let k = 0; k < 7; k++) last = stop(sim, 180).d;
+  assert.ok(sim.brakeT > 480, `dischi a ${sim.brakeT.toFixed(0)} °C`);
+  assert.ok(last > first * 1.08, `prima ${first.toFixed(0)} m, ottava ${last.toFixed(0)} m`);
+  // a 100 km/h per un minuto si raffreddano
+  sim.gear = 0;
+  for (let t = 0; t < 60; t += 1 / 60) { sim.v = 27.8; sim.in.brake = 0; sim.update(1 / 60); sim.events.length = 0; }
+  assert.ok(sim.brakeT < 300, `dopo un minuto ${sim.brakeT.toFixed(0)} °C`);
+});
+
+test('massa: il serbatoio pieno pesa e il pilota conta', () => {
+  const sim = carSim('supra');
+  sim.fuel = 1; const full = sim.massNow(); sim.fuel = 0; const empty = sim.massNow();
+  assert.ok(Math.abs(full - empty - 70 * 0.74) < 1, `pieno ${full.toFixed(0)} kg, vuoto ${empty.toFixed(0)} kg`);
+  assert.ok(full > sim.P.mass + 75, 'pilota compreso');
+});
+
+test('aria: in scia si raggiunge una velocità più alta', () => {
+  const top = (draft) => {
+    const sim = carSim('panda'); sim.shift(1); sim.draft = draft;
+    for (let t = 0; t < 90; t += 1 / 60) { sim.in.thr = 1; if (sim.rpm > sim.P.limiter - 300 && sim.gear < sim.topGear() && !sim.shiftSeq) sim.shift(sim.gear + 1); sim.update(1 / 60); sim.events.length = 0; }
+    return sim.kmh;
+  };
+  const free = top(0), tow = top(0.3);
+  assert.ok(tow > free + 4, `da sola ${free.toFixed(0)} km/h, in scia ${tow.toFixed(0)} km/h`);
+});
+
+test('suono: in galleria lo scarico rimbomba e si allarga, in abitacolo arriva attutito', () => {
+  const sr = 48000, render = (view, env) => {
+    const dsp = new EngineDSP(sr);
+    dsp.msg({ cfg: { view }, p: { rpm: 4500, charge: 1.2, air: 1, thr: 1, running: 1, turbo: 0.6, boost: 0.5, speed: 20 } });
+    dsp.msg({ env });
+    const L = new Float32Array(sr), R = new Float32Array(sr);
+    for (let k = 0; k < 3; k++) dsp.render(L, R, sr);                 // si assesta (filtri, riverbero)
+    let mid = 0, side = 0; for (let i = 0; i < sr; i++) { mid += (L[i] + R[i]) ** 2; side += (L[i] - R[i]) ** 2; }
+    return { level: 10 * Math.log10(mid / sr), width: 10 * Math.log10(side / mid) };
+  };
+  const open = render(1, 0), tunnel = render(1, 2), cabin = render(0, 2);
+  assert.ok(tunnel.width > open.width + 6, `larghezza: aperto ${open.width.toFixed(1)} dB, galleria ${tunnel.width.toFixed(1)} dB`);
+  assert.ok(tunnel.level > open.level + 1, `livello: aperto ${open.level.toFixed(1)} dB, galleria ${tunnel.level.toFixed(1)} dB`);
+  assert.ok(cabin.width < tunnel.width, 'dentro la galleria si sente meno largo che da fuori');
 });
