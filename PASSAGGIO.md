@@ -56,6 +56,9 @@ gioco fa, sezione per sezione).
   in `index.html`). Ambiente (`setEnv`: 0 strada aperta, 1 città, 2 galleria, lo decide `envNow`): prime riflessioni
   diverse a sinistra e a destra (stereo) e coda di riverbero lunga in galleria. Livelli per punto d'ascolto (`g`),
   cinghia e alternatore nel vano motore.
+- **Radio** (`radio.js`): stazione FM 103.5 Night House con quattro canzoni del proprietario in fila
+  (`audio/house/`: Redline Ascent, Midnight Gearbox, Midnight Apex, Midnight Redline), poi ricomincia; il titolo in
+  onda va accanto al nome. Le stazioni a scaletta si fanno con `list` al posto di `src`.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
   ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000

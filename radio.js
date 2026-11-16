@@ -1,7 +1,8 @@
 // ============================================================================
 //  CarRadio · musica di sottofondo mentre si guida, come un'autoradio
 //  Stazioni: spenta, FM 89.7 (Redline at Midnight, dal file), FM 76.1 (synth notturno
-//  generato in tempo reale con Web Audio: cassa, rullante, charleston, basso, accordi).
+//  generato in tempo reale con Web Audio: cassa, rullante, charleston, basso, accordi), FM 103.5 Night House
+//  (più canzoni una dopo l'altra: `list`; il titolo di quella in onda va accanto al nome della stazione).
 //  Cambiando stazione si sente il fruscio della sintonia. Volume basso e separato dal motore.
 // ============================================================================
 /* global window, Audio */
@@ -14,6 +15,12 @@ class CarRadio {
       { id: 'metal', freq: 'FM 94.5', name: 'Metal Alive', src: 'audio/metal_alive.mp3' },
       { id: 'apex', freq: 'FM 98.1', name: 'Apex to Apex', src: 'audio/apex_to_apex.mp3' },
       { id: 'synth', freq: 'FM 76.1', name: 'Synth Notturno', gen: true },
+      { id: 'house', freq: 'FM 103.5', name: 'Night House', base: 'Night House', list: [
+        { src: 'audio/house/redline_ascent.mp3', title: 'Redline Ascent' },
+        { src: 'audio/house/midnight_gearbox.mp3', title: 'Midnight Gearbox' },
+        { src: 'audio/house/midnight_apex.mp3', title: 'Midnight Apex' },
+        { src: 'audio/house/midnight_redline.mp3', title: 'Midnight Redline' },
+      ] },
     ];
     this.i = 1; this.vol = 0.3; this.master = 1; this.muted = false; this.on = false;
     this.el = null; this.els = {}; this.ctx = null; this.timer = null;
@@ -61,7 +68,18 @@ class CarRadio {
     this.halt();
     const st = this.station;
     if (!this.on || st.id === 'off') return;
-    if (st.src) {
+    if (st.list) {
+      // stazione a scaletta: un lettore solo, a fine canzone passa alla successiva (e in fondo ricomincia)
+      if (!this.els[st.id]) {
+        const a = new Audio(); a.preload = 'auto'; st.k = st.k || 0;
+        const load = () => { const tr = st.list[st.k]; a.src = tr.src; st.name = `${st.base} · ${tr.title}`; };
+        a.addEventListener('ended', () => { st.k = (st.k + 1) % st.list.length; load(); if (this.on && this.station === st) { const p = a.play(); if (p && p.catch) p.catch(() => {}); this.onChange(st); } });
+        load(); this.els[st.id] = a;
+      }
+      this.el = this.els[st.id];
+      this.apply();
+      const p = this.el.play(); if (p && p.catch) p.catch(() => {});
+    } else if (st.src) {
       // un lettore per stazione: tornando su una stazione la canzone riprende da dove era
       if (!this.els[st.id]) { const a = new Audio(st.src); a.loop = true; a.preload = 'auto'; this.els[st.id] = a; }
       this.el = this.els[st.id];
