@@ -27,6 +27,16 @@ const TEL_SMS = [
 // rubrica: nome, ruolo, atto da cui compare
 const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Remo', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
   ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
+// app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
+// (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
+// km = dove compare il cartellone; quando lo superi spunta l'icona da scaricare (il download è finto). Una per volta, in quest'ordine.
+const TEL_APP_OFFERS = [
+  { app: 'job', km: 0.6, name: 'Lavori', sign: 'PORTAFOGLIO|IN LUTTO?' },
+  { app: 'pax', km: 2.5, name: 'Passeggeri', sign: 'TROPPO SILENZIO|IN AUTO?' },
+  { app: 'motel', km: 6, name: 'Motel', sign: 'OCCHI CHE|SI CHIUDONO?' },
+];
+// prossimo cartellone da mettere sulla strada: il primo della lista non ancora toccato, se il km c'è già
+const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps && apps[o.app]) continue; return km >= o.km ? o : null; } return null; };
 const telAtto = (km) => { let a = 0; for (let i = 0; i < TEL_ATTI.length; i++) if (km >= TEL_ATTI[i]) a = i; return a; };
 const telRecenti = (a) => {
   const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Niko', 'Persa', 'lun', 1]];
@@ -45,7 +55,7 @@ const telThreads = (km) => {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   const NR = () => window.nightRun, G = () => NR() && NR().game;
   const km = () => { const g = G(); return g && g.s ? (g.s.dist || 0) / 1000 : 0; };
-  const T = () => { const g = G(); if (!g || !g.s) return { read: {}, rang: {} }; return g.s.tel || (g.s.tel = { read: {}, rang: {} }); };
+  const T = () => { const g = G(); if (!g || !g.s) return { read: {}, rang: {}, apps: {} }; const t = g.s.tel || (g.s.tel = { read: {}, rang: {}, apps: {} }); if (!t.apps) t.apps = {}; return t; };
   const fmt = (n, d = 0) => Number(n || 0).toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d });
 
   // ------------------------------------------------------------ pagina in un ombra
@@ -64,7 +74,7 @@ const telThreads = (km) => {
 .bat{display:inline-block;width:22px;height:10px;border:1px solid #fff9;border-radius:3px;padding:1px}.bat i{display:block;height:100%;background:#fff;border-radius:1px;width:80%}.bat.low i{background:var(--red);width:12%}
 .hb{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);width:100px;height:5px;border-radius:3px;background:#fffc;z-index:30;cursor:pointer}
 .view{position:absolute;inset:0;padding:46px 0 22px;display:flex;flex-direction:column;overflow:hidden;animation:in .18s ease-out}
-@keyframes in{from{opacity:0;transform:scale(.97)}}
+@keyframes in{from{opacity:0;transform:scale(.97)}}.quiet .view{animation:none}
 .wall{background:radial-gradient(120% 60% at 50% 105%,rgba(255,179,71,.28),transparent 60%),linear-gradient(180deg,#05060c,#0f1220 60%,#1a1424)}
 .wall::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45)),repeating-linear-gradient(0deg,rgba(255,179,71,.07) 0 2px,transparent 2px 14px);pointer-events:none}
 .lock{align-items:center;text-align:center;padding-top:80px}.lock .tm{font:300 78px/1 system-ui;letter-spacing:-.02em}.lock .dt{color:#ffffffb0;margin-top:2px}
@@ -78,6 +88,8 @@ const telThreads = (km) => {
 .ic svg{width:27px;height:27px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .bd{position:absolute;top:-4px;right:2px;min-width:18px;height:18px;border-radius:9px;background:var(--red);font:700 11px/18px system-ui;text-align:center;padding:0 4px}
 .dot{position:absolute;top:-2px;right:4px;width:11px;height:11px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red)}
+.ap.offer .ic{background:#2c2c2e!important;box-shadow:inset 0 0 0 1.5px #ffffff55;animation:rg 1.4s ease-in-out infinite}.ap.offer .cl{color:#7fb0ff;font-weight:600}
+.pg{width:46px;height:4px;border-radius:2px;background:#ffffff33;overflow:hidden;display:block}.pg i{display:block;height:100%;background:#34c759}
 .strange .ic{background:linear-gradient(145deg,#3a0f14,#150608)!important;box-shadow:inset 0 0 0 1px #ff453a66,0 0 12px #ff453a55}
 .strange{animation:flick 4s steps(1) infinite}@keyframes flick{0%,93%{opacity:1}95%{opacity:.35}97%{opacity:1}99%{opacity:.6}}
 .app{background:#0c0d12}
@@ -122,10 +134,11 @@ const telThreads = (km) => {
     con: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>', job: '<path d="M4 8h16v11H4zM9 8V5h6v3M4 13h16"/>',
     map: '<path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>', pho: '<path d="M4 6h16v13H4zM4 16l5-4 4 3 3-2 4 3"/><circle cx="16" cy="10" r="1.3"/>',
     clk: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', pax: '<path d="M3 17l2-6h14l2 6zM7 17v2M17 17v2M5 11l1.5-4h11L19 11"/>',
+    motel: '<path d="M3 19v-9M3 15h18v4M21 19v-6a3 3 0 00-3-3h-7v5"/><circle cx="7" cy="12" r="1.6"/>', get: '<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/>',
     ext: '<path d="M12 3v18M5 6h12l3 3-3 3H5zM19 14H7l-3 3 3 3h12z"/>', vm: '<circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M7 15h10"/>' };
-  const COL = { tel: '#34c759', msg: '#3b82f6', con: '#8e8e93', job: '#ff9f0a', map: '#5e5ce6', pho: '#af52de', clk: '#2c2c2e', pax: '#000', ext: '#000', vm: '#000' };
+  const COL = { tel: '#34c759', msg: '#3b82f6', con: '#8e8e93', job: '#ff9f0a', map: '#5e5ce6', pho: '#af52de', clk: '#2c2c2e', pax: '#16a34a', motel: '#c2410c', get: '#2c2c2e', ext: '#000', vm: '#000' };
   const ic = (k) => `<span class="ic" style="background:${COL[k]}"><svg viewBox="0 0 24 24">${IC[k]}</svg></span>`;
-  const ST = { on: false, view: 'lock', stack: [], tab: 0, call: null, cd: 3.2, atto: null };
+  const ST = { on: false, view: 'lock', stack: [], tab: 0, call: null, cd: 3.2, atto: null, dl: null };
   const atto = () => (ST.atto !== null ? ST.atto : telAtto(km()));
   const clock = () => { if (atto() >= 2) return '03:07'; const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
   const unreadOf = (t) => { const r = T().read[t.n] || 0; return t.m.filter((x) => x.dir !== 'o').length - r > 0 ? t.m.filter((x) => x.dir !== 'o').length - r : 0; };
@@ -143,12 +156,18 @@ const telThreads = (km) => {
   }
   function home() {
     const a = atto(), g = G(), goal = g && g.vgGoal ? g.vgGoal() : null, u = unread();
-    const apps = [['tel', 'Telefono'], ['msg', 'Messaggi', u], ['con', 'Rubrica'], ['job', 'Lavori', goal ? 1 : 0], ['map', 'Mappa'], ['pho', 'Foto'], ['clk', 'Orologio']];
-    for (const e of EXT) apps.push([e.id, e.name, e.badge ? e.badge() : 0]);
-    const str = []; if (a >= 1) str.push(['pax', 'Passeggeri']); if (a >= 2) str.push(['ext', 'Ultima Uscita'], ['vm', 'Segreteria']);
+    const ap = T().apps || {}, DL = { job: ['job', 'Lavori', goal ? 1 : 0], pax: ['pax', 'Passeggeri'], motel: ['motel', 'Motel'] };
+    // app aggiunte da altri file (addApp): se hanno un cartellone in TEL_APP_OFFERS si scaricano come le altre, se no ci sono subito
+    for (const e of EXT) { DL[e.id] = [e.id, e.name, e.badge ? e.badge() : 0]; if (!TEL_APP_OFFERS.some((o) => o.app === e.id) && !ap[e.id]) ap[e.id] = { st: 'ok' }; }
+    const apps = [['tel', 'Telefono'], ['msg', 'Messaggi', u], ['con', 'Rubrica'], ['map', 'Mappa'], ['pho', 'Foto'], ['clk', 'Orologio']];
+    for (const k of Object.keys(DL)) if (ap[k] && ap[k].st === 'ok') apps.push(DL[k]);
+    const str = []; if (a >= 2) str.push(['ext', 'Ultima Uscita'], ['vm', 'Segreteria']);
+    const get = Object.keys(DL).filter((k) => ap[k] && (ap[k].st === 'offer' || ap[k].st === 'dl'));
+    const gcell = (k) => { const d = ap[k].st === 'dl', p = d ? Math.min(100, Math.round((performance.now() - ST.dl.t0) / 35)) : 0;
+      return `<button class="ap ${d ? '' : 'offer'}" data-get="${k}"><span class="ic" style="background:${COL[k]}"><svg viewBox="0 0 24 24">${IC[d ? k : 'get']}</svg></span>${d ? `<span class="pg"><i style="width:${p}%"></i></span>${p}%` : '<span class="cl">Scarica</span>'}</button>`; };
     const cell = (x, s) => `<button class="ap ${s ? 'strange' : ''}" data-open="${x[0]}">${ic(x[0])}${x[2] && !s ? `<span class="bd">${x[2]}</span>` : ''}${s ? '<span class="dot"></span>' : ''}${x[1]}</button>`;
     const nx = goal ? `${esc(goal.title)}: ${fmt(goal.left, 1)} km` : a >= 2 ? 'prossima uscita: —' : 'nessun lavoro in corso';
-    return `<div class="view wall"><div class="widget"><b>km ${fmt(km(), 1)}</b><div>${clock()}</div><small>${nx}</small></div><div class="grid">${apps.map((x) => cell(x, 0)).join('')}${str.map((x) => cell(x, 1)).join('')}</div></div>`;
+    return `<div class="view wall"><div class="widget"><b>km ${fmt(km(), 1)}</b><div>${clock()}</div><small>${nx}</small></div><div class="grid">${apps.map((x) => cell(x, 0)).join('')}${get.map(gcell).join('')}${str.map((x) => cell(x, 1)).join('')}</div></div>`;
   }
   const EXT = [];                                     // app aggiunte da altri file (addApp)
   const APPS = {
@@ -178,9 +197,15 @@ const telThreads = (km) => {
     },
     pho() { const a = atto(); return `<div class="view app">${nav('Foto')}<div class="body"><div class="ph3"><i>ieri</i><i>ieri</i><i>lun</i><i>lun</i><i>dom</i><i>dom</i>${a >= 1 ? '<i class="x">03:07</i>' : ''}${a >= 2 ? '<i class="x">03:07</i><i class="x">03:07</i>' : ''}</div>${a >= 1 ? `<p class="cen" style="font-size:12px;margin-top:12px">${a >= 2 ? '3 foto non scattate' : '1 foto non scattata'} da te</p>` : ''}</div></div>`; },
     clk() { const a = atto(); return `<div class="view app">${nav('Orologio')}<div class="body"><div class="big" ${a >= 2 ? 'style="color:var(--red)"' : ''}>${a >= 2 ? '--:--' : clock()}</div><p class="cen">${a >= 2 ? 'sveglia: 03:07 · impostata da te' : 'sveglia: nessuna'}</p></div></div>`; },
+    motel() {
+      const g = G(); if (!g) return ''; const d = g.s.dist, n0 = VG.stopIndex(d), list = [];
+      for (let n = Math.max(0, n0 - 1); n < n0 + 40 && list.length < 3; n++) { const p = VG.stop(n); if (p.id === 'motel' && p.x >= d - 200) list.push(p); }
+      const cassa = g.s.vg && g.s.vg.cassa ? g.s.vg.cassa.length : 0;
+      return `<div class="view app">${nav('Motel Ovunque')}<div class="body"><div class="card"><div class="meta"><span>La tua cassa</span></div><h4 style="font-size:20px">${cassa ? cassa + (cassa === 1 ? ' oggetto' : ' oggetti') : 'Vuota'}</h4><div class="meta"><span>Ti aspetta in camera</span></div></div>${list.map((p) => `<div class="card"><h4>${esc(p.name)}</h4><div class="meta"><span>km ${fmt(p.x / 1000, 1)}</span><span>${p.x >= d ? 'tra ' + fmt((p.x - d) / 1000, 1) + ' km' : 'qui dietro'}</span></div><div class="pay">€ 45 a notte</div></div>`).join('') || '<p class="cen">Nessun motel in vista.</p>'}</div></div>`;
+    },
     pax() {
-      const g = G(), n = g && g.s.vg ? g.s.vg.pax.length : 0, a = atto();
-      return `<div class="view app">${nav('Passeggeri')}<div class="body"><div class="card"><div class="meta"><span>A bordo</span></div><h4 style="font-size:22px">${n ? n + (n === 1 ? ' persona' : ' persone') : 'Nessuno'}</h4><div class="meta"><span>Posti occupati: ${n + (a >= 2 ? 1 : 0)}</span></div></div>${a >= 2 ? `<div class="row">${av('Nessuno')}<span class="tx"><b>Sedile dietro</b><small>occupato · non risulta salito</small></span></div><p class="cen" style="font-size:12px;margin-top:10px">Il conto non torna.</p>` : ''}</div></div>`;
+      const g = G(), n = g && g.s.vg ? g.s.vg.pax.length : 0, a = atto(), seats = g && g.vgSeats ? g.vgSeats() : 0;
+      return `<div class="view app">${nav('Passeggeri')}<div class="body"><div class="card"><div class="meta"><span>A bordo</span></div><h4 style="font-size:22px">${n ? n + (n === 1 ? ' persona' : ' persone') : 'Nessuno'}</h4><div class="meta"><span>Posti occupati: ${n + (a >= 2 ? 1 : 0)}${seats ? ' su ' + seats : ''}</span></div></div>${a >= 2 ? `<div class="row">${av('Nessuno')}<span class="tx"><b>Sedile dietro</b><small>occupato · non risulta salito</small></span></div><p class="cen" style="font-size:12px;margin-top:10px">Il conto non torna.</p>` : ''}</div></div>`;
     },
     ext() { return `<div class="view app">${nav('Ultima Uscita')}<div class="body"><div class="cd" id="cd">${ST.cd.toFixed(1)}</div><p class="cen">km all'uscita 4</p><p class="cen" style="font-size:12px;margin-top:22px">Il conto scende. Poi ricomincia.</p></div></div>`; },
     vm() { return `<div class="view app">${nav('Segreteria')}<div class="body">${[['Zio Remo', '0:07', 'domani'], ['Sconosciuto', '0:00', '03:07'], ['Io', '0:19', 'ora']].map((v) => `<div class="card"><div style="display:flex;gap:10px;align-items:center"><span class="av bad">▶</span><span class="tx" style="flex:1"><b>${v[0]}</b><small style="display:block;color:var(--t2);font-size:12px">ricevuto: ${v[2]} · ${v[1]}</small></span></div><div class="bar">${Array.from({ length: 22 }, (_, i) => `<i style="height:${20 + ((i * 37) % 70)}%;animation-delay:${i * 40}ms"></i>`).join('')}</div></div>`).join('')}<p class="cen" style="font-size:12px">«…tieni le mani sul volante…»</p></div></div>`; },
@@ -190,8 +215,8 @@ const telThreads = (km) => {
     if (c.live) return `<div class="call"><div class="av ${atto() > 0 ? 'bad' : ''}">${initials(c.who)}</div><h3>${esc(c.who)}</h3><p id="ct">${atto() > 0 ? 'in linea · nessuno parla' : 'in linea'} · 0:00</p><div class="act"><button style="background:#e5373a" data-decl>✕</button></div></div>`;
     return `<div class="call"><div class="av ring ${atto() > 0 ? 'bad' : ''}">${initials(c.who)}</div><h3>${esc(c.who)}</h3><p>${c.out ? 'chiamata in corso…' : 'chiamata in arrivo…'}</p><div class="act"><button style="background:#e5373a" data-decl>✕</button>${c.out ? '' : '<button style="background:#2fb750" data-acc>✆</button>'}</div></div>`;
   }
-  function render() {
-    const s = root.getElementById('scr'); if (!s) return;
+  function render(quiet) {
+    const s = root.getElementById('scr'); if (!s) return; s.classList.toggle('quiet', !!quiet);
     const v = ST.view; s.innerHTML = status() + (v === 'lock' ? lock() : v === 'home' ? home() : APPS[v] ? APPS[v]() : home()) + callScreen();
     const ex = EXT.find((e) => e.id === v); if (ex && ex.after) ex.after(s);
     refreshBtn();
@@ -200,9 +225,10 @@ const telThreads = (km) => {
 
   // ------------------------------------------------------------ tocchi
   root.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc],[data-x]'); if (!t) return;
+    const t = e.target.closest('[data-get],[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc],[data-x]'); if (!t) return;
     const D = t.dataset;
     if (D.x !== undefined) { const ex = EXT.find((a) => a.id === ST.view); if (ex && ex.click) ex.click(D, t); }
+    else if (D.get) { if (!ST.dl) { const ap = T().apps; ap[D.get].st = 'dl'; ST.dl = { app: D.get, t0: performance.now() }; render(); } }
     else if (D.open) open(D.open);
     else if (D.home !== undefined) { ST.view = 'home'; ST.stack = []; if (ST.call && !ST.call.live) ST.call = null; render(); }
     else if (D.back !== undefined) { ST.stack = ST.stack.slice(0, 1); render(); }
@@ -239,8 +265,9 @@ const telThreads = (km) => {
   }, true);
 
   // avviso di messaggio nuovo: una striscia sopra la strada
-  function toast(from, text, bad) {
-    if (!toastEl) { toastEl = document.createElement('div'); toastEl.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:62;max-width:min(340px,92vw);padding:10px 14px;border-radius:16px;background:rgba(18,20,28,.92);color:#eceef5;font:13px/1.3 system-ui;box-shadow:0 8px 24px #000a;cursor:pointer;transition:opacity .3s;opacity:0;pointer-events:none'; toastEl.addEventListener('click', () => { setOpen(true); ST.view = 'msg'; ST.stack = ['msg']; render(); }); document.body.appendChild(toastEl); }
+  function toast(from, text, bad, go) {
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:62;max-width:min(340px,92vw);padding:10px 14px;border-radius:16px;background:rgba(18,20,28,.92);color:#eceef5;font:13px/1.3 system-ui;box-shadow:0 8px 24px #000a;cursor:pointer;transition:opacity .3s;opacity:0;pointer-events:none'; toastEl.addEventListener('click', () => { if (toastEl._go) { toastEl._go(); return; } setOpen(true); ST.view = 'msg'; ST.stack = ['msg']; render(); }); document.body.appendChild(toastEl); }
+    toastEl._go = go || null;
     toastEl.innerHTML = `<b style="display:block;font-size:12px;color:${bad ? '#ff8a80' : '#8fb4ff'}">${esc(from)}</b>${esc(text)}`;
     toastEl.style.opacity = '1'; toastEl.style.pointerEvents = 'auto'; clearTimeout(toast.t); toast.t = setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.pointerEvents = 'none'; }, 4200);
   }
@@ -254,13 +281,28 @@ const telThreads = (km) => {
     const k = km(), t = T(), n = TEL_SMS.filter((m) => m.km <= k).length;
     if (t.n === undefined) t.n = k < 1 ? 0 : n;
     if (n > t.n) { const m = TEL_SMS.filter((x) => x.km <= k && x.dir !== 'o').pop(); t.n = n; if (m) { toast(m.from, m.text, m.bad); if (ST.on && ST.view === 'msg') render(); } refreshBtn(); }
+    // cartelloni delle app: il prossimo compare sulla strada davanti a te; quando lo superi spunta l'icona da scaricare
+    const off = telNextOffer(k, t.apps);
+    if (off && g.ents) { const x = g.s.dist + 260; t.apps[off.app] = { st: 'sign', x }; g.ents.push({ id: g.id++, kind: 'vgsign', lane: 0, x, v: 0, text: off.sign, app: true }); }
+    for (const o of TEL_APP_OFFERS) { const p = t.apps[o.app]; if (p && p.st === 'sign' && g.s.dist >= p.x) { p.st = 'offer'; toast('Telefono', `Nuova app: ${o.name}. Tocca per scaricarla.`, 0, () => { setOpen(true); ST.view = 'home'; ST.stack = []; render(); }); if (ST.on && ST.view === 'home') render(); } }
     const a = telAtto(k); if (a >= 1 && !t.rang[a] && ST.atto === null) { t.rang[a] = 1; if (a === 1) ring('Zio Remo'); }
     if (seen !== a) { seen = a; if (ST.on && (ST.view === 'home' || ST.view === 'lock')) render(); }
     if (ST.on && ST.view === 'ext') { ST.cd = ST.cd <= 0.15 ? 3.2 : ST.cd - 0.1; const c = root.getElementById('cd'); if (c) c.textContent = ST.cd.toFixed(1); }
     if (ST.call && ST.call.live) { const ct = root.getElementById('ct'), s = Math.floor((performance.now() - ST.call.t0) / 1000); if (ct) ct.textContent = `${atto() > 0 ? 'in linea · nessuno parla' : 'in linea'} · 0:${String(s % 60).padStart(2, '0')}`; }
   }, 1000);
 
+  // download finto: la barra sull'icona sale in 3,5 secondi, poi l'app c'è
+  setInterval(() => {
+    if (!ST.dl) return; const g = G(), p = (performance.now() - ST.dl.t0) / 3500;
+    if (p < 1) { if (ST.on && ST.view === 'home') render(true); return; }
+    const app = ST.dl.app, def = TEL_APP_OFFERS.find((o) => o.app === app); ST.dl = null;
+    if (g && g.s.tel) g.s.tel.apps[app].st = 'ok';
+    toast('Telefono', `${def ? def.name : 'App'} installata.`, 0, () => { setOpen(true); open(app); });
+    if (ST.on && ST.view === 'home') render(); refreshBtn();
+  }, 150);
+
   window.telefono = {
+    install: (app) => { const t = T(); t.apps[app] = { st: 'ok' }; render(); },      // per provare o per la storia: l'app c'è subito, senza cartellone
     open: () => setOpen(true), close: () => setOpen(false), get isOpen() { return ST.on; }, ring,
     setAtto: (n) => { ST.atto = n === null || n === undefined ? null : n; render(); },   // per provare: 0, 1, 2; senza argomento torna ai km
     sms: (from, text, o = {}) => { TEL_SMS.push(Object.assign({ from, text, km: km() }, o)); toast(from, text, o.bad); refreshBtn(); },
@@ -272,4 +314,4 @@ const telThreads = (km) => {
     render, show: (id) => { setOpen(true); open(id); }, get view() { return ST.view; }, toast,
   };
 })();
-if (typeof window !== 'undefined') Object.assign(window, { TEL_ATTI, TEL_SMS, TEL_RUBRICA, telAtto, telThreads });
+if (typeof window !== 'undefined') Object.assign(window, { TEL_ATTI, TEL_SMS, TEL_RUBRICA, TEL_APP_OFFERS, telAtto, telThreads, telNextOffer });

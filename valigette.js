@@ -592,9 +592,26 @@ const CASE_MOD_MAX = 5000;                            // valore massimo del pezz
     try { g.caseRewards(); g.sim.extraPw = g.caseBoosts(); } catch (e) { /* partita non pronta */ }
   }, 500);
 
+  // nel telefono anche Valigette si scarica: un cartellone sulla strada dopo quello di Passeggeri (vedi TEL_APP_OFFERS).
+  // Se si guadagna una valigetta prima, l'icona da scaricare compare subito.
+  if (typeof TEL_APP_OFFERS !== 'undefined' && !TEL_APP_OFFERS.some((o) => o.app === 'vgl')) {
+    const i = TEL_APP_OFFERS.findIndex((o) => o.app === 'pax');
+    TEL_APP_OFFERS.splice(i >= 0 ? i + 1 : TEL_APP_OFFERS.length, 0, { app: 'vgl', km: 4, name: 'Valigette', sign: 'E SE CI FOSSE|DI PIU?' });
+  }
+  const offerApp = () => {
+    const g = G(), t = g && g.s && g.s.tel; if (!t) return false;
+    t.apps = t.apps || {};
+    const st = t.apps.vgl && t.apps.vgl.st;
+    if (st === 'ok' || st === 'dl' || st === 'offer') return false;
+    t.apps.vgl = { st: 'offer' }; return true;
+  };
   window.valigette = {
     play, openCase, drawCase, drawPrize,
-    notify(type) { if (window.telefono && window.telefono.toast) window.telefono.toast('Valigette', `${CASE_TYPES[type].name}: aprila dal telefono`, false); },
+    notify(type) {
+      const nuova = offerApp();
+      if (window.telefono && window.telefono.toast) window.telefono.toast('Valigette', nuova ? `${CASE_TYPES[type].name}! Scarica l'app Valigette dal telefono per aprirla.` : `${CASE_TYPES[type].name}: aprila dal telefono`, false);
+      if (window.telefono && window.telefono.render) window.telefono.render();
+    },
     // per provare la scena: window.valigette.demo('oro', 5)
     demo(type = 'oro', rar = 5, icon = 'soldi') { return play({ type, rar, icon, name: 'Prova', text: 'Solo una prova della scena.' }); },
   };
