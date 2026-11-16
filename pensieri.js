@@ -1,0 +1,129 @@
+// ============================================================================
+//  Night Run · I pensieri del protagonista (dopo missioni.js)
+//  Ogni tanto il protagonista dice cosa pensa: un testo scritto sulla strada, 8-10 secondi, senza vignetta e senza riquadro.
+//  Tre sorgenti: PENS_KM (uno scritto, a un certo km: la radio, il navigatore...), PENS_BISOGNI (fame, sete, sonno, igiene:
+//  due livelli, prima presto e poi con urgenza) e PENS_ANIMO (pensieri a caso, ognuno una sola volta per partita).
+//  Non si ripetono: ogni gruppo si pesca da un mazzo mescolato, che si ricarica solo quando è finito.
+//  I TESTI SONO SEGNAPOSTO (tranne la radio): si cambiano qui. La storia nuova ne aggiunge con game.vgThink(testo).
+//  Stato in game.s.vg.pens; l'ultimo pensiero in game.thought ({ text, left, id }), che il testo a schermo legge.
+// ============================================================================
+const PENS_KM = [
+  { km: 1, id: 'radio', text: 'La radio gracchia. E queste stazioni non le ho mai sentite, eppure sono sempre in zona.' },
+  { km: 3.5, id: 'navigatore', text: 'Il navigatore del telefono dice solo «prosegui dritto». Utile.' },
+  { km: 6, id: 'uscite', text: 'Guido da un po\' e non ho ancora visto un\'uscita. Non mi ricordavo questa strada così.' },
+  { km: 9, id: 'volvo', text: 'La Volvo di zio Claudio non l\'avevo mai guidata. Si sente che l\'ha tenuta bene.' },
+  { km: 13, id: 'bar', text: 'Tanti bar, tutti aperti. A quest\'ora, poi.' },
+  { km: 18, id: 'cartello', text: 'Sono sicuro di aver già visto quel cartello. Forse no.' },
+];
+// [soglia del livello 1, soglia del livello 2]: sotto la prima parla presto, sotto la seconda con urgenza
+const PENS_SOGLIE = { food: [0.45, 0.2], water: [0.45, 0.2], sleep: [0.45, 0.2], wash: [0.35, 0.15] };
+const PENS_BISOGNI = {
+  food: [
+    ['Lo stomaco comincia a farsi sentire.', 'Un panino non mi farebbe schifo.', 'Non mangio da un po\'. Al prossimo bar mi fermo.', 'Ho un buco allo stomaco.', 'Speriamo che il prossimo bar sia aperto: ho fame.'],
+    ['Ho una fame che vedo doppio.', 'Mi tremano le mani dalla fame. Al primo posto che trovo mi fermo.', 'Lo stomaco ormai protesta a voce alta.', 'Se non mangio qualcosa adesso mi mangio il volante.'],
+  ],
+  water: [
+    ['Ho la bocca asciutta.', 'Un goccio d\'acqua adesso sarebbe oro.', 'Mi sa che ho sete da un po\'.', 'La gola è secca. Dov\'è la bottiglia?'],
+    ['Ho una sete bestiale.', 'Potrei bere una fontana intera.', 'Sete. Solo sete. Non riesco a pensare ad altro.'],
+  ],
+  sleep: [
+    ['Gli occhi mi pesano.', 'Ho sbadigliato tre volte in un minuto.', 'La strada è lunga e io sono stanco. Devo stare attento.'],
+    ['Gli occhi mi si chiudono da soli.', 'Se chiudo gli occhi un secondo... no. No.', 'Devo fermarmi a dormire. Adesso.'],
+  ],
+  wash: [
+    ['Avrei bisogno di una doccia.', 'Mi sento appiccicoso. Una doccia ci starebbe.'],
+    ['Faccio schifo anche a me stesso.', 'Mi sento uno straccio sporco.'],
+  ],
+};
+// a caso, ogni tanto, mentre si guida: ognuno una sola volta per partita
+const PENS_ANIMO = [
+  'Che silenzio. Solo il motore e la strada.',
+  'La Volvo tira bene, per essere una station wagon.',
+  'Chissà cosa aveva in mente lo zio con tutte quelle auto sotto i teli.',
+  'Di notte la strada sembra più lunga. Come diceva il notaio.',
+  'Ho la strada quasi tutta per me.',
+  'Chissà se prima o poi arrivo a una fine.',
+  'Ho lasciato la luce accesa a casa? Boh.',
+  'Mi sa che ho esagerato col caffè.',
+];
+const PENS_PAUSA = 25;                    // secondi minimi tra un pensiero e il prossimo
+const PENS_ANIMO_OGNI = [150, 150];       // i pensieri a caso arrivano ogni 150-300 secondi di guida
+const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con un'altra frase) ogni 7 minuti
+
+(function pensieri() {
+  if (typeof StreetGame === 'undefined' || typeof VG === 'undefined') return;
+  const P = StreetGame.prototype;
+
+  const stato = (g) => { const v = g.s.vg; return v.pens || (v.pens = { seen: {}, deck: {}, last: -999, t: 0, nextAmb: 120, lvl: {}, nag: {}, lastIdx: {} }); };
+  // pesca da un mazzo mescolato: nessuna frase si ripete finché non sono uscite tutte
+  P.vgPensDraw = function (pool, key) {
+    const p = stato(this), rnd = this.rnd || Math.random;
+    let deck = p.deck[key];
+    if (!deck || !deck.length) {
+      deck = pool.map((_, i) => i);
+      for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+      if (deck.length > 1 && deck[deck.length - 1] === p.lastIdx[key]) deck.unshift(deck.pop());
+    }
+    const i = deck.pop(); p.deck[key] = deck; (p.lastIdx = p.lastIdx || {})[key] = i; return pool[i];
+  };
+  // il pensiero a schermo: da 8 a 10 secondi secondo la lunghezza
+  P.vgThink = function (text) {
+    const p = stato(this);
+    this.thoughtN = (this.thoughtN || 0) + 1;
+    this.thought = { text, left: Math.max(8, Math.min(10, 7.5 + text.length * 0.025)), id: this.thoughtN };
+    p.last = p.t;
+  };
+
+  P.vgPensTick = function (dt) {
+    const v = this.s.vg, p = stato(this); p.lastIdx = p.lastIdx || {};
+    p.t += dt;
+    if (this.thought && this.thought.left > 0) this.thought.left -= dt;
+    // non si pensa in un locale, durante una domanda, in gara, o da fermi
+    if (this.prompt || this.inside || this.race || Math.abs(this.sim.v) < 2 || p.t - p.last < PENS_PAUSA) return;
+    const km = vgKm(this);
+    // 1. un pensiero scritto, a un certo km
+    const k = PENS_KM.find((q) => km >= q.km && !p.seen[q.id]);
+    if (k) { p.seen[k.id] = true; this.vgThink(k.text); return; }
+    // 2. un bisogno che peggiora (o che dura): parla prima il più urgente
+    const order = Object.keys(PENS_SOGLIE).sort((a, b) => v.needs[a] - v.needs[b]);
+    for (const n of order) {
+      const th = PENS_SOGLIE[n], val = v.needs[n], lvl = val < th[1] ? 2 : val < th[0] ? 1 : 0, was = p.lvl[n] || 0;
+      p.lvl[n] = lvl;
+      if (lvl && (lvl > was || p.t - (p.nag[n] || 0) > PENS_RIPETI)) { p.nag[n] = p.t; this.vgThink(this.vgPensDraw(PENS_BISOGNI[n][lvl - 1], n + lvl)); return; }
+    }
+    // 3. un pensiero a caso, ogni tanto
+    if (p.t >= p.nextAmb) {
+      const left = PENS_ANIMO.filter((_, i) => !p.seen['a' + i]);
+      p.nextAmb = p.t + PENS_ANIMO_OGNI[0] + (this.rnd || Math.random)() * PENS_ANIMO_OGNI[1];
+      if (left.length) { const i = PENS_ANIMO.indexOf(left[Math.floor((this.rnd || Math.random)() * left.length)]); p.seen['a' + i] = true; this.vgThink(PENS_ANIMO[i]); }
+    }
+  };
+
+  const upd = P.vgUpdate;
+  P.vgUpdate = function (dt) {
+    upd.call(this, dt);
+    if (this.mode === 'career' && this.s.vg && this.s.vg.on) this.vgPensTick(dt);
+  };
+})();
+
+// ---------------------------------------------------------------- il testo sulla strada (solo nel browser)
+(function testo() {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return;
+  let el = null, mostrato = -1;
+  const css = document.createElement('style');
+  css.textContent = `.pensiero{position:absolute;left:50%;bottom:31%;transform:translate(-50%,6px);max-width:min(620px,76%);text-align:center;pointer-events:none;z-index:6;
+    font:italic 500 clamp(15px,2vw,22px)/1.4 "Barlow Semi Condensed",Georgia,serif;color:#f4ead2;letter-spacing:.01em;opacity:0;transition:opacity .7s ease,transform .7s ease;
+    text-shadow:0 0 12px #000,0 0 3px #000,0 2px 5px #000}
+    .pensiero.on{opacity:.95;transform:translate(-50%,0)}
+    @media (prefers-reduced-motion:reduce){.pensiero{transition:none}}`;
+  document.head.appendChild(css);
+  setInterval(() => {
+    const NR = window.nightRun, g = NR && NR.game, th = g && g.thought; if (!th) return;
+    const stage = document.getElementById('roadStage'); if (!stage) return;
+    if (!el) { el = document.createElement('div'); el.className = 'pensiero'; el.setAttribute('aria-live', 'polite'); stage.appendChild(el); }
+    if (th.id !== mostrato) { mostrato = th.id; el.textContent = th.text; }
+    const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing);
+    el.classList.toggle('on', th.left > 0.8 && !nascosto);
+  }, 150);
+})();
+if (typeof window !== 'undefined') Object.assign(window, { PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_SOGLIE });

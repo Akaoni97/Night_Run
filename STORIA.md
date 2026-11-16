@@ -17,6 +17,7 @@ psicologico. Il telefono è lo strumento principale: lì si sviluppano le cose s
   Orologio). Sull'autostrada compaiono cartelloni con una domanda; quando li superi spunta l'icona da scaricare
   (download finto) di Lavori, Passeggeri, Motel. Più avanti compaiono **da sole, senza scaricarle**, app horror e
   arrivano chiamate strane.
+- **I pensieri del protagonista** (fatto, `pensieri.js`): ogni tanto scrive cosa pensa, sulla strada, 8-10 secondi, senza vignetta: la radio che non conosce le stazioni (km 1), il navigatore, fame, sete, sonno, igiene, pensieri a caso. Non si ripetono. I testi sono segnaposto.
 - **Effetti pensati**: il bussare nel bagagliaio (poi non c'è niente), chiamate strane, app che compaiono da sole.
 
 ## Da decidere
@@ -29,5 +30,6 @@ psicologico. Il telefono è lo strumento principale: lì si sviluppano le cose s
 ## Dove si attacca nel codice
 - **Capitoli** ai km: `VG_CHAPTERS` (oggi solo la partenza). **Eventi strani**: `VG_ODD`, vuoto. **Passeggeri speciali**:
   `VG_STORY_PAX`, vuoto. Il formato è scritto sopra a ciascuno in `viaggio.js`.
+- **Pensieri**: `PENS_KM`, `PENS_BISOGNI`, `PENS_ANIMO`, `game.vgThink(testo)` per dirne uno dalla storia.
 - **Telefono**: `TEL_SMS` (messaggi per km), `TEL_ATTI` (momenti), `TEL_APP_OFFERS` (cartelloni), `window.telefono`.
 - **Prologo**: `PRO_LETTERA`, `PRO_NOTAIO`, `PRO_AUTO`, `PRO_PARENTE`.
