@@ -920,7 +920,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
           <button type="button" id="dbFlash" title="Sfanala (F): chiedi strada o lancia una sfida">FARI</button>
           <button type="button" id="dbMap" title="Mappa del mondo (T)">MAPPA</button>
-          <button type="button" id="dbWin" title="Finestrini: apri e chiudi (0)">FINESTR.</button>
+          <button type="button" id="dbWin" title="Finestrini: apri e chiudi (8)">FINESTR.</button>
         </div>
         <canvas id="hudP" aria-hidden="true"></canvas>
       </div>
@@ -1142,7 +1142,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div><div>Rispondi alle proposte (altrimenti: marcia diretta)</div>
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
         <div><kbd>9</kbd></div><div>Cambia la gomma forata con la ruota di scorta (da fermo, serve la scorta nel bagagliaio)</div>
-        <div><kbd>0</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
+        <div><kbd>8</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
         <div><kbd>C</kbd> <kbd>F</kbd> <kbd>H</kbd> <kbd>B</kbd></div><div>Telecamera (anche abitacolo) · abbaglianti · clacson · bagagliaio</div>
         <div><kbd>N</kbd> <kbd>R</kbd> <kbd>Spazio</kbd></div><div>Folle · retro · frizione (manuale)</div>
         <div><kbd>V</kbd> <kbd>L</kbd> <kbd>M</kbd></div><div>Ascolto · launch control · muto</div>
@@ -1549,7 +1549,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
     else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
-    else if (k === '0') toggleWindows();
+    else if (k === '8') toggleWindows();
     else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') cycleHud();
