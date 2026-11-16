@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const src = readFileSync(new URL('../telefono.js', import.meta.url), 'utf8');
-const { TEL_ATTI, TEL_SMS, telAtto, telThreads } = new Function(src + ';return { TEL_ATTI, TEL_SMS, telAtto, telThreads };')();
+const { TEL_ATTI, TEL_SMS, TEL_APP_OFFERS, telAtto, telThreads, telNextOffer } = new Function(src + ';return { TEL_ATTI, TEL_SMS, TEL_APP_OFFERS, telAtto, telThreads, telNextOffer };')();
 
 test('telefono: l\'atto cresce coi km e non torna indietro', () => {
   assert.equal(telAtto(0), 0);
@@ -26,4 +26,14 @@ test('telefono: i messaggi arrivano al loro km e si raggruppano per mittente', (
 
 test('telefono: ogni messaggio ha mittente, testo e km', () => {
   for (const m of TEL_SMS) assert.ok(m.from && m.text && typeof m.km === 'number');
+});
+
+test('telefono: le app da scaricare arrivano una alla volta, nell\'ordine, ognuna al suo km', () => {
+  assert.equal(telNextOffer(0, {}), null, 'all\'inizio nessun cartellone');
+  assert.equal(telNextOffer(TEL_APP_OFFERS[0].km, {}).app, 'job', 'prima i lavori');
+  assert.equal(telNextOffer(99, { job: { st: 'sign' } }).app, 'pax', 'poi i passeggeri');
+  assert.equal(telNextOffer(99, { job: { st: 'ok' }, pax: { st: 'ok' } }).app, 'motel');
+  assert.equal(telNextOffer(99, { job: {}, pax: {}, motel: {} }), null, 'finite');
+  assert.equal(telNextOffer(0.1, {}), null, 'troppo presto');
+  assert.ok(TEL_APP_OFFERS.every((o) => /^[A-Z0-9?|. ]+$/.test(o.sign)), 'i cartelloni usano il font pixel: solo maiuscole e simboli semplici');
 });

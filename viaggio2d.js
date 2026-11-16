@@ -125,6 +125,15 @@
     if (e.kind === 'vgsign') {
       const X = Math.round(x);
       if (e.cippo) { g.fillStyle = C.ink; g.fillRect(X - 1, 196, 16, 32); g.fillStyle = '#e8e6df'; g.fillRect(X, 197, 14, 30); g.fillStyle = '#c8282b'; g.fillRect(X, 197, 14, 4); this.text(g, 'KM', X + 2, 205, '#14161e'); this.text(g, '9', X + 5, 213, '#14161e'); return true; }
+      if (e.app) {                                   // cartellone luminoso: scarica l'app (il telefono la offre quando lo superi)
+        const L = e.text.split('|'), w = Math.max(...L.map((s) => s.length)) * 4 + 12, h = L.length * 9 + 8, top = 150, bx = X - Math.round(w / 2);
+        g.fillStyle = C.ink; g.fillRect(bx + 6, top + h, 3, 228 - top - h); g.fillRect(bx + w - 9, top + h, 3, 228 - top - h);
+        this.light(g, X, top + h / 2, w * 0.9, h + 14, '#7fb0ff', 0.14, 3);
+        g.fillStyle = C.ink; g.fillRect(bx - 1, top - 1, w + 2, h + 2); g.fillStyle = '#10224a'; g.fillRect(bx, top, w, h); g.fillStyle = '#1e3f86'; g.fillRect(bx, top, w, 2);
+        const blink = Math.floor((performance.now() || 0) / 500) % 2;
+        L.forEach((s, i) => this.text(g, s, bx + Math.round((w - s.length * 4) / 2), top + 5 + i * 9, i === 0 ? '#ffd23f' : i === L.length - 1 && blink ? '#9bd1ff' : '#f4f1e6'));
+        return true;
+      }
       if (e.wall) {
         g.fillStyle = '#5a3a30'; g.fillRect(X + 60, 180, 90, 48); for (let yy = 182; yy < 228; yy += 5) for (let xx = X + 60 + ((yy / 5) % 2 ? 0 : 6); xx < X + 150; xx += 12) { g.fillStyle = '#3e2820'; g.fillRect(xx, yy, 1, 5); g.fillRect(X + 60, yy, 90, 1); }
         g.fillStyle = '#2a5a2a'; for (let q = 0; q < 30; q++) g.fillRect(X + 60 + Math.floor(rnd(q + e.id) * 88), 180 + Math.floor(rnd(q * 3 + e.id) * 46), 3, 2);   // muschio
