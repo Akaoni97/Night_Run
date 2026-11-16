@@ -201,6 +201,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     }
     return ui.call(this, i);
   };
+  // un salvataggio con oggetti che non esistono più (per esempio quelli della vecchia storia) li perde invece di rompersi
+  const ld = P.load;
+  P.load = function (json) {
+    const r = ld.call(this, json), ok = (it) => it && INV[it.kind];
+    if (Array.isArray(this.s.trunk)) this.s.trunk = this.s.trunk.filter(ok);
+    if (this.s.vg && Array.isArray(this.s.vg.cassa)) this.s.vg.cassa = this.s.vg.cassa.filter(ok);
+    return r;
+  };
   const di = P.dropItem;
   P.dropItem = function (i) {
     const it = this.s.trunk[i];

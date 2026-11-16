@@ -424,6 +424,16 @@ test('limitatore regolabile: discesa in giri e durata del taglio in ms', () => {
   assert.ok(timed.cuts < base.cuts, 'taglio lungo 250 ms, meno tagli');
 });
 
+test('viaggio: un salvataggio con oggetti che non esistono più li perde senza rompersi', () => {
+  const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5);
+  game.startTrip();
+  game.s.trunk.push({ kind: 'valigia', kg: 12 }); game.s.vg.cassa.push({ kind: 'foto', kg: 0.05 });
+  const json = game.save(), g2 = new StreetGame(new SupraSim(), () => 0.5);
+  g2.load(json);
+  assert.ok(g2.s.trunk.every((it) => it.kind !== 'valigia') && g2.s.trunk.length >= 1, 'la valigia sparisce, il resto resta');
+  assert.equal(g2.s.vg.cassa.length, 0, 'la fotografia sparisce dalla cassa');
+});
+
 test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e paghe', () => {
   const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5);
   game.startTrip();
