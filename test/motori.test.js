@@ -35,6 +35,7 @@ test('limitatore a 7000 giri in folle', () => {
 
 test('prestazioni realistiche della configurazione originale', () => {
   const sim = new SupraSim();
+  sim.setTune(tuningParams(TUNING_PRESETS.find((p) => p.id === 'stock').sel).sim);   // la RZ come esce dal concessionario (Torsen compreso)
   startEngine(sim);
   sim.shift(1);
   drive(sim, 30, (s) => {
@@ -222,6 +223,8 @@ test('officina: si compra solo con i soldi sufficienti', () => {
   const { game } = career();
   assert.equal(game.owns('turbo', 't51r'), false);
   assert.equal(game.buy('turbo', 't51r').ok, false, 'costa 6000, ne hai 3000');
+  assert.equal(game.buy('bov', 'ssqv').ok, false, 'a 0 km il pezzo è ancora bloccato');
+  game.s.cars[game.car] = Object.assign(game.s.cars[game.car] || {}, { km: game.partKm('bov', 'ssqv') });
   assert.equal(game.buy('bov', 'ssqv').ok, true);
   assert.equal(game.s.money, 3000 - 380);
   assert.ok(game.owns('bov', 'ssqv'));

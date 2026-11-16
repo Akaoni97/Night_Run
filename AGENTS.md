@@ -69,9 +69,7 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
-  Oggi passano 27 test su 29 (i test caricano anche `viaggio.js`). I 2 che falliscono erano già rotti prima:
-  "prestazioni realistiche della configurazione originale" (lo 0-100 della prova è 6,28 s, il test vuole meno di 6)
-  e "officina: si compra solo con i soldi sufficienti". Non peggiorare il conteggio.
+  Oggi passano tutti i 29 test (i test caricano anche `viaggio.js` e `missioni.js`). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.
