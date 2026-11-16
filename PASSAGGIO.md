@@ -56,6 +56,14 @@ gioco fa, sezione per sezione).
   in `index.html`). Ambiente (`setEnv`: 0 strada aperta, 1 città, 2 galleria, lo decide `envNow`): prime riflessioni
   diverse a sinistra e a destra (stereo) e coda di riverbero lunga in galleria. Livelli per punto d'ascolto (`g`),
   cinghia e alternatore nel vano motore.
+- **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
+  € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
+  ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
+  (Luca); potenziamenti a tempo (+8 % per 50 km, +15 % per 100 km) e per sempre (+3 %, mitico); pezzo vero del
+  catalogo (epico), kit turbo (mitico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
+  primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, bronzo per le
+  sfide vinte (argento ogni quinta). Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
+  Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco

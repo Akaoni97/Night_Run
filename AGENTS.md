@@ -38,6 +38,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `menu.js` | Schermata di gioco compatta (dopo lo script principale): sposta i pannelli della pagina in un menu a schede (Tab o pulsante MENU, Esc chiude), messaggi sopra la strada, pedali GAS/FRENO al tocco. `window.gameMenu.open('bagagliaio')`. |
 | `telefono.js` | Il telefono (dopo `menu.js`): smartphone sopra la strada, tasto 0 o pulsante TELEFONO. App Telefono, Messaggi, Rubrica, Lavori (bacheca e consegne vere), Mappa, Foto, Orologio; app strane (Passeggeri, Ultima Uscita, Segreteria) con la storia. `TEL_SMS` (messaggi per km), `TEL_ATTI` (km dei momenti della storia), `window.telefono.sms/ring/open/setAtto`. Grafica in Shadow DOM. Test in `test/telefono.test.js`. |
+| `valigette.js` | Le valigette (dopo `telefono.js`): app Valigette nel telefono (negozio bronzo/argento/oro, le mie, premi), sei rarità (`CASE_RAR`), probabilità e prezzi (`CASE_TYPES`), premi (soldi, oggetti, ticket tagliando e modifica, potenziamenti a tempo e per sempre via `sim.extraPw`, pezzi veri, kit turbo, auto in regalo), garanzia, ricompense dai lavori e dalle sfide (`caseRewards`), scena d'apertura a tutto schermo con suoni sintetizzati (`window.valigette.play`, prova: `window.valigette.demo('oro', 5)`). Stato in `game.s.cases`. Test in `test/valigette.test.js`. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
 | `audio/`, `models/` | Suoni e modelli 3D liberi già nel progetto. |
@@ -69,8 +70,8 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
 6. Prima di cambiare qualcosa leggi per intero i file coinvolti: un'auto o un pezzo passano da più file.
 
 ## Come provare
-- Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
-  Oggi passano tutti i 36 test (i test caricano anche `viaggio.js` e `missioni.js`). Non peggiorare il conteggio.
+- Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js`.
+  Oggi passano tutti i 47 test (36 + 3 del telefono + 8 delle valigette). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.

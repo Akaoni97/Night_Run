@@ -7,6 +7,8 @@
 //  cambia momento (0, 1, 2). I testi sono SEGNAPOSTO in attesa della storia: si cambiano qui, in TEL_SMS e dintorni.
 //  Si vive in un ombra (Shadow DOM): la grafica del telefono non tocca quella della pagina.
 //  Dal resto del gioco: window.telefono.sms(...), .ring(chi), .open(), .close(), .setAtto(n).
+//  Altri file possono aggiungere un'app: window.telefono.addApp({ id, name, icon, color, badge, render, after, click, css })
+//  (icona sulla home, schermata, tocchi sugli elementi con data-x; vedi valigette.js).
 // ============================================================================
 const TEL_ATTI = [0, 150, 400];                       // km da cui comincia l'atto 0, 1, 2 (segnaposto)
 // messaggi: da chi, a che km arrivano, testo; dir 'o' = lo scrivi tu; bad = sporco (rosso)
@@ -142,11 +144,13 @@ const telThreads = (km) => {
   function home() {
     const a = atto(), g = G(), goal = g && g.vgGoal ? g.vgGoal() : null, u = unread();
     const apps = [['tel', 'Telefono'], ['msg', 'Messaggi', u], ['con', 'Rubrica'], ['job', 'Lavori', goal ? 1 : 0], ['map', 'Mappa'], ['pho', 'Foto'], ['clk', 'Orologio']];
+    for (const e of EXT) apps.push([e.id, e.name, e.badge ? e.badge() : 0]);
     const str = []; if (a >= 1) str.push(['pax', 'Passeggeri']); if (a >= 2) str.push(['ext', 'Ultima Uscita'], ['vm', 'Segreteria']);
     const cell = (x, s) => `<button class="ap ${s ? 'strange' : ''}" data-open="${x[0]}">${ic(x[0])}${x[2] && !s ? `<span class="bd">${x[2]}</span>` : ''}${s ? '<span class="dot"></span>' : ''}${x[1]}</button>`;
     const nx = goal ? `${esc(goal.title)}: ${fmt(goal.left, 1)} km` : a >= 2 ? 'prossima uscita: —' : 'nessun lavoro in corso';
     return `<div class="view wall"><div class="widget"><b>km ${fmt(km(), 1)}</b><div>${clock()}</div><small>${nx}</small></div><div class="grid">${apps.map((x) => cell(x, 0)).join('')}${str.map((x) => cell(x, 1)).join('')}</div></div>`;
   }
+  const EXT = [];                                     // app aggiunte da altri file (addApp)
   const APPS = {
     tel() { return `<div class="view app">${nav('Recenti')}<div class="body">${telRecenti(atto()).map((r) => `<div class="row ${r[3] === 1 ? 'miss' : ''}" data-call="${esc(r[0])}">${av(r[0], r[3] === 2 && atto() > 0)}<span class="tx"><b>${esc(r[0])}</b><small>${esc(r[1])}</small></span><span class="rt">${r[2]}</span></div>`).join('')}</div></div>`; },
     msg() {
@@ -189,15 +193,17 @@ const telThreads = (km) => {
   function render() {
     const s = root.getElementById('scr'); if (!s) return;
     const v = ST.view; s.innerHTML = status() + (v === 'lock' ? lock() : v === 'home' ? home() : APPS[v] ? APPS[v]() : home()) + callScreen();
+    const ex = EXT.find((e) => e.id === v); if (ex && ex.after) ex.after(s);
     refreshBtn();
   }
   const open = (id) => { ST.view = id; ST.stack = [id]; ST.tab = 0; render(); };
 
   // ------------------------------------------------------------ tocchi
   root.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc]'); if (!t) return;
+    const t = e.target.closest('[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc],[data-x]'); if (!t) return;
     const D = t.dataset;
-    if (D.open) open(D.open);
+    if (D.x !== undefined) { const ex = EXT.find((a) => a.id === ST.view); if (ex && ex.click) ex.click(D, t); }
+    else if (D.open) open(D.open);
     else if (D.home !== undefined) { ST.view = 'home'; ST.stack = []; if (ST.call && !ST.call.live) ST.call = null; render(); }
     else if (D.back !== undefined) { ST.stack = ST.stack.slice(0, 1); render(); }
     else if (D.push !== undefined) { ST.stack = [ST.view, +D.push]; render(); }
@@ -258,6 +264,12 @@ const telThreads = (km) => {
     open: () => setOpen(true), close: () => setOpen(false), get isOpen() { return ST.on; }, ring,
     setAtto: (n) => { ST.atto = n === null || n === undefined ? null : n; render(); },   // per provare: 0, 1, 2; senza argomento torna ai km
     sms: (from, text, o = {}) => { TEL_SMS.push(Object.assign({ from, text, km: km() }, o)); toast(from, text, o.bad); refreshBtn(); },
+    // app di altri file: icona (svg a tratto 24×24), colore, numerino, schermata (render → html), after(schermo), click(dataset)
+    addApp(a) {
+      EXT.push(a); IC[a.id] = a.icon; COL[a.id] = a.color; APPS[a.id] = a.render;
+      if (a.css) { const st = document.createElement('style'); st.textContent = a.css; root.appendChild(st); }
+    },
+    render, show: (id) => { setOpen(true); open(id); }, get view() { return ST.view; }, toast,
   };
 })();
 if (typeof window !== 'undefined') Object.assign(window, { TEL_ATTI, TEL_SMS, TEL_RUBRICA, telAtto, telThreads });
