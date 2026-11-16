@@ -1,0 +1,946 @@
+// ============================================================================
+//  StreetGame · carriera su strada: soldi, benzina, polizia, sfide, consegne
+//  Indipendente dalla grafica: la scena 3D legge `ents`, `laneZ`, `s.dist`.
+// ============================================================================
+const GAME_FUEL_PRICE = 1.95;            // € al litro
+const GAME_RIVALS = [
+  { name: 'Kenji', car: 'Nissan Silvia S15' }, { name: 'Marta', car: 'Mazda RX-7 FD' },
+  { name: 'Dario', car: 'Mitsubishi Lancer Evo VI' }, { name: 'Yuki', car: 'Honda NSX' },
+  { name: 'Ivan', car: 'Nissan Skyline GT-R R34' }, { name: 'Sara', car: 'Subaru Impreza STI' },
+  { name: 'Leo', car: 'BMW M3 E46' }, { name: 'Nico', car: 'Honda S2000' },
+];
+const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a, 0xb38b2d];
+// traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
+// velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
+const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spesso si vedono
+  { vt: 'panda', len: 3.7, kmh: [95, 120], w: 14 }, { vt: 'punto', len: 4.0, kmh: [100, 125], w: 13 }, { vt: 'polo', len: 4.0, kmh: [100, 128], w: 13 },
+  { vt: 'corsa', len: 4.0, kmh: [100, 125], w: 12 }, { vt: 'clio', len: 4.05, kmh: [105, 130], w: 12 }, { vt: 'p308', len: 4.25, kmh: [110, 135], w: 11 },
+  { vt: 'a3', len: 4.3, kmh: [115, 140], w: 10 }, { vt: 'taxi', len: 4.7, kmh: [105, 130], w: 6 }, { vt: 'doblo', len: 4.4, kmh: [100, 120], w: 8 },
+  { vt: 'van', len: 4.3, kmh: [95, 118], w: 8 }, { vt: 'bus', len: 12, kmh: [85, 95], w: 4 }, { vt: 'ambulanza', len: 5.9, kmh: [110, 130], w: 2 },
+  { vt: 'a80', len: 4.5, kmh: [105, 125], w: 6 }, { vt: 'p206', len: 3.8, kmh: [110, 135], w: 6 }, { vt: 'v850', len: 4.7, kmh: [115, 140], w: 4 },
+  { vt: 'golf', len: 3.8, kmh: [105, 130], w: 4 }, { vt: 'p205', len: 3.7, kmh: [110, 135], w: 3 }, { vt: 'williams', len: 3.7, kmh: [110, 135], w: 3 },
+  { vt: 'a112', len: 3.2, kmh: [90, 115], w: 3 }, { vt: 'e36', len: 4.4, kmh: [110, 140], w: 4 }, { vt: 'e34', len: 4.7, kmh: [110, 140], w: 3 },
+  { vt: 'e30', len: 4.3, kmh: [105, 130], w: 3 }, { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 2 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 2 },
+];
+// luoghi della mappa del mondo: posti veri, ognuno con il suo sfondo 2D e il suo traffico
+// bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
+const GAME_LOCS = [
+  { id: 'tokyo', name: 'Tokyo · Shinjuku', country: 'Giappone', bg: 'city', lat: 35.6938, lon: 139.7034, traffic: 1.1, places: true,
+    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Niko e il Neon Kustom.' },
+  { id: 'wangan', name: 'Wangan · Bayshore Route', country: 'Giappone', bg: 'highway', lat: 35.4614, lon: 139.6800, traffic: 1.6, mix: { truck: 2.6, bus: 0.3, kei: 0.5, taxi: 0.6 },
+    note: 'L\'autostrada sopraelevata sulla baia di Tokyo verso Daikoku: barriere antirumore, lampioni al sodio, la città sull\'acqua.' },
+  { id: 'hakone', name: 'Hakone Turnpike', country: 'Giappone', bg: 'mountain', lat: 35.2420, lon: 139.1040, traffic: 0.5, mix: { truck: 0.2, bus: 0.2, taxi: 0.2 },
+    note: 'La salita tra i cedri sopra Odawara, col Fuji innevato all\'orizzonte. Niente lampioni: solo i tuoi fari e i catarifrangenti.' },
+  { id: 'positano', name: 'Costiera Amalfitana · Positano', country: 'Italia', bg: 'sea', lat: 40.6281, lon: 14.4850, traffic: 0.8, mix: { bus: 1.5, truck: 0.3, kei: 0.3, taxi: 0.2, van: 1.3 },
+    note: 'La statale 163 a picco sul Tirreno: muretto bianco, case colorate sulla roccia, la luna sul mare e le lampare.' },
+  { id: 'bassa', name: 'Bassa Reggiana · Guastalla', country: 'Italia', bg: 'plain', lat: 44.9203, lon: 10.6555, traffic: 0.6, mix: { truck: 1.6, bus: 0.2, taxi: 0.1, kei: 0.4 },
+    note: 'Pianura Padana vicino al Po: filari di pioppi, cascine, tralicci, banchi di nebbia sui campi.' },
+  { id: 'sangimignano', name: 'San Gimignano', country: 'Italia', bg: 'village', lat: 43.4676, lon: 11.0434, traffic: 0.5, mix: { bus: 0.4, truck: 0.3, kei: 0.5, van: 1.3, taxi: 0.1 },
+    note: 'Il borgo delle torri sulle colline senesi: case di pietra, persiane verdi, cipressi e il campanile.' },
+  { id: 'route66', name: 'Route 66 · Amboy, Mojave', country: 'Stati Uniti', bg: 'desert', lat: 34.5583, lon: -115.7444, traffic: 0.4, mix: { truck: 2.2, bus: 0.1, kei: 0.05, taxi: 0, van: 1.2 },
+    note: 'La Mother Road nel deserto della California: mesas sotto le stelle, pali del telefono, un motel col neon.' },
+];
+const GAME_LANE_Z = { 0: 6.1, 1: 3.5, 2: 0, 3: -3.5 };
+
+// strada di montagna: la direzione cambia con la distanza percorsa (somma di sinusoidi), raggi fino a ~60 m.
+// theta > 0 = la strada gira a sinistra. Carreggiata di 8 m (due corsie), guardrail a 4,6 m dal centro.
+const MOUNTAIN = {
+  half: 4.6,
+  theta: (s) => 0.55 * Math.sin(s / 140) + 0.35 * Math.sin(s / 61 + 1.3) + 0.2 * Math.sin(s / 29 + 0.4),
+  // quota della strada (m) e pendenza: salite e discese
+  height: (s) => 9 * Math.sin(s / 170) + 4 * Math.sin(s / 53 + 0.7),
+  slope: (s) => 9 / 170 * Math.cos(s / 170) + 4 / 53 * Math.cos(s / 53 + 0.7),
+  kappa: (s) => 0.55 / 140 * Math.cos(s / 140) + 0.35 / 61 * Math.cos(s / 61 + 1.3) + 0.2 / 29 * Math.cos(s / 29 + 0.4),
+};
+// luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
+const GAME_PLACE_CYCLE = 2400;
+const GAME_PLACES = [
+  { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
+  { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
+  { id: 'niko', at: 1450, name: 'Officina Niko', what: 'meccanico', col: '#5ad1ff' },
+  { id: 'style', at: 1950, name: 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
+];
+// sticker e decalcomanie (Neon Kustom): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
+const GAME_STICKERS = [
+  { id: 'wakaba', name: 'Wakaba', price: 60 }, { id: 'sakura', name: 'Fiore di ciliegio', price: 90 },
+  { id: 'jdm', name: 'JDM', price: 80 }, { id: 'oni', name: 'Maschera Oni', price: 200 },
+  { id: 'n27', name: 'Numero di gara 27', price: 150 }, { id: 'nightrun', name: 'Night Run', price: 120 },
+  { id: 'flames', name: 'Fiamme', price: 350 },
+];
+const GAME_STICKER_SLOTS = [['st_door', 'Portiera'], ['st_rear', 'Parafango posteriore'], ['st_glass', 'Vetro posteriore']];
+// manutenzione da Niko: quanto dura ogni cosa (km di gioco) e quanto costa
+const GAME_SERVICES = [
+  { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 70, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
+  { id: 'plugs', name: 'Candele nuove', km: 90, price: 110, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
+  { id: 'pads', name: 'Pastiglie dei freni', km: 35, price: 150, note: 'Pastiglie finite: frenate lunghe, poi ferro su ferro.' },
+  { id: 'wash', name: 'Lavaggio e lucidatura', km: 15, price: 25, note: 'Fango e polvere si accumulano, di più con la pioggia.' },
+];
+// ricambi estetici: si comprano dal Neon Kustom e si vedono sulla Supra in 2D
+const GAME_COSMETICS = {
+  glow: { label: 'Neon sottoscocca', items: [
+    { id: 'none', name: 'Nessuno', price: 0 },
+    { id: '#2ee6ff', name: 'Ciano', price: 450 }, { id: '#ff2e88', name: 'Rosa', price: 450 },
+    { id: '#b8ff3a', name: 'Verde acido', price: 450 }, { id: '#b07bff', name: 'Viola', price: 450 } ] },
+  rims: { label: 'Colore dei cerchi', items: [
+    { id: 'none', name: 'Argento di serie', price: 0 },
+    { id: '#1c1d22', name: 'Neri opachi', price: 600 }, { id: '#d9a82e', name: 'Oro', price: 800 },
+    { id: '#9a6a3a', name: 'Bronzo', price: 750 }, { id: '#ff2e88', name: 'Rosa', price: 700 } ] },
+  stripe: { label: 'Strisce laterali', items: [
+    { id: 'none', name: 'Nessuna', price: 0 },
+    { id: '#f2f2ee', name: 'Bianche', price: 350 }, { id: '#0d0e10', name: 'Nere', price: 350 }, { id: '#d9a82e', name: 'Oro', price: 420 } ] },
+  tint: { label: 'Vetri', items: [ { id: 'none', name: 'Chiari', price: 0 }, { id: 'dark', name: 'Oscurati', price: 250 } ] },
+  decal: { label: 'Adesivo sulla portiera', items: [
+    { id: 'none', name: 'Nessuno', price: 0 }, { id: '2JZ', name: '2JZ', price: 120 }, { id: 'JDM', name: 'JDM', price: 120 }, { id: 'NIGHT RUN', name: 'Night Run', price: 180 } ] },
+  caliper: { label: 'Pinze dei freni', items: [
+    { id: 'none', name: 'Oro di serie', price: 0 },
+    { id: '#d0141e', name: 'Rosse', price: 300 }, { id: '#2e6bff', name: 'Blu', price: 300 },
+    { id: '#b8ff3a', name: 'Verde acido', price: 350 }, { id: '#1c1d22', name: 'Nere', price: 250 } ] },
+  paint: { label: 'Vernice speciale', items: [
+    { id: 'none', name: 'Tinte di serie', price: 0 },
+    { id: '#6d2bd9', name: 'Viola perlato', price: 900 }, { id: '#1f8f4e', name: 'Verde Kawasaki', price: 900 },
+    { id: '#f2c200', name: 'Giallo Lancia', price: 900 }, { id: '#36c5d6', name: 'Azzurro Midnight', price: 1100 } ] },
+};
+// traguardi di chilometri: premi che non si comprano, si guadagnano guidando
+const GAME_KM_PERKS = [
+  { km: 25, id: 'rodaggio', name: 'Rodaggio finito', note: 'Motore sciolto: +3 % di potenza' },
+  { km: 75, id: 'mano', name: 'Mano sul cambio', note: 'Cambiate più rapide' },
+  { km: 150, id: 'cliente', name: 'Cliente fisso', note: '−10 % su pezzi, carrozziere e gomme' },
+  { km: 300, id: 'leggenda', name: 'Leggenda della notte', note: '+3 % di potenza e +4 % di aderenza' },
+];
+// bagagliaio: 12 posti, 150 kg; il peso si somma alla massa della Supra
+const TRUNK_SLOTS = 12, TRUNK_KG = 150, CAR_MASS = 1570;
+const INV = {
+  tanica: { name: 'Tanica 10 L', kg: 9, price: 35, note: 'Versa 10 litri nel serbatoio, anche a secco.' },
+  kit: { name: 'Kit attrezzi', kg: 7, price: 120, uses: 3, note: 'Raddrizzi un po\' la carrozzeria per strada: −15 % di danni, tre usi.' },
+  scorta: { name: 'Ruota di scorta', kg: 14, price: 90, note: 'Peso morto finché non serve. Toglierla alleggerisce l\'auto.' },
+  pacco: { name: 'Pacco da consegnare', kg: 10, price: 0, note: 'Va portato a destinazione.' },
+  trofeo: { name: 'Trofeo', kg: 2, price: 0, note: 'Ricordo di un capo battuto.' },
+  zavorra: { name: 'Sacco di sabbia', kg: 25, price: 10, note: 'Peso sul posteriore: più trazione in partenza, ma più massa.' },
+};
+// scala dei rivali: quattro quartieri, tre rivali e un capo ciascuno (tempi sui 400 m)
+const GAME_LADDER = [
+  { zone: 'Porto', rivals: [
+    { name: 'Tommy', car: 'Honda Civic Type R EK9', et: 15.2, prize: 300 },
+    { name: 'Gina', car: 'Mazda MX-5 turbo', et: 14.6, prize: 400 },
+    { name: 'Bruno', car: 'Nissan 200SX S14', et: 14.0, prize: 550 },
+    { name: 'Lo Scaricatore', car: 'Nissan Skyline GTS-T R33', et: 13.5, prize: 1200, boss: true } ] },
+  { zone: 'Zona industriale', rivals: [
+    { name: 'Ale', car: 'Mitsubishi Lancer Evo VI', et: 13.1, prize: 900 },
+    { name: 'Rina', car: 'Subaru Impreza STI', et: 12.8, prize: 1100 },
+    { name: 'Max', car: 'Mazda RX-7 FD', et: 12.5, prize: 1300 },
+    { name: 'La Gru', car: 'Nissan Skyline GT-R R34', et: 12.1, prize: 2800, boss: true } ] },
+  { zone: 'Centro', rivals: [
+    { name: 'Yuki', car: 'Honda NSX', et: 11.9, prize: 2000 },
+    { name: 'Dario', car: 'Nissan Silvia S15 SR20 big turbo', et: 11.6, prize: 2400 },
+    { name: 'Vera', car: 'Toyota Chaser JZX100', et: 11.3, prize: 2800 },
+    { name: 'Il Notaio', car: 'Nissan Skyline GT-R R32 RB26 800 CV', et: 11.0, prize: 6000, boss: true } ] },
+  { zone: 'Tangenziale', rivals: [
+    { name: 'Ivan', car: 'Mitsubishi 3000GT', et: 10.8, prize: 4000 },
+    { name: 'Sara', car: 'Toyota Supra JZA80 single turbo', et: 10.6, prize: 4800 },
+    { name: 'Leo', car: 'Nissan GT-R R35', et: 10.4, prize: 5600 },
+    { name: 'Il Fantasma', car: 'Toyota Supra JZA80 1000 CV', et: 10.1, prize: 15000, boss: true } ] },
+];
+
+class StreetGame {
+  constructor(sim, rnd = Math.random) {
+    this.sim = sim;
+    this.rnd = rnd;
+    this.mode = 'career';                 // 'career' | 'free'
+    this.s = { money: 3000, rep: 0, heat: 0, dist: 0, owned: {}, wins: 0, losses: 0, fines: 0, jobs: 0, ladder: 0,
+      trunk: [{ kind: 'scorta', kg: 14 }, { kind: 'kit', kg: 7, uses: 3 }, { kind: 'tanica', kg: 9 }] };
+    this.ents = [];
+    this.trip = 0;
+    this.s.carId = 'supra'; this.s.cars = { supra: { km: 0, perks: [] }, v40: { km: 0, perks: [], up: 0, fuel: 0.55 } }; this.s.perks = [];
+    this.prompt = null;
+    this.ap = null;                        // pilota automatico (fermate)
+    this.race = null;
+    this.job = null;
+    this.out = [];                         // messaggi per l'interfaccia
+    this.lane = 1; this.laneZ = GAME_LANE_Z[1]; this.laneT = 0;
+    this.nextSpawn = 250; this.id = 1;
+    this.siren = 0;
+    this.autoLane = true;      // sorpasso automatico (si può spegnere)
+    this.track = 'city';       // 'city' oppure 'mountain' (solo in modalità libera)
+    this.loc = GAME_LOCS[0];   // luogo della mappa del mondo (sfondo 2D e traffico)
+    this.manualT = 0;          // secondi in cui la corsia l'ha scelta il pilota
+    this.steerIn = 0;          // sterzo libero tenuto dal pilota: +1 sinistra, -1 destra
+    this.latV = 0;             // velocità laterale (m/s)
+    this.free = false;         // posizione libera sulla carreggiata, fuori dalle corsie
+    this.fx = [];              // eventi grafici per le viste (tamponamenti…)
+    this.applyMass();
+  }
+
+  // cambio corsia del pilota: dir +1 a sinistra (verso la corsia 3), -1 a destra (verso la 1)
+  steer(dir) {
+    if (this.race || this.ap) return false;
+    const nl = Math.max(1, Math.min(3, this.lane + dir));
+    if (nl === this.lane) return false;
+    this.lane = nl; this.manualT = this.autoLane ? 5 : 1e9;
+    return true;
+  }
+
+  // sterzo libero: finché il pilota tiene premuto, l'auto si sposta dove vuole sulla carreggiata
+  steerHold(x) { this.steerIn = Math.max(-1, Math.min(1, x || 0)); }
+
+  // tamponamento: la Supra rallenta di colpo, l'altra auto viene spinta avanti, si pagano i danni
+  // urto con un altro veicolo: quantità di moto divisa secondo le masse, danni secondo la differenza di velocità
+  crash(e, kind = 'front') {
+    const sim = this.sim, m1 = sim.P.mass, m2 = (typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].mass) || 1400;
+    const dv = Math.abs(sim.v - e.v), I = Math.min(1.5, dv / 10);
+    e.hitT = 1.2;
+    if (kind === 'side') {
+      // strisciata: si torna nella corsia da cui si veniva, un po' di velocità persa da entrambi
+      const back = this.prevLaneSafe || (this.lane === 1 ? 2 : this.lane - 1);
+      this.lane = this.laneZ > (e._gz ?? GAME_LANE_Z[e.lane]) ? Math.max(1, Math.min(3, (e.lane || 2) - 1)) : Math.max(1, Math.min(3, (e.lane || 2) + 1));
+      if (this.lane === e.lane) this.lane = back;
+      sim.v *= 0.94; e.v *= 0.97; this.manualT = 1.2; this.free = false;
+      sim.damage = Math.min(1, sim.damage + 0.04 + dv * 0.004);
+      sim.events.push({ type: 'crash', I: 0.5 }); this.fx.push({ k: 'scrape', I: 0.5 });
+      this.say(`Strisciata contro ${(typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].short) || 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
+      this.s.crashes = (this.s.crashes || 0) + 1; return;
+    }
+    // urto quasi anelastico (restituzione 0,2)
+    const vc = (m1 * sim.v + m2 * e.v) / (m1 + m2), r = 0.2;
+    const v1 = vc - r * m2 * (sim.v - e.v) / (m1 + m2), v2 = vc + r * m1 * (sim.v - e.v) / (m1 + m2);
+    sim.v = Math.max(0, v1); sim.ww = sim.v / sim.P.r; sim.wo = sim.ww; sim.phi = 0;
+    if (sim.gear > 0 && sim.lock) sim.we = Math.max(sim.we * 0.6, sim.wo * sim.ratio(sim.gear));
+    e.v = Math.max(0, v2);
+    const half = ((e.len || 4.6) + 4.4) / 2 + 0.25;
+    e.x = this.s.dist + (kind === 'front' ? half : -half);                 // si separano: niente urti ripetuti
+    // un colpetto a pochi km/h (spingere chi sta davanti) lascia appena un graffio; un tamponamento vero fa male
+    const soft = dv < 2.5;
+    const dmg = soft ? 0.004 + dv * 0.004 : Math.min(0.45, (kind === 'front' ? 0.05 : 0.03) + dv * (kind === 'front' ? 0.022 : 0.012) * Math.min(2, m2 / 1400));
+    sim.damage = Math.min(1, sim.damage + dmg);
+    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I });
+    if (soft) return;
+    this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I });
+    this.say(kind === 'rear' ? `Ti hanno tamponato a ${Math.round(dv * 3.6)} km/h di differenza: danni al ${Math.round(sim.damage * 100)} %`
+      : `Tamponamento a ${Math.round(dv * 3.6)} km/h di differenza: carrozzeria al ${Math.round(sim.damage * 100)} % di danni`, 'police');
+  }
+
+  // ------------------------------------------------------------ luoghi (benzinaio, officina, estetica)
+  placesBetween(a, b) {
+    const out = [];
+    for (let c = Math.floor(a / GAME_PLACE_CYCLE) - 1; c * GAME_PLACE_CYCLE <= b; c++)
+      for (const p of GAME_PLACES) { const x = c * GAME_PLACE_CYCLE + p.at; if (x >= a && x <= b && x > 60) out.push(Object.assign({ x, kind: 'place' }, p)); }
+    return out;
+  }
+  // il luogo davanti a cui ci si può fermare adesso (null se troppo lontano, o se a questa velocità non si riesce a frenare)
+  nearPlace() {
+    if (!this.placesOn || this.race || this.ap || this.inside) return null;
+    const d = this.s.dist, v = Math.max(0, this.sim.v);
+    const p = this.placesBetween(d - 12, d + 160)[0];
+    if (!p) return null;
+    const rel = p.x - d, stop = v * v / (2 * 4.5);
+    return Object.assign(p, { rel, ok: rel > -12 && stop < rel + 8 });
+  }
+  // entra: accosta sul lato dei negozi, si ferma davanti all'ingresso e ci entra
+  enterPlace(p) {
+    if (!p || !p.ok) return false;
+    this.prompt = null; this.lane = 3; this.manualT = 0; this.free = false;
+    const go = () => { this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0 }; this.laneZ = GAME_LANE_Z[3]; };
+    if (p.rel < 4) { this.stopAt(null, go); } else this.stopAt(p.x, go);
+    this.say(`Accosto: ${p.name}`, p.id === 'fuel' ? 'fuel' : 'buy');
+    return true;
+  }
+  exitPlace() {
+    const I = this.inside; if (!I || I.phase !== 'shop') return;
+    if (I.fill && I.fill.got > 0.05) {       // pistola staccata a metà: si paga quello che è entrato
+      const c = Math.round(I.fill.cost * 100) / 100; if (this.mode === 'career') this.s.money -= c;
+      this.say(`Rifornimento interrotto: ${I.fill.got.toFixed(1).replace('.', ',')} litri, − € ${c.toFixed(2).replace('.', ',')}`, 'fuel');
+    }
+    I.fill = null; I.phase = 'out'; I.t = 0;
+  }
+  // rifornimento alla pompa: litri che entrano un po' alla volta
+  startFill(liters) {
+    const I = this.inside; if (!I || I.id !== 'fuel' || I.fill) return { ok: false };
+    const miss = (1 - this.sim.fuel) * this.sim.P.tank;
+    liters = Math.max(0, Math.min(liters, miss));
+    if (liters < 0.5) return { ok: false, why: 'Il serbatoio è già pieno' };
+    const cost = liters * GAME_FUEL_PRICE;
+    if (this.mode === 'career' && cost > this.s.money + 0.5) liters = Math.max(0, this.s.money / GAME_FUEL_PRICE);
+    if (liters < 0.5) return { ok: false, why: 'Non hai abbastanza soldi' };
+    I.fill = { liters, got: 0, cost: 0 };
+    return { ok: true };
+  }
+  // estetica: le categorie comuni più quelle proprie dell'auto; ogni auto ha i suoi acquisti
+  cosCats() {
+    const all = Object.assign({}, GAME_COSMETICS, (CARS[this.car] && CARS[this.car].body) || {});
+    if (this.car !== 'supra') { delete all.stripe; delete all.tint; delete all.decal; }   // disegnati sullo sprite della Supra
+    return all;
+  }
+  ownKey(k) { return (this.car === 'supra' ? '' : this.car + '|') + k; }
+  cosOwned(cat, id) { const c = this.cosCats()[cat], it = c && c.items.find((x) => x.id === id); return this.mode === 'free' || id === 'none' || (it && !it.price) || !!this.s.owned[this.ownKey('cos:' + cat + ':' + id)]; }
+  buyCos(cat, id, item) {
+    const c = this.cosCats()[cat], it = item || (c && c.items.find((x) => x.id === id)); if (!it) return { ok: false };
+    if (this.cosOwned(cat, id)) return { ok: true, paid: 0 };
+    if (it.price > this.s.money) return { ok: false, why: `Servono € ${it.price}, ne hai ${Math.floor(this.s.money)}` };
+    this.s.money -= it.price; this.s.owned[this.ownKey('cos:' + cat + ':' + id)] = true;
+    this.say(`${c ? c.label : 'Sticker'}: ${it.name} − € ${it.price}`, 'buy');
+    return { ok: true, paid: it.price };
+  }
+  // ------------------------------------------------------------ manutenzione (Niko)
+  maint() { const st = this.carState(); return st.maint || (st.maint = { oil: 1, plugs: 1, pads: 1, dirt: st.clean === false ? 0.8 : 0.2 }); }
+  wear(km, braking) {
+    const m = this.maint();
+    m.oil = Math.max(0, m.oil - km / 40); m.plugs = Math.max(0, m.plugs - km / 90);
+    m.pads = Math.max(0, m.pads - km / 35 - braking);
+    m.dirt = Math.min(1, m.dirt + km / 15 * (this.sim.wet ? 3 : 1));
+  }
+  serviceCost(id) { if (this.mode !== 'career') return 0; const s = GAME_SERVICES.find((x) => x.id === id); return Math.round(s.price * this.disc() / 5) * 5; }
+  service(id) {
+    const s = GAME_SERVICES.find((x) => x.id === id), m = this.maint(), c = this.serviceCost(id);
+    const level = id === 'wash' ? 1 - m.dirt : m[id];
+    if (level > 0.97) return { ok: false, why: 'Non serve: è a posto' };
+    if (c > this.s.money) return { ok: false, why: `Niko vuole € ${c}` };
+    this.s.money -= c; if (id === 'wash') m.dirt = 0; else m[id] = 1;
+    this.say(`${s.name}${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
+  }
+
+  // ------------------------------------------------------------ salvataggio
+  save() { return JSON.stringify({ mode: this.mode, s: this.s }); }
+  load(json) {
+    try { const o = JSON.parse(json); if (o && o.s) { Object.assign(this.s, o.s); this.mode = o.mode === 'free' ? 'free' : 'career'; this.loc = GAME_LOCS.find((l) => l.id === this.s.loc) || GAME_LOCS[0]; } } catch (e) { /* salvataggio illeggibile */ }
+    if (!Array.isArray(this.s.trunk)) this.s.trunk = [];
+    // contachilometri per auto (i salvataggi vecchi partono dalla distanza già percorsa)
+    if (!this.s.cars || (!this.s.cars.supra && !this.s.vg)) this.s.cars = { supra: { km: Math.max(0, (this.s.dist || 0) / 1000) } };
+    if (!Array.isArray(this.s.perks)) this.s.perks = GAME_KM_PERKS.filter((p) => ((this.s.cars.supra || {}).km || 0) >= p.km).map((p) => p.id);
+    // ogni auto ha i suoi traguardi; la Volvo arriva nel garage con i salvataggi vecchi
+    if (this.s.cars.supra && !Array.isArray(this.s.cars.supra.perks)) this.s.cars.supra.perks = this.s.perks.slice();
+    if (!this.s.cars.v40) this.s.cars.v40 = { km: 0, perks: [], up: 0, fuel: 0.55 };
+    if (this.s.vg && !CARS[this.s.carId]) this.s.carId = 'v40';
+    if (!CARS[this.s.carId]) this.s.carId = 'supra';
+    this.applyMass();
+  }
+  reset() { const m = this.mode; Object.assign(this, new StreetGame(this.sim, this.rnd)); this.mode = m; }
+
+  // ------------------------------------------------------------ officina
+  // ---------------------------------------------------------------- bagagliaio
+  trunkKg() { return (this.s.trunk || []).reduce((a, it) => a + it.kg, 0); }
+  trunkFits(kg) { return (this.s.trunk || []).length < TRUNK_SLOTS && this.trunkKg() + kg <= TRUNK_KG; }
+  applyMass(dm, rearOff) {
+    // il peso nel bagagliaio va sul posteriore: aiuta la trazione posteriore (Supra), toglie un filo a quella anteriore (V40).
+    // L'alleggerimento (dm < 0) toglie peso soprattutto dietro (rearOff = quota tolta dal posteriore)
+    if (dm !== undefined) { this.massDelta = dm; this.massRear = rearOff ?? 0.6; }
+    const kg = this.trunkKg(), P = this.sim.P, car = CARS[this.car] || CARS.supra, d = this.massDelta || 0, ro = this.massRear ?? 0.6;
+    const m = car.mass + d, driveKg = car.driveW * car.mass + d * (car.fwd ? 1 - ro : ro);
+    P.mass = m + kg; P.fwd = car.fwd;
+    P.rearW = (driveKg + kg * (car.fwd ? 0.05 : 0.95)) / (m + kg);
+  }
+  // ------------------------------------------------------------ garage: più auto, ognuna con i suoi chilometri e potenziamenti
+  get car() { return (this.s && CARS[this.s.carId] && this.s.carId) || 'supra'; }
+  carState(id = this.car) { return this.s.cars[id] || (this.s.cars[id] = { km: 0, perks: [] }); }
+  switchCar(id) {
+    if (!CARS[id] || id === this.car) return { ok: false };
+    if (Math.abs(this.sim.v) > 0.5 || this.race || this.inside || this.ap) return { ok: false, why: 'Per cambiare auto fermati (e non in gara)' };
+    const sim = this.sim, cur = this.carState();
+    Object.assign(cur, { fuel: sim.fuel, damage: sim.damage, tireWear: sim.tireWear });
+    this.s.carId = id;
+    const nx = this.carState();
+    sim.fuel = nx.fuel ?? 0.6; sim.damage = nx.damage || 0; sim.tireWear = nx.tireWear || 0; sim.dry = false;
+    this.applyMass();
+    this.say(`In garage: ${CARS[id].name}`, 'buy');
+    return { ok: true };
+  }
+  // potenziamenti progressivi (V40): si montano in ordine
+  ups() { return (CARS[this.car] && CARS[this.car].ups) || null; }
+  upLevel() { return this.carState().up || 0; }
+  nextUp() { const u = this.ups(); return u ? u[this.upLevel()] || null : null; }
+  upPrice(u) { return this.mode === 'career' ? Math.round(u.price * this.disc() / 10) * 10 : 0; }
+  buyUp() {
+    const u = this.nextUp(); if (!u) return { ok: false, why: 'Tutto montato' };
+    if (this.mode === 'career' && this.odo < u.km) return { ok: false, why: `Si sblocca a ${u.km} km: la ${CARS[this.car].short} ne ha ${Math.floor(this.odo)}` };
+    const p = this.upPrice(u);
+    if (p > this.s.money) return { ok: false, why: `Servono € ${p}, ne hai ${Math.floor(this.s.money)}` };
+    this.s.money -= p; this.carState().up = this.upLevel() + 1;
+    this.say(`${u.name}${p ? `: − € ${p}` : ''}`, 'buy');
+    return { ok: true };
+  }
+  addItem(kind, extra = {}) {
+    const it = Object.assign({ kind, kg: INV[kind].kg }, INV[kind].uses ? { uses: INV[kind].uses } : {}, extra);
+    if (!this.trunkFits(it.kg)) return false;
+    this.s.trunk.push(it); this.applyMass(); return true;
+  }
+  itemName(it) { return it.name || INV[it.kind].name; }
+  buyItem(kind) {
+    const p = this.mode === 'career' ? INV[kind].price : 0;
+    if (p > this.s.money) return { ok: false, why: `Costa € ${p}` };
+    if (!this.trunkFits(INV[kind].kg)) return { ok: false, why: 'Il bagagliaio è pieno' };
+    this.s.money -= p; this.addItem(kind); this.say(`${INV[kind].name} nel bagagliaio${p ? `: − € ${p}` : ''}`, 'buy');
+    return { ok: true };
+  }
+  useItem(i) {
+    const it = this.s.trunk[i]; if (!it) return { ok: false, why: 'Posto vuoto' };
+    const sim = this.sim;
+    if (it.kind === 'tanica') {
+      if (sim.fuel > 0.97) return { ok: false, why: 'Il serbatoio è già pieno' };
+      sim.fuel = Math.min(1, sim.fuel + 10 / sim.P.tank); sim.dry = false; this.s.trunk.splice(i, 1);
+      this.say('10 litri dalla tanica', 'fuel');
+    } else if (it.kind === 'kit') {
+      if (Math.abs(sim.v) > 0.5) return { ok: false, why: 'Fermati per usare gli attrezzi' };
+      if (sim.damage < 0.01) return { ok: false, why: 'Non c\'è niente da raddrizzare' };
+      sim.damage = Math.max(0, sim.damage - 0.15); it.uses -= 1; if (it.uses <= 0) this.s.trunk.splice(i, 1);
+      this.say(`Martello e pazienza: danni al ${Math.round(sim.damage * 100)} %`, 'buy');
+    } else return { ok: false, why: it.kind === 'pacco' ? 'Il pacco va consegnato, non aperto' : 'Questo oggetto non si usa: puoi solo toglierlo' };
+    this.applyMass(); return { ok: true };
+  }
+  dropItem(i) {
+    const it = this.s.trunk[i]; if (!it) return { ok: false };
+    if (it.kind === 'pacco' && this.job) return { ok: false, why: 'Se butti il pacco perdi la consegna: portalo a destinazione' };
+    this.s.trunk.splice(i, 1); this.applyMass(); this.say(`${this.itemName(it)} lasciato sul marciapiede`); return { ok: true };
+  }
+
+  // servizi d'officina: carrozziere e gomme nuove
+  repairCost() { return Math.round(this.sim.damage * 2600 * this.disc() / 10) * 10; }
+  tireCost() { return Math.round(Math.max(380, tuningItem('tires', this.tireId || 'oem').price * 0.55) * this.disc() / 10) * 10; }
+  repair() {
+    const c = this.mode === 'career' ? this.repairCost() : 0;
+    if (!this.sim.damage) return { ok: false, why: 'La carrozzeria è già a posto' };
+    if (c > this.s.money) return { ok: false, why: `Il carrozziere vuole € ${c}` };
+    this.s.money -= c; this.sim.damage = 0; this.say(`Carrozzeria riparata${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
+  }
+  newTires() {
+    const c = this.mode === 'career' ? this.tireCost() : 0;
+    if (c > this.s.money) return { ok: false, why: `Un treno di gomme costa € ${c}` };
+    this.s.money -= c; this.sim.tireWear = 0; this.sim.tireT = 24; this.say(`Gomme nuove montate${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
+  }
+  // ------------------------------------------------------------ chilometri
+  get odo() { return (this.s.cars[this.car] || { km: 0 }).km; }
+  hasPerk(id) { return (this.carState().perks || []).includes(id); }
+  perkPow() { return 1 + (this.hasPerk('rodaggio') ? 0.03 : 0) + (this.hasPerk('leggenda') ? 0.03 : 0); }
+  perkGrip() { return this.hasPerk('leggenda') ? 1.04 : 1; }
+  disc() { return this.hasPerk('cliente') ? 0.9 : 1; }
+  nextPerk() { return GAME_KM_PERKS.find((p) => !this.hasPerk(p.id)) || null; }
+  // ogni pezzo chiede anche un po' di strada: più costa, più chilometri servono per sbloccarlo
+  // ogni pezzo chiede anche un po' di strada (km del pezzo, oppure: più costa, più chilometri)
+  partKm(cat, id) { const it = tuningItem(cat, id); if (!it || !it.price) return 0; return it.km ?? Math.max(5, Math.round(it.price / 150 / 5) * 5); }
+  partLocked(cat, id) { return this.mode === 'career' && !this.owns(cat, id) && this.odo < this.partKm(cat, id); }
+  owns(cat, id) { return this.mode === 'free' || !TUNING[cat] || TUNING[cat].items[0].id === id || tuningItem(cat, id).price === 0 || !!this.s.owned[this.ownKey(cat + ':' + id)]; }
+  price(cat, id) { return this.owns(cat, id) ? 0 : Math.round(tuningItem(cat, id).price * this.disc() / 10) * 10; }
+  canMount() { return this.mode === 'free' || (Math.abs(this.sim.v) < 0.5 && !this.race); }
+  // con i luoghi in città (2D, carriera) i pezzi si montano solo dentro l'officina
+  inShop() { return !!(this.inside && this.inside.id === 'shop' && this.inside.phase === 'shop'); }
+  needsShop() { return this.mode === 'career' && this.placesOn && !this.inShop(); }
+  inNiko() { return !!(this.inside && this.inside.id === 'niko' && this.inside.phase === 'shop'); }
+  needsNiko() { return this.mode === 'career' && this.placesOn && !this.inNiko(); }
+  buy(cat, id) {
+    const p = this.price(cat, id);
+    if (this.partLocked(cat, id)) return { ok: false, why: `Si sblocca a ${this.partKm(cat, id)} km: la Supra ne ha ${Math.floor(this.odo)}` };
+    if (p > this.s.money) return { ok: false, why: `Servono € ${p}, ne hai ${Math.floor(this.s.money)}` };
+    this.s.money -= p;
+    this.s.owned[this.ownKey(cat + ':' + id)] = true;
+    if (p) this.say(`Comprato ${tuningItem(cat, id).brand} ${tuningItem(cat, id).name}: − € ${p}`, 'buy');
+    return { ok: true, paid: p };
+  }
+
+  // viaggio verso un altro punto della mappa: cambia sfondo e traffico, la strada si svuota
+  setLoc(id) {
+    const L = GAME_LOCS.find((l) => l.id === id); if (!L) return false;
+    this.loc = L; this.s.loc = L.id;
+    this.ents = this.ents.filter((e) => e.kind === 'drop');
+    this.nextTraffic = 0; this.inside = null; this.prompt = null;
+    return true;
+  }
+  say(text, kind = 'info') { this.out.push({ text, kind }); }
+  ask(p) { if (this.prompt) return false; this.prompt = Object.assign({ t: 9, time: 9 }, p); this.prompt.t = this.prompt.time; return true; }
+  answer(i) {
+    const p = this.prompt; if (!p) return;
+    const o = p.options[i]; if (!o) return;
+    this.prompt = null;
+    if (o.act) o.act();
+  }
+
+  get kmh() { return this.sim.v * 3.6; }
+  rel(e) { return e.x - this.s.dist; }
+
+  // ------------------------------------------------------------ eventi
+  spawn() {
+    const sim = this.sim, d = this.s.dist, r = this.rnd;
+    const w = [
+      ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
+      ['race', this.kmh > 15 && !this.job ? 14 : 0], ['job', !this.job ? 10 : 0],
+    ];
+    let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
+    for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }
+    if (kind === 'traffic') {
+      const n = 1 + (r() < 0.35 ? 1 : 0);
+      for (let i = 0; i < n; i++) this.spawnTraffic(d + 230 + r() * 160 + i * 45);
+    } else if (kind === 'police') {
+      const parked = r() < 0.6;
+      this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 2, x: d + (parked ? 380 : 260), v: parked ? 0 : 24 + r() * 4 });
+    } else if (kind === 'station') {
+      if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
+    } else if (kind === 'race') this.offerRace();
+    else if (kind === 'job') this.offerJob();
+  }
+
+  // un veicolo del traffico (tipo a caso secondo il luogo), in una corsia libera
+  spawnTraffic(x, lane) {
+    const r = this.rnd, mix = (this.loc && this.loc.mix) || {};
+    const tot = GAME_TRAFFIC.reduce((a, t) => a + t.w * (mix[t.vt] ?? 1), 0);
+    let k = r() * tot, T = GAME_TRAFFIC[0];
+    for (const t of GAME_TRAFFIC) { if ((k -= t.w * (mix[t.vt] ?? 1)) < 0) { T = t; break; } }
+    const heavy = T.vt === 'bus';
+    lane = lane || (heavy ? (r() < 0.8 ? 1 : 2) : r() < 0.5 ? 1 : r() < 0.6 ? 2 : 3);
+    if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 14 + (o.len || 4.6))) return null;
+    const cols = GAME_COLORS;
+    const hw = !!(this.s && this.s.vg) || (this.loc && this.loc.bg === 'highway'), kv = hw ? 1 : 0.5;
+    const v = (T.kmh[0] + r() * (T.kmh[1] - T.kmh[0])) * kv / 3.6;
+    const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: 'orig' };
+    this.ents.push(e); return e;
+  }
+
+  offerRace() {
+    const r = this.rnd, rv = GAME_RIVALS[Math.floor(r() * GAME_RIVALS.length)];
+    const stake = Math.round((200 + r() * 300 + this.s.rep * 6) / 50) * 50;
+    this.ask({
+      kind: 'race', title: 'Sfida al semaforo',
+      text: `${rv.name} su ${rv.car} si affianca e dà due colpi di gas. 400 metri da fermo, posta € ${stake}.`,
+      options: [
+        { label: 'Accetto', act: () => this.startRace(rv, stake) },
+        { label: 'Lascia stare', act: () => this.say(`${rv.name} se ne va ridendo.`) },
+      ],
+    });
+  }
+
+  offerJob() {
+    const r = this.rnd, km = 2 + Math.round(r() * 30) / 10, pay = Math.round((90 + km * 45 + r() * 60) / 10) * 10;
+    const goods = [['un pacco per un\'officina', 8], ['dei cerchi in lega', 36], ['una centralina riprogrammata', 3], ['dei pezzi di ricambio', 22], ['una cassa di olio motore', 28]];
+    const [what, kg] = goods[Math.floor(r() * goods.length)];
+    if (!this.trunkFits(kg)) { this.say(`Un lavoretto da ${kg} kg, ma il bagagliaio non ce la fa`, 'job'); return; }
+    this.ask({
+      kind: 'job', title: 'Lavoretto',
+      text: `Porta ${what} (${kg} kg nel bagagliaio) a ${km.toLocaleString('it-IT')} km da qui. Paga € ${pay}, + 30% se arrivi entro ${Math.ceil(km / 0.95)} minuti.`,
+      options: [
+        { label: 'Lo faccio', act: () => {
+          const to = this.s.dist + km * 1000;
+          this.job = { to, pay, km, deadline: km / 0.95 * 60, t: 0 };
+          this.addItem('pacco', { kg, name: what.replace(/^(un |una |dei |delle )/, '').replace(/^./, (c) => c.toUpperCase()) });
+          this.ents.push({ id: this.id++, kind: 'drop', lane: 1, x: to, v: 0 });
+          this.say(`Consegna accettata: ${km.toLocaleString('it-IT')} km`, 'job');
+        } },
+        { label: 'No grazie' },
+      ],
+    });
+  }
+
+  // tempo previsto sui 400 m con la formula di Hale (+ partenza da strada)
+  etEstimate() {
+    const cv = this.sim.estimatePeak().cv;
+    return 5.825 * Math.pow((this.sim.P.mass + 75) * 2.2046 / (cv * 0.986), 1 / 3) + 0.45 + Math.max(0, 0.35 - (this.sim.P.mu - 1.1));
+  }
+  ladderRival() {
+    let i = this.s.ladder || 0;
+    for (const z of GAME_LADDER) { if (i < z.rivals.length) return { zone: z.zone, ...z.rivals[i] }; i -= z.rivals.length; }
+    return null;
+  }
+  // zona verde dei giri in partenza: più boost da costruire, più alta; più grip, più alta
+  launchZone() {
+    const tc = this.sim.tune.turbo, mid = (tc.twin ? 3600 : 3600 + (tc.a - 2800) * 0.6) + (this.sim.P.mu - 1.1) * 1800;
+    return { lo: Math.round(mid - 450), hi: Math.round(mid + 450) };
+  }
+  startLadder() {
+    const rv = this.ladderRival(); if (!rv || this.race) return false;
+    this.startRace(rv, 0, { et: rv.et, prize: rv.prize, ladder: this.s.ladder });
+    return true;
+  }
+
+  startRace(rv, stake, opt = {}) {
+    this.ents = this.ents.filter((e) => e.kind === 'station' || e.kind === 'drop' || this.rel(e) < -20);
+    this.prompt = null;
+    const et = opt.et || this.etEstimate() * (1.0 + this.rnd() * 0.09 - Math.min(0.05, this.s.rep * 0.0005));
+    this.race = { rv, stake, et, phase: 'stage', t: 0, prize: opt.prize || 0, ladder: opt.ladder, zone: this.launchZone(), shifts: [], hitLim: false };
+    this.lane = 1;
+    this.stopAt(null, () => {
+      this.race.phase = 'count'; this.race.t = 3.6;
+      this.race.x0 = this.s.dist;
+      this.ap = null;
+      this.ents.push({ id: this.id++, kind: 'rival', lane: 2, x: this.s.dist, v: 0, color: GAME_COLORS[Math.floor(this.rnd() * GAME_COLORS.length)] });
+      this.ents.push({ id: this.id++, kind: 'line', lane: 1, x: this.s.dist + 2.6, v: 0 });
+      this.ents.push({ id: this.id++, kind: 'line', lane: 1, x: this.s.dist + 402.3 + 2.6, v: 0, finish: true });
+      this.say('Prima marcia. Tieni il freno, gas su, parti al verde.', 'race');
+    });
+    this.say(`Sfida accettata contro ${rv.name}: accosta al semaforo`, 'race');
+  }
+
+  busted(e) {
+    const kmh = this.kmh;
+    const fine = Math.round((160 + Math.max(0, kmh - 90) * 6) * (1 + this.s.heat * 0.3) / 10) * 10;
+    e.chase = true; e.lane = this.lane; e.x = Math.min(e.x, this.s.dist - 40);
+    this.siren = 1;
+    this.say(`Polizia! Fermato in sesta a ${Math.round(kmh)} km/h`, 'police');
+    this.stopAt(null, () => {
+      this.ask({
+        kind: 'police', title: 'Posto di blocco', time: 12,
+        text: `Patente e libretto. Sesta marcia a ${Math.round(kmh)} km/h in città: multa di € ${fine}.`,
+        options: [{ label: `Paga € ${fine}`, act: () => this.payFine(e, fine) }],
+        onTimeout: () => this.payFine(e, fine),
+      });
+    });
+  }
+  payFine(e, fine) {
+    this.s.money -= fine; this.s.fines += fine; this.s.heat = Math.min(5, this.s.heat + 1);
+    e.chase = false; e.v = 0; e.lane = 0; this.siren = 0; this.ap = null;
+    this.say(`Multa pagata: − € ${fine}`, 'police');
+  }
+
+  // fermata guidata dal gioco; atX = posizione assoluta o null (prima possibile)
+  stopAt(atX, onStop) { this.ap = { atX, onStop, stopped: false, t: 0 }; }
+
+  // il gioco può prendere il controllo dei pedali (fermate, rifornimento)
+  control(inp, dt) {
+    const out = { thr: inp.thr, brake: inp.brake, auto: false };
+    const ap = this.ap;
+    if (ap) {
+      out.auto = true; out.thr = 0;
+      const v = Math.max(0, this.sim.v);
+      if (!ap.stopped) {
+        const rel = ap.atX === null ? 0 : ap.atX - this.s.dist;
+        if (ap.atX === null) out.brake = Math.min(1, 6 / 10.3 * 1.5 + 0.05);
+        else {
+          // velocità obiettivo: avvicinamento a ~50 km/h, poi frenata a 3 m/s² fino alla pompa
+          const vt = Math.min(Math.max(v, 14), Math.sqrt(2 * 3 * Math.max(rel, 0)));
+          const need = v * v / (2 * Math.max(rel, 0.8));
+          out.brake = v > vt + 0.4 ? Math.min(1, need / 10.3 * 1.4 + (v - vt) * 0.05) : 0;
+          if (v < vt - 1 && rel > 4) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
+        }
+        if (v < 0.25 && (ap.atX === null || rel < 6)) {
+          ap.stopped = true;
+          if (this.sim.gear > 1 && this.sim.cfg.autoClutch) this.sim.shift(1);
+          if (ap.onStop) ap.onStop();
+        }
+      } else { out.brake = 1; ap.t += dt; if (ap.tick) ap.tick(dt); }
+    }
+    if (this.race && this.race.phase === 'count') out.auto = false;
+    return out;
+  }
+
+  update(dt) {
+    const sim = this.sim, d0 = this.s.dist;
+    if (sim.v > 0) this.s.dist += sim.v * dt;
+    const d = this.s.dist;
+    // contachilometri e traguardi
+    if (d > d0) {
+      const km = (d - d0) / 1000, car = this.s.cars[this.car] || (this.s.cars[this.car] = { km: 0 });
+      car.km += km; this.trip += km;
+      this.wear(km, sim.in.brake > 0.5 && sim.v > 8 ? km * 0.04 : 0);
+      const np = this.nextPerk();
+      if (np && car.km >= np.km) { (car.perks || (car.perks = [])).push(np.id); this.perkUp = np; this.say(`${np.km} km: ${np.name}! ${np.note}`, 'money'); }
+    }
+    if (this.prompt) {
+      this.prompt.t -= dt;
+      if (this.prompt.t <= 0) {          // senza risposta vale l'ultima opzione (di solito "no")
+        const p = this.prompt; this.prompt = null;
+        if (p.onTimeout) p.onTimeout(); else { const o = p.options[p.options.length - 1]; if (o.act) o.act(); }
+      }
+    }
+    this.s.heat = Math.max(0, this.s.heat - dt * 0.004);
+    const I = this.inside;
+    if (I) {
+      I.t += dt;
+      if (I.phase === 'in' && I.t > 1.3) { I.phase = 'shop'; I.t = 0; }
+      if (I.phase === 'out' && I.t > 1.1) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
+      if (I.fill) {
+        const F = I.fill, step = Math.min(F.liters - F.got, dt * 8);
+        F.got += step; sim.fuel = Math.min(1, sim.fuel + step / sim.P.tank); sim.dry = false;
+        F.cost = F.got * GAME_FUEL_PRICE;
+        if (F.got >= F.liters - 1e-6) {
+          const c = Math.round(F.cost * 100) / 100;
+          if (this.mode === 'career') this.s.money -= c;
+          this.say(`Rifornimento: ${F.got.toFixed(1).replace('.', ',')} litri, − € ${c.toFixed(2).replace('.', ',')}`, 'fuel');
+          I.fill = null; I.filled = true;
+        }
+      }
+      return;
+    }
+
+    // traffico continuo (città e luoghi della mappa): densità secondo il luogo
+    if (this.track === 'city' && !this.race && !this.ap && !this.inside && this.trafficOn !== false && d > (this.nextTraffic || 0)) {
+      const dens = (this.loc && this.loc.traffic) || 1;
+      if (this.ents.filter((e) => e.kind === 'traffic' && e.x - d > -60 && e.x - d < 700).length < 3 + dens * 5) {
+        // se andiamo più piano del traffico qualcuno arriva da dietro e ci sorpassa
+        if (sim.v < 29 && this.rnd() < 0.45) { const e = this.spawnTraffic(d - 140 - this.rnd() * 80, this.rnd() < 0.6 ? 2 : 3); if (e && e.v < sim.v + 3) e.v = e.vT = e.vBase = sim.v + 4 + this.rnd() * 6; }
+        else this.spawnTraffic(d + 240 + this.rnd() * 260);
+      }
+      this.nextTraffic = d + (40 + this.rnd() * 90) / dens;
+    }
+    if (this.mode === 'career' && sim.running && !this.race && !this.ap && d > this.nextSpawn) {
+      this.spawn(); this.nextSpawn = d + 220 + this.rnd() * 380;
+    }
+    if (this.mode === 'career' && sim.dry && Math.abs(sim.v) < 0.5 && !this.prompt && !this.ap) {
+      this.ask({
+        kind: 'fuel', title: 'A secco', time: 30,
+        text: 'Il serbatoio è vuoto. Il carro attrezzi ti porta 10 litri per € 120.',
+        options: [{ label: 'Chiama il soccorso', act: () => { this.s.money -= 120; sim.fuel = Math.min(1, sim.fuel + 10 / sim.P.tank); sim.dry = false; this.say('10 litri nel serbatoio. Riavvia il motore.', 'fuel'); } }],
+        onTimeout: () => {},
+      });
+    }
+
+    // entità
+    for (const e of this.ents) {
+      if (e.chase) { e.x += (d - 9 - e.x) * Math.min(1, dt * 1.6) + sim.v * dt; e.lane = this.lane; continue; }
+      e.x += (e.v || 0) * dt;
+      const rel = e.x - d;
+      // traffico vivo: ogni tanto cambia corsia (con la freccia prima), e suona se gli stai attaccato
+      if (e.kind === 'traffic' && !e.racing && !e.still) {
+        // coda: chi raggiunge un veicolo più lento nella sua corsia rallenta e prima o poi mette la freccia
+        // ogni guidatore cambia un po' andatura nel tempo; accelera e frena con dei limiti, non a scatti
+        e.driftT = (e.driftT || 0) - dt;
+        if (e.driftT <= 0 && e.vBase) { e.driftT = 6 + Math.random() * 10; e.vT = e.vBase * (0.93 + Math.random() * 0.12); }
+        const gapNeed = 10 + e.v * 0.9;
+        const lead = this.ents.find((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.lane && o.x > e.x && o.x - e.x < gapNeed + ((o.len || 4.6) + (e.len || 4.6)) / 2);
+        // anche il giocatore conta: chi ci arriva dietro nella stessa corsia rallenta (e prima o poi cambia corsia)
+        const meAhead = Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && d > e.x && d - e.x < gapNeed + ((e.len || 4.6) + 4.5) / 2;
+        let want = e.vT || e.v;
+        if (lead) want = Math.min(want, lead.v - (lead.x - e.x < 8 + ((lead.len || 4.6) + (e.len || 4.6)) / 2 ? 1.5 : 0));
+        if (meAhead) want = Math.min(want, Math.max(0, sim.v - 0.5));
+        e.v += Math.max(-4 * dt, Math.min(1.4 * dt, want - e.v));
+        if (e.sig > 0) { e.sig -= dt; if (e.sig <= 0 && e.to) { if (!(Math.abs(this.laneZ - GAME_LANE_Z[e.to]) < 1.7 && Math.abs(d - e.x) < 14 + Math.abs(sim.v - e.v) * 2)) e.lane = e.to; e.to = 0; } }
+        else if ((rel > 30 || rel < -15) && Math.random() < dt * (lead || meAhead ? 0.5 : 0.05)) {
+          const to = e.lane + (e.lane === 1 ? 1 : e.lane === 3 ? -1 : Math.random() < 0.5 ? 1 : -1);
+          if (!this.ents.some((o) => o !== e && o.kind === 'traffic' && (o.lane === to || o.to === to) && Math.abs(o.x - e.x) < 14 + Math.abs(o.v - e.v) * 2)
+            && !(Math.abs(this.laneZ - GAME_LANE_Z[to]) < 1.7 && Math.abs(d - e.x) < 22 + Math.abs(sim.v - e.v) * 2.5)) { e.to = to; e.sig = 1.6; }   // non ci taglia la strada
+        }
+        // passaggio accanto: suono con effetto doppler
+        if (e.prevRel !== undefined && Math.sign(e.prevRel) !== Math.sign(rel) && Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 5 && Math.abs(sim.v - (e.v || 0)) > 4)
+          this.fx.push({ k: 'pass', dv: sim.v - (e.v || 0), near: Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 2.5 });
+        e.prevRel = rel;
+        e.honk = Math.max(0, (e.honk || 0) - dt);
+        if (rel > 3 && rel < 9 && Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 1.4 && sim.v > (e.v || 0) + 2 && !e.honk) { e.honk = 4; this.fx.push({ k: 'honk', x: e.x }); }
+      }
+      if (e.kind === 'police' && !e.checked && !e.busy && rel < 3 && rel > -8 && this.mode === 'career') {
+        e.checked = true;
+        if (sim.gear === sim.topGear() && sim.gear >= 5 && sim.v > 4 && !this.ap) this.busted(e);
+      }
+      if (e.kind === 'station' && !e.asked && rel < 620 && rel > 120) {
+        e.asked = true;
+        const missing = Math.max(0, (1 - sim.fuel) * sim.P.tank), full = Math.ceil(missing * GAME_FUEL_PRICE);
+        this.ask({
+          kind: 'station', title: 'Distributore tra 600 m',
+          text: `Nel serbatoio hai ${Math.round(sim.fuel * sim.P.tank)} litri su ${sim.P.tank}. Benzina a € ${GAME_FUEL_PRICE.toLocaleString('it-IT')} al litro.`,
+          options: [
+            { label: `Pieno · € ${full}`, act: () => this.planFuel(e, missing) },
+            { label: '€ 20 di benzina', act: () => this.planFuel(e, 20 / GAME_FUEL_PRICE) },
+            { label: 'Tiro dritto' },
+          ],
+        });
+      }
+      if (e.kind === 'drop' && this.job && rel <= 0) {
+        const j = this.job, bonus = j.t <= j.deadline ? Math.round(j.pay * 0.3) : 0;
+        this.s.money += j.pay + bonus; this.s.jobs++; this.s.rep += 3;
+        this.say(`Consegna fatta: + € ${j.pay}${bonus ? ` e € ${bonus} di bonus puntualità` : ''}`, 'money');
+        this.job = null; e.done = true;
+        const pi = this.s.trunk.findIndex((it) => it.kind === 'pacco'); if (pi >= 0) { this.s.trunk.splice(pi, 1); this.applyMass(); }
+      }
+    }
+    if (this.job) this.job.t += dt;
+    this.ents = this.ents.filter((e) => !e.done && (e.chase || e.racing || e.kind === 'drop' || (e.x - d > -220 && e.x - d < 1500)));
+
+    // sorpasso automatico: resta a destra; se davanti c'è qualcuno più lento guarda la corsia accanto (prima a sinistra,
+    // poi a destra) tenendo conto delle velocità: davanti deve esserci spazio per sorpassare, dietro nessuno che arriva forte
+    const moving = (e) => e.kind === 'traffic' || (e.kind === 'police' && !e.chase && (e.v > 0 || e.still));
+    const laneFree = (lane, back, front) => !this.ents.some((e) => moving(e) && (e.lane === lane || e.to === lane) && (() => {
+      const rel = e.x - d, half = ((e.len || 4.6) + 4.5) / 2, dv = sim.v - e.v;
+      // davanti: spazio che serve per non raggiungerlo durante il cambio; dietro: chi è più veloce ci arriverebbe addosso
+      return rel > -half - back - Math.max(0, -dv) * 2.2 && rel < half + front + Math.max(0, dv) * 1.6;
+    })());
+    this.laneT = Math.max(0, this.laneT - dt);
+    this.manualT = Math.max(0, this.manualT - dt);
+    this.blocked = false;
+    if (!this.race && !this.ap && this.autoLane && this.manualT === 0) {
+      const look = 22 + sim.v * 2.4, L = this.lane;
+      const lead = this.ents.filter((e) => moving(e) && e.lane === L && e.x - d > -2 && e.x - d < look && e.v < sim.v - 0.2).sort((a, b) => a.x - b.x)[0];
+      if (lead && this.laneT === 0) {
+        if (L < 3 && laneFree(L + 1, 6, 10)) { this.lane = L + 1; this.laneT = 1.4; }
+        else if (L > 1 && laneFree(L - 1, 6, 10)) { this.lane = L - 1; this.laneT = 1.4; }
+      } else if (!lead && L > 1 && this.laneT === 0 && laneFree(L - 1, 10, 25 + sim.v * 1.2)) { this.lane = L - 1; this.laneT = 2.2; }
+      // nessuno spazio: si accoda dietro a chi è più lento (frenata dolce, più decisa se si è vicini)
+      this.blockBrake = 0;
+      if (lead && this.lane === L) {
+        const gap = lead.x - d - ((lead.len || 4.6) + 4.5) / 2, dv = sim.v - lead.v;
+        this.blocked = gap < 10 + dv * 2.2 + sim.v * 0.5;
+        // frenata che serve per non arrivargli addosso (più forte quanto più si è vicini e veloci)
+        if (this.blocked) this.blockBrake = Math.min(1, 0.12 + Math.max(0, dv) * Math.max(0, dv) / (2 * Math.max(1.5, gap - 4)) / 9 + (gap < 6 ? 0.3 : 0));
+      }
+    }
+    // contatti: tamponi (muso contro coda), vieni tamponato (coda contro muso), strisciate di fianco in cambio corsia
+    if (!this.race) for (const e of this.ents) {
+      if (!moving(e)) continue;
+      if ((e.hitT || 0) > 0) { e.hitT -= dt; continue; }
+      const rel = e.x - d, half = ((e.len || 4.6) + 4.4) / 2, dz = Math.abs(this.laneZ - (e._gz ?? GAME_LANE_Z[e.lane]));
+      if (Math.abs(rel) > half) continue;
+      if (dz < 1.6) {
+        if (rel > 0 && sim.v > e.v + 0.5) this.crash(e, 'front');
+        else if (rel <= 0 && e.v > sim.v + 0.5) this.crash(e, 'rear');
+      } else if (dz < 2.6 && Math.abs(rel) < half - 0.6) this.crash(e, 'side');
+    }
+    // frecce: lampeggiano qualche secondo quando cambia la corsia scelta
+    if (this.prevLane !== undefined && this.lane !== this.prevLane) this.signal = { dir: this.lane > this.prevLane ? 'L' : 'R', t: 2.6 };
+    this.prevLane = this.lane;
+    if (this.signal) { this.signal.t -= dt; if (this.signal.t <= 0) this.signal = null; }
+    // strada di montagna: niente corsie fisse, in curva la Supra viene spinta verso l'esterno (v²·κ):
+    // va tenuta in strada con lo sterzo; contro il guardrail rallenta, struscia e si ammacca
+    if (this.track === 'mountain') {
+      // guida libera: l'auto ha una sua direzione (relYaw rispetto alla strada). Lo sterzo dà un angolo alle ruote,
+      // l'angolo dà una rotazione (v·tanδ/passo) limitata dall'aderenza: se si esagera l'auto allarga (sottosterzo).
+      // Se la strada curva e non si sterza, si va dritti verso il bordo. Nessun aiuto automatico.
+      const v = Math.max(0, sim.v), grip = (sim.P.mu || 1.1) * sim.tireGrip() * 9.81;
+      const dMax = 0.55 / (1 + v * 0.06);                                   // sterzo pieno: meno angolo in velocità
+      this.steerAngle = (this.steerAngle || 0) + (this.steerIn * dMax - (this.steerAngle || 0)) * Math.min(1, dt * 9);
+      let yawRate = v * Math.tan(this.steerAngle) / 2.55;
+      const aMax = grip * 0.95; this.slide = 0;
+      if (v > 1 && Math.abs(yawRate * v) > aMax) { this.slide = Math.min(1, (Math.abs(yawRate * v) - aMax) / aMax); yawRate = Math.sign(yawRate) * aMax / v; }
+      // sovrasterzo di potenza: con le ruote che pattinano la coda gira di più
+      const wheelSlip = Math.max(0, sim.ww * sim.P.r - sim.v) / Math.max(4, sim.v);
+      if (wheelSlip > 0.12 && Math.abs(this.steerAngle) > 0.02) yawRate += Math.sign(this.steerAngle) * Math.min(0.9, wheelSlip * 1.6);
+      this.relYaw = (this.relYaw || 0) + (yawRate - MOUNTAIN.kappa(d) * v) * dt;
+      this.relYaw = Math.max(-1.2, Math.min(1.2, this.relYaw));
+      this.laneZ -= v * Math.sin(this.relYaw) * dt;
+      sim.grade = MOUNTAIN.slope(d);
+      // traffico: corsia di destra (o = +2) nel nostro senso, corsia di sinistra (o = -2) in senso opposto;
+      // rallentano nelle curve strette. Urtarli ammacca e frena di colpo (frontale molto peggio)
+      if (!this.mtnCars) {
+        const cols = [0x2b4c7e, 0xd8d8d0, 0x1c1c22, 0x8a1c1c, 0x3f6f4a, 0xb9a46a, 0x5a5f68];
+        this.mtnCars = [];
+        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 90 + k * 110, o: 2, dir: 1, v: 0, base: 13 + Math.random() * 6, color: cols[k % cols.length] });
+        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 140 + k * 150, o: -2, dir: -1, v: 0, base: 14 + Math.random() * 7, color: cols[(k + 3) % cols.length] });
+      }
+      for (const c of this.mtnCars) {
+        const tgt = Math.min(c.base, Math.sqrt(3.2 / Math.max(0.002, Math.abs(MOUNTAIN.kappa(c.s)))));
+        c.v += (tgt - c.v) * Math.min(1, dt * 0.8);
+        c.s += c.dir * c.v * dt;
+        const rel = c.s - d;
+        if (c.dir > 0 && (rel < -70 || rel > 520)) { c.s = d + 260 + Math.random() * 200; c.v = c.base * 0.8; }
+        if (c.dir < 0 && rel < -70) { c.s = d + 300 + Math.random() * 220; c.v = c.base; }
+        if (Math.abs(rel) < 4.3 && Math.abs(c.o - this.laneZ) < 1.75) {
+          if (!c.hit) {
+            c.hit = true; const head = c.dir < 0;
+            sim.v *= head ? 0.15 : 0.55; sim.damage = Math.min(1, sim.damage + (head ? 0.3 : 0.12));
+            this.laneZ -= Math.sign(c.o - this.laneZ || 1) * 0.6; this.relYaw = (this.relYaw || 0) * 0.3;
+            this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash' });
+            this.say(head ? 'Frontale! Resta nella tua corsia' : 'Tamponamento', 'bad');
+          }
+        } else if (Math.abs(rel) > 7) c.hit = false;
+      }
+      const lim = MOUNTAIN.half - 1.0;
+      this.rail = 0;
+      if (Math.abs(this.laneZ) > lim) {
+        this.rail = Math.sign(this.laneZ); this.laneZ = this.rail * lim;
+        // il guardrail raddrizza l'auto lungo la strada e la rallenta
+        if (Math.sign(-this.relYaw) === this.rail) this.relYaw *= 0.3;
+        if (v > 3) { sim.v *= 1 - Math.min(0.5, dt * 1.2); sim.damage = Math.min(1, sim.damage + dt * 0.012 * v / 20); if (Math.random() < dt * 10) this.fx.push({ k: 'scrape', side: this.rail }); }
+      }
+      this.free = true; this.lane = 1; this.prevLane = 1; this.signal = null;
+      this.updateRace(dt, d0);
+      return;
+    }
+    // sterzo libero: velocità laterale che cresce con la velocità, nessuno scatto tra le corsie
+    const freeOK = !this.race && !this.ap && sim.v > 0.3;
+    if (freeOK && Math.abs(this.steerIn) > 0.05) {
+      this.free = true; this.manualT = this.autoLane ? 5 : 1e9;
+      // più reattivo: la velocità laterale arriva quasi subito e cresce con la velocità dell'auto
+      const vmax = 2.4 + Math.min(4.6, sim.v * 0.15);
+      // risposta un po' non lineare: piccole correzioni morbide, sterzata piena decisa
+      const k = Math.sign(this.steerIn) * Math.pow(Math.abs(this.steerIn), 1.4);
+      this.latV += (-k * vmax - this.latV) * Math.min(1, dt * 16);
+    } else this.latV += (0 - this.latV) * Math.min(1, dt * 16);
+    if (!freeOK || (this.manualT === 0 && Math.abs(this.steerIn) <= 0.05)) this.free = false;
+    if (this.free) {
+      this.laneZ = Math.max(GAME_LANE_Z[3] - 1.4, Math.min(GAME_LANE_Z[1] + 1.4, this.laneZ + this.latV * dt));
+      // assistenza: mollato lo sterzo a meno di 30 cm dal centro di una corsia, la Supra ci si centra piano
+      if (Math.abs(this.steerIn) <= 0.05 && Math.abs(this.latV) < 0.3) {
+        let c = GAME_LANE_Z[1]; for (const l of [2, 3]) if (Math.abs(GAME_LANE_Z[l] - this.laneZ) < Math.abs(c - this.laneZ)) c = GAME_LANE_Z[l];
+        if (Math.abs(c - this.laneZ) < 0.3) this.laneZ += Math.sign(c - this.laneZ) * Math.min(Math.abs(c - this.laneZ), dt * 0.8);
+      }
+      if (this.laneZ === GAME_LANE_Z[3] - 1.4 || this.laneZ === GAME_LANE_Z[1] + 1.4) this.latV = 0;   // cordolo
+      let best = 1; for (const l of [2, 3]) if (Math.abs(GAME_LANE_Z[l] - this.laneZ) < Math.abs(GAME_LANE_Z[best] - this.laneZ)) best = l;
+      this.lane = best; this.prevLane = best;
+    } else {
+      this.latV = 0;
+      const zT = GAME_LANE_Z[this.lane];
+      // cambio corsia deciso: ~0,7 s a velocità d'autostrada, più morbido da fermi
+      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));
+    }
+
+    this.updateRace(dt, d0);
+  }
+
+  planFuel(e, liters) {
+    liters = Math.max(0, Math.min(liters, (1 - this.sim.fuel) * this.sim.P.tank));
+    this.lane = 1;
+    this.stopAt(e.x, null);
+    const ap = this.ap; let got = 0;
+    ap.onStop = () => this.say('Pompa n. 3, sblocca il tappo…', 'fuel');
+    ap.tick = (dt) => {
+      if (ap.t < 1) return;
+      const step = Math.min(liters - got, dt * 9);
+      got += step; this.sim.fuel = Math.min(1, this.sim.fuel + step / this.sim.P.tank);
+      if (got >= liters - 1e-6) {
+        const cost = Math.round(got * GAME_FUEL_PRICE);
+        this.s.money -= cost; this.ap = null; this.sim.dry = false;
+        this.say(`Rifornimento: ${Math.round(got)} litri, − € ${cost}`, 'fuel');
+      }
+    };
+  }
+
+  updateRace(dt) {
+    const R = this.race; if (!R) return;
+    const d = this.s.dist, rival = this.ents.find((e) => e.kind === 'rival');
+    if (R.phase === 'count') {
+      R.t -= dt;
+      if (d - R.x0 > 1.0) { this.endRace(false, 'Falsa partenza!'); return; }
+      if (R.t <= 0) {
+        R.phase = 'run'; R.tt = 0;
+        const rpm = this.sim.rpm, z = R.zone;
+        R.launchRpm = rpm;
+        R.launch = rpm >= z.lo && rpm <= z.hi ? 'perfetta' : rpm >= z.lo - 700 && rpm <= z.hi + 700 ? 'buona' : rpm < z.lo ? 'fiacca' : 'pattinata';
+      }
+    } else if (R.phase === 'run') {
+      R.tt += dt;
+      const released = this.sim.cfg.autoClutch ? this.sim.in.brake < 0.25 : this.sim.in.clutch < 0.6;
+      if (R.react === undefined && released) R.react = R.tt;
+      if (this.sim.cut === 2 && this.sim.clutch < 0.3 && R.tt > 0.3) R.hitLim = true;   // limitatore a frizione chiusa
+      R.vmax = Math.max(R.vmax || 0, this.kmh);
+      if (rival) {
+        const k = R.tt / R.et;
+        rival.x = R.x0 + (k <= 1 ? 402.3 * Math.pow(k, 1.75) : 402.3 + 402.3 * 1.75 / R.et * (R.tt - R.et));
+      }
+      if (d - R.x0 >= 402.3) { R.you = R.tt; this.endRace(R.tt < R.et); }
+      else if (R.tt > R.et + 12) this.endRace(false);
+    }
+  }
+  // valuta una cambiata durante la gara; la perfetta rende il cambio più rapido
+  gradeShift() {
+    const R = this.race; if (!R || R.phase !== 'run') return null;
+    const rpm = this.sim.rpm, lim = this.sim.P.limiter;
+    const g = R.hitLim || rpm > lim - 30 ? 'tardi' : rpm >= lim - 420 ? 'perfetta' : rpm >= lim - 1000 ? 'buona' : 'anticipata';
+    R.shifts.push(g); R.hitLim = false;
+    this.sim.fastShift = g === 'perfetta';
+    return g;
+  }
+
+  endRace(win, why) {
+    const R = this.race; this.race = null;
+    const ladder = R.ladder !== undefined;
+    const gain = win ? (ladder ? R.prize : R.stake) : (ladder ? 0 : -R.stake);
+    if (this.mode === 'career') this.s.money += gain;
+    if (win) { this.s.rep += ladder ? 15 : 10; this.s.wins++; } else this.s.losses++;
+    if (win && ladder && R.ladder === this.s.ladder) this.s.ladder++;
+    if (win && R.rv.boss) { if (this.addItem('trofeo', { name: `Trofeo: ${R.rv.name}` })) this.say(`Trofeo di ${R.rv.name} nel bagagliaio`, 'money'); }
+    this.say(win ? `Vinto contro ${R.rv.name}: ${R.you.toFixed(3)} s contro ${R.et.toFixed(3)}` : `${why || 'Perso'} contro ${R.rv.name}`, win ? 'money' : 'lose');
+    this.result = {
+      win, why, rv: R.rv, you: R.you, et: R.et, gain, ladder, react: R.react, launch: R.launch, launchRpm: R.launchRpm,
+      shifts: R.shifts, vmax: R.vmax, boss: !!R.rv.boss, zoneDone: win && ladder && R.rv.boss,
+    };
+    this.lastRace = { win, you: R.you, et: R.et, rv: R.rv };
+    this.ents.forEach((e) => { if (e.kind === 'rival') e.v = win ? 18 : 40; });
+  }
+
+  // polizia più vicina davanti (per l'avviso radar)
+  radar() {
+    const d = this.s.dist;
+    let best = null;
+    for (const e of this.ents) if (e.kind === 'police' && !e.chase && e.x - d > 0 && e.x - d < 450 && (!best || e.x < best.x)) best = e;
+    return best ? best.x - d : null;
+  }
+}
