@@ -920,6 +920,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
           <button type="button" id="dbFlash" title="Sfanala (F): chiedi strada o lancia una sfida">FARI</button>
           <button type="button" id="dbMap" title="Mappa del mondo (T)">MAPPA</button>
+          <button type="button" id="dbWin" title="Finestrini: apri e chiudi (0)">FINESTR.</button>
         </div>
         <canvas id="hudP" aria-hidden="true"></canvas>
       </div>
@@ -1140,6 +1141,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div><kbd>E</kbd><kbd>→</kbd> <kbd>Q</kbd><kbd>←</kbd></div><div>Sali · scala marcia</div>
         <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div><div>Rispondi alle proposte (altrimenti: marcia diretta)</div>
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
+        <div><kbd>0</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
         <div><kbd>C</kbd> <kbd>F</kbd> <kbd>H</kbd> <kbd>B</kbd></div><div>Telecamera (anche abitacolo) · abbaglianti · clacson · bagagliaio</div>
         <div><kbd>N</kbd> <kbd>R</kbd> <kbd>Spazio</kbd></div><div>Folle · retro · frizione (manuale)</div>
         <div><kbd>V</kbd> <kbd>L</kbd> <kbd>M</kbd></div><div>Ascolto · launch control · muto</div>
@@ -1546,6 +1548,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
     else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
+    else if (k === '0') toggleWindows();
     else if (k === '5') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') cycleHud();
@@ -2762,10 +2765,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     flash(nx === 0 ? 'Strumenti in gioco: spenti' : nx === 1 ? 'Strumenti in gioco: cruscotto dell\'auto' : 'Strumenti in gioco: stile anime', 1.4);
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   }
+  // finestrini: col quadro spento il motorino non va
+  function toggleWindows() {
+    if (!sim.ign) { flash('Finestrini: prima accendi il quadro (I)', 1.6); return; }
+    const open = sim.toggleWindows(); ensureAudio();
+    flash(open ? 'Finestrini giù: entra l\'aria (e il rumore)' : 'Finestrini su', 1.2);
+  }
   // pulsanti accanto al cruscotto
   function dashBtns() {
     const set = (id, on, hot) => { const b = $(id); if (!b) return; b.setAttribute('aria-pressed', String(!!on)); b.classList.toggle('hot', !!hot); };
-    set('dbAuto', S.autoLane !== false, auto.on); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
+    set('dbWin', sim.winT > 0.5, sim.winMot); set('dbAuto', S.autoLane !== false, auto.on); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
     $('dbLaunch').disabled = !TP.sim.ecuLaunch;
   }
   $('dbAuto').addEventListener('click', () => { S.autoLane = S.autoLane === false; applySettings(); flash(S.autoLane ? 'Guida automatica: parte dopo 3 secondi senza tasti' : 'Guida automatica spenta', 1.8); });
@@ -2773,6 +2782,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('dbLaunch').addEventListener('click', () => { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); });
   $('dbHud').addEventListener('click', cycleHud);
   $('dbMap').addEventListener('click', () => toggleWorldMap());
+  $('dbWin').addEventListener('click', toggleWindows);
   $('dbFlash').addEventListener('click', sfanala);
   // abbaglianti: un colpo di fari a chi sta davanti (chiede strada o lancia una sfida di 2 km)
   function sfanala() {
@@ -3239,7 +3249,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : 0.38) * (1 - sim.ovr / liftT) * Math.min(1, sim.rpm / 4500) * TP.dsp.cat.pop : 0;
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
         ign: sim.ign, brake: sim.in.brake, flame: flameT, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
-        thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.high, fwd: !!sim.P.fwd };
+        thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.high, fwd: !!sim.P.fwd };
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
     }

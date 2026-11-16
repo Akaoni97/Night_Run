@@ -32,7 +32,7 @@ class EngineDSP {
     this.k = 0;
     // parametri in arrivo dalla simulazione (target) e copie smussate
     this.T = { rpm: 0, charge: 0, air: 0, thr: 0, boost: 0, turbo: 0, cut: 0, ovr: 9, running: 0, starter: 0,
-      speed: 0, spin: 0, drive: 0, gearRpm: 0, rev: 0, wg: 0, sec: 0, pump: 0, rattle: 0 };
+      speed: 0, spin: 0, drive: 0, gearRpm: 0, rev: 0, wg: 0, sec: 0, pump: 0, rattle: 0, win: 0, winMot: 0 };
     this.S = Object.assign({}, this.T);
     this.cfg = { tune: EngineDSP.stock(), pops: 0, view: 0, vol: 0.8, fx: { bov: 0, pop: 0, turbo: 0 } };
     this.rpmI = 0; this.rpmStep = 0; this.fluM = 0;      // giri interpolati campione per campione
@@ -99,6 +99,8 @@ class EngineDSP {
     // strada, vento, gomme, trasmissione
     this.brown = 0; this.roadLP = new BQ().set('lp', 320, 0.7, sr);
     this.windBP = new BQ().set('bp', 850, 0.55, sr);
+    // finestrino aperto: rombo basso dell'aria che entra, battito ("buffeting") a finestrino socchiuso, motorino elettrico
+    this.windLP = new BQ().set('lp', 220, 0.7, sr); this.buffPh = 0; this.motPh = 0; this.motBP = new BQ().set('bp', 900, 1.2, sr); this.winS = 0; this.motS = 0;
     this.sq1 = new BQ().set('bp', 1040, 14, sr); this.sq2 = new BQ().set('bp', 1460, 12, sr); this.sqPh = 0;
     this.gPh = 0;
     this.grind = 0; this.grBP = new BQ().set('bp', 1700, 1.5, sr); this.grPh = 0;
@@ -190,7 +192,7 @@ class EngineDSP {
     // g: livello d'insieme (da fuori uno scarico si sente più forte che da dentro) · er: quanto arrivano le riflessioni
     // dell'ambiente (in abitacolo poco, filtrate dai vetri) · belt: cinghia e alternatore (si sentono solo col cofano aperto)
     const V = [
-      { exh: 0.62, lp: 1300, boom: 0.9, intake: 0.5, mech: 0.12, turbo: 0.3, bov: 0.45, road: 1.0, wind: 0.9, tire: 0.55, gear: 1.0, starter: 0.55, pump: 1.0, rev: 0.14, width: 0.15, g: 0.82, er: 0.12, belt: 0.04 },
+      { exh: 0.62, lp: 1300, boom: 0.9, intake: 0.5, mech: 0.12, turbo: 0.3, bov: 0.45, road: 0.3, wind: 0.9, tire: 0.55, gear: 1.0, starter: 0.55, pump: 1.0, rev: 0.14, width: 0.15, g: 0.82, er: 0.12, belt: 0.04 },
       { exh: 1.0, lp: 14000, boom: 0.0, intake: 0.16, mech: 0.07, turbo: 0.32, bov: 0.6, road: 0.35, wind: 0.12, tire: 1.0, gear: 0.15, starter: 0.3, pump: 0.0, rev: 0.11, width: 1.0, g: 1.8, er: 1.0, belt: 0.08 },
       { exh: 0.35, lp: 2600, boom: 0.0, intake: 1.0, mech: 0.8, turbo: 1.0, bov: 1.0, road: 0.15, wind: 0.1, tire: 0.3, gear: 0.45, starter: 1.0, pump: 0.25, rev: 0.08, width: 0.35, g: 1.15, er: 0.45, belt: 1.0 },
     ];
@@ -326,8 +328,9 @@ class EngineDSP {
     // corpo che cambia coi giri: rimbombo verso i 3300, grinta oltre i 5000
     const bell = Math.exp(-Math.pow((S.rpm - vc.boomRpm) / 520, 2));
     this.openG = (0.82 + 0.38 * o + 0.1 * bell * ld) * (1 + 0.12 * ss(hi - 1800, hi, S.rpm) * ld);
-    this.viewLP.set('lp', Math.min(15000, M.lp * (0.55 + 1.75 * o)), 0.6, this.sr);
-    this.viewLP2.set('lp', Math.min(16000, M.lp * (0.9 + 2.2 * o)), 0.6, this.sr);
+    const lpW = M.lp * (this.cfg.view === 0 ? 1 + 2.4 * (this.winS || 0) : 1);   // in abitacolo col finestrino giù lo scarico arriva diretto
+    this.viewLP.set('lp', Math.min(15000, lpW * (0.55 + 1.75 * o)), 0.6, this.sr);
+    this.viewLP2.set('lp', Math.min(16000, lpW * (0.9 + 2.2 * o)), 0.6, this.sr);
     this.barkPK.set('peak', 900 + 900 * o, 0.9, this.sr, 7.5 * o);
     if (this.bov.env > 0) {
       const pr = Math.min(1, this.bov.t / this.bov.len);
@@ -521,7 +524,22 @@ class EngineDSP {
       const v = S.speed;
       this.brown = this.brown * 0.996 + nz2 * 0.06;
       let road = this.roadLP.p(this.brown) * Math.min(1.6, Math.pow(v / 30, 1.1)) * 0.5;
-      const wind = this.windBP.p(nz3) * Math.min(3, (v / 55) * (v / 55)) * 0.22;
+      // vento: in abitacolo coi finestrini chiusi resta solo il fruscio filtrato dalle guarnizioni; aperti entra l'aria
+      // (fruscio pieno e rombo basso) e a finestrino socchiuso, oltre i 50 km/h, l'abitacolo pulsa come una bottiglia
+      this.winS += ((this.T.win || 0) - this.winS) * 0.0005; this.motS += ((this.T.winMot || 0) - this.motS) * 0.002;
+      const cab = cfg.view === 0, wo = this.winS, vk = Math.min(3, (v / 55) * (v / 55));
+      let wind = this.windBP.p(nz3) * vk * 0.22 * (cab ? 0.2 + 0.8 * wo : 1);
+      if (cab && wo > 0.02) {
+        const half = Math.max(0, 1 - Math.abs(wo - 0.35) / 0.3), buf = half * Math.max(0, Math.min(1, (v - 14) / 10));
+        this.buffPh += (13 + v * 0.12) / sr; if (this.buffPh > 1) this.buffPh -= 1;
+        wind += this.windLP.p(nz) * vk * 0.5 * wo + Math.sin(TAU * this.buffPh) * buf * 0.05 * Math.min(1.4, vk);
+      }
+      // motorino del finestrino: ronzio con un po' di fatica, si sente quasi solo da dentro
+      let winMotor = 0;
+      if (this.motS > 0.003) {
+        this.motPh += (88 + 10 * Math.sin(TAU * this.buffPh)) / sr; if (this.motPh > 1) this.motPh -= 1;
+        winMotor = (this.motBP.p((this.motPh * 2 - 1) + nz2 * 0.25) * 0.05 + (this.motPh * 2 - 1) * 0.006) * this.motS * (cab ? 1 : 0.12);
+      }
       let tire = 0;
       if (S.spin > 0.005) {
         this.sqPh += 8.5 / sr; if (this.sqPh > 1) this.sqPh -= 1;
@@ -583,7 +601,9 @@ class EngineDSP {
       const side = exhR * M.exh - exh * M.exh;   // differenza tra i terminali → immagine stereo
       const cabK = this.cfg.view === 0 ? (tn.cabin || 1) : 1;   // abitacolo alleggerito: rimbomba di più
       let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech * (1 + 5 * this.vc.diesel) + turbo * M.turbo * this.fxT + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
-        + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt;
+        + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt + winMotor;
+      // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
+      if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
       out = out * M.g + 1e-18;
 
       // ---- ambiente: prime riflessioni (asfalto, palazzi, pareti) e coda di riverbero -------------------------------
@@ -612,8 +632,9 @@ class EngineDSP {
       }
       const g = cfg.vol * 2.6;
       const w = side * 0.5 * M.width;
-      outL[i] = Math.tanh((out - w + el * M.er + wl * this.rvWet) * g) * 0.9;
-      outR[i] = Math.tanh((out + w + er * M.er + wr * this.rvWet) * g) * 0.9;
+      const eo = cab ? 1 + 4 * wo : 1, ro = cab ? 1 + 2.5 * wo : 1;   // finestrino aperto: l'eco della città e della galleria entra
+      outL[i] = Math.tanh((out - w + el * M.er * eo + wl * this.rvWet * ro) * g) * 0.9;
+      outR[i] = Math.tanh((out + w + er * M.er * eo + wr * this.rvWet * ro) * g) * 0.9;
     }
   }
 }

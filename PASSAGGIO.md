@@ -56,6 +56,14 @@ gioco fa, sezione per sezione).
   in `index.html`). Ambiente (`setEnv`: 0 strada aperta, 1 città, 2 galleria, lo decide `envNow`): prime riflessioni
   diverse a sinistra e a destra (stereo) e coda di riverbero lunga in galleria. Livelli per punto d'ascolto (`g`),
   cinghia e alternatore nel vano motore.
+- **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 0 o pulsante FINESTR.): motorino da 2,6 s col quadro acceso,
+  un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
+  bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco
+  dell'ambiente; socchiusi in velocità l'abitacolo pulsa. Nel 2D il vetro abbassato perde i riflessi.
+- **Guidatore** (`pilota2d.js`): finestrino del pilota misurato a mano per ogni auto (`WIN`), maschera = riquadro meno
+  vernice (`img/<auto>_paint.png`) e montanti scuri; la figura si adatta al finestrino. La Supra usa ancora il
+  riconoscimento del vetro. Attenzione: i tasti 1-6 mettono le marce, quindi il tasto 5 della ruota di scorta non
+  arriva mai al suo gestore (bug vecchio, da decidere col proprietario).
 - **Quartieri** (`quartieri2d.js`): la città (primi 12 km del viaggio e modalità in città) alterna sei quartieri
   con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
   Ogni quartiere ha il suo asfalto (`districtRoad`): buche con l'acqua, rattoppi, strisce consumate e cartacce

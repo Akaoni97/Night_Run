@@ -33,7 +33,7 @@ class SupraSim {
       clutch: 0, lock: false, shiftSeq: null, events: [], runT: 0, pumpT: 0, bovLatch: false, launchArmed: false,
       Tc: 0, Tnet: 0, charge: 0, stalled: false,
       fuel: 0.72, waterT: 74, oilT: 69, oilP: 0, volt: 12.5, odo: 48213.4, trip: 0,
-      tireT: 24, tireWear: 0, damage: 0, slipPow: 0, skid: 0, brakeT: 28, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
+      tireT: 24, tireWear: 0, damage: 0, slipPow: 0, skid: 0, brakeT: 28, winPos: 0, winT: 0, winMot: 0, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
       run0: null, best100: null, best400: null, last100: null, last400: null,
     });
   }
@@ -48,6 +48,9 @@ class SupraSim {
   // massa vera in movimento: l'auto (P.mass: peso a secco col 90 % di carburante, più il carico) + pilota 75 kg
   // + il carburante che c'è davvero (0,74 kg/l). Il rimorchio (trailerKg) ha le sue ruote: spinge e frena, ma non pesa sugli assi.
   massNow() { const P = this.P; return Math.max(P.mass * 0.6, P.mass + 75 + (this.fuel - 0.9) * (P.tank || 60) * 0.74); }
+  // finestrini: si aprono e si chiudono col motorino elettrico (2,6 s per tutta la corsa); si può invertire a metà
+  setWindows(open) { this.winT = open ? 1 : 0; }
+  toggleWindows() { this.winT = this.winT > 0.5 ? 0 : 1; return this.winT > 0.5; }
   // efficacia delle pastiglie con la temperatura dei dischi: un filo meno da fredde, piena fino a 380 °C, poi il fading
   padK() { const T = this.brakeT; return T < 60 ? 0.94 + 0.06 * T / 60 : T < 380 ? 1 : Math.max(0.55, 1 - (T - 380) / 320 * 0.4); }
   setTune(t) {
@@ -155,6 +158,10 @@ class SupraSim {
     const dist = Math.abs(this.v) * dt / 1000;
     this.odo += dist; this.trip += dist;
     this.pumpT = Math.max(0, this.pumpT - dt);
+    // motorino dei finestrini (va solo col quadro acceso, come nelle auto vere)
+    const wd = (this.winT || 0) - (this.winPos || 0);
+    if (Math.abs(wd) > 1e-4 && this.ign) { this.winPos += Math.sign(wd) * Math.min(Math.abs(wd), dt / 2.6); this.winMot = 1; if (Math.abs(this.winT - this.winPos) < 1e-4) this.events.push({ type: 'click' }); }
+    else { this.winPos = this.winT || 0; this.winMot = 0; }
     // 0-100 km/h e 400 m da fermo
     if (Math.abs(this.v) < 0.05 && !this.in.thr) this.run0 = { armed: true, t: 0, d: 0 };
     if (this.run0) {
@@ -387,7 +394,7 @@ class SupraSim {
     const v0 = this.v;
     // resistenza dell'aria: in scia a un'auto davanti (draft, 0..1 deciso dal gioco) ne resta meno; il rimorchio ne aggiunge
     const tk = this.trailerKg || 0;
-    const drag = 0.5 * 1.2 * (P.cd * (1 + this.damage * 0.25) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v);
+    const drag = 0.5 * 1.2 * (P.cd * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v);
     // ---- freni: ogni asse frena fino a quanto tiene la sua gomma, col carico che in frenata va avanti ----------------------
     // ripartizione fissa (P.bf sull'anteriore). Con l'ABS l'asse al limite lavora a impulsi; senza ABS si blocca e striscia
     // (attrito radente, circa tre quarti), finché il pedale non si alleggerisce. I dischi si scaldano e perdono efficacia.
@@ -451,7 +458,7 @@ class SupraSim {
       drive: Math.abs(this.Tc * this.ratio(this.gear)) / 3000, gearRpm: this.ww * this.ratio(this.gear) * 9.5493,
       rev: this.gear === -1 ? 1 : 0, wg: this.wg, sec: this.tune.turbo.twin ? this.sec : 0,
       rattle: this.running && (this.gear === 0 || this.shiftSeq) && this.clutch < 0.3 ? 1 - SIM_SS(900, 1600, this.rpm) : 0,
-      pump: this.pumpT > 0 ? 1 : this.running ? 0.25 : 0,
+      pump: this.pumpT > 0 ? 1 : this.running ? 0.25 : 0, win: this.winPos || 0, winMot: this.winMot || 0,
     };
   }
 }

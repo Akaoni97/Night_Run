@@ -12,10 +12,53 @@
   const S = Street2D.prototype;
   const F = 3;                                                   // risoluzione del guidatore: 3 pixel per unità del disegno
 
+  // finestrino del pilota di ogni auto, misurato sul disegno: [sinistra, destra, alto, basso] in pixel del disegno.
+  // Serve perché sulle vernici argento, bianche e grigie il colore della carrozzeria somiglia a quello del vetro e il
+  // riconoscimento automatico sbaglia. Dentro il riquadro il pilota si vede dove non c'è vernice (maschera _paint) né
+  // montanti e guarnizioni scure. La Supra (disegno fatto a codice) usa ancora il riconoscimento del vetro.
+  const WIN = {
+    v40: [88, 125, 8, 25], r5: [72, 98, 6, 21], b2002: [76, 107, 4, 20], e30: [77, 115, 7, 23], e36: [74, 111, 4, 19], e34: [92, 118, 2, 20],
+    a80: [95, 129, 13, 25], a3: [90, 121, 8, 21], a112: [56, 84, 8, 23], doblo: [95, 123, 17, 40], panda: [68, 97, 16, 33], punto: [67, 107, 13, 32],
+    golf: [66, 98, 6, 21], corsa: [79, 110, 14, 34], p205: [62, 95, 8, 25], p206: [67, 102, 13, 29], p308: [84, 123, 16, 33], clio: [77, 109, 16, 31],
+    williams: [66, 105, 16, 33], taxi: [93, 115, 11, 25], v850: [105, 134, 10, 25], polo: [80, 116, 16, 33], van: [97, 136, 16, 40],
+    ambulanza: [165, 205, 33, 64], polizia: [88, 128, 12, 29],
+  };
+  S.WIN2D = WIN;
+  const paintOf = (id) => {
+    if (id === 'v40') { if (!Street2D._v40p) { Street2D._v40p = new Image(); Street2D._v40p.src = 'img/v40_paint.png'; } return Street2D._v40p; }
+    return Street2D.gen && Street2D.gen[id] ? Street2D.gen[id].paint : null;
+  };
+  // maschera dal riquadro misurato (null finché la maschera della vernice non è caricata)
+  const rectMasks = (hd, R, paint) => {
+    const w = hd.width, h = hd.height, d = hd.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h).data;
+    let pm = null;
+    if (paint && paint.width === w && paint.height === h) {
+      const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(paint, 0, 0);
+      pm = x.getImageData(0, 0, w, h).data;
+    }
+    const m = new Uint8Array(w * h); let n = 0;
+    for (let y = Math.max(0, R[2]); y <= Math.min(h - 1, R[3]); y++) for (let x = Math.max(0, R[0]); x <= Math.min(w - 1, R[1]); x++) {
+      const i = (y * w + x) * 4, L = (d[i] + d[i + 1] + d[i + 2]) / 3;
+      if (d[i + 3] < 200 || L < 30 || L > 238 || (pm && pm[i + 3] > 127)) continue;
+      m[y * w + x] = 1; n++;
+    }
+    const c = document.createElement('canvas'); c.width = w * F; c.height = h * F;
+    const x = c.getContext('2d'); x.fillStyle = '#fff';
+    for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) if (m[y * w + xx]) x.fillRect(xx * F, y * F, F, F);
+    return { glass: c, win: c, n, band: { top: R[2], bot: R[3], x0: R[0], x1: R[1] } };
+  };
+
   // maschere dei vetri sul disegno a grandezza piena (in cache sul disegno stesso)
   // glass: i pixel di vetro (azzurrini, chiari); win: vetro più gli spazi stretti tra vetri (dettagli, maniglie, cuciture)
   S.glassMasks = function (hd, G) {
     if (hd._gm) return hd._gm;
+    const R = WIN[this.carId];
+    if (R) {
+      const pi = paintOf(this.carId), ready = pi && pi.complete && pi.naturalWidth > 0;
+      const M = rectMasks(hd, R, ready ? pi : null);
+      if (ready) hd._gm = M;                                       // senza maschera della vernice si ricalcola al prossimo giro
+      return M;
+    }
     const w = hd.width, h = hd.height, d = hd.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, w, h).data;
     const yMax = Math.max(4, (G.wy || h * 0.6) - (G.wr || 12) * 0.55), cand = new Uint8Array(w * h), glass = new Uint8Array(w * h);
     // vetro: azzurrino o grigio-blu, chiaro e poco saturo (la vernice azzurra è più satura)
@@ -64,8 +107,12 @@
     x.setTransform(F, 0, 0, F, 0, 0);
     const day = this.day || 0, nt = 1 - day, bob = Math.max(-1, Math.min(1, -st.heave * 0.15));
     // la figura si adatta all'altezza del finestrino: la testa sta sotto il tetto, le spalle arrivano alla linea di cintura
-    const B = M.band, bh = B ? B.bot - B.top + 1 : 10, sc = Math.max(0.62, Math.min(1.15, bh / 12.5)), lean = st.head * 0.8 * sc;
-    const ax = (G.hx ?? 108) + 3, ay = B ? B.top + 0.8 + 4.9 * sc : (G.hy ?? 0) + 17;
+    const B = M.band, bh = B ? B.bot - B.top + 1 : 10;
+    // col riquadro misurato la figura riempie il finestrino (testa sotto il tetto, spalle alla linea di cintura) e sta nella
+    // metà posteriore del vetro, come chi guida; senza, la vecchia regola sul vetro riconosciuto
+    const sc = B && B.x0 != null ? Math.max(0.7, Math.min(1.55, bh / 14)) : Math.max(0.62, Math.min(1.15, bh / 12.5)), lean = st.head * 0.8 * sc;
+    const ax = B && B.x0 != null ? B.x0 + (B.x1 - B.x0) * 0.42 : (G.hx ?? 108) + 3;
+    const ay = B && B.x0 != null ? B.top + bh * 0.17 + 4.6 * sc : B ? B.top + 0.8 + 4.9 * sc : (G.hy ?? 0) + 17;
     x.translate(ax, ay); x.scale(sc, sc); x.translate(-ax, -ay);
     const cx = ax + lean / sc, cy = ay + bob / sc, sx = ax + lean * 0.4 / sc;
     const shade = (hex, f) => Street2D.shade(hex, f);
@@ -121,7 +168,7 @@
     if (R.width !== L.width || R.height !== L.height) { R.width = L.width; R.height = L.height; }
     const rx = R.getContext('2d'); rx.globalCompositeOperation = 'source-over'; rx.clearRect(0, 0, R.width, R.height);
     const off = ((this.st.reflOff || 0) % (w * F) + w * F) % (w * F);
-    rx.fillStyle = `rgba(220,235,255,${0.1 + 0.08 * nt})`;
+    rx.fillStyle = `rgba(220,235,255,${(0.1 + 0.08 * nt) * (1 - 0.9 * (s.win || 0))})`;   // finestrino abbassato: niente riflessi
     for (const [o, wd] of [[0, 7], [w * F * 0.45, 3], [w * F * 0.7, 12]]) { const bx = (o - off + w * F) % (w * F); rx.beginPath(); rx.moveTo(bx, 0); rx.lineTo(bx + wd * F, 0); rx.lineTo(bx + wd * F - h * F * 0.5, h * F); rx.lineTo(bx - h * F * 0.5, h * F); rx.closePath(); rx.fill(); }
     rx.globalCompositeOperation = 'destination-in'; rx.drawImage(M.glass, 0, 0);
     x.drawImage(R, 0, 0);

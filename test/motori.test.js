@@ -530,3 +530,17 @@ test('suono: in galleria lo scarico rimbomba e si allarga, in abitacolo arriva a
   assert.ok(tunnel.level > open.level + 1, `livello: aperto ${open.level.toFixed(1)} dB, galleria ${tunnel.level.toFixed(1)} dB`);
   assert.ok(cabin.width < tunnel.width, 'dentro la galleria si sente meno largo che da fuori');
 });
+
+test('finestrini: il motorino li apre in circa 2,6 s e aperti in abitacolo si sente di più', () => {
+  const sim = new SupraSim(); startEngine(sim);
+  sim.toggleWindows();
+  drive(sim, 1.3); assert.ok(sim.winPos > 0.4 && sim.winPos < 0.6 && sim.winMot === 1, `a metà corsa: ${sim.winPos.toFixed(2)}`);
+  drive(sim, 1.5); assert.ok(sim.winPos === 1 && sim.winMot === 0, 'tutti giù');
+  const sr = 48000, level = (win) => {
+    const dsp = new EngineDSP(sr); dsp.msg({ cfg: { view: 0 }, p: { rpm: 3000, charge: 0.5, air: 0.4, thr: 0.3, running: 1, speed: 33, win } });
+    const L = new Float32Array(sr), R = new Float32Array(sr); for (let k = 0; k < 4; k++) dsp.render(L, R, sr);
+    let e = 0; for (let i = 0; i < sr; i++) e += L[i] * L[i]; return 10 * Math.log10(e / sr);
+  };
+  const closed = level(0), open = level(1);
+  assert.ok(open > closed + 5, `chiusi ${closed.toFixed(1)} dB, aperti ${open.toFixed(1)} dB`);
+});
