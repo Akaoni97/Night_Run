@@ -405,6 +405,21 @@ const CARS = {
 CARS.supra.tuning = TUNING_SUPRA; CARS.supra.presets = SUPRA_PRESETS; CARS.supra.params = supraParams;
 for (const c of GEN_CARS) CARS[c.id] = genCar(c);
 const CAR_IDS = Object.keys(CARS);
+// freni di ogni auto (la Supra ha i suoi in sim.js): abs = c'era di serie · bk = decelerazione massima a pedale pieno (g),
+// con pastiglie fredde e senza limiti di gomma · bf = quota sull'asse anteriore · Iwf = inerzia delle ruote non motrici
+// (kg·m²) · cl = portanza. Le auto degli anni 70-80 senza ABS bloccano le ruote; tamburi e servofreni deboli frenano meno.
+const CAR_BRAKES = {
+  v40: { abs: true, bk: 1.08, bf: 0.68, Iwf: 1.6 }, r5: { abs: false, bk: 1.05, bf: 0.6, Iwf: 1.4 }, b2002: { abs: false, bk: 0.92, bf: 0.68, Iwf: 1.6, cl: 0.2 },
+  e30: { abs: true, bk: 1.1, bf: 0.66, cl: 0.12 }, e36: { abs: true, bk: 1.18, bf: 0.66 }, e34: { abs: true, bk: 1.15, bf: 0.65 },
+  a80: { abs: true, bk: 1.0, bf: 0.68 }, a3: { abs: true, bk: 1.15, bf: 0.7 }, a112: { abs: false, bk: 0.9, bf: 0.7, cl: 0.2 },
+  bus: { abs: true, bk: 0.62, bf: 0.55, cl: 0 }, doblo: { abs: true, bk: 1.0, bf: 0.7 }, panda: { abs: true, bk: 1.0, bf: 0.72 },
+  punto: { abs: true, bk: 1.05, bf: 0.7 }, golf: { abs: false, bk: 0.98, bf: 0.72, cl: 0.18 }, corsa: { abs: true, bk: 1.0, bf: 0.7 },
+  p205: { abs: false, bk: 1.0, bf: 0.7, cl: 0.15 }, p206: { abs: true, bk: 1.08, bf: 0.7 }, p308: { abs: true, bk: 1.12, bf: 0.7 },
+  clio: { abs: true, bk: 1.08, bf: 0.7 }, williams: { abs: false, bk: 1.04, bf: 0.7 }, taxi: { abs: true, bk: 1.05, bf: 0.68 },
+  v850: { abs: true, bk: 1.1, bf: 0.68 }, polo: { abs: true, bk: 1.02, bf: 0.7 }, van: { abs: true, bk: 0.95, bf: 0.66 },
+  ambulanza: { abs: true, bk: 0.85, bf: 0.6 }, polizia: { abs: true, bk: 1.05, bf: 0.68 },
+};
+for (const id of CAR_IDS) if (id !== 'supra' && CARS[id].P) Object.assign(CARS[id].P, { abs: true, bk: 1.05, bf: 0.68 }, CAR_BRAKES[id] || {});
 // quadro strumenti originale di ogni auto (banner in alto e strumenti in gioco)
 // speed: fondo scala km/h · tach: fondo scala ×1000 · red: inizio zona rossa · face/num/needle: quadrante, numeri, lancette
 // glow: luce notturna dei numeri · lcd: colore dei display · tachMid: contagiri al centro (Toyota) · m: strisce M · varRed: zona rossa che segue l'olio (E36)

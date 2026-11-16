@@ -257,11 +257,13 @@
     const mOf = (px) => dist + (px - carX) / PPM, v = Math.abs(s.v), spin = s.spin || 0;
     const drv = s.fwd ? 1 : 0, wD = left + GE.ax[drv] * k, wO = left + GE.ax[1 - drv] * k;   // ruota motrice e l'altra
     const emit = (key, rate, fn) => { st[key] = (st[key] || 0) + rate * dt; let n = 0; while (st[key] >= 1 && n++ < 8) { st[key] -= 1; fn(); } if (st[key] > 1) st[key] = 0; };
-    const lock = s.brake > 0.9 && v > 8;
-    // segni di gomma: dalle ruote motrici quando pattinano, da tutte e due gli assi a ruote bloccate
-    if (((s.skid || 0) > 0.18 && v > 0.3) || lock) {
-      const len = Math.max(0.15, v * dt * 1.05 + 0.05), a = Math.min(0.7, 0.25 + (s.skid || 0.5));
-      for (const wxp of lock ? [wD, wO] : [wD]) { const m = mOf(wxp) - len; this.marks.push({ m, y: y0 - 1, len, a }, { m, y: y0 - 4, len, a: a * 0.6 }); }
+    // ruote bloccate (auto senza ABS): lo dice la fisica, asse per asse. Con l'ABS al lavoro restano segni leggeri a tratti
+    const lock = !!s.locked && v > 1, absMk = !!s.abs && v > 6 && (st.t * 9) % 1 < 0.55;
+    // segni di gomma: dalle ruote motrici quando pattinano, dalle ruote bloccate quando strisciano
+    if (((s.skid || 0) > 0.18 && v > 0.3) || lock || absMk) {
+      const len = Math.max(0.15, v * dt * 1.05 + 0.05), a = lock ? Math.min(0.7, 0.3 + (s.skid || 0.5)) : absMk && !((s.skid || 0) > 0.18) ? 0.14 : Math.min(0.7, 0.25 + (s.skid || 0.5));
+      const ws = lock ? [s.lockF ? (s.fwd ? wD : wO) : null, s.lockR ? (s.fwd ? wO : wD) : null].filter((x) => x !== null) : absMk ? [wD, wO] : [wD];
+      for (const wxp of ws) { const m = mOf(wxp) - len; this.marks.push({ m, y: y0 - 1, len, a }, { m, y: y0 - 4, len, a: a * 0.6 }); }
     }
     // fumo delle gomme: sbuffi piccoli e fitti che il battistrada lancia indietro, più grossi quando pattina forte
     const tyre = (wxp, pow, big) => this.parts.push({ k: 'tyre', m: mOf(wxp - (4 + R() * 12) * k), y: y0 - 2 - R() * 5, dx: v * PPM * 0.06 - (24 + R() * 50) * (0.5 + pow),

@@ -207,7 +207,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.applyMass = function (dm, rearOff) {
     am.call(this, dm, rearOff);
     const v = this.s && this.s.vg;
-    if (v && v.on && v.trailerOn && !VG_CARGO[this.car]) this.sim.P.mass += VG_TRAILER.mass;
+    if (v && v.on && v.trailerOn && !VG_CARGO[this.car]) this.sim.trailerKg = VG_TRAILER.mass;   // ha le sue ruote: spinge, non pesa sugli assi
   };
   // cambio mezzo: nel viaggio solo quelli tuoi, e solo al motel
   const sc = P.switchCar;

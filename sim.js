@@ -11,6 +11,9 @@ class SupraSim {
       idle: 750, limiter: 7000, limHyst: 300, launchRpm: 4300,
       Ie: 0.21, Iw: 3.0, mass: 1570, r: 0.322, cd: 0.31, A: 1.95, crr: 0.012, mu: 1.1, cgH: 0.48, wb: 2.55, rearW: 0.47,
       tank: 70, gears: [0, 3.827, 2.360, 1.685, 1.312, 1.000, 0.793], rev: -3.280, fd: 3.133, clutchMax: 820,
+      // freni: decelerazione massima a pedale pieno (in g, pastiglie fredde), quota sull'anteriore, ABS di serie (RZ '93);
+      // Iwf: inerzia delle ruote non motrici (kg·m²); cl: coefficiente di portanza (alleggerisce gli assi in velocità)
+      bk: 1.2, bf: 0.64, abs: true, Iwf: 2.4, cl: 0.1,
       // coppia indicata a pieno carico atmosferico (Nm) — il turbo la moltiplica
       tq: [[0, 140], [500, 160], [1000, 212], [1500, 240], [2000, 258], [2500, 270], [3000, 281], [3500, 290],
         [4000, 296], [4500, 298], [5000, 295], [5500, 287], [6000, 275], [6500, 260], [7000, 244], [7500, 225]],
@@ -30,7 +33,7 @@ class SupraSim {
       clutch: 0, lock: false, shiftSeq: null, events: [], runT: 0, pumpT: 0, bovLatch: false, launchArmed: false,
       Tc: 0, Tnet: 0, charge: 0, stalled: false,
       fuel: 0.72, waterT: 74, oilT: 69, oilP: 0, volt: 12.5, odo: 48213.4, trip: 0,
-      tireT: 24, tireWear: 0, damage: 0, slipPow: 0, skid: 0,
+      tireT: 24, tireWear: 0, damage: 0, slipPow: 0, skid: 0, brakeT: 28, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
       run0: null, best100: null, best400: null, last100: null, last400: null,
     });
   }
@@ -42,6 +45,11 @@ class SupraSim {
     if (this.gear > this.P.gears.length - 1) this.gear = this.P.gears.length - 1;
   }
   topGear() { return this.P.gears.length - 1; }
+  // massa vera in movimento: l'auto (P.mass: peso a secco col 90 % di carburante, più il carico) + pilota 75 kg
+  // + il carburante che c'è davvero (0,74 kg/l). Il rimorchio (trailerKg) ha le sue ruote: spinge e frena, ma non pesa sugli assi.
+  massNow() { const P = this.P; return Math.max(P.mass * 0.6, P.mass + 75 + (this.fuel - 0.9) * (P.tank || 60) * 0.74); }
+  // efficacia delle pastiglie con la temperatura dei dischi: un filo meno da fredde, piena fino a 380 °C, poi il fading
+  padK() { const T = this.brakeT; return T < 60 ? 0.94 + 0.06 * T / 60 : T < 380 ? 1 : Math.max(0.55, 1 - (T - 380) / 320 * 0.4); }
   setTune(t) {
     Object.assign(this.tune, t);
     this.P.limiter = this.tune.limiter; this.P.idle = this.tune.idle; this.P.Ie = this.tune.Ie;
@@ -128,11 +136,14 @@ class SupraSim {
     const oilTarget = (this.running ? (this.oilT > 85 ? 0.9 : 1.4) + 4.0 * Math.min(1, this.rpm / 5500) : (this.starter ? 0.35 : 0)) * oilK;
     this.oilP += (oilTarget - this.oilP) * Math.min(1, dt * 4);
     // temperatura delle gomme: scaldano con lo slittamento e con la frenata, raffreddano con l'aria
-    const heatIn = this.slipPow * 0.00028 + (this.in.brake || 0) * Math.abs(this.v) * 0.12 + Math.abs(this.v) * 0.035;
+    // dischi: ricevono quasi tutta l'energia della frenata (capacità termica ~7 J/K per kg d'auto), l'aria li raffredda
+    this.brakeT += ((this.brakePow || 0) * 0.9 / (7 * this.P.mass) - (this.brakeT - 25) * (0.006 + 0.001 * Math.abs(this.v))) * dt;
+    this.brakeT = SIM_CLAMP(this.brakeT, 10, 900);
+    const heatIn = (this.slipPow + (this.lockPow || 0)) * 0.00028 + (this.in.brake || 0) * Math.abs(this.v) * 0.12 + Math.abs(this.v) * 0.035;
     this.tireT += (heatIn - (this.tireT - 22) * (0.035 + Math.abs(this.v) * 0.0012)) * dt;
     this.tireT = SIM_CLAMP(this.tireT, 15, 160);
-    this.tireWear = Math.min(1, this.tireWear + this.slipPow * dt * 4e-8 + Math.abs(this.v) * dt * 1.5e-7);
-    this.skid = SIM_CLAMP(this.slipPow / 60000, 0, 1);
+    this.tireWear = Math.min(1, this.tireWear + (this.slipPow + (this.lockPow || 0) * 1.5) * dt * 4e-8 + Math.abs(this.v) * dt * 1.5e-7);
+    this.skid = SIM_CLAMP(Math.max(this.slipPow, (this.lockPow || 0) * 2) / 60000, 0, 1);
     const voltT = !this.ign ? 12.5 : this.starter && !this.running ? 10.3 : this.running ? 14.1 : 12.2;
     this.volt += (voltT - this.volt) * Math.min(1, dt * 6);
     // consumo: ~300 g/kWh di potenza effettiva + minimo; serbatoio da 70 litri
@@ -333,8 +344,9 @@ class SupraSim {
     this.hopPh = ((this.hopPh || 0) + h * 10.5) % 1;
     const hopF = 1 + 0.26 * this.hopE * Math.sin(this.hopPh * 6.2832);
     if (this.hopE > 0.3 && this.hopPh < h * 10.5) this.events.push({ type: 'bump', I: 0.25 * this.hopE });
-    const Nr0 = P.mass * 9.81 * P.rearW;
-    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * P.mass * this.pz * P.cgH / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
+    const m = this.massNow(), lift = 0.5 * 1.2 * (P.cl ?? 0.1) * P.A * this.v * this.v;   // portanza: metà per asse
+    const Nr0 = m * 9.81 * P.rearW - lift * 0.5;
+    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * m * this.pz * P.cgH / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
     // differenziale: aperto (la ruota scarica gira a vuoto), Torsen (ripartisce), autobloccante (blocca)
     const dk = tn.diff === 'lsd' ? 1 : tn.diff === 'torsen' ? 0.96 : 0.87;
     // assetto: in partenza un posteriore che si "siede" (o un anteriore che non si alza) carica le ruote motrici
@@ -373,21 +385,46 @@ class SupraSim {
 
     // ---- vettura ---------------------------------------------------------------------------------
     const v0 = this.v;
-    const drag = 0.5 * 1.2 * P.cd * (1 + this.damage * 0.25) * P.A * this.v * Math.abs(this.v);
-    // freni: chiedono fino a 1,1 g, ma più di quanto tengono le quattro gomme non danno; l'ABS lavora a impulsi al limite
-    const ty2 = tn.tyre || {}, gripAll = (P.mu * 0.92 + 0.08) * this.tireGrip() * (ty2.brake || 1) * P.mass * 9.81;
+    // resistenza dell'aria: in scia a un'auto davanti (draft, 0..1 deciso dal gioco) ne resta meno; il rimorchio ne aggiunge
+    const tk = this.trailerKg || 0;
+    const drag = 0.5 * 1.2 * (P.cd * (1 + this.damage * 0.25) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v);
+    // ---- freni: ogni asse frena fino a quanto tiene la sua gomma, col carico che in frenata va avanti ----------------------
+    // ripartizione fissa (P.bf sull'anteriore). Con l'ABS l'asse al limite lavora a impulsi; senza ABS si blocca e striscia
+    // (attrito radente, circa tre quarti), finché il pedale non si alleggerisce. I dischi si scaldano e perdono efficacia.
+    const ty2 = tn.tyre || {}, mu = (P.mu * 0.92 + 0.08) * this.tireGrip() * (ty2.brake || 1);
+    const wf0 = P.fwd ? P.rearW : 1 - P.rearW, W = m * 9.81 - lift;
+    const Nf = SIM_CLAMP(W * wf0 - m * this.pz * P.cgH / P.wb, W * 0.15, W * 0.95), Nrb = W - Nf;
     const pads = (tn.maint || {}).pads ?? 1;
-    let Fb = I.brake * P.mass * 9.81 * 1.1 * (0.7 + 0.3 * Math.min(1, pads / 0.3));
+    const req = I.brake * m * 9.81 * (P.bk ?? 1.15) * (0.7 + 0.3 * Math.min(1, pads / 0.3)) * this.padK();
     if (pads < 0.1 && I.brake > 0.3 && Math.abs(this.v) > 3 && Math.random() < h * 3) this.events.push({ type: 'grind' });   // ferro su ferro
-    this.abs = Fb > gripAll * 0.97 && Math.abs(this.v) > 1.5;
-    if (this.abs) { this.absPh = ((this.absPh || 0) + h * 14) % 1; Fb = gripAll * (this.absPh < 0.7 ? 0.97 : 0.8); }
-    const Froll = P.crr * (1 + Math.abs(this.v) / 120) * P.mass * 9.81 * (this.crrK ?? 1);
+    const av = Math.abs(this.v), bf = P.bf ?? 0.65, slide = 0.75;
+    const axle = (rq, grip, key) => {
+      if (P.abs !== false) {
+        const on = rq > grip * 0.97 && av > 1.5;
+        if (on) this.absOn = true;
+        return on ? grip * (this.absPh < 0.7 ? 0.97 : 0.8) : rq;
+      }
+      if (!this[key] && rq > grip && av > 1) this[key] = true;
+      else if (this[key] && (rq < grip * 0.7 || av < 0.4)) this[key] = false;
+      return this[key] ? grip * slide : rq;
+    };
+    this.absOn = false;
+    if (P.abs !== false) this.absPh = ((this.absPh || 0) + h * 14) % 1;
+    const FbF = axle(req * bf, mu * Nf, 'lockF'), FbR = axle(req * (1 - bf), mu * Nrb, 'lockR');
+    let Fb = FbF + FbR;
+    this.abs = this.absOn;
+    this.locked = this.lockF || this.lockR;
+    this.lockPow = ((this.lockF ? FbF : 0) + (this.lockR ? FbR : 0)) * av;     // potenza che le gomme bloccate consumano strisciando
+    this.brakePow = Fb * av;
+    const Froll = P.crr * (1 + Math.abs(this.v) / 120) * (m + tk) * 9.81 * (this.crrK ?? 1);
+    // massa da muovere: auto, rimorchio, e l'inerzia delle ruote non motrici (quelle motrici girano già nel loro modello)
+    const mI = m + tk + (P.Iwf ?? P.Iw * 0.75) / (P.r * P.r);
     if (Math.abs(this.v) < 0.03) {
       const Fs = Fb + Froll;
       if (Math.abs(Ft) <= Fs) this.v = 0;
-      else this.v += h * (Ft - Math.sign(Ft) * Fs) / P.mass;
+      else this.v += h * (Ft - Math.sign(Ft) * Fs) / mI;
     } else {
-      let nv = this.v + h * (Ft - drag - Math.sign(this.v) * (Froll + Fb) - P.mass * 9.81 * (this.grade || 0)) / P.mass;
+      let nv = this.v + h * (Ft - drag - Math.sign(this.v) * (Froll + Fb) - (m + tk) * 9.81 * (this.grade || 0)) / mI;
       if (Math.sign(nv) !== Math.sign(this.v) && Math.abs(Ft) < Fb + Froll) nv = 0;
       this.v = nv;
     }
@@ -410,7 +447,7 @@ class SupraSim {
     return {
       rpm: this.rpm, charge: this.charge * (0.35 + 0.65 * (this.softK ?? 1)), soft: 1 - (this.softK ?? 1), air: this.air, thr: this.thr, boost: this.pipeP, turbo: this.tur,
       cut: this.cut, ovr: this.ovr, running: this.running ? 1 : 0, starter: this.starter ? 1 : 0,
-      speed: Math.abs(this.v), spin: SIM_CLAMP((Math.abs(vw - this.v) - 1.5) / 5, 0, 1), abs: this.abs ? 1 : 0, tc: this.tcAct ? 1 : 0, iat: this.iat || 0,
+      speed: Math.abs(this.v), spin: Math.max(SIM_CLAMP((Math.abs(vw - this.v) - 1.5) / 5, 0, 1), this.locked ? SIM_CLAMP(Math.abs(this.v) / 10, 0, 0.9) : 0), abs: this.abs ? 1 : 0, tc: this.tcAct ? 1 : 0, iat: this.iat || 0,
       drive: Math.abs(this.Tc * this.ratio(this.gear)) / 3000, gearRpm: this.ww * this.ratio(this.gear) * 9.5493,
       rev: this.gear === -1 ? 1 : 0, wg: this.wg, sec: this.tune.turbo.twin ? this.sec : 0,
       rattle: this.running && (this.gear === 0 || this.shiftSeq) && this.clutch < 0.3 ? 1 - SIM_SS(900, 1600, this.rpm) : 0,

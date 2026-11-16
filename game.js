@@ -324,7 +324,7 @@ class StreetGame {
     if (dm !== undefined) { this.massDelta = dm; this.massRear = rearOff ?? 0.6; }
     const kg = this.trunkKg(), P = this.sim.P, car = CARS[this.car] || CARS.supra, d = this.massDelta || 0, ro = this.massRear ?? 0.6;
     const m = car.mass + d, driveKg = car.driveW * car.mass + d * (car.fwd ? 1 - ro : ro);
-    P.mass = m + kg; P.fwd = car.fwd;
+    P.mass = m + kg; P.fwd = car.fwd; this.sim.trailerKg = 0;
     P.rearW = (driveKg + kg * (car.fwd ? 0.05 : 0.95)) / (m + kg);
   }
   // ------------------------------------------------------------ garage: più auto, ognuna con i suoi chilometri e potenziamenti
@@ -675,6 +675,19 @@ class StreetGame {
         onTimeout: () => {},
       });
     }
+
+    // scia: dietro un veicolo nella tua corsia l'aria è già smossa. Fino a un terzo di resistenza in meno a pochi metri
+    // (quasi metà dietro un autobus), niente oltre i 30 m
+    let draft = 0;
+    for (const e of this.ents) {
+      if ((e.kind !== 'traffic' && e.kind !== 'police') || e.chase || Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) > 1.2) continue;
+      const gap = e.x - d - ((e.len || 4.6) + 4.5) / 2;
+      if (gap > 0 && gap < 30) draft = Math.max(draft, ((e.len || 4.6) > 8 ? 0.45 : 0.32) * Math.pow(1 - gap / 30, 1.5));
+    }
+    sim.draft = draft;
+    // freni: oltre i 480 °C le pastiglie perdono presa (fading); lo si dice una volta, finché non si raffreddano
+    if (sim.brakeT > 480 && !this.fadeSaid) { this.fadeSaid = true; this.say('Freni roventi: il pedale si allunga. Lasciali raffreddare', 'police'); }
+    if (sim.brakeT < 300) this.fadeSaid = false;
 
     // entità
     for (const e of this.ents) {
