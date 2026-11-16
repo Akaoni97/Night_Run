@@ -36,7 +36,9 @@ gioco fa, sezione per sezione).
 - **Primo lavoro**: pacco dal primo locale (km 1,8) alla tappa dopo (km 5) per € 10.000, obiettivo a schermo
   (`VG_FIRST`, `vgGoal`, test nel file dei test).
 - **Missioni** (`missioni.js`): catena di sei lavori con storia e regole, poi lavori generati senza fine.
-  Idee non fatte: mostrare la destinazione sulla mappa in basso, missioni che cambiano col paesaggio.
+  La meta del lavoro in corso è una bandierina verde sulla mappa a barra in basso (oltre i 2,7 km resta sul bordo
+  destro con la distanza); scatole e bancali caricati hanno una "P" sulla sosta di consegna (`renderMiniMap` in
+  `index.html`). Idee non fatte: missioni che cambiano col paesaggio.
 - **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta o accetta una sfida di
   2 km), reputazione con vinte/perse e vantaggi (`ST_REP_PERKS`), incidenti e controlli della polizia in prima
   corsia, traffico che tiene la destra.
@@ -45,8 +47,10 @@ gioco fa, sezione per sezione).
   consumo e autonomia, fisica con beccheggio e wheel hop.
 - **Quartieri** (`quartieri2d.js`): la città (primi 12 km del viaggio e modalità in città) alterna sei quartieri
   con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
-  Idee non fatte: oggetti e pedoni diversi per quartiere, strada più rovinata nei bassifondi, quartieri anche
-  negli altri paesaggi.
+  Ogni quartiere ha il suo asfalto (`districtRoad`): buche con l'acqua, rattoppi, strisce consumate e cartacce
+  nei bassifondi; asfalto nuovo e catarifrangenti nel quartiere alto; binari e gasolio al porto; coriandoli in via
+  delle lanterne. Idee non fatte: oggetti e pedoni diversi per quartiere, quartieri anche negli altri paesaggi,
+  buche che si sentono guidando (oggi sono solo disegnate).
 - **Effetti del 2D** (`effetti2d.js`): fumo, fiammate, scintille, ombre proiettate, fari, luci sulla carrozzeria,
   asfalto. `street2d.js` li chiama da `update()`; per provarli senza guidare si forzano `flame`, `spin`, `brake`
   nello stato passato a `view2d.update`.
@@ -66,12 +70,17 @@ gioco fa, sezione per sezione).
 - Manca il disegno di un **camion** (traffico lento a 90 km/h, lavori pesanti: la logica c'è, serve il disegno).
 - La **reputazione** sblocca solo vantaggi meccanici: il giocatore potrebbe volere anche premi estetici.
 - Sulle auto molto scure (Golf GTI, 205 GTI) il cambio di vernice prende poco (maschera povera).
-- La V40 non compare nel traffico (il suo disegno è gestito a parte in `street2d.js`).
+- La V40 è nel traffico: ruota e maschera della vernice sono ricavate dal disegno con `strumenti/v40_traffico.py`
+  (`img/v40_wheel.png`, `img/v40_paint.png`); la V40 guidata dal giocatore resta disegnata a parte (`v40Base`).
+- Il traffico mette il bagliore di fanali e frecce all'altezza giusta di ogni disegno (dati `tail`/`head`).
 - La Volvo 850 R ha 5 cilindri ma `dsp.js` sa fare solo 4 o 6.
 - La vista 3D non ha i luoghi, le auto nuove né gli eventi.
 - Gli **sticker** del giocatore: `img/stickers/manifest.json` è vuoto, arriveranno.
-- Due test falliscono da prima di tutto questo lavoro (0-100 della Supra di serie: 6,3 s contro meno di 6 attesi;
-  "officina: si compra solo con i soldi sufficienti"). Non peggiorare il conteggio: oggi 27 su 29.
+- Passano tutti i 29 test. I due vecchi fallimenti erano errori dei test, non del gioco: la prova dello 0-100 non
+  montava la configurazione originale (con il Torsen di serie fa 5,6 s e 13,7 s sui 400 m) e quella dell'officina
+  non sapeva che i pezzi si sbloccano anche coi chilometri.
+- **La storia del Viaggio (`STORIA.md`) la scrive e la carica il cognato**: non costruirla e non toccarla senza
+  che il proprietario lo chieda.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 

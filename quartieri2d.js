@@ -6,6 +6,8 @@
 //  - kindExtra: i palazzi nuovi (baracca, grattacielo di vetro, boutique, hotel, fabbrica, container, mercato).
 //  - landmark: le sagome lontane (ruota panoramica, gru, ciminiere, guglia, cisterna, pagoda).
 //  - decayTile: il degrado dei condomini dei bassifondi.
+//  - districtRoad: l'asfalto di ogni quartiere (buche e cartacce nei bassifondi, asfalto nuovo e catarifrangenti nel
+//    quartiere alto, binari e gasolio al porto, coriandoli della festa in via delle lanterne).
 //  Per aggiungere un quartiere basta una voce in DISTRICTS.
 // ============================================================================
 (() => {
@@ -291,5 +293,86 @@
     g.fillStyle = I.D.neon[0]; g.fillRect(bx - 12, by - 7, tw + 24, 1); g.fillRect(bx - 12, by + 16, tw + 24, 1);
     this.text(g, name, bx, by, '#f4f1e6', 2);
     g.restore();
+  };
+  // ---------------------------------------------------------------- asfalto dei quartieri
+  // Disegnato sopra la carreggiata di base, a passi di 9 m (ogni passo ha il suo seme: le cose restano dove sono).
+  // Corsie: bordo alto 238, linee tratteggiate 262 e 300, bordo basso 335.
+  S.districtRoad = function (g, wx, from, to, TUN) {
+    if (!this.districtAt) return;
+    const C = this.C, u = 1 / (this.SS || 1), night = 1 - (this.day || 0), STEP = 9;
+    const skip = (m) => TUN && m > TUN.a - 40 && m < TUN.b + 20;
+    const ppm = wx(1) - wx(0), lanesY = [[241, 260], [265, 298], [303, 333]];
+    const px = (col, x, y, w = 1, h = 1) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
+    for (let m = Math.floor(from / STEP) * STEP - STEP; m < to; m += STEP) {
+      if (skip(m)) continue;
+      const D = this.districtAt(m), k = Math.round(m / STEP), r = (o) => rnd(k * 7.13 + o * 3.71), x0 = wx(m), x1 = wx(m + STEP);
+      if (D.id === 'bassi') {
+        // strisce consumate: pezzi di tratteggio mangiati dal traffico
+        for (const ly of [262, 300]) if (r(ly) < 0.55) { g.fillStyle = 'rgba(18,20,34,.82)'; const a = x0 + r(ly + 1) * ppm * STEP; g.fillRect(Math.round(a), ly, Math.round(ppm * (0.6 + r(ly + 2) * 2.2)), 2); }
+        // rattoppo storto, più scuro del resto
+        if (r(3) < 0.3) {
+          const x = x0 + r(4) * (x1 - x0), y = 244 + Math.floor(r(5) * 80), w = 16 + Math.floor(r(6) * 30), h = 5 + Math.floor(r(7) * 7);
+          px('#171a29', x, y, w, h); px('#0e1019', x, y, w, 1); px('#2a2f44', x, y + h, w, 1);
+          for (let q = 0; q < w * h * 0.25; q++) px(rnd(q + k) > 0.5 ? '#12141f' : '#1f2335', x + Math.floor(rnd(q * 3 + k) * w), y + Math.floor(rnd(q * 7 + k) * h));
+        }
+        // buca: bordo rotto, fondo nero, acqua che riflette il cielo e un neon
+        if (r(8) < 0.62) {
+          const L = lanesY[Math.floor(r(9) * 3)], ry = 3 + Math.floor(r(13) * 3), y = L[0] + ry + 1 + Math.floor(r(10) * Math.max(1, L[1] - L[0] - ry * 2 - 2)), x = x0 + r(11) * (x1 - x0), rx = 12 + Math.floor(r(12) * 14);
+          g.fillStyle = '#4a5170'; this.span(g, x, y + 1, rx + 2, ry + 1);                                  // bordo rotto, illuminato davanti
+          g.fillStyle = '#07080f'; this.span(g, x, y, rx + 1, ry);
+          g.fillStyle = '#0f1220'; this.span(g, x + 1, y + 1, rx - 1, ry - 1);
+          if (r(14) < 0.75) {                                                                                // acqua: riflette il cielo e un neon
+            g.fillStyle = '#25305a'; this.span(g, x + 1, y + 1, rx * 0.8, Math.max(1, ry - 2));
+            px('#8796d6', x - rx * 0.5, y, Math.max(3, rx * 0.45), 1); px(C.neon[k % C.neon.length], x + rx * 0.15, y + 1, 4, 1);
+          }
+          for (let q = 0; q < rx; q += 3) px('#20243a', x - rx + q * 2, y - ry - (q % 2), 2, 1);                // crepe del bordo alto
+          for (let q = 0; q < 5; q++) px(q % 2 ? '#525a7a' : '#2c3148', x + (r(20 + q) - 0.5) * rx * 3.2, y + (r(30 + q) - 0.3) * ry * 3, 2, 1);   // sassi sparsi
+        }
+        // cartacce e lattine lungo i bordi
+        for (let q = 0; q < 3; q++) if (r(40 + q) < 0.45) {
+          const x = x0 + r(50 + q) * (x1 - x0), y = r(60 + q) < 0.5 ? 240 + Math.floor(r(70 + q) * 6) : 327 + Math.floor(r(70 + q) * 6), t = r(80 + q);
+          if (t < 0.5) { px('#cfc7ab', x, y, 5, 3); px('#9a927a', x + 1, y + 2, 4, 1); px('#efe8d0', x + 1, y, 2, 1); }   // cartaccia
+          else if (t < 0.8) { px(['#c0392b', '#2e7dd1', '#7fbf2a'][q], x, y, 5, 2); px('#e8e8e8', x, y, 1, 2); px('#2a2a2a', x + 4, y, 1, 2); }   // lattina schiacciata
+          else { px('#5a4026', x, y - 1, 7, 4); px('#7a5a36', x, y - 1, 7, 1); px('#3a2a1a', x + 3, y, 1, 3); }   // cartone
+        }
+      } else if (D.id === 'ricco') {
+        // asfalto steso da poco: più scuro e uniforme (le linee restano chiare)
+        g.fillStyle = 'rgba(8,10,24,.42)'; for (const L of lanesY) g.fillRect(Math.floor(x0), L[0], Math.ceil(x1 - x0) + 1, L[1] - L[0] + 1);
+        g.fillStyle = 'rgba(120,150,220,.05)'; g.fillRect(Math.floor(x0), 241, Math.ceil(x1 - x0) + 1, 2);
+        // linea di bordo continua e catarifrangenti ogni 4,5 m che si accendono coi fari
+        px('#e8e4d4', x0, 336, Math.ceil(x1 - x0) + 1, 1);
+        for (let q = 0; q < 2; q++) {
+          const x = wx(m + q * 4.5);
+          for (const ly of [262, 300]) {
+            const tw = 0.6 + 0.4 * Math.sin(m * 0.7 + ly + (this._t || 0) * 3);
+            px('#4a4436', x - 1, ly - 1, 5, 4); px(`rgba(255,${210 + 35 * tw | 0},140,${0.7 + 0.3 * tw})`, x, ly, 3, 2);
+            if (night > 0.3) { this.light(g, x + 1.5, ly + 1, 9, 3, '#ffe2a0', 0.07 * night * tw, 2); if (this.lightAdd) this.lightAdd(x + 1.5, ly + 1, 8, 3, '255,236,190', 0.7 * night * tw); }
+          }
+        }
+      } else if (D.id === 'porto') {
+        // binari del porto che attraversano la strada (ogni 63 m), annegati in una fascia di cemento
+        if (k % 4 === 1) {
+          const x = Math.round(x0 + (x1 - x0) * 0.3), w = Math.round(ppm * 2.2);
+          px('#2c2e36', x, 239, w, 97); px('#3a3c44', x, 239, w, 1); px('#18191f', x + w, 239, 1, 97);
+          for (let yy = 241; yy < 335; yy += 6) px('#25272e', x + 1, yy, w - 2, 1);
+          for (const rx of [Math.round(w * 0.22), Math.round(w * 0.72)]) { px('#0c0d12', x + rx, 239, 2, 97); px('#8a8f9e', x + rx + 2, 239, 1, 97); px('#c8ccd8', x + rx + 2, 248 + (k * 13) % 70, 1, 6); }
+          if (night > 0.3 && this.lightAdd) this.lightAdd(x + w / 2, 290, w * 0.7, 30, '255,170,90', 0.12 * night);
+        }
+        // macchie di gasolio iridescenti
+        if (r(5) < 0.65) {
+          const x = x0 + r(6) * (x1 - x0), y = 248 + Math.floor(r(7) * 78), rx = 12 + Math.floor(r(8) * 14);
+          g.fillStyle = 'rgba(4,5,10,.62)'; this.span(g, x, y, rx, 3); this.span(g, x + rx * 0.7, y + 2, rx * 0.4, 2);
+          px('rgba(190,90,230,.6)', x - rx * 0.6, y - 1, rx * 0.45, 1); px('rgba(70,210,210,.6)', x - rx * 0.15, y, rx * 0.45, 1); px('rgba(230,200,70,.55)', x + rx * 0.25, y + 1, rx * 0.35, 1);
+        }
+      } else if (D.id === 'lanterne') {
+        // coriandoli e cartine rosse e oro della festa, più fitti verso i marciapiedi
+        for (let q = 0; q < 10; q++) {
+          if (r(q + 90) < 0.35) continue;
+          const edge = r(q + 100) < 0.7, y = edge ? (r(q + 110) < 0.5 ? 240 + r(q + 120) * 8 : 325 + r(q + 120) * 9) : 244 + r(q + 120) * 86;
+          px(['#ff3a2a', '#ffd23f', '#ff8a5a', '#f4f1e6'][q % 4], x0 + r(q + 130) * (x1 - x0), y, q % 3 ? 2 : 3, q % 2 ? 1 : 2);
+        }
+        if (r(9) < 0.3) { const x = x0 + r(10) * (x1 - x0); px('#c4241c', x, 328, 7, 4); px('#ffd23f', x + 2, 329, 3, 1); px('#7a1410', x, 331, 7, 1); }   // busta rossa caduta
+      }
+    }
   };
 })();

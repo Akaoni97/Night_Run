@@ -20,7 +20,7 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
   { vt: 'a80', len: 4.5, kmh: [105, 125], w: 6 }, { vt: 'p206', len: 3.8, kmh: [110, 135], w: 6 }, { vt: 'v850', len: 4.7, kmh: [115, 140], w: 4 },
   { vt: 'golf', len: 3.8, kmh: [105, 130], w: 4 }, { vt: 'p205', len: 3.7, kmh: [110, 135], w: 3 }, { vt: 'williams', len: 3.7, kmh: [110, 135], w: 3 },
   { vt: 'a112', len: 3.2, kmh: [90, 115], w: 3 }, { vt: 'e36', len: 4.4, kmh: [110, 140], w: 4 }, { vt: 'e34', len: 4.7, kmh: [110, 140], w: 3 },
-  { vt: 'e30', len: 4.3, kmh: [105, 130], w: 3 }, { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 2 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 2 },
+  { vt: 'e30', len: 4.3, kmh: [105, 130], w: 3 }, { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 2 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 2 }, { vt: 'v40', len: 4.5, kmh: [105, 130], w: 4 },
 ];
 // luoghi della mappa del mondo: posti veri, ognuno con il suo sfondo 2D e il suo traffico
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine

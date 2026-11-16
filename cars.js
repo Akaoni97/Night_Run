@@ -372,6 +372,10 @@ const CARS = {
   v40: {
     id: 'v40', name: 'Volvo V40 SW 2.0', short: 'V40', tag: 'Volvo V40 SW · 2.0 16V B4204S · quattro in linea · cambio M56 a 5 marce',
     engine: 'B4204S 2.0 16V aspirato', mass: 1290, driveW: 0.61, fwd: true,
+    // disegno per il traffico: carrozzeria del giocatore, ruota e maschera ricavate da strumenti/v40_traffico.py
+    // (la V40 guidata dal giocatore si disegna a parte in street2d.js: v40Base, v40Wheel)
+    sprite: { img: 'img/v40.png', wheel: 'img/v40_wheel.png', paint: 'img/v40_paint.png', w: 200, h: 71, wy: 56, wr: 14.4, ax: [41, 156], head: [190, 40], tail: [2, 26, 6, 7],
+      ex: [3, 54], hx: 112, hy: 3, refL: 62.2, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] }, ws: 31, fixed: 1 },
     // fisica: 2.0 aspirato da 140 CV a 6000 giri e ~185 Nm a 4500, trazione anteriore, 5 marce
     P: {
       idle: 800, limiter: 6500, launchRpm: 3800, Ie: 0.16, mass: 1290, r: 0.308, cd: 0.33, A: 2.08, mu: 1.0, cgH: 0.52, wb: 2.56,

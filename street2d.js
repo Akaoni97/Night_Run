@@ -534,7 +534,7 @@ class Street2D {
     }
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx }; c.wheelImg = G.wheel; c.k = k; c.hd = base;
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = G.wheel; c.k = k; c.hd = base;
     return (this.spr[key] = c);
   }
 
@@ -1796,6 +1796,7 @@ class Street2D {
       g.fillStyle = '#7a86c0'; g.fillRect(x - rx + 5, y - 1, 3, 1);
     }
 
+    if (bg === 'city' && this.districtRoad) { this._t = st.t; this.districtRoad(g, wx, visFrom, visTo, TUN); }   // asfalto del quartiere
     // ---- corsia scelta: frecce luminose dipinte sull'asfalto davanti all'auto (si spostano col cambio corsia)
     if (game && game.track === 'city' && !game.inside && !game.race && this.laneRadar !== false && Math.abs(s.v) > 0.5) {
       const ly = Math.round(this.laneY(GAME_LANE_Z[game.lane] ?? 3.5)) - 6, pulse = 0.25 + 0.15 * Math.sin(st.t * 6);
@@ -1899,9 +1900,11 @@ class Street2D {
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
+      // altezza di fanali e fari: dai dati del disegno (tail/head) se ci sono, altrimenti il riferimento vecchio
+      const tY = GG.tail ? Math.round((GG.tail[1] + GG.tail[3] / 2) * k) : T0 + Math.round(35 * k), hY = GG.head ? Math.round(GG.head[1] * k) : T0 + Math.round(36 * k);
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
       this.fxShadow(g, spr, left, y, (GG.wy + GG.wr) * k + 1, x, lampX);
-      if ((this.day || 0) < 0.6 && this.quality !== 'bassa' && !e.hazard) this.fxBeam(g, left + w - 4, sy + T0 + 36 * k, 110 * k, 16 * k, (0.3 + (this.rainOn ? 0.2 : 0)) * (1 - (this.day || 0)));
+      if ((this.day || 0) < 0.6 && this.quality !== 'bassa' && !e.hazard) this.fxBeam(g, left + w - 4, sy + hY, 110 * k, 16 * k, (0.3 + (this.rainOn ? 0.2 : 0)) * (1 - (this.day || 0)));
       this.body(g, spr, left, sy);
       if (this.hazeOf && this.quality !== 'bassa') {                              // velo di foschia: più forte nelle corsie lontane
         const hzA = (0.07 + Math.max(0, Math.min(1, (318 - y) / 44)) * 0.2) * (1 - 0.5 * (this.day || 0));
@@ -1914,13 +1917,13 @@ class Street2D {
         if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
-      this.light(g, left + 3, sy + T0 + 35 * k, 8, 6, '#ff2a2a', 0.15, 2);
-      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + T0 + 35 * k, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
+      this.light(g, left + 3, sy + tY, 8, 6, '#ff2a2a', 0.15, 2);
+      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + tY, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
       if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce
-        g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3);
-        this.light(g, left + 4, sy + T0 + 39 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + T0 + 37 * k, 12, 7, '#ffa020', 0.35, 3);
+        g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3);
+        this.light(g, left + 4, sy + tY + 4 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + hY + k, 12, 7, '#ffa020', 0.35, 3);
       }
-      if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + T0 + Math.round(38 * k), 4, 3); g.fillRect(left + w - 6, sy + T0 + Math.round(36 * k), 4, 3); this.light(g, left + 4, sy + T0 + 39 * k, 9, 6, '#ffa020', 0.3, 3); }
+      if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3); this.light(g, left + 4, sy + tY + 4 * k, 9, 6, '#ffa020', 0.3, 3); }
       if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
       if (e.kind === 'police') {
         const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
