@@ -101,7 +101,7 @@ const VG_RUMORS = [
 
 // capitoli: si leggono al passaggio dei chilometri
 const VG_CHAPTERS = [
-  { km: 0, title: 'Km 0', text: 'Sotto casa, il motore acceso. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Tutti dicono la stessa cosa: l\'autostrada va solo avanti, e da qualche parte si arriva. Nessuno sa dove. Nessuno è mai tornato a raccontarlo. Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
+  { km: 0, title: 'Km 0', text: 'La Volvo di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
   { km: 1, title: 'Il primo cartello', text: 'Un cartello verde, appena fuori dalla città: «AUTOSTRADA · SOLO AVANTI». Sotto, qualcuno ha scritto a pennarello: «buon viaggio».' },
   { km: 10, title: 'Dieci', text: 'Dieci chilometri. Lo specchietto mostra la città, piccola. Poi una curva, e la città non c\'è più.' },
   { km: 25, title: 'La catena', text: 'Hai già visto due cartelli dei Motel Ovunque. «La tua cassa ti aspetta in camera». Dicono che sia il loro vanto: lasci le tue cose in un motel, le ritrovi nel prossimo. Come facciano, nessuno lo chiede.' },

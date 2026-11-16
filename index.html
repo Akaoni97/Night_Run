@@ -3224,7 +3224,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('goBtn').addEventListener('click', () => {
     ensureAudio(); hideGate(); setTimeout(() => $('btnIgn').focus(), 50);
     // la sigla sfuma, poi si accende l'autoradio a volume basso
-    if (radio && !radio.on) setTimeout(() => { radio.setMaster(S.vol / 100, S.muted); radio.start(audio.ctx); renderRadio(false); }, intro ? 2400 : 0);
+    const startRadio = () => { if (radio && !radio.on) { radio.setMaster(S.vol / 100, S.muted); radio.start(audio.ctx); renderRadio(false); } };
+    // all'inizio di un Viaggio nuovo c'è prima il prologo (lettera, E36, notaio, scelta dell'auto, autostrada); la radio parte dopo
+    if (window.NightPrologo && NightPrologo.shouldPlay(game)) {
+      game.s.vg.prologo = 1;
+      setTimeout(() => NightPrologo.play({ ctx: () => audio.ctx, onDone: () => { $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } }), intro ? 900 : 0);
+    } else setTimeout(startRadio, intro ? 2400 : 0);
   });
   if (intro) {
     $('introPress').addEventListener('click', () => intro.start());
@@ -3454,5 +3459,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 </script>
 <script src="menu.js"></script>
 <script src="telefono.js"></script>
+<script src="prologo.js"></script>
 </body>
 </html>
