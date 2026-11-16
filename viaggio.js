@@ -287,7 +287,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (vgOn(this) && dkm > 0 && Math.random() < dkm / 260 * (1 + 2 * (sim.tireWear || 0))) {
       const i = Math.floor(Math.random() * 4); if (!T.leak[i]) {
         const fast = Math.random() < 0.3; T.leak[i] = fast ? 0.22 : 0.01 + Math.random() * 0.02;
-        this.say(fast ? `Foratura! Gomma ${TYRE_NAMES[i]} a terra: fermati e cambiala (5)` : `La gomma ${TYRE_NAMES[i]} perde pressione piano piano`, 'bad');
+        this.say(fast ? `Foratura! Gomma ${TYRE_NAMES[i]} a terra: fermati e cambiala (9)` : `La gomma ${TYRE_NAMES[i]} perde pressione piano piano`, 'bad');
       }
     }
     // effetto sulla guida: meno aderenza e più attrito di rotolamento; a terra in velocità si rovina il cerchio

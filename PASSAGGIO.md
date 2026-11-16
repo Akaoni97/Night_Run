@@ -43,7 +43,7 @@ gioco fa, sezione per sezione).
   2 km), reputazione con vinte/perse e vantaggi (`ST_REP_PERKS`), incidenti e controlli della polizia in prima
   corsia, traffico che tiene la destra.
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
-  limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 5),
+  limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 9),
   consumo e autonomia, fisica con beccheggio e wheel hop.
 - **Fisica** (`sim.js`): massa vera in marcia (`massNow`: auto + carico + pilota 75 kg + carburante a 0,74 kg/l),
   inerzia delle ruote non motrici, portanza (`P.cl`). Freni per asse con trasferimento di carico e ripartizione
@@ -62,8 +62,7 @@ gioco fa, sezione per sezione).
   dell'ambiente; socchiusi in velocità l'abitacolo pulsa. Nel 2D il vetro abbassato perde i riflessi.
 - **Guidatore** (`pilota2d.js`): finestrino del pilota misurato a mano per ogni auto (`WIN`), maschera = riquadro meno
   vernice (`img/<auto>_paint.png`) e montanti scuri; la figura si adatta al finestrino. La Supra usa ancora il
-  riconoscimento del vetro. Attenzione: i tasti 1-6 mettono le marce, quindi il tasto 5 della ruota di scorta non
-  arriva mai al suo gestore (bug vecchio, da decidere col proprietario).
+  riconoscimento del vetro. I tasti 1-6 mettono le marce: per questo la ruota di scorta è sul 9 e i finestrini sullo 0.
 - **Quartieri** (`quartieri2d.js`): la città (primi 12 km del viaggio e modalità in città) alterna sei quartieri
   con palazzi, luci e atmosfera propri; il proprietario vuole sentire di essere "sempre in un paesaggio diverso".
   Ogni quartiere ha il suo asfalto (`districtRoad`): buche con l'acqua, rattoppi, strisce consumate e cartacce
