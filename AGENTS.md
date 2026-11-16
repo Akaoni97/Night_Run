@@ -37,6 +37,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `strada.js` | Sfide lanciate con gli abbaglianti (2 km), reputazione e vantaggi, eventi in prima corsia, comportamento del traffico. |
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `menu.js` | Schermata di gioco compatta (dopo lo script principale): sposta i pannelli della pagina in un menu a schede (Tab o pulsante MENU, Esc chiude), messaggi sopra la strada, pedali GAS/FRENO al tocco. `window.gameMenu.open('bagagliaio')`. |
+| `telefono.js` | Il telefono (dopo `menu.js`): smartphone sopra la strada, tasto 0 o pulsante TELEFONO. App Telefono, Messaggi, Rubrica, Lavori (bacheca e consegne vere), Mappa, Foto, Orologio; app strane (Passeggeri, Ultima Uscita, Segreteria) con la storia. `TEL_SMS` (messaggi per km), `TEL_ATTI` (km dei momenti della storia), `window.telefono.sms/ring/open/setAtto`. Grafica in Shadow DOM. Test in `test/telefono.test.js`. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
 | `audio/`, `models/` | Suoni e modelli 3D liberi già nel progetto. |
