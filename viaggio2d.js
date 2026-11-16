@@ -131,7 +131,7 @@
         this.light(g, X, top + h / 2, w * 0.9, h + 14, '#7fb0ff', 0.14, 3);
         g.fillStyle = C.ink; g.fillRect(bx - 1, top - 1, w + 2, h + 2); g.fillStyle = '#10224a'; g.fillRect(bx, top, w, h); g.fillStyle = '#1e3f86'; g.fillRect(bx, top, w, 2);
         const blink = Math.floor((performance.now() || 0) / 500) % 2;
-        L.forEach((s, i) => this.text(g, s, bx + Math.round((w - s.length * 4) / 2), top + 5 + i * 9, i === 0 ? '#ffd23f' : i === L.length - 1 && blink ? '#9bd1ff' : '#f4f1e6'));
+        L.forEach((s, i) => this.text(g, s, bx + Math.round((w - s.length * 4) / 2), top + 5 + i * 9, i === L.length - 1 && blink ? '#fff6c8' : '#ffd23f'));
         return true;
       }
       if (e.wall) {

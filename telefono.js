@@ -25,12 +25,13 @@ const TEL_SMS = [
 // rubrica: nome, ruolo, atto da cui compare
 const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Remo', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
   ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
-// app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono i cartelloni «servono soldi? scarica l'app»:
+// app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
+// (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
 // km = dove compare il cartellone; quando lo superi spunta l'icona da scaricare (il download è finto). Una per volta, in quest'ordine.
 const TEL_APP_OFFERS = [
-  { app: 'job', km: 0.6, name: 'Lavori', sign: 'SERVONO SOLDI?|SCARICA|APP LAVORI' },
-  { app: 'pax', km: 2.5, name: 'Passeggeri', sign: 'VUOI COMPAGNIA?|SCARICA|APP PASSEGGERI' },
-  { app: 'motel', km: 6, name: 'Motel', sign: 'STANCO?|SCARICA|APP MOTEL OVUNQUE' },
+  { app: 'job', km: 0.6, name: 'Lavori', sign: 'PORTAFOGLIO|IN LUTTO?' },
+  { app: 'pax', km: 2.5, name: 'Passeggeri', sign: 'TROPPO SILENZIO|IN AUTO?' },
+  { app: 'motel', km: 6, name: 'Motel', sign: 'OCCHI CHE|SI CHIUDONO?' },
 ];
 // prossimo cartellone da mettere sulla strada: il primo della lista non ancora toccato, se il km c'è già
 const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps && apps[o.app]) continue; return km >= o.km ? o : null; } return null; };
