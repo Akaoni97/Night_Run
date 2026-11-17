@@ -23,12 +23,10 @@ Legenda:
 3. **[S] Il finale Ospite diventa doppio:** B1 inconsapevole, B2 consapevole (vedi §10 e spiegazione sotto).
 4. **[S] Sei proprietari, sei luoghi, ma i luoghi sono quelli già nel gioco** (`VG_ROUTE`: Bassa, San Gimignano, Positano,
    Hakone, Wangan, Route 66), non sei capitali. La galleria che li collega esiste già (`galleria2d.js`).
-5. **[S] Sei auto nel testamento, ma se ne ritira una sola.** Ognuna ha avuto un proprietario diverso, e quello che
-   scegli decide il primo legame del viaggio. Le altre cinque restano al notaio, poi **ricompaiono** una alla volta nel
-   garage del Motel Ovunque (§3bis). La formula di prima, "la Volvo è di Claudio", cade: la Volvo era di Ottavio,
-   mentre l'auto di Claudio è un'altra delle sei.
-6. **[S] Il riconoscimento è la regola che regge tutto:** la presenza esce solo se un vivo la riconosce come qualcuno che
-   conosce; la porta si chiude solo se un vivo riconosce la persona che la sorveglia. Simmetria che dà senso a A, B, C e D.
+5. **[S] Sei auto nel testamento, ma se ne ritira una sola.** Sono quelle decise dal proprietario: Fiat Panda, Audi 80
+   Avant, Fiat Grande Punto, Opel Corsa, Volkswagen Polo e Volvo V40 SW. Ognuna ha avuto un proprietario diverso, e quella
+   che scegli decide il primo legame del viaggio. Le altre cinque finiscono in vendita all'**Autosalone Notte** (§3bis).
+   Cade la mia formula precedente "la Volvo è di Claudio": la Volvo era di Ottavio, e l'auto di Claudio è l'Audi 80.
 
 **Rifiniture**
 - **[R]** Tutti i divieti della 02 sono tolti. Restano solo le cose che servono alla coerenza: la presenza non è onnisciente,
@@ -182,23 +180,24 @@ restino.»* Il notaio la legge senza capirla e senza interpretarla.
    col temperino.
 2. **Cosa decide la scelta:** il **primo legame** del viaggio (§3 e tabella sotto), l'ordine di alcuni indizi, l'oggetto
    ordinario che trova nell'auto. La struttura principale è condivisa: nessuna delle sei porta a una storia a parte.
-3. **Le altre cinque** restano nel garage del notaio, con la loro storia incompleta. Poi, una alla volta, **ricompaiono
-   nel garage del Motel Ovunque**, coperte dal telo. Succede quando il giocatore ha incontrato il loro proprietario, o la
-   sua traccia, nel luogo della rotta. Nessuno ha portato l'auto lì: la galleria sposta le cose. È una delle prime
-   stranezze pratiche, e il giocatore vede il garage del notaio vuoto dalla telefonata di Livia.
+3. **Le altre cinque** finiscono in vendita all'**Autosalone Notte**, dove c'è scritto che erano dello zio (così è già
+   deciso nel gioco). Chi ne compra una trova nel vano portaoggetti **l'oggetto del suo vecchio proprietario**: avvia o
+   rinforza il filo di quella persona. Così si arriva a ogni legame anche senza averlo scelto all'inizio, e ricomprare
+   le cinque diventa anche una piccola indagine.
 4. **Nessuna scelta rende un finale impossibile.** Qualunque auto si scelga, la catena principale (Claudio, Irene,
    Livia, l'archivio, la porta) è raggiungibile. Cambia l'ordine e *chi si conosce per primo*.
 
-| Auto (luogo) | Proprietario | Primo legame se la scegli |
+| Auto (luogo) | Proprietario (provvisorio) | Primo legame se la scegli |
 | --- | --- | --- |
 | **Volvo V40 SW** (Bassa) | *Ottavio*, rappresentante | Livia e Rosa arrivano presto; l'incursione 3 è più vicina. |
-| Auto di Claudio (San Gimignano) | Claudio | Si sente prima il nastro e si trova prima la foto sbiadita. |
-| Auto del Wangan | *il ragazzo del Wangan* | La prima ripetizione con sangue fresco arriva prima. |
-| Auto di Hakone | *la coppia di Hakone* | Si impara presto che una porta si può richiudere. |
-| Auto di Positano | *proprietario provvisorio* | Si incontra presto l'uscita che cambia paese e torna allo svincolo. |
-| Auto della Route 66 | *la donna della Route 66* | Si legge presto la nota che spiega cosa vuole la presenza. |
+| **Audi 80 Avant** (San Gimignano) | Claudio | Si sente prima il nastro e si trova prima la foto sbiadita. |
+| **Fiat Grande Punto** (Wangan) | *il ragazzo del Wangan* | La prima ripetizione con sangue fresco arriva prima. |
+| **Opel Corsa** (Hakone) | *la coppia di Hakone* | Si impara presto che una porta si può richiudere. |
+| **Volkswagen Polo** (Positano) | *proprietario provvisorio* | Si incontra presto l'uscita che cambia paese e torna allo svincolo. |
+| **Fiat Panda** (Route 66) | *la donna della Route 66* | Si legge presto la nota che spiega cosa vuole la presenza. |
 
-Per ora il prologo permette di prendere solo la Volvo, quindi **per ora il legame è con Ottavio e con Livia**.
+Il prologo oggi permette di scegliere una qualsiasi delle sei. Ogni auto porta con sé il proprio oggetto ordinario e
+il proprio piccolo avvio di storia: cambia solo da dove si comincia a tirare il filo.
 
 ---
 
@@ -604,11 +603,10 @@ Con il consenso del proprietario le implementerò quando decidi di cominciare: d
 1. **Irene.** La persona tornata con Claudio era la presenza e la vera Irene è la figura alla porta. (§0, §2)
 2. **Elena è la sorella.** Con il soprannome «Nonno», che serve da prova. (§3)
 3. **Il finale Ospite doppio.** (§10)
-4. **Le sei auto: ne ritiri una, le altre ricompaiono al Motel Ovunque** (§3bis).
+4. **Le sei auto e i sei proprietari** (§3bis): quale auto va a quale proprietario è una mia proposta.
 
-**Non verificato nel codice:** se il menu di pausa ferma davvero i timer del gioco; se le altre cinque auto possono
-ricomparire nel garage del Motel Ovunque (il garage del motel e `g.s.vg.garage` esistono, ma non ho verificato il
-passaggio); il comportamento della vendita delle auto con gli oggetti di storia (la V40 risulta
+**Non verificato nel codice:** se il menu di pausa ferma davvero i timer del gioco; se l'oggetto del vecchio proprietario nel vano portaoggetti delle auto comprate all'Autosalone (da inserire nelle
+schede delle auto, non ancora verificato); il comportamento della vendita delle auto con gli oggetti di storia (la V40 risulta
 «non in vendita»); la capacità dell'app Foto di reggere la scena 04; la resa di sangue e volti in 2D a 720 righe.
 
 **Da calibrare giocando:** durata delle incursioni, numero di lampade, lunghezza dei sottotitoli, tempo delle pause.
