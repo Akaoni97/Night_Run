@@ -64,6 +64,12 @@ solo in maiuscolo ASCII (`PX_FONT`). Le auto guardano a destra.
 Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shiftK`, `hesK`), sprite e coppia in
 `GEN_DATA`, immagini in `img/`, voce in `CLUSTERS`.
 
+## Plugin ECC (Everything Claude Code)
+`.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
+cartella in Claude Code e dando fiducia al progetto, Claude Code propone di installarlo. Le sue rules non sono
+copiate qui apposta. Se una skill o un agente di ECC dice altro (commit in inglese, copertura test all'80 %, npm,
+TDD obbligatorio), valgono le regole di questo file.
+
 ## Regole
 1. `main` è il ramo pubblicato su GitHub Pages: non ci si lavora sopra direttamente. Lavora su un ramo tuo
    (es. `kimi/lavoro`, o quello che ti assegna la sessione) e porta le modifiche su `main` con una pull request,
