@@ -773,6 +773,10 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 /* pulsante MENU nella barra in alto */
 .menubtn { display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; clip-path: none; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 6px 18px rgba(255,179,71,.3); }
 .menubtn i { width: 14px; height: 10px; background: linear-gradient(#1a1206 0 2px, transparent 2px 4px, #1a1206 4px 6px, transparent 6px 8px, #1a1206 8px 10px); }
+@media (max-width: 520px) {   /* telefono: MENU, TELEFONO e TASTI stanno tutti nella barra */
+  .menubtn { padding: 6px 7px 5px; font-size: 10px; letter-spacing: .02em; gap: 4px; } .menubtn kbd { display: none; } .menubtn i { width: 10px; height: 8px; }
+  header.top { gap: 6px; } header.top h1 { font-size: 15px; }
+}
 html.game .top { padding: 0 6px; border-radius: 10px; background: linear-gradient(90deg, rgba(255,179,71,.06), transparent 40%); }
 html.game .chip { border-radius: 8px; clip-path: none; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
 html.game h1 { text-shadow: 0 0 14px rgba(255,179,71,.45), 2px 2px 0 #2a2216; }
@@ -3198,7 +3202,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
 
   // ---------------------------------------------------------------- ciclo principale
-  const joints = {};
   let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0;
   function frame(now) {
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now;
@@ -3240,12 +3243,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (game.perkUp) { game.perkUp = null; applySettings(); renderServices(); saveGame(); }
     renderGame(dt);
     const ev = sim.events.splice(0);
-    // giunti dell'asfalto ogni 47 m: prima l'asse anteriore, poi il posteriore ("ta-dum")
-    for (const [k, off] of [['jf', 1.28], ['jr', -1.28]]) {
-      const j = Math.floor((game.s.dist + off) / 47);
-      if (joints[k] !== undefined && j !== joints[k] && sim.v > 2) ev.push({ type: 'bump', I: Math.min(1, sim.v / 30) * (k === 'jf' ? 1 : 0.85) });
-      joints[k] = j;
-    }
+    // (i giunti dell'asfalto ogni 47 m facevano un "ta-dum" continuo: tolti, davano fastidio)
     for (const e of ev) if (e.type === 'grind' && S.autoClutch && Math.abs(sim.v) > 1.2) flash('Retromarcia solo da fermo');
     if (wasRunning && !sim.running && sim.stalled) flash('Motore spento: stallo. Folle e riavvia', 3);
     wasRunning = sim.running;
@@ -3306,6 +3304,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // all'inizio di un Viaggio nuovo c'è prima il prologo (lettera, E36, notaio, scelta dell'auto, autostrada); la radio parte dopo
     if (window.NightPrologo && NightPrologo.shouldPlay(game)) {
       game.s.vg.prologo = 1;
+      if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash('La Volvo dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina. Prima tappa: un benzinaio o Niko', 6), 1500); }
       setTimeout(() => NightPrologo.play({ ctx: () => audio.ctx, onDone: () => { $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } }), intro ? 900 : 0);
     } else setTimeout(startRadio, intro ? 2400 : 0);
   });
@@ -3535,6 +3534,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   requestAnimationFrame(frame);
 })();
 </script>
+<script src="tasti.js"></script>
 <script src="menu.js"></script>
 <script src="telefono.js"></script>
 <script src="prologo.js"></script>

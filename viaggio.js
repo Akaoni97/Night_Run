@@ -285,6 +285,17 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     };
     return { ok: true };
   };
+  // l'auto ereditata (all'inizio del primo Viaggio): è rimasta ferma anni nel garage dello zio. Gomme mezze sgonfie e
+  // consumate, olio e candele da cambiare, pastiglie basse, polvere, qualche ammaccatura, poca benzina. Una volta sola.
+  const VG_EREDITA = { p: [1.55, 1.7, 1.45, 1.65], wear: 0.55, damage: 0.14, oil: 0.22, plugs: 0.35, pads: 0.3, dirt: 0.95, fuel: 0.22 };
+  P.vgInherit = function () {
+    const v = this.s.vg; if (!v || v.inherited) return false;
+    v.inherited = 1; const E = VG_EREDITA, T = this.tyres(), sim = this.sim;
+    T.p = E.p.slice(); T.leak = [0, 0, 0, 0];
+    sim.tireWear = Math.max(sim.tireWear || 0, E.wear); sim.damage = Math.max(sim.damage || 0, E.damage); sim.fuel = Math.min(sim.fuel, E.fuel);
+    const m = this.maint(); m.oil = Math.min(m.oil, E.oil); m.plugs = Math.min(m.plugs, E.plugs); m.pads = Math.min(m.pads, E.pads); m.dirt = Math.max(m.dirt, E.dirt);
+    return true;
+  };
   P.inflate = function () { const T = this.tyres(); for (let i = 0; i < 4; i++) if (T.leak[i] < 0.05) T.p[i] = TYRE_P; return { ok: true }; };
   P.repairTyre = function () {
     const i = this.s.trunk.findIndex((it) => it.kind === 'forata'); if (i < 0) return { ok: false, why: 'Non hai gomme forate da riparare' };

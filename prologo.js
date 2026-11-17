@@ -29,10 +29,11 @@ const PRO_NOTAIO = [
   'Una sola potrà portarsela via stasera. Le altre aspetteranno.',
   'Scelga con calma. Ma non troppa: suo zio diceva che di notte la strada si fa più lunga.',
 ];
-// le sei auto del garage: per ora solo la Volvo si può scegliere. Le altre cinque restano sotto il telo (nomi in arrivo).
+// le sei auto del garage: per ora solo la Volvo si può scegliere. Le altre cinque sono le auto più vecchie ed economiche
+// che ci sono nel gioco (disegni del proprietario), al buio e impolverate: si vedono, ma "non ancora".
 const PRO_AUTO = [
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' },
+  { id: 'panda', nome: 'Fiat Panda' }, { id: 'a80', nome: 'Audi 80 Avant' }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
+  { id: 'punto', nome: 'Fiat Grande Punto' }, { id: 'corsa', nome: 'Opel Corsa' }, { id: 'polo', nome: 'Volkswagen Polo' },
 ];
 // si gioca il prologo solo all'inizio di un Viaggio nuovo (km 0, mai visto)
 const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 0) < 50);
@@ -48,6 +49,9 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   const load = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(i); i.src = src; });
   async function prepare() {
     if (IMG.ready) return;
+    await Promise.all(PRO_AUTO.filter((a) => !a.ok && typeof CARS !== 'undefined' && CARS[a.id] && CARS[a.id].sprite).map(async (a) => {
+      const [b, w] = await Promise.all([load(`img/${a.id}.png`), load(`img/${a.id}_wheel.png`)]); IMG['car_' + a.id] = { b, w, D: CARS[a.id].sprite };
+    }));
     const [body, wheel, mask, v40] = await Promise.all([load('img/e36.png'), load('img/e36_wheel.png'), load('img/e36_paint.png'), load('img/v40.png')]);
     const c = document.createElement('canvas'); c.width = E36.w; c.height = E36.h; const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(body, 0, 0);
     if (mask.width) {
@@ -226,6 +230,15 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   function carThumb(c, a) {
     const k = c.getContext('2d'); c.width = 200; c.height = 90; k.imageSmoothingEnabled = false; R(k, 0, 0, 200, 90, 'rgba(0,0,0,0)');
     if (a.ok) { glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2); k.drawImage(IMG.v40, 0, 8, 200, 71); }
+    else if (IMG['car_' + a.id] && IMG['car_' + a.id].b.width) {   // un'auto vera del garage: al buio, impolverata
+      const C = IMG['car_' + a.id], D = C.D, sc = Math.min(190 / D.w, 76 / D.h), w = D.w * sc, h = D.h * sc, x0 = (200 - w) / 2, y0 = 84 - (D.wy + D.wr) * sc;
+      const t = document.createElement('canvas'); t.width = 200; t.height = 90; const tx = t.getContext('2d'); tx.imageSmoothingEnabled = false;
+      tx.drawImage(C.b, x0, y0, w, h);
+      if (C.w.width) for (const ax of D.ax) { const ws = C.w.width * sc; tx.drawImage(C.w, x0 + ax * sc - ws / 2, y0 + D.wy * sc - ws / 2, ws, ws); }
+      tx.globalCompositeOperation = 'source-atop'; tx.fillStyle = 'rgba(14,16,26,.55)'; tx.fillRect(0, 0, 200, 90);   // al buio
+      tx.fillStyle = 'rgba(190,180,160,.12)'; for (let i = 0; i < 260; i++) tx.fillRect(hash(i + a.id.length * 31) * 200 | 0, hash(i * 7.3 + 1) * 90 | 0, 1, 1);   // polvere
+      R(k, 30, 80, 140, 4, 'rgba(0,0,0,.35)'); k.drawImage(t, 0, 0);
+    }
     else {      // un'auto sotto il telo: gobba grigia con le pieghe
       k.fillStyle = '#3a3d48'; k.beginPath(); k.moveTo(10, 78); k.quadraticCurveTo(14, 40, 60, 34); k.quadraticCurveTo(100, 16, 140, 34); k.quadraticCurveTo(186, 42, 192, 78); k.closePath(); k.fill();
       k.strokeStyle = '#2a2c35'; k.lineWidth = 2; for (let i = 0; i < 6; i++) { k.beginPath(); k.moveTo(30 + i * 26, 76); k.quadraticCurveTo(34 + i * 26, 52, 40 + i * 24, 30 + (i % 3) * 3); k.stroke(); }

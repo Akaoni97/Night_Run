@@ -213,7 +213,7 @@ class StreetGame {
     const soft = dv < 2.5;
     const dmg = soft ? 0.004 + dv * 0.004 : Math.min(0.45, (kind === 'front' ? 0.05 : 0.03) + dv * (kind === 'front' ? 0.022 : 0.012) * Math.min(2, m2 / 1400));
     sim.damage = Math.min(1, sim.damage + dmg);
-    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I, kind });
+    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I, kind, hit: true });
     if (soft) return;
     this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I, kind, vt: e.vt });
     e.dent = 1; e.hazT = 10;                                              // l'altra auto: ammaccata, quattro frecce

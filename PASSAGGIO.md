@@ -72,6 +72,12 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Tasti, eredità, giunti (17/11/2026)**: tolto il "ta-dum" delle ruote sui giunti dell'asfalto (dava fastidio);
+  i colpetti fanno il rumore di lamiera solo contro un'auto. Pulsante TASTI accanto a MENU e TELEFONO con l'elenco dei
+  comandi e la possibilità di cambiarli (`tasti.js`; sul telefono solo l'icona). All'inizio del primo Viaggio la Volvo
+  ereditata è malconcia (`vgInherit`, `VG_EREDITA` in `viaggio.js`: gomme a 1,45-1,7 bar e consumate, olio, candele e
+  pastiglie da cambiare, sporca, un po' ammaccata, 22 % di benzina). Nel garage del prologo le altre cinque auto sono
+  Panda, Audi 80, Grande Punto, Corsa e Polo (le più vecchie ed economiche), al buio e impolverate, non ancora sceglibili.
 - **Interni rifatti in parte (17/11/2026)**: personaggi ridisegnati (testa arrotondata con mascella, tre toni di luce,
   capelli con volume e frangia, occhi col riflesso, naso, labbra, braccia e mani a pixel netti con le dita); insegna BAR
   leggibile (prima era al rovescio), MOTEL/LIBERE dentro la finestra; dalle finestre passano le auto vere del traffico
