@@ -171,16 +171,9 @@ retrotreno (più trazione, più lenta in accelerazione). Tanica (+10 L), kit di 
 fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro) e i trofei dei
 capi battuti. Si compra e si butta dal pannello del bagagliaio.
 
-**Intro.** All'apertura parte una sigla sulla canzone *Redline at Midnight* (`audio/redline_at_midnight.mp3`,
-`intro.js`) girata in 2D con la stessa grafica del gioco: la città in pixel art, la tua Supra illustrata (vernice
-e ricambi estetici) e i fumetti degli effetti. Le inquadrature sono zoom e bande nere da cinema legati al brano:
-a mezzanotte primo piano sul muso mentre la Supra si accende, poi sulla coda per i colpi di gas, alla cassa
-parte tra fumo e "BANG!" e l'inquadratura si allarga, carrellata larga sulla città durante le cambiate, stretta
-sul muso nel crescendo, al picco il titolo NIGHT RUN sulla scena intera, poi il menu con la Supra che continua
-ad affondare e rilasciare. Il suono non è registrato: una simulazione propria guida il motore audio del gioco,
-quindi si sentono il 2JZ, il fischio delle turbine e la valvola sotto la musica. Invio o tocco per iniziare,
-Esc per saltare, M per la musica; entrando in gioco la canzone sfuma. Col telefono in verticale la scena è
-quasi quadrata. Senza la vista 2D resta una versione in prospettiva.
+**Schermata iniziale.** All'apertura c'è il titolo NIGHT RUN e il menu del Viaggio con il pulsante *Accendi e parti*
+(o Invio, o Spazio). La sigla con la Supra e la canzone è stata tolta: adesso a inizio Viaggio c'è il **prologo**
+(`prologo.js`). La canzone *Redline at Midnight* resta come stazione dell'autoradio.
 
 ## La carriera
 
