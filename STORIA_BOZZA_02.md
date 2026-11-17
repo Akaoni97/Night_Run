@@ -23,8 +23,10 @@ Legenda:
 3. **[S] Il finale Ospite diventa doppio:** B1 inconsapevole, B2 consapevole (vedi §10 e spiegazione sotto).
 4. **[S] Sei proprietari, sei luoghi, ma i luoghi sono quelli già nel gioco** (`VG_ROUTE`: Bassa, San Gimignano, Positano,
    Hakone, Wangan, Route 66), non sei capitali. La galleria che li collega esiste già (`galleria2d.js`).
-5. **[S] La Volvo V40 è l'auto di Claudio.** Per ora è l'unica scelta possibile nel prologo: il suo legame è il perno della
-   storia. Le altre cinque auto si sbloccano incontrando i loro proprietari (§4).
+5. **[S] Sei auto nel testamento, ma se ne ritira una sola.** Ognuna ha avuto un proprietario diverso, e quello che
+   scegli decide il primo legame del viaggio. Le altre cinque restano al notaio, poi **ricompaiono** una alla volta nel
+   garage del Motel Ovunque (§3bis). La formula di prima, "la Volvo è di Claudio", cade: la Volvo era di Ottavio,
+   mentre l'auto di Claudio è un'altra delle sei.
 6. **[S] Il riconoscimento è la regola che regge tutto:** la presenza esce solo se un vivo la riconosce come qualcuno che
    conosce; la porta si chiude solo se un vivo riconosce la persona che la sorveglia. Simmetria che dà senso a A, B, C e D.
 
@@ -68,6 +70,14 @@ un demone di nascita. È un'eco con un metodo.
 8. **Chi resta a guardia di un varco viene dimenticato da chi sta fuori**, un poco alla volta. È il prezzo che pagano
    Claudio, Rosa e (nel finale D) il protagonista.
 
+**In parole semplici: il riconoscimento.** La presenza non può uscire dalla galleria da sola. Deve farsi guardare da
+una persona viva che dica «ti conosco, sei tu» e se ne vada con lei. Per questo si traveste da qualcuno che quella
+persona conosce. La porta funziona al contrario: Irene la tiene chiusa da dentro, ed è l'unica cosa che ferma la
+presenza. Per chiudere la porta per sempre, un vivo deve fare il gesto opposto: **riconoscere Irene** (dire il suo
+nome, con la foto che prova chi è) così che lei possa smettere di montare la guardia.
+Quindi: **A** = esci dal vero svincolo, da solo. **B** = apri la porta e accompagni la presenza. **C** = riconosci
+Irene e chiudi. **D** = resti tu a guardia del varco, così gli altri possono uscire.
+
 ---
 
 ## 2. Cronologia privata
@@ -86,7 +96,7 @@ Anni relativi al presente della storia (anno 0 = la lettera dello studio).
 | −6 | *Rosa* e *Ottavio* entrano insieme. Lei esce, lui resta dentro. Lei resta sulla strada per tornare a prenderlo. |
 | −5 | Claudio incontra *Livia*, sorella di Ottavio, e le affida in custodia gli originali (foto, nastri, documenti): **fuori dalla rete**. Scrive il testamento, convinto di poter rendere innocue le auto richiudendo i collegamenti. |
 | −4 → −2 | Claudio richiude dall'interno i collegamenti che riesce a raggiungere: lascia cartelli scritti a mano e le **uscite chiuse**. |
-| −1 | Ultima scoperta: dentro la galleria vede la vera Irene alla porta, e capisce che è lei a tenere il varco chiuso. Ha il tempo di registrare un nastro nella radio della Volvo. Muore di notte, di malore, in un autogrill: ufficialmente una morte naturale. |
+| −1 | Ultima scoperta: dentro la galleria vede la vera Irene alla porta, e capisce che è lei a tenere il varco chiuso. Ha il tempo di registrare un nastro, e ne lascia una copia nella radio di ciascuna delle sei auto. Muore di notte, di malore, in un autogrill: ufficialmente una morte naturale. |
 | −1 | La presenza perde la maschera di Irene. Torna sulla strada. Dai discorsi di Claudio conosce già un nipote e una sorella, *Elena*. |
 | 0 | Lettera dello studio Ferri. Il protagonista eredita e sceglie l'auto. **[A]** |
 
@@ -103,8 +113,11 @@ Nel ramo più esposto comincia a usare parole e ricordi che non sono suoi.
 
 ### *Elena*, sorella minore (contatto di casa) [P]
 Vive in città, lavora, ha una giornata vera: un lavoro con orari assurdi, un gatto di nome *Pasta*, un coinquilino
-noioso. Lo prende in giro. Usa il soprannome **«Nonno»** (glielo aveva dato Claudio quando aveva otto anni, perché
-brontolava per tutto). Lo usa **solo per prenderlo in giro**, mai con dolcezza.
+noioso. Lo prende in giro. Usa il soprannome **«Nonno»** per il protagonista (glielo aveva dato Claudio quando lui aveva otto
+anni, perché brontolava per tutto). Il protagonista non la chiama in nessun modo particolare: il soprannome è a senso
+unico, da lei a lui. Elena lo usa **solo per prenderlo in giro** («Ok, Nonno, calmati»), mai con dolcezza. Claudio,
+nel nastro, lo dice **con dolcezza**. Se qualcuno al telefono dice «Nonno» con tenerezza, non è Elena: è chi ha
+imparato quella parola da Claudio.
 - *Sa:* che il protagonista è a ritirare un'eredità e che sta guidando.
 - *Non sa:* della galleria. Non lo sa mai, nemmeno alla fine di A.
 - Alcuni dettagli di lei, fissati nelle prime telefonate (il gatto, il turno, il soprannome), servono più avanti per
@@ -146,12 +159,46 @@ nel luogo e una prova che aggiunge un pezzo al contenimento. Ne scrivo la funzio
 
 | Luogo | Funzione |
 | --- | --- |
-| San Gimignano | Claudio e la prima chiusura. Qui c'è il primo cartello scritto a mano. |
-| Bassa | Ottavio: l'autogrill dove ritrovarono la sua macchina. |
+| San Gimignano | **L'auto di Claudio** e la sua prima chiusura. Qui c'è il primo cartello scritto a mano. |
+| Bassa | **La Volvo V40: l'auto di Ottavio** (un rappresentante: una station wagon da lavoro). L'autogrill dove la ritrovarono. |
 | Wangan | Il ragazzo: il primo esempio di una ripetizione con sangue fresco. |
 | Hakone | La coppia: la prima porta che si apre dall'esterno. Mostra che si può **richiudere**. |
 | Positano | Nessun proprietario: un luogo dove l'uscita cambia paese ma torna al solito svincolo. |
 | Route 66 | La donna: la prima a capire cosa vuole la presenza. Ha lasciato una nota. |
+
+---
+
+## 3bis. Le sei auto: ne ritiri una sola
+
+**[A] come scritto dall'autore.** Ti chiamano, ti dicono che nel testamento c'è un'auto per te, arrivi, e il notaio ti
+dice che puoi sceglierne **una** tra sei. Il resto è mio.
+
+**[P] Perché una sola.** Una clausola scritta da Claudio nel testamento: *«Una sola. Le altre restano dov'è giusto che
+restino.»* Il notaio la legge senza capirla e senza interpretarla.
+
+**[P] Come si gestisce.**
+1. **La scelta.** Sei auto sotto un telo, ognuna con un cartellino di una riga scritto a mano (non c'è il nome del
+   proprietario). Il protagonista può sollevare un telo, guardare l'interno, e scegliere. Le chiavi arrivano con una busta
+   col temperino.
+2. **Cosa decide la scelta:** il **primo legame** del viaggio (§3 e tabella sotto), l'ordine di alcuni indizi, l'oggetto
+   ordinario che trova nell'auto. La struttura principale è condivisa: nessuna delle sei porta a una storia a parte.
+3. **Le altre cinque** restano nel garage del notaio, con la loro storia incompleta. Poi, una alla volta, **ricompaiono
+   nel garage del Motel Ovunque**, coperte dal telo. Succede quando il giocatore ha incontrato il loro proprietario, o la
+   sua traccia, nel luogo della rotta. Nessuno ha portato l'auto lì: la galleria sposta le cose. È una delle prime
+   stranezze pratiche, e il giocatore vede il garage del notaio vuoto dalla telefonata di Livia.
+4. **Nessuna scelta rende un finale impossibile.** Qualunque auto si scelga, la catena principale (Claudio, Irene,
+   Livia, l'archivio, la porta) è raggiungibile. Cambia l'ordine e *chi si conosce per primo*.
+
+| Auto (luogo) | Proprietario | Primo legame se la scegli |
+| --- | --- | --- |
+| **Volvo V40 SW** (Bassa) | *Ottavio*, rappresentante | Livia e Rosa arrivano presto; l'incursione 3 è più vicina. |
+| Auto di Claudio (San Gimignano) | Claudio | Si sente prima il nastro e si trova prima la foto sbiadita. |
+| Auto del Wangan | *il ragazzo del Wangan* | La prima ripetizione con sangue fresco arriva prima. |
+| Auto di Hakone | *la coppia di Hakone* | Si impara presto che una porta si può richiudere. |
+| Auto di Positano | *proprietario provvisorio* | Si incontra presto l'uscita che cambia paese e torna allo svincolo. |
+| Auto della Route 66 | *la donna della Route 66* | Si legge presto la nota che spiega cosa vuole la presenza. |
+
+Per ora il prologo permette di prendere solo la Volvo, quindi **per ora il legame è con Ottavio e con Livia**.
 
 ---
 
@@ -207,9 +254,9 @@ richiudere. Chi ha preso patti o varchi aperti può avere la terza e la quarta. 
 
 **[P]** Esiste in **tre forme**, così non dipende da un oggetto perso.
 
-1. **Il nastro nella radio della Volvo.** Una stazione che non conosce nessuno, che si può ascoltare cercando in banda.
+1. **Il nastro nella radio dell'auto** (in ognuna delle sei). Una stazione che non conosce nessuno, che si può ascoltare cercando in banda.
    Dura pochi secondi, spezzato in tre battute.
-2. **Una frase sul parasole** della Volvo, scritta a mano da Claudio: *«Chiedi una cosa che sa solo lui.»*
+2. **Una frase sul parasole** dell'auto, scritta a mano da Claudio: *«Chiedi una cosa che sa solo lui.»*
 3. **Un messaggio dello studio Ferri** a una soglia del viaggio: hanno trovato in un faldone una lettera di Claudio con
    le stesse parole, aggiunta dopo il testamento.
 
@@ -231,7 +278,7 @@ imparato da lui (§11, scena 09).
 
 | | Prima lettura | Seconda lettura | Verifica | Conseguenza giocabile |
 | --- | --- | --- | --- | --- |
-| **A** Legame con le auto | Oggetti vecchi nella Volvo: un temperino, una pellicola mai sviluppata. | Le auto sono di sei viaggiatori, Claudio ne ha raccolte sei. | Documenti di Claudio + Livia che conosce un altro proprietario. | Sblocca la conoscenza dei sei luoghi; Livia compare. |
+| **A** Legame con le auto | Oggetti di chi guidava l'auto prima (nella Volvo: il tesserino di Ottavio, caramelle alla menta). Il temperino che il notaio consegna con le chiavi. | Le auto sono di sei viaggiatori, Claudio ne ha raccolte sei. | Documenti di Claudio + Livia che conosce un altro proprietario. | Sblocca la conoscenza dei sei luoghi; Livia compare. |
 | **B** Uscite chiuse | Deviazioni, poi prigionia. | Sono state chiuse **da dentro**, a mano, da Claudio. La grafia è la stessa del parasole. | Un cartello nuovo vicino a una chiusura che davvero ostacola la presenza. | La presenza insiste su una chiusura precisa: si può capire quale. |
 | **C** Figura alla porta | Una donna aspetta il protagonista per aggredirlo. | Guarda oltre di lui, verso l'ingresso: sorveglia. | Stessa scena vista in un contesto più ampio, e la foto originale. | La porta diventa riconoscibile; apre C. |
 | **D** Voce familiare | Elena, o Claudio, è riuscito a raggiungerlo. | Alcuni frammenti sono imitati con **lacune specifiche** (un soprannome usato male). | Domande di casa + un originale di Livia. | Smascherare il contatto cambia l'uso del telefono. |
@@ -243,7 +290,7 @@ I tre casi del sangue (§1 regola 7) si distinguono con **colore e posizione**:
 - macchia fresca con un suono dietro la porta: *viaggiatore vivo* da recuperare.
 
 La prova più importante, la foto originale di Irene alla porta, **non sta in un solo posto**: Livia la custodisce, e una
-copia sbiadita si trova nel vano portaoggetti della Volvo (ma sembra solo un rullino sovraesposto finché non la si
+copia sbiadita si trova nel vano portaoggetti dell'auto di Claudio (ma sembra solo un rullino sovraesposto finché non la si
 confronta con l'originale).
 
 ---
@@ -369,7 +416,7 @@ Nelle scene ho tolto i commenti e lasciato i fatti. I testi a pixel sulla strada
 
 *Pensiero dopo un rumore meccanico:* «Va bene. Un problema alla volta. Questo faccia la fila.»
 
-Nella Volvo c'è un **temperino**: Claudio lo diede al protagonista una sera, anni prima. Un pensiero breve, non più di
+Con le chiavi il notaio consegna un **temperino**: Claudio lo regalò al protagonista una sera, anni prima, e glielo ha lasciato in una busta. Un pensiero breve, non più di
 due righe, e niente di più.
 
 ### Scena 02 · Un aiuto concreto (Rosa)
@@ -557,10 +604,11 @@ Con il consenso del proprietario le implementerò quando decidi di cominciare: d
 1. **Irene.** La persona tornata con Claudio era la presenza e la vera Irene è la figura alla porta. (§0, §2)
 2. **Elena è la sorella.** Con il soprannome «Nonno», che serve da prova. (§3)
 3. **Il finale Ospite doppio.** (§10)
-4. **La Volvo è di Claudio** e le altre cinque auto si sbloccano con i proprietari. (§0)
+4. **Le sei auto: ne ritiri una, le altre ricompaiono al Motel Ovunque** (§3bis).
 
-**Non verificato nel codice:** se il menu di pausa ferma davvero i timer del gioco; se le sei auto possono essere
-sbloccate dal garage già esistente; il comportamento della vendita delle auto con gli oggetti di storia (la V40 risulta
+**Non verificato nel codice:** se il menu di pausa ferma davvero i timer del gioco; se le altre cinque auto possono
+ricomparire nel garage del Motel Ovunque (il garage del motel e `g.s.vg.garage` esistono, ma non ho verificato il
+passaggio); il comportamento della vendita delle auto con gli oggetti di storia (la V40 risulta
 «non in vendita»); la capacità dell'app Foto di reggere la scena 04; la resa di sangue e volti in 2D a 720 righe.
 
 **Da calibrare giocando:** durata delle incursioni, numero di lampade, lunghezza dei sottotitoli, tempo delle pause.
