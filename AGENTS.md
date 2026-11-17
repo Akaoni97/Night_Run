@@ -78,6 +78,10 @@ Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola
 | `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
 | `night-run-controllo` | controllo del gioco con voti per area e proposte |
 
+Skill nuove o modificate si fanno sul ramo **`skill`** (partito da `main`): una cartella
+`.claude/skills/<nome>/SKILL.md` con `name` uguale al nome della cartella e una `description` che dice quando usarla,
+una riga nella tabella qui sopra, poi pull request verso `main`. Prima di cominciare porta `skill` in pari con `main`.
+
 Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
 `node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore> <file.wav> [vista] [ambiente]`.
