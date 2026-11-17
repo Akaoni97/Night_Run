@@ -21,8 +21,10 @@ Legenda:
 2. **[S] Il contatto di casa è la sorella minore, *Elena*.** Rapporto alla pari, scherzi, soprannomi condivisi: è il
    materiale giusto per l'imitazione. Claudio è per lei uno zio quasi sconosciuto, come per il protagonista.
 3. **[S] Il finale Ospite diventa doppio:** B1 inconsapevole, B2 consapevole (vedi §10 e spiegazione sotto).
-4. **[S] Sei proprietari, sei luoghi, ma i luoghi sono quelli già nel gioco** (`VG_ROUTE`: Bassa, San Gimignano, Positano,
-   Hakone, Wangan, Route 66), non sei capitali. La galleria che li collega esiste già (`galleria2d.js`).
+4. **[S] Si torna alle capitali, e sono più di sei.** La galleria collega **dodici luoghi**: Tokyo (casa), Roma, Parigi,
+   Londra, Stoccolma, Berlino, Praga, Vienna, Madrid, Lisbona, Atene e Washington D.C. (§3ter). Sei di queste sono legate ai
+   sei proprietari delle auto; le altre sei sono città di passaggio. I paesaggi che il gioco ha già (Bassa, San Gimignano,
+   Positano, Hakone, Wangan, Route 66) restano come **tratti di strada tra una capitale e l'altra**.
 5. **[S] Sei auto nel testamento, ma se ne ritira una sola.** Sono quelle decise dal proprietario: Fiat Panda, Audi 80
    Avant, Fiat Grande Punto, Opel Corsa, Volkswagen Polo e Volvo V40 SW. Ognuna ha avuto un proprietario diverso, e quella
    che scegli decide il primo legame del viaggio. Le altre cinque finiscono in vendita all'**Autosalone Notte** (§3bis).
@@ -88,7 +90,7 @@ Anni relativi al presente della storia (anno 0 = la lettera dello studio).
 | Anno | Fatto |
 | --- | --- |
 | −41 | Incidente a catena nel tunnel, poi chiuso. Il luogo comincia a ripetersi. **[P]** |
-| −30, −24, −14 | Tre proprietari incontrano la galleria in momenti diversi (**scelti perché l'auto esisteva già**): −30 *la donna della Route 66* (Fiat Panda), −24 *la coppia di Hakone* (Opel Corsa), −14 *il ragazzo del Wangan* (Fiat Grande Punto). Nessuno tornerà intero. |
+| −30, −24, −14 | Tre proprietari incontrano la galleria in momenti diversi (**scelti perché l'auto esisteva già**): −30 *la donna di Washington* (Fiat Panda), −24 *la coppia di Berlino* (Opel Corsa), −14 *il ragazzo di Lisbona* (Fiat Grande Punto). Nessuno tornerà intero. |
 | −19 | **Claudio e Irene** tornano di notte da una cena, imboccano la galleria con l'Audi 80. Lei scende dall'auto e va verso una porta (per tenerla chiusa mentre lui esce, ma lui non lo saprà mai). Claudio esce da solo. Irene è data per dispersa. |
 | −17 | **Claudio rientra nella galleria a cercarla.** Alla porta vede una donna con la faccia di Irene, dice «Irene» e cammina con lei fino all'uscita: è il **riconoscimento** che la presenza aspettava. A casa "Irene" ha ricordi incompleti. Lui l'accetta. **È la presenza, ed è uscita per colpa del suo amore.** Prima di uscire ha scattato un fotogramma alla porta (macchina nel vano portaoggetti): non lo guarda. |
 | −16 → −12 | Piccole contraddizioni: un nome, una data. Claudio le corregge lui. |
@@ -154,18 +156,19 @@ Tre versioni dello stesso uomo, ognuna con una traccia:
 Non parla, non cerca il protagonista. Sorveglia un varco. Le sue apparizioni sembrano ostili finché non si vede che
 guarda **oltre** il protagonista, verso l'ingresso della galleria.
 
-### Gli altri cinque proprietari (provvisori)
-Servono a sbloccare le altre auto e a dare un posto a ogni luogo della rotta. Ognuno ha una vicenda breve, una traccia
-nel luogo e una prova che aggiunge un pezzo al contenimento. Ne scrivo la funzione, non i nomi.
+### I sei proprietari delle auto (provvisori)
+Servono a dare un posto a sei capitali. Ognuno ha una vicenda breve, una traccia nella sua città
+e una prova che aggiunge un pezzo al contenimento. Ne scrivo la funzione, non i nomi.
 
-| Luogo | Funzione |
+| Capitale | Funzione |
 | --- | --- |
-| San Gimignano | **L'auto di Claudio** e la sua prima chiusura. Qui c'è il primo cartello scritto a mano. |
-| Bassa | **La Volvo V40: l'auto di Ottavio** (un rappresentante: una station wagon da lavoro). L'autogrill dove la ritrovarono. |
-| Wangan | Il ragazzo: il primo esempio di una ripetizione con sangue fresco. |
-| Hakone | La coppia: la prima porta che si apre dall'esterno. Mostra che si può **richiudere**. |
-| Positano | Nessun proprietario: un luogo dove l'uscita cambia paese ma torna al solito svincolo. |
-| Route 66 | La donna: la prima a capire cosa vuole la presenza. Ha lasciato una nota. |
+| Roma | **L'Audi 80 di Claudio** e la sua prima chiusura. Qui c'è il primo cartello scritto a mano. |
+| Stoccolma | **La Volvo V40 di Ottavio** (un rappresentante: una station wagon da lavoro). L'autogrill dove la ritrovarono. |
+| Lisbona | Il ragazzo: il primo esempio di una ripetizione con sangue fresco. |
+| Berlino | La coppia: la prima porta che si apre dall'esterno. Mostra che si può **richiudere**. |
+| Vienna | Il proprietario della Polo, senza storia scritta: qui l'uscita cambia paese ma torna al solito svincolo. |
+| Washington D.C. | La donna: la prima a capire cosa vuole la presenza. Ha lasciato una nota. |
+
 
 ---
 
@@ -192,15 +195,45 @@ restino.»* Il notaio la legge senza capirla e senza interpretarla.
 
 | Auto (luogo) | Proprietario (provvisorio) | Primo legame se la scegli |
 | --- | --- | --- |
-| **Volvo V40 SW** (Bassa) | *Ottavio*, rappresentante | Livia e Rosa arrivano presto; l'incursione 3 è più vicina. |
-| **Audi 80 Avant** (San Gimignano) | Claudio | Si sente prima il nastro e si trova prima la foto sbiadita. |
-| **Fiat Grande Punto** (Wangan) | *il ragazzo del Wangan* | La prima ripetizione con sangue fresco arriva prima. |
-| **Opel Corsa** (Hakone) | *la coppia di Hakone* | Si impara presto che una porta si può richiudere. |
-| **Volkswagen Polo** (Positano) | *proprietario provvisorio* | Si incontra presto l'uscita che cambia paese e torna allo svincolo. |
-| **Fiat Panda** (Route 66) | *la donna della Route 66* | Si legge presto la nota che spiega cosa vuole la presenza. |
+| **Volvo V40 SW** (Stoccolma) | *Ottavio*, rappresentante | Livia e Rosa arrivano presto; l'incursione 3 è più vicina. |
+| **Audi 80 Avant** (Roma) | Claudio | Si sente prima il nastro e si trova prima la foto sbiadita. |
+| **Fiat Grande Punto** (Lisbona) | *il ragazzo di Lisbona* | La prima ripetizione con sangue fresco arriva prima. |
+| **Opel Corsa** (Berlino) | *la coppia di Berlino* | Si impara presto che una porta si può richiudere. |
+| **Volkswagen Polo** (Vienna) | *proprietario provvisorio* | Si incontra presto l'uscita che cambia paese e torna allo svincolo. |
+| **Fiat Panda** (Washington D.C.) | *la donna di Washington* | Si legge presto la nota che spiega cosa vuole la presenza. |
 
 Il prologo oggi permette di scegliere una qualsiasi delle sei. Ogni auto porta con sé il proprio oggetto ordinario e
 il proprio piccolo avvio di storia: cambia solo da dove si comincia a tirare il filo.
+
+---
+
+## 3ter. I luoghi: dodici capitali collegate dalla galleria
+
+**[A]** La galleria collega capitali reali. **[P]** Sono dodici, in un giro che poi ricomincia (come il Viaggio già fa).
+Il giocatore le attraversa **in auto**, da strade che sembrano normali: arrivare in una capitale non vuol dire essere fuori dalla
+rete. Non si esplora a piedi: ogni capitale è un **tratto di Viaggio** con il suo nome, il suo cielo e i suoi dettagli, più una
+tappa. Fra una capitale e l'altra restano i paesaggi che il gioco ha già (Bassa, San Gimignano, Positano, Hakone, Wangan,
+Route 66): sono i **tratti di collegamento**, quelli dove la galleria si sporca di sangue per gradi.
+
+| # | Luogo | Ruolo nella storia |
+| --- | --- | --- |
+| 1 | **Tokyo** | Casa e inizio del viaggio. Nel gioco c'è già. |
+| 2 | **Roma** | Proprietario: Claudio (Audi 80). Primo cartello scritto a mano. Studio Ferri. |
+| 3 | **Parigi** | Di passaggio. Prima capitale «impossibile» (distanza che non torna, §5 Fase II). |
+| 4 | **Londra** | Di passaggio. Una chiusura di Claudio che si vede bene dalla strada. |
+| 5 | **Stoccolma** | Proprietario: Ottavio (Volvo V40). L'autogrill dove ritrovarono l'auto. Rosa e Livia. |
+| 6 | **Berlino** | Proprietaria: la coppia (Opel Corsa). La porta che si può richiudere. |
+| 7 | **Praga** | Di passaggio. Primo segno di sangue fresco: una ripetizione. |
+| 8 | **Vienna** | Proprietario: Polo (nessuna storia scritta). L'uscita che cambia paese e torna allo svincolo. |
+| 9 | **Madrid** | Di passaggio. Una presenza che sembra Elena e sbaglia un dettaglio. |
+| 10 | **Lisbona** | Proprietario: il ragazzo (Grande Punto). Ripetizione con sangue fresco. |
+| 11 | **Atene** | Di passaggio. Il punto più lontano da casa: l'ultima porta, che non è ancora l'uscita. |
+| 12 | **Washington D.C.** | Proprietaria: la donna (Panda). La nota su cosa vuole la presenza. |
+
+Regole: l'ordine del giro è fisso. Ogni capitale ha **sempre le stesse cose** (stesso nome, stessi dettagli, stesse tappe),
+perché la galleria *ripete*. La prima volta che il giocatore passa per Roma è già la seconda volta per Claudio.
+**La storia non dipende dall'ordine in cui si visitano le capitali dei proprietari**: ogni capitale con un proprietario ha
+la propria traccia, che aggiunge un pezzo al contenimento, nell'ordine in cui il giro le porta.
 
 ---
 
@@ -635,13 +668,13 @@ sono già state corrette di conseguenza.
 | D05 | Una porta sola, ma Claudio chiude accessi in molti luoghi. | **La porta** è il *confine*: l'unico varco da cui la presenza può uscire (è quello da cui è già passata). Le **uscite chiuse** sono le *diramazioni* che Claudio ha richiuso per impedire a un viaggiatore di raggiungere la porta e accompagnarla. Lo **svincolo che ritorna** è l'uscita autentica (A), cosa diversa. Il significato non cambia nei finali. |
 | D06 | Come si affida un originale a Livia che è fuori dalla rete? | Non si affida: **gli originali sono già da lei**. Il protagonista ha copie; manda la copia a Livia, che la confronta con l'originale e la **verifica**. Cambia il significato della scelta 1 (§8). |
 | D07 | Perché portare Marco costa foto, nastro o posto? | Il costo non è "ingombro": è **tempo di lampade e cosa si lascia a bordo**. Tre alternative concrete: **il carico** (il lavoro in corso, perso con la paga), **la copia di una prova** (si recupera da Livia, perdendo tempo), **una lampada in più** (rischio maggiore). Il «posto» diventa «tempo». |
-| D08 | I proprietari e le auto devono avere epoche compatibili. | −30 Panda (Route 66), −24 Opel Corsa (Hakone), −14 Grande Punto (Wangan), −19 Audi 80 (Claudio), −6 Volvo V40 (Ottavio). La Polo di Positano resta senza anno. Nessun'auto anacronistica. |
-| D09 | Positano: nessun proprietario o proprietario provvisorio? | Un proprietario **senza storia scritta**: nessuno ne conosce il nome, e la presenza non ha imparato nulla di lui. Positano è il luogo dell'uscita che cambia paese. |
+| D08 | I proprietari e le auto devono avere epoche compatibili. | −30 Panda (Washington), −24 Opel Corsa (Berlino), −14 Grande Punto (Lisbona), −19 Audi 80 (Claudio, Roma), −6 Volvo V40 (Ottavio, Stoccolma). La Polo di Vienna resta senza anno. Nessun'auto anacronistica. |
+| D09 | Positano: nessun proprietario o proprietario provvisorio? | Un proprietario **senza storia scritta**: nessuno ne conosce il nome, e la presenza non ha imparato nulla di lui. **Vienna** è il luogo dell'uscita che cambia paese. |
 | D10 | Irene non parla. | **Resta muta.** Una sua prima battuta sarebbe un fatto nuovo e pesante: non si scrive. |
 | D11 | La presenza ascolta, quindi non può fallire sempre sulle stesse domande. | Ogni **domanda di casa funziona una volta**: dopo che la risposta vera è passata dal telefono, la presenza la sa. I nuclei 1-4 servono per il primo sospetto, i 5-8 sono verifiche deboli. Le prove forti sono sempre indipendenti (Livia, il vicino, gli originali). |
 | D12 | Quattro azioni finali contro un massimo di tre risposte. | Il limite di tre vale **solo per le conversazioni**. La scena «L'ultima porta» ha una sua interfaccia con quattro pulsanti. |
 | D13 | Il nastro supera i 90 caratteri. | Lo si legge a schermate come ha fatto Codex; si ascolta da fermo. |
-| D14 | Sei luoghi invece delle capitali. | Confermato (la bozza li usa già). **Resta una differenza dal desiderio iniziale dell'autore**, da non dare per scontata: se si vuole tornare alle capitali, si rifà §3bis. |
+| D14 | Sei luoghi invece delle capitali. | **Superato: si torna alle capitali** (l'autore ha chiarito il fraintendimento). Sono dodici luoghi, vedi §3ter. |
 | D15 | Conseguenze dei fallimenti non definite. | *Passaggio* → perdi la copia del nastro (la riascolti da Livia). *Tornare con qualcuno* → Marco resta dentro e ricompare come viaggiatore ambiguo, Rosa −5. *Recuperare* → `ottavioSalvo` falso, **mai** un successo fittizio. *Varco* → il varco resta aperto (+varchi) con una possibilità di richiuderlo. Nessuna perde una via, solo un'occasione. |
 | D16 | Che cosa conta come "indizio ignorato" in B1. | **Una verifica proposta dal gioco e lasciata cadere.** Tre volte. B2 conta comprensione e motivo, non un contatore alto. |
 | D17 | Scelte esclusive e contatori che non si revocano. | Oltre alla memoria (contatori e flag che non scendono) ci sono **stati attuali**: `patto` (nessuno · esplicito · sospeso · rifiutato), `varco` (chiuso · aperto · richiuso), `livia` (fiducia · rotta · riparata). Vale l'ultimo; la storia resta nel registro. |

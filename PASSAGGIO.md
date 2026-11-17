@@ -63,8 +63,11 @@ gioco fa, sezione per sezione).
   altri no, altri compaiono solo con abbastanza confidenza), barra di **confidenza** per persona (si vede nelle chat e nella
   Rubrica a schede), **gusti** che si scoprono dalle reazioni (▲ piace, ▼ non piace), soglie 25/50/75/100 che sbloccano altre
   conversazioni. Nessun obbligo: una chat ignorata resta ad aspettare, e si possono coltivare tutte le persone. La presenza ha la sua
-  barra rossa. "Sta scrivendo…", conferma di lettura, suono breve. I testi sono **segnaposto**; il materiale vero arriva da Codex
-  (`RICHIESTA_PER_CODEX.md`, stesso formato dei nodi). Stato in `game.s.chat`. Ritmo rivisto: cartelloni delle app a km 5, 11,5 e 21
+  barra rossa. "Sta scrivendo…", conferma di lettura, suono breve. Le **28 conversazioni scritte da Codex** (Elena 12, Rosa 10, Livia 6, più la presenza che imita Elena e zio Claudio e i
+  messaggi sporchi) sono dentro: `chat_dati.js`, generato da `strumenti/importa_chat.py`. I **toni sono provvisori** (regole sulle parole + 17
+  risposte aggiunte da me, tra cui 10 sboccate per Rosa) finché non arriva la tabella dei toni di Codex; i km di partenza sono
+  segnaposto. Le conversazioni che dipendono da eventi non ancora fatti (incursioni, sangue, foto, fase V) restano ferme con
+  un flag `ev_…`. Prossimo materiale richiesto: `RICHIESTA_PER_CODEX_3.md`. Stato in `game.s.chat`. Ritmo rivisto: cartelloni delle app a km 5, 11,5 e 21
   (3-5 minuti di guida tra uno e l'altro) e messaggi di Niko e del Motel a km 7 e 14.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico

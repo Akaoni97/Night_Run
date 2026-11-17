@@ -18,11 +18,6 @@ const TEL_SMS = [
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
   { from: 'Officina Niko', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
   { from: 'Motel Ovunque', km: 14, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
-  { from: 'Zio Claudio', km: 150, bad: 1, text: 'Hai preso {auto}. Giusto così.' },   // {auto}: l'auto scelta nel garage
-  { from: 'Zio Claudio', km: 400, bad: 1, text: 'sei già passato di qui' },
-  { from: 'Zio Claudio', km: 400.1, bad: 1, dir: 'o', text: 'chi sei' },
-  { from: 'Zio Claudio', km: 400.2, bad: 1, text: 'non fermarti' },
-  { from: 'Sconosciuto', km: 401, bad: 1, text: 'l\'uscita 4 non c\'è mai stata' },
 ];
 // rubrica: nome, ruolo, atto da cui compare
 const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],

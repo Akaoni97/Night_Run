@@ -9,8 +9,7 @@
 //  Il file ha due parti: il MOTORE (funzioni pure sullo stato `game.s.chat`, provate in test/chat.test.js) e la
 //  GRAFICA (messaggi con "sta scrivendo…", barre, rubrica a schede), che si aggancia a telefono.js.
 //
-//  I TESTI QUI SOTTO SONO SEGNAPOSTO, scritti per provare il meccanismo: il materiale vero della storia arriva da
-//  RICHIESTA_PER_CODEX.md e si scrive nello stesso formato (nodi con id, risposte con tono ed effetti).
+//  I nodi (testi e bivi) stanno in chat_dati.js, generato da strumenti/importa_chat.py a partire dal materiale scritto da Codex.
 //
 //  Formato di un nodo (CHAT_LIST):
 //    { id, who, text: 'riga' | ['riga', 'riga'], alt?: [{ req, text }],      // alt: versione diversa se req è vero
@@ -24,90 +23,27 @@ const CHAT_TIER_PRES = ['Estranea', 'Attenta', 'Insistente', 'Vicina', 'Dentro']
 const CHAT_TONI = ['sboccato', 'pacato', 'ironico', 'gentile', 'freddo', 'sincero', 'evasivo'];
 const CHAT_CNT = ['conoscenza', 'legami', 'patti', 'varchi'];
 
-// le persone: ruolo, colore, gusti (1 piace, −1 non piace, assente = indifferente); presenza = la barra è rossa e dice «fiducia concessa»
+// le persone: ruolo, colore, gusti (1 piace, −1 non piace, assente = indifferente) e quanto sale/scende la barra a ogni risposta
+// (k: piace, indifferente, non piace). presenza = barra rossa e «fiducia». nobar = nome che compare senza barra (la presenza lo imita).
 const CHAT_NPC = {
-  Elena: { ruolo: 'Sorella', col: '#e879a6', gusti: { ironico: 1, gentile: 1, sincero: 1, freddo: -1, evasivo: -1 } },
-  Rosa: { ruolo: 'Meccanica', col: '#f59e0b', gusti: { sboccato: 1, sincero: 1, ironico: 1, evasivo: -1, freddo: -1 } },
-  Livia: { ruolo: 'Archivista', col: '#38bdf8', gusti: { pacato: 1, sincero: 1, gentile: 1, sboccato: -1, evasivo: -1 } },
-  Sconosciuto: { ruolo: 'Numero nascosto', col: '#ef4444', presenza: true, gusti: { gentile: 1, sincero: 1, freddo: -1, sboccato: -1 } },
+  Elena: { ruolo: 'Sorella', col: '#e879a6', k: [2, 1, -1], gusti: { ironico: 1, gentile: 1, sincero: 1, freddo: -1, evasivo: -1 } },
+  Rosa: { ruolo: 'Meccanica', col: '#f59e0b', k: [3, 1, -1], gusti: { sboccato: 1, sincero: 1, ironico: 1, evasivo: -1, freddo: -1 } },
+  Livia: { ruolo: 'Archivista', col: '#38bdf8', k: [3, 1, -2], gusti: { pacato: 1, sincero: 1, gentile: 1, sboccato: -1, evasivo: -1 } },
+  Sconosciuto: { ruolo: 'Numero nascosto', col: '#ef4444', presenza: true, k: [4, 1, -1], gusti: { gentile: 1, sincero: 1, ironico: 1, freddo: -1, sboccato: -1 } },
+  'Zio Claudio': { ruolo: 'Zio', col: '#9ca3af', k: [0, 0, 0], gusti: {}, nobar: true },
 };
-
-// i nodi (segnaposto)
-const CHAT_LIST = [
-  // --- Elena
-  { id: 'ELE_01', who: 'Elena', text: 'Allora, com\'è?', opts: [
-    { t: 'Parte.', to: 'ELE_02', tono: 'ironico' },
-    { t: 'Una meraviglia. Ti saluta il cofano.', to: 'ELE_02', tono: 'ironico' },
-    { t: 'Non ho voglia di parlarne.', to: 'ELE_03', tono: 'freddo' }] },
-  { id: 'ELE_02', who: 'Elena', text: 'Mi dici solo le cose belle?', opts: [
-    { t: 'Le ho finite.', to: 'ELE_fine', tono: 'sincero', fx: ['flag:elena_sa_che_va_male'] },
-    { t: 'Il resto te lo dico a voce.', to: 'ELE_fine', tono: 'evasivo' }] },
-  { id: 'ELE_03', who: 'Elena', text: ['Ok, Nonno, calmati.', 'Pasta ha vomitato sul tappeto: stasera la giornata peggiore è la sua.'], opts: [
-    { t: 'Vi voglio bene, eh.', to: 'ELE_fine', tono: 'gentile' },
-    { t: 'Mandami la foto del disastro.', to: 'ELE_fine', tono: 'ironico' }] },
-  { id: 'ELE_fine', who: 'Elena', text: 'Ti richiamo dopo cena. Guida piano.',
-    alt: [{ req: 'flag:elena_sa_che_va_male', text: ['Ti richiamo dopo cena.', 'E se la macchina fa cose strane, me lo dici. Davvero.'] }] },
-  // --- Rosa
-  { id: 'ROS_01', who: 'Rosa', text: 'Ehi, tu. Sei tu che accendi il motore ogni trenta secondi?', opts: [
-    { t: 'Controllavo.', to: 'ROS_02', tono: 'ironico' },
-    { t: 'E tu chi cazzo sei?', to: 'ROS_02', tono: 'sboccato' },
-    { t: 'Mi lasci in pace, grazie.', to: 'ROS_03', tono: 'freddo' }] },
-  { id: 'ROS_02', who: 'Rosa', text: 'Si ripara con gli attrezzi, non con la fiducia. Passami quel tubo.', opts: [
-    { t: 'Questo?', to: 'ROS_04', tono: 'ironico' },
-    { t: 'Ti ho portato un caffè.', to: 'ROS_04', tono: 'gentile', req: 'conf:Rosa>=25' },
-    { t: 'Non so quale sia, non faccio il meccanico.', to: 'ROS_04', tono: 'sincero' }] },
-  { id: 'ROS_03', who: 'Rosa', text: 'Come vuoi. Il liquido sotto è sparso per tutta la corsia, però.', opts: [
-    { t: 'Aspetta. Fammi vedere.', to: 'ROS_02', tono: 'sincero' },
-    { t: 'Me la cavo.', to: 'ROS_fine', tono: 'evasivo' }] },
-  { id: 'ROS_04', who: 'Rosa', text: ['No. Quello che sto indicando, porca puttana.', 'Poi guarda qui: un tubo fesso. Ti ha salvato la giornata.'], opts: [
-    { t: 'Grazie.', to: 'ROS_fine', tono: 'gentile' },
-    { t: 'Quindi l\'hai riparata tu e mi insulti pure?', to: 'ROS_fine', tono: 'sboccato' }] },
-  { id: 'ROS_fine', who: 'Rosa', text: 'Le soste di notte sono mie. Se serve, mi trovi.',
-    alt: [{ req: 'conf:Rosa>=50', text: ['Le soste di notte sono mie.', 'E tu non sei male, per uno che passa. Dai, scrivimi.'] }] },
-  { id: 'ROS_s25', who: 'Rosa', text: 'Passa da me alla prossima sosta, ti guardo il liquido gratis.', opts: [
-    { t: 'Arrivo.', to: 'ROS_s25b', tono: 'gentile', fx: ['flag:rosa_guarda_auto'] },
-    { t: 'Gratis un cazzo, che c\'è sotto?', to: 'ROS_s25b', tono: 'sboccato' }] },
-  { id: 'ROS_s25b', who: 'Rosa', text: 'Niente. Mi piace l\'odore dell\'olio. Muoviti.' },
-  { id: 'ROS_s50', who: 'Rosa', text: ['Ti dico una cosa che non dico a nessuno.', 'Ho promesso a una persona di riportare indietro suo fratello.'], opts: [
-    { t: 'Dov\'è adesso?', to: 'ROS_s50b', tono: 'sincero', fx: ['flag:rosa_promessa', 'cnt:conoscenza+1'] },
-    { t: 'Non devi dirmi niente.', to: 'ROS_s50b', tono: 'gentile', fx: ['flag:rosa_promessa'] }] },
-  { id: 'ROS_s50b', who: 'Rosa', text: 'Non lo so. Ecco perché sono ancora qui.' },
-  // --- Livia
-  { id: 'LIV_01', who: 'Livia', text: 'Parlo con il nipote di Claudio?', opts: [
-    { t: 'Sì. Lei chi è?', to: 'LIV_02', tono: 'pacato' },
-    { t: 'Dipende da chi lo chiede.', to: 'LIV_02', tono: 'evasivo' },
-    { t: 'Sì, mi dica.', to: 'LIV_02', tono: 'gentile' }] },
-  { id: 'LIV_02', who: 'Livia', text: ['Mi chiamo Livia. Lavoro in un archivio.', 'Ho una cosa di suo zio da custodire.'], opts: [
-    { t: 'La custodisca pure.', to: 'LIV_03', tono: 'pacato', fx: ['flag:livia_custodisce', 'cnt:legami+1'] },
-    { t: 'Voglio vederla.', to: 'LIV_03', tono: 'sincero', fx: ['flag:livia_mostra', 'cnt:conoscenza+1'] }] },
-  { id: 'LIV_03', who: 'Livia', text: 'Capisco. Ne riparliamo di persona.',
-    alt: [{ req: 'flag:livia_mostra', text: ['Capisco la fretta.', 'Ma è meglio guardarla insieme, con calma.'] }] },
-  { id: 'LIV_s25', who: 'Livia', text: 'Non so se posso fidarmi di lei. Ma lei mi sembra una persona che ascolta.', opts: [
-    { t: 'Ascolto.', to: 'LIV_s25b', tono: 'pacato' },
-    { t: 'Dipende da cosa mi dice.', to: 'LIV_s25b', tono: 'evasivo' }] },
-  { id: 'LIV_s25b', who: 'Livia', text: 'Ecco. Per ora basta così.' },
-  // --- Sconosciuto (la presenza: la barra è visibile, ma non è detto che la si voglia riempire)
-  { id: 'SCO_01', who: 'Sconosciuto', text: 'Quella non era una cosa tua.', opts: [
-    { t: 'Chi sei?', to: 'SCO_02', tono: 'sincero' },
-    { t: 'Di che cosa parli?', to: 'SCO_02', tono: 'evasivo' }] },
-  { id: 'SCO_02', who: 'Sconosciuto', text: 'Lo sai. Ti ricordi.', opts: [
-    { t: 'Smettila.', to: 'SCO_fine', tono: 'freddo' },
-    { t: 'Cosa dovrei ricordare?', to: 'SCO_03', tono: 'gentile', fx: ['conf:Sconosciuto+3'] }] },
-  { id: 'SCO_03', who: 'Sconosciuto', text: 'Presto lo capirai. Basta che continui a rispondermi.' },
-  { id: 'SCO_fine', who: 'Sconosciuto', text: 'Va bene. Ti aspetto.' },
-];
-const CHAT_NODES = {}; for (const n of CHAT_LIST) CHAT_NODES[n.id] = n;
-// quando comincia una conversazione: a quel km (e se la condizione è vera), purché la chat di quella persona sia libera
-const CHAT_START = [
-  { id: 'e1', who: 'Elena', km: 8, node: 'ELE_01' },
-  { id: 'r1', who: 'Rosa', km: 28, node: 'ROS_01' },
-  { id: 'l1', who: 'Livia', km: 55, node: 'LIV_01' },
-  { id: 's1', who: 'Sconosciuto', km: 42, node: 'SCO_01' },
-];
-// cosa si apre quando la confidenza supera una soglia (nodo da cominciare)
-const CHAT_UNLOCK = { Rosa: { 25: ['ROS_s25'], 50: ['ROS_s50'] }, Livia: { 25: ['LIV_s25'] } };
+// CHAT_LIST, CHAT_START e CHAT_TONI_MAP stanno in chat_dati.js (generato da strumenti/importa_chat.py)
+// CHAT_UNLOCK (cosa si apre a ogni soglia di confidenza) sta anche lui in chat_dati.js
+const CHAT_NODES = {};
+for (const n of CHAT_LIST) {
+  CHAT_NODES[n.id] = n;
+  const tt = CHAT_TONI_MAP[n.id] || [];
+  (n.opts || []).forEach((o, i) => { o.tono = tt[i] || o.tono || 'pacato'; });
+}
 
 // ------------------------------------------------------------ motore (funzioni pure sullo stato s)
+// «chi parla» e «in che chat compare» possono differire: la presenza può scrivere dentro la chat di Elena o di zio Claudio
+// (node.as = nome della chat; node.who = a chi vanno confidenza e gusti). La chiave di una chat è sempre il nome con cui compare.
 function chatState(s) {
   if (!s.chat) s.chat = { conf: {}, taste: {}, flags: {}, cnt: { conoscenza: 0, legami: 0, patti: 0, varchi: 0 }, th: {}, started: {}, closed: {}, q: [] };
   const c = s.chat; for (const k of ['conf', 'taste', 'flags', 'th', 'started', 'closed']) if (!c[k]) c[k] = {};
@@ -115,13 +51,15 @@ function chatState(s) {
   return c;
 }
 const chatConf = (s, who) => chatState(s).conf[who] || 0;
-function chatThread(c, who) { return c.th[who] || (c.th[who] = { who, msgs: [], at: null, seen: 0, k: 0, done: {} }); }
+const chatKey = (n) => n.as || n.who;
+function chatThread(c, tk) { return c.th[tk] || (c.th[tk] = { who: tk, msgs: [], at: null, seen: 0, k: 0, done: {} }); }
 function chatCond(s, km, req) {
   if (!req) return true; if (Array.isArray(req)) return req.every((r) => chatCond(s, km, r));
   const c = chatState(s); let m;
   if ((m = /^(!?)flag:(.+)$/.exec(req))) return !!c.flags[m[2]] !== (m[1] === '!');
   if ((m = /^conf:(.+?)(>=|<=|>|<)(\d+)$/.exec(req))) { const v = c.conf[m[1]] || 0, n = +m[3]; return m[2] === '>=' ? v >= n : m[2] === '<=' ? v <= n : m[2] === '>' ? v > n : v < n; }
   if ((m = /^km>=([\d.]+)$/.exec(req))) return km >= +m[1];
+  if ((m = /^fatto:(.+)$/.exec(req))) return Object.values(c.th).some((t) => t.done[m[1]]);       // quel nodo è già stato letto
   return false;
 }
 // righe di un nodo, con la versione diversa se una condizione di `alt` è vera
@@ -133,68 +71,73 @@ function chatLines(s, km, node) {
 function chatSetConf(s, km, who, d) {
   const c = chatState(s), old = c.conf[who] || 0, nu = Math.max(0, Math.min(100, old + d)); c.conf[who] = nu;
   const crossed = d > 0 ? CHAT_SOGLIE.filter((t) => old < t && nu >= t) : [];
-  for (const t of crossed) for (const id of ((CHAT_UNLOCK[who] || {})[t] || [])) c.q.push({ who, node: id, km: km + 0.6 });
+  for (const t of crossed) for (const id of ((CHAT_UNLOCK[who] || {})[t] || [])) c.q.push({ node: id, km: km + 0.6 });
   return crossed;
 }
-function chatApply(s, km, who, fx) {
+function chatApply(s, km, fx) {
   const c = chatState(s), ev = [];
   for (const f of fx || []) {
     let m;
     if ((m = /^conf:(.+?)([+-]\d+)$/.exec(f))) { const cr = chatSetConf(s, km, m[1], +m[2]); for (const t of cr) ev.push({ type: 'soglia', who: m[1], t }); }
     else if ((m = /^flag:(.+)$/.exec(f))) c.flags[m[1]] = 1;
     else if ((m = /^cnt:(\w+)([+-]\d+)$/.exec(f))) { if (CHAT_CNT.includes(m[1])) c.cnt[m[1]] = Math.max(0, (c.cnt[m[1]] || 0) + +m[2]); }
-    else if ((m = /^sblocca:(.+)$/.exec(f))) { const n = CHAT_NODES[m[1]]; if (n) c.q.push({ who: n.who, node: n.id, km: km + 0.3 }); }
+    else if ((m = /^sblocca:(.+)$/.exec(f))) c.q.push({ node: m[1], km: km + 0.3 });
     else if ((m = /^chiude:(.+)$/.exec(f))) c.closed[m[1]] = 1;
   }
   return ev;
 }
-// entra in un nodo: aggiunge le sue righe alla chat; se ha risposte la chat aspetta, se ha `next` prosegue, altrimenti finisce
-function chatEnter(s, km, who, id) {
-  const c = chatState(s), th = chatThread(c, who), ev = [];
+// entra in un nodo: aggiunge le sue righe alla chat; se ha risposte la chat aspetta, se ha `next` prosegue, altrimenti finisce.
+// Un nodo con `req` falso passa alla battuta `fallback` (se c'è), altrimenti non si legge.
+function chatEnter(s, km, tk, id) {
+  const c = chatState(s), th = chatThread(c, tk), ev = [];
   for (let guard = 0; guard < 6 && id; guard++) {
-    const n = CHAT_NODES[id]; if (!n || c.closed[id]) { th.at = null; break; }
+    let n = CHAT_NODES[id]; if (!n || c.closed[id]) { th.at = null; break; }
+    if (n.req && !chatCond(s, km, n.req)) { if (n.fallback) { id = n.fallback; continue; } th.at = null; break; }
     const lines = chatLines(s, km, n);
-    for (const x of lines) th.msgs.push({ d: 'i', x, k: km, n: n.id });
-    th.k = km; th.done[n.id] = 1; ev.push({ type: 'msg', who, text: lines[lines.length - 1], node: n.id });
+    for (const x of lines) th.msgs.push({ d: 'i', x, k: km, n: n.id, im: n.as ? 1 : 0 });
+    th.k = km; th.done[n.id] = 1; ev.push({ type: 'msg', who: tk, text: lines[lines.length - 1], node: n.id });
     if (n.opts && n.opts.length) { th.at = n.id; break; }
     th.at = null; id = n.next || null;
   }
   return ev;
 }
 // le risposte che si vedono adesso (quelle con condizione falsa restano nascoste: si sbloccano più avanti)
-function chatOptions(s, km, who) {
-  const th = chatState(s).th[who]; if (!th || !th.at) return [];
+function chatOptions(s, km, tk) {
+  const th = chatState(s).th[tk]; if (!th || !th.at) return [];
   const n = CHAT_NODES[th.at]; if (!n) return [];
   return (n.opts || []).map((o, i) => ({ i, t: o.t, tono: o.tono })).filter((o) => chatCond(s, km, n.opts[o.i].req));
 }
-// risponde: applica gli effetti, scopre il gusto, passa al nodo dopo. Restituisce { ok, reaction, delta, crossed, ev }
-function chatReply(s, km, who, i) {
-  const c = chatState(s), th = c.th[who]; if (!th || !th.at) return { ok: false };
+// risponde: applica gli effetti, scopre il gusto, passa al nodo dopo. Restituisce { ok, target, reaction, delta, crossed, ev }
+function chatReply(s, km, tk, i) {
+  const c = chatState(s), th = c.th[tk]; if (!th || !th.at) return { ok: false };
   const n = CHAT_NODES[th.at], o = n && n.opts && n.opts[i]; if (!o || !chatCond(s, km, o.req)) return { ok: false };
-  const g = ((CHAT_NPC[who] || {}).gusti || {})[o.tono] || 0, fx = (o.fx || []).slice();
+  const who = n.who, npc = CHAT_NPC[who] || { gusti: {}, k: [2, 1, -1] };       // confidenza e gusti vanno a chi sta davvero scrivendo
+  const g = npc.gusti[o.tono] || 0, fx = (o.fx || []).slice();
   const explicit = fx.some((f) => f.startsWith('conf:' + who));
-  const delta = explicit ? 0 : g > 0 ? 4 : g < 0 ? -2 : 1;
-  const before = c.conf[who] || 0;
+  const delta = explicit ? 0 : g > 0 ? npc.k[0] : g < 0 ? npc.k[2] : npc.k[1];
+  const before = c.conf[who] || 0, imit = !!n.as;
   th.seen = th.msgs.length;
-  th.msgs.push({ d: 'o', x: o.t, k: km, tono: o.tono, r: g }); th.seen = th.msgs.length; th.k = km; th.at = null;
+  th.msgs.push({ d: 'o', x: o.t, k: km, tono: o.tono, r: imit ? 0 : g, tg: who }); th.seen = th.msgs.length; th.k = km; th.at = null;
   if (g !== 0 && o.tono) (c.taste[who] || (c.taste[who] = {}))[o.tono] = g > 0 ? 1 : -1;      // il gusto si scopre dalla reazione
   const crossed = delta ? chatSetConf(s, km, who, delta) : [];
-  const ev = crossed.map((t) => ({ type: 'soglia', who, t })).concat(chatApply(s, km, who, fx));
+  const ev = crossed.map((t) => ({ type: 'soglia', who, t })).concat(chatApply(s, km, fx));
   const after = c.conf[who] || 0;
-  if (o.to && o.to !== 'FINE') ev.push(...chatEnter(s, km, who, o.to));
-  return { ok: true, reaction: g, delta: after - before, crossed: ev.filter((e) => e.type === 'soglia' && e.who === who).map((e) => e.t), ev };
+  if (o.to && o.to !== 'FINE') ev.push(...chatEnter(s, km, tk, o.to));
+  return { ok: true, target: who, reaction: imit ? 0 : g, delta: after - before, crossed: ev.filter((e) => e.type === 'soglia' && e.who === who).map((e) => e.t), ev };
 }
 // ogni secondo: comincia le conversazioni arrivate al loro km (e quelle sbloccate), se la chat di quella persona è libera
 function chatTick(s, km) {
   const c = chatState(s), ev = [];
+  if (s.vg && s.vg.eredita) c.flags['auto_' + s.vg.eredita] = 1;                  // l'auto scelta dal notaio: le battute possono cambiare di conseguenza (ALT se: auto_panda)
   for (const st of CHAT_START) {
     if (c.started[st.id] || km < st.km || !chatCond(s, km, st.req)) continue;
-    if ((c.th[st.who] || {}).at) continue;
-    c.started[st.id] = 1; ev.push(...chatEnter(s, km, st.who, st.node));
+    if ((c.th[st.th] || {}).at) continue;
+    c.started[st.id] = 1; ev.push(...chatEnter(s, km, st.th, st.node));
   }
   for (const q of c.q.slice()) {
-    if (km < q.km || (c.th[q.who] || {}).at) continue;
-    c.q.splice(c.q.indexOf(q), 1); ev.push(...chatEnter(s, km, q.who, q.node));
+    const n = CHAT_NODES[q.node]; if (!n) { c.q.splice(c.q.indexOf(q), 1); continue; }
+    if (km < q.km || (c.th[chatKey(n)] || {}).at) continue;
+    c.q.splice(c.q.indexOf(q), 1); ev.push(...chatEnter(s, km, chatKey(n), q.node));
   }
   return ev;
 }
@@ -302,11 +245,11 @@ const chatThreads = (s) => (s && s.chat ? Object.values(s.chat.th).filter((th) =
     const tray = more ? '<div class="tray"><div class="hint">…</div></div>'
       : opts.length ? `<div class="tray">${opts.map((o) => `<button data-ch="r" data-who="${H.esc(who)}" data-i="${o.i}">${H.esc(o.t)}</button>`).join('')}</div>`
       : `<div class="tray"><div class="hint">${th.at ? '' : 'La conversazione è finita. Se ti scrive ancora, lo vedrai qui.'}</div></div>`;
-    const strip = `<div class="cstrip" style="--c:${npc(who).col}"><div class="tl"><b>${npc(who).ruolo}</b><span>${npc(who).presenza ? 'fiducia' : 'confidenza'} ${v} · ${tierName(who, v)}</span></div>${bar(who, v, w0)}</div>`;
+    const strip = npc(who).nobar ? '' : `<div class="cstrip" style="--c:${npc(who).col}"><div class="tl"><b>${npc(who).ruolo}</b><span>${npc(who).presenza ? 'fiducia' : 'confidenza'} ${v} · ${tierName(who, v)}</span></div>${bar(who, v, w0)}</div>`;
     return `<div class="view app">${H.nav(H.esc(who), 1)}${strip}<div class="body" id="chbody"><div class="chat">${html}</div></div>${tray}</div>`;
   }
   function renderCon(H) {
-    const s = S(), a = H.atto(), ths = chatThreads(s).map((t) => t.who), names = new Set(ths);
+    const s = S(), a = H.atto(), ths = chatThreads(s).map((t) => t.who).filter((w) => !npc(w).nobar), names = new Set(ths);
     const cards = ths.map((who) => { const v = chatConf(s, who); return `<div class="pc" data-ch="open" data-who="${H.esc(who)}" style="--c:${npc(who).col}">${ring(H, who, 1)}<div class="px"><b>${H.esc(who)}</b><small>${npc(who).ruolo} · ${tierName(who, v)}</small>${bar(who, v, v)}<div class="gs">${tastes(who)}</div><div>${diamonds(v)} <span class="dm">${v}/100</span></div></div><button class="cbtn" data-call="${H.esc(who)}">✆</button></div>`; }).join('');
     const rest = H.rubrica.filter((c) => a >= c[2] && !names.has(c[0])).map((c) => `<div class="row" data-call="${H.esc(c[0])}">${H.av(c[0], c[2] > 0)}<span class="tx"><b>${H.esc(c[0])}</b><small>${H.esc(c[1])}</small></span></div>`).join('');
     return `<div class="view app">${H.nav('Rubrica')}<div class="body">${cards ? `<div class="sec">Persone</div>${cards}<div class="sec">Altri numeri</div>` : ''}${rest}</div></div>`;
@@ -330,7 +273,7 @@ const chatThreads = (s) => (s && s.chat ? Object.values(s.chat.th).filter((th) =
     if (D.ch === 'open') { H.ST.view = 'msg'; H.ST.stack = ['msg', 'ch:' + D.who]; H.render(); return; }
     if (D.ch === 'r') {
       const who = D.who, r = chatReply(s, KM(), who, +D.i); if (!r.ok) return;
-      UI.prev[who] = UI.prev[who] === undefined ? chatConf(s, who) - r.delta : UI.prev[who]; UI.delta[who] = r.delta;
+      const tg = r.target || who; UI.prev[tg] = UI.prev[tg] === undefined ? chatConf(s, tg) - r.delta : UI.prev[tg]; UI.delta[tg] = r.delta;
       for (const e of r.ev) if (e.type === 'soglia') H.toast(e.who, `Confidenza ${e.t}: ${tierName(e.who, e.t)}. Si apre qualcosa di nuovo.`, 0);
       if (window.nightRun && window.nightRun.save) window.nightRun.save();
       H.render(true);
@@ -354,4 +297,13 @@ const chatThreads = (s) => (s && s.chat ? Object.values(s.chat.th).filter((th) =
   });
 })();
 
-if (typeof window !== 'undefined') Object.assign(window, { CHAT_NPC, CHAT_LIST, CHAT_NODES, CHAT_START, CHAT_UNLOCK, CHAT_SOGLIE, CHAT_TONI, chatState, chatConf, chatCond, chatLines, chatEnter, chatOptions, chatReply, chatTick, chatUnread, chatThreads, chatSetConf });
+if (typeof window !== 'undefined') {
+  Object.assign(window, { CHAT_NPC, CHAT_LIST, CHAT_NODES, CHAT_START, CHAT_UNLOCK, CHAT_SOGLIE, CHAT_TONI, chatState, chatConf, chatCond, chatLines, chatEnter, chatOptions, chatReply, chatTick, chatUnread, chatThreads, chatSetConf });
+  // per provare senza giocare per ore: chatDebug.flag('ev_fase_v') · .conf('Rosa', 60) · .vai('ROS_attrezzi_01') · .km(300)
+  window.chatDebug = {
+    flag: (n) => { const g = window.nightRun && window.nightRun.game; if (g) chatState(g.s).flags[n] = 1; },
+    conf: (who, v) => { const g = window.nightRun && window.nightRun.game; if (g) chatSetConf(g.s, g.s.dist / 1000, who, v - chatConf(g.s, who)); },
+    vai: (id) => { const g = window.nightRun && window.nightRun.game, n = CHAT_NODES[id]; if (g && n) { const th = chatThread(chatState(g.s), chatKey(n)); th.at = null; chatEnter(g.s, g.s.dist / 1000, chatKey(n), id); } },
+    stato: () => { const g = window.nightRun && window.nightRun.game; return g ? JSON.stringify(chatState(g.s)) : null; },
+  };
+}
