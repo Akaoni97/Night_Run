@@ -84,7 +84,7 @@ function chatApply(s, km, fx) {
   for (const f of fx || []) {
     let m;
     if ((m = /^conf:(.+?)([+-]\d+)$/.exec(f))) { const cr = chatSetConf(s, km, m[1], +m[2]); for (const t of cr) ev.push({ type: 'soglia', who: m[1], t }); }
-    else if ((m = /^flag:(.+)$/.exec(f))) c.flags[m[1]] = 1;
+    else if ((m = /^flag:(.+)$/.exec(f))) { c.flags[m[1]] = 1; if (typeof regiaOnFlag === 'function') regiaOnFlag(s, m[1]); }
     else if ((m = /^cnt:(\w+)([+-]\d+)$/.exec(f))) { if (CHAT_CNT.includes(m[1])) c.cnt[m[1]] = Math.max(0, (c.cnt[m[1]] || 0) + +m[2]); }
     else if ((m = /^sblocca:(.+)$/.exec(f))) c.q.push({ node: m[1], km: km + 0.3 });
     else if ((m = /^chiude:(.+)$/.exec(f))) c.closed[m[1]] = 1;
@@ -145,6 +145,7 @@ function chatTick(s, km) {
     if (n.req && !n.fallback && !chatCond(s, km, n.req)) continue;     // aspetta i suoi prerequisiti invece di perdersi
     c.q.splice(c.q.indexOf(q), 1); ev.push(...chatEnter(s, km, chatKey(n), q.node));
   }
+  if (typeof regiaTick === 'function') ev.push(...regiaTick(s, km));      // domande di casa (regia.js)
   return ev;
 }
 const chatUn = (th) => th.msgs.slice(th.seen).filter((m) => m.d === 'i').length;
