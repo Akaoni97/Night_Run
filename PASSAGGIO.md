@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 101).
+  (ultima versione pubblicata: 103).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -95,6 +95,7 @@ gioco fa, sezione per sezione).
   ~€ 30 da consegne e passeggeri; una Panda nuova dopo ~45 km di lavoro, la Supra dopo ~200 (si sblocca al km 260).
 - **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
   Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
+- **Gare tolte (17/11/2026, ramo del cognato)**: niente più sfide al semaforo, con gli abbaglianti, scala dei rivali e reputazione di strada; le categorie restano per Garage e documenti. La voce qui sotto sulle sfide per categoria è superata.
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
   sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`, usate da Garage e documenti; le sfide con gli abbaglianti sono state tolte). Traguardi:
   Cinque marche, Una per tipo, Il garage dello zio (tappa secondaria: ricomprare le cinque non scelte).
