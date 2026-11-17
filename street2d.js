@@ -1744,7 +1744,8 @@ class Street2D {
       // una sola copia dello sfondo a risoluzione logica (la scia è comunque sfocata), poi tre passate spostate
       const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W) { sm.width = W; sm.height = 192; }
       const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W, 192);
-      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.24], [9, 0.13], [15, 0.06]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }   // lo sfondo scorre a sinistra: la scia resta dietro, a destra g.restore();
+      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.24], [9, 0.13], [15, 0.06]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }
+      g.restore();   // lo sfondo scorre a sinistra: la scia resta dietro, a destra
     }
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
