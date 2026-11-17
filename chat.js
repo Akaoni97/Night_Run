@@ -71,7 +71,12 @@ function chatLines(s, km, node) {
 function chatSetConf(s, km, who, d) {
   const c = chatState(s), old = c.conf[who] || 0, nu = Math.max(0, Math.min(100, old + d)); c.conf[who] = nu;
   const crossed = d > 0 ? CHAT_SOGLIE.filter((t) => old < t && nu >= t) : [];
-  for (const t of crossed) for (const id of ((CHAT_UNLOCK[who] || {})[t] || [])) c.q.push({ node: id, km: km + 0.6 });
+  if (!c.opened) c.opened = {};
+  for (const t of crossed) {
+    if (c.opened[who + ':' + t]) continue;                    // una soglia si consuma una volta sola: scendere e risalire non riapre la chat
+    c.opened[who + ':' + t] = 1;
+    for (const id of ((CHAT_UNLOCK[who] || {})[t] || [])) c.q.push({ node: id, km: km + 0.6 });
+  }
   return crossed;
 }
 function chatApply(s, km, fx) {
@@ -137,6 +142,7 @@ function chatTick(s, km) {
   for (const q of c.q.slice()) {
     const n = CHAT_NODES[q.node]; if (!n) { c.q.splice(c.q.indexOf(q), 1); continue; }
     if (km < q.km || (c.th[chatKey(n)] || {}).at) continue;
+    if (n.req && !n.fallback && !chatCond(s, km, n.req)) continue;     // aspetta i suoi prerequisiti invece di perdersi
     c.q.splice(c.q.indexOf(q), 1); ev.push(...chatEnter(s, km, chatKey(n), q.node));
   }
   return ev;

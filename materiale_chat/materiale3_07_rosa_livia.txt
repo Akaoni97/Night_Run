@@ -1,0 +1,473 @@
+NIGHT RUN · MATERIALE 3 · FILE 07
+
+[REDAZIONE] NOTE
+T8. Rosa: venti righe da selezionare nelle soste, non da concatenare. Dodici o più usano
+volgarità esplicita; quattro sono affettuose e quattro sono brevi per la paura. Nessuna
+è una prescrizione di guida. Le righe INS2 sono repertorio, non venti nuove chat
+autonome.
+
+[ROS_INS2_01]
+uso: affettuoso
+Coglione, mangia. La macchina può aspettare, tu no.
+
+[ROS_INS2_02]
+uso: affettuoso
+Stronzetto, sono ancora qui. Puoi smettere di fare il duro.
+
+[ROS_INS2_03]
+uso: affettuoso
+Testa di cazzo, stavolta lasciati aiutare.
+
+[ROS_INS2_04]
+uso: affettuoso
+Mannaggia a te, pezzo di somaro. Sono contenta che tu sia intero.
+
+[ROS_INS2_05]
+uso: paura; secco
+Fermo, cazzo.
+
+[ROS_INS2_06]
+uso: paura; secco
+Non toccare, porca puttana.
+
+[ROS_INS2_07]
+uso: paura; secco
+Respira, testa di minchia.
+
+[ROS_INS2_08]
+uso: paura; secco
+Giù le mani, stronzo.
+
+[ROS_INS2_09]
+uso: pratico
+Quel cofano non si apre a forza di bestemmie. Ho già controllato io.
+
+[ROS_INS2_10]
+uso: pratico
+Hai il culo sulla sedia e la fretta al posto del cervello.
+
+[ROS_INS2_11]
+uso: pratico
+Che rottura di palle: sai aspettare soltanto quando cerco la chiave?
+
+[ROS_INS2_12]
+uso: pratico
+Non sei un genio incompreso. Stai solo indicando l’attrezzo sbagliato.
+
+[ROS_INS2_13]
+uso: pratico
+Sei partito per un giro e mi stai montando un casino di merda.
+
+[ROS_INS2_14]
+uso: pratico
+Minchia, smetti di dirmi facile mentre lo faccio io.
+
+[ROS_INS2_15]
+uso: pratico
+Vaffanculo, non chiamarla prova se hai solo girato la chiave tre volte.
+
+[ROS_INS2_16]
+uso: pratico
+Porca miseria, lo scontrino non è il libretto delle istruzioni.
+
+[ROS_INS2_17]
+uso: pratico
+Hai una fiducia nel nastro adesivo che mi fa venire voglia di bestemmiare.
+
+[ROS_INS2_18]
+uso: pratico
+Bel rompicoglioni. Ti ho detto aspetta, non aiutami peggio.
+
+[ROS_INS2_19]
+uso: pratico
+Non mettermi il cazzo di telefono dove sto appoggiando gli attrezzi.
+
+[ROS_INS2_20]
+uso: pratico
+Bella faccia da culo. Hai capito al primo colpo e mi hai lasciata spiegare.
+
+[REDAZIONE] NOTE
+Correzioni ulteriori: mancano al sonno, ti ha descritto, uso testuale di scrivi/leggo e
+risposte coerenti. Le voci del nastro e i RADIO restano audio narrativo. Vuoleva non è
+presente nei nodi del campione letto: non dichiaro tre sostituzioni inesistenti.
+Nell’eventuale scheda usare Voleva.
+
+[REDAZIONE] NOTE
+Guardia, regia: Livia non deve recitare che ha dimenticato tutti. È una lacuna presente
+e circoscritta sul custode. Si confronta lo scambio autentico dal lato esterno; la
+persona ritrova il nome leggendo, senza cancellare la perdita di familiarità. La scena
+illustra la regola 8, non un nuovo potere della presenza.
+
+[REDAZIONE] NOTE
+NODI
+
+[LIV_primo_02] LIVIA · III · sempre
+Claudio mi ha lasciato delle cose. Ti dico quali, prima che immagini il peggio.
+  ALT se: conf:Livia>=25 → Claudio mi ha lasciato delle cose. Te le mostro prima.
+  A) «Quali originali?» → LIV_primo_03
+  B) «Come posso controllare quello che dici?» → LIV_primo_04
+
+
+[LIV_primo_06] LIVIA · III · sempre
+Questo coincide. Al resto non ho ancora trovato una risposta.
+  A) «Mi serve questa distinzione.» → LIV_primo_08
+  B) «Non trasformiamola in una risposta a tutto.» → LIV_primo_08
+
+
+[LIV_affido_01] LIVIA · III · sempre
+Quello che hai tu non è quello che Claudio ha affidato a me.
+  A) «Ti affido l’originale.» → LIV_affido_02 [+legami;flag:livia]
+  B) «La tengo. Non te la mando.» → V2_L02_01 [flag:prova_trattenuta;flag:l02b]
+  C) «Non voglio più parlarne con te.» → V2_L02_03 [flag:l02c;sblocca:LIV_affido_08]
+
+
+[LIV_affido_02] LIVIA · III · sempre
+L’originale resta qui. Mi basta confrontare quello che hai tu.
+  A) «Tengo una copia e te lo affido.» → LIV_affido_04 [flag:copia_conservata]
+  B) «Voglio che resti custodito da te.» → LIV_affido_05
+
+
+[LIV_affido_03] LIVIA · III · sempre
+Se non vuoi mandarmelo, dimmelo. Ci resto male, non divento il notaio.
+  ALT se: conf:Livia>=25 → Puoi tenerla. Mi dispiace restare fuori dal confronto.
+  A) «Lo tengo sapendo che manca il riscontro.» → LIV_affido_04
+  B) «Non ti chiedo di garantirlo.» → LIV_affido_05
+
+
+[LIV_affido_04] LIVIA · III · sempre
+Non ti sto chiedendo di rimanere senza niente.
+  A) «Annotiamo la fonte.» → LIV_affido_06
+  B) «Conserva l’originale fuori.» → LIV_affido_07
+
+
+[LIV_affido_05] LIVIA · III · sempre
+Non mi conosci abbastanza. Lo capisco anche quando mi dà fastidio.
+  A) «Ne riparliamo quando mi fiderò.» → LIV_affido_06
+  B) «Capisco che così non puoi accompagnarmi.» → LIV_affido_07
+
+
+[LIV_affido_06] LIVIA · III · sempre
+È arrivato. Adesso posso dirti in che cosa coincide e in che cosa no.
+  A) «È un affidamento, non una rinuncia.» → LIV_affido_08
+  B) «Ti chiederò di confrontarlo più avanti.» → LIV_affido_08
+
+
+[LIV_affido_07] LIVIA · III · sempre
+Possiamo riparlarne. Non mi devi una fiducia che non senti.
+  A) «Non chiudo la porta tra noi.» → LIV_affido_08
+  B) «Non lo chiamerò un originale verificato.» → LIV_affido_08
+  C) «Ti dico perché l’avevo tenuta. Poi la confrontiamo.» → V2_L02_03 [se:l02b]
+
+
+[LIV_affido_08] LIVIA · III · sempre
+Se lo teniamo per noi, resta qualcosa che stiamo soltanto immaginando.
+  ALT se: l02c → Avevi chiuso il confronto. Per riaprirlo manca ancora un pezzo.
+  ALT se: conf:Livia>=50 → Non fidarti per educazione. Lasciami poter riparlarne.
+[FINE]
+
+
+[LIV_ottavio_02] LIVIA · III · sempre
+È mio fratello. La parte ordinata di me non riesce a rispondere a tutto.
+  ALT se: conf:Livia>=50 → È mio fratello. Non riesco a essere metodica su tutto.
+  A) «Che cosa hai verificato?» → LIV_ottavio_03
+  B) «Che cosa è ancora una speranza?» → LIV_ottavio_04
+
+
+[LIV_ottavio_04] LIVIA · III · sempre
+Vorrei che fosse vivo. La sera diventa difficile aggiungere non lo so.
+  A) «Grazie per averlo detto.» → LIV_ottavio_05
+  B) «Voglio sapere su cosa si basa.» → LIV_ottavio_05
+
+
+[LIV_ottavio_07] LIVIA · III · sempre
+Non voglio metterti in mano una speranza e chiamarla un incarico.
+  A) «Cerchiamo senza promettere il risultato.» → LIV_ottavio_08
+  B) «Non ti rispondo solo per consolarti.» → LIV_ottavio_08
+  C) «Posso ascoltare una speranza senza trasformarla in certezza.» → V2_L03_03 [se:l03b]
+
+
+[LIV_fiducia_02] LIVIA · IV · sempre
+Non ti chiedo di far finta che ieri ci fidassimo già.
+  A) «Non lo cancello. Ti chiedo di rimediare.» → LIV_fiducia_04
+  B) «Ho cambiato idea dopo quello che ho visto.» → LIV_fiducia_04
+
+
+[LIV_fiducia_05] LIVIA · IV · sempre
+Possiamo aver capito male senza smettere di volerci aiutare.
+  ALT se: conf:Livia>=50 → Possiamo volerci aiutare e aver capito male. Ripartiamo da lì.
+  A) «Accetto che tu mi corregga.» → LIV_fiducia_07
+  B) «Non ti chiedo di approvare tutto.» → LIV_fiducia_07
+
+
+[LIV_fiducia_08] LIVIA · IV · sempre
+Grazie per essere tornato sul discorso. Non era obbligatorio farmi contenta.
+  ALT se: l04c → Hai fermato il confronto. Per riprenderlo mi serve la copia.
+  ALT se: conf:Livia>=75 → Grazie per esserci tornato. Non ti faccio ripagare ogni riga.
+[FINE]
+
+
+[LIV_irene_03] LIVIA · IV · sempre
+Non voglio far dire a questa foto più di quello che mostra.
+  ALT se: conf:Livia>=50 → La foto non deve dire tutto quello che ho paura di sapere.
+  A) «Non le chiedo di dimostrare tutto.» → LIV_irene_04
+  B) «Partiamo da chi si vede.» → LIV_irene_05
+
+
+[LIV_irene_08] LIVIA · IV · sempre
+Il volto, il nome, la porta. Per adesso teniamoli insieme, senza aggiustarli.
+  ALT se: l05c → Quel punto non volevi guardarlo. Non lo riempio io al posto tuo.
+  ALT se: conf:Livia>=75 → La guardiamo insieme. Non devi capirla prima per aiutarmi.
+[FINE]
+
+
+[LIV_promessa_06] LIVIA · V · sempre
+Grazie. Il resto non riesco a chiedertelo senza farmi male da sola.
+  ALT se: conf:Livia>=100 → Senza una buona notizia puoi entrare lo stesso.
+  A) «Questo te lo prometto.» → LIV_promessa_08 [+legami;flag:livia_verita_promessa]
+  B) «Non ti mento.» → LIV_promessa_08 [+legami;flag:livia_verita_promessa]
+
+
+[LIV_promessa_08] LIVIA · V · sempre
+Io resto qui. Quando puoi, dimmi anche quello che non avresti voluto trovare.
+  ALT se: l06c → Il risultato lo volevi tenere. Per ripartire serve una verità.
+  ALT se: conf:Livia>=100 → Ti aspetto con quello che c’è, non con la risposta bella.
+[FINE]
+
+
+[LIV_affido_01] LIVIA · III · sempre
+Quello che hai tu non è quello che Claudio ha affidato a me.
+  A) «Ti mando quello che ho, per confrontarlo.» → LIV_affido_02 [+legami;flag:livia]
+  B) «La tengo. Non te la mando.» → V2_L02_01 [flag:prova_trattenuta;flag:l02b]
+  C) «Non voglio più parlarne con te.» → V2_L02_03 [flag:l02c;sblocca:LIV_affido_08]
+
+
+[LIV_affido_02] LIVIA · III · sempre
+L’originale resta qui. Mi basta confrontare quello che hai tu.
+  A) «Mando il mio. Il tuo resta lì.» → LIV_affido_04 [flag:copia_conservata]
+  B) «Confrontiamo senza spostare quello che custodisci.» → LIV_affido_05
+
+
+[LIV_affido_03] LIVIA · III · sempre
+Se non vuoi mandarmelo, dimmelo. Ci resto male, non divento il notaio.
+  ALT se: conf:Livia>=25 → Puoi tenerla. Mi dispiace restare fuori dal confronto.
+  A) «Lo tengo sapendo che manca il confronto.» → LIV_affido_04
+  B) «Non ti chiedo di garantirmi niente.» → LIV_affido_05
+
+
+[LIV_affido_04] LIVIA · III · sempre
+Non ti sto chiedendo di rimanere senza niente.
+  A) «Guardiamo quello che ti ho mandato.» → LIV_affido_06
+  B) «Dimmi che cosa coincide.» → LIV_affido_07
+
+
+[LIV_affido_05] LIVIA · III · sempre
+Non mi conosci abbastanza. Lo capisco anche quando mi dà fastidio.
+  A) «Ne riparliamo quando riesco a fidarmi.» → LIV_affido_06
+  B) «Capisco che così non puoi aiutarmi sul punto.» → LIV_affido_07
+
+
+[LIV_affido_06] LIVIA · III · sempre
+È arrivato. Adesso posso dirti in che cosa coincide e in che cosa no.
+  A) «Ti chiederò di riguardarlo se mi sembrerà diverso.» → LIV_affido_08
+  B) «Adesso possiamo tenerlo distinto da un sospetto.» → LIV_affido_08
+
+
+[LIV_affido_07] LIVIA · III · sempre
+Possiamo riparlarne. Non mi devi una fiducia che non senti.
+  A) «Non chiudo il discorso tra noi.» → LIV_affido_08
+  B) «Non lo presenterò come un controllo già fatto.» → LIV_affido_08
+  C) «Ti dico perché l’avevo tenuta. Poi la confrontiamo.» → V2_L02_03 [se:l02b]
+
+
+[LIV_fiducia_01] LIVIA · IV · richiede: prova_trattenuta
+Prima avevi scelto di non mandarmi quello che avevi.
+  A) «Te la mando.» → LIV_fiducia_02 [+legami;flag:livia;flag:livia_fiducia_riparata]
+  B) «Per ora lo tengo, ma ti ascolto.» → V2_L04_01 [flag:l04b]
+  C) «La tengo. Chiudo il discorso.» → V2_L04_03 [flag:l04c;sblocca:LIV_fiducia_08]
+
+
+[LIV_fiducia_03] LIVIA · IV · sempre
+Se hai cambiato idea, mandami quello che guardi tu. Il resto è già qui.
+  A) «Te lo mando e facciamo il confronto.» → LIV_fiducia_05
+  B) «Quello che conservi tu resta al suo posto.» → LIV_fiducia_05
+
+
+[LIV_fiducia_06] LIVIA · IV · sempre
+È arrivato. Non dobbiamo fingere di essere stati d’accordo dall’inizio.
+  A) «Ripartiamo da qui.» → LIV_fiducia_08
+  B) «Ti dirò anche dove ho sbagliato.» → LIV_fiducia_08
+
+
+[ELE_pasta_05] ELENA · I · sempre
+Stai ridendo. Lo capisco da come scrivi, stronzo.
+  A) «Siamo almeno in due a ridere.» → ELE_pasta_06
+  B) «Tu avresti riso uguale.» → ELE_pasta_07
+
+
+[ROS_ricontrollo_03] ROSA · III · sempre
+Non conto le ore. Stai scrivendo ogni cosa tre volte.
+  A) «Adesso parlo più piano apposta.» → ROS_ricontrollo_05
+  B) «Hai ragione. Non basta rispondere.» → ROS_ricontrollo_05
+  C) «Mi rompi il cazzo, ma hai ragione.» → ROS_ricontrollo_05
+
+
+[ELE_richiamo_03] ELENA · II · sempre
+Almeno stavolta mi scrivi da fermo.
+  A) «Sto bene. Sono solo in ritardo.» → ELE_richiamo_05
+  B) «Ho bisogno di fermarmi un po’.» → ELE_richiamo_05
+
+
+[ELE_richiamo_08] ELENA · II · sempre
+Mangia qualcosa. Mi scrivi quando riparti, se puoi.
+  ALT se: e07c → Ti lascio spazio, come hai chiesto. Non confonderlo con non esserci.
+[FINE]
+
+
+[ELE_litigio_06] ELENA · II · sempre
+Resto qui un minuto. Poi posa il telefono e riposa.
+  A) «Grazie. Adesso mi basta.» → ELE_litigio_08
+  B) «Se non parlo, resta un momento.» → ELE_litigio_08
+
+
+[ELE_coinquilino_03] ELENA · I · sempre
+Non gli giro la chat. Voglio bene anche a te, purtroppo.
+  A) «Allora racconta tu.» → ELE_coinquilino_04
+  B) «Mi hai tolto una curiosità.» → ELE_coinquilino_05
+
+
+[ELE_coinquilino_08] ELENA · I · sempre
+Vado. Ti riscrivo quando ho qualcosa di meno noioso.
+  ALT se: e04c → Lo sfogo lo tengo per dopo. Prima mi hai detto che eri pieno.
+[FINE]
+
+
+[ELE_distanza_07] ELENA · II · sempre
+Preferisco un messaggio corto da fermo a un ti spiego mentre guidi.
+  A) «Va bene. Ti ascolto.» → ELE_distanza_08
+  B) «Almeno su questo siamo d’accordo.» → ELE_distanza_08
+  C) «Riprendiamo il particolare che ti avevo mandato.» → V2_E09_03 [se:e09b]
+
+
+[ELE_riparazione_06] ELENA · III · sempre
+Leggo. Non devi scrivermi tutto insieme.
+  A) «Sono stanco, ma sono fermo.» → ELE_riparazione_08
+  B) «Ho trovato qualcuno che mi aiuta con l’auto.» → ELE_riparazione_08
+
+
+[ELE_cena_ritorno_08] ELENA · V · sempre
+Scrivimi quando puoi. Io sono qui.
+  ALT se: e12c → Oggi niente domande, come hai scelto. Il posto nella chat resta.
+  ALT se: conf:Elena>=100 → Sono qui. Non serve una bella storia per tornare a scrivermi.
+[FINE]
+
+
+[ROS_dopo_passaggio_06] ROSA · III · sempre
+Quello che hai visto me lo scrivi da fermo, senza completarlo dopo.
+  A) «Niente cose aggiunte per farle tornare.» → ROS_dopo_passaggio_08
+  B) «Se un pezzo manca, lo dico.» → ROS_dopo_passaggio_08
+
+
+[ROS_recupero_08] ROSA · V · sempre
+Scrivi quando puoi. Quando guidi, guida.
+  ALT se: r08c → Hai scelto di non venire. Il recupero non è già riuscito.
+  ALT se: conf:Rosa>=100 → Di ritorno, non eroico. Quando guidi non rispondi a me.
+[FINE]
+
+
+[ROS_prima_porta_08] ROSA · V · sempre
+Prima della porta scrivimi. Senza fare i duri, stavolta.
+  ALT se: r10c → Non volevi dirmelo. Non ti strappo la risposta adesso.
+  ALT se: conf:Rosa>=100 → Prima della porta scrivi, anche se scegli di tornare.
+[FINE]
+
+
+[ROS_prudenza_05] ROSA · II · sempre
+Non mi chiedere quanti chilometri mancano al sonno.
+  A) «Non lo chiedo.» → ROS_prudenza_06
+  B) «Mi pareva una misura ragionevole.» → ROS_prudenza_07
+  C) «Che cazzo ne so io quanto manca.» → ROS_prudenza_07
+
+
+[V2_VICINO_05] ELENA · IV · sempre
+La sua conferma è sul recapito che avevi già. Ti ha descritto la scena da qui.
+  A) «Vale per questa richiesta.» → V2_VICINO_06 [flag:elena_verificata;+conoscenza]
+  B) «Per adesso, non per sempre.» → V2_VICINO_06 [flag:elena_verificata;+conoscenza]
+
+
+[ELE_litigio_06] ELENA · II · sempre
+Resto qui un minuto. Poi posa il telefono e riposa.
+  A) «Grazie. Adesso mi basta.» → ELE_litigio_08
+  B) «Se non scrivo, resta un momento.» → ELE_litigio_08
+
+
+[ELE_riparazione_01] ELENA · III · richiede: elena_scuse
+Ci siamo calmati?
+  A) «Io sì. Ti dovevo un messaggio decente.» → ELE_riparazione_02
+  B) «Ho chiesto scusa. Non cancella tutto.» → V2_E10_01 [flag:e10b]
+  C) «Ne ho abbastanza. Basta.» → V2_E10_03 [flag:e10c;sblocca:ELE_riparazione_08]
+
+
+[ROS_ricontrollo_03] ROSA · III · sempre
+Non conto le ore. Stai scrivendo ogni cosa tre volte.
+  A) «Adesso scrivo più piano apposta.» → ROS_ricontrollo_05
+  B) «Hai ragione. Non basta rispondere.» → ROS_ricontrollo_05
+  C) «Mi rompi il cazzo, ma hai ragione.» → ROS_ricontrollo_05
+
+
+[ELE_coinquilino_01] ELENA · I · sempre
+Il mio coinquilino parla. Io avrei un turno da superare.
+  A) «Quanto parla?» → ELE_coinquilino_02
+  B) «Fagli scrivere due righe. Voglio verificare.» → V2_E04_01 [flag:e04b]
+  C) «Non reggo altri sfoghi.» → V2_E04_03 [flag:e04c;sblocca:ELE_coinquilino_08]
+
+
+[ROS_dopo_passaggio_05] ROSA · III · sempre
+È finita questa corsa. Non tutto il resto.
+  A) «Ti scrivo quello che ricordo.» → ROS_dopo_passaggio_06
+  B) «Prima voglio capire la conseguenza.» → ROS_dopo_passaggio_07
+
+
+[ELE_distanza_07] ELENA · II · sempre
+Preferisco un messaggio corto da fermo a un ti spiego mentre guidi.
+  A) «Va bene. Leggo quello che trovi.» → ELE_distanza_08
+  B) «Almeno su questo siamo d’accordo.» → ELE_distanza_08
+  C) «Riprendiamo il particolare che ti avevo mandato.» → V2_E09_03 [se:e09b]
+
+
+[V2_GUARDIA_01] ROSA · V · richiede: ev_prezzo_guardia
+Guarda lo scambio con Livia. Non te lo sto ricostruendo a memoria.
+  A) «Continuo da fermo.» → V2_GUARDIA_02
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_02
+
+
+[V2_GUARDIA_02] ROSA · V · sempre
+Prima mi ha scritto: Dì a Rosa di aspettare. Il messaggio è ancora qui.
+  A) «Continuo da fermo.» → V2_GUARDIA_03
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_03
+
+
+[V2_GUARDIA_03] ROSA · V · sempre
+Adesso chiede: A chi stavi scrivendo? Non le manca il messaggio: le manca il nome.
+  A) «Continuo da fermo.» → V2_GUARDIA_04
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_04
+
+
+[V2_GUARDIA_04] ROSA · V · sempre
+Non tutti insieme, non in un istante. Comincia così, il posto che perdi fuori.
+  A) «Continuo da fermo.» → V2_GUARDIA_05
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_05
+
+
+[V2_GUARDIA_05] ROSA · V · sempre
+Puoi chiederglielo direttamente. I fogli restano, non è l’archivio che cambia.
+  A) «Continuo da fermo.» → V2_GUARDIA_06
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_06
+
+
+[V2_GUARDIA_06] ROSA · V · sempre
+Se resti, devi sapere chi fai uscire e quale posto stai lasciando vuoto.
+[FINE]
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE

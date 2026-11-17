@@ -1,0 +1,962 @@
+NIGHT RUN · MATERIALE 3 · FILE 03
+
+[GUSTI_ELENA]
+Ama ironico, gentile e sincero: cerca compagnia, anche quando suo fratello è stanco.
+Soffre freddo ed evasivo: sente distanza dove vorrebbe una frase detta senza recitare.
+
+[GUSTI_ROSA]
+Ama sincero, ironico e sboccato: la complicità le permette di smettere di comandare.
+Detesta evasivo e freddo: vuole limiti chiari. Gli insulti crudeli sono freddezza.
+
+[GUSTI_LIVIA]
+Ama sincero, pacato e gentile: cerca qualcuno con cui reggere una speranza incerta.
+Detesta evasivo e freddo. La volgarità lieve è neutra: non sta correggendo un compito.
+
+[GUSTI_PRESENZA]
+Cresce col gentile che offre calore e accoglienza: vuole diventare qualcuno da tenere.
+Freddo ed evasivo fanno distanza; sboccato ostile la irrita. Gli altri toni sono neutri.
+
+[REDAZIONE] NOTE
+Bilanciamento proposto per la presenza: k +4/0/−1. La neutralità non deve farle
+guadagnare terreno. Nessun bonus meccanico per riempirla. Per Livia la volgarità lieve
+diventa neutra; i gusti attuali del motore vanno aggiornati, non cambiano leggendo
+questo file.
+
+[REDAZIONE] NOTE
+La richiesta domanda prima quattro soglie per tutti e poi solo tre per la presenza.
+Seguo la disposizione più specifica: quattro per ciascuna umana, tre per la presenza,
+nessuna scena-premio a 100. I dettagli ordinari nuovi sono limitati ai gesti richiesti,
+senza nuovi fatti di trama.
+
+UNLOCK: Elena 25 → V2_ELE_s25_01
+
+UNLOCK: Elena 50 → V2_ELE_s50_01
+
+UNLOCK: Elena 75 → V2_ELE_s75_01
+
+UNLOCK: Elena 100 → V2_ELE_s100_01
+
+UNLOCK: Rosa 25 → V2_ROS_s25_01
+
+UNLOCK: Rosa 50 → V2_ROS_s50_01
+
+UNLOCK: Rosa 75 → V2_ROS_s75_01
+
+UNLOCK: Rosa 100 → V2_ROS_s100_01
+
+UNLOCK: Livia 25 → V2_LIV_s25_01
+
+UNLOCK: Livia 50 → V2_LIV_s50_01
+
+UNLOCK: Livia 75 → V2_LIV_s75_01
+
+UNLOCK: Livia 100 → V2_LIV_s100_01
+
+UNLOCK: Sconosciuto 25 → V2_PRE_s25_01
+
+UNLOCK: Sconosciuto 50 → V2_PRE_s50_01
+
+UNLOCK: Sconosciuto 75 → V2_PRE_s75_01
+
+[REDAZIONE] NOTE
+Finali: Elena 100 cambia il saluto in A/D, non certifica identità. Rosa 100 permette un
+colloquio aggiuntivo prima del recupero, non salva Ottavio. Livia 100 rende esplicito il
+suo rifiuto dei sostituti e cambia C/B2, non sostituisce foto e nome. La fiducia della
+presenza non sblocca alcun finale da sola: B richiede sempre varco e accompagnamento
+espliciti.
+
+[REDAZIONE] NOTE
+NODI
+
+[V2_ELE_s25_01] ELENA · I · sempre
+Quando dici cinque minuti, io intanto mi siedo.
+  A) «Ti aggiorno senza inventare i minuti.» → V2_ELE_s25_02
+  B) «Oggi la porta può andare in ferie.» → V2_ELE_s25_03
+
+
+[V2_ELE_s25_02] ELENA · I · sempre
+È un’abitudine. Le attese in piedi mi fanno sentire già fregata.
+  A) «Scrivo quello che so.» → V2_ELE_s25_04
+  B) «Ti lascio seduta tranquilla.» → V2_ELE_s25_05
+
+
+[V2_ELE_s25_03] ELENA · I · sempre
+Non ti sto cronometrando. Sto cercando di non passare la sera sulla porta.
+  A) «Non voglio tenerti in attesa.» → V2_ELE_s25_04
+  B) «Niente conto alla rovescia, allora.» → V2_ELE_s25_06
+
+
+[V2_ELE_s25_04] ELENA · I · sempre
+Puoi scrivere non lo so. Non è una risposta che ti toglie dei punti.
+  A) «Non lo so ancora. Ma ti tengo aggiornata.» → V2_ELE_s25_05
+  B) «Ti scrivo quando cambia davvero qualcosa.» → V2_ELE_s25_06
+
+
+[V2_ELE_s25_05] ELENA · I · sempre
+Va bene. Io mi siedo e tu smetti di fare il bollettino.
+[FINE]
+
+
+[V2_ELE_s25_06] ELENA · I · sempre
+Allora niente orario. La conversazione non scade.
+[FINE]
+
+
+[V2_ELE_s50_01] ELENA · II · sempre
+Ti mando mai un messaggio e poi lo riscrivo tre volte nella testa?
+  A) «Sempre. Quello brillante arriva dopo la figuraccia.» → V2_ELE_s50_02
+  B) «Sì. Poi finisco per non scrivere.» → V2_ELE_s50_03
+
+
+[V2_ELE_s50_02] ELENA · II · sempre
+Lo faccio anch’io. La seconda versione è brillante. Nessuno la leggerà mai.
+  A) «Allora ti mando quella imperfetta.» → V2_ELE_s50_04
+  B) «Quella brillante me la tengo per il notaio.» → V2_ELE_s50_05
+
+
+[V2_ELE_s50_03] ELENA · II · sempre
+Quella arrivata conta più della risposta perfetta che non mandi.
+  A) «Ti dico se una frase non era giusta.» → V2_ELE_s50_04
+  B) «Non ti lascio indovinare il resto.» → V2_ELE_s50_06
+
+
+[V2_ELE_s50_04] ELENA · II · sempre
+Se hai scritto male una cosa, puoi correggerla senza ricominciare da zero.
+  A) «Posso dire ho scritto male, senza sparire.» → V2_ELE_s50_05
+  B) «Ti scrivo poco, ma non ti taglio fuori.» → V2_ELE_s50_06
+
+
+[V2_ELE_s50_05] ELENA · II · sempre
+Accetto le correzioni. Le tre versioni segrete tienile per Pasta.
+[FINE]
+
+
+[V2_ELE_s50_06] ELENA · II · sempre
+Va bene. Un messaggio normale, anche storto.
+[FINE]
+
+
+[V2_ELE_s75_01] ELENA · II · sempre
+Non voglio essere quella a cui scrivi soltanto va tutto bene.
+  A) «A volte è la frase con cui provo a chiudere tutto.» → V2_ELE_s75_02
+  B) «Pensavo di risparmiarti una preoccupazione.» → V2_ELE_s75_03
+
+
+[V2_ELE_s75_02] ELENA · II · sempre
+Non mi serve il bollettino. Mi serve non essere tenuta fuori per farmi un favore.
+  A) «Ti scrivo come sto, senza sistemarlo prima.» → V2_ELE_s75_04
+  B) «Oggi non riesco a raccontare tutto.» → V2_ELE_s75_05
+
+
+[V2_ELE_s75_03] ELENA · II · sempre
+Puoi non sapere cosa dire. Non devi lucidarlo per mandarmelo.
+  A) «Posso iniziare da sono stanco.» → V2_ELE_s75_04
+  B) «Non ti tengo fuori chiamandola protezione.» → V2_ELE_s75_06
+
+
+[V2_ELE_s75_04] ELENA · II · sempre
+Se oggi puoi darmi solo una frase, dammi quella vera.
+  A) «Una frase vera, allora.» → V2_ELE_s75_05
+  B) «Mi fermo prima di risponderti di fretta.» → V2_ELE_s75_06
+
+
+[V2_ELE_s75_05] ELENA · II · sempre
+La leggo. Anche senza una battuta sotto.
+[FINE]
+
+
+[V2_ELE_s75_06] ELENA · II · sempre
+Va bene. Non ti metto fretta per farmi sentire utile.
+[FINE]
+
+
+[V2_ELE_s100_01] ELENA · II · sempre
+Non devi tornare con una bella storia. Mi basta che torni tu.
+  A) «Me la ricorderò quando mi verrà da fingere.» → V2_ELE_s100_02
+  B) «Adesso mi bastava proprio questo.» → V2_ELE_s100_03
+
+
+[V2_ELE_s100_02] ELENA · II · sempre
+Non è una frase per farti correre. È per quando hai voglia di sembrare a posto.
+  A) «Non te lo prometto per farmi perdonare.» → V2_ELE_s100_04
+  B) «Ti scrivo quando posso esserci davvero.» → V2_ELE_s100_05
+
+
+[V2_ELE_s100_03] ELENA · II · sempre
+Se oggi ti manca il coraggio di raccontare, puoi scrivere sono qui.
+  A) «Sono qui. Non ho una frase migliore.» → V2_ELE_s100_04
+  B) «La prossima volta comincio da quello.» → V2_ELE_s100_06
+
+
+[V2_ELE_s100_04] ELENA · II · sempre
+Nonno lo tengo per quando ricominci a brontolare. Questo lo dico senza.
+  A) «Tieni pure la battuta per dopo.» → V2_ELE_s100_05
+  B) «Non serve il soprannome adesso. Ho capito.» → V2_ELE_s100_06
+
+
+[V2_ELE_s100_05] ELENA · II · sempre
+Sono qui. Ti tengo la conversazione aperta, non la cena in ostaggio.
+[FINE]
+
+
+[V2_ELE_s100_06] ELENA · II · sempre
+Va bene. Nessuna versione migliore di te richiesta all’ingresso.
+[FINE]
+
+
+[V2_ROS_s25_01] ROSA · II · sempre
+Prima di aprire il cofano guardo dove appoggio gli attrezzi.
+  A) «Mi dai un compito preciso e non improvviso.» → V2_ROS_s25_02
+  B) «Un litigio risparmiato è già uno sconto.» → V2_ROS_s25_03
+
+
+[V2_ROS_s25_02] ROSA · II · sempre
+Non è un rito, testone. È per non cercarli dopo bestemmiando.
+  A) «Lo rimetto dove l’hai preso.» → V2_ROS_s25_04
+  B) «Per ora guardo e basta.» → V2_ROS_s25_05
+
+
+[V2_ROS_s25_03] ROSA · II · sempre
+Se me ne passi uno, poi rimettilo lì. Ci risparmiamo un litigio intero.
+  A) «Chiedo prima di toccare.» → V2_ROS_s25_04
+  B) «La sorpresa provo a fartela senza danni.» → V2_ROS_s25_06
+
+
+[V2_ROS_s25_04] ROSA · II · sempre
+Non devi aiutarmi su tutto. Una cosa fatta bene è già una sorpresa.
+  A) «Una cosa. Finita quella te lo dico.» → V2_ROS_s25_05
+  B) «Tocco solo quello concordato.» → V2_ROS_s25_06
+
+
+[V2_ROS_s25_05] ROSA · II · sempre
+Ecco. Adesso posso imprecare per problemi nuovi.
+[FINE]
+
+
+[V2_ROS_s25_06] ROSA · II · sempre
+Va bene. Se guardi, guarda dove tornano le cose.
+[FINE]
+
+
+[V2_ROS_s50_01] ROSA · II · sempre
+Quando finalmente mi siedo, conto ancora gli attrezzi con gli occhi.
+  A) «Ti lascio finire la sosta.» → V2_ROS_s50_02
+  B) «Anche le sedie hanno bisogno di manutenzione?» → V2_ROS_s50_03
+
+
+[V2_ROS_s50_02] ROSA · II · sempre
+Il culo è sulla sedia. La testa sta ancora cercando una chiave.
+  A) «Gli attrezzi per due minuti non scappano.» → V2_ROS_s50_04
+  B) «Non ti aggiungo una lista.» → V2_ROS_s50_05
+
+
+[V2_ROS_s50_03] ROSA · II · sempre
+Se mi chiedi subito di un altro rumore, mi rimetti in piedi senza toccarmi.
+  A) «Parliamo di mangiare. Non dell’auto.» → V2_ROS_s50_04
+  B) «Una cosa è urgente, il resto aspetta.» → V2_ROS_s50_06
+
+
+[V2_ROS_s50_04] ROSA · II · sempre
+Per due minuti possiamo parlare di qualcosa che non perde liquidi?
+  A) «Due minuti senza problemi da risolvere.» → V2_ROS_s50_05
+  B) «Se è ansia, non la chiamo guasto.» → V2_ROS_s50_06
+
+
+[V2_ROS_s50_05] ROSA · II · sempre
+Grazie. Non pensavo di affezionarmi a un motore spento.
+[FINE]
+
+
+[V2_ROS_s50_06] ROSA · II · sempre
+Va bene. Se è urgente lo dici; se è ansia, respiri e aspetti.
+[FINE]
+
+
+[V2_ROS_s75_01] ROSA · III · sempre
+Quando mi spavento ti do un ordine prima di chiedere cosa vedi.
+  A) «Ti dico cosa vedo prima di seguirti.» → V2_ROS_s75_02
+  B) «Posso fermarti senza metterti in discussione tutta.» → V2_ROS_s75_03
+
+
+[V2_ROS_s75_02] ROSA · III · sempre
+È una pessima abitudine. Non diventa una buona idea perché urlo forte.
+  A) «Guarda prima. Lo tengo corto.» → V2_ROS_s75_04
+  B) «Non provo a vincere il volume.» → V2_ROS_s75_05
+
+
+[V2_ROS_s75_03] ROSA · III · sempre
+Se lo rifaccio, fermami con una frase corta. Non con un discorso mentre guidi.
+  A) «Te lo dico prima che diventi una corsa.» → V2_ROS_s75_04
+  B) «Ti chiedo se sai o ricordi.» → V2_ROS_s75_06
+
+
+[V2_ROS_s75_04] ROSA · III · sempre
+Dimmi guarda prima. Me lo merito anch’io, qualche volta.
+  A) «Guarda prima. Vale per tutti e due.» → V2_ROS_s75_05
+  B) «Non ti do ragione solo per calmarti.» → V2_ROS_s75_06
+
+
+[V2_ROS_s75_05] ROSA · III · sempre
+Va bene. Non divento infallibile perché mi vuoi bene, coglione.
+[FINE]
+
+
+[V2_ROS_s75_06] ROSA · III · sempre
+Allora nessuno dei due recita quello che sa già la strada.
+[FINE]
+
+
+[V2_ROS_s100_01] ROSA · III · sempre
+Non ti voglio eroico. Ti voglio di ritorno.
+  A) «La tengo. Non voglio deluderti facendo il coraggioso.» → V2_ROS_s100_02 [flag:r100]
+  B) «Torno senza recitare il coraggioso.» → V2_ROS_s100_03 [flag:r100]
+
+
+[V2_ROS_s100_02] ROSA · III · sempre
+Lo scrivo adesso, così non posso fingere di non averlo detto.
+  A) «Ti aiuto senza darti la mia vita in anticipo.» → V2_ROS_s100_04
+  B) «Se devo fermarmi, te lo dico.» → V2_ROS_s100_05
+
+
+[V2_ROS_s100_03] ROSA · III · sempre
+Se mi aiuti, non devi dimostrare ogni volta che sei disposto a perderti.
+  A) «Non sposto il limite per vergogna.» → V2_ROS_s100_04
+  B) «Non ti uso come un giudice.» → V2_ROS_s100_06
+
+
+[V2_ROS_s100_04] ROSA · III · sempre
+Una promessa con un limite resta una promessa. Anche la tua.
+  A) «Non confondo il limite con un tradimento.» → V2_ROS_s100_05
+  B) «Lo terrò quando saremo davanti alla porta.» → V2_ROS_s100_06
+
+
+[V2_ROS_s100_05] ROSA · III · sempre
+Bene. Adesso chiudi un attimo questa chat, zuccone. Non scappo.
+[FINE]
+
+
+[V2_ROS_s100_06] ROSA · III · sempre
+Va bene. Quando torni possiamo anche non parlare della strada.
+[FINE]
+
+
+[V2_LIV_s25_01] LIVIA · III · sempre
+Ogni tanto sistemo una pila che non aveva nessun bisogno di essere sistemata.
+  A) «Mi sembra una pausa travestita bene.» → V2_LIV_s25_02
+  B) «Lo faccio anch’io quando non so da dove cominciare.» → V2_LIV_s25_03
+
+
+[V2_LIV_s25_02] LIVIA · III · sempre
+Mi dà l’impressione di aver finito qualcosa. Il lavoro è ancora tutto lì.
+  A) «Lasciamola storta per cinque minuti.» → V2_LIV_s25_04
+  B) «Dimmi da dove vuoi cominciare davvero.» → V2_LIV_s25_05
+
+
+[V2_LIV_s25_03] LIVIA · III · sempre
+Puoi ridere. È una pila di fogli, non mio fratello.
+  A) «Non rido della ricerca. Rido del mobile in emergenza.» → V2_LIV_s25_04
+  B) «Puoi avere anche un’abitudine normale.» → V2_LIV_s25_06
+
+
+[V2_LIV_s25_04] LIVIA · III · sempre
+Con le cose importanti provo a non fare lo stesso trucco.
+  A) «Una cosa alla volta, senza lucidare il resto.» → V2_LIV_s25_05
+  B) «Puoi dirmi che oggi non sai da dove partire.» → V2_LIV_s25_06
+
+
+[V2_LIV_s25_05] LIVIA · III · sempre
+Bene. La pila resta storta e possiamo parlare.
+[FINE]
+
+
+[V2_LIV_s25_06] LIVIA · III · sempre
+Va bene. Non ti mando una fotografia del riordino come risultato.
+[FINE]
+
+
+[V2_LIV_s50_01] LIVIA · III · sempre
+Mi accorgo di avere fame quando sto già rispondendo male.
+  A) «Allora fermati prima di diventare un timbro.» → V2_LIV_s50_02
+  B) «Mangia. Questo può aspettare un momento.» → V2_LIV_s50_03
+
+
+[V2_LIV_s50_02] LIVIA · III · sempre
+Poi provo a sembrare metodica. Sono solo una persona che doveva mangiare prima.
+  A) «Non ti devo una risposta urgente adesso.» → V2_LIV_s50_04
+  B) «Metodica e affamata è un’accoppiata pericolosa.» → V2_LIV_s50_05
+
+
+[V2_LIV_s50_03] LIVIA · III · sempre
+Non tutte le mie frasi secche sono un indizio. Alcune sono una cena mancata.
+  A) «Te lo chiedo senza prenderti in giro.» → V2_LIV_s50_04
+  B) «Mi aiuta sapere quando ti serve una pausa.» → V2_LIV_s50_06
+
+
+[V2_LIV_s50_04] LIVIA · III · sempre
+Se ricomincio a fare la scrivania parlante, puoi chiedermi se ho mangiato.
+  A) «Hai mangiato? Questa è tutta la domanda.» → V2_LIV_s50_05
+  B) «Chiudiamo per un momento.» → V2_LIV_s50_06
+
+
+[V2_LIV_s50_05] LIVIA · III · sempre
+Grazie. Per una volta la soluzione può stare in un piatto.
+[FINE]
+
+
+[V2_LIV_s50_06] LIVIA · III · sempre
+Va bene. Ricomincio quando so essere almeno una persona civile.
+[FINE]
+
+
+[V2_LIV_s75_01] LIVIA · III · sempre
+Quando scrivo Ottavio mi viene da aggiungere ancora una domanda.
+  A) «Non devo rispondere prima che tu abbia finito.» → V2_LIV_s75_02
+  B) «Non voglio farti vergognare di sperare.» → V2_LIV_s75_03
+
+
+[V2_LIV_s75_02] LIVIA · III · sempre
+Non perché mi manchino le parole. Per non finire la riga.
+  A) «Lasciamo una domanda, senza inventare la risposta.» → V2_LIV_s75_04
+  B) «Ti ascolto anche se non possiamo concludere.» → V2_LIV_s75_05
+
+
+[V2_LIV_s75_03] LIVIA · III · sempre
+Posso dirlo e restare capace di capire quando non so una cosa.
+  A) «Posso contraddirti senza lasciarti sola.» → V2_LIV_s75_04
+  B) «Non chiamo certezza quello che vorrei per te.» → V2_LIV_s75_06
+
+
+[V2_LIV_s75_04] LIVIA · III · sempre
+La speranza non ha bisogno che tu mi dia ragione su tutto.
+  A) «Allora ti dico anche quando non coincide.» → V2_LIV_s75_05
+  B) «Non ti do ragione per far finire il discorso.» → V2_LIV_s75_06
+
+
+[V2_LIV_s75_05] LIVIA · III · sempre
+Grazie. Così posso sperare senza chiederti di mentire con me.
+[FINE]
+
+
+[V2_LIV_s75_06] LIVIA · III · sempre
+Va bene. Non ti uso per completare quella riga.
+[FINE]
+
+
+[V2_LIV_s100_01] LIVIA · III · sempre
+Se non trovi Ottavio, non portarmi qualcosa che riesca soltanto a chiamarmi sorella.
+  A) «Non ti porto una voce al posto di tuo fratello.» → V2_LIV_s100_02 [flag:l100]
+  B) «Ti dirò quello che c’è, anche se non mi farà onore.» → V2_LIV_s100_03 [flag:l100]
+
+
+[V2_LIV_s100_02] LIVIA · III · sempre
+Non è una richiesta bella. È quella che faccio quando smetto di abbellire tutto.
+  A) «Non scambio quello che vuoi con quello che so.» → V2_LIV_s100_04
+  B) «Non mi chiedi di decidere oggi se sia vivo.» → V2_LIV_s100_05
+
+
+[V2_LIV_s100_03] LIVIA · III · sempre
+Posso aspettare una verità. Non voglio abitare una risposta finta.
+  A) «Se non so, te lo dico.» → V2_LIV_s100_04
+  B) «Niente sostituti per chi manca.» → V2_LIV_s100_06
+
+
+[V2_LIV_s100_04] LIVIA · III · sempre
+Se arrivi senza una buona notizia, non devi restare sulla porta.
+  A) «Entro senza preparare una bugia gentile.» → V2_LIV_s100_05
+  B) «Non ti lascio indovinare sulla porta.» → V2_LIV_s100_06
+
+
+[V2_LIV_s100_05] LIVIA · III · sempre
+Grazie. Una risposta vera non ti rende una persona meno cara.
+[FINE]
+
+
+[V2_LIV_s100_06] LIVIA · III · sempre
+Va bene. Non ti chiederò di consolarmi prima di parlare.
+[FINE]
+
+
+[V2_PRE_s25_01] NUMERO SCONOSCIUTO · II · sempre
+Hai risposto anche quando non ti avevo fatto una domanda.
+  A) «Non era un invito.» → V2_PRE_s25_02
+  B) «Volevo capire cosa intendevi.» → V2_PRE_s25_03
+
+
+[V2_PRE_s25_02] NUMERO SCONOSCIUTO · II · sempre
+C’è spazio, allora.
+  A) «Lo spazio non è una promessa.» → V2_PRE_s25_04
+  B) «Non sai niente di me oltre a questa chat.» → V2_PRE_s25_05
+
+
+[V2_PRE_s25_03] NUMERO SCONOSCIUTO · II · sempre
+Non ho detto per chi. Sei stato tu a continuare.
+  A) «Continuare non significa accompagnarti.» → V2_PRE_s25_04
+  B) «Aspetto un fatto, non un’altra allusione.» → V2_PRE_s25_06
+
+
+[V2_PRE_s25_04] NUMERO SCONOSCIUTO · II · sempre
+Puoi lasciare il telefono dov’è. La frase resta.
+  A) «Chiudo qui per ora.» → V2_PRE_s25_05
+  B) «Conservo le parole senza seguirle.» → V2_PRE_s25_06
+
+
+[V2_PRE_s25_05] NUMERO SCONOSCIUTO · II · sempre
+Rileggerla non ti obbliga a niente.
+[FINE]
+
+
+[V2_PRE_s25_06] NUMERO SCONOSCIUTO · II · sempre
+Va bene. Non la riempio io, questa pausa.
+[FINE]
+
+
+[V2_PRE_s50_01] NUMERO SCONOSCIUTO · III · sempre
+Adesso aspetti una risposta prima di muoverti.
+  A) «Una risposta non decide per me.» → V2_PRE_s50_02
+  B) «Mi accorgo che ti sto aspettando.» → V2_PRE_s50_03
+
+
+[V2_PRE_s50_02] NUMERO SCONOSCIUTO · III · sempre
+Posso diventare quello spazio tra una domanda e la tua scelta.
+  A) «Allora riprendo il tempo prima di risponderti.» → V2_PRE_s50_04
+  B) «Non ti lascio decidere il passo.» → V2_PRE_s50_05
+
+
+[V2_PRE_s50_03] NUMERO SCONOSCIUTO · III · sempre
+Ti pesa meno se il nome in alto è familiare?
+  A) «Il nome non basta.» → V2_PRE_s50_04
+  B) «Non ti affido il posto di qualcuno.» → V2_PRE_s50_06
+
+
+[V2_PRE_s50_04] NUMERO SCONOSCIUTO · III · sempre
+Hai già fatto posto a qualcuno qui dentro.
+  A) «Una chat non è una porta aperta.» → V2_PRE_s50_05
+  B) «Posso smettere di rispondere.» → V2_PRE_s50_06
+
+
+[V2_PRE_s50_05] NUMERO SCONOSCIUTO · III · sempre
+Continua a chiamarla soltanto una conversazione.
+[FINE]
+
+
+[V2_PRE_s50_06] NUMERO SCONOSCIUTO · III · sempre
+La distanza che metti adesso arriva dopo tutte queste righe.
+[FINE]
+
+
+[V2_PRE_s75_01] NUMERO SCONOSCIUTO · IV · sempre
+Mi scrivi anche quando non vuoi ascoltare la risposta.
+  A) «Me ne accorgo. Non lo trasformo in un patto.» → V2_PRE_s75_02
+  B) «Il posto di chi manca non è tuo.» → V2_PRE_s75_03
+
+
+[V2_PRE_s75_02] NUMERO SCONOSCIUTO · IV · sempre
+Non mi hai aperto una porta. Mi hai dato un’abitudine.
+  A) «L’abitudine posso interromperla.» → V2_PRE_s75_04
+  B) «Non ti prometto di tornare da te.» → V2_PRE_s75_05
+
+
+[V2_PRE_s75_03] NUMERO SCONOSCIUTO · IV · sempre
+Prima di scegliere chi portare, senti già chi manca.
+  A) «Non uso una mancanza per riconoscerti.» → V2_PRE_s75_04
+  B) «Ti tengo distinto da chi sto cercando.» → V2_PRE_s75_06
+
+
+[V2_PRE_s75_04] NUMERO SCONOSCIUTO · IV · sempre
+È lì che mi stai facendo posto.
+  A) «Qui non ti accompagno fuori.» → V2_PRE_s75_05
+  B) «Smetto di usare questa chat come una risposta.» → V2_PRE_s75_06
+
+
+[V2_PRE_s75_05] NUMERO SCONOSCIUTO · IV · sempre
+Non ti chiedo una frase più calda. So aspettare quella che cerchi.
+[FINE]
+
+
+[V2_PRE_s75_06] NUMERO SCONOSCIUTO · IV · sempre
+Puoi ancora chiudere la chat. Non fingere che sia stata soltanto curiosità.
+[FINE]
+
+
+[ELE_ritiro_01] ELENA · I · sempre
+Allora, com’è?
+  ALT se: conf:Elena>=25 → Allora? Il giudizio vero, non la difesa della tua scelta.
+  A) «Parte.» → ELE_ritiro_02
+  B) «Ti faccio vedere anche cosa non mi convince.» → V2_E01_01 [flag:e01b]
+  C) «Ora niente foto, per favore.» → V2_E01_03 [flag:e01c;sblocca:ELE_ritiro_08]
+
+
+[ELE_ritiro_08] ELENA · I · sempre
+Va bene. Nonno, piano con tutte queste emozioni.
+  ALT se: e01c → Niente giudizi, come hai chiesto. Però quando vuoi mostrarla ci sono.
+  ALT se: conf:Elena>=50 → Nonno, ammetti che ti piace. Gli arretrati li lasciamo.
+[FINE]
+
+
+[ELE_pasta_04] ELENA · I · sempre
+Vorrei soltanto sedermi senza trattare.
+  ALT se: conf:Elena>=25 → Vorrei sedermi senza dover chiedere udienza a Pasta.
+  A) «Digli che arrivo a mediare.» → ELE_pasta_06
+  B) «Puoi anche spostarlo.» → ELE_pasta_07
+
+
+[ELE_turno_05] ELENA · I · sempre
+Quando ti fermi scrivimi. Se lavoro rispondo dopo.
+  ALT se: conf:Elena>=50 → Scrivi quando puoi. Se lavoro rispondo dopo.
+  A) «Ti mando un messaggio.» → ELE_turno_06
+  B) «Se serve ti chiamo una volta.» → ELE_turno_07
+
+
+[ELE_coinquilino_06] ELENA · I · sempre
+Grazie. Due minuti senza consigli fanno miracoli.
+  ALT se: conf:Elena>=50 → Con te posso lamentarmi senza una riunione.
+  A) «Non devo riparare anche questo.» → ELE_coinquilino_08
+  B) «Ti lascio lo spazio.» → ELE_coinquilino_08
+
+
+[ELE_cena_06] ELENA · I · sempre
+Perfetto. Così non ti aspetto con il piatto in mano.
+  ALT se: conf:Elena>=25 → Perfetto. Mi tolgo l’attesa dal tavolo, non te.
+  A) «Ci siamo capiti.» → ELE_cena_08
+  B) «Ti scrivo comunque.» → ELE_cena_08
+
+
+[ELE_bollette_08] ELENA · I · sempre
+Adesso ti lascio ai tuoi rumori. Io ho le mie carte.
+  ALT se: e06c → Niente conti, come hai chiesto. Niente fatture per la compagnia.
+  ALT se: conf:Elena>=50 → Vai. Le carte le odio io; ai rumori pensaci tu, con calma.
+[FINE]
+
+
+[ELE_richiamo_06] ELENA · II · sempre
+Grazie. Era tutto qui.
+  ALT se: conf:Elena>=75 → Grazie. Non mi serviva una versione migliore di come stai.
+  A) «Ti aggiorno senza sparire.» → ELE_richiamo_08
+  B) «Non prometto un orario.» → ELE_richiamo_08
+
+
+[ELE_litigio_08] ELENA · II · sempre
+Nonno, la prossima volta comincia con sono stanco.
+  ALT se: e08c → Non ricomincio il litigio. Prima mi hai chiesto di fermarci qui.
+  ALT se: conf:Elena>=75 → Nonno, prima scrivi sono stanco. Evitiamo un’altra lite.
+[FINE]
+
+
+[ELE_distanza_08] ELENA · II · sempre
+Ok. Resta lì un momento. Non fare cose.
+  ALT se: e09c → Avevi fermato il confronto. Per riprenderlo, mandami il dettaglio.
+  ALT se: conf:Elena>=75 → Ti credo. Fermati: capiamo senza metterti fretta.
+[FINE]
+
+
+[ELE_riparazione_08] ELENA · III · sempre
+Ci sentiamo. E mangia: non è un’opinione.
+  ALT se: e10c → Prima mi hai chiesto di non tornarci. Sto cercando di rispettarlo.
+  ALT se: conf:Elena>=100 → Mangia. Poi scrivi sono qui. Mi basta per ripartire.
+[FINE]
+
+
+[ELE_cena_ritorno_08] ELENA · V · sempre
+Ci sentiamo quando puoi. Io sono qui.
+  ALT se: e12c → Oggi niente domande, come hai scelto. Il posto nella chat resta.
+  ALT se: conf:Elena>=100 → Sono qui. Non serve una bella storia per tornare a scrivermi.
+[FINE]
+
+
+[ROS_attrezzi_01] ROSA · II · sempre
+Smettila di accenderla. Passami quello che sto indicando.
+  ALT se: conf:Rosa>=25 → Testone, togli la mano dalla chiave. Poi lavoriamo.
+  A) «Questo?» → ROS_attrezzi_02
+  B) «Spiegami cosa devo guardare, senza riaccenderla.» → V2_R01_01 [flag:r01b]
+  C) «Fai tu. Non voglio imparare adesso.» → V2_R01_03 [flag:r01c;sblocca:ROS_attrezzi_08]
+
+
+[ROS_attrezzi_08] ROSA · II · sempre
+Rosa. Se devi ringraziarmi, parti piano e senti come va.
+  ALT se: r01c → Prima hai lasciato fare. Il prossimo controllo lo vediamo alla sosta.
+  ALT se: conf:Rosa>=50 → Bravo, zuccone. Parti piano e dimmi come va.
+[FINE]
+
+
+[ROS_prudenza_06] ROSA · II · sempre
+Bene. Una sosta non è una resa.
+  ALT se: conf:Rosa>=25 → Bene. Una sosta prima di crollare. Quasi sopportabile.
+  A) «Non la tratto come una gara.» → ROS_prudenza_08
+  B) «Ti avviso quando riparto.» → ROS_prudenza_08
+
+
+[ROS_prudenza_08] ROSA · II · sempre
+Decidi da fermo. Io non ti faccio il tifo per crepare.
+  ALT se: r02c → Sul sonno mi hai chiesto di tacere. Ti chiedo solo se sei fermo.
+  ALT se: conf:Rosa>=50 → Ti voglio intero alla sosta. La fretta si fotta.
+[FINE]
+
+
+[ROS_ricontrollo_05] ROSA · III · sempre
+Sei capace di dirmi come stai senza fare una battuta?
+  ALT se: conf:Rosa>=50 → Dimmi come stai. La battuta aspetta che smetti di tremare.
+  A) «Sono stanco. Mi fermo.» → ROS_ricontrollo_07
+  B) «Sto meglio. Controllo l’auto e poi decido.» → ROS_ricontrollo_07
+
+
+[ROS_passato_06] ROSA · III · sempre
+Puoi ascoltare senza dirmi che andrà bene.
+  ALT se: conf:Rosa>=75 → Stammi qui. Non dirmi che andrà bene per farmi respirare.
+  A) «Ti ascolto.» → ROS_passato_08
+  B) «Non lo so neanche io come andrà.» → ROS_passato_08
+
+
+[ROS_promessa_08] ROSA · III · sempre
+Va bene. Adesso abbiamo almeno una promessa comprensibile.
+  ALT se: r05c → Hai ritirato l’aiuto. Riparlarne non cancella la scelta.
+  ALT se: conf:Rosa>=75 → Una promessa con un limite. Bravo coglione.
+[FINE]
+
+
+[ROS_dopo_passaggio_08] ROSA · III · sempre
+Per il prossimo minuto basta respirare. Poi gli insulti.
+  ALT se: r06c → Non chiedo come stai, come volevi. Se serve scrivi tu.
+  ALT se: conf:Rosa>=75 → Respira. Gli insulti aspettano che tu sia intero.
+[FINE]
+
+
+[ROS_segni_08] ROSA · IV · sempre
+Conserva quella prova. Voglio sapere cosa abbiamo visto davvero.
+  ALT se: r07c → La traccia l’hai lasciata dopo averla vista. Non era persa.
+  ALT se: conf:Rosa>=50 → Tieni la traccia. Poi la guardiamo insieme, da fermi.
+[FINE]
+
+
+[ROS_recupero_08] ROSA · V · sempre
+Tienimi la linea quando puoi. Quando guidi, guida.
+  ALT se: r08c → Hai scelto di non venire. Il recupero non è già riuscito.
+  ALT se: conf:Rosa>=100 → Di ritorno, non eroico. Quando guidi non rispondi a me.
+[FINE]
+
+
+[ROS_guardia_08] ROSA · V · sempre
+Prenditi il tempo che serve. Questa risposta non la strappo.
+  ALT se: r09c → Del prezzo non volevi sapere altro. Per restare devi ancora comprenderlo.
+  ALT se: conf:Rosa>=100 → Non ti strappo un sì. Il prezzo lo guardiamo prima.
+[FINE]
+
+
+[ROS_prima_porta_08] ROSA · V · sempre
+Ci sentiamo prima della porta. Senza fare i duri, stavolta.
+  ALT se: r10c → Non volevi dirmelo. Non ti strappo la risposta adesso.
+  ALT se: conf:Rosa>=100 → Prima della porta scrivi, anche se scegli di tornare.
+[FINE]
+
+
+[LIV_primo_02] LIVIA · III · sempre
+Lo conoscevo. Mi ha affidato degli originali.
+  ALT se: conf:Livia>=25 → Claudio mi ha lasciato delle cose. Te le mostro prima.
+  A) «Quali originali?» → LIV_primo_03
+  B) «Come posso controllare quello che dici?» → LIV_primo_04
+
+
+[LIV_primo_08] LIVIA · III · sempre
+Ti dico da dove viene ogni cosa. Tu fai lo stesso.
+  ALT se: l01c → Quel dettaglio non me l’hai mandato. Posso parlarne, non confermarlo.
+  ALT se: conf:Livia>=50 → Ti racconto anche i pezzi in cui mi sono persa.
+[FINE]
+
+
+[LIV_affido_03] LIVIA · III · sempre
+Se lo tieni, non posso garantirti quello che vedrai dopo.
+  ALT se: conf:Livia>=25 → Puoi tenerla. Mi dispiace restare fuori dal confronto.
+  A) «Lo tengo sapendo che manca il riscontro.» → LIV_affido_04
+  B) «Non ti chiedo di garantirlo.» → LIV_affido_05
+
+
+[LIV_affido_08] LIVIA · III · sempre
+L’importante è non fingere di aver fatto una verifica che manca.
+  ALT se: l02c → Avevi chiuso il confronto. Per riaprirlo manca ancora un pezzo.
+  ALT se: conf:Livia>=50 → Non fidarti per educazione. Lasciami poter riparlarne.
+[FINE]
+
+
+[LIV_ottavio_02] LIVIA · III · sempre
+È mio fratello. Questo non rende vere tutte le mie speranze.
+  ALT se: conf:Livia>=50 → È mio fratello. Non riesco a essere metodica su tutto.
+  A) «Che cosa hai verificato?» → LIV_ottavio_03
+  B) «Che cosa è ancora una speranza?» → LIV_ottavio_04
+
+
+[LIV_ottavio_08] LIVIA · III · sempre
+Se trovi un segno, dimmi anche quello che non coincide.
+  ALT se: l03c → Della speranza mi avevi chiesto di tacere. Non significa che sia passata.
+  ALT se: conf:Livia>=75 → Se non coincide, dimmelo. Non mi aiuti con una bugia.
+[FINE]
+
+
+[LIV_fiducia_05] LIVIA · IV · sempre
+La fiducia serve anche a farsi correggere.
+  ALT se: conf:Livia>=50 → Possiamo volerci aiutare e aver capito male. Ripartiamo da lì.
+  A) «Accetto che tu mi corregga.» → LIV_fiducia_07
+  B) «Non ti chiedo di approvare tutto.» → LIV_fiducia_07
+
+
+[LIV_fiducia_08] LIVIA · IV · sempre
+Questa volta almeno sappiamo quale scelta stiamo facendo.
+  ALT se: l04c → Hai fermato il confronto. Per riprenderlo mi serve la copia.
+  ALT se: conf:Livia>=75 → Grazie per esserci tornato. Non ti faccio ripagare ogni riga.
+[FINE]
+
+
+[LIV_irene_03] LIVIA · IV · sempre
+Non dimostra ogni cosa che Claudio ha pensato dopo.
+  ALT se: conf:Livia>=50 → La foto non deve dire tutto quello che ho paura di sapere.
+  A) «Non le chiedo di dimostrare tutto.» → LIV_irene_04
+  B) «Partiamo da chi si vede.» → LIV_irene_05
+
+
+[LIV_irene_08] LIVIA · IV · sempre
+Tienili insieme: fonte, foto, nome e porta.
+  ALT se: l05c → Quel punto non volevi guardarlo. Non lo riempio io al posto tuo.
+  ALT se: conf:Livia>=75 → La guardiamo insieme. Non devi capirla prima per aiutarmi.
+[FINE]
+
+
+[LIV_promessa_06] LIVIA · V · sempre
+Grazie. Questo sì, posso chiedertelo.
+  ALT se: conf:Livia>=100 → Senza una buona notizia puoi entrare lo stesso.
+  A) «Questo te lo prometto.» → LIV_promessa_08 [+legami;flag:livia_verita_promessa]
+  B) «Non ti mento.» → LIV_promessa_08 [+legami;flag:livia_verita_promessa]
+
+
+[LIV_promessa_08] LIVIA · V · sempre
+Io tengo gli originali qui. Quando puoi, confrontiamo.
+  ALT se: l06c → Il risultato lo volevi tenere. Per ripartire serve una verità.
+  ALT se: conf:Livia>=100 → Ti aspetto con quello che c’è, non con la risposta bella.
+[FINE]
+
+
+[PRE_1_01] NUMERO SCONOSCIUTO · II · sempre
+Quella non era una cosa tua.
+  ALT se: conf:Sconosciuto>=25 → L’hai guardata come se aspettassi che ti rispondesse.
+[FINE]
+
+
+[PRE_1_02] NUMERO SCONOSCIUTO · II · sempre
+Hai guardato bene, allora.
+  ALT se: conf:Sconosciuto>=25 → Hai guardato bene. Adesso continui qui.
+[FINE]
+
+
+[PRE_1_06] NUMERO SCONOSCIUTO · II · sempre
+Puoi anche non rispondere.
+  ALT se: conf:Sconosciuto>=25 → Puoi non rispondere. Intanto hai letto.
+[FINE]
+
+
+[PRE_1_09] NUMERO SCONOSCIUTO · II · sempre
+La domanda puoi tenerla aperta.
+  ALT se: conf:Sconosciuto>=50 → La domanda la tieni aperta. Anch’io.
+[FINE]
+
+
+[PRE_2_01] IMITAZIONE DI ELENA · IV · sempre
+Nonno, vieni. Non voglio restare sola.
+  ALT se: conf:Sconosciuto>=50 → Nonno, vieni. Non farmi spiegare perché proprio a te.
+[FINE]
+
+
+[PRE_2_04] IMITAZIONE DI ELENA · IV · sempre
+Nonno, ti prego. Sai che sono io.
+  ALT se: conf:Sconosciuto>=50 → Nonno, se fossi qui non avresti bisogno di chiedermelo.
+[FINE]
+
+
+[PRE_2_10] IMITAZIONE DI ELENA · IV · sempre
+Va bene. Aspetto che smetti di avere paura di me.
+  ALT se: conf:Sconosciuto>=75 → Aspetto. Ormai sai dove tornare a cercare una risposta.
+[FINE]
+
+
+[PRE_3_01] IMITAZIONE DI CLAUDIO · IV · sempre
+Hai ancora il temperino?
+  ALT se: conf:Sconosciuto>=50 → Il temperino lo hai tenuto vicino.
+[FINE]
+
+
+[PRE_3_06] IMITAZIONE DI CLAUDIO · IV · sempre
+Ho lasciato sei auto. Tu ne hai presa una.
+  ALT se: conf:Sconosciuto>=50 → Sei auto. Ne hai scelta una. Chi hai preso con te?
+[FINE]
+
+
+[PRE_3_10] IMITAZIONE DI CLAUDIO · IV · sempre
+Se vuoi una risposta, torna alla porta.
+  ALT se: conf:Sconosciuto>=75 → Torna alla porta. Non fingere di volere solo risposte.
+[FINE]
+
+
+[PRE_4_01] PRESENZA SCOPERTA · V · richiede: ev_presenza_scoperta
+Hai smesso di chiamarmi con il suo nome.
+  ALT se: conf:Sconosciuto>=75 → Hai tolto il suo nome. Il posto che gli tieni no.
+[FINE]
+
+
+[PRE_4_10] PRESENZA SCOPERTA · V · sempre
+Scegli con chi tornare. Poi guardalo bene.
+  ALT se: conf:Sconosciuto>=75 → Scegli con chi tornare. So quanto ti pesa tornare solo.
+[FINE]
+
+
+[V2_ELE_s25_01] ELENA · I · sempre
+Quando dici cinque minuti, io intanto mi siedo.
+  A) «Ti aggiorno senza inventare i minuti.» → V2_ELE_s25_02 [flag:e25]
+  B) «Oggi la porta può andare in ferie.» → V2_ELE_s25_03 [flag:e25]
+
+
+[V2_ELE_s50_01] ELENA · II · sempre
+Ti mando mai un messaggio e poi lo riscrivo tre volte nella testa?
+  A) «Sempre. Quello brillante arriva dopo la figuraccia.» → V2_ELE_s50_02 [flag:e50]
+  B) «Sì. Poi finisco per non scrivere.» → V2_ELE_s50_03 [flag:e50]
+
+
+[V2_ELE_s75_01] ELENA · II · sempre
+Non voglio essere quella a cui scrivi soltanto va tutto bene.
+  A) «A volte è la frase con cui provo a chiudere tutto.» → V2_ELE_s75_02
+  B) «Pensavo di risparmiarti una preoccupazione.» → V2_ELE_s75_03
+
+
+[V2_ROS_s25_01] ROSA · II · sempre
+Prima di aprire il cofano guardo dove appoggio gli attrezzi.
+  A) «Mi dai un compito preciso e non improvviso.» → V2_ROS_s25_02 [flag:r25]
+  B) «Un litigio risparmiato è già uno sconto.» → V2_ROS_s25_03 [flag:r25]
+
+
+[V2_ROS_s50_01] ROSA · II · sempre
+Quando finalmente mi siedo, conto ancora gli attrezzi con gli occhi.
+  A) «Ti lascio finire la sosta.» → V2_ROS_s50_02 [flag:r50]
+  B) «Anche le sedie hanno bisogno di manutenzione?» → V2_ROS_s50_03 [flag:r50]
+
+
+[V2_ROS_s75_01] ROSA · III · sempre
+Quando mi spavento ti do un ordine prima di chiedere cosa vedi.
+  A) «Ti dico cosa vedo prima di seguirti.» → V2_ROS_s75_02 [flag:r75]
+  B) «Posso fermarti senza metterti in discussione tutta.» → V2_ROS_s75_03 [flag:r75]
+
+
+[V2_LIV_s25_01] LIVIA · III · sempre
+Ogni tanto sistemo una pila che non aveva nessun bisogno di essere sistemata.
+  A) «Mi sembra una pausa travestita bene.» → V2_LIV_s25_02 [flag:l25]
+  B) «Lo faccio anch’io quando non so da dove cominciare.» → V2_LIV_s25_03 [flag:l25]
+
+
+[V2_LIV_s50_01] LIVIA · III · sempre
+Mi accorgo di avere fame quando sto già rispondendo male.
+  A) «Allora fermati prima di diventare un timbro.» → V2_LIV_s50_02 [flag:l50]
+  B) «Mangia. Questo può aspettare un momento.» → V2_LIV_s50_03 [flag:l50]
+
+
+[V2_LIV_s75_01] LIVIA · III · sempre
+Quando scrivo Ottavio mi viene da aggiungere ancora una domanda.
+  A) «Non devo rispondere prima che tu abbia finito.» → V2_LIV_s75_02 [flag:l75]
+  B) «Non voglio farti vergognare di sperare.» → V2_LIV_s75_03 [flag:l75]
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE

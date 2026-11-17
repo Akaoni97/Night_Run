@@ -131,7 +131,7 @@ def head(h, nid):
     return w, a, fase, cond
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('src', nargs='+'); ap.add_argument('--toni'); ap.add_argument('--out', default='chat_dati.js')
+    ap = argparse.ArgumentParser(); ap.add_argument('src', nargs='+'); ap.add_argument('--toni'); ap.add_argument('--out', default='chat_dati.js'); ap.add_argument('--attivazione')
     a = ap.parse_args()
     nodes, order = {}, []
     for src in a.src: parse(src, nodes, order)
@@ -194,6 +194,20 @@ def main():
         else: km = max(km + GAP, BAND[e['fase']]); e['km'] = km
         reqs = ['km>=%d' % km] + e['req']
         starts.append({'id': 'st_' + e['id'], 'th': e['as'], 'node': e['id'], 'km': km, **({'req': e['req']} if e['req'] else {})})
+    if a.attivazione:
+        # ingressi decisi da Codex (11_ATTIVAZIONE.json): i 56 originali con le loro condizioni, le 18 conversazioni nuove col loro flag,
+        # le 12 città col flag d'arrivo. Le soglie di confidenza (UNLOCK) e gli ingressi manuali (casa, scene) non partono da soli.
+        att = json.load(open(a.attivazione, encoding='utf-8'))
+        starts = [{'id': b['id'], 'th': b['th'], 'node': b['node'], 'km': b['km'], **({'req': b['req']} if b.get('req') else {})} for b in att['baseline_starts_da_preservare']]
+        cnt = {}
+        for grp, key in (('T9_da_accodare_una_volta', 'req'), ('luoghi', 'req')):
+            for e in att[grp]:
+                who = e.get('who') or head(nodes[e['entry']]['head'], e['entry'])[0]
+                th = head(nodes[e['entry']]['head'], e['entry'])[1] or who
+                fase = e['fase']; k = cnt.get((who, fase), 0); cnt[(who, fase)] = k + 1
+                req = [cond_of(e[key])]
+                if fase == 'V': req.append(FASE_V)
+                starts.append({'id': 'st_' + e['entry'], 'th': th, 'node': e['entry'], 'km': BAND[fase] + 8 * k, 'req': req})
     js = ['// ============================================================================',
           '//  Night Run · Dati delle chat (generato da strumenti/importa_chat.py: non si modifica a mano)',
           '//  Nodi di conversazione, quando partono e toni delle risposte. Il motore è in chat.js.',

@@ -40,7 +40,7 @@ test('chat: le risposte che piacciono alzano la barra e svelano il gusto; quelle
   assert.equal(r.reaction, 1); assert.equal(r.delta, E.CHAT_NPC.Rosa.k[0]);
   assert.equal(s.chat.taste.Rosa.sboccato, 1, 'il gusto si scopre dalla reazione');
   assert.ok(freddo);
-  const t = fresh(); E.chatEnter(t, 20, 'Livia', 'LIV_primo_01');
+  const t = fresh(); E.chatEnter(t, 20, 'Livia', 'V2_LIV_s25_01');
   const l = E.chatOptions(t, 20, 'Livia'), iro = l.find((x) => x.tono === 'ironico');
   assert.ok(iro, 'Livia ha una risposta ironica');
   E.chatSetConf(t, 20, 'Livia', 10);
@@ -128,12 +128,12 @@ test('chat: i dati sono coerenti (nodi che esistono, toni noti, frasi brevi, fla
     if (n.fallback) assert.ok(E.CHAT_NODES[n.fallback]);
   }
   for (const st of E.CHAT_START) { assert.ok(E.CHAT_NODES[st.node]); for (const r of [].concat(st.req || [])) { const m = /^flag:(.+)$/.exec(r); if (m) need.add(m[1]); } }
-  for (const f of need) assert.ok(setf.has(f) || /^ev_/.test(f), `flag richiesto ma mai impostato: ${f}`);
+  for (const f of need) assert.ok(setf.has(f) || /^(ev_|luogo_)/.test(f), `flag richiesto ma mai impostato: ${f}`);
   for (const [who, p] of Object.entries(E.CHAT_NPC)) for (const k of Object.keys(p.gusti)) assert.ok(E.CHAT_TONI.includes(k), `${who}: gusto ${k}`);
 });
 
 test('ritmo: le chat non partono tutte insieme, e tra cartelloni e messaggi passano alcuni minuti di guida', () => {
-  const kms = E.CHAT_START.filter((s) => !(s.req || []).some((r) => /ev_/.test(r))).map((s) => s.km).sort((a, b) => a - b);
+  const kms = E.CHAT_START.filter((s) => !(s.req || []).some((r) => /^(flag|fatto):/.test(r))).map((s) => s.km).sort((a, b) => a - b);
   assert.ok(kms[0] >= 18, 'la prima chat arriva dopo i primi minuti');
   for (let i = 1; i < kms.length; i++) assert.ok(kms[i] - kms[i - 1] >= 9, `chat troppo vicine: km ${kms[i - 1]} e ${kms[i]}`);
   const km = TEL_APP_OFFERS.map((o) => o.km);
@@ -141,4 +141,34 @@ test('ritmo: le chat non partono tutte insieme, e tra cartelloni e messaggi pass
   for (let i = 1; i < km.length; i++) assert.ok(km[i] - km[i - 1] >= 6, `cartelloni troppo vicini: ${km[i - 1]} e ${km[i]}`);
   const sms = TEL_SMS.filter((m) => m.km > 0 && m.km < 100 && m.dir !== 'o').map((m) => m.km);
   for (let i = 1; i < sms.length; i++) assert.ok(sms[i] - sms[i - 1] >= 5, 'messaggi troppo vicini');
+});
+
+test('chat: una soglia si consuma una volta sola (scendere sotto e risalire non riapre la conversazione)', () => {
+  const s = fresh(); E.chatState(s).conf.Elena = 24;
+  E.chatSetConf(s, 10, 'Elena', 2); E.chatSetConf(s, 10, 'Elena', -3); E.chatSetConf(s, 10, 'Elena', 2);
+  assert.equal(s.chat.q.filter((q) => q.node === 'V2_ELE_s25_01').length, 1);
+});
+
+test('chat: una conversazione sbloccata con prerequisiti falsi resta in coda invece di perdersi', () => {
+  const s = fresh(); const c = E.chatState(s);
+  for (const st of E.CHAT_START) c.started[st.id] = 1;          // solo la coda, senza le conversazioni a chilometri
+  c.q.push({ node: 'V2_ELE_n1_01', km: 0 });
+  const n = E.CHAT_NODES.V2_ELE_n1_01;
+  const salvato = n.req; n.req = 'flag:aspetto_questo';
+  try {
+    E.chatTick(s, 50);
+    assert.equal(c.q.length, 1, 'ancora in coda'); assert.ok(!(c.th.Elena && c.th.Elena.done.V2_ELE_n1_01));
+    c.flags.aspetto_questo = 1; E.chatTick(s, 51);
+    assert.equal(c.q.length, 0); assert.ok(c.th.Elena.done.V2_ELE_n1_01);
+  } finally { if (salvato === undefined) delete n.req; else n.req = salvato; }
+});
+
+test('chat: le 18 conversazioni nuove, le 15 di soglia e le 12 città ci sono, e le città aspettano il loro flag', () => {
+  for (const w of ['ELE', 'ROS', 'LIV']) for (let i = 1; i <= 6; i++) assert.ok(E.CHAT_NODES[`V2_${w}_n${i}_01`], `V2_${w}_n${i}_01`);
+  for (const w of ['ELE', 'ROS', 'LIV', 'PRE']) for (const t of [25, 50, 75, 100]) if (!(w === 'PRE' && t === 100)) assert.ok(E.CHAT_NODES[`V2_${w}_s${t}_01`], `soglia ${w} ${t}`);
+  const citta = E.CHAT_START.filter((x) => /^V2_LUOGO_/.test(x.node)); assert.equal(citta.length, 12);
+  const s = fresh(); E.chatTick(s, 99999);
+  assert.ok(!E.CHAT_START.some((x) => /^V2_LUOGO_/.test(x.node) && s.chat.started[x.id]), 'nessuna città parte prima di essere raggiunta');
+  E.chatState(s).flags.luogo_roma = 1; E.chatTick(s, 99999);
+  assert.ok(s.chat.started.st_V2_LUOGO_roma_01 || (s.chat.th.Livia || s.chat.th.Rosa || s.chat.th.Elena || {}).msgs, 'a Roma parte la sua conversazione');
 });

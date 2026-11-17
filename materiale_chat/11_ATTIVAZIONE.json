@@ -1,0 +1,1593 @@
+{
+  "nota": "Specifica di attivazione per Claude; non un adattatore già implementato.",
+  "ordine": "Importare gli otto file numerati con ultimo ID prevalente e tabella toni 01.",
+  "baseline_starts_da_preservare": [
+    {
+      "id": "st_ELE_ritiro_01",
+      "th": "Elena",
+      "node": "ELE_ritiro_01",
+      "km": 18
+    },
+    {
+      "id": "st_ELE_pasta_01",
+      "th": "Elena",
+      "node": "ELE_pasta_01",
+      "km": 32
+    },
+    {
+      "id": "st_ELE_turno_01",
+      "th": "Elena",
+      "node": "ELE_turno_01",
+      "km": 46
+    },
+    {
+      "id": "st_ELE_coinquilino_01",
+      "th": "Elena",
+      "node": "ELE_coinquilino_01",
+      "km": 60
+    },
+    {
+      "id": "st_ELE_cena_01",
+      "th": "Elena",
+      "node": "ELE_cena_01",
+      "km": 74
+    },
+    {
+      "id": "st_ELE_bollette_01",
+      "th": "Elena",
+      "node": "ELE_bollette_01",
+      "km": 88
+    },
+    {
+      "id": "st_ELE_temperino_fissato",
+      "th": "Elena",
+      "node": "ELE_temperino_fissato",
+      "km": 102,
+      "req": [
+        "fatto:ELE_ritiro_08"
+      ]
+    },
+    {
+      "id": "st_ELE_claudio_fissato",
+      "th": "Elena",
+      "node": "ELE_claudio_fissato",
+      "km": 116,
+      "req": [
+        "fatto:ELE_ritiro_08"
+      ]
+    },
+    {
+      "id": "st_ELE_richiamo_01",
+      "th": "Elena",
+      "node": "ELE_richiamo_01",
+      "km": 130,
+      "req": [
+        "flag:elena_sosta_promessa"
+      ]
+    },
+    {
+      "id": "st_ROS_attrezzi_01",
+      "th": "Rosa",
+      "node": "ROS_attrezzi_01",
+      "km": 144
+    },
+    {
+      "id": "st_PRE_1_01",
+      "th": "Sconosciuto",
+      "node": "PRE_1_01",
+      "km": 158
+    },
+    {
+      "id": "st_ELE_litigio_01",
+      "th": "Elena",
+      "node": "ELE_litigio_01",
+      "km": 172
+    },
+    {
+      "id": "st_ROS_prudenza_01",
+      "th": "Rosa",
+      "node": "ROS_prudenza_01",
+      "km": 186
+    },
+    {
+      "id": "st_PRE_1_02",
+      "th": "Sconosciuto",
+      "node": "PRE_1_02",
+      "km": 200
+    },
+    {
+      "id": "st_ELE_distanza_01",
+      "th": "Elena",
+      "node": "ELE_distanza_01",
+      "km": 200,
+      "req": [
+        "flag:ev_distanza_impossibile"
+      ]
+    },
+    {
+      "id": "st_PRE_1_03",
+      "th": "Sconosciuto",
+      "node": "PRE_1_03",
+      "km": 214
+    },
+    {
+      "id": "st_PRE_1_06",
+      "th": "Sconosciuto",
+      "node": "PRE_1_06",
+      "km": 228
+    },
+    {
+      "id": "st_PRE_1_07",
+      "th": "Sconosciuto",
+      "node": "PRE_1_07",
+      "km": 242
+    },
+    {
+      "id": "st_ELE_riparazione_01",
+      "th": "Elena",
+      "node": "ELE_riparazione_01",
+      "km": 270,
+      "req": [
+        "flag:elena_scuse"
+      ]
+    },
+    {
+      "id": "st_ROS_ricontrollo_01",
+      "th": "Rosa",
+      "node": "ROS_ricontrollo_01",
+      "km": 284,
+      "req": [
+        "flag:rosa_sosta_accettata"
+      ]
+    },
+    {
+      "id": "st_LIV_primo_01",
+      "th": "Livia",
+      "node": "LIV_primo_01",
+      "km": 298
+    },
+    {
+      "id": "st_ROS_passato_01",
+      "th": "Rosa",
+      "node": "ROS_passato_01",
+      "km": 312
+    },
+    {
+      "id": "st_LIV_affido_01",
+      "th": "Livia",
+      "node": "LIV_affido_01",
+      "km": 326
+    },
+    {
+      "id": "st_ROS_promessa_01",
+      "th": "Rosa",
+      "node": "ROS_promessa_01",
+      "km": 340,
+      "req": [
+        "flag:promessa_rosa"
+      ]
+    },
+    {
+      "id": "st_LIV_ottavio_01",
+      "th": "Livia",
+      "node": "LIV_ottavio_01",
+      "km": 354
+    },
+    {
+      "id": "st_ROS_dopo_passaggio_01",
+      "th": "Rosa",
+      "node": "ROS_dopo_passaggio_01",
+      "km": 354,
+      "req": [
+        "flag:ev_incursione_1_conclusa"
+      ]
+    },
+    {
+      "id": "st_ELE_nonno_01",
+      "th": "Elena",
+      "node": "ELE_nonno_01",
+      "km": 430
+    },
+    {
+      "id": "st_ROS_segni_01",
+      "th": "Rosa",
+      "node": "ROS_segni_01",
+      "km": 430,
+      "req": [
+        "flag:ev_indizio_sangue"
+      ]
+    },
+    {
+      "id": "st_LIV_fiducia_01",
+      "th": "Livia",
+      "node": "LIV_fiducia_01",
+      "km": 444,
+      "req": [
+        "flag:prova_trattenuta"
+      ]
+    },
+    {
+      "id": "st_SPORCO_01",
+      "th": "Elena",
+      "node": "SPORCO_01",
+      "km": 458,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_LIV_irene_01",
+      "th": "Livia",
+      "node": "LIV_irene_01",
+      "km": 458,
+      "req": [
+        "flag:ev_foto_originale"
+      ]
+    },
+    {
+      "id": "st_SPORCO_02",
+      "th": "Elena",
+      "node": "SPORCO_02",
+      "km": 472,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_SPORCO_03",
+      "th": "Elena",
+      "node": "SPORCO_03",
+      "km": 486,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_SPORCO_04",
+      "th": "Elena",
+      "node": "SPORCO_04",
+      "km": 500,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_SPORCO_05",
+      "th": "Elena",
+      "node": "SPORCO_05",
+      "km": 514,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_SPORCO_06",
+      "th": "Elena",
+      "node": "SPORCO_06",
+      "km": 528,
+      "req": [
+        "flag:nonno_uso_fissato"
+      ]
+    },
+    {
+      "id": "st_PRE_2_01",
+      "th": "Elena",
+      "node": "PRE_2_01",
+      "km": 542
+    },
+    {
+      "id": "st_PRE_2_02",
+      "th": "Elena",
+      "node": "PRE_2_02",
+      "km": 556
+    },
+    {
+      "id": "st_PRE_2_03",
+      "th": "Elena",
+      "node": "PRE_2_03",
+      "km": 570
+    },
+    {
+      "id": "st_PRE_2_06",
+      "th": "Elena",
+      "node": "PRE_2_06",
+      "km": 584
+    },
+    {
+      "id": "st_PRE_2_07",
+      "th": "Elena",
+      "node": "PRE_2_07",
+      "km": 598
+    },
+    {
+      "id": "st_PRE_3_01",
+      "th": "Zio Claudio",
+      "node": "PRE_3_01",
+      "km": 612
+    },
+    {
+      "id": "st_PRE_3_02",
+      "th": "Zio Claudio",
+      "node": "PRE_3_02",
+      "km": 626
+    },
+    {
+      "id": "st_PRE_3_03",
+      "th": "Zio Claudio",
+      "node": "PRE_3_03",
+      "km": 640
+    },
+    {
+      "id": "st_PRE_3_06",
+      "th": "Zio Claudio",
+      "node": "PRE_3_06",
+      "km": 654
+    },
+    {
+      "id": "st_PRE_3_07",
+      "th": "Zio Claudio",
+      "node": "PRE_3_07",
+      "km": 668
+    },
+    {
+      "id": "st_ELE_cena_ritorno_01",
+      "th": "Elena",
+      "node": "ELE_cena_ritorno_01",
+      "km": 668,
+      "req": [
+        "flag:elena_non_aspettare",
+        "flag:ev_fase_v"
+      ]
+    },
+    {
+      "id": "st_ROS_recupero_01",
+      "th": "Rosa",
+      "node": "ROS_recupero_01",
+      "km": 668,
+      "req": [
+        "flag:promessa_rosa_chiarita",
+        "flag:ev_fase_v"
+      ]
+    },
+    {
+      "id": "st_LIV_promessa_01",
+      "th": "Livia",
+      "node": "LIV_promessa_01",
+      "km": 668,
+      "req": [
+        "flag:promessa_rosa_chiarita",
+        "flag:ev_fase_v"
+      ]
+    },
+    {
+      "id": "st_PRE_4_01",
+      "th": "Sconosciuto",
+      "node": "PRE_4_01",
+      "km": 668,
+      "req": [
+        "flag:ev_presenza_scoperta"
+      ]
+    },
+    {
+      "id": "st_ROS_guardia_01",
+      "th": "Rosa",
+      "node": "ROS_guardia_01",
+      "km": 668,
+      "req": [
+        "flag:ev_fase_v"
+      ]
+    },
+    {
+      "id": "st_PRE_4_02",
+      "th": "Sconosciuto",
+      "node": "PRE_4_02",
+      "km": 668,
+      "req": [
+        "flag:ev_presenza_scoperta"
+      ]
+    },
+    {
+      "id": "st_ROS_prima_porta_01",
+      "th": "Rosa",
+      "node": "ROS_prima_porta_01",
+      "km": 668,
+      "req": [
+        "flag:promessa_rosa",
+        "flag:ev_fase_v"
+      ]
+    },
+    {
+      "id": "st_PRE_4_03",
+      "th": "Sconosciuto",
+      "node": "PRE_4_03",
+      "km": 668,
+      "req": [
+        "flag:ev_presenza_scoperta"
+      ]
+    },
+    {
+      "id": "st_PRE_4_06",
+      "th": "Sconosciuto",
+      "node": "PRE_4_06",
+      "km": 668,
+      "req": [
+        "flag:ev_presenza_scoperta"
+      ]
+    },
+    {
+      "id": "st_PRE_4_07",
+      "th": "Sconosciuto",
+      "node": "PRE_4_07",
+      "km": 668,
+      "req": [
+        "flag:ev_presenza_scoperta"
+      ]
+    }
+  ],
+  "confidenza_solo_unlock": [
+    {
+      "entry": "V2_ELE_s25_01",
+      "nodes": [
+        "V2_ELE_s25_01",
+        "V2_ELE_s25_02",
+        "V2_ELE_s25_03",
+        "V2_ELE_s25_04",
+        "V2_ELE_s25_05",
+        "V2_ELE_s25_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ELE_s50_01",
+      "nodes": [
+        "V2_ELE_s50_01",
+        "V2_ELE_s50_02",
+        "V2_ELE_s50_03",
+        "V2_ELE_s50_04",
+        "V2_ELE_s50_05",
+        "V2_ELE_s50_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ELE_s75_01",
+      "nodes": [
+        "V2_ELE_s75_01",
+        "V2_ELE_s75_02",
+        "V2_ELE_s75_03",
+        "V2_ELE_s75_04",
+        "V2_ELE_s75_05",
+        "V2_ELE_s75_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ELE_s100_01",
+      "nodes": [
+        "V2_ELE_s100_01",
+        "V2_ELE_s100_02",
+        "V2_ELE_s100_03",
+        "V2_ELE_s100_04",
+        "V2_ELE_s100_05",
+        "V2_ELE_s100_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ROS_s25_01",
+      "nodes": [
+        "V2_ROS_s25_01",
+        "V2_ROS_s25_02",
+        "V2_ROS_s25_03",
+        "V2_ROS_s25_04",
+        "V2_ROS_s25_05",
+        "V2_ROS_s25_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ROS_s50_01",
+      "nodes": [
+        "V2_ROS_s50_01",
+        "V2_ROS_s50_02",
+        "V2_ROS_s50_03",
+        "V2_ROS_s50_04",
+        "V2_ROS_s50_05",
+        "V2_ROS_s50_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ROS_s75_01",
+      "nodes": [
+        "V2_ROS_s75_01",
+        "V2_ROS_s75_02",
+        "V2_ROS_s75_03",
+        "V2_ROS_s75_04",
+        "V2_ROS_s75_05",
+        "V2_ROS_s75_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_ROS_s100_01",
+      "nodes": [
+        "V2_ROS_s100_01",
+        "V2_ROS_s100_02",
+        "V2_ROS_s100_03",
+        "V2_ROS_s100_04",
+        "V2_ROS_s100_05",
+        "V2_ROS_s100_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_LIV_s25_01",
+      "nodes": [
+        "V2_LIV_s25_01",
+        "V2_LIV_s25_02",
+        "V2_LIV_s25_03",
+        "V2_LIV_s25_04",
+        "V2_LIV_s25_05",
+        "V2_LIV_s25_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_LIV_s50_01",
+      "nodes": [
+        "V2_LIV_s50_01",
+        "V2_LIV_s50_02",
+        "V2_LIV_s50_03",
+        "V2_LIV_s50_04",
+        "V2_LIV_s50_05",
+        "V2_LIV_s50_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_LIV_s75_01",
+      "nodes": [
+        "V2_LIV_s75_01",
+        "V2_LIV_s75_02",
+        "V2_LIV_s75_03",
+        "V2_LIV_s75_04",
+        "V2_LIV_s75_05",
+        "V2_LIV_s75_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_LIV_s100_01",
+      "nodes": [
+        "V2_LIV_s100_01",
+        "V2_LIV_s100_02",
+        "V2_LIV_s100_03",
+        "V2_LIV_s100_04",
+        "V2_LIV_s100_05",
+        "V2_LIV_s100_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_PRE_s25_01",
+      "nodes": [
+        "V2_PRE_s25_01",
+        "V2_PRE_s25_02",
+        "V2_PRE_s25_03",
+        "V2_PRE_s25_04",
+        "V2_PRE_s25_05",
+        "V2_PRE_s25_06"
+      ],
+      "kind": "dialogo",
+      "who": "Sconosciuto",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_PRE_s50_01",
+      "nodes": [
+        "V2_PRE_s50_01",
+        "V2_PRE_s50_02",
+        "V2_PRE_s50_03",
+        "V2_PRE_s50_04",
+        "V2_PRE_s50_05",
+        "V2_PRE_s50_06"
+      ],
+      "kind": "dialogo",
+      "who": "Sconosciuto",
+      "trigger": "UNLOCK; una volta sola"
+    },
+    {
+      "entry": "V2_PRE_s75_01",
+      "nodes": [
+        "V2_PRE_s75_01",
+        "V2_PRE_s75_02",
+        "V2_PRE_s75_03",
+        "V2_PRE_s75_04",
+        "V2_PRE_s75_05",
+        "V2_PRE_s75_06"
+      ],
+      "kind": "dialogo",
+      "who": "Sconosciuto",
+      "trigger": "UNLOCK; una volta sola"
+    }
+  ],
+  "T9_da_accodare_una_volta": [
+    {
+      "entry": "V2_ELE_n1_01",
+      "nodes": [
+        "V2_ELE_n1_01",
+        "V2_ELE_n1_02",
+        "V2_ELE_n1_03",
+        "V2_ELE_n1_04",
+        "V2_ELE_n1_05",
+        "V2_ELE_n1_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:e25",
+      "fase": "I"
+    },
+    {
+      "entry": "V2_ELE_n2_01",
+      "nodes": [
+        "V2_ELE_n2_01",
+        "V2_ELE_n2_02",
+        "V2_ELE_n2_03",
+        "V2_ELE_n2_04",
+        "V2_ELE_n2_05",
+        "V2_ELE_n2_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:e50",
+      "fase": "II"
+    },
+    {
+      "entry": "V2_ELE_n3_01",
+      "nodes": [
+        "V2_ELE_n3_01",
+        "V2_ELE_n3_02",
+        "V2_ELE_n3_03",
+        "V2_ELE_n3_04",
+        "V2_ELE_n3_05",
+        "V2_ELE_n3_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:e01b",
+      "fase": "II"
+    },
+    {
+      "entry": "V2_ELE_n4_01",
+      "nodes": [
+        "V2_ELE_n4_01",
+        "V2_ELE_n4_02",
+        "V2_ELE_n4_03",
+        "V2_ELE_n4_04",
+        "V2_ELE_n4_05",
+        "V2_ELE_n4_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:elena_scuse",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_ELE_n5_01",
+      "nodes": [
+        "V2_ELE_n5_01",
+        "V2_ELE_n5_02",
+        "V2_ELE_n5_03",
+        "V2_ELE_n5_04",
+        "V2_ELE_n5_05",
+        "V2_ELE_n5_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:temperino_detto_elena",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_ELE_n6_01",
+      "nodes": [
+        "V2_ELE_n6_01",
+        "V2_ELE_n6_02",
+        "V2_ELE_n6_03",
+        "V2_ELE_n6_04",
+        "V2_ELE_n6_05",
+        "V2_ELE_n6_06"
+      ],
+      "kind": "dialogo",
+      "who": "Elena",
+      "req": "flag:e08c",
+      "fase": "IV"
+    },
+    {
+      "entry": "V2_ROS_n1_01",
+      "nodes": [
+        "V2_ROS_n1_01",
+        "V2_ROS_n1_02",
+        "V2_ROS_n1_03",
+        "V2_ROS_n1_04",
+        "V2_ROS_n1_05",
+        "V2_ROS_n1_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r25",
+      "fase": "II"
+    },
+    {
+      "entry": "V2_ROS_n2_01",
+      "nodes": [
+        "V2_ROS_n2_01",
+        "V2_ROS_n2_02",
+        "V2_ROS_n2_03",
+        "V2_ROS_n2_04",
+        "V2_ROS_n2_05",
+        "V2_ROS_n2_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r50",
+      "fase": "II"
+    },
+    {
+      "entry": "V2_ROS_n3_01",
+      "nodes": [
+        "V2_ROS_n3_01",
+        "V2_ROS_n3_02",
+        "V2_ROS_n3_03",
+        "V2_ROS_n3_04",
+        "V2_ROS_n3_05",
+        "V2_ROS_n3_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r75",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_ROS_n4_01",
+      "nodes": [
+        "V2_ROS_n4_01",
+        "V2_ROS_n4_02",
+        "V2_ROS_n4_03",
+        "V2_ROS_n4_04",
+        "V2_ROS_n4_05",
+        "V2_ROS_n4_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r01b",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_ROS_n5_01",
+      "nodes": [
+        "V2_ROS_n5_01",
+        "V2_ROS_n5_02",
+        "V2_ROS_n5_03",
+        "V2_ROS_n5_04",
+        "V2_ROS_n5_05",
+        "V2_ROS_n5_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r05c",
+      "fase": "V"
+    },
+    {
+      "entry": "V2_ROS_n6_01",
+      "nodes": [
+        "V2_ROS_n6_01",
+        "V2_ROS_n6_02",
+        "V2_ROS_n6_03",
+        "V2_ROS_n6_04",
+        "V2_ROS_n6_05",
+        "V2_ROS_n6_06"
+      ],
+      "kind": "dialogo",
+      "who": "Rosa",
+      "req": "flag:r100",
+      "fase": "V"
+    },
+    {
+      "entry": "V2_LIV_n1_01",
+      "nodes": [
+        "V2_LIV_n1_01",
+        "V2_LIV_n1_02",
+        "V2_LIV_n1_03",
+        "V2_LIV_n1_04",
+        "V2_LIV_n1_05",
+        "V2_LIV_n1_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:l25",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_LIV_n2_01",
+      "nodes": [
+        "V2_LIV_n2_01",
+        "V2_LIV_n2_02",
+        "V2_LIV_n2_03",
+        "V2_LIV_n2_04",
+        "V2_LIV_n2_05",
+        "V2_LIV_n2_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:l50",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_LIV_n3_01",
+      "nodes": [
+        "V2_LIV_n3_01",
+        "V2_LIV_n3_02",
+        "V2_LIV_n3_03",
+        "V2_LIV_n3_04",
+        "V2_LIV_n3_05",
+        "V2_LIV_n3_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:l75",
+      "fase": "III"
+    },
+    {
+      "entry": "V2_LIV_n4_01",
+      "nodes": [
+        "V2_LIV_n4_01",
+        "V2_LIV_n4_02",
+        "V2_LIV_n4_03",
+        "V2_LIV_n4_04",
+        "V2_LIV_n4_05",
+        "V2_LIV_n4_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:l02c",
+      "fase": "IV"
+    },
+    {
+      "entry": "V2_LIV_n5_01",
+      "nodes": [
+        "V2_LIV_n5_01",
+        "V2_LIV_n5_02",
+        "V2_LIV_n5_03",
+        "V2_LIV_n5_04",
+        "V2_LIV_n5_05",
+        "V2_LIV_n5_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:foto",
+      "fase": "IV"
+    },
+    {
+      "entry": "V2_LIV_n6_01",
+      "nodes": [
+        "V2_LIV_n6_01",
+        "V2_LIV_n6_02",
+        "V2_LIV_n6_03",
+        "V2_LIV_n6_04",
+        "V2_LIV_n6_05",
+        "V2_LIV_n6_06"
+      ],
+      "kind": "dialogo",
+      "who": "Livia",
+      "req": "flag:l100",
+      "fase": "V"
+    }
+  ],
+  "luoghi": [
+    {
+      "entry": "V2_LUOGO_tokyo_01",
+      "req": "luogo_tokyo",
+      "fase": "I",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_roma_01",
+      "req": "luogo_roma",
+      "fase": "I",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_parigi_01",
+      "req": "luogo_parigi",
+      "fase": "II",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_londra_01",
+      "req": "luogo_londra",
+      "fase": "III",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_stoccolma_01",
+      "req": "luogo_stoccolma",
+      "fase": "III",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_berlino_01",
+      "req": "luogo_berlino",
+      "fase": "III",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_praga_01",
+      "req": "luogo_praga",
+      "fase": "III",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_vienna_01",
+      "req": "luogo_vienna",
+      "fase": "III",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_madrid_01",
+      "req": "luogo_madrid",
+      "fase": "IV",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_lisbona_01",
+      "req": "luogo_lisbona",
+      "fase": "IV",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_atene_01",
+      "req": "luogo_atene",
+      "fase": "V",
+      "una_volta": true
+    },
+    {
+      "entry": "V2_LUOGO_washington_01",
+      "req": "luogo_washington",
+      "fase": "V",
+      "una_volta": true
+    }
+  ],
+  "ingressi_manuali": [
+    {
+      "entry": "V2_CASA_01",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_01_M1",
+        "V2_CASA_01_M2",
+        "V2_CASA_01_M3",
+        "V2_CASA_01_M4",
+        "V2_CASA_01_M5",
+        "V2_CASA_01_M6",
+        "V2_CASA_01",
+        "V2_CASA_01_fine",
+        "V2_CASA_01_Q1_M1",
+        "V2_CASA_01_Q2_M2",
+        "V2_CASA_01_Q1_M3",
+        "V2_CASA_01_Q2_M3",
+        "V2_CASA_01_Q3_M4",
+        "V2_CASA_01_Q1_M5",
+        "V2_CASA_01_Q3_M5",
+        "V2_CASA_01_Q2_M6",
+        "V2_CASA_01_Q3_M6",
+        "V2_CASA_01_Q1_M7",
+        "V2_CASA_01_Q2_M7",
+        "V2_CASA_01_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_01_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_01_P_M1",
+        "V2_CASA_01_P_M2",
+        "V2_CASA_01_P_M3",
+        "V2_CASA_01_P_M4",
+        "V2_CASA_01_P_M5",
+        "V2_CASA_01_P_M6",
+        "V2_CASA_01_P",
+        "V2_CASA_01_P_fine",
+        "V2_CASA_01_P_Q1_M1",
+        "V2_CASA_01_P_Q2_M2",
+        "V2_CASA_01_P_Q1_M3",
+        "V2_CASA_01_P_Q2_M3",
+        "V2_CASA_01_P_Q3_M4",
+        "V2_CASA_01_P_Q1_M5",
+        "V2_CASA_01_P_Q3_M5",
+        "V2_CASA_01_P_Q2_M6",
+        "V2_CASA_01_P_Q3_M6",
+        "V2_CASA_01_P_Q1_M7",
+        "V2_CASA_01_P_Q2_M7",
+        "V2_CASA_01_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_02",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_02_M1",
+        "V2_CASA_02_M2",
+        "V2_CASA_02_M3",
+        "V2_CASA_02_M4",
+        "V2_CASA_02_M5",
+        "V2_CASA_02_M6",
+        "V2_CASA_02",
+        "V2_CASA_02_fine",
+        "V2_CASA_02_Q1_M1",
+        "V2_CASA_02_Q2_M2",
+        "V2_CASA_02_Q1_M3",
+        "V2_CASA_02_Q2_M3",
+        "V2_CASA_02_Q3_M4",
+        "V2_CASA_02_Q1_M5",
+        "V2_CASA_02_Q3_M5",
+        "V2_CASA_02_Q2_M6",
+        "V2_CASA_02_Q3_M6",
+        "V2_CASA_02_Q1_M7",
+        "V2_CASA_02_Q2_M7",
+        "V2_CASA_02_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_02_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_02_P_M1",
+        "V2_CASA_02_P_M2",
+        "V2_CASA_02_P_M3",
+        "V2_CASA_02_P_M4",
+        "V2_CASA_02_P_M5",
+        "V2_CASA_02_P_M6",
+        "V2_CASA_02_P",
+        "V2_CASA_02_P_fine",
+        "V2_CASA_02_P_Q1_M1",
+        "V2_CASA_02_P_Q2_M2",
+        "V2_CASA_02_P_Q1_M3",
+        "V2_CASA_02_P_Q2_M3",
+        "V2_CASA_02_P_Q3_M4",
+        "V2_CASA_02_P_Q1_M5",
+        "V2_CASA_02_P_Q3_M5",
+        "V2_CASA_02_P_Q2_M6",
+        "V2_CASA_02_P_Q3_M6",
+        "V2_CASA_02_P_Q1_M7",
+        "V2_CASA_02_P_Q2_M7",
+        "V2_CASA_02_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_03",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_03_M1",
+        "V2_CASA_03_M2",
+        "V2_CASA_03_M3",
+        "V2_CASA_03_M4",
+        "V2_CASA_03_M5",
+        "V2_CASA_03_M6",
+        "V2_CASA_03",
+        "V2_CASA_03_fine",
+        "V2_CASA_03_Q1_M1",
+        "V2_CASA_03_Q2_M2",
+        "V2_CASA_03_Q1_M3",
+        "V2_CASA_03_Q2_M3",
+        "V2_CASA_03_Q3_M4",
+        "V2_CASA_03_Q1_M5",
+        "V2_CASA_03_Q3_M5",
+        "V2_CASA_03_Q2_M6",
+        "V2_CASA_03_Q3_M6",
+        "V2_CASA_03_Q1_M7",
+        "V2_CASA_03_Q2_M7",
+        "V2_CASA_03_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_03_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_03_P_M1",
+        "V2_CASA_03_P_M2",
+        "V2_CASA_03_P_M3",
+        "V2_CASA_03_P_M4",
+        "V2_CASA_03_P_M5",
+        "V2_CASA_03_P_M6",
+        "V2_CASA_03_P",
+        "V2_CASA_03_P_fine",
+        "V2_CASA_03_P_Q1_M1",
+        "V2_CASA_03_P_Q2_M2",
+        "V2_CASA_03_P_Q1_M3",
+        "V2_CASA_03_P_Q2_M3",
+        "V2_CASA_03_P_Q3_M4",
+        "V2_CASA_03_P_Q1_M5",
+        "V2_CASA_03_P_Q3_M5",
+        "V2_CASA_03_P_Q2_M6",
+        "V2_CASA_03_P_Q3_M6",
+        "V2_CASA_03_P_Q1_M7",
+        "V2_CASA_03_P_Q2_M7",
+        "V2_CASA_03_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_04",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_04_M1",
+        "V2_CASA_04_M2",
+        "V2_CASA_04_M3",
+        "V2_CASA_04_M4",
+        "V2_CASA_04_M5",
+        "V2_CASA_04_M6",
+        "V2_CASA_04",
+        "V2_CASA_04_fine",
+        "V2_CASA_04_Q1_M1",
+        "V2_CASA_04_Q2_M2",
+        "V2_CASA_04_Q1_M3",
+        "V2_CASA_04_Q2_M3",
+        "V2_CASA_04_Q3_M4",
+        "V2_CASA_04_Q1_M5",
+        "V2_CASA_04_Q3_M5",
+        "V2_CASA_04_Q2_M6",
+        "V2_CASA_04_Q3_M6",
+        "V2_CASA_04_Q1_M7",
+        "V2_CASA_04_Q2_M7",
+        "V2_CASA_04_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_04_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_04_P_M1",
+        "V2_CASA_04_P_M2",
+        "V2_CASA_04_P_M3",
+        "V2_CASA_04_P_M4",
+        "V2_CASA_04_P_M5",
+        "V2_CASA_04_P_M6",
+        "V2_CASA_04_P",
+        "V2_CASA_04_P_fine",
+        "V2_CASA_04_P_Q1_M1",
+        "V2_CASA_04_P_Q2_M2",
+        "V2_CASA_04_P_Q1_M3",
+        "V2_CASA_04_P_Q2_M3",
+        "V2_CASA_04_P_Q3_M4",
+        "V2_CASA_04_P_Q1_M5",
+        "V2_CASA_04_P_Q3_M5",
+        "V2_CASA_04_P_Q2_M6",
+        "V2_CASA_04_P_Q3_M6",
+        "V2_CASA_04_P_Q1_M7",
+        "V2_CASA_04_P_Q2_M7",
+        "V2_CASA_04_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_05",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_05_M1",
+        "V2_CASA_05_M2",
+        "V2_CASA_05_M3",
+        "V2_CASA_05_M4",
+        "V2_CASA_05_M5",
+        "V2_CASA_05_M6",
+        "V2_CASA_05",
+        "V2_CASA_05_fine",
+        "V2_CASA_05_Q1_M1",
+        "V2_CASA_05_Q2_M2",
+        "V2_CASA_05_Q1_M3",
+        "V2_CASA_05_Q2_M3",
+        "V2_CASA_05_Q3_M4",
+        "V2_CASA_05_Q1_M5",
+        "V2_CASA_05_Q3_M5",
+        "V2_CASA_05_Q2_M6",
+        "V2_CASA_05_Q3_M6",
+        "V2_CASA_05_Q1_M7",
+        "V2_CASA_05_Q2_M7",
+        "V2_CASA_05_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_05_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_05_P_M1",
+        "V2_CASA_05_P_M2",
+        "V2_CASA_05_P_M3",
+        "V2_CASA_05_P_M4",
+        "V2_CASA_05_P_M5",
+        "V2_CASA_05_P_M6",
+        "V2_CASA_05_P",
+        "V2_CASA_05_P_fine",
+        "V2_CASA_05_P_Q1_M1",
+        "V2_CASA_05_P_Q2_M2",
+        "V2_CASA_05_P_Q1_M3",
+        "V2_CASA_05_P_Q2_M3",
+        "V2_CASA_05_P_Q3_M4",
+        "V2_CASA_05_P_Q1_M5",
+        "V2_CASA_05_P_Q3_M5",
+        "V2_CASA_05_P_Q2_M6",
+        "V2_CASA_05_P_Q3_M6",
+        "V2_CASA_05_P_Q1_M7",
+        "V2_CASA_05_P_Q2_M7",
+        "V2_CASA_05_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_06",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_06_M1",
+        "V2_CASA_06_M2",
+        "V2_CASA_06_M3",
+        "V2_CASA_06_M4",
+        "V2_CASA_06_M5",
+        "V2_CASA_06_M6",
+        "V2_CASA_06",
+        "V2_CASA_06_fine",
+        "V2_CASA_06_Q1_M1",
+        "V2_CASA_06_Q2_M2",
+        "V2_CASA_06_Q1_M3",
+        "V2_CASA_06_Q2_M3",
+        "V2_CASA_06_Q3_M4",
+        "V2_CASA_06_Q1_M5",
+        "V2_CASA_06_Q3_M5",
+        "V2_CASA_06_Q2_M6",
+        "V2_CASA_06_Q3_M6",
+        "V2_CASA_06_Q1_M7",
+        "V2_CASA_06_Q2_M7",
+        "V2_CASA_06_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_06_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_06_P_M1",
+        "V2_CASA_06_P_M2",
+        "V2_CASA_06_P_M3",
+        "V2_CASA_06_P_M4",
+        "V2_CASA_06_P_M5",
+        "V2_CASA_06_P_M6",
+        "V2_CASA_06_P",
+        "V2_CASA_06_P_fine",
+        "V2_CASA_06_P_Q1_M1",
+        "V2_CASA_06_P_Q2_M2",
+        "V2_CASA_06_P_Q1_M3",
+        "V2_CASA_06_P_Q2_M3",
+        "V2_CASA_06_P_Q3_M4",
+        "V2_CASA_06_P_Q1_M5",
+        "V2_CASA_06_P_Q3_M5",
+        "V2_CASA_06_P_Q2_M6",
+        "V2_CASA_06_P_Q3_M6",
+        "V2_CASA_06_P_Q1_M7",
+        "V2_CASA_06_P_Q2_M7",
+        "V2_CASA_06_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_07",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_07_M1",
+        "V2_CASA_07_M2",
+        "V2_CASA_07_M3",
+        "V2_CASA_07_M4",
+        "V2_CASA_07_M5",
+        "V2_CASA_07_M6",
+        "V2_CASA_07",
+        "V2_CASA_07_fine",
+        "V2_CASA_07_Q1_M1",
+        "V2_CASA_07_Q2_M2",
+        "V2_CASA_07_Q1_M3",
+        "V2_CASA_07_Q2_M3",
+        "V2_CASA_07_Q3_M4",
+        "V2_CASA_07_Q1_M5",
+        "V2_CASA_07_Q3_M5",
+        "V2_CASA_07_Q2_M6",
+        "V2_CASA_07_Q3_M6",
+        "V2_CASA_07_Q1_M7",
+        "V2_CASA_07_Q2_M7",
+        "V2_CASA_07_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_07_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_07_P_M1",
+        "V2_CASA_07_P_M2",
+        "V2_CASA_07_P_M3",
+        "V2_CASA_07_P_M4",
+        "V2_CASA_07_P_M5",
+        "V2_CASA_07_P_M6",
+        "V2_CASA_07_P",
+        "V2_CASA_07_P_fine",
+        "V2_CASA_07_P_Q1_M1",
+        "V2_CASA_07_P_Q2_M2",
+        "V2_CASA_07_P_Q1_M3",
+        "V2_CASA_07_P_Q2_M3",
+        "V2_CASA_07_P_Q3_M4",
+        "V2_CASA_07_P_Q1_M5",
+        "V2_CASA_07_P_Q3_M5",
+        "V2_CASA_07_P_Q2_M6",
+        "V2_CASA_07_P_Q3_M6",
+        "V2_CASA_07_P_Q1_M7",
+        "V2_CASA_07_P_Q2_M7",
+        "V2_CASA_07_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_08",
+      "kind": "casa",
+      "who": "Elena",
+      "nodes": [
+        "V2_CASA_08_M1",
+        "V2_CASA_08_M2",
+        "V2_CASA_08_M3",
+        "V2_CASA_08_M4",
+        "V2_CASA_08_M5",
+        "V2_CASA_08_M6",
+        "V2_CASA_08",
+        "V2_CASA_08_fine",
+        "V2_CASA_08_Q1_M1",
+        "V2_CASA_08_Q2_M2",
+        "V2_CASA_08_Q1_M3",
+        "V2_CASA_08_Q2_M3",
+        "V2_CASA_08_Q3_M4",
+        "V2_CASA_08_Q1_M5",
+        "V2_CASA_08_Q3_M5",
+        "V2_CASA_08_Q2_M6",
+        "V2_CASA_08_Q3_M6",
+        "V2_CASA_08_Q1_M7",
+        "V2_CASA_08_Q2_M7",
+        "V2_CASA_08_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_CASA_08_P",
+      "kind": "casa",
+      "who": "Sconosciuto",
+      "nodes": [
+        "V2_CASA_08_P_M1",
+        "V2_CASA_08_P_M2",
+        "V2_CASA_08_P_M3",
+        "V2_CASA_08_P_M4",
+        "V2_CASA_08_P_M5",
+        "V2_CASA_08_P_M6",
+        "V2_CASA_08_P",
+        "V2_CASA_08_P_fine",
+        "V2_CASA_08_P_Q1_M1",
+        "V2_CASA_08_P_Q2_M2",
+        "V2_CASA_08_P_Q1_M3",
+        "V2_CASA_08_P_Q2_M3",
+        "V2_CASA_08_P_Q3_M4",
+        "V2_CASA_08_P_Q1_M5",
+        "V2_CASA_08_P_Q3_M5",
+        "V2_CASA_08_P_Q2_M6",
+        "V2_CASA_08_P_Q3_M6",
+        "V2_CASA_08_P_Q1_M7",
+        "V2_CASA_08_P_Q2_M7",
+        "V2_CASA_08_P_Q3_M7"
+      ]
+    },
+    {
+      "entry": "V2_VICINO_01",
+      "kind": "scena",
+      "who": "Elena",
+      "nodes": [
+        "V2_VICINO_01",
+        "V2_VICINO_02",
+        "V2_VICINO_03",
+        "V2_VICINO_04",
+        "V2_VICINO_05",
+        "V2_VICINO_06"
+      ]
+    },
+    {
+      "entry": "V2_MARCO_costo_01",
+      "nodes": [
+        "V2_MARCO_costo_01",
+        "V2_MARCO_costo_02",
+        "V2_MARCO_costo_03",
+        "V2_MARCO_costo_04",
+        "V2_MARCO_costo_05",
+        "V2_MARCO_costo_06"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_FAL_1_01",
+      "nodes": [
+        "V2_FAL_1_01",
+        "V2_FAL_1_02",
+        "V2_FAL_1_03",
+        "V2_FAL_1_04"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_FAL_2_01",
+      "nodes": [
+        "V2_FAL_2_01",
+        "V2_FAL_2_02",
+        "V2_FAL_2_03",
+        "V2_FAL_2_04"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_FAL_3_01",
+      "nodes": [
+        "V2_FAL_3_01",
+        "V2_FAL_3_02",
+        "V2_FAL_3_03",
+        "V2_FAL_3_04"
+      ],
+      "kind": "scena",
+      "who": "Livia"
+    },
+    {
+      "entry": "V2_FAL_4_01",
+      "nodes": [
+        "V2_FAL_4_01",
+        "V2_FAL_4_02",
+        "V2_FAL_4_03",
+        "V2_FAL_4_04"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_USCITA_01",
+      "nodes": [
+        "V2_USCITA_01",
+        "V2_USCITA_02",
+        "V2_USCITA_03",
+        "V2_USCITA_04",
+        "V2_USCITA_05",
+        "V2_USCITA_06"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_GUARDIA_01",
+      "nodes": [
+        "V2_GUARDIA_01",
+        "V2_GUARDIA_02",
+        "V2_GUARDIA_03",
+        "V2_GUARDIA_04",
+        "V2_GUARDIA_05",
+        "V2_GUARDIA_06"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    },
+    {
+      "entry": "V2_VARCO_01",
+      "nodes": [
+        "V2_VARCO_01",
+        "V2_VARCO_02",
+        "V2_VARCO_03",
+        "V2_VARCO_04",
+        "V2_VARCO_05",
+        "V2_VARCO_06"
+      ],
+      "kind": "scena",
+      "who": "Rosa"
+    }
+  ],
+  "nessun_altro_start_automatico": true,
+  "flag_regia": [
+    "ev_distanza_impossibile",
+    "ev_fallimento_1",
+    "ev_fallimento_2",
+    "ev_fallimento_3",
+    "ev_fallimento_4",
+    "ev_fase_v",
+    "ev_foto_originale",
+    "ev_indizio_sangue",
+    "ev_marco_carico",
+    "ev_marco_costo",
+    "ev_presenza_scoperta",
+    "ev_prezzo_guardia",
+    "ev_scelta_varco",
+    "ev_uscita_autentica",
+    "ev_verifica_vicino",
+    "vc_richiudibile"
+  ],
+  "canonico": {
+    "patto": [
+      "nessuno",
+      "esplicito",
+      "sospeso",
+      "rifiutato"
+    ],
+    "varco": [
+      "chiuso",
+      "aperto",
+      "richiuso"
+    ],
+    "affidamento": [
+      "fiducia",
+      "interrotto",
+      "riparato"
+    ]
+  },
+  "cutscene": {
+    "B1": [
+      "EPI_B1_01",
+      "EPI_B1_02",
+      "EPI_B1_03",
+      "EPI_B1_04",
+      "EPI_B1_05",
+      "EPI_B1_06",
+      "EPI_B1_07",
+      "EPI_B1_08"
+    ],
+    "B2": [
+      "EPI_B2_01",
+      "EPI_B2_02",
+      "EPI_B2_03",
+      "EPI_B2_04",
+      "EPI_B2_05",
+      "EPI_B2_06",
+      "EPI_B2_07",
+      "EPI_B2_08"
+    ]
+  },
+  "provenienza": {
+    "repository": "Akaoni97/Night_Run",
+    "ramo": "claude/wonderful-knuth-5ohwxa",
+    "lettura": "2026-11-17",
+    "scritture_repository": false
+  }
+}
