@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 87).
+  (ultima versione pubblicata: 88).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -68,6 +68,14 @@ gioco fa, sezione per sezione).
   primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, bronzo per le
   sfide vinte (argento ogni quinta). Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
   Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
+- **Interni** (`interni.js`): entrando in un locale (U) la strada lascia il posto a una scena in pixel art del locale,
+  inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
+  serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
+  suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Traguardi** (`traguardi.js`): 26 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
+  250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
+  al limitatore, 30 km senza danni, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
+  (`caseGrant`). Avviso dorato dall'alto con suono, uno alla volta; app Traguardi nel telefono (installata da sola).
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco
