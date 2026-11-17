@@ -4,6 +4,18 @@
 //  Si aggancia a StreetGame (game.js), caricato dopo viaggio.js.
 // ============================================================================
 
+// categorie delle auto (le usano il Garage e i documenti: una Panda e una M5 non sono nella stessa classe)
+const ST_CAT = {
+  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112'],
+  familiare: ['v40', 'a80', 'a3', 'p308', 'v850', 'taxi'],
+  hot: ['golf', 'p205', 'p206', 'williams', 'r5'],
+  sportiva: ['e30', 'e36', 'e34', 'b2002', 'supra'],
+  lavoro: ['bus', 'van', 'doblo', 'ambulanza', 'polizia'],
+};
+const ST_CAT_NAME = { utilitaria: 'utilitarie', familiare: 'familiari', hot: 'piccole sportive', sportiva: 'sportive', lavoro: 'mezzi da lavoro' };
+const ST_CAT_ONE = { utilitaria: 'un\'utilitaria', familiare: 'una familiare', hot: 'una piccola sportiva', sportiva: 'una sportiva', lavoro: 'un mezzo da lavoro' };
+function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return k; return 'familiare'; }
+
 (function () {
   const P = StreetGame.prototype;
   const kmh = (v) => Math.round(v * 3.6);
@@ -24,7 +36,8 @@
     // mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
     const to = lead.lane > 1 ? lead.lane - 1 : lead.lane + 1;
     lead.to = to; lead.sig = 1.0; lead.yield = 4;
-    this.say(`${(CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto'} davanti mette la freccia e ti fa passare`, 'info');
+    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto';
+    this.say(`${nm} davanti mette la freccia e ti fa passare`, 'info');
     return 'yield';
   };
 
@@ -78,3 +91,4 @@
     if (km > this.nextRoadEvent) { this.nextRoadEvent = km + 7 + Math.random() * 12; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
   };
 })();
+if (typeof window !== 'undefined') Object.assign(window, { ST_CAT, ST_CAT_NAME, ST_CAT_ONE, stCat });

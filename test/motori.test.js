@@ -313,20 +313,20 @@ test('bagagliaio: peso sull\'auto, tanica, kit, consegne', () => {
   assert.equal(game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'pacco')).ok, false);
 });
 
-test('viaggio: primo lavoro, il pacco dal primo locale al successivo paga € 10.000', () => {
+test('viaggio: primo lavoro, il pacco dal primo locale al successivo paga € 3.000', () => {
   const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5);
   game.startTrip();
   const m0 = game.s.money, goal0 = game.vgGoal();
   assert.ok(goal0 && /Ritira/.test(goal0.text), 'all\'inizio l\'obiettivo è ritirare il pacco');
   const o = game.vgOffers(0).find((x) => x.first);
   assert.ok(o, 'la bacheca del primo locale ha il pacco');
-  assert.equal(o.pay, 10000); assert.equal(o.to, 1);
+  assert.equal(o.pay, 3000); assert.equal(o.to, 1);
   assert.ok(!game.vgOffers(1).some((x) => x.first), 'solo al primo locale');
   assert.ok(game.vgTake(o, 0).ok);
   assert.ok(!game.vgTake(o, 0).ok, 'non si prende due volte');
   assert.ok(/Consegna/.test(game.vgGoal().title), 'poi l\'obiettivo è la consegna');
   game.vgArrive(VG.stop(1));
-  assert.equal(game.s.money, m0 + 10000, 'consegnato: + € 10.000');
+  assert.equal(game.s.money, m0 + 3000, 'consegnato: + € 3.000');
   assert.ok(/Prossimo lavoro/.test(game.vgGoal().title), 'primo lavoro finito: l\'obiettivo passa al lavoro dopo');
   assert.ok(!game.vgOffers(0).some((x) => x.first), 'non torna più');
   assert.ok(!game.s.trunk.some((it) => it.first), 'il pacco è sceso');
@@ -377,22 +377,22 @@ test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e 
   let t = take(); assert.ok(t.r.ok); assert.equal(VG.stop(t.o.to).id, 'motel');
   assert.ok(!game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'missione')).ok, 'il lavoro non si butta');
   game.s.crashes = (game.s.crashes || 0) + 2;
-  assert.equal(deliver(), 3000, 'cristalli: due botte = metà paga');
+  assert.equal(deliver(), 1000, 'cristalli: due botte = metà paga');
   // 2. a tempo: in orario paga piena
   t = take(); assert.ok(t.r.ok); assert.ok(game.vgMisState().lim > 30);
-  game.vgMisState().t = game.vgMisState().lim - 1; assert.equal(deliver(), 8000);
+  game.vgMisState().t = game.vgMisState().lim - 1; assert.equal(deliver(), 2800);
   // 3. il signore della valigetta: occupa un posto, troppa velocità abbassa la paga
   t = take(); assert.ok(t.r.ok); assert.equal(game.vgSeats(), 3, 'un posto è del signore');
-  game.vgMisState().over = 10; assert.equal(deliver(), 7200);
+  game.vgMisState().over = 10; assert.equal(deliver(), 2400);
   // 4. la cassa da 240 kg: senza rimorchio non ci sta, col rimorchio sì
   t = take(); assert.ok(!t.r.ok && /rimorchietto/.test(t.r.why));
   game.s.vg.trailer = true; game.s.vg.trailerOn = true;
-  t = take(); assert.ok(t.r.ok, t.r.why); assert.equal(deliver(), 15000);
+  t = take(); assert.ok(t.r.ok, t.r.why); assert.equal(deliver(), 4500);
   // 5. la busta: un pacco semplice, paga piena
-  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 12000);
+  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 4000);
   // 6. la chiave, poi i lavori senza fine
-  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 20000);
-  t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 7000, 'i lavori dopo la catena pagano ancora');
+  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 6500);
+  t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 2500, 'i lavori dopo la catena pagano ancora');
   assert.equal(game.s.vg.misDone, 6);
 });
 

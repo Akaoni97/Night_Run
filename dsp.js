@@ -230,7 +230,7 @@ class EngineDSP {
     else if (e.type === 'clunk') this.clunk = 1;
     else if (e.type === 'click') this.click = 1;
     else if (e.type === 'crash') this.hit(e.I || 0.6, e.kind || 'front');
-    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }
+    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; if (e.hit) this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }   // la lamiera solo nei colpetti contro un'auto
     void T;
   }
 

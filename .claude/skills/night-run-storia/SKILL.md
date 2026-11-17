@@ -31,6 +31,9 @@ psicologico. Il telefono è lo strumento principale. La vecchia storia è stata 
 | App che compaiono | `telefono.js` | `window.telefono.install(id)` / `addApp(...)` |
 | Cartelloni sulla strada | `telefono.js` | `TEL_APP_OFFERS` |
 
+Nei testi si può scrivere `{Auto}` / `{auto}` (l'auto scelta nel garage, con l'articolo: «La Panda», «l'Audi») e
+`{tipo}` («un'utilitaria», «una station wagon»): li sostituisce `vgTesto` in `viaggio.js`.
+
 ## Provare un momento della storia
 Senza guidare per ore: `node strumenti/prova.js km:150 aspetta:3000 foto:momento stato` (skill `night-run-prova`).
 Per un messaggio: `js:telefono.sms('Sconosciuto','...')`. Per un pensiero: `js:g.vgThink('...')`.

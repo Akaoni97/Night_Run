@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 94).
+  (ultima versione pubblicata: 101).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -70,6 +70,27 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Economia (rivista il 17/11/2026)**: prezzi delle auto credibili (nuove: Panda 13.500, Punto 14.000, Corsa 15.500,
+  Clio 17.000, Polo 17.500, 308 25.000, A3 30.000; usate e d'epoca: Audi 80 4.500, 206 GTI 6.500, Golf GTI 15.000, A112
+  14.000, 205 GTI 19.000, Williams 25.000, E36 28.000, M5 32.000, 2002 Turbo 55.000, Supra 65.000, E30 75.000, R5 Turbo
+  95.000). Lavori più bassi (primo € 3.000, catena 2.000-6.500, poi 2.500 + 300 a lavoro fino a 9.000), consegne ×4,
+  passeggeri ~€ 30 + 9-13 al km, autobus € 12 a passeggero; tagliando 120, candele 140, pastiglie 180, gomme da 420,
+  motel 60. Ritmo misurato (40 lavori di fila, strumento in scratchpad non salvato): ~€ 290 netti al km coi lavori più
+  ~€ 30 da consegne e passeggeri; una Panda nuova dopo ~45 km di lavoro, la Supra dopo ~200 (si sblocca al km 260).
+- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
+  Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
+- **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
+  sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`, usate da Garage e documenti; le sfide con gli abbaglianti sono state tolte). Traguardi:
+  Cinque marche, Una per tipo, Il garage dello zio (tappa secondaria: ricomprare le cinque non scelte).
+  Le cinque auto dello zio non scelte nel prologo finiscono in vendita all'Autosalone (scritta «Era nel garage dello zio»).
+- **Testi con l'auto scelta**: `{Auto}`, `{auto}`, `{tipo}` nei testi della storia (pensieri, capitoli, messaggi) diventano
+  «La Panda», «l'Audi», «un'utilitaria»… secondo l'auto ereditata (`game.s.vg.eredita`, `vgTesto` e `VG_AUTO_NOME` in `viaggio.js`).
+- **Tasti, eredità, giunti (17/11/2026)**: tolto il "ta-dum" delle ruote sui giunti dell'asfalto (dava fastidio);
+  i colpetti fanno il rumore di lamiera solo contro un'auto. Pulsante TASTI accanto a MENU e TELEFONO con l'elenco dei
+  comandi e la possibilità di cambiarli (`tasti.js`; sul telefono solo l'icona). All'inizio del primo Viaggio la Volvo
+  ereditata è malconcia (`vgInherit`, `VG_EREDITA` in `viaggio.js`: gomme a 1,45-1,7 bar e consumate, olio, candele e
+  pastiglie da cambiare, sporca, un po' ammaccata, 22 % di benzina). Nel garage del prologo le altre cinque auto sono
+  Panda, Audi 80, Grande Punto, Corsa e Polo (le più vecchie ed economiche). Il giocatore sceglie una delle sei: diventa la sola auto nel garage del Viaggio, malconcia (`onPick` del prologo → `eredita` in `index.html`); saltando il prologo resta la V40.
 - **Interni rifatti in parte (17/11/2026)**: personaggi ridisegnati (testa arrotondata con mascella, tre toni di luce,
   capelli con volume e frangia, occhi col riflesso, naso, labbra, braccia e mani a pixel netti con le dita); insegna BAR
   leggibile (prima era al rovescio), MOTEL/LIBERE dentro la finestra; dalle finestre passano le auto vere del traffico
@@ -198,3 +219,6 @@ Gli strumenti sono in `strumenti/` (Python con Pillow e NumPy):
    limitatore, marce, finale, prezzo, km di sblocco, diesel): coppia, voce del motore, quadro e catalogo dei pezzi
    si costruiscono da lì. Poi aggiungilo a `GAME_TRAFFIC` (velocità tipiche e frequenza) e, se ha posti diversi,
    a `VG_SEATS` in `viaggio.js`. Controlla lo 0-100 con una prova veloce della fisica.
+7. Pulisci i ritagli: `python3 -I strumenti/pulisci_bordi.py img geo.json` (geo.json con `wy`, `wr`, `ax` di ogni sprite,
+   da `CARS[id].sprite`; prima con `--prova`). Toglie i pezzi di gomma e d'ombra rimasti sotto la carrozzeria e chiude i
+   buchi di un pixel nei passaruota, che lasciavano vedere lo sfondo a puntini. Fatto su tutte le 26 auto il 17/11/2026.

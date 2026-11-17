@@ -29,10 +29,11 @@ const PRO_NOTAIO = [
   'Una sola potrà portarsela via stasera. Le altre aspetteranno.',
   'Scelga con calma. Ma non troppa: suo zio diceva che di notte la strada si fa più lunga.',
 ];
-// le sei auto del garage: per ora solo la Volvo si può scegliere. Le altre cinque restano sotto il telo (nomi in arrivo).
+// le sei auto del garage (le più vecchie ed economiche del gioco, disegni del proprietario): il giocatore ne sceglie una,
+// che diventa la sua auto del Viaggio (malconcia: è ferma da anni). Le altre restano nel garage.
 const PRO_AUTO = [
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' },
+  { id: 'panda', nome: 'Fiat Panda', ok: true }, { id: 'a80', nome: 'Audi 80 Avant', ok: true }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
+  { id: 'punto', nome: 'Fiat Grande Punto', ok: true }, { id: 'corsa', nome: 'Opel Corsa', ok: true }, { id: 'polo', nome: 'Volkswagen Polo', ok: true },
 ];
 // si gioca il prologo solo all'inizio di un Viaggio nuovo (km 0, mai visto)
 const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 0) < 50);
@@ -48,6 +49,9 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   const load = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(i); i.src = src; });
   async function prepare() {
     if (IMG.ready) return;
+    await Promise.all(PRO_AUTO.filter((a) => a.id !== 'v40' && typeof CARS !== 'undefined' && CARS[a.id] && CARS[a.id].sprite).map(async (a) => {
+      const [b, w] = await Promise.all([load(`img/${a.id}.png`), load(`img/${a.id}_wheel.png`)]); IMG['car_' + a.id] = { b, w, D: CARS[a.id].sprite };
+    }));
     const [body, wheel, mask, v40] = await Promise.all([load('img/e36.png'), load('img/e36_wheel.png'), load('img/e36_paint.png'), load('img/v40.png')]);
     const c = document.createElement('canvas'); c.width = E36.w; c.height = E36.h; const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(body, 0, 0);
     if (mask.width) {
@@ -169,8 +173,9 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     if (gx > -260 && gx < W + 20) { R(g, gx, 60, 240, 84, '#0b4a2a'); R(g, gx + 3, 63, 234, 78, '#0e5c34'); R(g, gx - 8, 60, 6, 220, '#2a2a33'); R(g, gx + 242, 60, 6, 220, '#2a2a33'); banner(g, 'AUTOSTRADA', gx + 120, 94, '#f2f2e6', 18); banner(g, 'SOLO AVANTI', gx + 120, 122, '#f2f2e6', 18); glow(g, gx + 120, 110, 160, 'rgba(160,255,200,A)', 0.12); }
     const vx = t < 3 ? lerp(-260, 130, ease(t / 3)) : 130 + Math.sin(t * 2) * 1.5, vy = 232 + (t < 3 ? 0 : Math.sin(t * 9) * 0.6);
     glow(g, vx + 100, 322, 120, 'rgba(0,0,0,A)', 0.5);
-    beam(g, vx + 196, 288, 240, 0.4); g.drawImage(IMG.v40, Math.round(vx), Math.round(vy)); R(g, vx + 2, 258, 4, 3, '#ff3a2a');
-    glow(g, vx + 198, 289, 50, 'rgba(255,240,190,A)', 0.4);
+    const fx = IMG.drive ? IMG.drive.width - 4 : 196;
+    beam(g, vx + fx, 288, 240, 0.4); if (IMG.drive) g.drawImage(IMG.drive, Math.round(vx), Math.round(vy + IMG.driveDy)); else g.drawImage(IMG.v40, Math.round(vx), Math.round(vy)); R(g, vx + 2, 258, 4, 3, '#ff3a2a');
+    glow(g, vx + fx + 2, 289, 50, 'rgba(255,240,190,A)', 0.4);
     const fade = clamp((t - 9.5) / 1.5, 0, 1); if (fade > 0) { R(g, 0, 0, W, H, `rgba(0,0,0,${fade})`); if (t > 10.5) { g.globalAlpha = clamp((t - 10.5) / 1, 0, 1); g.font = '44px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#f0e6d2'; g.textAlign = 'center'; g.fillText('NIGHT RUN', W / 2, 190); g.font = '12px "Share Tech Mono", monospace'; g.fillStyle = '#ffb347'; g.fillText('km 0', W / 2, 216); g.textAlign = 'left'; g.globalAlpha = 1; } }
   } };
   const ORDER = ['lettera', 'arrivo', 'studio', 'garage', 'strada'];
@@ -223,9 +228,25 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     clearUI(); lineI = n;
     const d = el('<div class="dlg"><h4>Il notaio</h4><p></p></div>'); root.appendChild(d); type(d.querySelector('p'), PRO_NOTAIO[n], () => hint(n < PRO_NOTAIO.length - 1 ? 'CLIC PER CONTINUARE' : 'CLIC PER SCEGLIERE L\'AUTO'));
   }
+  function chosen(id) {
+    IMG.drive = null; const C = IMG['car_' + id]; if (id === 'v40' || !C || !C.b.width) return;
+    const D = C.D, c = document.createElement('canvas'); c.width = D.w; c.height = D.h; const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(C.b, 0, 0);
+    if (C.w.width) for (const ax of D.ax) x.drawImage(C.w, ax - C.w.width / 2, D.wy - C.w.height / 2);
+    IMG.drive = c; IMG.driveDy = 70.4 - (D.wy + D.wr);
+  }
   function carThumb(c, a) {
     const k = c.getContext('2d'); c.width = 200; c.height = 90; k.imageSmoothingEnabled = false; R(k, 0, 0, 200, 90, 'rgba(0,0,0,0)');
-    if (a.ok) { glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2); k.drawImage(IMG.v40, 0, 8, 200, 71); }
+    if (a.id === 'v40') { glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2); k.drawImage(IMG.v40, 0, 8, 200, 71); }
+    else if (IMG['car_' + a.id] && IMG['car_' + a.id].b.width) {   // un'auto vera del garage, con un velo di polvere
+      glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2);
+      const C = IMG['car_' + a.id], D = C.D, sc = Math.min(190 / D.w, 76 / D.h), w = D.w * sc, h = D.h * sc, x0 = (200 - w) / 2, y0 = 84 - (D.wy + D.wr) * sc;
+      const t = document.createElement('canvas'); t.width = 200; t.height = 90; const tx = t.getContext('2d'); tx.imageSmoothingEnabled = false;
+      tx.drawImage(C.b, x0, y0, w, h);
+      if (C.w.width) for (const ax of D.ax) { const ws = C.w.width * sc; tx.drawImage(C.w, x0 + ax * sc - ws / 2, y0 + D.wy * sc - ws / 2, ws, ws); }
+      tx.globalCompositeOperation = 'source-atop'; tx.fillStyle = 'rgba(14,16,26,.12)'; tx.fillRect(0, 0, 200, 90);
+      tx.fillStyle = 'rgba(190,180,160,.12)'; for (let i = 0; i < 260; i++) tx.fillRect(hash(i + a.id.length * 31) * 200 | 0, hash(i * 7.3 + 1) * 90 | 0, 1, 1);   // polvere
+      R(k, 30, 80, 140, 4, 'rgba(0,0,0,.35)'); k.drawImage(t, 0, 0);
+    }
     else {      // un'auto sotto il telo: gobba grigia con le pieghe
       k.fillStyle = '#3a3d48'; k.beginPath(); k.moveTo(10, 78); k.quadraticCurveTo(14, 40, 60, 34); k.quadraticCurveTo(100, 16, 140, 34); k.quadraticCurveTo(186, 42, 192, 78); k.closePath(); k.fill();
       k.strokeStyle = '#2a2c35'; k.lineWidth = 2; for (let i = 0; i < 6; i++) { k.beginPath(); k.moveTo(30 + i * 26, 76); k.quadraticCurveTo(34 + i * 26, 52, 40 + i * 24, 30 + (i % 3) * 3); k.stroke(); }
@@ -240,7 +261,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   function pick(i, node) {
     const a = PRO_AUTO[i]; if (pickLocked) return;
     if (!a.ok) { node.classList.remove('shake'); void node.offsetWidth; node.classList.add('shake'); thump(0.1); const p = root.querySelector('.dlg p'); if (p) type(p, 'Quella no. Non ancora.'); return; }
-    pickLocked = true; thump(0.2); const p = root.querySelector('.dlg p'); type(p, 'Le chiavi sono nel cruscotto. Come sempre. Buona strada.', () => setTimeout(() => go(cur + 1), 1500));
+    pickLocked = true; thump(0.2); chosen(a.id); if (opts.onPick) opts.onPick(a.id); const p = root.querySelector('.dlg p'); type(p, 'Le chiavi sono nel cruscotto. Come sempre. Buona strada.', () => setTimeout(() => go(cur + 1), 1500));
   }
 
   // clic / Invio / Spazio: va avanti dove ha senso
@@ -271,7 +292,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   }
 
   async function play(o = {}) {
-    if (root) return; opts = o; done = false; pickLocked = false; await prepare();
+    if (root) return; opts = o; done = false; pickLocked = false; IMG.drive = null; await prepare();
     actx = (typeof o.ctx === 'function' ? o.ctx() : o.ctx) || null;
     if (!document.getElementById('proCss')) { const s = document.createElement('style'); s.id = 'proCss'; s.textContent = CSS; document.head.appendChild(s); }
     root = el('<div class="pro" role="dialog" aria-label="Prologo"><canvas></canvas><button type="button" class="skip">SALTA ›</button></div>');

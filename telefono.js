@@ -18,7 +18,7 @@ const TEL_SMS = [
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
   { from: 'Officina Niko', km: 2, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
   { from: 'Motel Ovunque', km: 4, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
-  { from: 'Zio Claudio', km: 150, bad: 1, text: 'Hai preso la Volvo. Giusto così.' },
+  { from: 'Zio Claudio', km: 150, bad: 1, text: 'Hai preso {auto}. Giusto così.' },   // {auto}: l'auto scelta nel garage
   { from: 'Zio Claudio', km: 400, bad: 1, text: 'sei già passato di qui' },
   { from: 'Zio Claudio', km: 400.1, bad: 1, dir: 'o', text: 'chi sei' },
   { from: 'Zio Claudio', km: 400.2, bad: 1, text: 'non fermarti' },
@@ -146,7 +146,8 @@ const telThreads = (km) => {
   const initials = (n) => n.split(' ').map((w) => w[0]).slice(0, 2).join('');
   const av = (n, bad) => `<span class="av ${bad ? 'bad' : ''}">${initials(n)}</span>`;
   const nav = (t, back) => `<div class="nav ${back ? 'sm' : ''}">${back ? '<button class="bk" data-back>‹ Indietro</button>' : ''}<h3>${t}</h3>${back ? '<span style="width:60px"></span>' : ''}</div>`;
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const auto = (s) => (typeof vgTesto === 'function' && window.nightRun ? vgTesto(window.nightRun.game, s) : s);   // {auto} → l'auto ereditata
+  const esc = (s) => String(auto(s)).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   // ------------------------------------------------------------ schermate
   const status = () => `<div class="sb"><span>${clock()}</span><span>${atto() >= 1 ? '<span style="opacity:.5">▂▄▆</span>' : '▂▄▆▇'}<span class="bat ${atto() >= 2 ? 'low' : ''}"><i></i></span></span></div><div class="isl"></div><div class="hb" data-home></div>`;
@@ -282,7 +283,7 @@ const telThreads = (km) => {
     if (btn) btn.hidden = false;
     const k = km(), t = T(), n = TEL_SMS.filter((m) => m.km <= k).length;
     if (t.n === undefined) t.n = n;                                      // i messaggi che c'erano già non fanno avviso (la lettera dello studio l'hai letta nel prologo)
-    if (n > t.n) { const m = TEL_SMS.filter((x) => x.km <= k && x.dir !== 'o').pop(); t.n = n; if (m) { toast(m.from, m.text, m.bad); if (ST.on && ST.view === 'msg') render(); } refreshBtn(); }
+    if (n > t.n) { const m = TEL_SMS.filter((x) => x.km <= k && x.dir !== 'o').pop(); t.n = n; if (m) { toast(m.from, auto(m.text), m.bad); if (ST.on && ST.view === 'msg') render(); } refreshBtn(); }
     // cartelloni delle app: il prossimo compare sulla strada davanti a te; quando lo superi spunta l'icona da scaricare
     const off = telNextOffer(k, t.apps);
     if (off && g.ents) { const x = g.s.dist + 260; t.apps[off.app] = { st: 'sign', x }; g.ents.push({ id: g.id++, kind: 'vgsign', lane: 0, x, v: 0, text: off.sign, app: true }); }

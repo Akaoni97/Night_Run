@@ -202,7 +202,7 @@ h1 span { color: var(--amber); }
 .prompt .opts button:first-child { background: var(--lime); color: #141a04; }
 .prompt .opts button kbd { margin-left: 6px; }
 .prompt .timer { height: 3px; background: #24201a; } .prompt .timer i { display: block; height: 100%; background: var(--amber); }
-.minimap { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(560px, calc(100% - 150px)); display: grid; gap: 3px; pointer-events: none; }
+.minimap { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); width: min(380px, calc(100% - 150px)); display: grid; gap: 3px; pointer-events: none; }
 .mm-track { position: relative; height: 22px; background: rgba(10,9,7,.72); box-shadow: inset 0 0 0 1px #4a4234; overflow: hidden; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
 .mm-track::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 2px; background: repeating-linear-gradient(90deg, #6b5f4a 0 10px, transparent 10px 18px); background-position: var(--mm-off, 0) 0; }
 .mm-you { position: absolute; left: 10%; top: 3px; width: 6px; height: 16px; margin-left: -3px; background: var(--fg); box-shadow: 0 0 0 1px #000, 0 0 8px var(--amber); z-index: 1; }
@@ -693,6 +693,10 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 /* pulsante MENU nella barra in alto */
 .menubtn { display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; clip-path: none; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 6px 18px rgba(255,179,71,.3); }
 .menubtn i { width: 14px; height: 10px; background: linear-gradient(#1a1206 0 2px, transparent 2px 4px, #1a1206 4px 6px, transparent 6px 8px, #1a1206 8px 10px); }
+@media (max-width: 520px) {   /* telefono: MENU, TELEFONO e TASTI stanno tutti nella barra */
+  .menubtn { padding: 6px 7px 5px; font-size: 10px; letter-spacing: .02em; gap: 4px; } .menubtn kbd { display: none; } .menubtn i { width: 10px; height: 8px; }
+  header.top { gap: 6px; } header.top h1 { font-size: 15px; }
+}
 html.game .top { padding: 0 6px; border-radius: 10px; background: linear-gradient(90deg, rgba(255,179,71,.06), transparent 40%); }
 html.game .chip { border-radius: 8px; clip-path: none; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
 html.game h1 { text-shadow: 0 0 14px rgba(255,179,71,.45), 2px 2px 0 #2a2216; }
@@ -1071,12 +1075,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <h2>Il <em>Viaggio</em></h2>
     <ul>
       <li><i aria-hidden="true">🏠</i><span>Si parte dal km 0 con la Volvo di tuo zio e € 450 in tasca. L'autostrada va solo avanti.</span></li>
-      <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 10.000.</span></li>
+      <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 3.000.</span></li>
       <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel Ovunque. E tieni d'occhio il telefono (tasto 0).</span></li>
     </ul>
     <div class="keys"><span><kbd>I</kbd> quadro</span><span><kbd>Invio</kbd> tenuto: avvia</span><span><kbd>E</kbd> marcia</span><span><kbd>W</kbd> gas</span><span><kbd>A</kbd><kbd>D</kbd> corsie</span><span><kbd>U</kbd> entra</span><span><kbd>Tab</kbd> menu</span></div>
     <button class="go" id="goBtn" type="button">Accendi e parti</button>
-    <small>Il viaggio si salva in questo browser. Dal menu (Tab) ci sono anche le modalità libere: sfide in città, città libera, montagna.</small>
+    <small>Il viaggio si salva in questo browser. Dal menu (Tab) ci sono anche le modalità libere: città libera e montagna.</small>
   </div>
 </div>
 
@@ -2282,7 +2286,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'motel') {
       note('Motel Ovunque. «La sua cassa è già in camera.» Qui si dorme, ci si lava, si lasciano le cose nella cassa e si cambia mezzo.');
       const r = group('La stanza 7');
-      r.appendChild(row(IC('letto') + 'Dormire <small>€ 45 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
+      r.appendChild(row(IC('letto') + 'Dormire <small>€ 60 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
       r.appendChild(row(IC('doccia') + 'Doccia <small>compresa</small>', () => game.vgShower(0)));
       r.appendChild(row('Cena <small>€ 9</small>', svc(9, 'Cena del motel', { food: 0.8, water: 0.4 })));
       // la cassa
@@ -2432,6 +2436,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       renderCos();
     }
     // l'annuncio di un privato a questa tappa, e da Niko la revisione del motore (usato.js)
+    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Niko: la revisione (documenti.js)
     if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     box.hidden = false;
     if (street2d) {
@@ -2976,7 +2981,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
 
   // ---------------------------------------------------------------- ciclo principale
-  const joints = {};
   let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0;
   function frame(now) {
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now;
@@ -3008,12 +3012,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (game.perkUp) { game.perkUp = null; applySettings(); renderServices(); saveGame(); }
     renderGame(dt);
     const ev = sim.events.splice(0);
-    // giunti dell'asfalto ogni 47 m: prima l'asse anteriore, poi il posteriore ("ta-dum")
-    for (const [k, off] of [['jf', 1.28], ['jr', -1.28]]) {
-      const j = Math.floor((game.s.dist + off) / 47);
-      if (joints[k] !== undefined && j !== joints[k] && sim.v > 2) ev.push({ type: 'bump', I: Math.min(1, sim.v / 30) * (k === 'jf' ? 1 : 0.85) });
-      joints[k] = j;
-    }
+    // (i giunti dell'asfalto ogni 47 m facevano un "ta-dum" continuo: tolti, davano fastidio)
     for (const e of ev) if (e.type === 'grind' && S.autoClutch && Math.abs(sim.v) > 1.2) flash('Retromarcia solo da fermo');
     if (wasRunning && !sim.running && sim.stalled) flash('Motore spento: stallo. Folle e riavvia', 3);
     wasRunning = sim.running;
@@ -3061,7 +3060,15 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // all'inizio di un Viaggio nuovo c'è prima il prologo (lettera, E36, notaio, scelta dell'auto, autostrada); la radio parte dopo
     if (window.NightPrologo && NightPrologo.shouldPlay(game)) {
       game.s.vg.prologo = 1;
-      NightPrologo.play({ ctx: () => audio.ctx, onDone: () => { $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
+      // l'auto scelta nel garage dello zio diventa l'auto del Viaggio (la sola nel garage), malconcia perché ferma da anni
+      const eredita = (id) => {
+        if (game.s.vg.inherited) return;
+        if (id && CARS[id] && id !== game.car) { game.s.vg.garage = [id]; window.nightRun.swapCar(id); }
+        if (game.car === id || !id) game.s.vg.garage = [game.car];
+        game.s.vg.eredita = game.car;
+        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Niko`, 7), 1500); }
+      };
+      NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
     } else setTimeout(startRadio, 700);
   });
   window.addEventListener('resize', layout);
@@ -3284,6 +3291,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   requestAnimationFrame(frame);
 })();
 </script>
+<script src="tasti.js"></script>
 <script src="menu.js"></script>
 <script src="telefono.js"></script>
 <script src="prologo.js"></script>
@@ -3294,5 +3302,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="concessionario.js"></script>
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
+<script src="garage.js"></script>
+<script src="documenti.js"></script>
 </body>
 </html>

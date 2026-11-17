@@ -44,7 +44,7 @@ const COP = {
     return 1;
   } },
   // urti a 100 km/h in 4ª: tamponamento forte (2 s), strisciata di fianco (5 s), colpetto (8 s), tamponamento leggero (10 s)
-  urti: { T: 12, ev: [[2, { type: 'crash', I: 1.4, kind: 'front' }], [5, { type: 'crash', I: 0.5, kind: 'side' }], [8, { type: 'bump', I: 0.4 }], [10, { type: 'crash', I: 0.5, kind: 'rear' }]],
+  urti: { T: 12, ev: [[2, { type: 'crash', I: 1.4, kind: 'front' }], [5, { type: 'crash', I: 0.5, kind: 'side' }], [8, { type: 'bump', I: 0.4, hit: true }], [10, { type: 'crash', I: 0.5, kind: 'rear' }]],
     f: (t, s) => { if (s.gear !== 4 && !s.shiftSeq) { s.gear = 4; s.v = 100 / 3.6; s.ww = s.v / s.P.r; s.wo = s.ww; } return 0.3; } },
   crociera: { T: 10, f: (t, s) => { if (s.gear !== 4 && !s.shiftSeq) { s.gear = 4; s.v = 100 / 3.6; s.ww = s.v / s.P.r; s.wo = s.ww; } return 0.3; } },
 };

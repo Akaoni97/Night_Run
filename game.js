@@ -64,9 +64,9 @@ const GAME_STICKERS = [
 const GAME_STICKER_SLOTS = [['st_door', 'Portiera'], ['st_rear', 'Parafango posteriore'], ['st_glass', 'Vetro posteriore']];
 // manutenzione da Niko: quanto dura ogni cosa (km di gioco) e quanto costa
 const GAME_SERVICES = [
-  { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 70, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
-  { id: 'plugs', name: 'Candele nuove', km: 90, price: 110, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
-  { id: 'pads', name: 'Pastiglie dei freni', km: 35, price: 150, note: 'Pastiglie finite: frenate lunghe, poi ferro su ferro.' },
+  { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 120, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
+  { id: 'plugs', name: 'Candele nuove', km: 90, price: 140, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
+  { id: 'pads', name: 'Pastiglie dei freni', km: 35, price: 180, note: 'Pastiglie finite: frenate lunghe, poi ferro su ferro.' },
   { id: 'wash', name: 'Lavaggio e lucidatura', km: 15, price: 25, note: 'Fango e polvere si accumulano, di più con la pioggia.' },
 ];
 // ricambi estetici: si comprano dal Neon Kustom e si vedono sulla Supra in 2D
@@ -181,7 +181,7 @@ class StreetGame {
     const soft = dv < 2.5;
     const dmg = soft ? 0.004 + dv * 0.004 : Math.min(0.45, (kind === 'front' ? 0.05 : 0.03) + dv * (kind === 'front' ? 0.022 : 0.012) * Math.min(2, m2 / 1400));
     sim.damage = Math.min(1, sim.damage + dmg);
-    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I, kind });
+    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I, kind, hit: true });
     if (soft) return;
     this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I, kind, vt: e.vt });
     e.dent = 1; e.hazT = 10;                                              // l'altra auto: ammaccata, quattro frecce
@@ -366,7 +366,7 @@ class StreetGame {
 
   // servizi d'officina: carrozziere e gomme nuove
   repairCost() { return Math.round(this.sim.damage * 2600 * this.disc() / 10) * 10; }
-  tireCost() { return Math.round(Math.max(380, tuningItem('tires', this.tireId || 'oem').price * 0.55) * this.disc() / 10) * 10; }
+  tireCost() { return Math.round(Math.max(420, tuningItem('tires', this.tireId || 'oem').price * 0.55) * this.disc() / 10) * 10; }
   repair() {
     const c = this.mode === 'career' ? this.repairCost() : 0;
     if (!this.sim.damage) return { ok: false, why: 'La carrozzeria è già a posto' };
