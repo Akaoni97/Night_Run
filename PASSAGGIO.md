@@ -72,6 +72,15 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Economia (rivista il 17/11/2026)**: prezzi delle auto credibili (nuove: Panda 13.500, Punto 14.000, Corsa 15.500,
+  Clio 17.000, Polo 17.500, 308 25.000, A3 30.000; usate e d'epoca: Audi 80 4.500, 206 GTI 6.500, Golf GTI 15.000, A112
+  14.000, 205 GTI 19.000, Williams 25.000, E36 28.000, M5 32.000, 2002 Turbo 55.000, Supra 65.000, E30 75.000, R5 Turbo
+  95.000). Lavori più bassi (primo € 3.000, catena 2.000-6.500, poi 2.500 + 300 a lavoro fino a 9.000), consegne ×4,
+  passeggeri ~€ 30 + 9-13 al km, autobus € 12 a passeggero; tagliando 120, candele 140, pastiglie 180, gomme da 420,
+  motel 60. Ritmo misurato (40 lavori di fila, strumento in scratchpad non salvato): ~€ 290 netti al km coi lavori più
+  ~€ 30 da consegne e passeggeri; una Panda nuova dopo ~45 km di lavoro, la Supra dopo ~200 (si sblocca al km 260).
+- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
+  Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
   sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`): con gli abbaglianti accetta la sfida solo un'auto della
   tua categoria (40 %, 65 % le sportive), le altre ti fanno passare dicendo perché; i mezzi da lavoro mai. Traguardi:

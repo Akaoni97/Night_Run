@@ -47,7 +47,7 @@ test('concessionario: a rate si paga l\'anticipo e poi una rata ogni 10 km, fino
 });
 
 test('concessionario: tre rate saltate e il carro attrezzi si riprende l\'auto (anche se ci sei sopra, quando ti fermi)', () => {
-  const { game, sim } = trip(300, 10000);
+  const { game, sim } = trip(300, 20000);
   assert.ok(game.dlBuy('e30', 'fin').ok); game.dlSwap('e30'); assert.equal(game.car, 'e30');
   game.s.money = 0;
   game.s.dist = 310000; game.dlTick(); assert.equal(game.s.vg.fin[0].miss, 1); assert.ok(game.s.vg.fin[0].mora > 0);

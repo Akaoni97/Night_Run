@@ -1155,7 +1155,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <h2>Il <em>Viaggio</em></h2>
     <ul>
       <li><i aria-hidden="true">🏠</i><span>Si parte dal km 0 con la Volvo di tuo zio e € 450 in tasca. L'autostrada va solo avanti.</span></li>
-      <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 10.000.</span></li>
+      <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 3.000.</span></li>
       <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel Ovunque. E tieni d'occhio il telefono (tasto 0).</span></li>
     </ul>
     <div class="keys"><span><kbd>I</kbd> quadro</span><span><kbd>Invio</kbd> tenuto: avvia</span><span><kbd>E</kbd> marcia</span><span><kbd>W</kbd> gas</span><span><kbd>A</kbd><kbd>D</kbd> corsie</span><span><kbd>U</kbd> entra</span><span><kbd>Tab</kbd> menu</span></div>
@@ -2376,7 +2376,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'motel') {
       note('Motel Ovunque. «La sua cassa è già in camera.» Qui si dorme, ci si lava, si lasciano le cose nella cassa e si cambia mezzo.');
       const r = group('La stanza 7');
-      r.appendChild(row(IC('letto') + 'Dormire <small>€ 45 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
+      r.appendChild(row(IC('letto') + 'Dormire <small>€ 60 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
       r.appendChild(row(IC('doccia') + 'Doccia <small>compresa</small>', () => game.vgShower(0)));
       r.appendChild(row('Cena <small>€ 9</small>', svc(9, 'Cena del motel', { food: 0.8, water: 0.4 })));
       // la cassa
@@ -2526,6 +2526,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       renderCos();
     }
     // l'annuncio di un privato a questa tappa, e da Niko la revisione del motore (usato.js)
+    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Niko: la revisione (documenti.js)
     if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     box.hidden = false;
     if (street2d) {
@@ -3241,7 +3242,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         if (id && CARS[id] && id !== game.car) { game.s.vg.garage = [id]; window.nightRun.swapCar(id); }
         if (game.car === id || !id) game.s.vg.garage = [game.car];
         game.s.vg.eredita = game.car;
-        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina. Prima tappa: un benzinaio o Niko`, 6), 1500); }
+        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Niko`, 7), 1500); }
       };
       NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
     } else setTimeout(startRadio, 700);
@@ -3478,5 +3479,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
 <script src="garage.js"></script>
+<script src="documenti.js"></script>
 </body>
 </html>

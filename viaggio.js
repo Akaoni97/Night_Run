@@ -72,13 +72,13 @@ const VG_SEATS = { v40: 4, supra: 1, r5: 1, b2002: 3, e30: 3, e36: 3, e34: 4, va
 const VG_CARGO = { van: { kg: 900, slots: 24 }, truck: { kg: 9000, slots: 18 }, bus: { kg: 300, slots: 16 } };
 const VG_TRAILER = { kg: 300, slots: 10, mass: 320 };
 const VG_SHOP = [
-  { id: 'trailer', name: 'Gancio e rimorchietto', price: 1600, km: 20, note: 'Dieci posti e 300 kg in più per le scatole. Più peso, frenate lunghe e sopra i 110 km/h il rimorchio comincia a sbandare.' },
-  { id: 'b2002', name: 'BMW 2002 Turbo (usata)', price: 16000, km: 60, car: true, note: 'Turbo anni \'70 e un ritardo leggendario.' },
-  { id: 'e30', name: 'BMW M3 E30 (usata)', price: 24000, km: 120, car: true, note: 'Quattro farfalle e un cambio dogleg.' },
-  { id: 'e36', name: 'BMW M3 E36 (usata)', price: 21000, km: 120, car: true, note: 'Sei in linea che urla.' },
-  { id: 'e34', name: 'BMW M5 E34 (usata)', price: 26000, km: 160, car: true, note: 'La berlina che non sembra.' },
-  { id: 'r5', name: 'Renault 5 Turbo 2', price: 30000, km: 220, car: true, note: 'Motore dietro, rally nel sangue.' },
-  { id: 'supra', name: 'Toyota Supra RZ', price: 34000, km: 260, car: true, note: 'Il 2JZ. Lo sai.' },
+  { id: 'trailer', name: 'Gancio e rimorchietto', price: 2200, km: 20, note: 'Dieci posti e 300 kg in più per le scatole. Più peso, frenate lunghe e sopra i 110 km/h il rimorchio comincia a sbandare.' },
+  { id: 'b2002', name: 'BMW 2002 Turbo (usata)', price: 55000, km: 60, car: true, note: 'Turbo anni \'70 e un ritardo leggendario.' },
+  { id: 'e30', name: 'BMW M3 E30 (usata)', price: 75000, km: 120, car: true, note: 'Quattro farfalle e un cambio dogleg.' },
+  { id: 'e36', name: 'BMW M3 E36 (usata)', price: 28000, km: 120, car: true, note: 'Sei in linea che urla.' },
+  { id: 'e34', name: 'BMW M5 E34 (usata)', price: 32000, km: 160, car: true, note: 'La berlina che non sembra.' },
+  { id: 'r5', name: 'Renault 5 Turbo 2', price: 95000, km: 220, car: true, note: 'Motore dietro, rally nel sangue.' },
+  { id: 'supra', name: 'Toyota Supra RZ', price: 65000, km: 260, car: true, note: 'Il 2JZ. Lo sai.' },
 ];
 
 // le auto del pacchetto del giocatore si comprano alla concessionaria del motel; posti a sedere secondo la carrozzeria
@@ -105,7 +105,7 @@ const VG_RUMORS = [
 // capitoli: si leggono al passaggio dei chilometri. Per ora solo la partenza: il resto lo scrive la nuova storia
 // (km, title, text; ogni capitolo si legge una volta)
 const VG_CHAPTERS = [
-  { km: 0, title: 'Km 0', text: '{Auto} di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
+  { km: 0, title: 'Km 0', text: '{Auto} di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano tremila. Metti la prima.' },
 ];
 
 // ---------------------------------------------------------------- eventi strani (per ora vuoto: li scrive la nuova storia)
@@ -388,7 +388,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (!story) { v.recent.push(name); if (v.recent.length > 8) v.recent.shift(); }
       const far = 3 + Math.floor(Math.random() * 14);
       this.ents.push({ id: this.id++, kind: 'hitch', lane: 0, x: d + 260 + Math.random() * 120, v: 0, name, story: story ? story.id : null,
-        to: Math.round(km + far), pay: Math.round(18 + far * (3.5 + Math.random() * 2)) });
+        to: Math.round(km + far), pay: Math.round(30 + far * (9 + Math.random() * 4)) });
     }
     // ci si ferma accanto: la domanda
     for (const e of this.ents) {
@@ -461,8 +461,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 
   // ------------------------------------------------------------ lavori: bacheca dei locali
-  // prima missione: al primo locale c'è un pacco da portare alla tappa dopo, paga € 10.000 (soldi da spendere subito)
-  const VG_FIRST = { pay: 10000, kg: 4, from: 0, to: 1 };
+  // prima missione: al primo locale c'è un pacco da portare alla tappa dopo, paga € 3.000 (per rimettere in sesto l'auto ereditata)
+  const VG_FIRST = { pay: 3000, kg: 4, from: 0, to: 1 };
   P.vgFirstOffer = function () {
     const dest = VG.stop(VG_FIRST.to);
     return { k: 'primo', kind: 'scatola', kg: VG_FIRST.kg, to: VG_FIRST.to, toName: dest.name, kmTo: Math.round(dest.x / 100) / 10, pay: VG_FIRST.pay, first: true };
@@ -484,7 +484,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     for (let k = 0; k < 3; k++) {
       const hops = 1 + Math.floor(h(k) * 6), to = n + hops, dest = VG.stop(to), kmTo = (dest.x / 1000);
       const kg = Math.round(base * (1 + h(k + 5) * (car === 'truck' ? 1 : 3)));
-      const pay = Math.round((12 + hops * 3.2 * (car === 'truck' ? 9 : car === 'van' ? 2.4 : 1) * (1 + kg / (base * 3))) * (car === 'truck' ? 6 : 1) / 5) * 5;
+      const pay = Math.round((12 + hops * 3.2 * (car === 'truck' ? 9 : car === 'van' ? 2.4 : 1) * (1 + kg / (base * 3))) * (car === 'truck' ? 6 : 1) * 4 / 5) * 5;
       offers.push({ k, kind, kg, to, toName: dest.name, kmTo: Math.round(kmTo * 10) / 10, pay });
     }
     return offers;
@@ -510,7 +510,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const v = this.s.vg, L = v.line;
     const off = Math.floor(L.onboard * (0.2 + Math.random() * 0.4)), on = pl.n >= L.to ? 0 : Math.floor(Math.random() * 9);
     L.onboard = Math.min(40, L.onboard - off + on);
-    const pay = on * 6; L.earned += pay; this.s.money += pay; v.earned += pay;
+    const pay = on * 12; L.earned += pay; this.s.money += pay; v.earned += pay;
     this.say(`Fermata ${pl.name}: scendono ${off}, salgono ${on} (+ € ${pay})${L.onboard ? `, a bordo ${L.onboard}` : ''}`, 'money');
     if (pl.n >= L.to) { this.say(`Fine linea: incassati € ${L.earned}`, 'money'); v.line = null; v.jobs++; }
   };
@@ -527,7 +527,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgShower = function (eur) { const r = this.vgPay(eur, 'Doccia'); if (r.ok) this.s.vg.needs.wash = 1; return r; };
   P.vgSleep = function () {
     const v = this.s.vg, km = vgKm(this), n = this.inside ? VG.stopIndex(this.inside.x) : -1;
-    const r = this.vgPay(45, 'Notte al Motel Ovunque'); if (!r.ok) return r;
+    const r = this.vgPay(60, 'Notte al Motel Ovunque'); if (!r.ok) return r;
     v.needs.sleep = 1; v.needs.wash = Math.min(1, v.needs.wash + 0.2); v.needs.food = Math.max(0, v.needs.food - 0.15); v.needs.water = Math.max(0, v.needs.water - 0.2);
     v.lastMotel = n; v.sleepAt = km;
     return r;
