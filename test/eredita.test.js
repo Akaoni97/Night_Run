@@ -16,3 +16,12 @@ test('eredità: gomme sgonfie e consumate, tagliando da fare, ammaccata, poca be
   game.inflate(); game.tyreUpdate(0.1, 0); const k = sim.tyreK; assert.ok(k > 0.95, 'gonfiate tornano a posto');
   assert.equal(game.vgInherit(), false, 'una volta sola');
 });
+
+test('eredità: i testi della storia nominano l\'auto scelta, con l\'articolo giusto', () => {
+  const { vgTesto } = new Function(src + ';return { vgTesto };')();
+  const t = (id) => vgTesto({ s: { vg: { eredita: id } } }, '{Auto} tira bene, per essere {tipo}. Hai preso {auto}.');
+  assert.equal(t('a80'), 'L\'Audi tira bene, per essere una station wagon. Hai preso l\'Audi.');
+  assert.equal(t('panda'), 'La Panda tira bene, per essere un\'utilitaria. Hai preso la Panda.');
+  assert.equal(t(undefined), 'La Volvo tira bene, per essere una station wagon. Hai preso la Volvo.');
+  assert.equal(vgTesto(null, 'niente da cambiare'), 'niente da cambiare');
+});

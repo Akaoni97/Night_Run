@@ -72,6 +72,8 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Testi con l'auto scelta**: `{Auto}`, `{auto}`, `{tipo}` nei testi della storia (pensieri, capitoli, messaggi) diventano
+  «La Panda», «l'Audi», «un'utilitaria»… secondo l'auto ereditata (`game.s.vg.eredita`, `vgTesto` e `VG_AUTO_NOME` in `viaggio.js`).
 - **Tasti, eredità, giunti (17/11/2026)**: tolto il "ta-dum" delle ruote sui giunti dell'asfalto (dava fastidio);
   i colpetti fanno il rumore di lamiera solo contro un'auto. Pulsante TASTI accanto a MENU e TELEFONO con l'elenco dei
   comandi e la possibilità di cambiarli (`tasti.js`; sul telefono solo l'icona). All'inizio del primo Viaggio la Volvo
@@ -207,3 +209,6 @@ Gli strumenti sono in `strumenti/` (Python con Pillow e NumPy):
    limitatore, marce, finale, prezzo, km di sblocco, diesel): coppia, voce del motore, quadro e catalogo dei pezzi
    si costruiscono da lì. Poi aggiungilo a `GAME_TRAFFIC` (velocità tipiche e frequenza) e, se ha posti diversi,
    a `VG_SEATS` in `viaggio.js`. Controlla lo 0-100 con una prova veloce della fisica.
+7. Pulisci i ritagli: `python3 -I strumenti/pulisci_bordi.py img geo.json` (geo.json con `wy`, `wr`, `ax` di ogni sprite,
+   da `CARS[id].sprite`; prima con `--prova`). Toglie i pezzi di gomma e d'ombra rimasti sotto la carrozzeria e chiude i
+   buchi di un pixel nei passaruota, che lasciavano vedere lo sfondo a puntini. Fatto su tutte le 26 auto il 17/11/2026.

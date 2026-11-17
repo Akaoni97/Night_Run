@@ -3240,7 +3240,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         if (game.s.vg.inherited) return;
         if (id && CARS[id] && id !== game.car) { game.s.vg.garage = [id]; window.nightRun.swapCar(id); }
         if (game.car === id || !id) game.s.vg.garage = [game.car];
-        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`La ${CARS[game.car].short || CARS[game.car].name} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina. Prima tappa: un benzinaio o Niko`, 6), 1500); }
+        game.s.vg.eredita = game.car;
+        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina. Prima tappa: un benzinaio o Niko`, 6), 1500); }
       };
       NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
     } else setTimeout(startRadio, 700);

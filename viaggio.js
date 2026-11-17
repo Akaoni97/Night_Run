@@ -9,6 +9,17 @@
 
 // ---------------------------------------------------------------- la strada: tappe e paesaggi
 const VG_STOP0 = 1800, VG_STEP = 3200;                     // prima tappa al km 1,8, poi una ogni 3,2 km
+// l'auto ereditata dallo zio (scelta nel prologo) nei testi della storia: {Auto} e {auto} diventano «La Panda» / «la Panda»,
+// {tipo} «un'utilitaria» / «una station wagon». Si ricorda in game.s.vg.eredita (senza: la Volvo).
+const VG_AUTO_NOME = { v40: ['la', 'Volvo', 'una station wagon'], a80: ["l'", 'Audi', 'una station wagon'], panda: ['la', 'Panda', "un'utilitaria"],
+  punto: ['la', 'Punto', "un'utilitaria"], corsa: ['la', 'Corsa', "un'utilitaria"], polo: ['la', 'Polo', "un'utilitaria"] };
+function vgTesto(game, text) {
+  if (typeof text !== 'string' || text.indexOf('{') < 0) return text;
+  const id = (game && game.s && game.s.vg && game.s.vg.eredita) || 'v40', c = typeof CARS !== 'undefined' && CARS[id];
+  const [art, nome, tipo] = VG_AUTO_NOME[id] || ['la', (c && (c.short || c.name)) || 'auto', "un'auto"];
+  const low = art.endsWith("'") ? art + nome : art + ' ' + nome, cap = low.charAt(0).toUpperCase() + low.slice(1);
+  return text.replace(/\{Auto\}/g, cap).replace(/\{auto\}/g, low).replace(/\{tipo\}/g, tipo);
+}
 const VG_PATTERN = ['bar', 'fuel', 'grill', 'niko', 'bar', 'motel', 'fuel', 'shop', 'bar', 'grill', 'style', 'motel'];
 const VG_BARS = ['Bar Sport', 'Bar della Curva', 'Caffè del Ponte', 'Bar Stella', 'Bar dei Camionisti', 'Bar Luna', 'Caffè Centrale', 'Bar Ultima Sosta'];
 const VG_PLACE = {
@@ -94,7 +105,7 @@ const VG_RUMORS = [
 // capitoli: si leggono al passaggio dei chilometri. Per ora solo la partenza: il resto lo scrive la nuova storia
 // (km, title, text; ogni capitolo si legge una volta)
 const VG_CHAPTERS = [
-  { km: 0, title: 'Km 0', text: 'La Volvo di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
+  { km: 0, title: 'Km 0', text: '{Auto} di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
 ];
 
 // ---------------------------------------------------------------- eventi strani (per ora vuoto: li scrive la nuova storia)
@@ -358,7 +369,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const v = this.s.vg, c = VG_CHAPTERS.find((q) => q.km === k); if (!c) return;
     v.chapters[k] = true;
     this.prompt = null;
-    this.ask({ kind: 'story', title: c.title, text: c.text, time: 40, options: [{ label: k === 0 ? 'Parti' : 'Continua' }] });
+    this.ask({ kind: 'story', title: c.title, text: vgTesto(this, c.text), time: 40, options: [{ label: k === 0 ? 'Parti' : 'Continua' }] });
   };
 
   // ------------------------------------------------------------ autostoppisti
@@ -575,4 +586,4 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 })();
 
-if (typeof window !== 'undefined') Object.assign(window, { VG, VG_SHOP, VG_CHAPTERS, VG_ODD, VG_STORY_PAX, VG_FOODS, VG_SEATS, VG_RUMORS, vgOn });
+if (typeof window !== 'undefined') Object.assign(window, { vgTesto, VG_AUTO_NOME, VG, VG_SHOP, VG_CHAPTERS, VG_ODD, VG_STORY_PAX, VG_FOODS, VG_SEATS, VG_RUMORS, vgOn });

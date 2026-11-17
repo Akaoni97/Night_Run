@@ -11,7 +11,7 @@ const PENS_KM = [
   { km: 1, id: 'radio', text: 'La radio gracchia. E queste stazioni non le ho mai sentite, eppure sono sempre in zona.' },
   { km: 3.5, id: 'navigatore', text: 'Il navigatore del telefono dice solo «prosegui dritto». Utile.' },
   { km: 6, id: 'uscite', text: 'Guido da un po\' e non ho ancora visto un\'uscita. Non mi ricordavo questa strada così.' },
-  { km: 9, id: 'volvo', text: 'La Volvo di zio Claudio non l\'avevo mai guidata. Si sente che l\'ha tenuta bene.' },
+  { km: 9, id: 'volvo', text: '{Auto} di zio Claudio non l\'avevo mai guidata. Si sente che l\'ha tenuta bene.' },   // {Auto}: l'auto scelta nel garage
   { km: 13, id: 'bar', text: 'Tanti bar, tutti aperti. A quest\'ora, poi.' },
   { km: 18, id: 'cartello', text: 'Sono sicuro di aver già visto quel cartello. Forse no.' },
 ];
@@ -38,7 +38,7 @@ const PENS_BISOGNI = {
 // a caso, ogni tanto, mentre si guida: ognuno una sola volta per partita
 const PENS_ANIMO = [
   'Che silenzio. Solo il motore e la strada.',
-  'La Volvo tira bene, per essere una station wagon.',
+  '{Auto} tira bene, per essere {tipo}.',
   'Chissà cosa aveva in mente lo zio con tutte quelle auto sotto i teli.',
   'Di notte la strada sembra più lunga. Come diceva il notaio.',
   'Ho la strada quasi tutta per me.',
@@ -70,6 +70,7 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
   P.vgThink = function (text) {
     const p = stato(this);
     this.thoughtN = (this.thoughtN || 0) + 1;
+    text = typeof vgTesto === 'function' ? vgTesto(this, text) : text;
     this.thought = { text, left: Math.max(8, Math.min(10, 7.5 + text.length * 0.025)), id: this.thoughtN };
     p.last = p.t;
   };
