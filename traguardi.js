@@ -32,6 +32,7 @@ const TRG_LIST = [
   { id: 'vapori', name: 'Coi vapori', text: 'Guida con meno del 3 % di benzina nel serbatoio.', prize: { soldi: 500 }, check: (g) => g.sim.running && g.sim.fuel < 0.03 && g.sim.kmh > 20 },
   { id: 'ricco', name: 'Tasche piene', text: 'Abbi € 50.000 in contanti.', prize: { cassa: 'argento' }, check: (g) => [Math.floor(g.s.money), 50000] },
   { id: 'motel', name: 'Una notte all\'Ovunque', text: 'Dormi al Motel Ovunque.', prize: { soldi: 300 }, check: (g) => !!(g.s.vg && g.s.vg.sleepAt != null) },
+  { id: 'ruota7', name: 'Abitudine', text: 'Gira la ruota 7 giorni di fila.', prize: { cassa: 'argento' }, check: (g) => [g.s.ruota ? g.s.ruota.best || 0 : 0, 7] },
   { id: 'habitue', name: 'Habitué', text: 'Entra in 5 locali diversi.', prize: { cassa: 'bronzo' }, check: (g, c) => [Object.keys(c.places || {}).length, 5] },
 ];
 
