@@ -491,7 +491,7 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
 - **La storia.** La nuova storia è in costruzione (`STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
   strutture già pronte e vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` in `viaggio.js`) che aspettano i testi.
 
-**Modalità.** *Il Viaggio* è la modalità principale; *Sfide in città*, *Città libera* e *Montagna* sono le
+**Modalità.** *Il Viaggio* è la modalità principale; *Città libera* e *Montagna* sono le
 modalità libere.
 
 **Cruscotto in gioco (J).** In alta definizione, nello stile del quadro di ogni auto: tachimetro con la benzina,

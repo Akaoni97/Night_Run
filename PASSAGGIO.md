@@ -30,7 +30,7 @@ gioco fa, sezione per sezione).
   sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), il prologo di apertura (`prologo.js`)
   e il telefono (`telefono.js`). La storia dopo il km 0 è da scrivere: capitoli, eventi strani e passeggeri speciali
   sono strutture vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX`).
-- **Modalità libere**: Città (la vecchia carriera, senza più gare né scala dei rivali), Città libera, Montagna (solo 3D).
+- **Modalità libere**: Città libera, Montagna (solo 3D). Il pulsante "Sfide in città" è stato tolto; la modalità interna `career` serve ancora al Viaggio.
 - **Auto**: Supra, V40 e 25 veicoli dai disegni del giocatore (`cars.js`, `GEN_DATA` + `GEN_CARS`, immagini in
   `img/<id>.png`, `_wheel.png`, `_paint.png`). Tutti con motore, peso e marce veri; si comprano alla concessionaria
   del Motel Ovunque. Il traffico usa solo questi disegni, coi loro colori (`GAME_TRAFFIC` in `game.js`).

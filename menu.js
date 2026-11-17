@@ -85,7 +85,7 @@
     const g = NR.game, v2 = NR.view2d, s = g.s, vg = s.vg, car = (typeof CARS !== 'undefined' && CARS[g.car]) || { name: g.car };
     const goal = g.vgGoal ? g.vgGoal() : null;
     const stat = (k, v, cls = '') => `<div class="gs-stat ${cls}"><small>${k}</small><b>${v}</b></div>`;
-    el.innerHTML = `<div class="gs-car"><canvas width="10" height="10" aria-hidden="true"></canvas><div><small>${vg ? 'Il Viaggio' : g.mode === 'free' ? 'Città libera' : 'Sfide in città'}</small><b>${car.name}</b><span>${car.engine || ''}</span></div></div>`
+    el.innerHTML = `<div class="gs-car"><canvas width="10" height="10" aria-hidden="true"></canvas><div><small>${vg ? 'Il Viaggio' : g.mode === 'free' ? 'Città libera' : 'Città'}</small><b>${car.name}</b><span>${car.engine || ''}</span></div></div>`
       + '<div class="gs-stats">' + stat('Contanti', '€ ' + fmt(s.money), 'money') + stat(vg ? 'Km del viaggio' : 'Km', fmt((s.dist || 0) / 1000, 1))
       + stat('Reputazione', fmt(s.rep)) + (vg ? stat('Lavori fatti', fmt(vg.jobs)) + stat('Guadagnato', '€ ' + fmt(vg.earned)) : '') + '</div>'
       + (goal ? `<div class="gs-goal"><small>${goal.title}</small><b>${goal.text}</b><span>${goal.left > 0.05 ? 'tra ' + fmt(goal.left, 1) + ' km · ' : ''}paga € ${fmt(goal.pay)}${goal.note ? ' · ' + goal.note : ''}</span></div>` : '');
