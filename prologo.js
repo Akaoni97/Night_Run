@@ -1,5 +1,5 @@
 // ============================================================================
-//  Night Run · Il prologo (dopo intro.js, prima di partire)
+//  Night Run · Il prologo (dopo la schermata iniziale, prima di partire)
 //  Si vede a inizio partita, dopo "Accendi e parti": una lettera dello studio notarile (l'eredità di un parente),
 //  la BMW E36 blu che arriva davanti all'edificio, il colloquio col notaio, la scelta dell'auto (per ora si può
 //  prendere solo la Volvo V40) e la Volvo che imbocca l'autostrada. Poi comincia il Viaggio.

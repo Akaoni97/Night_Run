@@ -55,7 +55,7 @@ const telThreads = (km) => {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   const NR = () => window.nightRun, G = () => NR() && NR().game;
   const km = () => { const g = G(); return g && g.s ? (g.s.dist || 0) / 1000 : 0; };
-  const T = () => { const g = G(); if (!g || !g.s) return { read: {}, rang: {}, apps: {} }; const t = g.s.tel || (g.s.tel = { read: {}, rang: {}, apps: {} }); if (!t.apps) t.apps = {}; return t; };
+  const T = () => { const g = G(); if (!g || !g.s) return { read: {}, rang: {}, apps: {} }; const t = g.s.tel || (g.s.tel = { read: { 'Studio Ferri': 2 }, rang: {}, apps: {} }); if (!t.apps) t.apps = {}; return t; };
   const fmt = (n, d = 0) => Number(n || 0).toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d });
 
   // ------------------------------------------------------------ pagina in un ombra
@@ -276,10 +276,12 @@ const telThreads = (km) => {
   // ogni secondo: messaggi che arrivano coi km, chiamate scritte, conto alla rovescia e durata chiamata
   let seen = null;
   setInterval(() => {
+    const gate = document.getElementById('gate');
+    if ((gate && !gate.hidden) || (window.NightPrologo && window.NightPrologo.playing)) return;   // schermata iniziale e prologo: il telefono sta zitto
     const g = G(); if (!g || !g.s || !g.s.vg || !g.s.vg.on) { if (ST.on) setOpen(false); host.hidden = true; if (btn) btn.hidden = true; return; }
     if (btn) btn.hidden = false;
     const k = km(), t = T(), n = TEL_SMS.filter((m) => m.km <= k).length;
-    if (t.n === undefined) t.n = k < 1 ? 0 : n;
+    if (t.n === undefined) t.n = n;                                      // i messaggi che c'erano già non fanno avviso (la lettera dello studio l'hai letta nel prologo)
     if (n > t.n) { const m = TEL_SMS.filter((x) => x.km <= k && x.dir !== 'o').pop(); t.n = n; if (m) { toast(m.from, m.text, m.bad); if (ST.on && ST.view === 'msg') render(); } refreshBtn(); }
     // cartelloni delle app: il prossimo compare sulla strada davanti a te; quando lo superi spunta l'icona da scaricare
     const off = telNextOffer(k, t.apps);
