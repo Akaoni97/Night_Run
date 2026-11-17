@@ -107,22 +107,35 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
 })();
 
 // ---------------------------------------------------------------- il testo sulla strada (solo nel browser)
+// In basso a destra, allineato a destra, e alzato sopra quello che occupa già quell'angolo (pedali al tocco, riquadro del
+// cambio, bottone della corsia): ogni 150 ms guarda dove sono e si mette sopra. Si nasconde col menu, il prologo o il telefono aperti.
 (function testo() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   let el = null, mostrato = -1;
   const css = document.createElement('style');
-  css.textContent = `.pensiero{position:absolute;left:50%;bottom:31%;transform:translate(-50%,6px);max-width:min(620px,76%);text-align:center;pointer-events:none;z-index:6;
-    font:italic 500 clamp(15px,2vw,22px)/1.4 "Barlow Semi Condensed",Georgia,serif;color:#f4ead2;letter-spacing:.01em;opacity:0;transition:opacity .7s ease,transform .7s ease;
+  css.textContent = `.pensiero{position:absolute;right:12px;bottom:84px;width:max-content;max-width:clamp(160px,calc(50% - 232px),360px);text-align:right;pointer-events:none;z-index:6;
+    font:italic 500 clamp(14px,1.7vw,21px)/1.4 "Barlow Semi Condensed",Georgia,serif;color:#f4ead2;letter-spacing:.01em;opacity:0;transform:translateY(6px);transition:opacity .7s ease,transform .7s ease;
     text-shadow:0 0 12px #000,0 0 3px #000,0 2px 5px #000}
-    .pensiero.on{opacity:.95;transform:translate(-50%,0)}
+    .pensiero.on{opacity:.95;transform:none}
     @media (prefers-reduced-motion:reduce){.pensiero{transition:none}}`;
   document.head.appendChild(css);
+  // quanto stare alti dal fondo della strada: sopra il più alto tra gli elementi visibili della metà destra
+  const sopra = (stage) => {
+    const r = stage.getBoundingClientRect(); let top = r.bottom;
+    for (const sel of ['#hudG', '.touchpedals', '.lanebtn.r']) {
+      const e = document.querySelector(sel); if (!e) continue;
+      const b = e.getBoundingClientRect(); if (b.width < 1 || b.height < 1 || b.right < r.left + r.width / 2) continue;
+      top = Math.min(top, b.top);
+    }
+    return Math.max(14, Math.round(r.bottom - top + 12));
+  };
   setInterval(() => {
     const NR = window.nightRun, g = NR && NR.game, th = g && g.thought; if (!th) return;
     const stage = document.getElementById('roadStage'); if (!stage) return;
     if (!el) { el = document.createElement('div'); el.className = 'pensiero'; el.setAttribute('aria-live', 'polite'); stage.appendChild(el); }
     if (th.id !== mostrato) { mostrato = th.id; el.textContent = th.text; }
-    const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing);
+    el.style.bottom = sopra(stage) + 'px';
+    const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing) || (window.telefono && window.telefono.isOpen);
     el.classList.toggle('on', th.left > 0.8 && !nascosto);
   }, 150);
 })();
