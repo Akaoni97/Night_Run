@@ -59,16 +59,22 @@ gioco fa, sezione per sezione).
 - **Radio** (`radio.js`): stazione FM 103.5 Night House con quattro canzoni del proprietario in fila
   (`audio/house/`: Redline Ascent, Midnight Gearbox, Midnight Apex, Midnight Redline), poi ricomincia; il titolo in
   onda va accanto al nome. Le stazioni a scaletta si fanno con `list` al posto di `src`.
-- **Chat del telefono** (`chat.js`, 18/11/2026): conversazioni vere con 2-3 risposte e bivi (alcuni tornano sullo stesso punto,
-  altri no, altri compaiono solo con abbastanza confidenza), barra di **confidenza** per persona (si vede nelle chat e nella
-  Rubrica a schede), **gusti** che si scoprono dalle reazioni (▲ piace, ▼ non piace), soglie 25/50/75/100 che sbloccano altre
-  conversazioni. Nessun obbligo: una chat ignorata resta ad aspettare, e si possono coltivare tutte le persone. La presenza ha la sua
-  barra rossa. "Sta scrivendo…", conferma di lettura, suono breve. Le **28 conversazioni scritte da Codex** (Elena 12, Rosa 10, Livia 6, più la presenza che imita Elena e zio Claudio e i
-  messaggi sporchi) sono dentro: `chat_dati.js`, generato da `strumenti/importa_chat.py`. I **toni sono provvisori** (regole sulle parole + 17
-  risposte aggiunte da me, tra cui 10 sboccate per Rosa) finché non arriva la tabella dei toni di Codex; i km di partenza sono
-  segnaposto. Le conversazioni che dipendono da eventi non ancora fatti (incursioni, sangue, foto, fase V) restano ferme con
-  un flag `ev_…`. Prossimo materiale richiesto: `RICHIESTA_PER_CODEX_3.md`. Stato in `game.s.chat`. Ritmo rivisto: cartelloni delle app a km 5, 11,5 e 21
-  (3-5 minuti di guida tra uno e l'altro) e messaggi di Niko e del Motel a km 7 e 14.
+- **Chat del telefono** (`chat.js`): conversazioni a bivi con 2-3 risposte, barra di **confidenza** per persona, **gusti** che si scoprono dalle
+  reazioni, soglie 25/50/75/100 che si consumano una volta sola, chat ignorate che restano ad aspettare (e restano in coda se i
+  prerequisiti non ci sono ancora). I dati (982 nodi del terzo giro di Codex: le 28 conversazioni ampliate, 15 di soglia, 18 nuove, 12 delle
+  capitali, domande di casa, scene) sono in `chat_dati.js`, **generato** da `strumenti/importa_chat.py` partendo da `materiale_chat/`
+  (comando in `materiale_chat/RIGENERA.md`; `11_ATTIVAZIONE.json` decide chi parte da solo). Toni dalla tabella di Codex. I km di partenza
+  sono ancora segnaposto da calibrare giocando.
+- **La storia gira** (18/11/2026): `capitali.js` (le dodici capitali nel Viaggio: rotta in `VG_ROUTE`, arrivi, 36 cartelli, 48 eventi, pensieri dei
+  tratti, flag `luogo_<città>`), `regia.js` (patto/varco/affidamento come stati, domande di casa, scene manuali, fallimenti, epiloghi B1/B2),
+  `storia.js` (fasi dalle capitali, momenti garantiti, quattro incursioni a lampade, vicino di Elena, L'ultima porta e i finali A, B1, B2, C, D;
+  gli epiloghi di A, C e D li ho scritti io, da rivedere). Prove: `storiaDebug`, `regiaDebug`, `chatDebug` nella console.
+  Ancora da fare: sfondi propri per le capitali (oggi usano quello di Tokyo), galleria disegnata, sangue a gradi, figura alla porta, rifugio
+  dopo un fallimento, calibrazione di lampade e metri delle incursioni.
+- **Tutorial del primo lavoro** (`missioni.js`): finché non è finito non si può superare il locale giusto; poi un'uscita saltata annulla la consegna.
+- **Comandi dell'auto** (`comandi.js`): rimorchio, turbo (ECO/NORMALE/FORTE), scarico (aperto/silenzio), neon; **fari** spenti/anabbaglianti/abbaglianti
+  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: sopra i pedali). Cambio e pedali sono nascosti nella scheda Guida del menu.
+- **Fari** (`effetti2d.js`): due coni volumetrici (anabbagliante e abbagliante), alone, pozza sull'asfalto, pulviscolo.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
   ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
@@ -181,7 +187,13 @@ gioco fa, sezione per sezione).
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
 
 ## Lavori aperti e idee in sospeso
-- **Nuova storia (in corso, dal 17/11/2026)**: il proprietario vuole una storia horror **graduale** (prima tutto tranquillo, poi una piccola cosa, poi il macabro). Fatti: i **pensieri del protagonista** (`pensieri.js`: testo sulla strada di 8-10 s per radio, bisogni e pensieri a caso), il **telefono** (`telefono.js`: app normali, app da scaricare con i cartelloni sulla strada, app strane) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada). Il parente morto è **zio Claudio**. La **vecchia storia è stata cancellata** (era in `STORIA.md`, nei capitoli ed eventi di `viaggio.js` e nei testi di `missioni.js`): non rimetterla, se serve è nella cronologia git. Da fare: scrivere la storia vera (`STORIA.md` dice cosa è deciso e cosa manca), i nomi delle altre 5 auto del garage e il loro sblocco, gli effetti horror (bussare nel bagagliaio senza niente, chiamate strane, app che compaiono da sole).
+
+- **Dal report di verifica del 18/11/2026** restano aperti: i tasti 1-4 per mangiare e bere sono intercettati dalle marce (`index.html` gestione tasti),
+  il test dell'officina (la SSQV si sblocca a 5 km) e il riferimento 0-100 della Supra (6,27 s contro i 6 del test). Il menu non ferma il gioco: è voluto
+  (ci si ferma in una postazione).
+- **Pulizia da fare più avanti:** il codice morto delle vecchie gare (coupé 3D «rival», `s.rep`), i blocchi cambio e pedali nascosti nella scheda Guida,
+  le app strane del telefono (Ultima Uscita, Segreteria, 03:07) e `TEL_ATTI`, residui della vecchia storia.
+- **Nuova storia (in corso, dal 17/11/2026)**: il proprietario vuole una storia horror **graduale** (prima tutto tranquillo, poi una piccola cosa, poi il macabro). Fatti: i **pensieri del protagonista** (`pensieri.js`: testo sulla strada di 8-10 s per radio, bisogni e pensieri a caso), il **telefono** (`telefono.js`: app normali, app da scaricare con i cartelloni sulla strada, app strane) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada). Il parente morto è **zio Claudio**. La **vecchia storia è stata cancellata** (era in `docs/storia/STORIA.md`, nei capitoli ed eventi di `viaggio.js` e nei testi di `missioni.js`): non rimetterla, se serve è nella cronologia git. Da fare: scrivere la storia vera (`STORIA.md` dice cosa è deciso e cosa manca), i nomi delle altre 5 auto del garage e il loro sblocco, gli effetti horror (bussare nel bagagliaio senza niente, chiamate strane, app che compaiono da sole).
 - **Alta definizione a 720 righe** (vedi AGENTS.md, "Densità doppia"): fatti tela interna, cielo, luci sfumate,
   carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
   (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
@@ -196,8 +208,8 @@ gioco fa, sezione per sezione).
 - Passano tutti i 29 test. I due vecchi fallimenti erano errori dei test, non del gioco: la prova dello 0-100 non
   montava la configurazione originale (con il Torsen di serie fa 5,6 s e 13,7 s sui 400 m) e quella dell'officina
   non sapeva che i pezzi si sbloccano anche coi chilometri.
-- **La storia del Viaggio** si costruisce a sessioni con il proprietario e si annota in `STORIA.md`: non inventarla da soli
-  e non toccare `STORIA.md` senza che il proprietario lo chieda.
+- **La storia del Viaggio** si costruisce a sessioni con il proprietario e si annota in `docs/storia/STORIA.md`: non inventarla da soli
+  e non toccare `docs/storia/STORIA.md` senza che il proprietario lo chieda.
 - Il cognato a volte lavora con **Kimi Code** sui rami `kimi/...`: prima di toccare gli stessi file controlla con
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 

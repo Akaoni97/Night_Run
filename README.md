@@ -24,7 +24,7 @@ l'auto. Ma più chilometri fai, più la strada smette di tornare.
 
 - [`AGENTS.md`](AGENTS.md): com'è fatto il codice, le regole, come provare. Da leggere per primo.
 - [`PASSAGGIO.md`](PASSAGGIO.md): stato del gioco, lavori aperti, come pubblicare.
-- [`STORIA.md`](STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
+- [`docs/storia/STORIA.md`](docs/storia/STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
 - Prove automatiche: `node --test test/motori.test.js` (Node 22 o più recente).
 - Si prova in locale con `python3 -m http.server 8765` dalla cartella del repository.
 
@@ -488,7 +488,7 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
   Rubrica, Mappa, Foto e Orologio. Sull'autostrada compaiono cartelloni con una domanda («Portafoglio in lutto?»):
   quando li superi spunta l'icona da scaricare (download finto) di Lavori, Passeggeri e Motel. Le app strane e le
   chiamate strane compaiono da sole, con la storia. Messaggi e chiamate dipendono dai km (`TEL_SMS`, `TEL_ATTI`).
-- **La storia.** La nuova storia è in costruzione (`STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
+- **La storia.** La nuova storia è in costruzione (`docs/storia/STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
   strutture già pronte e vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` in `viaggio.js`) che aspettano i testi.
 
 **Modalità.** *Il Viaggio* è la modalità principale; *Città libera* e *Montagna* sono le

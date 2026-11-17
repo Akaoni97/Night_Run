@@ -35,7 +35,7 @@ URL: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (versione attuale in `PAS
 
 ## Documentazione
 Ogni funzione nuova va in `AGENTS.md` (tabella dei file, conteggio dei test) e `PASSAGGIO.md` ("Com'è fatto il
-gioco", lavori aperti). `STORIA.md` si tocca solo se lo chiede il proprietario.
+gioco", lavori aperti). `docs/storia/STORIA.md` si tocca solo se lo chiede il proprietario.
 
 ## Rapporto finale
 In italiano: cosa è cambiato per il giocatore, cosa è stato provato e cosa no, link all'artifact, link alle pull
