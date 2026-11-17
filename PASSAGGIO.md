@@ -72,6 +72,11 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
+  sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`): con gli abbaglianti accetta la sfida solo un'auto della
+  tua categoria (40 %, 65 % le sportive), le altre ti fanno passare dicendo perché; i mezzi da lavoro mai. Traguardi:
+  Cinque marche, Una per tipo, Il garage dello zio (le sei del prologo), Re di ogni categoria. Le altre cinque auto del
+  garage dello zio sono normali auto in commercio.
 - **Testi con l'auto scelta**: `{Auto}`, `{auto}`, `{tipo}` nei testi della storia (pensieri, capitoli, messaggi) diventano
   «La Panda», «l'Audi», «un'utilitaria»… secondo l'auto ereditata (`game.s.vg.eredita`, `vgTesto` e `VG_AUTO_NOME` in `viaggio.js`).
 - **Tasti, eredità, giunti (17/11/2026)**: tolto il "ta-dum" delle ruote sui giunti dell'asfalto (dava fastidio);

@@ -7,6 +7,17 @@
 // auto "che ci stanno": con gli abbaglianti accettano la sfida più spesso; i mezzi da lavoro non accettano mai
 const ST_SPORTY = ['golf', 'p205', 'p206', 'williams', 'v850', 'a3', 'e30', 'e36', 'e34', 'r5', 'b2002', 'a112', 'supra'];
 const ST_NEVER = ['bus', 'van', 'doblo', 'ambulanza', 'taxi'];
+// categorie: con gli abbaglianti si sfidano solo auto della stessa categoria (una Panda non corre contro una M5)
+const ST_CAT = {
+  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112'],
+  familiare: ['v40', 'a80', 'a3', 'p308', 'v850', 'taxi'],
+  hot: ['golf', 'p205', 'p206', 'williams', 'r5'],
+  sportiva: ['e30', 'e36', 'e34', 'b2002', 'supra'],
+  lavoro: ['bus', 'van', 'doblo', 'ambulanza', 'polizia'],
+};
+const ST_CAT_NAME = { utilitaria: 'utilitarie', familiare: 'familiari', hot: 'piccole sportive', sportiva: 'sportive', lavoro: 'mezzi da lavoro' };
+const ST_CAT_ONE = { utilitaria: 'un\'utilitaria', familiare: 'una familiare', hot: 'una piccola sportiva', sportiva: 'una sportiva', lavoro: 'un mezzo da lavoro' };
+function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return k; return 'familiare'; }
 const ST_RACE_M = 2000;                                      // sfida in corsa: due chilometri fissi
 // reputazione: cosa si sblocca vincendo le sfide di strada
 const ST_REP_PERKS = [
@@ -44,12 +55,15 @@ const ST_REP_PERKS = [
     lead.flashed = true;
     const rep = this.streetRep();
     const sporty = ST_SPORTY.includes(lead.vt), never = ST_NEVER.includes(lead.vt);
-    const chance = never ? 0 : (sporty ? 0.65 : 0.22) + (this.repPerk('rep_rispetto') ? 0.15 : 0) + Math.min(0.15, rep.rep * 0.004);
+    const cl = stCat(lead.vt), cm = stCat(this.car), same = cl === cm && cl !== 'lavoro';
+    const chance = never || !same ? 0 : (sporty ? 0.65 : 0.4) + (this.repPerk('rep_rispetto') ? 0.15 : 0) + Math.min(0.15, rep.rep * 0.004);
     if (Math.random() < chance && sim.v > 8) { this.startStreetRace(lead); return 'race'; }
     // non ci sta: mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
     const to = lead.lane > 1 ? lead.lane - 1 : lead.lane + 1;
     lead.to = to; lead.sig = 1.0; lead.yield = 4;
-    this.say(`${(CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto'} davanti mette la freccia e ti fa passare`, 'info');
+    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto';
+    if (!never && !same && cm !== 'lavoro') this.say(`${nm} è ${ST_CAT_ONE[cl]}, tu guidi ${ST_CAT_ONE[cm]}: niente sfida, mette la freccia e ti fa passare`, 'info');
+    else this.say(`${nm} davanti mette la freccia e ti fa passare`, 'info');
     return 'yield';
   };
 
@@ -81,7 +95,7 @@ const ST_REP_PERKS = [
     R.gap = his - my;
     if (my >= ST_RACE_M || his >= ST_RACE_M || R.t > 120) {
       const win = my >= his, rep = this.streetRep();
-      if (win) { rep.w++; rep.rep += 3 + (ST_SPORTY.includes(e.vt) ? 2 : 0); } else { rep.l++; rep.rep = Math.max(0, rep.rep - 1); }
+      if (win) { rep.w++; rep.rep += 3 + (ST_SPORTY.includes(e.vt) ? 2 : 0); (rep.cat = rep.cat || {})[stCat(e.vt)] = (rep.cat[stCat(e.vt)] || 0) + 1; } else { rep.l++; rep.rep = Math.max(0, rep.rep - 1); }
       this.s.rep = (this.s.rep || 0) + (win ? 2 : 0);
       e.racing = false; e.vT = e.vBase || e.v * 0.8;
       this.street = null;
@@ -143,4 +157,4 @@ const ST_REP_PERKS = [
     if (km > this.nextRoadEvent && !this.race) { this.nextRoadEvent = km + 7 + Math.random() * 12; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
   };
 })();
-if (typeof window !== 'undefined') Object.assign(window, { ST_REP_PERKS, ST_RACE_M });
+if (typeof window !== 'undefined') Object.assign(window, { ST_REP_PERKS, ST_RACE_M, ST_CAT, ST_CAT_NAME, ST_CAT_ONE, stCat });
