@@ -183,3 +183,12 @@ test('capitali: le dodici stanno nella rotta del Viaggio, nell\'ordine, e hanno 
   const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
   for (const id of CAP_ORDER) { assert.ok(CAP[id].arrivo.length > 20, id); assert.ok(id === 'tokyo' || game.includes(`id: '${id}'`), `luogo ${id} in GAME_LOCS`); }
 });
+
+test('capitali: 36 cartelli (≤ 22 caratteri) e 48 eventi, ognuno con una capitale e una fase valide', () => {
+  const cap = readFileSync(new URL('../capitali.js', import.meta.url), 'utf8');
+  const { CAP_ORDER, CAP_SIGNS, CAP_EVT, CAP_FASE_KM } = new Function(cap.slice(0, cap.indexOf('(function')) + ';return { CAP_ORDER, CAP_SIGNS, CAP_EVT, CAP_FASE_KM };')();
+  assert.equal(Object.values(CAP_SIGNS).flat().length, 36);
+  for (const t of Object.values(CAP_SIGNS).flat()) assert.ok(t.length <= 22 && /^[A-Z0-9 .\-']+$/.test(t), t);
+  assert.equal(CAP_EVT.length, 48);
+  for (const e of CAP_EVT) { assert.ok(CAP_ORDER.includes(e.cap) && CAP_FASE_KM[e.fase] !== undefined, e.id); assert.ok(e.testo.length <= 140, e.id); }
+});
