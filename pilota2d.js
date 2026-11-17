@@ -180,7 +180,8 @@
     const rx = R.getContext('2d'); rx.globalCompositeOperation = 'source-over'; rx.clearRect(0, 0, R.width, R.height);
     const off = ((this.st.reflOff || 0) % (w * F) + w * F) % (w * F);
     rx.fillStyle = `rgba(220,235,255,${0.1 + 0.08 * nt})`;
-    for (const [o, wd] of [[0, 7], [w * F * 0.45, 3], [w * F * 0.7, 12]]) { const bx = (o - off + w * F) % (w * F); rx.beginPath(); rx.moveTo(bx, 0); rx.lineTo(bx + wd * F, 0); rx.lineTo(bx + wd * F - h * F * 0.5, h * F); rx.lineTo(bx - h * F * 0.5, h * F); rx.closePath(); rx.fill(); }
+    // riflessi diagonali sul vetro: tolti (davano fastidio sul guidatore)
+    for (const [o, wd] of []) { const bx = (o - off + w * F) % (w * F); rx.beginPath(); rx.moveTo(bx, 0); rx.lineTo(bx + wd * F, 0); rx.lineTo(bx + wd * F - h * F * 0.5, h * F); rx.lineTo(bx - h * F * 0.5, h * F); rx.closePath(); rx.fill(); }
     // finestrino che scende: sopra il bordo del cristallo non c'è più vetro (niente riflessi, il pilota si vede pulito);
     // il bordo è una riga chiara con l'ombra sotto, e scende insieme al motorino
     const wo = Math.max(0, Math.min(1, s.win || 0));

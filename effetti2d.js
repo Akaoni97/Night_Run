@@ -326,7 +326,7 @@
       } else {
         // riflesso del lampione: una fascia larga e tenue su tutta la fiancata e una lama stretta sul tetto e sui vetri
         const lc = l.col || '255,214,150', band = (hw, a, y1) => { const gr = x.createLinearGradient(l.x - hw, 0, l.x + hw, 0); gr.addColorStop(0, `rgba(${lc},0)`); gr.addColorStop(0.5, `rgba(${lc},${a})`); gr.addColorStop(1, `rgba(${lc},0)`); x.fillStyle = gr; x.fillRect(l.x - hw, 0, hw * 2, y1); };
-        band(l.w, l.a * 0.5, h); band(l.w * 0.3, l.a, h * 0.5);
+        band(l.w, l.a * 0.5, h);                       // solo la fascia larga e tenue sulla fiancata: la lama stretta sul tetto e sui vetri è tolta
       }
     }
     x.globalCompositeOperation = 'destination-in'; x.drawImage(spr, 0, 0);
