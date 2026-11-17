@@ -107,22 +107,46 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
 })();
 
 // ---------------------------------------------------------------- il testo sulla strada (solo nel browser)
+// In basso, subito a destra della barra dell'autostrada (la mappa a barra, stretta apposta), sulla sua stessa riga e prima del
+// bottone della corsia. Dove non c'è spazio (schermi stretti) sta in basso a destra, alzato sopra quello che occupa l'angolo
+// (pedali al tocco, riquadro del cambio, bottone corsia). Ogni 150 ms ricalcola dove sono gli altri. Si nasconde col menu,
+// il prologo o il telefono aperti.
 (function testo() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   let el = null, mostrato = -1;
   const css = document.createElement('style');
-  css.textContent = `.pensiero{position:absolute;left:50%;bottom:31%;transform:translate(-50%,6px);max-width:min(620px,76%);text-align:center;pointer-events:none;z-index:6;
-    font:italic 500 clamp(15px,2vw,22px)/1.4 "Barlow Semi Condensed",Georgia,serif;color:#f4ead2;letter-spacing:.01em;opacity:0;transition:opacity .7s ease,transform .7s ease;
+  css.textContent = `.pensiero{position:absolute;right:12px;bottom:84px;width:max-content;max-width:clamp(160px,calc(50% - 232px),360px);text-align:right;pointer-events:none;z-index:6;
+    font:italic 500 clamp(14px,1.7vw,21px)/1.4 "Barlow Semi Condensed",Georgia,serif;color:#f4ead2;letter-spacing:.01em;opacity:0;transform:translateY(6px);transition:opacity .7s ease,transform .7s ease;
     text-shadow:0 0 12px #000,0 0 3px #000,0 2px 5px #000}
-    .pensiero.on{opacity:.95;transform:translate(-50%,0)}
+    .pensiero.on{opacity:.95;transform:none}
     @media (prefers-reduced-motion:reduce){.pensiero{transition:none}}`;
   document.head.appendChild(css);
+  const visibile = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return b.width < 1 || b.height < 1 ? null : b; };
+  // dove mettere il testo: accanto alla barra se c'è spazio (almeno 200 px), altrimenti sopra l'angolo in basso a destra
+  const posizione = (stage) => {
+    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap')), ln = visibile(document.querySelector('.lanebtn.r'));
+    const fine = ln ? ln.left - 12 : r.right - 12;                       // il testo finisce prima del bottone della corsia
+    if (mm) {
+      const libero = fine - (mm.right + 16);
+      if (libero >= 200) return { accanto: true, left: Math.round(mm.right + 16 - r.left), bottom: Math.round(r.bottom - mm.bottom), maxW: Math.min(libero, 420) };
+    }
+    let top = r.bottom;                                                  // altrimenti: sopra il più alto tra gli elementi visibili della metà destra
+    for (const sel of ['#hudG', '.touchpedals', '.lanebtn.r']) {
+      const b = visibile(document.querySelector(sel)); if (!b || b.right < r.left + r.width / 2) continue;
+      top = Math.min(top, b.top);
+    }
+    return { accanto: false, bottom: Math.max(14, Math.round(r.bottom - top + 12)) };
+  };
   setInterval(() => {
     const NR = window.nightRun, g = NR && NR.game, th = g && g.thought; if (!th) return;
     const stage = document.getElementById('roadStage'); if (!stage) return;
     if (!el) { el = document.createElement('div'); el.className = 'pensiero'; el.setAttribute('aria-live', 'polite'); stage.appendChild(el); }
     if (th.id !== mostrato) { mostrato = th.id; el.textContent = th.text; }
-    const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing);
+    const p = posizione(stage), st = el.style;
+    st.bottom = p.bottom + 'px';
+    if (p.accanto) { st.left = p.left + 'px'; st.right = 'auto'; st.maxWidth = p.maxW + 'px'; st.textAlign = 'left'; }
+    else { st.left = 'auto'; st.right = '12px'; st.maxWidth = ''; st.textAlign = ''; }
+    const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing) || (window.telefono && window.telefono.isOpen);
     el.classList.toggle('on', th.left > 0.8 && !nascosto);
   }, 150);
 })();
