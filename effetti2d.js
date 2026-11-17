@@ -414,16 +414,19 @@
     return c;
   };
   // nuvola a tre toni: corpo scuro, dorso schiarito dalla luna, pancia tinta dalle luci della città
+  // nuvola notturna: un velo morbido fatto di tanti sbuffi sfumati, scuro, col bordo di sopra schiarito dalla luna
+  // e la pancia appena tinta dalle luci di sotto (niente contorni netti: di notte le nuvole non hanno bordi)
   S.cloudHD = function (k, SS) {
-    const w = 96 + k * 26, hh = 30;
+    const w = 110 + k * 30, hh = 34;
     return this.sprite(w * SS, hh * SS, (x) => {
       x.scale(SS, SS);
-      // cumulo: base piatta, gobbe più alte al centro; il ritaglio taglia tutto quello che scende sotto la base
-      x.beginPath(); x.rect(0, 0, w, 25); x.clip();
-      const n = 8 + k, hump = (col, dy, rs, sd) => { x.fillStyle = col; for (let i = 0; i < n; i++) { const m = Math.sin(Math.PI * (i + 0.5) / n), r = (4 + 9 * m * (0.7 + 0.6 * rnd(i * 3 + k * 7 + sd))) * rs; x.beginPath(); x.arc(10 + i * ((w - 20) / (n - 1)), 23 - r * 0.55 + dy, r, 0, Math.PI * 2); x.fill(); } };
-      hump('#2c2862', 0, 1, 0); hump('#3a3580', -2.2, 0.74, 0); hump('#5650a2', -4.6, 0.42, 0);
-      x.fillStyle = '#4a316e'; x.fillRect(8, 22, w - 16, 3);                                 // pancia tinta dalla città
-      x.fillStyle = '#2c2862'; for (let i = 0; i < w - 16; i += 2) if (rnd(i + k) > 0.5) x.fillRect(8 + i, 22, 2, 1);
+      const n = 14 + k * 3, blob = (cx, cy, rx, ry, rgb, a) => { x.save(); x.translate(cx, cy); x.scale(1, ry / rx); const gr = x.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(0.6, `rgba(${rgb},${a * 0.55})`); gr.addColorStop(1, `rgba(${rgb},0)`); x.fillStyle = gr; x.fillRect(-rx, -rx, rx * 2, rx * 2); x.restore(); };
+      const pts = [];
+      for (let i = 0; i < n; i++) { const u = (i + 0.5) / n, m = Math.sin(Math.PI * u); pts.push([8 + u * (w - 16) + (rnd(i * 3 + k) - 0.5) * 8, 20 - m * (6 + 5 * rnd(i * 5 + k)), 9 + 13 * m * (0.6 + 0.5 * rnd(i * 7 + k)), 4 + 4 * m]); }
+      for (const [cx, cy, rx, ry] of pts) blob(cx, cy + 2, rx, ry + 1, '30,28,70', 0.55);          // corpo
+      for (const [cx, cy, rx, ry] of pts) blob(cx, cy + 5, rx * 0.8, ry * 0.6, '70,40,90', 0.18);    // pancia tinta dalle luci di sotto
+      x.globalCompositeOperation = 'source-atop';
+      for (const [cx, cy, rx, ry] of pts) blob(cx - 2, cy - ry * 0.6, rx * 0.7, ry * 0.5, '150,150,210', 0.22);   // dorso illuminato dalla luna
     }, false);
   };
   S.skyHD = function (g, t, dist) {
@@ -449,7 +452,7 @@
     const lay = [[3, 22, 0.5, 2, 0.55], [1, 44, 0.62, 3, 0.7], [0, 30, 0.8, 4, 0.85], [2, 66, 1, 5.5, 1], [1, 98, 0.9, 7, 0.9], [3, 120, 0.7, 4.5, 0.6]];
     lay.forEach(([k, y, sc, sp, al], n) => {
       const c = this.spr[ck][k], cw = c.width / SS * sc, span = W + 300, cx = ((-(t * sp) - dist * 0.03 * sc + n * 233) % span + span) % span - 150;
-      g.globalAlpha = al * (this.rainOn ? 0.5 : 1); g.drawImage(c, Math.round(cx), y, cw, c.height / SS * sc);
+      g.globalAlpha = al * 0.85 * (this.rainOn ? 0.5 : 1); g.drawImage(c, Math.round(cx), y, cw, c.height / SS * sc);
     });
     g.globalAlpha = 1;
   };

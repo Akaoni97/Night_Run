@@ -747,14 +747,18 @@ class Street2D {
   drawSky(g, t, dist) {
     const W = this.LW;
     this.skyHD(g, t, dist);                                                    // fondo, stelle, luna e nuvole: effetti2d.js
+    // tinta del cielo per paesaggio: ogni posto ha la sua notte (la città resta viola)
+    const TINT = { plain: ['40,70,110', '120,130,150', 0.28], mountain: ['14,34,84', '40,60,110', 0.3], sea: ['16,56,120', '60,110,170', 0.26], village: ['60,40,90', '170,110,80', 0.22], desert: ['70,24,70', '220,110,90', 0.26] }[this._bg];
+    if (TINT && (this.day || 0) < 0.8) { const gr = g.createLinearGradient(0, 0, 0, 224); gr.addColorStop(0, `rgba(${TINT[0]},${TINT[2]})`); gr.addColorStop(0.7, `rgba(${TINT[0]},${TINT[2] * 0.6})`); gr.addColorStop(1, `rgba(${TINT[1]},${TINT[2] * 0.9})`); g.fillStyle = gr; g.fillRect(0, 0, W, 224); }
     const ax = ((t * 12) % (W + 80)) - 40, ay = 22 + Math.sin(t * 0.2) * 3;
     g.fillStyle = '#2a2850'; g.fillRect(Math.round(ax), Math.round(ay), 8, 2); g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 2, 6);
     if (Math.floor(t * 2) % 2) { g.fillStyle = '#ff3b3b'; g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 1, 1); } else { g.fillStyle = '#ffffff'; g.fillRect(Math.round(ax) + 7, Math.round(ay), 1, 1); }
     const night = 1 - (this.day || 0);
     if (night < 0.2) return;
-    // fari pubblicitari della città che spazzano il cielo (due coni lenti, viola e ciano)
+    // fari pubblicitari della città che spazzano il cielo (due coni lenti, viola e ciano): solo dove c'è la città
+    const urb = !this._bg || this._bg === 'city' || this._bg === 'highway';
     g.save(); g.globalCompositeOperation = 'lighter';
-    for (let q = 0; q < 2; q++) {
+    for (let q = 0; urb && q < 2; q++) {
       const bx = ((q ? W * 0.72 : W * 0.18) - dist * 0.03 % W + W) % W, a = -Math.PI / 2 + Math.sin(t * (0.23 + q * 0.07) + q * 2) * 0.55;
       const len = 260, wdt = 0.06, col = q ? '120,230,255' : '190,130,255';
       const gr = g.createLinearGradient(bx, 200, bx + Math.cos(a) * len, 200 + Math.sin(a) * len);
@@ -765,7 +769,7 @@ class Street2D {
     g.restore();
     // elicottero col faro di ricerca, ogni tanto
     const hp = (t % 46) / 46;
-    if (hp < 0.55) {
+    if (urb && hp < 0.55) {
       const hx = W + 40 - hp / 0.55 * (W + 80), hy = 62 + Math.sin(t * 0.7) * 6, rot = Math.floor(t * 30) % 2;
       g.save(); g.globalCompositeOperation = 'lighter';
       const sa = Math.PI / 2 + Math.sin(t * 0.9) * 0.35, gr = g.createLinearGradient(hx, hy, hx + Math.cos(sa) * 170, hy + Math.sin(sa) * 170);
@@ -1075,7 +1079,7 @@ class Street2D {
     if (bg === 'highway') {
       // Wangan: la città dall'altra parte della baia, l'acqua con i riflessi, un ponte strallato, la barriera antirumore
       this.drawCity(g, dist, t, 'haze', 0.025, 172, 50);
-      { const hz = g.createLinearGradient(0, 60, 0, 174); hz.addColorStop(0, 'rgba(40,30,80,0)'); hz.addColorStop(0.35, 'rgba(40,30,80,.5)'); hz.addColorStop(1, 'rgba(40,30,80,.62)'); g.fillStyle = hz; g.fillRect(0, 60, W, 114); }   // la città è lontana, dall'altra parte della baia: quasi solo luci
+      { const hz = g.createLinearGradient(0, 60, 0, 174); hz.addColorStop(0, 'rgba(40,30,80,0)'); hz.addColorStop(0.35, 'rgba(40,30,80,.3)'); hz.addColorStop(1, 'rgba(40,30,80,.42)'); g.fillStyle = hz; g.fillRect(0, 60, W, 114); }   // la città è lontana, dall'altra parte della baia: quasi solo luci
       this.tileRun(dist * 0.06, 1100, (i, x) => {
         if (rnd(i * 7.1) < 0.45) return;
         const bx = x + 200, top = 96, deck = 166;
@@ -1701,6 +1705,7 @@ class Street2D {
 
     if (game && game.inside && game.inside.phase === 'shop') { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
     // ---- sfondo: cielo, tre piani di città, foschia
+    this._bg = (game && game.loc && game.loc.bg) || this.bg || 'city';            // il cielo sa dove sei (fari e elicottero solo in città)
     this.drawSky(g, st.t, dist);
     // temporale: con la pioggia ogni tanto un fulmine (saetta nel cielo, lampo su tutta la scena, poi il tuono)
     st.bolt = Math.max(0, (st.bolt || 0) - dt * 3.2);
@@ -1740,7 +1745,7 @@ class Street2D {
       // una sola copia dello sfondo a risoluzione logica (la scia è comunque sfocata), poi tre passate spostate
       const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W) { sm.width = W; sm.height = 192; }
       const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W, 192);
-      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[5, 0.32], [11, 0.2], [18, 0.12]]) { g.globalAlpha = a * smear; g.drawImage(sm, -o * (0.5 + smear), 40, W, 192); } g.restore();
+      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.24], [9, 0.13], [15, 0.06]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }   // lo sfondo scorre a sinistra: la scia resta dietro, a destra g.restore();
     }
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
@@ -1786,6 +1791,7 @@ class Street2D {
     for (let m = Math.ceil(visFrom / 23) * 23; m < visTo; m += 23) { const x = wx(m); g.fillStyle = C.ink; g.fillRect(x - 1, 330, 14, 6); g.fillStyle = '#12141f'; g.fillRect(x, 331, 12, 4); g.fillStyle = '#3a3f58'; for (let k = 1; k < 12; k += 3) g.fillRect(x + k, 331, 1, 4); }
     g.fillStyle = C.line; g.fillRect(0, 238, W, 2); g.fillRect(0, 335, W, 2);
     for (let x = -((dist * PPM) % (12 * PPM)); x < W; x += 12 * PPM) { g.fillRect(Math.round(x), 262, Math.round(4.5 * PPM), 2); g.fillRect(Math.round(x), 300, Math.round(4.5 * PPM), 2); }
+    if (!urban && !TUN && this.pStuds) this.pStuds(g, dist, PPM, carX, 1 - (this.day || 0));   // catarifrangenti (paesaggi2d.js)
     // incroci: strisce pedonali ogni 260 m (il semaforo si disegna davanti, alla fine)
     for (let m = Math.floor((visFrom - 140) / 260) * 260 + 130; urban && m < visTo + 10; m += 260) {
       const x = wx(m);
@@ -1836,7 +1842,7 @@ class Street2D {
     this.marks = this.marks.filter((mk) => wx(mk.m) > -60).slice(-400);
 
     // ---- lampioni: alone piccolo, pozza a terra, riflesso sul bagnato (niente fasci)
-    const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
+    const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40, plain: 55 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
     for (let lm = Math.floor(visFrom / (lampSp || 1)) * lampSp; lampSp && lm < visTo + lampSp; lm += lampSp) {
       if (TUN && lm > TUN.a - 30 && lm < TUN.b + 4) continue;                  // in galleria niente lampioni
       const x = wx(lm), bro = !!DM && Street2D.rnd(lm * 0.77 + 3) < DM.broken, on = !bro || Math.sin(st.t * 23 + lm) + Math.sin(st.t * 7.3 + lm * 2) > 1.55;   // rotto: si accende a scatti

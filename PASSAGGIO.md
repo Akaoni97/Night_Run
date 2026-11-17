@@ -72,6 +72,12 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Grafica dei paesaggi (17/11/2026)**: `paesaggi2d.js` (luci lontane, fari, treni, torri illuminate, catarifrangenti),
+  lampioni anche nella Bassa (ogni 55 m), cielo con la sua tinta per paesaggio (`drawSky`: azzurro-grigio nella Bassa, blu
+  in montagna e al mare, caldo a San Gimignano, rosa nel deserto), fari pubblicitari ed elicottero solo in città e sul
+  Wangan, nuvole rifatte come veli morbidi illuminati dalla luna (`cloudHD`), meno foschia sulla città del Wangan. Corretta
+  la scia della velocità, che era disegnata davanti alle cose invece che dietro (fantasmi sulle case). Messaggi: la pila
+  a destra parte sotto il radar delle corsie (al massimo 3), l'avviso del telefono sotto la barra in alto.
 - **Economia (rivista il 17/11/2026)**: prezzi delle auto credibili (nuove: Panda 13.500, Punto 14.000, Corsa 15.500,
   Clio 17.000, Polo 17.500, 308 25.000, A3 30.000; usate e d'epoca: Audi 80 4.500, 206 GTI 6.500, Golf GTI 15.000, A112
   14.000, 205 GTI 19.000, Williams 25.000, E36 28.000, M5 32.000, 2002 Turbo 55.000, Supra 65.000, E30 75.000, R5 Turbo

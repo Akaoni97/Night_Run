@@ -326,7 +326,7 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .lanebtn small { font: 400 10px/1 var(--f-data); color: var(--muted); margin-top: -10px; }
 .lanebtn.l { left: 12px; } .lanebtn.r { right: 12px; }
 .lanebtn:active { background: rgba(255,179,71,.25); }
-.toasts { position: absolute; right: 12px; top: 12px; display: grid; gap: 6px; justify-items: end; max-width: min(380px, 60%); }
+.toasts { position: absolute; right: 12px; top: 31%; display: grid; gap: 6px; justify-items: end; max-width: min(380px, 60%); }   /* sotto il radar delle corsie e la radio */
 .toast { font: 400 13.5px/1.3 var(--f-data); padding: 6px 10px; background: rgba(10,9,7,.82); border-right: 3px solid var(--amber); animation: tin .25s ease-out; }
 .toast.money { border-color: var(--lime); color: var(--lime); }
 .toast.police, .toast.lose { border-color: var(--crit); color: #ffb3bf; }
@@ -1189,6 +1189,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="luci2d.js"></script>
 <script src="effetti2d.js"></script>
 <script src="dettagli2d.js"></script>
+<script src="paesaggi2d.js"></script>
 <script src="viaggio2d.js"></script>
 <script src="hudpro.js"></script>
 <script src="icone.js"></script>
@@ -3029,7 +3030,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     for (const m of game.out.splice(0)) {
       const t = document.createElement('div'); t.className = 'toast ' + m.kind; t.textContent = m.text;
       const box = $('toasts'); box.prepend(t);
-      while (box.children.length > 4) box.lastChild.remove();
+      while (box.children.length > 3) box.lastChild.remove();
       setTimeout(() => t.remove(), 5200);
     }
     // sirena bitonale
