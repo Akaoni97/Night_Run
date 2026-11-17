@@ -255,17 +255,22 @@
     x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
-  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = apertura alla fine. Un cono morbido a tre strati (alone, corpo, anima).
-  // Due di questi fanno anabbagliante e abbagliante.
+  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = semiapertura alla fine. Cono volumetrico morbido: più denso vicino al faro,
+  // con il centro caldo e i bordi che sfumano (niente retino). Due di questi fanno anabbagliante e abbagliante.
   S.beamShaft = function (len, w) {
-    const SS = this.SS || 1, key = 'shaft' + Math.round(len / 10) + '_' + Math.round(w) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
+    const SS = this.SS || 1, key = 'shaft2_' + Math.round(len / 10) + '_' + Math.round(w) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
     if (B[key]) return B[key];
     const H = Math.ceil(w * 2 + 8), c = document.createElement('canvas'); c.width = len * SS; c.height = H * SS; c.oy = H / 2; c.lw = len; c.lh = H;
-    const x = c.getContext('2d'); x.scale(SS, SS);
-    for (const [k, a] of [[1, 0.16], [0.62, 0.22], [0.28, 0.34]]) {
-      const gr = x.createLinearGradient(0, 0, len, 0); gr.addColorStop(0, `rgba(255,244,214,${a * 1.6})`); gr.addColorStop(0.35, `rgba(255,240,200,${a})`); gr.addColorStop(1, 'rgba(255,236,190,0)');
-      x.fillStyle = gr; x.beginPath(); x.moveTo(0, c.oy - 1.5 * k); x.lineTo(len, c.oy - w * k); x.lineTo(len, c.oy + w * k); x.lineTo(0, c.oy + 1.5 * k); x.closePath(); x.fill();
+    const x = c.getContext('2d'), im = x.createImageData(len * SS, H * SS), d = im.data, W = len * SS, oy = c.oy * SS;
+    for (let px = 0; px < W; px++) {
+      const u = px / W, hw = (1.6 + (w - 1.6) * Math.pow(u, 0.85)) * SS, along = Math.pow(1 - u, 0.8) * (0.62 + 0.38 * Math.exp(-u * 5));
+      for (let py = Math.max(0, Math.floor(oy - hw)); py < Math.min(H * SS, Math.ceil(oy + hw)); py++) {
+        const t = (py + 0.5 - oy) / hw, prof = Math.pow(Math.max(0, 1 - t * t), 1.5), core = Math.exp(-t * t * 5);        // sfumatura ai bordi e centro più caldo
+        const I = along * (0.5 * prof + 0.5 * core * prof), i = (py * W + px) * 4;
+        d[i] = 255; d[i + 1] = 236 + 12 * core; d[i + 2] = 190 + 40 * core; d[i + 3] = Math.min(255, I * 255 * 0.9);
+      }
     }
+    x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
   S.fxBeamAt = function (g, fx, fy, len, ang, w, a) {
@@ -274,6 +279,29 @@
     g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a);
     g.translate(Math.round(fx), Math.round(fy)); g.rotate(ang * Math.PI / 180);
     g.drawImage(sp, 0, -sp.oy, sp.lw, sp.lh); g.restore();
+  };
+  // il resto dell'effetto: alone del faro con la lama orizzontale, pozza di luce sull'asfalto dove cade l'anabbagliante, pulviscolo nel fascio
+  S.fxHeadlamp = function (g, fx, fy, groundY, a, t) {
+    if (a < 0.02) return;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const halo = (r, al) => { const gr = g.createRadialGradient(fx, fy, 0, fx, fy, r); gr.addColorStop(0, `rgba(255,248,225,${al})`); gr.addColorStop(0.4, `rgba(255,232,170,${al * 0.35})`); gr.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = gr; g.fillRect(fx - r, fy - r, r * 2, r * 2); };
+    halo(26, 0.75 * a);
+    g.globalAlpha = 0.55 * a; const bl = g.createLinearGradient(fx - 6, 0, fx + 70, 0); bl.addColorStop(0, 'rgba(255,248,225,0.9)'); bl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = bl; g.fillRect(fx - 6, fy - 1, 76, 2);
+    g.globalAlpha = 1;
+    // pozza sull'asfalto: ellisse schiacciata davanti all'auto, calda al centro
+    const px = fx + 120, py = groundY - 6;
+    g.save(); g.translate(px, py); g.scale(1, 0.16);
+    const pg = g.createRadialGradient(0, 0, 0, 0, 0, 150); pg.addColorStop(0, `rgba(255,240,190,${0.42 * a})`); pg.addColorStop(0.5, `rgba(255,226,160,${0.16 * a})`); pg.addColorStop(1, 'rgba(255,220,150,0)');
+    g.fillStyle = pg; g.beginPath(); g.arc(0, 0, 150, 0, 7); g.fill(); g.restore();
+    // pulviscolo: puntini che brillano nel fascio, sempre gli stessi, che respirano
+    for (let q = 0; q < 26; q++) {
+      const u = 0.12 + 0.8 * Street2D.rnd(q * 3 + 1), v = (Street2D.rnd(q * 3 + 2) - 0.5), lowB = q % 2 === 0;
+      const ang = (lowB ? 12 : -2.5) * Math.PI / 180, d = u * (lowB ? 280 : 380), wv = (1.6 + (lowB ? 12 : 10) * u) * v;
+      const x2 = fx + Math.cos(ang) * d - Math.sin(ang) * wv, y2 = fy + Math.sin(ang) * d + Math.cos(ang) * wv;
+      const tw = 0.5 + 0.5 * Math.sin(t * (1.2 + Street2D.rnd(q + 9) * 2) + q * 2.1);
+      g.fillStyle = `rgba(255,244,210,${(0.55 * tw * (1 - u)) * a})`; g.fillRect(Math.round(x2), Math.round(y2), 1, 1);
+    }
+    g.restore();
   };
   S.fxBeam = function (g, fx, fy, len, dn, a) {
     if (a < 0.02) return;

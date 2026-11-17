@@ -1981,8 +1981,9 @@ class Street2D {
       const fx = left + SW - 4, fy = y0 - 22 * k;
       const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
       // due tagli di luce: l'anabbagliante scende sulla strada, l'abbagliante parte più in alto e va lontano (più forte quando sfanali)
-      this.fxBeamAt(g, fx, fy, 300, 12, 9, (1 + wet) * night);                                              // anabbagliante: scende sulla strada
-      this.fxBeamAt(g, fx, fy - 2, s.high ? 460 : 400, -2.5, 8, (s.high ? 1 : 0.7 + wet * 0.5) * night);   // abbagliante: lungo e quasi dritto
+      this.fxBeamAt(g, fx, fy, 330, 11, 17, (1 + wet) * night);                                             // anabbagliante: scende sulla strada
+      this.fxBeamAt(g, fx, fy - 2, s.high ? 480 : 420, -2.5, 19, (s.high ? 1 : 0.95 + wet * 0.5) * night);  // abbagliante: lungo e quasi dritto
+      this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
