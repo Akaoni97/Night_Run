@@ -1,11 +1,12 @@
 // ============================================================================
 //  Night Run · Il garage (dopo sfascio.js)
 //  App Garage nel telefono: le tue auto con categoria, km, stato (carrozzeria, gomme, olio, pastiglie, pulizia),
-//  potenza e valore all'Autosalone; quella che guidi in cima. Traguardi da collezionista (marche, categorie,
-//  le sei auto del garage dello zio, sfide vinte in ogni categoria). La collezione (auto avute almeno una volta) sta in
+//  potenza e valore all'Autosalone; quella che guidi in cima. Traguardi da collezionista (marche, categorie, ricomprare
+//  le auto dello zio finite in salone, sfide vinte in ogni categoria). La collezione (auto avute almeno una volta) sta in
 //  game.s.vg.coll. Le categorie (ST_CAT, stCat) sono in strada.js.
 // ============================================================================
-const GAR_ZIO = ['panda', 'a80', 'v40', 'punto', 'corsa', 'polo'];          // le sei auto del garage dello zio (prologo)
+// le sei auto del garage dello zio (prologo): se ne sceglie una, le altre cinque finiscono in vendita all'Autosalone
+const GAR_ZIO = ['panda', 'a80', 'v40', 'punto', 'corsa', 'polo'];
 const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // mezzi senza marca nel nome
 
 (function garageLogica() {
@@ -32,7 +33,7 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
       check: (g) => [new Set(Object.keys(g.garColl()).map((id) => g.garMarca(id)).filter(Boolean)).size, 5] },
     { id: 'categorie', name: 'Una per tipo', text: 'Possiedi un\'utilitaria, una familiare, una piccola sportiva e una sportiva (anche non insieme).', prize: { cassa: 'argento' },
       check: (g) => [new Set(Object.keys(g.garColl()).map((id) => stCat(id)).filter((c) => cats.includes(c))).size, 4] },
-    { id: 'zio6', name: 'Il garage dello zio', text: 'Possiedi tutte e sei le auto che c\'erano nel garage dello zio (anche non insieme).', prize: { cassa: 'oro' },
+    { id: 'zio6', name: 'Il garage dello zio', text: 'Ricompra all\'Autosalone le cinque auto dello zio che non avevi scelto (anche non insieme).', prize: { cassa: 'argento' },
       check: (g) => { const c = g.garColl(); return [GAR_ZIO.filter((id) => c[id]).length, 6]; } },
     { id: 'sfide4', name: 'Re di ogni categoria', text: 'Vinci una sfida con gli abbaglianti in ognuna delle quattro categorie.', prize: { cassa: 'oro' },
       check: (g) => { const c = (g.s.street && g.s.street.cat) || {}; return [cats.filter((k) => c[k]).length, 4]; } },
@@ -53,11 +54,11 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
 .gr-tag{display:inline-block;margin-top:3px;padding:1px 7px;border-radius:9px;font:700 10.5px system-ui;background:#ffffff1a;color:#e8e8e8}.gr-tag.cur{background:#2fd16a;color:#062a12}.gr-tag.t{background:#ffb347;color:#2a1600}
 .gr-v{font:800 14px system-ui;color:#b8ff3a}
 .gr-bars{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}.gr-bars div{font-size:10px;color:var(--t2)}.gr-bars i{display:block;height:5px;border-radius:3px;background:#ffffff1a;margin-top:3px;overflow:hidden}.gr-bars i u{display:block;height:100%}
-.gr-warn{margin-top:6px;font-size:11px;color:#ffb347}.gr-coll{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:8px}.gr-coll img{width:100%;image-rendering:pixelated;opacity:.25;filter:grayscale(1)}.gr-coll img.ok{opacity:1;filter:none}`;
+.gr-warn{margin-top:6px;font-size:11px;color:#ffb347}`;
   const bar = (label, v) => { const k = Math.max(0, Math.min(1, v)), c = k > 0.6 ? '#2fd16a' : k > 0.3 ? '#ffb347' : '#ff453a'; return `<div>${label}<i><u style="width:${Math.round(k * 100)}%;background:${c}"></u></i></div>`; };
   function render() {
     const g = G(); if (!g || !g.s || !g.s.vg) return '';
-    const list = g.garList(), coll = g.garColl(), tot = list.reduce((a, s) => a + (s.test ? 0 : s.value), 0);
+    const list = g.garList(), tot = list.reduce((a, s) => a + (s.test ? 0 : s.value), 0);
     const re = () => window.telefono.render();
     const items = list.map((s) => {
       const c = CARS[s.id] || {}, spec = g.dlSpec ? g.dlSpec(s.id) : null, warn = [];
@@ -69,10 +70,8 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
         <div class="gr-bars">${bar('Carrozzeria', 1 - s.damage)}${bar('Gomme', 1 - s.wear)}${bar('Olio', s.oil)}${bar('Pastiglie', s.pads)}${bar('Pulizia', 1 - s.dirt)}</div>
         ${warn.length ? `<div class="gr-warn">${esc(warn.join(' · '))}</div>` : ''}</div>`;
     }).join('');
-    const zio = GAR_ZIO.map((id) => `<img alt="${esc((CARS[id] || {}).name || id)}" title="${esc((CARS[id] || {}).name || id)}" class="${coll[id] ? 'ok' : ''}" src="${pic(id, re)}">`).join('');
     return `<div class="view app"><div class="nav"><h3>Garage</h3></div><div class="body">
-      <div class="gr-hd"><b>${list.length} ${list.length === 1 ? 'auto' : 'auto'} · valore € ${fmt(tot)}</b>Le auto si cambiano al Motel Ovunque e all'Autosalone Notte; si comprano lì o dai privati (app Annunci).
-        <div class="gr-coll">${zio}</div><small>Le sei del garage dello zio: ${GAR_ZIO.filter((id) => coll[id]).length} su 6</small></div>
+      <div class="gr-hd"><b>${list.length} auto · valore € ${fmt(tot)}</b>Le auto si cambiano al Motel Ovunque e all'Autosalone Notte; si comprano lì o dai privati (app Annunci).</div>
       ${items || '<p class="cen">Nessuna auto.</p>'}
     </div></div>`;
   }

@@ -303,12 +303,15 @@ if (typeof VG_PLACE !== 'undefined') {
     const h4 = (t) => { const h = document.createElement('h4'); h.textContent = t; h.style.cssText = 'margin:4px 0 0;font:400 14px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:#b69cff'; wrap.appendChild(h); };
     const btn = (label, cls, fn, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn ' + (cls || ''); b.innerHTML = label; if (dis) b.disabled = true; b.addEventListener('click', act(fn)); return b; };
 
+    // le cinque auto del garage dello zio che non hai scelto nel prologo sono finite qui, in salone
+    const zio = (id) => typeof GAR_ZIO !== 'undefined' && GAR_ZIO.includes(id) && id !== (v.eredita || 'v40');
+    const ZIO = '<em style="display:block;font:italic 600 11px/1.3 system-ui;color:#ffb347">Era nel garage dello zio</em>';
     // scheda grande di un'auto (occasione o quella scelta)
     const big = (id, isDeal) => {
       const it = VG_SHOP.find((q) => q.id === id), price = g.dlPrice(id, n), plan = g.dlFinPlan(price), lock = k < it.km, testing = v.test && v.test.id === id;
       const d = document.createElement('div'); d.className = 'dl-deal';
       d.innerHTML = `${isDeal ? `<span class="rib">OCCASIONE −${Math.round(DL.deal * 100)} %</span>` : ''}<div class="dl-pic"><img alt="${esc(CARS[id].name)}" src="${pic(id, redraw)}"></div>`
-        + `<div class="dl-name">${esc(CARS[id].name)}<small>${esc(it.note || CARS[id].tag || '')}</small></div>`
+        + `<div class="dl-name">${esc(CARS[id].name)}<small>${esc(it.note || CARS[id].tag || '')}</small>${zio(id) ? ZIO : ''}</div>`
         + `<div class="dl-price">${price !== it.price ? `<s>€ ${fmt(it.price)}</s>` : ''}€ ${fmt(price)}</div>${specRow(g, id)}`;
       const a = document.createElement('div'); a.className = 'dl-acts';
       if (lock) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = `Arriva in salone dal km ${it.km}.`; d.appendChild(p); }
@@ -333,7 +336,7 @@ if (typeof VG_PLACE !== 'undefined') {
         for (const it of list) {
           const lock = k < it.km, s = g.dlSpec(it.id), price = g.dlPrice(it.id, n);
           const c = document.createElement('button'); c.type = 'button'; c.className = `dl-card ${lock ? 'lock' : ''} ${(sel || deal) === it.id ? 'sel' : ''}`;
-          c.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(it.id, redraw)}"></div><b>${esc(CARS[it.id].name)}</b><small>${s.cv} CV · ${fmt(s.kg)} kg</small><span class="p">${lock ? 'dal km ' + it.km : '€ ' + fmt(price)}${it.id === deal ? ' ★' : ''}</span>`;
+          c.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(it.id, redraw)}"></div><b>${esc(CARS[it.id].name)}</b><small>${s.cv} CV · ${fmt(s.kg)} kg</small>${zio(it.id) ? ZIO : ''}<span class="p">${lock ? 'dal km ' + it.km : '€ ' + fmt(price)}${it.id === deal ? ' ★' : ''}</span>`;
           c.addEventListener('click', () => { UI.sel = it.id; redraw(); const b = document.getElementById('placeBody'); if (b) b.scrollTo({ top: 0, behavior: 'smooth' }); });
           grid.appendChild(c);
         }

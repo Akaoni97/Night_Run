@@ -75,8 +75,8 @@ gioco fa, sezione per sezione).
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
   sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`): con gli abbaglianti accetta la sfida solo un'auto della
   tua categoria (40 %, 65 % le sportive), le altre ti fanno passare dicendo perché; i mezzi da lavoro mai. Traguardi:
-  Cinque marche, Una per tipo, Il garage dello zio (le sei del prologo), Re di ogni categoria. Le altre cinque auto del
-  garage dello zio sono normali auto in commercio.
+  Cinque marche, Una per tipo, Il garage dello zio (tappa secondaria: ricomprare le cinque non scelte), Re di ogni categoria.
+  Le cinque auto dello zio non scelte nel prologo finiscono in vendita all'Autosalone (scritta «Era nel garage dello zio»).
 - **Testi con l'auto scelta**: `{Auto}`, `{auto}`, `{tipo}` nei testi della storia (pensieri, capitoli, messaggi) diventano
   «La Panda», «l'Audi», «un'utilitaria»… secondo l'auto ereditata (`game.s.vg.eredita`, `vgTesto` e `VG_AUTO_NOME` in `viaggio.js`).
 - **Tasti, eredità, giunti (17/11/2026)**: tolto il "ta-dum" delle ruote sui giunti dell'asfalto (dava fastidio);
