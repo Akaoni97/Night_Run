@@ -59,6 +59,13 @@ gioco fa, sezione per sezione).
 - **Radio** (`radio.js`): stazione FM 103.5 Night House con quattro canzoni del proprietario in fila
   (`audio/house/`: Redline Ascent, Midnight Gearbox, Midnight Apex, Midnight Redline), poi ricomincia; il titolo in
   onda va accanto al nome. Le stazioni a scaletta si fanno con `list` al posto di `src`.
+- **Chat del telefono** (`chat.js`, 18/11/2026): conversazioni vere con 2-3 risposte e bivi (alcuni tornano sullo stesso punto,
+  altri no, altri compaiono solo con abbastanza confidenza), barra di **confidenza** per persona (si vede nelle chat e nella
+  Rubrica a schede), **gusti** che si scoprono dalle reazioni (▲ piace, ▼ non piace), soglie 25/50/75/100 che sbloccano altre
+  conversazioni. Nessun obbligo: una chat ignorata resta ad aspettare, e si possono coltivare tutte le persone. La presenza ha la sua
+  barra rossa. "Sta scrivendo…", conferma di lettura, suono breve. I testi sono **segnaposto**; il materiale vero arriva da Codex
+  (`RICHIESTA_PER_CODEX.md`, stesso formato dei nodi). Stato in `game.s.chat`. Ritmo rivisto: cartelloni delle app a km 5, 11,5 e 21
+  (3-5 minuti di guida tra uno e l'altro) e messaggi di Niko e del Motel a km 7 e 14.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
   ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
