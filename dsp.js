@@ -238,8 +238,9 @@ class EngineDSP {
   // I = forza (0..1,5); kind: front (tamponi tu), rear (ti tamponano), side (strisciata di fianco), bump (colpetto)
   hit(I, kind) {
     const sr = this.sr, H = this.H || (this.H = {
-      th: 0, thPh: 0, thF: 60, cr: 0, crG: 0, crHold: 0, crBP: new BQ(), crBP2: new BQ(), crLP: new BQ(),
-      ring: [0, 1, 2, 3, 4].map(() => ({ f: 0, ph: 0, a: 0, d: 1 })), gT: 0, gA: 0, gl: 0, glBP: new BQ(), glHP: new BQ().set('hp', 3800, 0.7, sr),
+      th: 0, cr: 0, crG: 0, crHold: 0, crBP: new BQ(), crBP2: new BQ(), crLP: new BQ(),
+      ring: [0, 1, 2, 3, 4].map(() => ({ bq: new BQ(), a: 0, d: 1 })), gT: 0, gA: 0,
+      tr: 0, trHP: new BQ().set('hp', 1200, 0.7, sr), boom: new BQ(), thLP: new BQ(), thLPf: 900, gs: 0, gsBP: new BQ(), gl: 0, glBP: new BQ(), glHP: new BQ().set('hp', 3800, 0.7, sr),
       db: 0, dbBP: new BQ(), sc: 0, scT: 0, scLen: 0, scBP: new BQ(), scSq: new BQ(), scLP: new BQ().set('lp', 140, 0.7, sr), scPh: 0, scJ: 0,
       cab: new BQ(), cabState: -1, ex: 0,
     });
@@ -251,21 +252,22 @@ class EngineDSP {
       // strisciata: lamiera contro lamiera per qualche decimo di secondo, colpo leggero all'inizio
       H.sc = Math.max(H.sc, 0.55 + 0.45 * Math.min(1, I)); H.scT = 0; H.scLen = 0.45 + 0.35 * u();
       H.scBP.set('bp', 1100 + 900 * u(), 1.6, sr); H.scSq.set('bp', 2600 + 1600 * u(), 14, sr);
-      H.th = Math.max(H.th, 0.35 * I); H.thF = 85; H.thPh = 0;
+      H.th = Math.max(H.th, 0.35 * I); H.thLPf = 700; H.boom.set('bp', 80, 2.2, sr); H.tr = Math.max(H.tr, 0.35);
       H.cr = Math.max(H.cr, 0.35 * I); H.crHold = 0.05; H.crBP.set('bp', 2400, 0.9, sr); H.crBP2.set('bp', 4200, 1.4, sr);
       H.db = Math.max(H.db, 0.25 * I); H.dbBP.set('bp', 1500, 4, sr);
     } else {
       const big = kind === 'bump' ? 0 : Math.min(1, I / 1.2);
       // botta: il colpo della massa, una nota che cade in fretta (più bassa e lunga se è forte)
-      H.th = Math.max(H.th, kind === 'bump' ? 0.5 * I : 0.55 + 0.6 * I); H.thF = kind === 'rear' ? 95 : 120 - 30 * big; H.thPh = 0;
+      H.th = Math.max(H.th, kind === 'bump' ? 0.5 * I : 0.55 + 0.6 * I); H.thLPf = kind === 'bump' ? 500 : 1400; H.boom.set('bp', 60 + 35 * u(), 2.2, sr);
+      H.tr = Math.max(H.tr, kind === 'bump' ? 0.3 : 0.7 + 0.3 * big);              // lo schiocco del contatto
       // lamiera: scrosci di crepitii filtrati, più lunghi coi colpi forti
       H.cr = Math.max(H.cr, kind === 'bump' ? 0.25 * I : 0.5 + 0.55 * I); H.crHold = kind === 'bump' ? 0.01 : 0.06 + 0.16 * big;
-      H.crBP.set('bp', 1300 + 700 * u(), 0.8, sr); H.crBP2.set('bp', 3000 + 1500 * u(), 1.3, sr); H.crLP.set('lp', 420, 0.7, sr);
+      H.crBP.set('bp', 450 + 400 * u(), 0.7, sr); H.crBP2.set('bp', 1700 + 900 * u(), 1.0, sr); H.crLP.set('lp', 420, 0.7, sr);   // accartocciarsi (medio-basso) e strappo
       // pannelli: cinque modi non armonici, diversi a ogni urto (si eccitano col crepitio: niente note fisse)
       const base = [170, 310, 590, 1080, 2150];
-      H.ring.forEach((m, k) => { m.f = base[k] * (0.8 + 0.45 * u()); m.ph = u(); m.a = (1 - k * 0.15) * (kind === 'bump' ? 0.25 : 0.4 + 0.6 * big); m.d = Math.exp(-1 / (sr * (0.05 + 0.22 * u() / (1 + k * 0.5)))); });
+      H.ring.forEach((m, k) => { m.bq.set('bp', base[k] * (0.8 + 0.45 * u()), 7 + 9 * u(), sr); m.a = (1 - k * 0.15) * (kind === 'bump' ? 0.25 : 0.4 + 0.6 * big); m.d = Math.exp(-1 / (sr * (0.04 + 0.16 * u() / (1 + k * 0.5)))); });
       // vetri e plastiche: solo negli urti veri
-      if (kind !== 'bump' && I > 0.7) { H.gl = Math.max(H.gl, Math.min(1, (I - 0.55) * 1.4)); H.glBP.set('bp', 5200 + 2200 * u(), 6, sr); }
+      if (kind !== 'bump' && I > 0.7) { H.gl = Math.max(H.gl, Math.min(1, (I - 0.55) * 1.4)); H.gs = H.gl; H.glBP.set('bp', 5200 + 2200 * u(), 6, sr); H.gsBP.set('bp', 4500 + 2000 * u(), 0.9, sr); }
       if (kind !== 'bump') { H.db = Math.max(H.db, 0.3 + 0.5 * big); H.dbBP.set('bp', 900 + 900 * u(), 5, sr); }
     }
   }
@@ -273,24 +275,29 @@ class EngineDSP {
   // un campione dell'urto (0 quando non c'è niente)
   hitSample(TAU, view) {
     const H = this.H, sr = this.sr; let o = 0, ex = 0;
+    if (H.tr > 1e-3) { o += H.trHP.p(this.r()) * H.tr * 2.2; H.tr *= Math.exp(-1 / (sr * 0.004)); }
     if (H.th > 1e-3) {
-      H.thPh += H.thF / sr; H.thF += (38 - H.thF) * (1 / (sr * 0.06));
-      o += (Math.sin(TAU * H.thPh) * 2.0 + H.crLP.p(this.r()) * 3.0) * H.th;
-      H.th *= Math.exp(-1 / (sr * 0.13));
+      // botta: rumore che si scurisce in fretta (filtro che scende) più il rimbombo della scocca, niente note pure
+      if ((this.k & 15) === 0) { H.thLPf = 110 + (H.thLPf - 110) * Math.exp(-16 / (sr * 0.05)); H.thLP.set('lp', H.thLPf, 0.9, sr); }
+      const nz = this.r();
+      o += (H.thLP.p(nz) * 10 + H.boom.p(nz) * 45) * H.th;
+      H.th *= Math.exp(-1 / (sr * 0.12));
     }
     if (H.cr > 1e-3) {
       // la lamiera cede a scatti: pezzetti di 1-9 ms di rumore, quasi tutti deboli e pochi forti, più qualche schiocco
       if ((H.gT -= 1) <= 0) { H.gT = Math.round(sr * (0.001 + 0.008 * Math.abs(this.r()))); const q = Math.abs(this.r()); H.gA = q * q * q * 3; }
       const grain = Math.abs(this.r()) < 0.004 ? this.r() * 5 : 0;
       ex = (this.r() * H.gA + grain) * H.cr;
-      o += H.crBP.p(ex) * 1.5 + H.crBP2.p(ex) * 0.9;
+      o += H.crBP.p(ex) * 2.6 + H.crBP2.p(ex) * 0.55;
       if (H.crHold > 0) H.crHold -= 1 / sr; else H.cr *= Math.exp(-1 / (sr * 0.07));
     }
     if (H.ring[0].a > 1e-4) {
       // pannelli che vibrano: modi non armonici che si spengono a tempi diversi, sporcati dagli scatti della lamiera
-      let r = 0; for (const m of H.ring) { m.ph += m.f / sr; if (m.ph > 1) m.ph -= 1; r += Math.sin(TAU * m.ph) * m.a; m.a *= m.d; }
-      o += r * (0.55 + Math.min(1.2, Math.abs(ex) * 2)) * 0.45;
+      const nz = this.r() * 0.35 + ex;
+      let r = 0; for (const m of H.ring) { r += m.bq.p(nz) * m.a; m.a *= m.d; }
+      o += r * 1.6;
     }
+    if (H.gs > 1e-3) { const nz = this.r(); o += (H.gsBP.p(nz) * 1.6 + H.glHP.p(nz) * 0.5) * H.gs * (0.6 + 0.4 * Math.abs(this.r())); H.gs *= Math.exp(-1 / (sr * 0.09)); }
     if (H.gl > 1e-3) {
       // vetri: tintinnii sottili e radi che continuano mentre i pezzi cadono
       const k = Math.abs(this.r()) < 0.0022 * H.gl ? this.r() * 6 : 0;

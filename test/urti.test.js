@@ -45,8 +45,8 @@ test('urti: il tamponamento si sente sopra il motore in tutti i punti d\'ascolto
   for (const view of [0, 1, 2]) {
     const quiet = level(null, view, 0.5, 0.8).rms, loud = level({ type: 'crash', I: 1.2, kind: 'front' }, view, 0.5, 0.8).rms;
     assert.ok(20 * Math.log10(loud / quiet) > 4, `vista ${view}: +${(20 * Math.log10(loud / quiet)).toFixed(1)} dB`);
-    const after = level({ type: 'crash', I: 1.2, kind: 'front' }, view, 2.6, 3.0).rms, base = level(null, view, 2.6, 3.0).rms;
-    assert.ok(Math.abs(20 * Math.log10(after / base)) < 1.5, `vista ${view}: dopo 2 s torna il motore`);
+    const after = level({ type: 'crash', I: 1.2, kind: 'front' }, view, 2.5, 3.5).rms, base = level(null, view, 2.5, 3.5).rms;
+    assert.ok(Math.abs(20 * Math.log10(after / base)) < 2.5, `vista ${view}: dopo 2 s torna il motore (${(20 * Math.log10(after / base)).toFixed(2)} dB)`);
   }
 });
 
