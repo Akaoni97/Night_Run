@@ -33,7 +33,7 @@ function cmdApply(game, sim, view2d) {
 
 (function comandiUI() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
-  let row = null, btn = {}, lastExh = null, lastKey = '';
+  let row = null, btn = {}, lastExh = null, pan = null, pbtn = {};
   const NR = () => window.nightRun;
   const css = document.createElement('style');
   css.textContent = '.dash-btns.cmd{margin-top:4px}.dash-btns.cmd button b{font-weight:700;letter-spacing:.04em}';
@@ -46,18 +46,27 @@ function cmdApply(game, sim, view2d) {
     add('Boost', 'Pressione della turbina', () => { const g = NR().game, b = cmdBoostNext(g.s); g.say(`Turbo: ${b.label}`, 'info'); refresh(); });
     add('Exh', 'Valvola di scarico: aperto o silenzio', () => { const g = NR().game, e = cmdExhToggle(g.s); g.say(e ? 'Scarico aperto' : 'Scarico in silenzio', 'info'); refresh(); });
     add('Neon', 'Neon sotto l\'auto', () => { const g = NR().game, n = cmdNeonToggle(g.s); g.say(n ? 'Neon acceso' : 'Neon spento', 'info'); refresh(); });
-    base.parentNode.insertBefore(row, base.nextSibling); return true;
+    base.parentNode.insertBefore(row, base.nextSibling);
+    // lo stesso comando anche nella scheda Guida del menu, dove prima c'erano cambio e pedali (tolti: da lì non si potevano usare)
+    const deck = document.querySelector('section.deck .panel.drive');
+    if (deck) {
+      pan = document.createElement('div'); pan.className = 'panel'; pan.innerHTML = '<h2>Comandi dell\'auto <em id="cmInfo"></em></h2><div class="keyrow" id="cmPanRow"></div><p class="hint">Compaiono quando l\'auto li ha: rimorchio dopo il gancio, turbo dopo un turbo, scarico dopo un po\' di potenza, neon dopo Neon Kustom. Sono anche sulla strada, sotto AUTO e TC.</p>';
+      deck.parentNode.insertBefore(pan, deck.nextSibling);
+      for (const id of Object.keys(btn)) { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.addEventListener('click', () => btn[id].click()); pan.querySelector('#cmPanRow').appendChild(b); pbtn[id] = b; }
+    }
+    return true;
   };
   const refresh = () => {
     const n = NR(); if (!n || !n.game || !n.game.s) return;
     if (!row && !make()) return;
     const g = n.game, c = cmdState(g.s), a = cmdApply(g, n.sim, n.view2d);
-    const on = (id, show, html, pressed) => { const b = btn[id]; b.hidden = !show; if (show) { b.innerHTML = html; b.setAttribute('aria-pressed', String(!!pressed)); } };
+    const on = (id, show, html, pressed) => { const b = btn[id]; b.hidden = !show; if (show) { b.innerHTML = html; b.setAttribute('aria-pressed', String(!!pressed)); } const p = pbtn[id]; if (p) { p.hidden = !show; p.innerHTML = html.replace(/<b>(.*?)<\/b>/, '<small>$1</small>'); p.classList.toggle('on', !!pressed); } };
     on('Trailer', a.rimorchio, g.s.vg && g.s.vg.trailerOn ? 'RIMORCHIO <b>AGG.</b>' : 'RIMORCHIO <b>—</b>', g.s.vg && g.s.vg.trailerOn);
     on('Boost', a.turbo, `TURBO <b>${CMD_BOOST[c.boost].label}</b>`, c.boost !== 1);
     on('Exh', a.scarico, `SCARICO <b>${c.exh ? 'APERTO' : 'SILENZIO'}</b>`, !c.exh);
     on('Neon', a.neon, `NEON <b>${c.neon ? 'ON' : 'OFF'}</b>`, c.neon);
     row.hidden = !(a.rimorchio || a.turbo || a.scarico || a.neon);
+    if (pan) pan.querySelector('#cmInfo').textContent = row.hidden ? 'nessuno disponibile' : '';
     if (lastExh !== c.exh) { lastExh = c.exh; if (n.audioCfg) n.audioCfg(); }              // il volume dello scarico passa al motore audio
   };
   setInterval(() => { try { refresh(); } catch (e) { /* il gioco non è ancora pronto */ } }, 400);

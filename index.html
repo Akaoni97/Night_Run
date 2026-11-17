@@ -888,15 +888,15 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <button class="kbtn start" id="btnStart" type="button">Avviamento<small>tieni premuto · Invio</small></button>
         <button class="kbtn" id="btnOff" type="button">Spegni<small>tasto O</small></button>
       </div>
-      <div class="pedals">
+      <div class="pedals" hidden>
         <div class="pedal clutch" id="pedClutch" data-p="clutch"><label>Frizione</label><kbd>Spazio</kbd><div class="fill"></div><output>0%</output></div>
         <div class="pedal brake" id="pedBrake" data-p="brake"><label>Freno</label><kbd>S ↓</kbd><div class="fill"></div><output>0%</output></div>
         <div class="pedal gas" id="pedGas" data-p="thr"><label>Gas</label><kbd>W ↑</kbd><div class="fill"></div><output>0%</output></div>
       </div>
-      <p class="hint" id="pedHint">Tocca e trascina un pedale per dosarlo. Più in alto premi, più affondi.</p>
+      <p class="hint" id="pedHint" hidden>Tocca e trascina un pedale per dosarlo. Più in alto premi, più affondi.</p>
     </div>
 
-    <div class="panel gearbox">
+    <div class="panel gearbox" hidden>
       <h2>Cambio <em id="gearName">folle</em></h2>
       <div class="gate-grid" id="gateGrid">
         <button class="g r" data-g="-1" type="button" aria-label="Retromarcia">R</button>

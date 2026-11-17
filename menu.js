@@ -34,7 +34,7 @@
     }],
     ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
-    ['guida', 'Guida', 'Pedali, cambio, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
+    ['guida', 'Guida', 'Comandi dell\'auto, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
     ['vista', 'Vista', 'Grafica, colori, ora e meteo', '#7fd3ff', () => {
       const box = document.createElement('div'); box.className = 'panel';
       const h = document.createElement('h2'); h.textContent = 'Vista e grafica'; box.appendChild(h);
