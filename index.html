@@ -591,9 +591,11 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 .menubtn kbd { margin-left: 6px; background: transparent; border-color: rgba(0,0,0,.3); color: #1a1206; }
 .touchpedals { position: absolute; right: 12px; bottom: 72px; display: none; gap: 8px; z-index: 4; }
 .touchpedals button { width: 64px; height: 64px; border: 0; border-radius: 10px; font: 400 13px/1 var(--f-display); color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.18); }
-.touchpedals .tp-gas { background: rgba(80,140,30,.72); } .touchpedals .tp-brk { background: rgba(160,40,30,.72); }
+.touchpedals .tp-eng { background: rgba(214,150,30,.82); color: #14100a; } .touchpedals .tp-gas { background: rgba(80,140,30,.72); } .touchpedals .tp-brk { background: rgba(160,40,30,.72); }
 .touchpedals button:active, .touchpedals button.on { filter: brightness(1.4); }
-@media (pointer: coarse) { .touchpedals { display: flex; } }
+@media (pointer: coarse) { .touchpedals { display: grid; grid-template-columns: auto auto; justify-content: end; } #dbEngine { display: none; } }
+.touchpedals .tp-eng { grid-column: 1 / -1; grid-row: 1; width: auto; height: 38px; }
+.touchpedals .tp-eng[hidden] { display: none; }
 /* schermi bassi (telefono in orizzontale): barra e riquadri più piccoli, niente sovrapposizioni col cruscotto */
 @media (max-height: 520px) {
   html.game .wrap { padding: 3px max(4px, env(safe-area-inset-right)) max(3px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); gap: 3px; }
@@ -817,6 +819,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <canvas id="hudG" aria-hidden="true"></canvas>
       <div class="dash" id="dash">
         <div class="dash-btns" role="group" aria-label="Comandi di guida">
+          <button type="button" id="dbEngine" title="Accensione: gira la chiave e avvia il motore (da fermo si spegne)">AVVIA</button>
           <button type="button" id="dbAuto" title="Guida automatica: parte dopo 3 secondi senza toccare tasti">AUTO</button>
           <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
           <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
@@ -1373,6 +1376,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function startOn() { ensureAudio(); if (sim.running) return; sim.setStarter(true); $('btnStart').classList.add('on'); }
   function startOff() { sim.setStarter(false); $('btnStart').classList.remove('on'); }
   function engineOff() { sim.setIgnition(false); startOff(); }
+  // accensione con un tocco (pulsante AVVIA sulla strada e sul telefono): quadro e avviamento finché il motore non gira; da fermo lo stesso tasto spegne
+  function engineTap() {
+    ensureAudio();
+    if (sim.running) { if (Math.abs(sim.v) > 1) { flash('Fermati prima di spegnere il motore', 1.6); return; } engineOff(); return; }
+    sim.setIgnition(true); startOn();
+    let n = 0; const iv = setInterval(() => { if (sim.running || ++n > 60) { clearInterval(iv); startOff(); } }, 100);
+  }
 
   $('btnIgn').addEventListener('click', ignToggle);
   $('btnOff').addEventListener('click', engineOff);
@@ -2662,8 +2672,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const set = (id, on, hot) => { const b = $(id); if (!b) return; b.setAttribute('aria-pressed', String(!!on)); b.classList.toggle('hot', !!hot); };
     set('dbWin', sim.winT > 0.5, sim.winMot); set('dbAuto', S.autoLane !== false, auto.on); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
     $('dbLaunch').disabled = !TP.sim.ecuLaunch;
+    set('dbEngine', sim.running, !sim.running); { const t = sim.running ? 'SPEGNI' : 'AVVIA'; if ($('dbEngine').textContent !== t) $('dbEngine').textContent = t; }
     set('dbFlash', lightsMode() > 0, lightsMode() === 2); if ($('dbFlash').textContent !== LIGHTS_NAME[lightsMode()]) $('dbFlash').textContent = LIGHTS_NAME[lightsMode()];
   }
+  $('dbEngine').addEventListener('click', engineTap);
   $('dbAuto').addEventListener('click', () => { S.autoLane = S.autoLane === false; applySettings(); flash(S.autoLane ? 'Guida automatica: parte dopo 3 secondi senza tasti' : 'Guida automatica spenta', 1.8); });
   $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });
   $('dbLaunch').addEventListener('click', () => { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); });
@@ -2988,7 +3000,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
