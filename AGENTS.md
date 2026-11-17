@@ -33,7 +33,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `radio.js` | Radio. |
 | `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia. |
 | `viaggio.js` | Il Viaggio (modalità principale): tappe, paesaggi, bisogni del guidatore, Motel Ovunque e la cassa, lavori, autostoppisti, capitoli ed eventi strani. Si aggancia a `StreetGame`; stato in `game.s.vg`. |
-| `missioni.js` | Missioni del Viaggio dopo il primo lavoro (`VG_MISSIONS`, poi generate): bacheca, regole (fragile, tempo, calmo, pesante), obiettivo a schermo, stato in `game.s.vg.mis`. Caricato anche dai test. |
+| `missioni.js` | Missioni del Viaggio dopo il primo lavoro (`VG_MISSIONS`, poi generate): bacheca, regole (fragile, tempo, calmo, pesante), obiettivo a schermo, stato in `game.s.vg.mis`. Mini tutorial del primo lavoro (`TUT_FIRST`, `TUT_TESTI`: finché non è finito, oltre il locale giusto ti riporta davanti, fermo) e, dopo, uscita saltata = consegna annullata. Caricato anche dai test. |
 | `strada.js` | Abbaglianti per chiedere strada, eventi in prima corsia, comportamento del traffico. |
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `menu.js` | Schermata di gioco compatta (dopo lo script principale): sposta i pannelli della pagina in un menu a schede (Tab o pulsante MENU, Esc chiude), messaggi sopra la strada, pedali GAS/FRENO al tocco. `window.gameMenu.open('bagagliaio')`. |
@@ -129,7 +129,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 131, compresi telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 132, compresi telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.

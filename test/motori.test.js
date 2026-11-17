@@ -483,3 +483,18 @@ test('finestrini: il motorino li apre in circa 2,6 s e aperti in abitacolo si se
   const closed = level(0), open = level(1);
   assert.ok(open > closed + 5, `chiusi ${closed.toFixed(1)} dB, aperti ${open.toFixed(1)} dB`);
 });
+
+test('viaggio: il tutorial del primo lavoro non lascia saltare il locale; poi un\'uscita saltata annulla la consegna', () => {
+  const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip(); game.mode = 'career';
+  // senza ritirare il pacco: oltre il Bar Sport ti rimette davanti, fermo
+  game.s.dist = VG.stopX(0) + 200; sim.v = 15; game.vgUpdate(0.016);
+  assert.ok(game.s.dist < VG.stopX(0), 'riportato davanti al bar'); assert.equal(sim.v, 0); assert.ok(!game.s.vg.firstDone);
+  // con il pacco in mano: il blocco è al locale della consegna
+  game.vgTake(game.vgOffers(0).find((x) => x.first), 0); game.s.dist = VG.stopX(1) + 200; sim.v = 15; game.vgUpdate(0.016);
+  assert.ok(game.s.dist < VG.stopX(1), 'riportato davanti al benzinaio'); assert.ok(game.s.trunk.some((it) => it.first), 'il pacco resta a bordo');
+  // consegna: finisce il tutorial e scatta la regola
+  game.s.dist = VG.stopX(1); game.vgArrive(VG.stop(1)); game.vgUpdate(0.016); assert.ok(game.s.vg.firstDone && game.s.vg.tutEnd);
+  const n = game.vgMisState().giverN; game.s.dist = VG.stopX(n); const o = game.vgOffers(n).find((x) => x.mission); assert.ok(game.vgTake(o, n).ok);
+  const to = game.vgMisState().toN; game.s.dist = VG.stopX(to) + 300; game.vgUpdate(0.016);
+  const m = game.vgMisState(); assert.equal(m.phase, 'go', 'missione annullata'); assert.ok(!game.s.trunk.some((it) => it.kind === 'missione')); assert.ok(m.giverN > to);
+});

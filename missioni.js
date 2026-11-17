@@ -168,4 +168,46 @@ const VG_MIS_MORE = {
   P.vgToCassa = function (i) { const it = this.s.trunk[i]; if (it && it.kind === 'missione') return { ok: false, why: 'Il lavoro resta a bordo' }; return toCassa.call(this, i); };
 })();
 
+// ---------------------------------------------------------------- il mini tutorial del primo lavoro, e le uscite saltate
+// Finché il primo lavoro non è finito il gioco non ti lascia superare il locale giusto (prima il bar col pacco, poi il benzinaio della consegna):
+// ti ferma e ti riporta indietro. Dopo, la regola vale per tutti i lavori: se oltrepassi l'uscita di una consegna, la missione è annullata.
+const TUT_FIRST = { from: 0, to: 1, over: 45 };           // tappe del primo lavoro e metri oltre il locale dopo i quali scatta il blocco
+const TUT_TESTI = {
+  start: 'Tutorial · Il primo lavoro si fa per intero: ritira il pacco al Bar Sport (rallenta, fermati davanti e premi U), poi consegnalo alla tappa dopo.',
+  blocco: 'Non puoi saltare questo lavoro: ti riporto davanti al locale. Rallenta, fermati e premi U per entrare.',
+  fine: 'Da adesso in poi, se oltrepassi l\'uscita di una consegna, la missione viene annullata. Guarda la barra dell\'autostrada e tieni la destra.',
+  persa: 'Hai saltato l\'uscita: la consegna è annullata. Niente paga, il carico torna a chi l\'aveva.',
+};
+(function () {
+  if (typeof StreetGame === 'undefined' || typeof VG === 'undefined') return;
+  const P = StreetGame.prototype, base = P.vgUpdate;
+  const nextBoard = (from) => { for (let n = from + 1; n < from + 60; n++) if (VG_BOARDS.includes(VG.stop(n).id)) return n; return from + 1; };
+  P.vgUpdate = function (dt) {
+    base.call(this, dt);
+    const v = this.s.vg; if (!v || this.mode !== 'career') return;
+    const sim = this.sim, d = this.s.dist;
+    if (!v.firstDone) {
+      if (!v.tutStart && d > 40) { v.tutStart = true; this.say(TUT_TESTI.start, 'info'); }
+      const carried = this.s.trunk.some((it) => it.first), T = VG.stop(carried ? TUT_FIRST.to : TUT_FIRST.from);
+      if (!this.inside && d > T.x + TUT_FIRST.over) {                    // oltre il locale: si torna davanti al locale, fermi
+        this.s.dist = T.x - 22; sim.v = 0; this.ents = this.ents.filter((e) => e.kind !== 'traffic');
+        if (!(v.tutMsgT > (this._tutNow || 0))) { this.say(TUT_TESTI.blocco, 'bad'); }
+        v.tutMsgT = (this._tutNow = (this._tutNow || 0) + 1) + 4;
+      }
+      return;
+    }
+    if (!v.tutEnd) { v.tutEnd = true; this.say(TUT_TESTI.fine, 'info'); }
+    // uscita saltata: la missione (o la consegna della bacheca) è annullata
+    if (this.inside) return;
+    const m = this.vgMisState();
+    if (m && m.phase === 'carry' && d > VG.stopX(m.toN) + 150) {
+      this.s.trunk = this.s.trunk.filter((it) => it.kind !== 'missione'); this.applyMass();
+      Object.assign(m, { phase: 'go', giverN: nextBoard(VG.stopIndex(d)), toN: null, pax: null });
+      this.say(TUT_TESTI.persa, 'bad'); this.fx.push({ k: 'missionLost' });
+    }
+    const lost = this.s.trunk.filter((it) => typeof it.to === 'number' && !it.mis && d > VG.stopX(it.to) + 150);
+    if (lost.length) { this.s.trunk = this.s.trunk.filter((it) => !lost.includes(it)); this.applyMass(); this.say(TUT_TESTI.persa, 'bad'); }
+  };
+})();
+
 if (typeof window !== 'undefined') Object.assign(window, { VG_MISSIONS, VG_MIS_MORE, VG_BOARDS });

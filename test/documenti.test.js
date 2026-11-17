@@ -36,7 +36,7 @@ test('documenti: ai controlli multa per ogni documento scaduto, niente se in reg
 });
 
 test('documenti: passando un posto di controllo ti possono fermare (una volta per posto)', () => {
-  const { game } = trip(); game.vgInherit(); game.docRnd = () => 0; game.s.dist = 20000;
+  const { game } = trip(); game.vgInherit(); game.s.vg.firstDone = true; game.docRnd = () => 0; game.s.dist = 20000;
   game.ents.push({ id: 999, kind: 'police', lane: 1, x: game.s.dist + 5, v: 0, busy: true, still: true, hazard: true });
   const m = game.s.money; game.update(0.016); assert.ok(game.s.money < m, 'multa');
   const m2 = game.s.money; game.update(0.016); assert.equal(game.s.money, m2, 'una volta sola');
