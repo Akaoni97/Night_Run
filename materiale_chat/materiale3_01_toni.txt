@@ -1,0 +1,1005 @@
+NIGHT RUN · MATERIALE 3 · FILE 01
+
+[REDAZIONE] NOTE
+T1. Tabella ragionata: 433 risposte originarie lette. Il tono segue ciò che la risposta
+fa: una scusa può essere sincera anche con stronzo; una domanda ferma resta pacata. La
+tabella finale comprende anche riscritture e nodi nuovi, per un solo --toni.
+
+[TONI_ORIGINALI] 433 risposte prima delle riscritture
+ELE_ritiro_01 · A ironico · B sincero · C sboccato
+ELE_ritiro_02 · A ironico · B pacato
+ELE_ritiro_03 · A pacato · B pacato
+ELE_ritiro_04 · A ironico · B ironico
+ELE_ritiro_05 · A ironico · B gentile
+ELE_ritiro_06 · A gentile · B pacato
+ELE_ritiro_07 · A ironico · B gentile
+ELE_pasta_01 · A ironico · B ironico
+ELE_pasta_02 · A ironico · B pacato
+ELE_pasta_03 · A ironico · B sincero
+ELE_pasta_04 · A ironico · B pacato
+ELE_pasta_05 · A ironico · B ironico
+ELE_pasta_06 · A sincero · B ironico
+ELE_pasta_07 · A ironico · B ironico
+ELE_turno_01 · A ironico · B evasivo · C sboccato
+ELE_turno_02 · A pacato · B gentile
+ELE_turno_03 · A gentile · B pacato
+ELE_turno_04 · A sincero · B pacato
+ELE_turno_05 · A gentile · B pacato
+ELE_turno_06 · A pacato · B gentile
+ELE_turno_07 · A pacato · B ironico
+ELE_coinquilino_01 · A pacato · B ironico
+ELE_coinquilino_02 · A gentile · B ironico
+ELE_coinquilino_03 · A gentile · B ironico
+ELE_coinquilino_04 · A gentile · B freddo
+ELE_coinquilino_05 · A sincero · B gentile
+ELE_coinquilino_06 · A sincero · B gentile
+ELE_coinquilino_07 · A pacato · B sincero
+ELE_cena_01 · A sincero · B ironico · C sboccato
+ELE_cena_02 · A gentile · B gentile
+ELE_cena_03 · A pacato · B gentile
+ELE_cena_04 · A ironico · B pacato
+ELE_cena_05 · A pacato · B gentile
+ELE_cena_06 · A pacato · B gentile
+ELE_cena_07 · A ironico · B sincero
+ELE_bollette_01 · A ironico · B freddo
+ELE_bollette_02 · A gentile · B evasivo
+ELE_bollette_03 · A gentile · B sincero
+ELE_bollette_04 · A pacato · B sincero
+ELE_bollette_05 · A pacato · B pacato
+ELE_bollette_06 · A ironico · B pacato
+ELE_bollette_07 · A ironico · B ironico
+ELE_richiamo_01 · A sincero · B pacato
+ELE_richiamo_02 · A sincero · B sincero
+ELE_richiamo_03 · A sincero · B sincero
+ELE_richiamo_04 · A sincero · B sincero
+ELE_richiamo_05 · A sincero · B sincero
+ELE_richiamo_06 · A gentile · B evasivo
+ELE_richiamo_07 · A sincero · B pacato
+ELE_litigio_01 · A sincero · B freddo · C sincero
+ELE_litigio_02 · A sincero · B sincero
+ELE_litigio_03 · A sincero · B pacato
+ELE_litigio_04 · A sincero · B pacato
+ELE_litigio_05 · A gentile · B sincero
+ELE_litigio_06 · A gentile · B sincero
+ELE_litigio_07 · A gentile · B pacato
+ELE_distanza_01 · A sincero · B sincero
+ELE_distanza_02 · A pacato · B pacato
+ELE_distanza_03 · A pacato · B sincero
+ELE_distanza_04 · A sincero · B pacato
+ELE_distanza_05 · A pacato · B pacato
+ELE_distanza_06 · A pacato · B pacato
+ELE_distanza_07 · A gentile · B pacato
+ELE_riparazione_01 · A sincero · B gentile
+ELE_riparazione_02 · A sincero · B sincero
+ELE_riparazione_03 · A sincero · B pacato
+ELE_riparazione_04 · A sincero · B pacato
+ELE_riparazione_05 · A pacato · B gentile
+ELE_riparazione_06 · A sincero · B sincero
+ELE_riparazione_07 · A sincero · B pacato
+ELE_nonno_01 · A ironico · B sincero
+ELE_nonno_02 · A pacato · B ironico
+ELE_nonno_03 · A sincero · B gentile
+ELE_nonno_04 · A pacato · B ironico
+ELE_nonno_05 · A sincero · B sincero
+ELE_nonno_06 · A sincero · B pacato
+ELE_nonno_07 · A gentile · B ironico
+ELE_cena_ritorno_01 · A gentile · B sincero
+ELE_cena_ritorno_02 · A sincero · B sincero
+ELE_cena_ritorno_03 · A pacato · B sincero
+ELE_cena_ritorno_04 · A gentile · B gentile
+ELE_cena_ritorno_05 · A sincero · B sincero
+ELE_cena_ritorno_06 · A pacato · B sincero
+ELE_cena_ritorno_07 · A sincero · B sincero
+ELE_temperino_fissato · A sincero · B sincero
+ELE_claudio_fissato · A sincero · B sincero
+ROS_attrezzi_01 · A pacato · B evasivo · C sincero
+ROS_attrezzi_02 · A pacato · B pacato · C sboccato
+ROS_attrezzi_03 · A pacato · B gentile
+ROS_attrezzi_04 · A pacato · B pacato
+ROS_attrezzi_05 · A gentile · B pacato · C sboccato
+ROS_attrezzi_06 · A pacato · B ironico
+ROS_attrezzi_07 · A pacato · B ironico
+ROS_prudenza_01 · A sincero · B sincero · C sboccato
+ROS_prudenza_02 · A pacato · B evasivo
+ROS_prudenza_03 · A sincero · B gentile
+ROS_prudenza_04 · A pacato · B pacato
+ROS_prudenza_05 · A pacato · B ironico · C sboccato
+ROS_prudenza_06 · A pacato · B gentile
+ROS_prudenza_07 · A sincero · B pacato
+ROS_ricontrollo_01 · A sincero · B sincero
+ROS_ricontrollo_02 · A sincero · B sincero
+ROS_ricontrollo_03 · A ironico · B sincero · C sincero
+ROS_ricontrollo_04 · A sincero · B pacato
+ROS_ricontrollo_05 · A sincero · B pacato
+ROS_ricontrollo_06 · A gentile · B evasivo
+ROS_ricontrollo_07 · A pacato · B ironico
+ROS_passato_01 · A pacato · B gentile
+ROS_passato_02 · A pacato · B pacato
+ROS_passato_03 · A sincero · B gentile
+ROS_passato_04 · A pacato · B pacato · C sboccato
+ROS_passato_05 · A gentile · B pacato
+ROS_passato_06 · A gentile · B sincero
+ROS_passato_07 · A sincero · B pacato
+ROS_promessa_01 · A sincero · B pacato
+ROS_promessa_02 · A pacato · B pacato · C sboccato
+ROS_promessa_03 · A sincero · B pacato
+ROS_promessa_04 · A sincero · B pacato
+ROS_promessa_05 · A pacato · B pacato
+ROS_promessa_06 · A pacato · B sincero
+ROS_promessa_07 · A sincero · B sincero · C sincero
+ROS_dopo_passaggio_01 · A sincero · B evasivo · C sboccato
+ROS_dopo_passaggio_02 · A sincero · B pacato
+ROS_dopo_passaggio_03 · A pacato · B pacato
+ROS_dopo_passaggio_04 · A sincero · B sincero
+ROS_dopo_passaggio_05 · A sincero · B pacato
+ROS_dopo_passaggio_06 · A pacato · B sincero
+ROS_dopo_passaggio_07 · A pacato · B pacato
+ROS_segni_01 · A pacato · B pacato
+ROS_segni_02 · A pacato · B pacato
+ROS_segni_03 · A gentile · B pacato
+ROS_segni_04 · A pacato · B pacato
+ROS_segni_05 · A pacato · B gentile
+ROS_segni_06 · A pacato · B pacato
+ROS_segni_07 · A sincero · B gentile
+ROS_recupero_01 · A sincero · B pacato
+ROS_recupero_02 · A sincero · B pacato
+ROS_recupero_03 · A sincero · B pacato
+ROS_recupero_04 · A pacato · B pacato
+ROS_recupero_05 · A sincero · B pacato
+ROS_recupero_06 · A pacato · B pacato
+ROS_recupero_07 · A sincero · B sincero
+ROS_guardia_01 · A pacato · B pacato
+ROS_guardia_02 · A sincero · B sincero
+ROS_guardia_03 · A pacato · B pacato
+ROS_guardia_04 · A pacato · B sincero
+ROS_guardia_05 · A pacato · B pacato
+ROS_guardia_06 · A pacato · B sincero
+ROS_guardia_07 · A sincero · B pacato
+ROS_prima_porta_01 · A pacato · B sincero
+ROS_prima_porta_02 · A pacato · B sincero
+ROS_prima_porta_03 · A sincero · B gentile
+ROS_prima_porta_04 · A pacato · B pacato
+ROS_prima_porta_05 · A sincero · B pacato
+ROS_prima_porta_06 · A sincero · B pacato
+ROS_prima_porta_07 · A sincero · B sincero
+LIV_primo_01 · A sincero · B sincero · C ironico
+LIV_primo_02 · A pacato · B pacato
+LIV_primo_03 · A pacato · B sincero
+LIV_primo_04 · A pacato · B pacato
+LIV_primo_05 · A pacato · B pacato
+LIV_primo_06 · A sincero · B pacato
+LIV_primo_07 · A pacato · B sincero
+LIV_affido_01 · A sincero · B evasivo
+LIV_affido_02 · A pacato · B pacato
+LIV_affido_03 · A sincero · B pacato
+LIV_affido_04 · A pacato · B pacato
+LIV_affido_05 · A evasivo · B pacato
+LIV_affido_06 · A sincero · B pacato
+LIV_affido_07 · A gentile · B pacato
+LIV_ottavio_01 · A pacato · B sincero · C evasivo
+LIV_ottavio_02 · A pacato · B pacato
+LIV_ottavio_03 · A pacato · B pacato
+LIV_ottavio_04 · A gentile · B pacato
+LIV_ottavio_05 · A pacato · B pacato
+LIV_ottavio_06 · A pacato · B pacato
+LIV_ottavio_07 · A sincero · B sincero
+LIV_fiducia_01 · A sincero · B sincero
+LIV_fiducia_02 · A sincero · B sincero
+LIV_fiducia_03 · A pacato · B pacato
+LIV_fiducia_04 · A pacato · B pacato
+LIV_fiducia_05 · A sincero · B pacato
+LIV_fiducia_06 · A gentile · B sincero
+LIV_fiducia_07 · A sincero · B pacato
+LIV_irene_01 · A pacato · B pacato
+LIV_irene_02 · A pacato · B pacato
+LIV_irene_03 · A pacato · B pacato
+LIV_irene_04 · A sincero · B pacato
+LIV_irene_05 · A pacato · B pacato
+LIV_irene_06 · A pacato · B pacato
+LIV_irene_07 · A pacato · B pacato
+LIV_promessa_01 · A sincero · B pacato · C ironico
+LIV_promessa_02 · A sincero · B pacato
+LIV_promessa_03 · A sincero · B gentile
+LIV_promessa_04 · A pacato · B sincero
+LIV_promessa_05 · A sincero · B sincero
+LIV_promessa_06 · A sincero · B sincero
+LIV_promessa_07 · A sincero · B sincero
+PRE_1_03 · A pacato · B freddo
+PRE_1_07 · A pacato · B pacato · C freddo
+PRE_2_03 · A pacato · B pacato
+PRE_2_07 · A pacato · B pacato · C freddo
+PRE_3_03 · A pacato · B pacato
+PRE_3_07 · A pacato · B pacato · C freddo
+PRE_4_03 · A freddo · B pacato
+PRE_4_07 · A gentile · B pacato · C freddo
+
+[TAB_ALL] Toni attivi; questi ultimi prevalgono
+ELE_ritiro_01 · A ironico · B pacato · C sincero
+ELE_ritiro_02 · A ironico · B pacato
+ELE_ritiro_03 · A pacato · B pacato
+ELE_ritiro_04 · A ironico · B ironico
+ELE_ritiro_05 · A ironico · B gentile
+ELE_ritiro_06 · A gentile · B pacato
+ELE_ritiro_07 · A ironico · B gentile · C sincero
+ELE_pasta_01 · A ironico · B pacato · C sincero
+ELE_pasta_02 · A ironico · B pacato
+ELE_pasta_03 · A ironico · B sincero
+ELE_pasta_04 · A ironico · B pacato
+ELE_pasta_05 · A ironico · B ironico
+ELE_pasta_06 · A sincero · B ironico
+ELE_pasta_07 · A ironico · B ironico · C sincero
+ELE_turno_01 · A sboccato · B pacato · C sincero
+ELE_turno_02 · A pacato · B gentile
+ELE_turno_03 · A gentile · B pacato
+ELE_turno_04 · A sincero · B pacato
+ELE_turno_05 · A gentile · B pacato
+ELE_turno_06 · A pacato · B gentile
+ELE_turno_07 · A pacato · B ironico · C sincero
+ELE_coinquilino_01 · A pacato · B pacato · C sincero
+ELE_coinquilino_02 · A gentile · B ironico
+ELE_coinquilino_03 · A gentile · B ironico
+ELE_coinquilino_04 · A gentile · B freddo
+ELE_coinquilino_05 · A sincero · B gentile
+ELE_coinquilino_06 · A sincero · B gentile
+ELE_coinquilino_07 · A pacato · B sincero · C sincero
+ELE_cena_01 · A sincero · B pacato · C sincero
+ELE_cena_02 · A gentile · B gentile
+ELE_cena_03 · A pacato · B gentile
+ELE_cena_04 · A ironico · B pacato
+ELE_cena_05 · A pacato · B gentile
+ELE_cena_06 · A pacato · B gentile
+ELE_cena_07 · A ironico · B sincero · C sincero
+ELE_bollette_01 · A ironico · B pacato · C sincero
+ELE_bollette_02 · A gentile · B evasivo
+ELE_bollette_03 · A gentile · B sincero
+ELE_bollette_04 · A pacato · B sincero
+ELE_bollette_05 · A pacato · B pacato
+ELE_bollette_06 · A ironico · B pacato
+ELE_bollette_07 · A ironico · B ironico · C sincero
+ELE_richiamo_01 · A sincero · B pacato · C sincero
+ELE_richiamo_02 · A sincero · B sincero
+ELE_richiamo_03 · A sincero · B sincero
+ELE_richiamo_04 · A sincero · B sincero
+ELE_richiamo_05 · A sincero · B sincero
+ELE_richiamo_06 · A gentile · B evasivo
+ELE_richiamo_07 · A sincero · B pacato · C sincero
+ELE_litigio_01 · A sincero · B pacato · C sincero
+ELE_litigio_02 · A sincero · B sincero
+ELE_litigio_03 · A sincero · B pacato
+ELE_litigio_04 · A sincero · B pacato
+ELE_litigio_05 · A gentile · B sincero
+ELE_litigio_06 · A gentile · B sincero
+ELE_litigio_07 · A gentile · B pacato · C sincero
+ELE_distanza_01 · A sincero · B pacato · C sincero
+ELE_distanza_02 · A pacato · B pacato
+ELE_distanza_03 · A pacato · B sincero
+ELE_distanza_04 · A sincero · B pacato
+ELE_distanza_05 · A pacato · B pacato
+ELE_distanza_06 · A pacato · B pacato
+ELE_distanza_07 · A gentile · B pacato · C sincero
+ELE_riparazione_01 · A sincero · B pacato · C sincero
+ELE_riparazione_02 · A sincero · B sincero
+ELE_riparazione_03 · A sincero · B pacato
+ELE_riparazione_04 · A sincero · B pacato
+ELE_riparazione_05 · A pacato · B gentile
+ELE_riparazione_06 · A sincero · B sincero
+ELE_riparazione_07 · A sincero · B pacato · C sincero
+ELE_nonno_01 · A ironico · B pacato · C sincero
+ELE_nonno_02 · A pacato · B ironico
+ELE_nonno_03 · A sincero · B gentile
+ELE_nonno_04 · A pacato · B ironico
+ELE_nonno_05 · A sincero · B sincero
+ELE_nonno_06 · A sincero · B pacato
+ELE_nonno_07 · A gentile · B ironico · C sincero
+ELE_cena_ritorno_01 · A gentile · B pacato · C sincero
+ELE_cena_ritorno_02 · A sincero · B sincero
+ELE_cena_ritorno_03 · A pacato · B sincero
+ELE_cena_ritorno_04 · A gentile · B gentile
+ELE_cena_ritorno_05 · A sincero · B sincero
+ELE_cena_ritorno_06 · A pacato · B sincero
+ELE_cena_ritorno_07 · A sincero · B sincero · C sincero
+ELE_temperino_fissato · A sincero · B sincero
+ELE_claudio_fissato · A sincero · B sincero
+ROS_attrezzi_01 · A sboccato · B pacato · C sincero
+ROS_attrezzi_02 · A pacato · B pacato · C sboccato
+ROS_attrezzi_03 · A pacato · B gentile
+ROS_attrezzi_04 · A pacato · B pacato
+ROS_attrezzi_05 · A gentile · B pacato · C sboccato
+ROS_attrezzi_06 · A pacato · B ironico
+ROS_attrezzi_07 · A pacato · B ironico · C sincero
+ROS_prudenza_01 · A sincero · B pacato · C sincero
+ROS_prudenza_02 · A pacato · B evasivo
+ROS_prudenza_03 · A sincero · B gentile
+ROS_prudenza_04 · A pacato · B pacato
+ROS_prudenza_05 · A pacato · B ironico · C sboccato
+ROS_prudenza_06 · A pacato · B gentile
+ROS_prudenza_07 · A sincero · B pacato · C sincero
+ROS_ricontrollo_01 · A sincero · B pacato · C sincero
+ROS_ricontrollo_02 · A sincero · B sincero
+ROS_ricontrollo_03 · A ironico · B sincero · C sincero
+ROS_ricontrollo_04 · A sincero · B pacato
+ROS_ricontrollo_05 · A sincero · B pacato
+ROS_ricontrollo_06 · A gentile · B evasivo
+ROS_ricontrollo_07 · A pacato · B ironico · C sincero
+ROS_passato_01 · A pacato · B pacato · C sincero
+ROS_passato_02 · A pacato · B pacato
+ROS_passato_03 · A sincero · B gentile
+ROS_passato_04 · A pacato · B pacato · C sboccato
+ROS_passato_05 · A gentile · B pacato
+ROS_passato_06 · A gentile · B sincero
+ROS_passato_07 · A sincero · B pacato · C sincero
+ROS_promessa_01 · A sincero · B pacato · C sincero
+ROS_promessa_02 · A pacato · B pacato · C sboccato
+ROS_promessa_03 · A sincero · B pacato
+ROS_promessa_04 · A sincero · B pacato
+ROS_promessa_05 · A pacato · B pacato
+ROS_promessa_06 · A pacato · B sincero · C sincero
+ROS_promessa_07 · A sincero · B sincero · C sincero
+ROS_dopo_passaggio_01 · A sincero · B pacato · C sincero
+ROS_dopo_passaggio_02 · A sincero · B pacato
+ROS_dopo_passaggio_03 · A pacato · B pacato
+ROS_dopo_passaggio_04 · A sincero · B sincero
+ROS_dopo_passaggio_05 · A sincero · B pacato
+ROS_dopo_passaggio_06 · A pacato · B sincero
+ROS_dopo_passaggio_07 · A pacato · B pacato · C sincero
+ROS_segni_01 · A pacato · B pacato · C sincero
+ROS_segni_02 · A pacato · B pacato
+ROS_segni_03 · A gentile · B pacato
+ROS_segni_04 · A pacato · B pacato
+ROS_segni_05 · A pacato · B gentile
+ROS_segni_06 · A pacato · B pacato
+ROS_segni_07 · A sincero · B gentile · C sincero
+ROS_recupero_01 · A sincero · B pacato · C sincero
+ROS_recupero_02 · A sincero · B pacato
+ROS_recupero_03 · A sincero · B pacato
+ROS_recupero_04 · A pacato · B pacato
+ROS_recupero_05 · A sincero · B pacato
+ROS_recupero_06 · A pacato · B pacato
+ROS_recupero_07 · A sincero · B sincero · C sincero
+ROS_guardia_01 · A pacato · B pacato · C sincero
+ROS_guardia_02 · A sincero · B sincero
+ROS_guardia_03 · A pacato · B pacato
+ROS_guardia_04 · A pacato · B sincero
+ROS_guardia_05 · A pacato · B pacato
+ROS_guardia_06 · A pacato · B sincero
+ROS_guardia_07 · A sincero · B pacato · C sincero
+ROS_prima_porta_01 · A pacato · B pacato · C sincero
+ROS_prima_porta_02 · A pacato · B sincero
+ROS_prima_porta_03 · A sincero · B gentile
+ROS_prima_porta_04 · A pacato · B pacato
+ROS_prima_porta_05 · A sincero · B pacato
+ROS_prima_porta_06 · A sincero · B pacato
+ROS_prima_porta_07 · A sincero · B sincero · C sincero
+LIV_primo_01 · A sincero · B pacato · C sincero
+LIV_primo_02 · A pacato · B pacato
+LIV_primo_03 · A pacato · B sincero
+LIV_primo_04 · A pacato · B pacato
+LIV_primo_05 · A pacato · B pacato
+LIV_primo_06 · A sincero · B pacato
+LIV_primo_07 · A pacato · B sincero · C sincero
+LIV_affido_01 · A sincero · B pacato · C sincero
+LIV_affido_02 · A sincero · B pacato
+LIV_affido_03 · A sincero · B pacato
+LIV_affido_04 · A sincero · B pacato
+LIV_affido_05 · A sincero · B pacato
+LIV_affido_06 · A sincero · B pacato
+LIV_affido_07 · A sincero · B pacato · C sincero
+LIV_ottavio_01 · A pacato · B pacato · C sincero
+LIV_ottavio_02 · A pacato · B pacato
+LIV_ottavio_03 · A pacato · B pacato
+LIV_ottavio_04 · A gentile · B pacato
+LIV_ottavio_05 · A pacato · B pacato
+LIV_ottavio_06 · A pacato · B pacato
+LIV_ottavio_07 · A sincero · B sincero · C sincero
+LIV_fiducia_01 · A sincero · B sincero · C sincero
+LIV_fiducia_02 · A sincero · B sincero
+LIV_fiducia_03 · A sincero · B sincero
+LIV_fiducia_04 · A pacato · B pacato
+LIV_fiducia_05 · A sincero · B pacato
+LIV_fiducia_06 · A sincero · B sincero
+LIV_fiducia_07 · A sincero · B pacato · C sincero
+LIV_irene_01 · A pacato · B pacato · C sincero
+LIV_irene_02 · A pacato · B pacato
+LIV_irene_03 · A pacato · B pacato
+LIV_irene_04 · A sincero · B pacato
+LIV_irene_05 · A pacato · B pacato
+LIV_irene_06 · A pacato · B pacato
+LIV_irene_07 · A pacato · B pacato · C sincero
+LIV_promessa_01 · A sincero · B pacato · C sincero
+LIV_promessa_02 · A sincero · B pacato
+LIV_promessa_03 · A sincero · B gentile
+LIV_promessa_04 · A pacato · B sincero
+LIV_promessa_05 · A sincero · B sincero
+LIV_promessa_06 · A sincero · B sincero
+LIV_promessa_07 · A sincero · B sincero · C sincero
+PRE_1_03 · A pacato · B freddo
+PRE_1_07 · A pacato · B pacato · C freddo
+PRE_2_03 · A pacato · B pacato
+PRE_2_07 · A pacato · B pacato · C freddo
+PRE_3_03 · A pacato · B pacato
+PRE_3_07 · A pacato · B pacato · C freddo
+PRE_4_03 · A freddo · B pacato
+PRE_4_07 · A gentile · B pacato · C freddo
+V2_E01_01 · A sincero · B pacato
+V2_E01_02 · A pacato · B pacato
+V2_E02_01 · A sincero · B pacato
+V2_E02_02 · A pacato · B pacato
+V2_E03_01 · A sincero · B pacato
+V2_E03_02 · A pacato · B pacato
+V2_E04_01 · A sincero · B pacato
+V2_E04_02 · A pacato · B pacato
+V2_E05_01 · A sincero · B pacato
+V2_E05_02 · A pacato · B pacato
+V2_E06_01 · A sincero · B pacato
+V2_E06_02 · A pacato · B pacato
+V2_E07_01 · A sincero · B pacato
+V2_E07_02 · A pacato · B pacato
+V2_E08_01 · A sincero · B pacato
+V2_E08_02 · A pacato · B pacato
+V2_E09_01 · A sincero · B pacato
+V2_E09_02 · A pacato · B pacato
+V2_E10_01 · A sincero · B pacato
+V2_E10_02 · A pacato · B pacato
+V2_E11_01 · A sincero · B pacato
+V2_E11_02 · A pacato · B pacato
+V2_E12_01 · A sincero · B pacato
+V2_E12_02 · A pacato · B pacato
+V2_R01_01 · A sincero · B pacato
+V2_R01_02 · A pacato · B pacato
+V2_R02_01 · A sincero · B pacato
+V2_R02_02 · A pacato · B pacato
+V2_R03_01 · A sincero · B pacato
+V2_R03_02 · A pacato · B pacato
+V2_R04_01 · A sincero · B pacato
+V2_R04_02 · A pacato · B pacato
+V2_R05_01 · A sincero · B pacato
+V2_R05_02 · A pacato · B pacato
+V2_R06_01 · A sincero · B pacato
+V2_R06_02 · A pacato · B pacato
+V2_R07_01 · A sincero · B pacato
+V2_R07_02 · A pacato · B pacato
+V2_R08_01 · A sincero · B pacato
+V2_R08_02 · A pacato · B pacato
+V2_R09_01 · A sincero · B pacato
+V2_R09_02 · A pacato · B pacato
+V2_R10_01 · A sincero · B pacato
+V2_R10_02 · A pacato · B pacato
+V2_L01_01 · A sincero · B pacato
+V2_L01_02 · A pacato · B pacato
+V2_L02_01 · A sincero · B pacato
+V2_L02_02 · A sincero · B pacato
+V2_L03_01 · A sincero · B pacato
+V2_L03_02 · A pacato · B pacato
+V2_L04_01 · A sincero · B pacato
+V2_L04_02 · A sincero · B pacato
+V2_L05_01 · A sincero · B pacato
+V2_L05_02 · A pacato · B pacato
+V2_L06_01 · A sincero · B pacato
+V2_L06_02 · A pacato · B pacato
+V2_ELE_s25_01 · A sincero · B ironico
+V2_ELE_s25_02 · A sincero · B gentile
+V2_ELE_s25_03 · A sincero · B pacato
+V2_ELE_s25_04 · A sincero · B pacato
+V2_ELE_s50_01 · A ironico · B sincero
+V2_ELE_s50_02 · A sincero · B ironico
+V2_ELE_s50_03 · A sincero · B gentile
+V2_ELE_s50_04 · A sincero · B gentile
+V2_ELE_s75_01 · A sincero · B sincero
+V2_ELE_s75_02 · A sincero · B pacato
+V2_ELE_s75_03 · A sincero · B sincero
+V2_ELE_s75_04 · A sincero · B pacato
+V2_ELE_s100_01 · A sincero · B sincero
+V2_ELE_s100_02 · A sincero · B gentile
+V2_ELE_s100_03 · A sincero · B pacato
+V2_ELE_s100_04 · A gentile · B sincero
+V2_ROS_s25_01 · A pacato · B ironico
+V2_ROS_s25_02 · A pacato · B pacato
+V2_ROS_s25_03 · A pacato · B ironico
+V2_ROS_s25_04 · A sincero · B pacato
+V2_ROS_s50_01 · A gentile · B ironico
+V2_ROS_s50_02 · A ironico · B gentile
+V2_ROS_s50_03 · A pacato · B sincero
+V2_ROS_s50_04 · A gentile · B sincero
+V2_ROS_s75_01 · A pacato · B sincero
+V2_ROS_s75_02 · A pacato · B ironico
+V2_ROS_s75_03 · A sincero · B pacato
+V2_ROS_s75_04 · A sincero · B sincero
+V2_ROS_s100_01 · A sincero · B sincero
+V2_ROS_s100_02 · A sincero · B pacato
+V2_ROS_s100_03 · A sincero · B sincero
+V2_ROS_s100_04 · A sincero · B pacato
+V2_LIV_s25_01 · A ironico · B sincero
+V2_LIV_s25_02 · A gentile · B pacato
+V2_LIV_s25_03 · A ironico · B gentile
+V2_LIV_s25_04 · A pacato · B gentile
+V2_LIV_s50_01 · A ironico · B gentile
+V2_LIV_s50_02 · A gentile · B ironico
+V2_LIV_s50_03 · A gentile · B sincero
+V2_LIV_s50_04 · A gentile · B pacato
+V2_LIV_s75_01 · A gentile · B sincero
+V2_LIV_s75_02 · A pacato · B gentile
+V2_LIV_s75_03 · A sincero · B sincero
+V2_LIV_s75_04 · A sincero · B sincero
+V2_LIV_s100_01 · A sincero · B sincero
+V2_LIV_s100_02 · A sincero · B pacato
+V2_LIV_s100_03 · A sincero · B pacato
+V2_LIV_s100_04 · A sincero · B gentile
+V2_PRE_s25_01 · A freddo · B gentile
+V2_PRE_s25_02 · A pacato · B freddo
+V2_PRE_s25_03 · A pacato · B pacato
+V2_PRE_s25_04 · A freddo · B pacato
+V2_PRE_s50_01 · A pacato · B sincero
+V2_PRE_s50_02 · A gentile · B freddo
+V2_PRE_s50_03 · A pacato · B freddo
+V2_PRE_s50_04 · A pacato · B freddo
+V2_PRE_s75_01 · A gentile · B freddo
+V2_PRE_s75_02 · A pacato · B freddo
+V2_PRE_s75_03 · A pacato · B pacato
+V2_PRE_s75_04 · A freddo · B pacato
+V2_LUOGO_tokyo_01 · A sincero · B pacato
+V2_LUOGO_tokyo_02 · A pacato · B gentile
+V2_LUOGO_tokyo_03 · A pacato · B ironico
+V2_LUOGO_tokyo_04 · A gentile · B ironico
+V2_LUOGO_roma_01 · A ironico · B sincero
+V2_LUOGO_roma_02 · A ironico · B pacato
+V2_LUOGO_roma_03 · A sincero · B ironico
+V2_LUOGO_roma_04 · A ironico · B pacato
+V2_LUOGO_parigi_01 · A sincero · B sincero
+V2_LUOGO_parigi_02 · A pacato · B sincero
+V2_LUOGO_parigi_03 · A sincero · B sincero
+V2_LUOGO_parigi_04 · A sincero · B pacato
+V2_LUOGO_londra_01 · A pacato · B pacato
+V2_LUOGO_londra_02 · A pacato · B sincero
+V2_LUOGO_londra_03 · A pacato · B sincero
+V2_LUOGO_londra_04 · A ironico · B pacato
+V2_LUOGO_stoccolma_01 · A sincero · B pacato
+V2_LUOGO_stoccolma_02 · A gentile · B sincero
+V2_LUOGO_stoccolma_03 · A pacato · B pacato
+V2_LUOGO_stoccolma_04 · A sincero · B gentile
+V2_LUOGO_berlino_01 · A sincero · B pacato
+V2_LUOGO_berlino_02 · A pacato · B sincero
+V2_LUOGO_berlino_03 · A pacato · B sincero
+V2_LUOGO_berlino_04 · A pacato · B sboccato
+V2_LUOGO_praga_01 · A pacato · B sincero
+V2_LUOGO_praga_02 · A pacato · B sincero
+V2_LUOGO_praga_03 · A pacato · B pacato
+V2_LUOGO_praga_04 · A sincero · B pacato
+V2_LUOGO_vienna_01 · A sincero · B pacato
+V2_LUOGO_vienna_02 · A sincero · B pacato
+V2_LUOGO_vienna_03 · A pacato · B sincero
+V2_LUOGO_vienna_04 · A sincero · B pacato
+V2_LUOGO_madrid_01 · A pacato · B pacato
+V2_LUOGO_madrid_02 · A pacato · B sincero
+V2_LUOGO_madrid_03 · A sincero · B pacato
+V2_LUOGO_madrid_04 · A pacato · B sincero
+V2_LUOGO_lisbona_01 · A pacato · B sincero
+V2_LUOGO_lisbona_02 · A pacato · B sincero
+V2_LUOGO_lisbona_03 · A sincero · B pacato
+V2_LUOGO_lisbona_04 · A pacato · B sincero
+V2_LUOGO_atene_01 · A sincero · B pacato
+V2_LUOGO_atene_02 · A pacato · B sincero
+V2_LUOGO_atene_03 · A pacato · B sincero
+V2_LUOGO_atene_04 · A sincero · B pacato
+V2_LUOGO_washington_01 · A pacato · B sincero
+V2_LUOGO_washington_02 · A pacato · B pacato
+V2_LUOGO_washington_03 · A pacato · B sincero
+V2_LUOGO_washington_04 · A sincero · B sincero
+V2_CASA_01_M1 · A pacato · B pacato
+V2_CASA_01_Q1_M1 · A pacato · B pacato
+V2_CASA_01_M2 · A pacato · B pacato
+V2_CASA_01_Q2_M2 · A pacato · B pacato
+V2_CASA_01_M3 · A pacato · B pacato · C pacato
+V2_CASA_01_Q1_M3 · A pacato · B pacato
+V2_CASA_01_Q2_M3 · A pacato · B pacato
+V2_CASA_01_M4 · A pacato · B pacato
+V2_CASA_01_Q3_M4 · A pacato · B pacato
+V2_CASA_01_M5 · A pacato · B pacato · C pacato
+V2_CASA_01_Q1_M5 · A pacato · B pacato
+V2_CASA_01_Q3_M5 · A pacato · B pacato
+V2_CASA_01_M6 · A pacato · B pacato · C pacato
+V2_CASA_01_Q2_M6 · A pacato · B pacato
+V2_CASA_01_Q3_M6 · A pacato · B pacato
+V2_CASA_01 · A pacato · B pacato · C pacato
+V2_CASA_01_Q1_M7 · A pacato · B pacato
+V2_CASA_01_Q2_M7 · A pacato · B pacato
+V2_CASA_01_Q3_M7 · A pacato · B pacato
+V2_CASA_01_P_M1 · A pacato · B pacato
+V2_CASA_01_P_Q1_M1 · A pacato · B pacato
+V2_CASA_01_P_M2 · A pacato · B pacato
+V2_CASA_01_P_Q2_M2 · A pacato · B pacato
+V2_CASA_01_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_01_P_Q1_M3 · A pacato · B pacato
+V2_CASA_01_P_Q2_M3 · A pacato · B pacato
+V2_CASA_01_P_M4 · A pacato · B pacato
+V2_CASA_01_P_Q3_M4 · A pacato · B pacato
+V2_CASA_01_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_01_P_Q1_M5 · A pacato · B pacato
+V2_CASA_01_P_Q3_M5 · A pacato · B pacato
+V2_CASA_01_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_01_P_Q2_M6 · A pacato · B pacato
+V2_CASA_01_P_Q3_M6 · A pacato · B pacato
+V2_CASA_01_P · A pacato · B pacato · C pacato
+V2_CASA_01_P_Q1_M7 · A pacato · B pacato
+V2_CASA_01_P_Q2_M7 · A pacato · B pacato
+V2_CASA_01_P_Q3_M7 · A pacato · B pacato
+V2_CASA_02_M1 · A pacato · B pacato
+V2_CASA_02_Q1_M1 · A pacato · B pacato
+V2_CASA_02_M2 · A pacato · B pacato
+V2_CASA_02_Q2_M2 · A pacato · B pacato
+V2_CASA_02_M3 · A pacato · B pacato · C pacato
+V2_CASA_02_Q1_M3 · A pacato · B pacato
+V2_CASA_02_Q2_M3 · A pacato · B pacato
+V2_CASA_02_M4 · A pacato · B pacato
+V2_CASA_02_Q3_M4 · A pacato · B pacato
+V2_CASA_02_M5 · A pacato · B pacato · C pacato
+V2_CASA_02_Q1_M5 · A pacato · B pacato
+V2_CASA_02_Q3_M5 · A pacato · B pacato
+V2_CASA_02_M6 · A pacato · B pacato · C pacato
+V2_CASA_02_Q2_M6 · A pacato · B pacato
+V2_CASA_02_Q3_M6 · A pacato · B pacato
+V2_CASA_02 · A pacato · B pacato · C pacato
+V2_CASA_02_Q1_M7 · A pacato · B pacato
+V2_CASA_02_Q2_M7 · A pacato · B pacato
+V2_CASA_02_Q3_M7 · A pacato · B pacato
+V2_CASA_02_P_M1 · A pacato · B pacato
+V2_CASA_02_P_Q1_M1 · A pacato · B pacato
+V2_CASA_02_P_M2 · A pacato · B pacato
+V2_CASA_02_P_Q2_M2 · A pacato · B pacato
+V2_CASA_02_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_02_P_Q1_M3 · A pacato · B pacato
+V2_CASA_02_P_Q2_M3 · A pacato · B pacato
+V2_CASA_02_P_M4 · A pacato · B pacato
+V2_CASA_02_P_Q3_M4 · A pacato · B pacato
+V2_CASA_02_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_02_P_Q1_M5 · A pacato · B pacato
+V2_CASA_02_P_Q3_M5 · A pacato · B pacato
+V2_CASA_02_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_02_P_Q2_M6 · A pacato · B pacato
+V2_CASA_02_P_Q3_M6 · A pacato · B pacato
+V2_CASA_02_P · A pacato · B pacato · C pacato
+V2_CASA_02_P_Q1_M7 · A pacato · B pacato
+V2_CASA_02_P_Q2_M7 · A pacato · B pacato
+V2_CASA_02_P_Q3_M7 · A pacato · B pacato
+V2_CASA_03_M1 · A pacato · B pacato
+V2_CASA_03_Q1_M1 · A pacato · B pacato
+V2_CASA_03_M2 · A pacato · B pacato
+V2_CASA_03_Q2_M2 · A pacato · B pacato
+V2_CASA_03_M3 · A pacato · B pacato · C pacato
+V2_CASA_03_Q1_M3 · A pacato · B pacato
+V2_CASA_03_Q2_M3 · A pacato · B pacato
+V2_CASA_03_M4 · A pacato · B pacato
+V2_CASA_03_Q3_M4 · A pacato · B pacato
+V2_CASA_03_M5 · A pacato · B pacato · C pacato
+V2_CASA_03_Q1_M5 · A pacato · B pacato
+V2_CASA_03_Q3_M5 · A pacato · B pacato
+V2_CASA_03_M6 · A pacato · B pacato · C pacato
+V2_CASA_03_Q2_M6 · A pacato · B pacato
+V2_CASA_03_Q3_M6 · A pacato · B pacato
+V2_CASA_03 · A pacato · B pacato · C pacato
+V2_CASA_03_Q1_M7 · A pacato · B pacato
+V2_CASA_03_Q2_M7 · A pacato · B pacato
+V2_CASA_03_Q3_M7 · A pacato · B pacato
+V2_CASA_03_P_M1 · A pacato · B pacato
+V2_CASA_03_P_Q1_M1 · A pacato · B pacato
+V2_CASA_03_P_M2 · A pacato · B pacato
+V2_CASA_03_P_Q2_M2 · A pacato · B pacato
+V2_CASA_03_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q1_M3 · A pacato · B pacato
+V2_CASA_03_P_Q2_M3 · A pacato · B pacato
+V2_CASA_03_P_M4 · A pacato · B pacato
+V2_CASA_03_P_Q3_M4 · A pacato · B pacato
+V2_CASA_03_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q1_M5 · A pacato · B pacato
+V2_CASA_03_P_Q3_M5 · A pacato · B pacato
+V2_CASA_03_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q2_M6 · A pacato · B pacato
+V2_CASA_03_P_Q3_M6 · A pacato · B pacato
+V2_CASA_03_P · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q1_M7 · A pacato · B pacato
+V2_CASA_03_P_Q2_M7 · A pacato · B pacato
+V2_CASA_03_P_Q3_M7 · A pacato · B pacato
+V2_CASA_04_M1 · A pacato · B pacato
+V2_CASA_04_Q1_M1 · A pacato · B pacato
+V2_CASA_04_M2 · A pacato · B pacato
+V2_CASA_04_Q2_M2 · A pacato · B pacato
+V2_CASA_04_M3 · A pacato · B pacato · C pacato
+V2_CASA_04_Q1_M3 · A pacato · B pacato
+V2_CASA_04_Q2_M3 · A pacato · B pacato
+V2_CASA_04_M4 · A pacato · B pacato
+V2_CASA_04_Q3_M4 · A pacato · B pacato
+V2_CASA_04_M5 · A pacato · B pacato · C pacato
+V2_CASA_04_Q1_M5 · A pacato · B pacato
+V2_CASA_04_Q3_M5 · A pacato · B pacato
+V2_CASA_04_M6 · A pacato · B pacato · C pacato
+V2_CASA_04_Q2_M6 · A pacato · B pacato
+V2_CASA_04_Q3_M6 · A pacato · B pacato
+V2_CASA_04 · A pacato · B pacato · C pacato
+V2_CASA_04_Q1_M7 · A pacato · B pacato
+V2_CASA_04_Q2_M7 · A pacato · B pacato
+V2_CASA_04_Q3_M7 · A pacato · B pacato
+V2_CASA_04_P_M1 · A pacato · B pacato
+V2_CASA_04_P_Q1_M1 · A pacato · B pacato
+V2_CASA_04_P_M2 · A pacato · B pacato
+V2_CASA_04_P_Q2_M2 · A pacato · B pacato
+V2_CASA_04_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_04_P_Q1_M3 · A pacato · B pacato
+V2_CASA_04_P_Q2_M3 · A pacato · B pacato
+V2_CASA_04_P_M4 · A pacato · B pacato
+V2_CASA_04_P_Q3_M4 · A pacato · B pacato
+V2_CASA_04_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_04_P_Q1_M5 · A pacato · B pacato
+V2_CASA_04_P_Q3_M5 · A pacato · B pacato
+V2_CASA_04_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_04_P_Q2_M6 · A pacato · B pacato
+V2_CASA_04_P_Q3_M6 · A pacato · B pacato
+V2_CASA_04_P · A pacato · B pacato · C pacato
+V2_CASA_04_P_Q1_M7 · A pacato · B pacato
+V2_CASA_04_P_Q2_M7 · A pacato · B pacato
+V2_CASA_04_P_Q3_M7 · A pacato · B pacato
+V2_CASA_05_M1 · A pacato · B pacato
+V2_CASA_05_Q1_M1 · A pacato · B pacato
+V2_CASA_05_M2 · A pacato · B pacato
+V2_CASA_05_Q2_M2 · A pacato · B pacato
+V2_CASA_05_M3 · A pacato · B pacato · C pacato
+V2_CASA_05_Q1_M3 · A pacato · B pacato
+V2_CASA_05_Q2_M3 · A pacato · B pacato
+V2_CASA_05_M4 · A pacato · B pacato
+V2_CASA_05_Q3_M4 · A pacato · B pacato
+V2_CASA_05_M5 · A pacato · B pacato · C pacato
+V2_CASA_05_Q1_M5 · A pacato · B pacato
+V2_CASA_05_Q3_M5 · A pacato · B pacato
+V2_CASA_05_M6 · A pacato · B pacato · C pacato
+V2_CASA_05_Q2_M6 · A pacato · B pacato
+V2_CASA_05_Q3_M6 · A pacato · B pacato
+V2_CASA_05 · A pacato · B pacato · C pacato
+V2_CASA_05_Q1_M7 · A pacato · B pacato
+V2_CASA_05_Q2_M7 · A pacato · B pacato
+V2_CASA_05_Q3_M7 · A pacato · B pacato
+V2_CASA_05_P_M1 · A pacato · B pacato
+V2_CASA_05_P_Q1_M1 · A pacato · B pacato
+V2_CASA_05_P_M2 · A pacato · B pacato
+V2_CASA_05_P_Q2_M2 · A pacato · B pacato
+V2_CASA_05_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_05_P_Q1_M3 · A pacato · B pacato
+V2_CASA_05_P_Q2_M3 · A pacato · B pacato
+V2_CASA_05_P_M4 · A pacato · B pacato
+V2_CASA_05_P_Q3_M4 · A pacato · B pacato
+V2_CASA_05_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_05_P_Q1_M5 · A pacato · B pacato
+V2_CASA_05_P_Q3_M5 · A pacato · B pacato
+V2_CASA_05_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_05_P_Q2_M6 · A pacato · B pacato
+V2_CASA_05_P_Q3_M6 · A pacato · B pacato
+V2_CASA_05_P · A pacato · B pacato · C pacato
+V2_CASA_05_P_Q1_M7 · A pacato · B pacato
+V2_CASA_05_P_Q2_M7 · A pacato · B pacato
+V2_CASA_05_P_Q3_M7 · A pacato · B pacato
+V2_CASA_06_M1 · A pacato · B pacato
+V2_CASA_06_Q1_M1 · A pacato · B pacato
+V2_CASA_06_M2 · A pacato · B pacato
+V2_CASA_06_Q2_M2 · A pacato · B pacato
+V2_CASA_06_M3 · A pacato · B pacato · C pacato
+V2_CASA_06_Q1_M3 · A pacato · B pacato
+V2_CASA_06_Q2_M3 · A pacato · B pacato
+V2_CASA_06_M4 · A pacato · B pacato
+V2_CASA_06_Q3_M4 · A pacato · B pacato
+V2_CASA_06_M5 · A pacato · B pacato · C pacato
+V2_CASA_06_Q1_M5 · A pacato · B pacato
+V2_CASA_06_Q3_M5 · A pacato · B pacato
+V2_CASA_06_M6 · A pacato · B pacato · C pacato
+V2_CASA_06_Q2_M6 · A pacato · B pacato
+V2_CASA_06_Q3_M6 · A pacato · B pacato
+V2_CASA_06 · A pacato · B pacato · C pacato
+V2_CASA_06_Q1_M7 · A pacato · B pacato
+V2_CASA_06_Q2_M7 · A pacato · B pacato
+V2_CASA_06_Q3_M7 · A pacato · B pacato
+V2_CASA_06_P_M1 · A pacato · B pacato
+V2_CASA_06_P_Q1_M1 · A pacato · B pacato
+V2_CASA_06_P_M2 · A pacato · B pacato
+V2_CASA_06_P_Q2_M2 · A pacato · B pacato
+V2_CASA_06_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_06_P_Q1_M3 · A pacato · B pacato
+V2_CASA_06_P_Q2_M3 · A pacato · B pacato
+V2_CASA_06_P_M4 · A pacato · B pacato
+V2_CASA_06_P_Q3_M4 · A pacato · B pacato
+V2_CASA_06_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_06_P_Q1_M5 · A pacato · B pacato
+V2_CASA_06_P_Q3_M5 · A pacato · B pacato
+V2_CASA_06_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_06_P_Q2_M6 · A pacato · B pacato
+V2_CASA_06_P_Q3_M6 · A pacato · B pacato
+V2_CASA_06_P · A pacato · B pacato · C pacato
+V2_CASA_06_P_Q1_M7 · A pacato · B pacato
+V2_CASA_06_P_Q2_M7 · A pacato · B pacato
+V2_CASA_06_P_Q3_M7 · A pacato · B pacato
+V2_CASA_07_M1 · A pacato · B pacato
+V2_CASA_07_Q1_M1 · A pacato · B pacato
+V2_CASA_07_M2 · A pacato · B pacato
+V2_CASA_07_Q2_M2 · A pacato · B pacato
+V2_CASA_07_M3 · A pacato · B pacato · C pacato
+V2_CASA_07_Q1_M3 · A pacato · B pacato
+V2_CASA_07_Q2_M3 · A pacato · B pacato
+V2_CASA_07_M4 · A pacato · B pacato
+V2_CASA_07_Q3_M4 · A pacato · B pacato
+V2_CASA_07_M5 · A pacato · B pacato · C pacato
+V2_CASA_07_Q1_M5 · A pacato · B pacato
+V2_CASA_07_Q3_M5 · A pacato · B pacato
+V2_CASA_07_M6 · A pacato · B pacato · C pacato
+V2_CASA_07_Q2_M6 · A pacato · B pacato
+V2_CASA_07_Q3_M6 · A pacato · B pacato
+V2_CASA_07 · A pacato · B pacato · C pacato
+V2_CASA_07_Q1_M7 · A pacato · B pacato
+V2_CASA_07_Q2_M7 · A pacato · B pacato
+V2_CASA_07_Q3_M7 · A pacato · B pacato
+V2_CASA_07_P_M1 · A pacato · B pacato
+V2_CASA_07_P_Q1_M1 · A pacato · B pacato
+V2_CASA_07_P_M2 · A pacato · B pacato
+V2_CASA_07_P_Q2_M2 · A pacato · B pacato
+V2_CASA_07_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_07_P_Q1_M3 · A pacato · B pacato
+V2_CASA_07_P_Q2_M3 · A pacato · B pacato
+V2_CASA_07_P_M4 · A pacato · B pacato
+V2_CASA_07_P_Q3_M4 · A pacato · B pacato
+V2_CASA_07_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_07_P_Q1_M5 · A pacato · B pacato
+V2_CASA_07_P_Q3_M5 · A pacato · B pacato
+V2_CASA_07_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_07_P_Q2_M6 · A pacato · B pacato
+V2_CASA_07_P_Q3_M6 · A pacato · B pacato
+V2_CASA_07_P · A pacato · B pacato · C pacato
+V2_CASA_07_P_Q1_M7 · A pacato · B pacato
+V2_CASA_07_P_Q2_M7 · A pacato · B pacato
+V2_CASA_07_P_Q3_M7 · A pacato · B pacato
+V2_CASA_08_M1 · A pacato · B pacato
+V2_CASA_08_Q1_M1 · A pacato · B pacato
+V2_CASA_08_M2 · A pacato · B pacato
+V2_CASA_08_Q2_M2 · A pacato · B pacato
+V2_CASA_08_M3 · A pacato · B pacato · C pacato
+V2_CASA_08_Q1_M3 · A pacato · B pacato
+V2_CASA_08_Q2_M3 · A pacato · B pacato
+V2_CASA_08_M4 · A pacato · B pacato
+V2_CASA_08_Q3_M4 · A pacato · B pacato
+V2_CASA_08_M5 · A pacato · B pacato · C pacato
+V2_CASA_08_Q1_M5 · A pacato · B pacato
+V2_CASA_08_Q3_M5 · A pacato · B pacato
+V2_CASA_08_M6 · A pacato · B pacato · C pacato
+V2_CASA_08_Q2_M6 · A pacato · B pacato
+V2_CASA_08_Q3_M6 · A pacato · B pacato
+V2_CASA_08 · A pacato · B pacato · C pacato
+V2_CASA_08_Q1_M7 · A pacato · B pacato
+V2_CASA_08_Q2_M7 · A pacato · B pacato
+V2_CASA_08_Q3_M7 · A pacato · B pacato
+V2_CASA_08_P_M1 · A pacato · B pacato
+V2_CASA_08_P_Q1_M1 · A pacato · B pacato
+V2_CASA_08_P_M2 · A pacato · B pacato
+V2_CASA_08_P_Q2_M2 · A pacato · B pacato
+V2_CASA_08_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_08_P_Q1_M3 · A pacato · B pacato
+V2_CASA_08_P_Q2_M3 · A pacato · B pacato
+V2_CASA_08_P_M4 · A pacato · B pacato
+V2_CASA_08_P_Q3_M4 · A pacato · B pacato
+V2_CASA_08_P_M5 · A pacato · B pacato · C pacato
+V2_CASA_08_P_Q1_M5 · A pacato · B pacato
+V2_CASA_08_P_Q3_M5 · A pacato · B pacato
+V2_CASA_08_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_08_P_Q2_M6 · A pacato · B pacato
+V2_CASA_08_P_Q3_M6 · A pacato · B pacato
+V2_CASA_08_P · A pacato · B pacato · C pacato
+V2_CASA_08_P_Q1_M7 · A pacato · B pacato
+V2_CASA_08_P_Q2_M7 · A pacato · B pacato
+V2_CASA_08_P_Q3_M7 · A pacato · B pacato
+V2_VICINO_01 · A pacato · B pacato
+V2_VICINO_02 · A pacato · B pacato
+V2_VICINO_03 · A pacato · B pacato
+V2_VICINO_04 · A pacato · B pacato
+V2_VICINO_05 · A pacato · B pacato
+V2_MARCO_costo_01 · A pacato · B sincero
+V2_MARCO_costo_02 · A pacato · B pacato
+V2_MARCO_costo_03 · A pacato · B pacato
+V2_MARCO_costo_04 · A pacato · B pacato
+V2_MARCO_costo_05 · A sincero · B sincero · C sincero
+V2_FAL_1_01 · A pacato · B sincero
+V2_FAL_1_02 · A sincero · B sincero
+V2_FAL_1_03 · A pacato · B sincero
+V2_FAL_2_01 · A sincero · B sincero
+V2_FAL_2_02 · A sincero · B sincero
+V2_FAL_2_03 · A pacato · B sincero
+V2_FAL_3_01 · A sincero · B sincero
+V2_FAL_3_02 · A sincero · B sincero
+V2_FAL_3_03 · A sincero · B pacato
+V2_FAL_4_01 · A sincero · B pacato
+V2_FAL_4_02 · A sincero · B pacato
+V2_FAL_4_03 · A pacato · B sincero
+V2_USCITA_01 · A pacato · B pacato
+V2_USCITA_02 · A pacato · B sincero
+V2_USCITA_03 · A pacato · B sincero
+V2_USCITA_04 · A sincero · B sincero
+V2_USCITA_05 · A sincero · B sincero
+V2_GUARDIA_01 · A pacato · B pacato
+V2_GUARDIA_02 · A pacato · B pacato
+V2_GUARDIA_03 · A pacato · B sincero
+V2_GUARDIA_04 · A sincero · B sincero
+V2_GUARDIA_05 · A pacato · B sincero
+V2_VARCO_01 · A pacato · B sincero
+V2_VARCO_02 · A pacato · B sincero
+V2_VARCO_03 · A pacato · B sincero
+V2_VARCO_04 · A pacato · B sincero
+V2_VARCO_05 · A sincero · B sincero · C sincero
+V2_ELE_n1_01 · A sboccato · B sincero
+V2_ELE_n1_02 · A ironico · B gentile
+V2_ELE_n1_03 · A sincero · B pacato
+V2_ELE_n1_04 · A gentile · B gentile
+V2_ELE_n2_01 · A sincero · B sincero
+V2_ELE_n2_02 · A sincero · B sincero
+V2_ELE_n2_03 · A sincero · B sincero
+V2_ELE_n2_04 · A gentile · B pacato
+V2_ELE_n3_01 · A sincero · B sincero
+V2_ELE_n3_02 · A ironico · B sincero
+V2_ELE_n3_03 · A sincero · B gentile
+V2_ELE_n3_04 · A sincero · B ironico
+V2_ELE_n4_01 · A sincero · B gentile
+V2_ELE_n4_02 · A sboccato · B pacato
+V2_ELE_n4_03 · A sincero · B sincero
+V2_ELE_n4_04 · A sincero · B gentile
+V2_ELE_n5_01 · A sincero · B sincero
+V2_ELE_n5_02 · A sincero · B sincero
+V2_ELE_n5_03 · A sincero · B sincero
+V2_ELE_n5_04 · A sincero · B sincero
+V2_ELE_n6_01 · A sincero · B sincero
+V2_ELE_n6_02 · A gentile · B sincero
+V2_ELE_n6_03 · A sincero · B sincero
+V2_ELE_n6_04 · A sboccato · B pacato
+V2_ROS_n1_01 · A sboccato · B sincero
+V2_ROS_n1_02 · A gentile · B ironico
+V2_ROS_n1_03 · A pacato · B gentile
+V2_ROS_n1_04 · A sincero · B pacato
+V2_ROS_n2_01 · A sboccato · B sincero
+V2_ROS_n2_02 · A sincero · B pacato
+V2_ROS_n2_03 · A pacato · B sboccato
+V2_ROS_n2_04 · A sincero · B pacato
+V2_ROS_n3_01 · A sincero · B pacato
+V2_ROS_n3_02 · A ironico · B pacato
+V2_ROS_n3_03 · A ironico · B pacato
+V2_ROS_n3_04 · A pacato · B sboccato
+V2_ROS_n4_01 · A sincero · B pacato
+V2_ROS_n4_02 · A ironico · B sincero
+V2_ROS_n4_03 · A pacato · B pacato
+V2_ROS_n4_04 · A sincero · B pacato
+V2_ROS_n5_01 · A sincero · B sincero
+V2_ROS_n5_02 · A sboccato · B pacato
+V2_ROS_n5_03 · A sincero · B gentile
+V2_ROS_n5_04 · A sincero · B pacato
+V2_ROS_n6_01 · A sincero · B sincero
+V2_ROS_n6_02 · A sincero · B gentile
+V2_ROS_n6_03 · A sincero · B pacato
+V2_ROS_n6_04 · A sincero · B sincero
+V2_LIV_n1_01 · A ironico · B pacato
+V2_LIV_n1_02 · A gentile · B ironico
+V2_LIV_n1_03 · A pacato · B gentile
+V2_LIV_n1_04 · A gentile · B pacato
+V2_LIV_n2_01 · A pacato · B gentile
+V2_LIV_n2_02 · A sincero · B pacato
+V2_LIV_n2_03 · A sincero · B gentile
+V2_LIV_n2_04 · A pacato · B sincero
+V2_LIV_n3_01 · A ironico · B gentile
+V2_LIV_n3_02 · A ironico · B pacato
+V2_LIV_n3_03 · A gentile · B sincero
+V2_LIV_n3_04 · A sincero · B gentile
+V2_LIV_n4_01 · A sincero · B sincero
+V2_LIV_n4_02 · A sincero · B pacato
+V2_LIV_n4_03 · A sincero · B sincero
+V2_LIV_n4_04 · A sincero · B pacato
+V2_LIV_n5_01 · A sincero · B pacato
+V2_LIV_n5_02 · A sincero · B sincero
+V2_LIV_n5_03 · A pacato · B pacato
+V2_LIV_n5_04 · A sincero · B gentile
+V2_LIV_n6_01 · A sincero · B sincero
+V2_LIV_n6_02 · A sincero · B sincero
+V2_LIV_n6_03 · A sincero · B pacato
+V2_LIV_n6_04 · A sincero · B sincero
+
+[REDAZIONE] NOTE
+NODI
+
+[REDAZIONE] NOTE
+FINE SEZIONE

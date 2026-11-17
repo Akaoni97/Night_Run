@@ -168,8 +168,8 @@ frecce automatiche quando si cambia corsia (spie ◀ ▶ con il ticchettio del r
 
 **Bagagliaio.** 12 posti e 150 kg al massimo; tutto quello che carichi pesa sulla massa dell'auto e sul
 retrotreno (più trazione, più lenta in accelerazione). Tanica (+10 L), kit di riparazione (3 usi, solo da
-fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro) e i trofei dei
-capi battuti. Si compra e si butta dal pannello del bagagliaio.
+fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro).
+Si compra e si butta dal pannello del bagagliaio.
 
 **Schermata iniziale.** All'apertura c'è il titolo NIGHT RUN e il menu del Viaggio con il pulsante *Accendi e parti*
 (o Invio, o Spazio). La sigla con la Supra e la canzone è stata tolta: adesso a inizio Viaggio c'è il **prologo**
@@ -265,7 +265,7 @@ auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 **Schermata di gioco (`menu.js`).** La strada riempie tutta la finestra, sopra c'è solo una barra sottile con
 contanti, reputazione, ricercato e il pulsante **MENU** (o tasto **Tab**; **Esc** o Tab per tornare in strada). Nel
 menu, a schede: Partita (modalità, auto, nuova carriera), Officina, Bagagliaio (anche col tasto B), Guida (pedali e
-cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo, qualità, stile del quadro),
+cambio a schermo), Vista (2D/3D, colori, mappa, foto, replay, ora, meteo, qualità, stile del quadro),
 Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
 e, in orizzontale, testata e riquadri si rimpiccioliscono.
 
@@ -277,14 +277,14 @@ Il bagliore è a due livelli: uno stretto sulle luci e uno largo e morbido (che 
 lenti). Con qualità *bassa* niente penombra né coni.
 
 **Icone degli oggetti (`icone.js`).** Ogni oggetto ha la sua icona in pixel art 32×32 (tanica, kit, ruota di
-scorta, gomma forata, pacchi, bancale, il lavoro sigillato, trofeo, sacco di sabbia, panino, acqua, thermos, bibita,
+scorta, gomma forata, pacchi, bancale, il lavoro sigillato, sacco di sabbia, panino, acqua, thermos, bibita,
 salviette, bomboletta) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
 si vedono nel bagagliaio, nel negozio, al bancone, nella bacheca e nella cassa del motel.
 
 **Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
 (il colore tinge titoli, pulsanti e cursori della sezione); a destra la testata e i pannelli arrotondati. La sezione
 *Partita* apre con il riassunto: la tua auto disegnata, contanti, km, reputazione, lavori fatti, guadagnato e il
-lavoro in corso. *Rivali* compare solo nelle sfide in città. Sul telefono le sezioni diventano una fila di icone in
+lavoro in corso. Sul telefono le sezioni diventano una fila di icone in
 alto. Anche i pannelli dei locali e la schermata iniziale (che ora presenta il Viaggio) hanno lo stesso stile.
 
 **Il protagonista (`pilota2d.js`).** Dentro l'auto c'è il guidatore di profilo, col giubbotto e il cappellino rosso,
@@ -416,7 +416,7 @@ con modello di aderenza, resistenza aerodinamica e frenata. Con la configurazion
 | `car3d.js` | Modello 3D dell'auto e sue animazioni |
 | `street2d.js` | Strada in pixel art cartoonesca vista di lato (vista predefinita) |
 | `street3d.js` | Strada notturna in 3D: città, arredo urbano, traffico, polizia, distributore |
-| `game.js` | Carriera: soldi, eventi, polizia, sfide, consegne, pilota automatico per le fermate |
+| `game.js` | Carriera: soldi, eventi, polizia, consegne, pilota automatico per le fermate |
 | `../test/motori.test.js` | Prove con `npm test` |
 
 ## Limitatore, quadri originali, traffico, fisica e mappa del mondo
@@ -475,10 +475,10 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
   *Bicchieri di cristallo* per il motel (fragili: botte e frenate brusche abbassano la paga, € 6.000), *Le medicine*
   per il benzinaio (a tempo, € 8.000), *Il signore della valigetta* da portare all'autogrill (passeggero: sotto i
   120 km/h e guida dolce, € 9.000), *La cassa pesante* per Luca (240 kg: serve il rimorchietto o un furgone,
-  € 15.000), *La busta* per Neon Kustom (prima vinci una sfida con gli abbaglianti, € 12.000) e *La chiave del
+  € 15.000), *La busta* per Neon Kustom (€ 12.000) e *La chiave del
   motel* (€ 20.000). Poi lavori senza fine, con paghe che crescono. Il lavoro dopo si prende sempre alla bacheca del
   locale successivo (in verde); se la salti lo trovi alla bacheca dopo. A schermo l'obiettivo con la distanza, la
-  paga e lo stato della regola (tempo che resta, integrità, soddisfazione del passeggero, sfida vinta). Testi e
+  paga e lo stato della regola (tempo che resta, integrità, soddisfazione del passeggero). Testi e
   paghe in `VG_MISSIONS`.
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
@@ -491,7 +491,7 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
 - **La storia.** La nuova storia è in costruzione (`STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
   strutture già pronte e vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` in `viaggio.js`) che aspettano i testi.
 
-**Modalità.** *Il Viaggio* è la modalità principale; *Sfide in città*, *Città libera* e *Montagna* sono le
+**Modalità.** *Il Viaggio* è la modalità principale; *Città libera* e *Montagna* sono le
 modalità libere.
 
 **Cruscotto in gioco (J).** In alta definizione, nello stile del quadro di ogni auto: tachimetro con la benzina,
@@ -516,9 +516,5 @@ Tutte si possono anche comprare alla concessionaria del Motel Ovunque, con motor
 Il traffico tiene la destra, sorpassa i più lenti, si sposta per tempo davanti agli ostacoli.
 
 **Strada viva (`strada.js`).** In prima corsia ogni tanto: un incidente (due auto ferme con le quattro frecce) o la
-polizia che ha fermato qualcuno. Con **F** (o il pulsante FARI) sfanali chi ti sta davanti: o si sposta e ti fa
-passare, o risponde e parte la **sfida di 2 km** (chi è davanti alla fine vince, senza premio in soldi). Le
-sportive accettano più spesso; autobus, furgoni, taxi e ambulanze mai; una volante sfanalata ti multa.
-**Reputazione**: +3 a vittoria (+5 contro una sportiva), −1 a sconfitta. A 5 rispetto (accettano di più), a 12
-+3 % di potenza, a 25 +3 % di aderenza, a 45 sconto del 15 % da Luca e Niko, a 70 altri +4 % di potenza.
+polizia che ha fermato qualcuno. Con **F** (o il pulsante FARI) sfanali chi ti sta davanti: si sposta e ti fa passare; una volante sfanalata ti multa.
 

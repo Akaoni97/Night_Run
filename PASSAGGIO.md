@@ -30,7 +30,7 @@ gioco fa, sezione per sezione).
   sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), il prologo di apertura (`prologo.js`)
   e il telefono (`telefono.js`). La storia dopo il km 0 è da scrivere: capitoli, eventi strani e passeggeri speciali
   sono strutture vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX`).
-- **Modalità libere**: Sfide in città (la vecchia carriera), Città libera, Montagna (solo 3D).
+- **Modalità libere**: Città libera, Montagna (solo 3D). Il pulsante "Sfide in città" è stato tolto; la modalità interna `career` serve ancora al Viaggio.
 - **Auto**: Supra, V40 e 25 veicoli dai disegni del giocatore (`cars.js`, `GEN_DATA` + `GEN_CARS`, immagini in
   `img/<id>.png`, `_wheel.png`, `_paint.png`). Tutti con motore, peso e marce veri; si comprano alla concessionaria
   del Motel Ovunque. Il traffico usa solo questi disegni, coi loro colori (`GAME_TRAFFIC` in `game.js`).
@@ -40,9 +40,8 @@ gioco fa, sezione per sezione).
   La meta del lavoro in corso è una bandierina verde sulla mappa a barra in basso (oltre i 2,7 km resta sul bordo
   destro con la distanza); scatole e bancali caricati hanno una "P" sulla sosta di consegna (`renderMiniMap` in
   `index.html`). Idee non fatte: missioni che cambiano col paesaggio.
-- **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta o accetta una sfida di
-  2 km), reputazione con vinte/perse e vantaggi (`ST_REP_PERKS`), incidenti e controlli della polizia in prima
-  corsia, traffico che tiene la destra.
+- **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta e ti fa passare),
+  incidenti e controlli della polizia in prima corsia, traffico che tiene la destra.
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
   limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 9),
   consumo e autonomia, fisica con beccheggio e wheel hop.
@@ -60,13 +59,22 @@ gioco fa, sezione per sezione).
 - **Radio** (`radio.js`): stazione FM 103.5 Night House con quattro canzoni del proprietario in fila
   (`audio/house/`: Redline Ascent, Midnight Gearbox, Midnight Apex, Midnight Redline), poi ricomincia; il titolo in
   onda va accanto al nome. Le stazioni a scaletta si fanno con `list` al posto di `src`.
+- **Chat del telefono** (`chat.js`, 18/11/2026): conversazioni vere con 2-3 risposte e bivi (alcuni tornano sullo stesso punto,
+  altri no, altri compaiono solo con abbastanza confidenza), barra di **confidenza** per persona (si vede nelle chat e nella
+  Rubrica a schede), **gusti** che si scoprono dalle reazioni (▲ piace, ▼ non piace), soglie 25/50/75/100 che sbloccano altre
+  conversazioni. Nessun obbligo: una chat ignorata resta ad aspettare, e si possono coltivare tutte le persone. La presenza ha la sua
+  barra rossa. "Sta scrivendo…", conferma di lettura, suono breve. Le **28 conversazioni scritte da Codex** (Elena 12, Rosa 10, Livia 6, più la presenza che imita Elena e zio Claudio e i
+  messaggi sporchi) sono dentro: `chat_dati.js`, generato da `strumenti/importa_chat.py`. I **toni sono provvisori** (regole sulle parole + 17
+  risposte aggiunte da me, tra cui 10 sboccate per Rosa) finché non arriva la tabella dei toni di Codex; i km di partenza sono
+  segnaposto. Le conversazioni che dipendono da eventi non ancora fatti (incursioni, sangue, foto, fase V) restano ferme con
+  un flag `ev_…`. Prossimo materiale richiesto: `RICHIESTA_PER_CODEX_3.md`. Stato in `game.s.chat`. Ritmo rivisto: cartelloni delle app a km 5, 11,5 e 21
+  (3-5 minuti di guida tra uno e l'altro) e messaggi di Niko e del Motel a km 7 e 14.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
   ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
   (Luca); potenziamenti a tempo (+8 % per 50 km, +15 % per 100 km) e per sempre (+3 %, mitico); pezzo vero del
   catalogo (epico), kit turbo (mitico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
-  primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, bronzo per le
-  sfide vinte (argento ogni quinta). Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
+  primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
   Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
 - **Interni** (`interni.js`): entrando in un locale (U) la strada lascia il posto a una scena in pixel art del locale,
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
@@ -88,9 +96,8 @@ gioco fa, sezione per sezione).
 - **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
   Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
-  sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`): con gli abbaglianti accetta la sfida solo un'auto della
-  tua categoria (40 %, 65 % le sportive), le altre ti fanno passare dicendo perché; i mezzi da lavoro mai. Traguardi:
-  Cinque marche, Una per tipo, Il garage dello zio (tappa secondaria: ricomprare le cinque non scelte), Re di ogni categoria.
+  sportive, sportive, mezzi da lavoro (`ST_CAT` in `strada.js`, usate da Garage e documenti; le sfide con gli abbaglianti sono state tolte). Traguardi:
+  Cinque marche, Una per tipo, Il garage dello zio (tappa secondaria: ricomprare le cinque non scelte).
   Le cinque auto dello zio non scelte nel prologo finiscono in vendita all'Autosalone (scritta «Era nel garage dello zio»).
 - **Testi con l'auto scelta**: `{Auto}`, `{auto}`, `{tipo}` nei testi della storia (pensieri, capitoli, messaggi) diventano
   «La Panda», «l'Audi», «un'utilitaria»… secondo l'auto ereditata (`game.s.vg.eredita`, `vgTesto` e `VG_AUTO_NOME` in `viaggio.js`).
@@ -107,7 +114,7 @@ gioco fa, sezione per sezione).
   volte al secondo: al Neon Kustom vernice, cerchi, kit e spoiler provati si vedono subito (prima un aggiornamento ogni
   mezzo secondo rimetteva quelli comprati, e i cerchi finivano sotto la carrozzeria). Pannello: valori dell'officina su
   tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Niko e Neon Kustom.
-- **Traguardi** (`traguardi.js`): 29 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
+- **Traguardi** (`traguardi.js`): 27 traguardi in `TRG_LIST` (lavori, catena, km, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
   (`caseGrant`). Avviso dorato dall'alto con suono, uno alla volta; app Traguardi nel telefono (installata da sola).
@@ -178,7 +185,6 @@ gioco fa, sezione per sezione).
   carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
   (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
 - Manca il disegno di un **camion** (traffico lento a 90 km/h, lavori pesanti: la logica c'è, serve il disegno).
-- La **reputazione** sblocca solo vantaggi meccanici: il giocatore potrebbe volere anche premi estetici.
 - Sulle auto molto scure (Golf GTI, 205 GTI) il cambio di vernice prende poco (maschera povera).
 - La V40 è nel traffico: ruota e maschera della vernice sono ricavate dal disegno con `strumenti/v40_traffico.py`
   (`img/v40_wheel.png`, `img/v40_paint.png`); la V40 guidata dal giocatore resta disegnata a parte (`v40Base`).

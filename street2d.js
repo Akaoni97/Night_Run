@@ -674,7 +674,6 @@ class Street2D {
   setRain(on) { this.rainOn = on; }
   setDaylight(d, ss) { this.day = d; this.sunset = ss; }
   resetCamera() {}
-  raceCam() {}
 
   resize() {
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
@@ -1526,7 +1525,7 @@ class Street2D {
     g.fillStyle = Math.floor(t * 4) % 2 || Math.abs(game.laneZ - (GAME_LANE_Z[game.lane] ?? 3.5)) < 0.3 ? 'rgba(184,255,58,.16)' : 'rgba(184,255,58,.3)'; g.fillRect(x0 + 4, tl - 4, w - 8, 9);
     const sim = game.sim, myV = sim ? sim.v : 0;
     for (const e of game.ents) {
-      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'rival' || e.kind === 'ghost')) continue;
+      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'ghost')) continue;
       const rel = e.x - dist; if (rel < from || rel > to || e.lane === 0) continue;
       const z = e._z ?? GAME_LANE_Z[e.lane], len = Math.max(3, Math.round((e.len || 4.6) / (to - from) * (w - 8) * 1.6));
       const same = Math.abs(z - game.laneZ) < 1.7, warn = same && rel > 0 && rel < 14 + myV * 1.2 && myV > (e.v || 0) + 1;
@@ -1810,7 +1809,7 @@ class Street2D {
 
     if (bg === 'city' && this.districtRoad) { this._t = st.t; this.districtRoad(g, wx, visFrom, visTo, TUN); }   // asfalto del quartiere
     // ---- corsia scelta: frecce luminose dipinte sull'asfalto davanti all'auto (si spostano col cambio corsia)
-    if (game && game.track === 'city' && !game.inside && !game.race && this.laneRadar !== false && Math.abs(s.v) > 0.5) {
+    if (game && game.track === 'city' && !game.inside && this.laneRadar !== false && Math.abs(s.v) > 0.5) {
       const ly = Math.round(this.laneY(GAME_LANE_Z[game.lane] ?? 3.5)) - 6, pulse = 0.25 + 0.15 * Math.sin(st.t * 6);
       for (let q = 0; q < 4; q++) {
         const xx = Math.round(carX + (110 + q * 26 + ((st.t * 40) % 26)) * 1), a = pulse * (1 - q * 0.2);
@@ -2132,12 +2131,11 @@ class Street2D {
       if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
       if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
     }
-    if (game) for (const f of game.fx) { if (f.k === 'challenge') this.comic('SFIDA! 2 KM', carX + 40, carTop - 30, '#ff2e88', 4, '#ffd23f'); else if (f.k === 'streetWin') this.comic('VINTA!', carX + 40, carTop - 30, '#b8ff3a', 5); else if (f.k === 'streetLose') this.comic('PERSA...', carX + 40, carTop - 30, '#8a93b0', 4); if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
+    if (game) for (const f of game.fx) { if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
     if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
     if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
     if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
     if (game && game.siren && !st.prevSiren) this.comic('ALT! POLIZIA', carX + 40, carTop - 30, '#4f7bff', 3);
-    if (game && game.race && game.race.phase === 'run' && game.race.tt < 0.05 && cd('go', 2)) this.comic('VIA!', carX + 80, carTop - 30, '#b8ff3a', 6, '#163a8c');
     st.prevV = s.v; st.prevFlame = st.flame; st.prevSiren = !!(game && game.siren);
     // ---- marciapiede vicino con oggetti in primo piano (fuori città: barriera, guardrail, roccia, erba o sabbia)
     if (!urban) this.drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, st.t);
@@ -2194,44 +2192,9 @@ class Street2D {
     }
     if (TUN) this.drawTunnelFront(g, TUN, wx, W);
 
-    // ---- gara: semaforo da drag grande, barra di avanzamento, striscione a scacchi
-    if (game && game.race) {
-      const R = game.race, tx = Math.round(W * 0.66), ty = 74;
-      if (R.phase === 'count' || (R.phase === 'run' && R.tt < 1.6)) {
-        const lit = R.phase === 'run' ? 4 : R.t < 1 ? 3 : R.t < 2 ? 2 : R.t < 3 ? 1 : 0;
-        g.fillStyle = C.ink; g.fillRect(tx - 2, ty + 120, 6, 40); g.fillRect(tx - 18, ty - 4, 38, 128);
-        g.fillStyle = '#1b1d28'; g.fillRect(tx - 16, ty - 2, 34, 124);
-        for (let i = 0; i < 4; i++) {
-          const on = i < 3 ? lit > i && lit < 4 : lit === 4, col = i < 3 ? '#ffb000' : '#3cff6a', yy = ty + 14 + i * 30;
-          g.fillStyle = on ? col : '#33281a'; this.span(g, tx + 1, yy, 10, 10);
-          if (on) { g.fillStyle = '#fff6d0'; this.span(g, tx - 2, yy - 3, 3, 3); this.light(g, tx + 1, yy, 34, 30, col, 0.28, 4); }
-        }
-      }
-      if (R.phase === 'run') {
-        const rival = game.ents.find((e) => e.kind === 'rival'), bx = Math.round(W * 0.3), bw = Math.round(W * 0.4), by = 14;
-        g.fillStyle = 'rgba(8,8,14,.75)'; g.fillRect(bx - 4, by - 4, bw + 8, 14);
-        g.fillStyle = '#3a3f58'; g.fillRect(bx, by + 3, bw, 2);
-        for (let q = 0; q <= 4; q++) g.fillRect(bx + Math.round(bw * q / 4), by, 1, 8);
-        for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : C.ink; g.fillRect(bx + bw - 3 + (q % 2) * 3, by - 2 + Math.floor(q / 2) * 4, 3, 4); }
-        const mark = (m, col) => { const xx = bx + Math.round(Math.max(0, Math.min(1, m / 402.3)) * bw); g.fillStyle = C.ink; g.fillRect(xx - 4, by - 1, 9, 8); g.fillStyle = col; g.fillRect(xx - 3, by, 7, 6); };
-        if (rival) mark(rival.x - R.x0, '#b8b8c8');
-        mark(game.s.dist - R.x0, this.paintHex);
-      }
-    }
-
     if (DM && this.districtBanner && game && !game.inside) this.districtBanner(g, dist, dt);
     // ---- segnalatore della corsia (radar delle tre corsie)
     if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
-    if (game && game.street) {   // sfida in corsa: barra dei 2 km con le due auto
-      const R = game.street, bx = Math.round(W * 0.3), bw = Math.round(W * 0.4), by = 46, f = (m) => Math.max(0, Math.min(1, m / ST_RACE_M));
-      g.fillStyle = 'rgba(8,8,14,.78)'; g.fillRect(bx - 6, by - 6, bw + 12, 26);
-      g.fillStyle = '#3a3f58'; g.fillRect(bx, by + 3, bw, 2);
-      for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : C.ink; g.fillRect(bx + bw - 3 + (q % 2) * 3, by - 2 + Math.floor(q / 2) * 4, 3, 4); }
-      const mk = (m, col) => { const xx = bx + Math.round(f(m) * bw); g.fillStyle = C.ink; g.fillRect(xx - 4, by - 1, 9, 8); g.fillStyle = col; g.fillRect(xx - 3, by, 7, 6); };
-      mk(R.e.x - R.x0, '#b8b8c8'); mk(dist - R.x0, this.paintHex || '#ff5a3a');
-      const gap = Math.round(-(R.gap || 0)), txt = (gap >= 0 ? '+' : '') + gap + ' M · ' + Math.max(0, Math.round((ST_RACE_M - (dist - R.x0)) / 10) * 10) + ' M ALLA FINE';
-      this.text(g, txt, bx, by + 10, gap >= 0 ? '#b8ff3a' : '#ff5a3a');
-    }
     if (game && game.track === 'city' && !game.inside && this.laneRadar !== false) this.drawLaneRadar(g, game, dist, st.t);
 
     // ---- su schermo

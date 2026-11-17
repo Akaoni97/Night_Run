@@ -2,7 +2,7 @@
 //  Night Run · Il garage (dopo sfascio.js)
 //  App Garage nel telefono: le tue auto con categoria, km, stato (carrozzeria, gomme, olio, pastiglie, pulizia),
 //  potenza e valore all'Autosalone; quella che guidi in cima. Traguardi da collezionista (marche, categorie, ricomprare
-//  le auto dello zio finite in salone, sfide vinte in ogni categoria). La collezione (auto avute almeno una volta) sta in
+//  le auto dello zio finite in salone). La collezione (auto avute almeno una volta) sta in
 //  game.s.vg.coll. Le categorie (ST_CAT, stCat) sono in strada.js.
 // ============================================================================
 // le sei auto del garage dello zio (prologo): se ne sceglie una, le altre cinque finiscono in vendita all'Autosalone
@@ -35,8 +35,6 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
       check: (g) => [new Set(Object.keys(g.garColl()).map((id) => stCat(id)).filter((c) => cats.includes(c))).size, 4] },
     { id: 'zio6', name: 'Il garage dello zio', text: 'Ricompra all\'Autosalone le cinque auto dello zio che non avevi scelto (anche non insieme).', prize: { cassa: 'argento' },
       check: (g) => { const c = g.garColl(); return [GAR_ZIO.filter((id) => c[id]).length, 6]; } },
-    { id: 'sfide4', name: 'Re di ogni categoria', text: 'Vinci una sfida con gli abbaglianti in ognuna delle quattro categorie.', prize: { cassa: 'oro' },
-      check: (g) => { const c = (g.s.street && g.s.street.cat) || {}; return [cats.filter((k) => c[k]).length, 4]; } },
   );
 })();
 

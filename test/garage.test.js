@@ -1,4 +1,4 @@
-// Prove del garage: categorie delle sfide, collezione, traguardi da collezionista.
+// Prove del garage: categorie delle auto, collezione, traguardi da collezionista.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -13,26 +13,6 @@ test('categorie: ogni auto del gioco ne ha una sola', () => {
   const all = Object.values(ST_CAT).flat();
   assert.equal(new Set(all).size, all.length, 'nessuna auto in due categorie');
   for (const id of Object.keys(CARS)) assert.ok(all.includes(id), `${id} senza categoria`);
-});
-
-// quante volte, su 200 colpi di abbaglianti, l'auto davanti accetta la sfida
-function sfide(game, sim, vt) {
-  let n = 0;
-  for (let i = 0; i < 200; i++) {
-    game.street = null; game.race = null;
-    game.ents = [{ id: i, kind: 'traffic', vt, len: 4.2, lane: game.lane, x: game.s.dist + 30, v: 25, vT: 25, vBase: 25 }];
-    game.laneZ = GAME_LANE_Z[game.lane]; sim.v = 30;
-    if (game.flashLights() === 'race') n++;
-  }
-  return n;
-}
-test('sfide: solo tra auto della stessa categoria', () => {
-  const { game, sim } = trip();                                          // si parte con la V40: familiare
-  assert.equal(stCat(game.car), 'familiare');
-  assert.equal(sfide(game, sim, 'e36'), 0, 'una sportiva non sfida una familiare');
-  assert.equal(sfide(game, sim, 'panda'), 0, 'un\'utilitaria nemmeno');
-  assert.ok(sfide(game, sim, 'a80') > 40, 'un\'altra familiare sì');
-  assert.equal(sfide(game, sim, 'doblo'), 0, 'i mezzi da lavoro mai');
 });
 
 test('collezione: le auto avute restano contate anche dopo averle vendute; traguardi', () => {
