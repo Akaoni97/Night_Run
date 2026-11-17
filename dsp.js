@@ -229,9 +229,99 @@ class EngineDSP {
     } else if (e.type === 'grind') this.grind = 1;
     else if (e.type === 'clunk') this.clunk = 1;
     else if (e.type === 'click') this.click = 1;
-    else if (e.type === 'crash') { this.crashE = Math.min(1.6, 0.6 + (e.I || 0.6)); this.crashPh = 0; }
-    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; }
+    else if (e.type === 'crash') this.hit(e.I || 0.6, e.kind || 'front');
+    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }
     void T;
+  }
+
+  // ---- urti: botta sorda, lamiera che si accartoccia, pannelli che vibrano, vetri, pezzi che cadono, strisciata ----
+  // I = forza (0..1,5); kind: front (tamponi tu), rear (ti tamponano), side (strisciata di fianco), bump (colpetto)
+  hit(I, kind) {
+    const sr = this.sr, H = this.H || (this.H = {
+      th: 0, cr: 0, crG: 0, crHold: 0, crBP: new BQ(), crBP2: new BQ(), crLP: new BQ(),
+      ring: [0, 1, 2, 3, 4].map(() => ({ bq: new BQ(), a: 0, d: 1 })), gT: 0, gA: 0,
+      tr: 0, trHP: new BQ().set('hp', 1200, 0.7, sr), boom: new BQ(), thLP: new BQ(), thLPf: 900, gs: 0, gsBP: new BQ(), gl: 0, glBP: new BQ(), glHP: new BQ().set('hp', 3800, 0.7, sr),
+      db: 0, dbBP: new BQ(), sc: 0, scT: 0, scLen: 0, scBP: new BQ(), scSq: new BQ(), scLP: new BQ().set('lp', 140, 0.7, sr), scPh: 0, scJ: 0,
+      cab: new BQ(), cabState: -1, ex: 0,
+    });
+    I = Math.max(0.05, Math.min(1.5, I));
+    const u = () => 0.5 + 0.5 * this.r();                                     // 0..1
+    // il motore si abbassa per un attimo: la botta copre tutto (e chi guida molla il gas)
+    H.duck = Math.max(H.duck || 0, kind === 'bump' ? 0.15 : kind === 'side' ? 0.3 : Math.min(0.65, 0.3 + 0.3 * I));
+    if (kind === 'side') {
+      // strisciata: lamiera contro lamiera per qualche decimo di secondo, colpo leggero all'inizio
+      H.sc = Math.max(H.sc, 0.55 + 0.45 * Math.min(1, I)); H.scT = 0; H.scLen = 0.45 + 0.35 * u();
+      H.scBP.set('bp', 1100 + 900 * u(), 1.6, sr); H.scSq.set('bp', 2600 + 1600 * u(), 14, sr);
+      H.th = Math.max(H.th, 0.35 * I); H.thLPf = 700; H.boom.set('bp', 80, 2.2, sr); H.tr = Math.max(H.tr, 0.35);
+      H.cr = Math.max(H.cr, 0.35 * I); H.crHold = 0.05; H.crBP.set('bp', 2400, 0.9, sr); H.crBP2.set('bp', 4200, 1.4, sr);
+      H.db = Math.max(H.db, 0.25 * I); H.dbBP.set('bp', 1500, 4, sr);
+    } else {
+      const big = kind === 'bump' ? 0 : Math.min(1, I / 1.2);
+      // botta: il colpo della massa, una nota che cade in fretta (più bassa e lunga se è forte)
+      H.th = Math.max(H.th, kind === 'bump' ? 0.5 * I : 0.55 + 0.6 * I); H.thLPf = kind === 'bump' ? 500 : 1400; H.boom.set('bp', 60 + 35 * u(), 2.2, sr);
+      H.tr = Math.max(H.tr, kind === 'bump' ? 0.3 : 0.7 + 0.3 * big);              // lo schiocco del contatto
+      // lamiera: scrosci di crepitii filtrati, più lunghi coi colpi forti
+      H.cr = Math.max(H.cr, kind === 'bump' ? 0.25 * I : 0.5 + 0.55 * I); H.crHold = kind === 'bump' ? 0.01 : 0.06 + 0.16 * big;
+      H.crBP.set('bp', 450 + 400 * u(), 0.7, sr); H.crBP2.set('bp', 1700 + 900 * u(), 1.0, sr); H.crLP.set('lp', 420, 0.7, sr);   // accartocciarsi (medio-basso) e strappo
+      // pannelli: cinque modi non armonici, diversi a ogni urto (si eccitano col crepitio: niente note fisse)
+      const base = [170, 310, 590, 1080, 2150];
+      H.ring.forEach((m, k) => { m.bq.set('bp', base[k] * (0.8 + 0.45 * u()), 7 + 9 * u(), sr); m.a = (1 - k * 0.15) * (kind === 'bump' ? 0.25 : 0.4 + 0.6 * big); m.d = Math.exp(-1 / (sr * (0.04 + 0.16 * u() / (1 + k * 0.5)))); });
+      // vetri e plastiche: solo negli urti veri
+      if (kind !== 'bump' && I > 0.7) { H.gl = Math.max(H.gl, Math.min(1, (I - 0.55) * 1.4)); H.gs = H.gl; H.glBP.set('bp', 5200 + 2200 * u(), 6, sr); H.gsBP.set('bp', 4500 + 2000 * u(), 0.9, sr); }
+      if (kind !== 'bump') { H.db = Math.max(H.db, 0.3 + 0.5 * big); H.dbBP.set('bp', 900 + 900 * u(), 5, sr); }
+    }
+  }
+
+  // un campione dell'urto (0 quando non c'è niente)
+  hitSample(TAU, view) {
+    const H = this.H, sr = this.sr; let o = 0, ex = 0;
+    if (H.tr > 1e-3) { o += H.trHP.p(this.r()) * H.tr * 2.2; H.tr *= Math.exp(-1 / (sr * 0.004)); }
+    if (H.th > 1e-3) {
+      // botta: rumore che si scurisce in fretta (filtro che scende) più il rimbombo della scocca, niente note pure
+      if ((this.k & 15) === 0) { H.thLPf = 110 + (H.thLPf - 110) * Math.exp(-16 / (sr * 0.05)); H.thLP.set('lp', H.thLPf, 0.9, sr); }
+      const nz = this.r();
+      o += (H.thLP.p(nz) * 10 + H.boom.p(nz) * 45) * H.th;
+      H.th *= Math.exp(-1 / (sr * 0.12));
+    }
+    if (H.cr > 1e-3) {
+      // la lamiera cede a scatti: pezzetti di 1-9 ms di rumore, quasi tutti deboli e pochi forti, più qualche schiocco
+      if ((H.gT -= 1) <= 0) { H.gT = Math.round(sr * (0.001 + 0.008 * Math.abs(this.r()))); const q = Math.abs(this.r()); H.gA = q * q * q * 3; }
+      const grain = Math.abs(this.r()) < 0.004 ? this.r() * 5 : 0;
+      ex = (this.r() * H.gA + grain) * H.cr;
+      o += H.crBP.p(ex) * 2.6 + H.crBP2.p(ex) * 0.55;
+      if (H.crHold > 0) H.crHold -= 1 / sr; else H.cr *= Math.exp(-1 / (sr * 0.07));
+    }
+    if (H.ring[0].a > 1e-4) {
+      // pannelli che vibrano: modi non armonici che si spengono a tempi diversi, sporcati dagli scatti della lamiera
+      const nz = this.r() * 0.35 + ex;
+      let r = 0; for (const m of H.ring) { r += m.bq.p(nz) * m.a; m.a *= m.d; }
+      o += r * 1.6;
+    }
+    if (H.gs > 1e-3) { const nz = this.r(); o += (H.gsBP.p(nz) * 1.6 + H.glHP.p(nz) * 0.5) * H.gs * (0.6 + 0.4 * Math.abs(this.r())); H.gs *= Math.exp(-1 / (sr * 0.09)); }
+    if (H.gl > 1e-3) {
+      // vetri: tintinnii sottili e radi che continuano mentre i pezzi cadono
+      const k = Math.abs(this.r()) < 0.0022 * H.gl ? this.r() * 6 : 0;
+      o += (H.glBP.p(k) * 1.2 + H.glHP.p(k) * 0.35) * H.gl;
+      H.gl *= Math.exp(-1 / (sr * 0.45));
+    }
+    if (H.db > 1e-3) {
+      // plastiche e pezzi che rimbalzano sull'asfalto
+      const k = Math.abs(this.r()) < 0.0009 ? this.r() * 5 : 0;
+      o += H.dbBP.p(k) * H.db * 1.4;
+      H.db *= Math.exp(-1 / (sr * 0.5));
+    }
+    if (H.sc > 1e-3) {
+      // strisciata: attrito a scatti (stick-slip), rumore filtrato che sale e scende, un fischio di lamiera e un rombo basso
+      H.scT += 1 / sr; H.scPh += (28 + 18 * Math.min(1, this.S.speed / 30)) / sr; if (H.scPh > 1) { H.scPh -= 1; H.scJ = 0.4 + 0.6 * Math.abs(this.r()); }
+      const env = H.scT < 0.02 ? H.scT / 0.02 : H.scT < H.scLen ? 1 : Math.exp(-(H.scT - H.scLen) / 0.12);
+      const stick = H.scJ * (0.55 + 0.45 * Math.sin(TAU * H.scPh));
+      const nz = this.r();
+      o += (H.scBP.p(nz) * 2.4 * stick + H.scSq.p(nz) * 1.6 * (0.4 + 0.6 * stick) + H.scLP.p(nz) * 2.0) * H.sc * env;
+      if (env < 1e-3 && H.scT > H.scLen) H.sc = 0;
+    }
+    // in abitacolo: si sente attraverso la scocca, alti attutiti e botta più piena
+    if (view === 0) { if (H.cabState !== 0) { H.cab.set('lp', 2600, 0.7, sr); H.cabState = 0; } return H.cab.p(o) * 1.25; }
+    return o;
   }
 
   addPop(big) {
@@ -567,13 +657,6 @@ class EngineDSP {
         road += (Math.sin(TAU * this.bumpPh) * 0.5 + this.roadLP.p(nz) * 2.5) * this.bump * 0.35;
         this.bump *= Math.exp(-1 / (sr * 0.045));
       }
-      // tamponamento: botta sorda + lamiera che vibra
-      if (this.crashE > 1e-3) {
-        this.crashPh += 1 / sr;
-        const ring = Math.sin(TAU * 520 * this.crashPh) * 0.5 + Math.sin(TAU * 1370 * this.crashPh) * 0.3 + Math.sin(TAU * 61 * this.crashPh) * 1.2;
-        gear += (this.roadLP.p(nz3) * 4 + ring) * this.crashE * 0.5;
-        this.crashE *= Math.exp(-1 / (sr * 0.12));
-      }
       if (this.click > 1e-3) { gear += this.tickHP.p(nz3) * this.click * 0.25; this.click *= Math.exp(-1 / (sr * 0.004)); }
 
       // tintinnio della frizione bidisco in folle al minimo
@@ -605,6 +688,8 @@ class EngineDSP {
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
       out = out * M.g + 1e-18;
+      // urti: livello pari in tutti i punti d'ascolto (non passano dal mix del motore), poi riverbero dell'ambiente
+      if (this.H) { const H = this.H; if (H.duck > 1e-3) { out *= 1 - H.duck; H.duck *= Math.exp(-1 / (sr * 0.3)); } out += this.hitSample(TAU, this.cfg.view) * 0.32; }
 
       // ---- ambiente: prime riflessioni (asfalto, palazzi, pareti) e coda di riverbero -------------------------------
       this.rvFb += ((this.rvFbT ?? 0.78) - this.rvFb) * 0.0002; this.rvWet += ((this.rvWetT ?? 0.035) - this.rvWet) * 0.0002;

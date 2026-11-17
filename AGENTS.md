@@ -15,7 +15,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 
 | File | Cosa contiene |
 | --- | --- |
-| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri, collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). |
+| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri, collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. |
 | `sim.js` | Fisica (classe `SupraSim`, passo 1/4000 s): motore, turbo, frizione, cambio, gomme Pacejka, differenziale, beccheggio, wheel hop, TRC, ABS, tipi di limitatore. |
 | `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), `tuningParams()`. |
 | `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
@@ -39,6 +39,12 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `telefono.js` | Il telefono (dopo `menu.js`): smartphone sopra la strada, tasto 0 o pulsante TELEFONO. All'inizio solo Telefono, Messaggi, Rubrica, Mappa, Foto, Orologio. Lavori (bacheca e consegne vere), Passeggeri e Motel si scaricano: `TEL_APP_OFFERS` mette un cartellone luminoso sulla strada (entità `vgsign` con `app`, disegnata in `viaggio2d.js`), quando lo superi spunta l'icona e il download è finto. Le app strane (Ultima Uscita, Segreteria) compaiono da sole con la storia, senza scaricarle. `TEL_SMS` (messaggi per km), `TEL_ATTI` (km dei momenti della storia), `window.telefono.sms/ring/open/setAtto`. Grafica in Shadow DOM. Test in `test/telefono.test.js`. |
 | `pensieri.js` | I pensieri del protagonista (dopo `missioni.js`): un testo sulla strada, 8-10 s, senza vignetta, che dice cosa pensa. `PENS_KM` (a un certo km: la radio a 1 km...), `PENS_BISOGNI` (fame, sete, sonno, igiene, a due livelli), `PENS_ANIMO` (a caso, una volta sola per partita). Non si ripetono (mazzo mescolato), pausa minima 25 s, tace in un locale, davanti a una domanda e da fermi. Testi segnaposto. `game.vgThink(testo)` per la storia, stato in `game.s.vg.pens`. Test in `test/pensieri.test.js`. |
 | `valigette.js` | Le valigette (dopo `telefono.js`): app Valigette nel telefono (negozio bronzo/argento/oro, le mie, premi), sei rarità (`CASE_RAR`), probabilità e prezzi (`CASE_TYPES`), premi (soldi, oggetti, ticket tagliando e modifica, potenziamenti a tempo e per sempre via `sim.extraPw`, pezzi veri, kit turbo, auto in regalo), garanzia, ricompense dai lavori e dalle sfide (`caseRewards`), scena d'apertura a tutto schermo con suoni sintetizzati (`window.valigette.play`, prova: `window.valigette.demo('oro', 5)`). Stato in `game.s.cases`. Test in `test/valigette.test.js`. |
+| `interni.js` | Gli interni dei sette locali (dopo `valigette.js`): scena in pixel art a tutto schermo quando entri (U) in bar, grill, motel, benzinaio, Luca, Niko e Style, con chi ti serve che si muove, luci, insegne al neon, la notte e il traffico fuori, pioggia, la tua auto parcheggiata e suoni d'ambiente. `NightInterni.open(place)` / `.close()`, scene in `SCENE` (`focus`, `static`, `dyn`, `hot` = punti toccabili che portano alla sezione del pannello). Si inquadra nello spazio lasciato libero da `#placeBox`. |
+| `traguardi.js` | I traguardi (dopo `interni.js`): elenco `TRG_LIST` (id, nome, testo, premio soldi o valigetta, `check`), controllo 4 volte al secondo (`game.achStep`), avviso dorato con suono, app Traguardi nel telefono (Da fare / Fatti, barre di avanzamento). Stato in `game.s.ach`. Prova: `window.traguardi.demo(3)`. Test in `test/traguardi.test.js`. |
+| `ruota.js` | La ruota giornaliera (dopo `traguardi.js`): un giro al giorno dall'app Ruota del telefono, 12 spicchi (`RUOTA_SEG`, pesi in percento), premio grosso un'auto sportiva in regalo (`RUOTA_CARS`, 1 %), il resto soldi, valigette, ticket e potenziamenti (riusa `CASE_GIVE` di `valigette.js`). Serie di giorni di fila, ogni 7° il giro d'oro senza premi comuni. Scena a tutto schermo con lancetta, pioli, luci e premio. Stato in `game.s.ruota`. Test in `test/ruota.test.js`. |
+| `concessionario.js` | L'Autosalone Notte (dopo `ruota.js`): tappa nuova del viaggio al posto del terzo bar di ogni giro (`VG_PATTERN[8]`, primo al km 27,4). Salone con le auto di `VG_SHOP` (sbloccate coi km), schede tecniche calcolate dal modello del motore (`dlSpec`), occasione della tappa −15 % (`dlDeal`), acquisto in contanti o a rate (`dlBuy`, rate ogni 10 km in `dlTick`, mora, carro attrezzi alla 3ª saltata), vendita con valutazione da km, danni e pezzi (`dlValue`, `dlSell`), giro di prova di 3 km (`dlTestStart`). Costanti in `DL`. Pannello (`NightDealer.panel`), facciata sulla strada (avvolge `Street2D.drawTripPlace`). Scena dell'interno in `interni.js` (`SCENE.dealer`). Le auto non si comprano più al motel. Test in `test/concessionario.test.js`. |
+| `usato.js` | L'usato dei privati (dopo `concessionario.js`): annunci legati alle tappe (`usAt(n)`, 40 % delle tappe, sempre uguali), app Annunci nel telefono, l'auto col cartello VENDESI davanti alla tappa, sezione dell'annuncio nel pannello di qualunque locale (`NightUsed.panel`, aggiunta in fondo a `openPlace`): guardala, fai un giro, chiama Niko (€ 120), tratta una volta (−10/−20/−30 %, più facile coi difetti scoperti), compra. Difetti nascosti in `US_DEF` (carrozzeria, gomme, freni, olio, motore stanco −15 % fino alla revisione da Niko, km scalati). Tiene il conto del guadagno rivendendo all'Autosalone. Stato in `game.s.vg.usato`. |
+| `sfascio.js` | Lo sfasciacarrozze Sfascio Ruggine (dopo `usato.js`): tappa nuova al posto del secondo autogrill (`VG_PATTERN[9]`, primo al km 30,6). Rovistare (€ 20, una volta per tappa, `JK_FINDS`), pezzi usati per l'auto che guidi al 45 % (più a volte uno raro), la carcassa da rimettere in strada (20 % del prezzo, con preventivo di riparazione e valore dopo), rottamazione a peso. Costanti in `JK`, stato in `game.s.vg.sfascio`. Scena in `interni.js` (`SCENE.junk`). Test di usato e sfascio in `test/usato.test.js`. |
 | `prologo.js` | Il prologo a inizio Viaggio (dopo la schermata iniziale): lettera dello studio notarile, E36 blu che arriva, colloquio col notaio, scelta dell'auto (solo la Volvo si può prendere), Volvo in autostrada. Scene in pixel art su tela 640×360 con testi in HTML sopra. `PRO_LETTERA`, `PRO_NOTAIO`, `PRO_AUTO` (testi e auto, segnaposto), `NightPrologo.play/jump/shouldPlay`. Parte da `goBtn` in `index.html` se `game.s.vg.prologo` non c'è ancora. Test in `test/prologo.test.js`. |
 | `index.html` | Interfaccia, quadro strumenti, impostazioni, mappa del mondo, ciclo principale (molto grande). |
 | `img/` | Disegni delle auto: `<id>.png`, `<id>_wheel.png`, `<id>_paint.png`; `img/stickers/manifest.json`. |
@@ -57,6 +63,34 @@ solo in maiuscolo ASCII (`PX_FONT`). Le auto guardano a destra.
 Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shiftK`, `hesK`), sprite e coppia in
 `GEN_DATA`, immagini in `img/`, voce in `CLUSTERS`.
 
+## Skill di Night Run (`.claude/skills/`)
+Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola; gli altri (Kimi...) leggano il
+`SKILL.md` giusto prima di cominciare.
+| Skill | Quando |
+| --- | --- |
+| `night-run-prova` | dopo ogni modifica: test, prova nel browser a copione (`strumenti/prova.js`), foto, rapporto |
+| `night-run-funzione` | una novità di gioco: file nuovo, tappa, app del telefono, interno, traguardo, stato, test |
+| `night-run-pixel` | prima di disegnare nel 2D: coordinate, stile, luci, facciate, interni |
+| `night-run-audio` | suono del motore: `strumenti/ascolta.mjs` lo registra in WAV fuori dal browser e lo misura |
+| `night-run-auto` | un veicolo nuovo dai disegni del proprietario |
+| `night-run-pubblica` | pull request del cognato, commit, push, artifact, documentazione |
+| `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
+| `night-run-controllo` | controllo del gioco con voti per area e proposte |
+
+Skill nuove o modificate si fanno sul ramo **`skill`** (partito da `main`): una cartella
+`.claude/skills/<nome>/SKILL.md` con `name` uguale al nome della cartella e una `description` che dice quando usarla,
+una riga nella tabella qui sopra, poi pull request verso `main`. Prima di cominciare porta `skill` in pari con `main`.
+
+Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
+`tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
+`node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore|urti> <file.wav> [vista] [ambiente]`.
+
+## Plugin ECC (Everything Claude Code)
+`.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
+cartella in Claude Code e dando fiducia al progetto, Claude Code propone di installarlo. Le sue rules non sono
+copiate qui apposta. Se una skill o un agente di ECC dice altro (commit in inglese, copertura test all'80 %, npm,
+TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
+
 ## Regole
 1. `main` è il ramo pubblicato su GitHub Pages: non ci si lavora sopra direttamente. Lavora su un ramo tuo
    (es. `kimi/lavoro`, o quello che ti assegna la sessione) e porta le modifiche su `main` con una pull request,
@@ -70,10 +104,27 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
    ha già troncato dei file).
 6. Prima di cambiare qualcosa leggi per intero i file coinvolti: un'auto o un pezzo passano da più file.
 
+## Skill per la grafica (`.claude/skills/`)
+Claude Code le carica da solo quando servono; provenienza e licenze in `.claude/skills/FONTI.md`.
+- `game-feel`: il "succo" del gioco (scosse, fermo immagine, easing, lampi, effetti a strati). Senza esagerare:
+  niente lampi forti e ripetuti a schermo intero.
+- `create-game-assets`: guida di stile e controllo di coerenza dei disegni. Gli script in Python servono solo
+  per i controlli in locale e non entrano nel gioco.
+- `pixel-art`: palette, dithering, contorni, animazione a pixel.
+Le regole di questo file valgono sopra le skill (testi in italiano, niente npm, niente grafica copiata da altri giochi).
+In particolare: le convenzioni di disegno di Night Run sono in `night-run-pixel` e valgono sopra `pixel-art` (che
+dice di "correggere" l'utente: le scelte di stile del proprietario non si correggono, al massimo si consiglia);
+`create-game-assets` parla di immagini generate con l'IA: **i veicoli vengono solo dai disegni del proprietario** e
+niente immagini generate entra nel gioco senza che il proprietario lo chieda; gli esempi in Godot e Unity di
+`game-feel` vanno tradotti nel canvas di `Street2D` (scossa = spostamento della telecamera, non dell'auto).
+
 ## Come provare
-- Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 51, compresi telefono, prologo e valigette). Non peggiorare il conteggio.
+- Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 92, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio e urti). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.
+- Grafica: ogni modifica a qualcosa che si vede va guardata, non immaginata. Fai uno screenshot del gioco nel
+  browser (Playwright o il browser di Claude Code) prima e dopo, e confrontali; se non puoi farlo, dillo nel
+  riassunto.
 - Alla fine scrivi un riassunto breve: cosa hai cambiato e dove, cosa hai provato, cosa non hai potuto provare.

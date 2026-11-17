@@ -2383,10 +2383,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const pr = group('Parcheggio: i tuoi mezzi');
       for (const id of v.garage) pr.appendChild(row(`${id === game.car ? '● ' : ''}${CARS[id].name}`, () => { if (id === game.car) return { ok: false, why: 'Ci sei già sopra' }; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); openPlace(I); return { ok: true }; }));
       if (v.trailer) pr.appendChild(row(v.trailerOn ? 'Stacca il rimorchio' : 'Attacca il rimorchio', () => { const q = game.vgTrailer(!v.trailerOn); if (q.ok) { applySettings(); openPlace(I); } return q; }));
-      // concessionaria della catena
-      const sr = group('Concessionaria Ovunque');
+      // le auto ora si comprano all'Autosalone Notte (concessionario.js); qui resta il rimorchio
+      const sr = group('Dal motel');
+      if (typeof DL !== 'undefined') note('Le auto nuove e usate le vende l\'Autosalone Notte, più avanti lungo la strada: lì si provano, si comprano anche a rate e si vendono le tue.');
       for (const it of VG_SHOP) {
-        if (v.owned[it.id] || v.garage.includes(it.id)) continue;
+        if (v.owned[it.id] || v.garage.includes(it.id) || (it.car && typeof DL !== 'undefined')) continue;
         const lock = vgKm(game) < it.km;
         const b = row(`${it.name} <small>€ ${fmt(it.price)}${lock ? ` · dal km ${it.km}` : ''}</small>`, () => { const q = game.vgBuy(it.id); if (q.ok) { flash(`${it.name}: è tuo`, 2); applySettings(); saveGame(); openPlace(I); } return q; });
         b.title = it.note; if (lock) b.classList.add('locked'); sr.appendChild(b);
@@ -2411,7 +2412,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
   function cosView(c) { return Object.assign({}, c || S.cos, { dirt: Math.round(game.maint().dirt * 10) / 10 }); }
-  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'N', style: 'E' };
+  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'N', style: 'E', dealer: 'A', junk: 'S' };
   let mmT = 0, placeOpen = null, cosPrev = null;
   const moved = [];
   const fmtDist = (m) => (m < 1000 ? Math.max(0, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km');
@@ -2472,13 +2473,14 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       }
     }
     const low = sim.fuel * sim.P.tank < 15;
-    const parts = ['fuel', 'shop', 'niko', 'style'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
+    const parts = ['fuel', 'shop', 'niko', 'style', 'dealer', 'junk'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
     const html = (low ? '<b style="color:var(--warn)">Riserva!</b> ' : '') + parts.join(' · ');
     if ($('mmNext').innerHTML !== html) $('mmNext').innerHTML = html;
   }
   function renderPlaceCash() { $('placeCash').textContent = game.mode === 'career' ? '€ ' + fmt(Math.floor(game.s.money)) : 'modalità libera'; }
   function openPlace(I) {
     placeOpen = I;
+    if (window.NightInterni) NightInterni.open(I);                  // la scena dell'interno sopra la strada (interni.js)
     const box = $('placeBox'), body = $('placeBody');
     box.style.setProperty('--place-col', I.col); $('placeTitle').textContent = I.name;
     body.innerHTML = '';
@@ -2486,6 +2488,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const move = (el) => { if (!el) return; moved.push({ el, parent: el.parentNode, next: el.nextSibling }); body.appendChild(el); };
     if (I.id === 'bar' || I.id === 'grill' || I.id === 'motel') {
       vgPlace(I, body, note);
+    } else if (I.id === 'dealer') {                                  // Autosalone Notte (concessionario.js)
+      if (window.NightDealer) NightDealer.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
+    } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
+      if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Scegli i pezzi dalle tendine: li monta subito. Alcuni si sbloccano solo dopo un po\' di chilometri.');
       move(document.querySelector('section.panel.tuning'));
@@ -2513,6 +2519,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       cosPrev = Object.assign({ paint: carPaint() }, S.cos);
       renderCos();
     }
+    // l'annuncio di un privato a questa tappa, e da Niko la revisione del motore (usato.js)
+    if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     box.hidden = false;
     if (street2d) {
       const r = $('g2d').getBoundingClientRect(), pl = box.getBoundingClientRect();
@@ -2524,6 +2532,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     renderPlaceCash();
   }
   function closePlace() {
+    if (window.NightInterni) NightInterni.close();
     while (moved.length) { const m = moved.pop(); m.parent.insertBefore(m.el, m.next); }
     $('placeBox').hidden = true; placeOpen = null; cosPrev = null;
     applyCos(null); renderTuning(); renderServices(); renderTrunk(); saveGame();
@@ -3134,7 +3143,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; } };   // utile per provare eventi dalla console
+  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; } };
+  // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
+  window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
+  window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
 
   // ---------------------------------------------------------------- ciclo principale
   const joints = {};
@@ -3147,6 +3159,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;
     if (game.blocked) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, game.blockBrake || 0.18); }
+    // dopo un tamponamento: niente gas per un attimo; se guida l'automatica frena e riparte più piano (non ci ricasca addosso)
+    if (game.shockT > 0) { sim.in.thr = 0; sim.in.brake = Math.max(sim.in.brake, 0.3); if (auto.on) { sim.in.brake = Math.max(sim.in.brake, 0.45); auto.v = Math.min(auto.v, Math.max(8, sim.v * 0.85)); } }
+    if (game.shockE) {
+      const e = game.shockE, gap = e.x - game.s.dist - ((e.len || 4.6) + 4.4) / 2;
+      if (!game.ents.includes(e) || gap > 18 || Math.abs(game.laneZ - (e._gz ?? GAME_LANE_Z[e.lane])) > 1.7) game.shockE = null;
+      else if (auto.on && gap < 8 + Math.max(0, sim.v - e.v) * 2.5) { sim.in.thr = 0; sim.in.brake = Math.max(sim.in.brake, gap < 3 ? 0.8 : 0.5); auto.v = Math.min(auto.v, Math.max(6, e.v - 2)); }
+    }
     if (game.mode === 'free') sim.fuel = Math.max(sim.fuel, 0.5);
     sim.update(dt);
     if (auto.on) keyAxis = 0;
@@ -3442,5 +3461,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="telefono.js"></script>
 <script src="prologo.js"></script>
 <script src="valigette.js"></script>
+<script src="interni.js"></script>
+<script src="traguardi.js"></script>
+<script src="ruota.js"></script>
+<script src="concessionario.js"></script>
+<script src="usato.js"></script>
+<script src="sfascio.js"></script>
 </body>
 </html>

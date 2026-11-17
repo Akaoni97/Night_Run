@@ -26,7 +26,8 @@ const CASE_TYPES = {
   oro: { name: 'Valigetta d\'oro', short: 'Oro', price: 18000, odds: [0, 30, 38, 20, 9, 3], note: 'Mai un comune. L\'unica con una possibilità vera di leggendario.' },
 };
 const CASE_PITY = { raro: 10, epico: 40 };            // garanzia: entro tante aperture almeno un raro / un epico
-const CASE_MOD_MAX = 5000;                            // valore massimo del pezzo che si prende col ticket modifica
+const CASE_MOD_MAX = 5000;
+let CASE_GIVE = null;                                 // i premi, riusati dalla ruota giornaliera                            // valore massimo del pezzo che si prende col ticket modifica
 
 (function valigetteLogica() {
   if (typeof StreetGame === 'undefined') return;
@@ -101,6 +102,7 @@ const CASE_MOD_MAX = 5000;                            // valore massimo del pezz
   ];
   const FALLBACK = [money(500, 900), money(2000, 3000), money(5000, 6000), money(9000, 11000), money(25000, 25000), money(60000, 60000)];
   if (typeof window !== 'undefined') window.CASE_PRIZES = CASE_PRIZES;
+  CASE_GIVE = { money, item, boost, ticket, car, perm, oil, tyres, FALLBACK };   // anche per la ruota (ruota.js)
 
   // apre una valigetta (la toglie da quelle possedute) e dà subito il premio: anche se si chiude il gioco durante la
   // scena, il premio resta. rnd: generatore (per i test), di solito Math.random
@@ -322,6 +324,23 @@ const CASE_MOD_MAX = 5000;                            // valore massimo del pezz
     whoosh() { this.noise(0, 0.35, 0.18, 'bandpass', 2500, 400, 1.2); },
   };
 
+  // ---------------------------------------------------------------- l'auto col disegno del giocatore e le ruote (pronta in done)
+  function carPic(id, done) {
+    const sp = CARS[id] && CARS[id].sprite, body = new Image(), wheel = new Image(), cc = document.createElement('canvas');
+    const geo = sp || (id === 'v40' ? { ax: [], wy: 56, wr: 14.4 } : { ax: [48, 158], wy: 42, wr: 15 });
+    const build = () => {
+      if (!body.complete || !body.naturalWidth || (sp && (!wheel.complete || !wheel.naturalWidth))) return;
+      cc.width = body.naturalWidth; cc.height = Math.max(body.naturalHeight, Math.ceil(geo.wy + geo.wr + 1)); const q = cc.getContext('2d'); q.imageSmoothingEnabled = false;
+      if (!sp && id !== 'v40') for (const ax of geo.ax) { q.fillStyle = '#0b0c10'; q.beginPath(); q.arc(ax, geo.wy, geo.wr, 0, Math.PI * 2); q.fill(); q.fillStyle = '#9aa3b2'; q.beginPath(); q.arc(ax, geo.wy, geo.wr * 0.55, 0, Math.PI * 2); q.fill(); }
+      q.drawImage(body, 0, 0);
+      if (sp) for (const ax of geo.ax) q.drawImage(wheel, Math.round(ax - wheel.naturalWidth / 2), Math.round(geo.wy - wheel.naturalHeight / 2));
+      done(cc);
+    };
+    body.onload = wheel.onload = build;
+    body.src = sp ? sp.img : id === 'v40' ? 'img/v40.png' : (typeof SUPRA2D_BODY !== 'undefined' ? SUPRA2D_BODY : '');
+    if (sp) wheel.src = sp.wheel;
+  }
+
   // ---------------------------------------------------------------- scena d'apertura a tutto schermo
   function play(prize, onDone) {
     const ri = prize.rar, R = CASE_RAR[ri], type = prize.type;
@@ -337,21 +356,7 @@ const CASE_MOD_MAX = 5000;                            // valore massimo del pezz
     const icn = document.createElement('canvas'); icn.width = 32; icn.height = 32; drawPrize(icn.getContext('2d'), prize.icon, ri);
     // l'auto regalata: il disegno del giocatore con le ruote (nei disegni del pacchetto sono a parte)
     let carImg = null;
-    if (prize.car) {
-      const sp = CARS[prize.car] && CARS[prize.car].sprite, body = new Image(), wheel = new Image(), cc = document.createElement('canvas');
-      const geo = sp || (prize.car === 'v40' ? { ax: [], wy: 56, wr: 14.4 } : { ax: [48, 158], wy: 42, wr: 15 });
-      const build = () => {
-        if (!body.complete || !body.naturalWidth || (sp && (!wheel.complete || !wheel.naturalWidth))) return;
-        cc.width = body.naturalWidth; cc.height = Math.max(body.naturalHeight, Math.ceil(geo.wy + geo.wr + 1)); const q = cc.getContext('2d'); q.imageSmoothingEnabled = false;
-        if (!sp && prize.car !== 'v40') for (const ax of geo.ax) { q.fillStyle = '#0b0c10'; q.beginPath(); q.arc(ax, geo.wy, geo.wr, 0, Math.PI * 2); q.fill(); q.fillStyle = '#9aa3b2'; q.beginPath(); q.arc(ax, geo.wy, geo.wr * 0.55, 0, Math.PI * 2); q.fill(); }
-        q.drawImage(body, 0, 0);
-        if (sp) for (const ax of geo.ax) q.drawImage(wheel, Math.round(ax - wheel.naturalWidth / 2), Math.round(geo.wy - wheel.naturalHeight / 2));
-        carImg = cc;
-      };
-      body.onload = wheel.onload = build;
-      body.src = sp ? sp.img : prize.car === 'v40' ? 'img/v40.png' : (typeof SUPRA2D_BODY !== 'undefined' ? SUPRA2D_BODY : '');
-      if (sp) wheel.src = sp.wheel;
-    }
+    if (prize.car) carPic(prize.car, (c) => { carImg = c; });
     const ban = document.createElement('canvas'), bx = ban.getContext('2d');   // la scritta della rarità, col riflesso solo sulle lettere
     // tempi: caduta, attesa con un gradino di luce per ogni livello di rarità, serrature, esplosione, premio
     const T_LAND = 0.85, STEP = 0.55, T_SUS = 1.05, T_STEPS = Array.from({ length: ri }, (_, k) => T_SUS + 0.35 + k * STEP);
@@ -606,7 +611,7 @@ const CASE_MOD_MAX = 5000;                            // valore massimo del pezz
     t.apps.vgl = { st: 'offer' }; return true;
   };
   window.valigette = {
-    play, openCase, drawCase, drawPrize,
+    play, openCase, drawCase, drawPrize, carPic, SND, ac,
     notify(type) {
       const nuova = offerApp();
       if (window.telefono && window.telefono.toast) window.telefono.toast('Valigette', nuova ? `${CASE_TYPES[type].name}! Scarica l'app Valigette dal telefono per aprirla.` : `${CASE_TYPES[type].name}: aprila dal telefono`, false);

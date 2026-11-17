@@ -168,13 +168,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.switchCar = function (id) {
     if (vgOn(this)) {
       const v = this.s.vg;
-      if (!v.garage.includes(id)) return { ok: false, why: 'Non è tua: le auto e i mezzi si comprano al parcheggio del Motel Ovunque' };
+      if (!v.garage.includes(id)) return { ok: false, why: typeof DL !== 'undefined' ? 'Non è tua: le auto si comprano all\'Autosalone Notte' : 'Non è tua: le auto e i mezzi si comprano al parcheggio del Motel Ovunque' };
       if (!(this.inside && this.inside.id === 'motel')) return { ok: false, why: 'I mezzi si cambiano nel parcheggio del Motel Ovunque' };
       if (v.pax.length) return { ok: false, why: 'Hai ancora passeggeri a bordo' };
       if ((this.s.trunk || []).some((it) => it.kind === 'scatola' || it.kind === 'bancale' || it.kind === 'pacco')) return { ok: false, why: 'Prima consegna la merce che hai a bordo' };
     }
-    const ins = this.inside; this.inside = null;              // al motel si è "dentro", ma il cambio si fa nel parcheggio
-    const r = sc.call(this, id); this.inside = ins; return r;
+    const ins = this.inside, ap = this.ap; this.inside = null;   // al motel si è "dentro", ma il cambio si fa nel parcheggio
+    if (ins && Math.abs(this.sim.v) < 0.5) this.ap = null;    // fermo davanti all'ingresso: l'accosto automatico non conta
+    const r = sc.call(this, id); this.inside = ins; this.ap = ap; return r;
   };
   // oggetti nuovi: cibo, bevande, salviette
   const ui = P.useItem;

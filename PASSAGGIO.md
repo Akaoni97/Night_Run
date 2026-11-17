@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 87).
+  (ultima versione pubblicata: 93).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -68,6 +68,44 @@ gioco fa, sezione per sezione).
   primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, bronzo per le
   sfide vinte (argento ogni quinta). Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
   Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
+- **Interni** (`interni.js`): entrando in un locale (U) la strada lascia il posto a una scena in pixel art del locale,
+  inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
+  serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
+  suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Traguardi** (`traguardi.js`): 29 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
+  250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
+  al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
+  (`caseGrant`). Avviso dorato dall'alto con suono, uno alla volta; app Traguardi nel telefono (installata da sola).
+- **Ruota giornaliera** (`ruota.js`, app Ruota nel telefono, si installa da sola, pallino quando il giro è pronto): un
+  giro per giorno di calendario (ora del dispositivo). Auto leggendaria 1 % (solo sportive: Supra, R5 Turbo, M5, M3 E30
+  ed E36, Clio Williams, 2002 Turbo; se le hai tutte € 60.000), valigetta d'oro 1,5 %, mappa da pista 3 %, argento 4 %,
+  ticket modifica 4 %, € 5.000 6 %, centralina 7 %, ticket tagliando 9 %, bronzo 10 %, € 2.500 11 %, € 1.000 20 %,
+  € 500 23,5 %. Giorni di fila = serie; il 7° è il giro d'oro (niente comuni). Il premio si dà al tocco su GIRA.
+- **Concessionario** (`concessionario.js`, Autosalone Notte): nona tappa di ogni giro (al posto del terzo bar), il primo
+  al km 27,4. Salone con schede (CV, Nm, peso, kg/CV, posti, carico), occasione della tappa −15 %, contanti o a rate
+  (anticipo 20 %, interessi 15 %, 8 rate ogni 10 km pagate da sole; rata saltata = mora 10 %, alla 3ª il carro attrezzi
+  si riprende l'auto, anche se ci sei sopra appena ti fermi), vendita delle tue auto (prezzo a nuovo × km × danni + un
+  terzo dei pezzi), giro di prova di 3 km (poi ti fermi e se la riprendono; € 250 a km oltre i 3,5, più i danni).
+  Lì si cambia anche auto. Al motel resta il parcheggio e il rimorchio. Corretto anche il cambio auto al motel, che
+  nel viaggio non funzionava (l'accosto automatico restava acceso e lo bloccava).
+- **Usato dei privati** (`usato.js`, app Annunci): a circa 4 tappe su 10 un privato vende la sua auto (cartello VENDESI
+  davanti al locale). Entrando in quel locale c'è l'annuncio: guardarla (scopre carrozzeria e gomme), farci un giro
+  (motore e freni), Niko a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
+  accetta), compra. I difetti restano sull'auto: si sistemano da Niko (servizi, carrozziere, gomme, revisione del motore).
+  Un'auto sana comprata bene si rivende all'Autosalone con guadagno (traguardo Commerciante).
+- **Sfascio Ruggine** (`sfascio.js`): decima tappa di ogni giro (al posto del secondo autogrill), primo al km 30,6.
+  Rovistare tra sei carcasse (€ 20, una volta: niente, soldi, oggetti, ticket, un pezzo, una valigetta, raramente
+  € 2.500), pezzi usati per l'auto che guidi al 45 % del nuovo, la carcassa del giorno (20 % del prezzo, tutti i difetti,
+  col conto di quanto costa sistemarla e quanto vale dopo), rottamazione a peso.
+- **Incidenti** (rifatti il 17/11/2026): suono a strati in `dsp.js` (botta sorda che scende, lamiera che cede a scatti,
+  pannelli che vibrano su note diverse a ogni urto, vetri e pezzi che cadono, strisciata che dura col suo attrito a
+  scatti; il motore si abbassa per un attimo; stesso livello in abitacolo, fuori e nel vano motore, prima dall'esterno
+  quasi non si sentiva). Nel 2D: scossa dell'inquadratura che si spegne in fretta, la scocca che rimbalza, scintille e
+  lampo dal punto giusto (muso, coda o fianco), frammenti di vetro e plastica che restano sull'asfalto, l'altra auto
+  ammaccata con le quattro frecce. Dopo un tamponamento chi guida molla il gas e frena d'istinto, l'auto colpita
+  rallenta piano e la guida automatica le resta lontana (prima si tamponava la stessa auto 2-4 volte di fila).
+  Guardrail della montagna: strisciata che si sente. Test in `test/urti.test.js`; per ascoltare
+  `node strumenti/ascolta.mjs v40 urti file.wav 1`.
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco
@@ -122,6 +160,9 @@ gioco fa, sezione per sezione).
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 
 ## Come lavorare
+- **Skill del progetto** in `.claude/skills/` (elenco in `AGENTS.md`): prova a copione nel browser
+  (`strumenti/prova.js`), ascolto del motore fuori dal browser (`strumenti/ascolta.mjs`), funzioni nuove, disegno,
+  auto dai disegni, pubblicazione, storia, controllo del gioco.
 - **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
 - **Nel browser**: dalla radice del repository lancia `python3 -m http.server 8765`; con Playwright (già installato) apri
   `http://localhost:8765/index.html`, clicca `#goBtn`, rispondi al primo capitolo con
