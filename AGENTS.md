@@ -67,6 +67,9 @@ Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shi
 ## Skill di Night Run (`.claude/skills/`)
 Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola; gli altri (Kimi...) leggano il
 `SKILL.md` giusto prima di cominciare.
+Catalogo con cosa fa e come si comporta ognuna: `.claude/skills/README.md`. Le skill generiche valgono sotto
+quelle di Night Run e sotto questo file (per il disegno comanda `night-run-pixel`).
+
 | Skill | Quando |
 | --- | --- |
 | `night-run-prova` | dopo ogni modifica: test, prova nel browser a copione (`strumenti/prova.js`), foto, rapporto |
@@ -77,16 +80,12 @@ Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola
 | `night-run-pubblica` | pull request del cognato, commit, push, artifact, documentazione |
 | `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
 | `night-run-controllo` | controllo del gioco con voti per area e proposte |
+| `game-feel` | il "succo" di un'azione: scosse, fermo immagine, easing, lampi a strati (skill generica, in inglese) |
+| `pixel-art` | principi generali di pixel art: palette, dithering, contorni, animazione (generica, in inglese) |
 
 Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
 `node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore> <file.wav> [vista] [ambiente]`.
-
-## Plugin ECC (Everything Claude Code)
-`.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
-cartella in Claude Code e dando fiducia al progetto, Claude Code propone di installarlo. Le sue rules non sono
-copiate qui apposta. Se una skill o un agente di ECC dice altro (commit in inglese, copertura test all'80 %, npm,
-TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
 
 ## Regole
 1. `main` è il ramo pubblicato su GitHub Pages: non ci si lavora sopra direttamente. Lavora su un ramo tuo
@@ -101,22 +100,10 @@ TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
    ha già troncato dei file).
 6. Prima di cambiare qualcosa leggi per intero i file coinvolti: un'auto o un pezzo passano da più file.
 
-## Skill per la grafica (`.claude/skills/`)
-Claude Code le carica da solo quando servono; provenienza e licenze in `.claude/skills/FONTI.md`.
-- `game-feel`: il "succo" del gioco (scosse, fermo immagine, easing, lampi, effetti a strati). Senza esagerare:
-  niente lampi forti e ripetuti a schermo intero.
-- `create-game-assets`: guida di stile e controllo di coerenza dei disegni. Gli script in Python servono solo
-  per i controlli in locale e non entrano nel gioco.
-- `pixel-art`: palette, dithering, contorni, animazione a pixel.
-Le regole di questo file valgono sopra le skill (testi in italiano, niente npm, niente grafica copiata da altri giochi).
-
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
   Oggi passano tutti i test (`node --test test/*.test.js`: 88, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato e sfascio). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.
-- Grafica: ogni modifica a qualcosa che si vede va guardata, non immaginata. Fai uno screenshot del gioco nel
-  browser (Playwright o il browser di Claude Code) prima e dopo, e confrontali; se non puoi farlo, dillo nel
-  riassunto.
 - Alla fine scrivi un riassunto breve: cosa hai cambiato e dove, cosa hai provato, cosa non hai potuto provare.
