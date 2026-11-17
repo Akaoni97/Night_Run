@@ -107,8 +107,10 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
 })();
 
 // ---------------------------------------------------------------- il testo sulla strada (solo nel browser)
-// In basso a destra, allineato a destra, e alzato sopra quello che occupa già quell'angolo (pedali al tocco, riquadro del
-// cambio, bottone della corsia): ogni 150 ms guarda dove sono e si mette sopra. Si nasconde col menu, il prologo o il telefono aperti.
+// In basso, subito a destra della barra dell'autostrada (la mappa a barra, stretta apposta), sulla sua stessa riga e prima del
+// bottone della corsia. Dove non c'è spazio (schermi stretti) sta in basso a destra, alzato sopra quello che occupa l'angolo
+// (pedali al tocco, riquadro del cambio, bottone corsia). Ogni 150 ms ricalcola dove sono gli altri. Si nasconde col menu,
+// il prologo o il telefono aperti.
 (function testo() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   let el = null, mostrato = -1;
@@ -119,22 +121,31 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     .pensiero.on{opacity:.95;transform:none}
     @media (prefers-reduced-motion:reduce){.pensiero{transition:none}}`;
   document.head.appendChild(css);
-  // quanto stare alti dal fondo della strada: sopra il più alto tra gli elementi visibili della metà destra
-  const sopra = (stage) => {
-    const r = stage.getBoundingClientRect(); let top = r.bottom;
+  const visibile = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return b.width < 1 || b.height < 1 ? null : b; };
+  // dove mettere il testo: accanto alla barra se c'è spazio (almeno 200 px), altrimenti sopra l'angolo in basso a destra
+  const posizione = (stage) => {
+    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap')), ln = visibile(document.querySelector('.lanebtn.r'));
+    const fine = ln ? ln.left - 12 : r.right - 12;                       // il testo finisce prima del bottone della corsia
+    if (mm) {
+      const libero = fine - (mm.right + 16);
+      if (libero >= 200) return { accanto: true, left: Math.round(mm.right + 16 - r.left), bottom: Math.round(r.bottom - mm.bottom), maxW: Math.min(libero, 420) };
+    }
+    let top = r.bottom;                                                  // altrimenti: sopra il più alto tra gli elementi visibili della metà destra
     for (const sel of ['#hudG', '.touchpedals', '.lanebtn.r']) {
-      const e = document.querySelector(sel); if (!e) continue;
-      const b = e.getBoundingClientRect(); if (b.width < 1 || b.height < 1 || b.right < r.left + r.width / 2) continue;
+      const b = visibile(document.querySelector(sel)); if (!b || b.right < r.left + r.width / 2) continue;
       top = Math.min(top, b.top);
     }
-    return Math.max(14, Math.round(r.bottom - top + 12));
+    return { accanto: false, bottom: Math.max(14, Math.round(r.bottom - top + 12)) };
   };
   setInterval(() => {
     const NR = window.nightRun, g = NR && NR.game, th = g && g.thought; if (!th) return;
     const stage = document.getElementById('roadStage'); if (!stage) return;
     if (!el) { el = document.createElement('div'); el.className = 'pensiero'; el.setAttribute('aria-live', 'polite'); stage.appendChild(el); }
     if (th.id !== mostrato) { mostrato = th.id; el.textContent = th.text; }
-    el.style.bottom = sopra(stage) + 'px';
+    const p = posizione(stage), st = el.style;
+    st.bottom = p.bottom + 'px';
+    if (p.accanto) { st.left = p.left + 'px'; st.right = 'auto'; st.maxWidth = p.maxW + 'px'; st.textAlign = 'left'; }
+    else { st.left = 'auto'; st.right = '12px'; st.maxWidth = ''; st.textAlign = ''; }
     const nascosto = (window.gameMenu && window.gameMenu.isOpen) || (window.NightPrologo && window.NightPrologo.playing) || (window.telefono && window.telefono.isOpen);
     el.classList.toggle('on', th.left > 0.8 && !nascosto);
   }, 150);
