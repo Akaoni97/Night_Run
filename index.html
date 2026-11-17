@@ -2525,6 +2525,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function renderPlaceCash() { $('placeCash').textContent = game.mode === 'career' ? '€ ' + fmt(Math.floor(game.s.money)) : 'modalità libera'; }
   function openPlace(I) {
     placeOpen = I;
+    if (window.NightInterni) NightInterni.open(I);                  // la scena dell'interno sopra la strada (interni.js)
     const box = $('placeBox'), body = $('placeBody');
     box.style.setProperty('--place-col', I.col); $('placeTitle').textContent = I.name;
     body.innerHTML = '';
@@ -2570,6 +2571,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     renderPlaceCash();
   }
   function closePlace() {
+    if (window.NightInterni) NightInterni.close();
     while (moved.length) { const m = moved.pop(); m.parent.insertBefore(m.el, m.next); }
     $('placeBox').hidden = true; placeOpen = null; cosPrev = null;
     applyCos(null); renderTuning(); renderServices(); renderTrunk(); saveGame();
@@ -3517,5 +3519,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="telefono.js"></script>
 <script src="prologo.js"></script>
 <script src="valigette.js"></script>
+<script src="interni.js"></script>
 </body>
 </html>
