@@ -1,5 +1,7 @@
 # Sorgenti delle chat (materiale di Codex, terzo giro)
 
+La storia e le richieste a Codex stanno in `docs/storia/`.
+
 `chat_dati.js` si rigenera da qui (l'ultimo ID dichiarato prevale; la tabella dei toni è nel file 01):
 
 ```bash

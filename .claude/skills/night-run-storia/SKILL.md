@@ -8,7 +8,7 @@ description: Dove e come si scrive la storia di Night Run (horror graduale) - ca
 ## Di chi è
 **La storia la scrive il cognato del proprietario e la carica lui.** Un assistente non inventa trama, nomi o
 battute dei personaggi della storia, a meno che chi scrive la storia lo chieda esplicitamente in quella sessione.
-Quello che è deciso è in `STORIA.md`; si aggiorna solo quando lo chiede chi scrive la storia.
+Quello che è deciso è in `docs/storia/STORIA.md`; si aggiorna solo quando lo chiede chi scrive la storia.
 
 Venditori, meccanici, commessi dei negozi nuovi restano **generici** (nessun nome, nessun ruolo nella trama): così
 chi scrive la storia può dargliene uno.

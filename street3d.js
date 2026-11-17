@@ -962,15 +962,15 @@ class Street3D extends Garage3D {
     this.fovKick = Math.max(0, (this.fovKick || 0) - dt * 7);
     const fov = (this.baseFov || 40) + Math.min(this.cockpitOn ? 6 : 16, Math.max(0, s.v) * (this.cockpitOn ? 0.08 : 0.2)) + this.fovKick;
     if (Math.abs(fov - this.camera.fov) > 0.05) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 3); this.camera.updateProjectionMatrix(); }
-    this.headlight.intensity = s.ign ? (s.high ? 4.6 : 2.6) : 0;
+    this.headlight.intensity = s.ign && s.lamps !== false ? (s.high ? 4.6 : 2.6) : 0;
     if (this.beams) {
-      const night = 1 - (this.dayK || 0), on = s.ign && !this.cockpitOn ? 1 : 0;
+      const night = 1 - (this.dayK || 0), on = s.ign && s.lamps !== false && !this.cockpitOn ? 1 : 0;
       this.beamMat.opacity += ((0.022 + (this.rainOn ? 0.035 : 0) + (s.high ? 0.02 : 0)) * night * on - this.beamMat.opacity) * Math.min(1, dt * 4);
       for (const b of this.beams) { b.visible = this.beamMat.opacity > 0.004; b.scale.set(s.high ? 1.35 : 1, 1, 1); }
     }
     this.headlight.distance = s.high ? 130 : 70; this.headlight.angle = s.high ? 0.33 : 0.42;
     this.brakeGlow.forEach((b) => { b.material.opacity = s.ign ? 0.25 + (s.brake || 0) * 0.75 : 0; });
-    this.headGlow.forEach((b) => { b.material.opacity = s.ign ? (s.high ? 0.95 : 0.55) : 0; b.scale.set(s.high ? 1.7 : 1.1, s.high ? 1.1 : 0.8, 1); });
+    this.headGlow.forEach((b) => { b.material.opacity = s.ign && s.lamps !== false ? (s.high ? 0.95 : 0.55) : 0; b.scale.set(s.high ? 1.7 : 1.1, s.high ? 1.1 : 0.8, 1); });
     if (game) for (const f of game.fx) if (f.k === 'crash') this.shakeT = 0.5;
     if (this.shakeT > 0) {
       this.shakeT -= dt;

@@ -34,7 +34,7 @@
     }],
     ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
-    ['guida', 'Guida', 'Pedali, cambio, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
+    ['guida', 'Guida', 'Comandi dell\'auto, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
     ['vista', 'Vista', 'Grafica, colori, ora e meteo', '#7fd3ff', () => {
       const box = document.createElement('div'); box.className = 'panel';
       const h = document.createElement('h2'); h.textContent = 'Vista e grafica'; box.appendChild(h);
@@ -117,13 +117,16 @@
   }, true);
 
   // pedali per il tocco (solo dove il puntatore è un dito): tengono premuti W e S come la tastiera
-  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.innerHTML = '<button type="button" class="tp-brk" aria-label="Freno">FRENO</button><button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
+  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.innerHTML = '<button type="button" class="tp-eng" aria-label="Accensione">AVVIA</button><button type="button" class="tp-brk" aria-label="Freno">FRENO</button><button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
   const hold = (btn, key) => {
     const down = (e) => { e.preventDefault(); btn.classList.add('on'); window.dispatchEvent(new KeyboardEvent('keydown', { key })); };
     const up = () => { if (!btn.classList.contains('on')) return; btn.classList.remove('on'); window.dispatchEvent(new KeyboardEvent('keyup', { key })); };
     btn.addEventListener('pointerdown', down); for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, up);
   };
-  hold(tp.children[0], 's'); hold(tp.children[1], 'w');
+  hold(tp.children[1], 's'); hold(tp.children[2], 'w');
+  // AVVIA: un tocco gira la chiave; sparisce a motore acceso (da telefono non si spegne per sbaglio mentre si guida)
+  tp.children[0].addEventListener('click', () => { if (window.nightRun) window.nightRun.engineTap(); });
+  setInterval(() => { const n = window.nightRun; if (n && n.sim) tp.children[0].hidden = !!n.sim.running; }, 300);
   const hud = stage.querySelector('.hud'); if (hud) hud.appendChild(tp);
 
   window.dispatchEvent(new Event('resize'));

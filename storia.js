@@ -4,7 +4,7 @@
 //  i momenti garantiti impostano i flag di regia (`ev_*`) che aprono le conversazioni, le quattro incursioni sono tratti a tempo
 //  («le lampade della galleria si spengono una dopo l'altra»), e a Washington D.C. c'è «L'ultima porta» con quattro scelte e cinque finali.
 //  Stato in `game.s.vg.story`; flag e contatori nel motore chat (`game.s.chat`). Funzioni pure provate in test/storia.test.js.
-//  Regole della bozza (STORIA_BOZZA_02.md §8-§10): nessuna penalità per il tempo reale, il menu e il telefono fermano le lampade,
+//  Regole della bozza (docs/storia/STORIA_BOZZA_02.md §8-§10): nessuna penalità per il tempo reale, il menu e il telefono fermano le lampade,
 //  un fallimento non si ripete e lascia una conseguenza che non è economica.
 // ============================================================================
 const STORIA_FASE = { tokyo: 'I', roma: 'I', parigi: 'II', londra: 'III', stoccolma: 'III', berlino: 'III', praga: 'III', vienna: 'III', madrid: 'IV', lisbona: 'IV', atene: 'V', washington: 'V' };

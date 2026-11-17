@@ -1642,7 +1642,7 @@ class Street2D {
     }
     // la Supra (vernice, cerchi, neon, strisce)
     const GI = this.geo(), spr = this.carSprite(K), left = Math.round(cx - 100 * K), top = Math.round(gy - (GI.wy + GI.wr) * K - lift + GI.low * K);
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     this.shadow(g, cx, gy, 120, 6);
     if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
     g.imageSmoothingEnabled = false; this.body(g, spr, left, top);
@@ -1975,19 +1975,23 @@ class Street2D {
     const GE0 = this.geo();
     if (s.ign) this.light(g, left + SW + (s.high ? 110 : 60) * k, y0 - 2, s.high ? 150 : 80, s.high ? 9 : 7, '#fff2c4', s.high ? 0.1 : 0.08, 4);   // pozza dei fari (più lunga con gli abbaglianti)
     if (this.lightAdd) {
-      if (s.ign) { this.lightAdd(left + SW + (s.high ? 160 : 100) * k, y0 - 6, (s.high ? 230 : 150) * k, 24, '255,244,214', 0.85 * (typeof hlK === 'number' ? hlK : 1)); }
+      if (s.ign && s.lamps !== false) { this.lightAdd(left + SW + (s.high ? 160 : 100) * k, y0 - 6, (s.high ? 230 : 150) * k, 24, '255,244,214', 0.85 * (typeof hlK === 'number' ? hlK : 1)); }
       this.lightAdd(left + SW / 2, y0 - 24 * k, SW * 0.75, 44 * k, '225,225,255', 0.38);          // luce di riempimento: il protagonista resta leggibile
       this.lightAdd(left, y0 - 18 * k, 50, 22, '255,40,40', s.brake > 0.05 ? 0.7 : s.ign ? 0.25 : 0);
     }
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
     // fascio dei fari nell'aria, di notte e sotto la pioggia
-    if (s.ign && (this.day || 0) < 0.6) {
+    if (s.ign && s.lamps !== false && (this.day || 0) < 0.6) {
       const fx = left + SW - 4, fy = y0 - 22 * k;
-      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)) * hlK);
+      const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
+      // due tagli di luce: l'anabbagliante scende sulla strada, l'abbagliante parte più in alto e va lontano (più forte quando sfanali)
+      this.fxBeamAt(g, fx, fy, 330, 11, 17, (1 + wet) * night);                                             // anabbagliante: scende sulla strada
+      this.fxBeamAt(g, fx, fy - 2, s.high ? 480 : 420, -2.5, 19, (s.high ? 1 : 0.95 + wet * 0.5) * night);  // abbagliante: lungo e quasi dritto
+      this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita
     if (this.rainOn && spr.img) {
@@ -2047,7 +2051,7 @@ class Street2D {
     // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
-    if (s.ign) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
+    if (s.ign && s.lamps !== false) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
     const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
@@ -2077,8 +2081,10 @@ class Street2D {
       const GH = this.geo(), hx2 = left + GH.head[0] * k, hy2 = top + GH.head[1] * k, nt = 1 - (this.day || 0) * 0.75, tlx = left + (GH.tail[0] + 2) * k, tly = top + (GH.tail[1] + 3) * k;
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
-      fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
-      g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
+      if (s.lamps !== false) {
+        fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
+        g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
+      }
       const br = s.brake > 0.05 ? 1 : 0.45;
       fl(tlx, tly, 26 * br * nt + 6, '255,40,60', 0.5 * br * nt, 2);
       const spd = Math.abs(s.v);
