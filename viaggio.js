@@ -32,7 +32,9 @@ const VG_PLACE = {
   style: { name: () => 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
 };
 // il paesaggio cambia lungo la strada: da casa (città) alla pianura, al borgo, al mare, ai monti, alla baia, al deserto… e poi ancora
-const VG_ROUTE = [['tokyo', 12], ['bassa', 45], ['sangimignano', 40], ['positano', 50], ['hakone', 45], ['wangan', 55], ['route66', 60]];
+// il giro delle dodici capitali (capitali.js) con in mezzo i paesaggi di sempre; dopo Washington si torna al Wangan e il giro riparte da Roma
+const VG_ROUTE = [['tokyo', 12], ['wangan', 30], ['roma', 12], ['sangimignano', 30], ['parigi', 12], ['bassa', 30], ['londra', 12], ['hakone', 30], ['stoccolma', 12], ['bassa', 30], ['berlino', 12],
+  ['sangimignano', 30], ['praga', 12], ['hakone', 30], ['vienna', 12], ['positano', 30], ['madrid', 12], ['positano', 30], ['lisbona', 12], ['sangimignano', 30], ['atene', 12], ['route66', 30], ['washington', 12], ['route66', 30]];
 const VG_ROUTE_LEN = VG_ROUTE.reduce((a, r) => a + r[1], 0);
 
 const VG = {
@@ -323,7 +325,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const lid = VG.locAt(km);
     if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap && !this.race) {
       const was = this.loc && this.loc.id; this.setLoc(lid);
-      if (was && was !== lid) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
+      if (was && was !== lid && !this.loc.cap) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
     }
     // bisogni: con i km e col tempo (di più a motore acceso)
     const N = v.needs, t = dt / 60;

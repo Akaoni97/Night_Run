@@ -172,3 +172,14 @@ test('chat: le 18 conversazioni nuove, le 15 di soglia e le 12 città ci sono, e
   E.chatState(s).flags.luogo_roma = 1; E.chatTick(s, 99999);
   assert.ok(s.chat.started.st_V2_LUOGO_roma_01 || (s.chat.th.Livia || s.chat.th.Rosa || s.chat.th.Elena || {}).msgs, 'a Roma parte la sua conversazione');
 });
+
+test('capitali: le dodici stanno nella rotta del Viaggio, nell\'ordine, e hanno il loro luogo e il loro testo', () => {
+  const via = readFileSync(new URL('../viaggio.js', import.meta.url), 'utf8').split('\n').filter((l, i, a) => i < 40).join('\n');
+  const route = new Function(via.slice(via.indexOf('const VG_ROUTE'), via.indexOf('const VG_ROUTE_LEN')) + ';return VG_ROUTE;')().map((r) => r[0]);
+  const cap = readFileSync(new URL('../capitali.js', import.meta.url), 'utf8');
+  const { CAP_ORDER, CAP } = new Function(cap.slice(0, cap.indexOf('(function')) + ';return { CAP_ORDER, CAP };')();
+  assert.equal(CAP_ORDER.length, 12);
+  assert.deepEqual(route.filter((r) => CAP_ORDER.includes(r)), CAP_ORDER, 'le capitali appaiono nell\'ordine canonico');
+  const game = readFileSync(new URL('../game.js', import.meta.url), 'utf8');
+  for (const id of CAP_ORDER) { assert.ok(CAP[id].arrivo.length > 20, id); assert.ok(id === 'tokyo' || game.includes(`id: '${id}'`), `luogo ${id} in GAME_LOCS`); }
+});

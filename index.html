@@ -2171,6 +2171,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     wm.pins = [];
     const tt = performance.now() / 1000;
     for (const L of GAME_LOCS) {
+      if (L.cap) continue;                         // le capitali del Viaggio non si scelgono dalla mappa
       const x = X(L.lon), y = Y(L.lat); if (x < -10 || x > Wc + 10 || y < -10 || y > Hc + 10) continue;
       const col = WM_TYPES[L.bg][1], here = game.loc && game.loc.id === L.id, sel = wm.sel === L.id;
       wm.pins.push({ id: L.id, x, y });
@@ -2193,6 +2194,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     for (const [id, V] of Object.entries(WM_VIEWS)) { const b = document.createElement('button'); b.type = 'button'; b.textContent = V[0]; b.setAttribute('aria-pressed', String(wm.view === id)); b.addEventListener('click', () => { wm.view = id; wmRender(); }); tabs.appendChild(b); }
     const list = $('wmList'); list.innerHTML = '';
     for (const L of GAME_LOCS) {
+      if (L.cap) continue;
       const [tName, col] = WM_TYPES[L.bg], here = game.loc && game.loc.id === L.id, d = document.createElement('div');
       d.className = 'wm-card' + (wm.sel === L.id ? ' sel' : ''); d.style.setProperty('--c', col);
       d.innerHTML = `<b>${L.name}</b><span class="wm-meta">${L.country} · <span style="color:${col}">${tName}</span> · ${fmtCoord(L.lat, 'N', 'S')} ${fmtCoord(L.lon, 'E', 'O')}</span><p>${L.note}</p>`;
@@ -3296,6 +3298,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="telefono.js"></script>
 <script src="chat_dati.js"></script>
 <script src="chat.js"></script>
+<script src="capitali.js"></script>
 <script src="prologo.js"></script>
 <script src="valigette.js"></script>
 <script src="interni.js"></script>
