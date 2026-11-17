@@ -28,9 +28,9 @@ formato** qui sotto.
 ```
 [ID] CHI · fase · condizione
 Testo della battuta (≤ 90 caratteri)
-  A) «Risposta» → ID_destinazione   [effetto]
-  B) «Risposta» → ID_destinazione   [effetto]
-  C) «Risposta» → ID_destinazione   [effetto]   (facoltativa)
+  A) «Risposta» → ID_destinazione   [tono] [effetto]
+  B) «Risposta» → ID_destinazione   [tono] [effetto]
+  C) «Risposta» → ID_destinazione   [tono] [effetto]   (facoltativa)
 ```
 
 - **ID:** parola chiara e unica, per esempio `ELE_gatto_01`, `ROS_officina_03`.
@@ -41,7 +41,24 @@ Testo della battuta (≤ 90 caratteri)
   - `flag: nome`: una scelta ricordata (per esempio `flag: ha_ascoltato_nastro`);
   - `sblocca: ID`: apre un nodo che altrimenti non compare;
   - `chiude: ID`: toglie la possibilità di un nodo.
+  - `conf: nome +N` o `conf: nome -N`: cambia la **confidenza** di un personaggio (vedi sotto); N tra 1 e 10.
+- **tono** di ogni risposta, uno solo: `sboccato`, `pacato`, `ironico`, `gentile`, `freddo`, `sincero`, `evasivo`.
 - **Fine:** un nodo senza risposte che finisce la conversazione si scrive `[FINE]`.
+
+### Confidenza e gusti (novità)
+Ogni personaggio con cui si parla (Elena, Rosa, Livia, Marco, l'imitazione, ecc.) ha una **barra di confidenza**
+(0-100) visibile nel telefono. Il giocatore **non è obbligato a parlare con tutti**: può rispondere a uno e lasciare
+da parte un altro. La barra sale con le risposte che *piacciono* a quel personaggio e scende (poco) con quelle che
+non gli piacciono.
+- Per ogni personaggio scrivi i **gusti** in 2 righe: quali toni gli piacciono, quali no, e **perché** (per esempio
+  Rosa ama lo `sboccato` e detesta l'`evasivo`; Livia preferisce il `pacato` e il `sincero`).
+- Ogni risposta ha **un tono** e un effetto `conf:` coerente con i gusti di *chi la riceve*. Lo stesso tono vale
+  di più con uno e meno con un altro. Non fare mai scendere una barra di più di −5 per risposta.
+- Soglie **25 · 50 · 75 · 100**: a ogni soglia sblocca nodi nuovi (`richiede: conf Rosa >= 50`). Scrivi, per ciascun
+  personaggio principale, **che cosa si sblocca a ogni soglia** (un'altra conversazione, un segreto, un aiuto in
+  un'incursione, una frase di epilogo diversa).
+- Puoi creare bivi dove rispondere a uno **allontana** dall'altro (la stessa notizia, due versioni) ma di norma si
+  possono **coltivare tutti**: nessuna barra ne svuota un'altra.
 
 ### Come devono essere i bivi
 
@@ -70,6 +87,7 @@ Formato: `[PRO_n] fase · tono` + testo.
 Ognuna di **6-12 nodi** con almeno un bivio. Telefonate e messaggi quotidiani: lavoro, gatto *Pasta*, coinquilino,
 bollette, una cena, un litigio piccolo. Stabilisci con naturalezza i **dettagli di casa** che servono per verificare
 (il gatto, il turno, il soprannome «Nonno» usato per prenderlo in giro). Inoltre:
+- **Gusti di Elena** (2 righe) e **cosa si sblocca a 25/50/75/100**.
 - **8 «domande di casa»** (§4 di `STORIA_BOZZA_02.md`): per ognuna, 3 domande possibili e, per ognuna, la **risposta
   giusta di Elena** e la **risposta sbagliata dell'imitazione**, con una lacuna specifica e credibile.
 - **6 messaggi «sporchi»** (imitazione) che usano «Nonno» con tenerezza.
@@ -79,17 +97,21 @@ Conversazioni di 6-12 nodi: officina da campo, un consiglio pratico, il suo pass
 - **20 battute radio** per le incursioni, **massimo 8 parole** (`[RADIO_n]`), per i momenti: via libera, pericolo,
   corsia, ritardo, vittoria, fallimento.
 - **15 insulti amichevoli** di Rosa, tutti diversi.
+- **Gusti di Rosa** (2 righe) e **cosa si sblocca a 25/50/75/100**.
 
 ### D. Livia · **6 conversazioni**
 Archivio, originali, Ottavio, cosa ha verificato e cosa crede soltanto. Con almeno due scelte che cambiano la
-fiducia (`+legami`).
+fiducia (`+legami`). Aggiungi **gusti di Livia** (2 righe) e **cosa si sblocca a 25/50/75/100**.
 
 ### E. La presenza · **40 battute**, divise per stadio
 - **Stadio 1 (10):** numero sconosciuto, laconico, inquietante.
 - **Stadio 2 (10):** imita Elena, con le lacune.
 - **Stadio 3 (10):** imita Claudio.
 - **Stadio 4 (10):** perde la pazienza, dura, volgare ma rara.
-Scrivi anche **5 risposte possibili del giocatore** a ogni stadio (A/B/C) con l'effetto.
+Scrivi anche **5 risposte possibili del giocatore** a ogni stadio (A/B/C) con l'effetto. La presenza ha **una barra
+anch'essa visibile** (la confidenza che il giocatore le concede): sale quando le si risponde con calore o la si
+asseconda, e **segnalo io** quando è un trucco. Scrivi i suoi **gusti** (che cosa la «attira») e come la barra cambia
+le sue battute a 25/50/75/100 (più intima, più insistente, più pericolosa).
 
 ### F. Claudio, le tracce · **testi brevi**
 - Il **nastro**: le 3 battute già scritte più **6 frammenti** nuovi (uno per momento: ottimista, negazione, paura,
