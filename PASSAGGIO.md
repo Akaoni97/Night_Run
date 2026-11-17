@@ -151,6 +151,9 @@ gioco fa, sezione per sezione).
   `git ls-remote --heads origin` e, se c'è lavoro suo, chiedi al proprietario prima di unirlo.
 
 ## Come lavorare
+- **Skill del progetto** in `.claude/skills/` (elenco in `AGENTS.md`): prova a copione nel browser
+  (`strumenti/prova.js`), ascolto del motore fuori dal browser (`strumenti/ascolta.mjs`), funzioni nuove, disegno,
+  auto dai disegni, pubblicazione, storia, controllo del gioco.
 - **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
 - **Nel browser**: dalla radice del repository lancia `python3 -m http.server 8765`; con Playwright (già installato) apri
   `http://localhost:8765/index.html`, clicca `#goBtn`, rispondi al primo capitolo con

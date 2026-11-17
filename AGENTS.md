@@ -64,6 +64,30 @@ solo in maiuscolo ASCII (`PX_FONT`). Le auto guardano a destra.
 Per aggiungere un'auto: voce in `GEN_CARS` (motore, cambio, turbo, `voice`, `shiftK`, `hesK`), sprite e coppia in
 `GEN_DATA`, immagini in `img/`, voce in `CLUSTERS`.
 
+## Skill di Night Run (`.claude/skills/`)
+Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola; gli altri (Kimi...) leggano il
+`SKILL.md` giusto prima di cominciare.
+| Skill | Quando |
+| --- | --- |
+| `night-run-prova` | dopo ogni modifica: test, prova nel browser a copione (`strumenti/prova.js`), foto, rapporto |
+| `night-run-funzione` | una novità di gioco: file nuovo, tappa, app del telefono, interno, traguardo, stato, test |
+| `night-run-pixel` | prima di disegnare nel 2D: coordinate, stile, luci, facciate, interni |
+| `night-run-audio` | suono del motore: `strumenti/ascolta.mjs` lo registra in WAV fuori dal browser e lo misura |
+| `night-run-auto` | un veicolo nuovo dai disegni del proprietario |
+| `night-run-pubblica` | pull request del cognato, commit, push, artifact, documentazione |
+| `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
+| `night-run-controllo` | controllo del gioco con voti per area e proposte |
+
+Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
+`tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
+`node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore> <file.wav> [vista] [ambiente]`.
+
+## Plugin ECC (Everything Claude Code)
+`.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
+cartella in Claude Code e dando fiducia al progetto, Claude Code propone di installarlo. Le sue rules non sono
+copiate qui apposta. Se una skill o un agente di ECC dice altro (commit in inglese, copertura test all'80 %, npm,
+TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
+
 ## Regole
 1. `main` è il ramo pubblicato su GitHub Pages: non ci si lavora sopra direttamente. Lavora su un ramo tuo
    (es. `kimi/lavoro`, o quello che ti assegna la sessione) e porta le modifiche su `main` con una pull request,
