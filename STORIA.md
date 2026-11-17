@@ -9,10 +9,11 @@ psicologico. Il telefono è lo strumento principale: lì si sviluppano le cose s
 
 ## Deciso
 - **Prologo** (fatto, `prologo.js`): una lettera dello studio notarile Ferri invita a ritirare l'eredità di uno zio morto.
-  La BMW E36 blu arriva all'edificio, il notaio fa scegliere una tra 6 auto del garage, tutte sotto un telo. Per ora si
-  può prendere solo la **Volvo V40**; le altre cinque si vedranno più avanti. La Volvo imbocca l'autostrada.
+  La BMW E36 blu arriva all'edificio, il notaio fa scegliere una tra 6 auto del garage, e il giocatore
+  ne sceglie una (vedi sotto). L'auto scelta imbocca l'autostrada.
 - **Le altre cinque auto del garage** (deciso dal proprietario il 17/11/2026): Fiat Panda, Audi 80 Avant, Fiat Grande
-  Punto, Opel Corsa, Volkswagen Polo, le più vecchie ed economiche del gioco. Quando si sbloccano: da decidere.
+  Punto, Opel Corsa, Volkswagen Polo, le più vecchie ed economiche del gioco. Il giocatore sceglie una delle sei (anche la Volvo):
+  quella è l'auto con cui parte, malconcia. Cosa succede alle altre cinque: da decidere.
 - **Lo zio morto si chiama Claudio.** (Il notaio non dice altro di lui che «di notte la strada si fa più lunga».)
 - **L'autostrada** è infinita e va solo avanti. Le uscite sono bloccate (come, da vedere).
 - **Il telefono** (fatto, `telefono.js`): all'inizio solo app normali (Telefono, Messaggi, Rubrica, Mappa, Foto,
