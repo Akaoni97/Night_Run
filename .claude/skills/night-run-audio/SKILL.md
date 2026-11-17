@@ -17,7 +17,8 @@ node strumenti/ascolta.mjs <auto> <copione> <file.wav> [vista] [ambiente]
 node strumenti/ascolta.mjs e30 allungo /tmp/e30.wav 1
 ```
 Copioni: `minimo`, `sgasate` (in folle), `allungo` (da fermo a gas pieno, cambia vicino al limitatore),
-`crociera` (4ª a 100 km/h, gas parziale), `limitatore` (in folle sul limitatore).
+`crociera` (4ª a 100 km/h, gas parziale), `limitatore` (in folle sul limitatore), `urti` (tamponamento
+forte a 2 s, strisciata a 5 s, colpetto a 8 s, tamponamento leggero a 10 s).
 
 Stampa una riga ogni mezzo secondo (o secondo): giri, marcia, RMS e picco in dB, frequenza attesa degli scoppi
 (giri/60 × cilindri/2) e fondamentale misurata. Alla fine: volume totale e **campioni saturati**.

@@ -195,7 +195,9 @@ class StreetGame {
       if (this.lane === e.lane) this.lane = back;
       sim.v *= 0.94; e.v *= 0.97; this.manualT = 1.2; this.free = false;
       sim.damage = Math.min(1, sim.damage + 0.04 + dv * 0.004);
-      sim.events.push({ type: 'crash', I: 0.5 }); this.fx.push({ k: 'scrape', I: 0.5 });
+      const sI = Math.min(1.2, 0.45 + dv * 0.05 + sim.v * 0.01);
+      sim.events.push({ type: 'crash', I: sI, kind: 'side' }); this.fx.push({ k: 'scrape', I: sI, vt: e.vt });
+      if (sI > 0.6) e.dent = 1; e.hazT = Math.max(e.hazT || 0, 4);
       this.say(`Strisciata contro ${(typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].short) || 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
       this.s.crashes = (this.s.crashes || 0) + 1; return;
     }
@@ -211,9 +213,13 @@ class StreetGame {
     const soft = dv < 2.5;
     const dmg = soft ? 0.004 + dv * 0.004 : Math.min(0.45, (kind === 'front' ? 0.05 : 0.03) + dv * (kind === 'front' ? 0.022 : 0.012) * Math.min(2, m2 / 1400));
     sim.damage = Math.min(1, sim.damage + dmg);
-    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I });
+    sim.events.push({ type: soft ? 'bump' : 'crash', I: soft ? 0.4 : I, kind });
     if (soft) return;
-    this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I });
+    this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I, kind, vt: e.vt });
+    e.dent = 1; e.hazT = 10;                                              // l'altra auto: ammaccata, quattro frecce
+    e.calmT = 2.5;                                                         // e per un paio di secondi rallenta piano, senza inchiodare
+    if (kind === 'front') this.shockT = Math.max(this.shockT || 0, 0.8 + 0.8 * Math.min(1, I));   // chi guida molla il gas e frena d'istinto
+    if (kind === 'front') this.shockE = e;                                   // l'auto colpita: la guida automatica le resta lontana
     this.say(kind === 'rear' ? `Ti hanno tamponato a ${Math.round(dv * 3.6)} km/h di differenza: danni al ${Math.round(sim.damage * 100)} %`
       : `Tamponamento a ${Math.round(dv * 3.6)} km/h di differenza: carrozzeria al ${Math.round(sim.damage * 100)} % di danni`, 'police');
   }
@@ -707,7 +713,8 @@ class StreetGame {
         let want = e.vT || e.v;
         if (lead) want = Math.min(want, lead.v - (lead.x - e.x < 8 + ((lead.len || 4.6) + (e.len || 4.6)) / 2 ? 1.5 : 0));
         if (meAhead) want = Math.min(want, Math.max(0, sim.v - 0.5));
-        e.v += Math.max(-4 * dt, Math.min(1.4 * dt, want - e.v));
+        if (e.calmT > 0) e.calmT -= dt;
+        e.v += Math.max((e.calmT > 0 ? -1.2 : -4) * dt, Math.min(1.4 * dt, want - e.v));
         if (e.sig > 0) { e.sig -= dt; if (e.sig <= 0 && e.to) { if (!(Math.abs(this.laneZ - GAME_LANE_Z[e.to]) < 1.7 && Math.abs(d - e.x) < 14 + Math.abs(sim.v - e.v) * 2)) e.lane = e.to; e.to = 0; } }
         else if ((rel > 30 || rel < -15) && Math.random() < dt * (lead || meAhead ? 0.5 : 0.05)) {
           const to = e.lane + (e.lane === 1 ? 1 : e.lane === 3 ? -1 : Math.random() < 0.5 ? 1 : -1);
@@ -777,7 +784,9 @@ class StreetGame {
       }
     }
     // contatti: tamponi (muso contro coda), vieni tamponato (coda contro muso), strisciate di fianco in cambio corsia
+    if (this.shockT > 0) this.shockT -= dt;
     if (!this.race) for (const e of this.ents) {
+      if (e.hazT > 0) e.hazT -= dt;
       if (!moving(e)) continue;
       if ((e.hitT || 0) > 0) { e.hitT -= dt; continue; }
       const rel = e.x - d, half = ((e.len || 4.6) + 4.4) / 2, dz = Math.abs(this.laneZ - (e._gz ?? GAME_LANE_Z[e.lane]));
@@ -830,7 +839,8 @@ class StreetGame {
             c.hit = true; const head = c.dir < 0;
             sim.v *= head ? 0.15 : 0.55; sim.damage = Math.min(1, sim.damage + (head ? 0.3 : 0.12));
             this.laneZ -= Math.sign(c.o - this.laneZ || 1) * 0.6; this.relYaw = (this.relYaw || 0) * 0.3;
-            this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash' });
+            this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
+            sim.events.push({ type: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
             this.say(head ? 'Frontale! Resta nella tua corsia' : 'Tamponamento', 'bad');
           }
         } else if (Math.abs(rel) > 7) c.hit = false;
@@ -841,7 +851,9 @@ class StreetGame {
         this.rail = Math.sign(this.laneZ); this.laneZ = this.rail * lim;
         // il guardrail raddrizza l'auto lungo la strada e la rallenta
         if (Math.sign(-this.relYaw) === this.rail) this.relYaw *= 0.3;
-        if (v > 3) { sim.v *= 1 - Math.min(0.5, dt * 1.2); sim.damage = Math.min(1, sim.damage + dt * 0.012 * v / 20); if (Math.random() < dt * 10) this.fx.push({ k: 'scrape', side: this.rail }); }
+        if (v > 3) { sim.v *= 1 - Math.min(0.5, dt * 1.2); sim.damage = Math.min(1, sim.damage + dt * 0.012 * v / 20); if (Math.random() < dt * 10) this.fx.push({ k: 'scrape', side: this.rail });
+          // guardrail: la strisciata si sente finché ci si resta attaccati
+          if ((this.railSndT = (this.railSndT || 0) - dt) <= 0) { this.railSndT = 0.4; sim.events.push({ type: 'crash', I: Math.min(1, 0.3 + v * 0.02), kind: 'side' }); } }
       }
       this.free = true; this.lane = 1; this.prevLane = 1; this.signal = null;
       this.updateRace(dt, d0);

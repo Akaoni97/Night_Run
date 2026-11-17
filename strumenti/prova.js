@@ -43,7 +43,7 @@ const STATO = () => {
   const near = g.nearPlace ? g.nearPlace() : null, r = (x, k = 1) => Math.round(x * k) / k;
   return {
     km: r(s.dist / 1000, 100), kmh: r(n.sim.kmh), soldi: Math.round(s.money), auto: g.car, garage: v.garage,
-    benzina: r(n.sim.fuel, 100), danni: r(s.damage || 0, 100), gomme: r(s.tireWear || 0, 100),
+    benzina: r(n.sim.fuel, 100), danni: r(n.sim.damage || 0, 100), gomme: r(n.sim.tireWear || s.tireWear || 0, 100),
     bisogni: { fame: r(N.food, 100), sete: r(N.water, 100), sonno: r(N.sleep, 100), igiene: r(N.wash, 100) },
     dentro: g.inside ? g.inside.id : null, vicino: near ? (near.id || (near.loc && near.loc.id) || true) : null,
     domanda: !!g.prompt, interno: window.NightInterni ? NightInterni.current || null : null,

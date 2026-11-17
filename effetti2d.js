@@ -71,6 +71,11 @@
     const E = this.fxEnv || {}, t = this.st.t, low = this.quality === 'bassa';
     if (layer === 0) {
       for (const p of this.parts) {
+        if (p.k === 'shard') {
+          p.life -= dt * p.rate; p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy += 260 * dt;
+          if (p.y >= p.gy) { p.y = p.gy; if (p.vy > 25) { p.vy *= -0.32; p.dx *= 0.55; } else { p.vy = 0; p.dx *= Math.exp(-7 * dt); } }
+          continue;
+        }
         if (p.k === 'spark' || p.k === 'spray') {
           p.pm = p.m; p.py = p.y;
           p.life -= dt * (p.rate || (p.k === 'spray' ? 2.6 : 1.5)); p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy += (p.k === 'spark' ? 210 : 90) * dt;
@@ -92,6 +97,12 @@
     for (const p of this.parts) {
       if ((p.layer ?? 1) !== layer) continue;
       const X = wx(p.m), Y = Math.round(p.y), L = Math.max(0, p.life);
+      if (p.k === 'shard') {
+        // frammento: un pixel o due; i vetri brillano quando prendono la luce
+        g.globalAlpha = Math.min(1, L * 3); g.fillStyle = p.col; g.fillRect(X, Y, p.sz, 1);
+        if (p.glint && ((t * 7 + p.m * 3) % 1) < 0.18) { g.fillStyle = '#ffffff'; g.fillRect(X, Y, 1, 1); }
+        g.globalAlpha = 1; continue;
+      }
       if (p.k === 'spark') {
         // scintilla: testa chiara e scia che va dal giallo al rosso scuro
         const X0 = wx(p.pm ?? p.m), Y0 = Math.round(p.py ?? p.y);
@@ -299,9 +310,30 @@
     if (this.rainOn && v > 6) emit('eMist', Math.min(low ? 12 : 30, v * 0.9), () => this.parts.push({ k: 'mist', m: mOf((R() < 0.5 ? wD : wO) - (8 + R() * 8) * k), y: y0 - 3 - R() * 7, dx: v * PPM * 0.22, vy: -6 - R() * 10, r: 3 + R() * 3, life: 1, layer: R() < 0.4 ? 0 : 1, v: (R() * 3) | 0 }));
     const wet = ((dist % 61) + 61) % 61 < 5;
     if ((wet || this.rainOn) && v > 12) emit('eSpray', Math.min(60, (v - 12) * (wet ? 3 : 1)), () => this.parts.push({ k: 'spray', m: mOf((R() < 0.5 ? wD : wO) - 14 * k), y: y0 - 2 - R() * 4, vy: -14 - R() * 22, dx: v * PPM * 0.5 - 30 - R() * 60, life: 1, gy: y0 }));
-    // tamponamento: pioggia di scintille dal muso
-    if (game) for (const f of game.fx) if (f.k === 'crash') this.sparkT = 0.35;
-    if (this.sparkT > 0) { this.sparkT -= dt; emit('eCrash', 140, () => this.parts.push({ k: 'spark', m: mOf(left + SW), y: y0 - 10 - R() * 20, vy: -40 - R() * 80, dx: v * PPM * 0.7 + 20 + R() * 90, life: 1, rate: 1.3 + R(), gy: y0 })); }
+    // urti: scintille dal punto di contatto (muso, coda o fianco), lampo, pezzi di vetro e plastica che cadono e restano sull'asfalto
+    if (game) for (const f of game.fx) {
+      if (f.k !== 'crash' && !(f.k === 'scrape' && f.I)) continue;
+      const kind = f.k === 'scrape' ? 'side' : f.kind || 'front', I = Math.min(1.5, f.I || 0.8);
+      const cx = kind === 'front' ? left + SW : kind === 'rear' ? left : left + SW * (0.3 + R() * 0.4), dir = kind === 'rear' ? -1 : 1;
+      this.hitFx = { kind, I, t: kind === 'side' ? 0.45 : 0.3, cx: cx - carX, dir };
+      st.hitFlash = Math.min(1, 0.5 + 0.4 * I);
+      if (kind !== 'side') {
+        const n = Math.round((low ? 8 : 18) * Math.min(1.4, 0.4 + I));
+        for (let q = 0; q < n; q++) {
+          const r = R(), glass = r < 0.45, paint = !glass && r < 0.7;
+          this.parts.push({ k: 'shard', m: mOf(cx + (R() - 0.5) * 6), y: y0 - 8 - R() * 18, vy: -30 - R() * 90 * I, dx: v * PPM * (0.92 + R() * 0.12) + dir * (10 + R() * 60),
+            life: 1, rate: 0.12 + R() * 0.1, gy: y0 - R() * 6, col: glass ? (R() < 0.5 ? '#cfe8ff' : '#8fb4d8') : paint ? (this.paintHex || '#c03030') : R() < 0.5 ? '#1c1d22' : '#ff4a2a', sz: R() < 0.25 ? 2 : 1, glint: glass });
+        }
+      }
+    }
+    if (this.hitFx && this.hitFx.t > 0) {
+      const H = this.hitFx; H.t -= dt;
+      const cx = carX + H.cx + (H.kind === 'side' ? (R() - 0.5) * SW * 0.3 : 0);
+      emit('eCrash', H.kind === 'side' ? 110 : 160 * Math.min(1.3, H.I), () => this.parts.push({ k: 'spark', m: mOf(cx), y: y0 - (H.kind === 'side' ? 6 + R() * 10 : 10 + R() * 20), vy: -40 - R() * 80,
+        dx: v * PPM * (H.kind === 'side' ? 0.8 : 0.9) + H.dir * (20 + R() * 90) - (H.kind === 'side' ? 40 + R() * 50 : 0), life: 1, rate: 1.6 + R(), gy: y0 }));
+    }
+    st.hitFlash = Math.max(0, (st.hitFlash || 0) - dt * 7);
+    if (st.hitFlash > 0.03 && this.hitFx) this.light(g, carX + this.hitFx.cx, y0 - 14, 60 * st.hitFlash, 22, '#fff0c8', 0.35 * st.hitFlash, 3);   // lampo nel punto d'urto
     // scoppiettii: ogni scoppio accende la fiammata e lancia scintille e uno sbuffo di fuliggine
     st.flame = Math.max(0, st.flame - dt * 8);
     st.popFlash = Math.max(0, (st.popFlash || 0) - dt * 6);

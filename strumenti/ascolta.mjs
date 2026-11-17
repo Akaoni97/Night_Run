@@ -7,6 +7,7 @@
 //   auto:     id di CARS (supra, v40, e30, panda...)
 //   copione:  minimo (8 s al minimo) | sgasate (in folle, colpi di gas) | allungo (da fermo, gas a fondo, cambia
 //             marcia vicino al limitatore) | crociera (in 4ª a velocità costante, gas parziale) | limitatore (in folle sul limitatore)
+//             | urti (a 100 km/h: tamponamento forte a 2 s, strisciata a 5 s, colpetto a 8 s, tamponamento leggero a 10 s)
 //   vista:    0 abitacolo (predefinita), 1 esterno, 2 vano motore
 //   ambiente: 0 strada aperta (predefinito), 1 città, 2 galleria
 // Esempio: node strumenti/ascolta.mjs e30 allungo /tmp/e30.wav 1
@@ -42,6 +43,9 @@ const COP = {
     if (s.rpm > lim * 0.96 && s.gear > 0 && s.gear < s.topGear() && !s.shiftSeq) s.shift(s.gear + 1);
     return 1;
   } },
+  // urti a 100 km/h in 4ª: tamponamento forte (2 s), strisciata di fianco (5 s), colpetto (8 s), tamponamento leggero (10 s)
+  urti: { T: 12, ev: [[2, { type: 'crash', I: 1.4, kind: 'front' }], [5, { type: 'crash', I: 0.5, kind: 'side' }], [8, { type: 'bump', I: 0.4 }], [10, { type: 'crash', I: 0.5, kind: 'rear' }]],
+    f: (t, s) => { if (s.gear !== 4 && !s.shiftSeq) { s.gear = 4; s.v = 100 / 3.6; s.ww = s.v / s.P.r; s.wo = s.ww; } return 0.3; } },
   crociera: { T: 10, f: (t, s) => { if (s.gear !== 4 && !s.shiftSeq) { s.gear = 4; s.v = 100 / 3.6; s.ww = s.v / s.P.r; s.wo = s.ww; } return 0.3; } },
 };
 const C = COP[copione];
@@ -58,7 +62,9 @@ for (let i = 0; i < N; i += B, k++) {
   const t = i / SR;
   sim.in.thr = C.f(t, sim); sim.in.clutch = 0; sim.in.brake = 0;
   sim.update(dt);
-  dsp.msg({ p: sim.audioParams(), ev: sim.events.splice(0) });
+  const evs = sim.events.splice(0);
+  if (C.ev) for (const [te, e] of C.ev) if (te >= t && te < t + dt) evs.push(Object.assign({}, e));
+  dsp.msg({ p: sim.audioParams(), ev: evs });
   dsp.render(bl, br, B);
   L.set(bl.subarray(0, Math.min(B, N - i)), i); R.set(br.subarray(0, Math.min(B, N - i)), i);
   rpmAt[k] = sim.rpm; gearAt[k] = sim.gear;

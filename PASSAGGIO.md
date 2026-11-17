@@ -97,6 +97,15 @@ gioco fa, sezione per sezione).
   Rovistare tra sei carcasse (€ 20, una volta: niente, soldi, oggetti, ticket, un pezzo, una valigetta, raramente
   € 2.500), pezzi usati per l'auto che guidi al 45 % del nuovo, la carcassa del giorno (20 % del prezzo, tutti i difetti,
   col conto di quanto costa sistemarla e quanto vale dopo), rottamazione a peso.
+- **Incidenti** (rifatti il 17/11/2026): suono a strati in `dsp.js` (botta sorda che scende, lamiera che cede a scatti,
+  pannelli che vibrano su note diverse a ogni urto, vetri e pezzi che cadono, strisciata che dura col suo attrito a
+  scatti; il motore si abbassa per un attimo; stesso livello in abitacolo, fuori e nel vano motore, prima dall'esterno
+  quasi non si sentiva). Nel 2D: scossa dell'inquadratura che si spegne in fretta, la scocca che rimbalza, scintille e
+  lampo dal punto giusto (muso, coda o fianco), frammenti di vetro e plastica che restano sull'asfalto, l'altra auto
+  ammaccata con le quattro frecce. Dopo un tamponamento chi guida molla il gas e frena d'istinto, l'auto colpita
+  rallenta piano e la guida automatica le resta lontana (prima si tamponava la stessa auto 2-4 volte di fila).
+  Guardrail della montagna: strisciata che si sente. Test in `test/urti.test.js`; per ascoltare
+  `node strumenti/ascolta.mjs v40 urti file.wav 1`.
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco

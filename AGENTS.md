@@ -15,7 +15,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 
 | File | Cosa contiene |
 | --- | --- |
-| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri, collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). |
+| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri, collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. |
 | `sim.js` | Fisica (classe `SupraSim`, passo 1/4000 s): motore, turbo, frizione, cambio, gomme Pacejka, differenziale, beccheggio, wheel hop, TRC, ABS, tipi di limitatore. |
 | `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), `tuningParams()`. |
 | `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
@@ -84,7 +84,7 @@ una riga nella tabella qui sopra, poi pull request verso `main`. Prima di cominc
 
 Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
-`node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore> <file.wav> [vista] [ambiente]`.
+`node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore|urti> <file.wav> [vista] [ambiente]`.
 
 ## Plugin ECC (Everything Claude Code)
 `.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
@@ -121,7 +121,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 88, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato e sfascio). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 92, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio e urti). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.

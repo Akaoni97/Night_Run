@@ -1924,8 +1924,8 @@ class Street2D {
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
       this.light(g, left + 3, sy + tY, 8, 6, '#ff2a2a', 0.15, 2);
-      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + tY, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
-      if (e.hazard && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce
+      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + tY, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
+      if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce (anche dopo un urto)
         g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3);
         this.light(g, left + 4, sy + tY + 4 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + hY + k, 12, 7, '#ffa020', 0.35, 3);
       }
@@ -1987,7 +1987,9 @@ class Street2D {
       this.tf(g, 1, 0, 0, -0.55, left, y0 + hgt * 0.55 + 2); this.body(g, spr, 0, 0); g.restore();
     }
     st.popJolt = Math.max(0, (st.popJolt || 0) - dt * 10);
-    const heave = Math.round(-st.heave + idleShake * 0.6 - (st.popJolt > 0.3 ? 1 : 0) + (s.hop || 0) * 1.6);   // saltellamento dell'assale
+    st.crashJolt = Math.max(0, (st.crashJolt || 0) - dt * 3.2);                // la scocca rimbalza dopo un urto
+    st.trauma = Math.max(0, (st.trauma || 0) - dt * 1.6);                    // scossa degli urti: si spegne in poco più di mezzo secondo
+    const heave = Math.round(-st.heave + idleShake * 0.6 - (st.popJolt > 0.3 ? 1 : 0) + (s.hop || 0) * 1.6 - st.crashJolt * 3 * Math.sin(st.crashJolt * 9));   // saltellamento dell'assale
     const skew = -st.pitch * 0.8;
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;
@@ -2124,7 +2126,7 @@ class Street2D {
       if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
       if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
     }
-    if (game) for (const f of game.fx) { if (f.k === 'challenge') this.comic('SFIDA! 2 KM', carX + 40, carTop - 30, '#ff2e88', 4, '#ffd23f'); else if (f.k === 'streetWin') this.comic('VINTA!', carX + 40, carTop - 30, '#b8ff3a', 5); else if (f.k === 'streetLose') this.comic('PERSA...', carX + 40, carTop - 30, '#8a93b0', 4); if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') this.comic('CRASH!', left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); else if (f.k === 'scrape') this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); }
+    if (game) for (const f of game.fx) { if (f.k === 'challenge') this.comic('SFIDA! 2 KM', carX + 40, carTop - 30, '#ff2e88', 4, '#ffd23f'); else if (f.k === 'streetWin') this.comic('VINTA!', carX + 40, carTop - 30, '#b8ff3a', 5); else if (f.k === 'streetLose') this.comic('PERSA...', carX + 40, carTop - 30, '#8a93b0', 4); if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
     if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
     if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
     if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
@@ -2228,8 +2230,10 @@ class Street2D {
 
     // ---- su schermo
     if (!this.visible) return;
-    const shake = Math.round((bF + bR) * 0.05 + (st.popJolt > 0.8 ? (Math.random() < 0.5 ? -1 : 1) : 0));
-    const shakeX = st.popJolt > 0.8 ? Math.round((Math.random() - 0.5) * 3) : 0;
+    // urti: scossa dell'inquadratura da un "trauma" che cala (forza = trauma², somma di seni: niente tremolio a caso)
+    const tq = (st.trauma || 0) * (st.trauma || 0), tt = st.t * 38;
+    const shake = Math.round((bF + bR) * 0.05 + (st.popJolt > 0.8 ? (Math.random() < 0.5 ? -1 : 1) : 0) + tq * 5 * Math.sin(tt * 1.7));
+    const shakeX = (st.popJolt > 0.8 ? Math.round((Math.random() - 0.5) * 3) : 0) + Math.round(tq * 8 * Math.sin(tt * 2.3 + 1));
     this.present(shake, shakeX);
     this.tPrev = performance.now() - tStart;
   }
