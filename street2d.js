@@ -1642,7 +1642,7 @@ class Street2D {
     }
     // la Supra (vernice, cerchi, neon, strisce)
     const GI = this.geo(), spr = this.carSprite(K), left = Math.round(cx - 100 * K), top = Math.round(gy - (GI.wy + GI.wr) * K - lift + GI.low * K);
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     this.shadow(g, cx, gy, 120, 6);
     if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
     g.imageSmoothingEnabled = false; this.body(g, spr, left, top);
@@ -1983,7 +1983,7 @@ class Street2D {
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita
     if (this.rainOn && spr.img) {

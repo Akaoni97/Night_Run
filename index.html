@@ -1208,7 +1208,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && game.car === 'supra' && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth,
+    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.5 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {
@@ -2978,7 +2978,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame() };
+  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
@@ -3302,6 +3302,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="capitali.js"></script>
 <script src="regia.js"></script>
 <script src="storia.js"></script>
+<script src="comandi.js"></script>
 <script src="prologo.js"></script>
 <script src="valigette.js"></script>
 <script src="interni.js"></script>

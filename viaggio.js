@@ -549,7 +549,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgTrailer = function (on) {
     const v = this.s.vg; if (!v.trailer) return { ok: false, why: 'Non hai il rimorchio' };
     if (VG_CARGO[this.car]) return { ok: false, why: 'Il rimorchio si attacca alle auto' };
-    if (!on && (this.s.trunk || []).length > TRUNK_SLOTS) return { ok: false, why: 'Prima scarica: nel bagagliaio non ci sta tutto' };
+    if (!on && ((this.s.trunk || []).length > TRUNK_SLOTS || this.trunkKg() > TRUNK_KG)) return { ok: false, why: 'Prima scarica: nel bagagliaio non ci sta tutto' };
     v.trailerOn = on; this.applyMass(); return { ok: true };
   };
   // cassa del motel: si sposta con te di motel in motel

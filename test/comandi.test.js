@@ -1,0 +1,44 @@
+// Prove dei comandi dell'auto: cosa compare, stato salvato, effetto sulla pressione del turbo.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const dir = new URL('../', import.meta.url);
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'comandi.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+const E = new Function(src + ';return { SupraSim, StreetGame, CMD_BOOST, cmdState, cmdAvailable, cmdBoostNext, cmdExhToggle, cmdNeonToggle, cmdApply, TRUNK_KG };')();
+
+const nuovo = () => { const sim = new E.SupraSim(), game = new E.StreetGame(sim, () => 0.5); game.startTrip(); return { sim, game }; };
+
+test('comandi: sull\'auto di partenza non compare niente', () => {
+  const { sim, game } = nuovo(); sim.tune.turbo.max = 0; sim.tune.pw = 1;      // come la Volvo ereditata: aspirata e di serie
+  const a = E.cmdAvailable(game, sim, null);
+  assert.deepEqual(a, { rimorchio: false, turbo: false, scarico: false, neon: false });
+});
+
+test('comandi: ogni comando compare solo quando ha senso', () => {
+  const { sim, game } = nuovo(); sim.tune.turbo.max = 0; sim.tune.pw = 1;
+  game.s.vg.trailer = true; assert.ok(E.cmdAvailable(game, sim, null).rimorchio);
+  sim.tune.turbo.max = 0.6; assert.ok(E.cmdAvailable(game, sim, null).turbo);
+  sim.tune.pw = 1.1; assert.ok(E.cmdAvailable(game, sim, null).scarico);
+  assert.ok(!E.cmdAvailable(game, sim, { glow: 'none' }).neon); assert.ok(E.cmdAvailable(game, sim, { glow: '#2ee6ff' }).neon);
+});
+
+test('comandi: pressione, scarico e neon cambiano e si salvano con la partita', () => {
+  const { sim, game } = nuovo(); sim.tune.turbo.max = 0.6;
+  assert.equal(E.cmdBoostNext(game.s).id, 'forte'); assert.equal(E.cmdBoostNext(game.s).id, 'eco'); assert.equal(E.cmdBoostNext(game.s).id, 'norm');
+  assert.equal(E.cmdExhToggle(game.s), 0); assert.equal(E.cmdNeonToggle(game.s), 0);
+  E.cmdBoostNext(game.s); const json = game.save(), g2 = new E.StreetGame(new E.SupraSim(), () => 0.5); g2.load(json);
+  assert.deepEqual(g2.s.cmd, { boost: 2, exh: 0, neon: 0 });
+});
+
+test('comandi: la pressione FORTE dà più coppia di ECO, e senza turbo non cambia nulla', () => {
+  assert.ok(E.CMD_BOOST[2].k > E.CMD_BOOST[0].k);
+  const { sim, game } = nuovo(); sim.tune.turbo.max = 0; E.cmdState(game.s).boost = 2; E.cmdApply(game, sim, null); assert.equal(sim.boostCtl, 1, 'senza turbo il comando non agisce');
+  sim.tune.turbo.max = 0.7; E.cmdApply(game, sim, null); assert.equal(sim.boostCtl, 1.15);
+});
+
+test('comandi: lo sgancio del rimorchio controlla anche i chili', () => {
+  const { sim, game } = nuovo(); game.s.vg.trailer = true; game.s.vg.trailerOn = true; game.s.trunk = [{ kind: 'scatola', kg: E.TRUNK_KG + 50, name: 'pesante' }];
+  const r = game.vgTrailer(false); assert.ok(!r.ok, 'troppo peso per il solo bagagliaio'); assert.ok(game.s.vg.trailerOn);
+  game.s.trunk = [{ kind: 'scatola', kg: 10, name: 'leggera' }]; assert.ok(game.vgTrailer(false).ok);
+});
