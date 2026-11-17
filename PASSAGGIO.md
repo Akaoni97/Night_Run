@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 103).
+  (ultima versione pubblicata: 105).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -86,6 +86,7 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Vita e giochi di luce (17/11/2026)**: `vita2d.js` (uccelli, scie d'aereo, fuochi d'artificio, lampi lontani, foglie e cartacce sulla strada, riflessi verticali sull'asfalto, falene, lucciole, raggi di sole, miraggio). Costa circa 2 ms a fotogramma sul computer di prova.
 - **Grafica dei paesaggi (17/11/2026)**: `paesaggi2d.js` (luci lontane, fari, treni, torri illuminate, catarifrangenti),
   lampioni anche nella Bassa (ogni 55 m), cielo con la sua tinta per paesaggio (`drawSky`: azzurro-grigio nella Bassa, blu
   in montagna e al mare, caldo a San Gimignano, rosa nel deserto), fari pubblicitari ed elicottero solo in città e sul

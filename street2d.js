@@ -1725,6 +1725,7 @@ class Street2D {
     }
     // luogo della mappa del mondo: la città di sempre o uno sfondo dedicato
     const bg = (game && game.loc && game.loc.bg) || this.bg || 'city';
+    if (this.vitaSky) this.vitaSky(g, dist, st.t, bg);                         // uccelli, fuochi d'artificio, lampi lontani (vita2d.js)
     let shops = [];
     const TUN = this.tunnelSpan ? this.tunnelSpan(game, visFrom, visTo) : null;   // galleria tra due paesaggi (galleria2d.js)
     const DM = bg === 'city' && this.districtMix ? this.districtMix(dist) : null, lampCol = DM ? DM.lamp : '#ffcf7a';
@@ -1744,7 +1745,8 @@ class Street2D {
       // una sola copia dello sfondo a risoluzione logica (la scia è comunque sfocata), poi tre passate spostate
       const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W) { sm.width = W; sm.height = 192; }
       const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W, 192);
-      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.24], [9, 0.13], [15, 0.06]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }   // lo sfondo scorre a sinistra: la scia resta dietro, a destra g.restore();
+      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.24], [9, 0.13], [15, 0.06]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }
+      g.restore();   // lo sfondo scorre a sinistra: la scia resta dietro, a destra
     }
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
@@ -1839,6 +1841,7 @@ class Street2D {
       g.fillStyle = `rgba(6,6,10,${mk.a})`; g.fillRect(x, mk.y, mw, 2); g.fillStyle = `rgba(6,6,10,${mk.a * 0.4})`; g.fillRect(x, mk.y - 1, mw, 1); g.fillRect(x, mk.y + 2, mw, 1);
     }
     this.marks = this.marks.filter((mk) => wx(mk.m) > -60).slice(-400);
+    if (this.vitaRoad) this.vitaRoad(g, dist, st.t, bg, dt, s, wx, carX);      // foglie, cartacce, rotolacampo (vita2d.js)
 
     // ---- lampioni: alone piccolo, pozza a terra, riflesso sul bagnato (niente fasci)
     const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40, plain: 55 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
@@ -1855,6 +1858,7 @@ class Street2D {
       for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
       g.restore();
     }
+    this._lampX = TUN ? [] : lampX; this._shops = shops;
     if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) { lampX.push(wx(m) - 18); if (this.lightAdd) this.lightAdd(wx(m), 290, 110, 70, '255,179,71', 0.55); }   // le luci della volta scorrono sulla carrozzeria
     for (const [x, on] of lampAll) {
       g.fillStyle = C.ink; g.fillRect(x - 2, 118, 5, 112); g.fillRect(x, 118, 24, 5); g.fillRect(x - 4, 222, 9, 8); g.fillRect(x - 3, 214, 7, 4);
@@ -2161,6 +2165,7 @@ class Street2D {
     }
 
     if (this.lightPass) this.lightPass(g, W, 1 - (this.day || 0), this.rainOn);   // penombra notturna e pozze di luce (luci2d.js)
+    if (this.vitaFront && !(game && game.inside)) this.vitaFront(g, dist, st.t, bg, dt, s);   // riflessi, falene, lucciole, raggi di sole (vita2d.js)
     this.drawComics(g, dt);
     // ---- linee di velocità sopra i 90 km/h circa
     if (Math.abs(s.v) > 25) {
