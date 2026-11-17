@@ -1979,7 +1979,10 @@ class Street2D {
     // fascio dei fari nell'aria, di notte e sotto la pioggia
     if (s.ign && (this.day || 0) < 0.6) {
       const fx = left + SW - 4, fy = y0 - 22 * k;
-      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)) * hlK);
+      const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
+      // due tagli di luce: l'anabbagliante scende sulla strada, l'abbagliante parte più in alto e va lontano (più forte quando sfanali)
+      this.fxBeamAt(g, fx, fy, 300, 12, 9, (1 + wet) * night);                                              // anabbagliante: scende sulla strada
+      this.fxBeamAt(g, fx, fy - 2, s.high ? 460 : 400, -2.5, 8, (s.high ? 1 : 0.7 + wet * 0.5) * night);   // abbagliante: lungo e quasi dritto
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme

@@ -255,6 +255,26 @@
     x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
+  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = apertura alla fine. Un cono morbido a tre strati (alone, corpo, anima).
+  // Due di questi fanno anabbagliante e abbagliante.
+  S.beamShaft = function (len, w) {
+    const SS = this.SS || 1, key = 'shaft' + Math.round(len / 10) + '_' + Math.round(w) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
+    if (B[key]) return B[key];
+    const H = Math.ceil(w * 2 + 8), c = document.createElement('canvas'); c.width = len * SS; c.height = H * SS; c.oy = H / 2; c.lw = len; c.lh = H;
+    const x = c.getContext('2d'); x.scale(SS, SS);
+    for (const [k, a] of [[1, 0.16], [0.62, 0.22], [0.28, 0.34]]) {
+      const gr = x.createLinearGradient(0, 0, len, 0); gr.addColorStop(0, `rgba(255,244,214,${a * 1.6})`); gr.addColorStop(0.35, `rgba(255,240,200,${a})`); gr.addColorStop(1, 'rgba(255,236,190,0)');
+      x.fillStyle = gr; x.beginPath(); x.moveTo(0, c.oy - 1.5 * k); x.lineTo(len, c.oy - w * k); x.lineTo(len, c.oy + w * k); x.lineTo(0, c.oy + 1.5 * k); x.closePath(); x.fill();
+    }
+    return (B[key] = c);
+  };
+  S.fxBeamAt = function (g, fx, fy, len, ang, w, a) {
+    if (a < 0.02) return;
+    const sp = this.beamShaft(len, w);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a);
+    g.translate(Math.round(fx), Math.round(fy)); g.rotate(ang * Math.PI / 180);
+    g.drawImage(sp, 0, -sp.oy, sp.lw, sp.lh); g.restore();
+  };
   S.fxBeam = function (g, fx, fy, len, dn, a) {
     if (a < 0.02) return;
     const sp = this.beamSprite(len, 5, dn);
