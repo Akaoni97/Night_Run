@@ -95,7 +95,7 @@ const STATO = () => {
     } else if (k === 'tieni') { const [key, ms] = a.split(':'); await page.keyboard.down(key); await page.waitForTimeout(+ms || 1000); await page.keyboard.up(key);
     } else if (k === 'clic') {
       const ok = a.startsWith('testo=')
-        ? await page.evaluate((t) => { const b = [...document.querySelectorAll('button,.kbtn,[role=button]')].find((x) => x.offsetParent && x.textContent.includes(t)); if (b) b.click(); return !!b; }, a.slice(6))
+        ? await page.evaluate((t) => { const b = [...document.querySelectorAll('button,.kbtn,[role=button],[data-k],[data-id]')].find((x) => x.offsetParent && x.textContent.toLowerCase().includes(t.toLowerCase())); if (b) b.click(); return !!b; }, a.slice(6))
         : await page.evaluate((s) => { const b = document.querySelector(s); if (b) b.click(); return !!b; }, a);
       log(ok ? `clic ${a}` : `clic ${a}: non trovato`); await page.waitForTimeout(400);
     } else if (k === 'aspetta') { await page.waitForTimeout(+a || 1000);

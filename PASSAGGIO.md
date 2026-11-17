@@ -72,6 +72,13 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Interni rifatti in parte (17/11/2026)**: personaggi ridisegnati (testa arrotondata con mascella, tre toni di luce,
+  capelli con volume e frangia, occhi col riflesso, naso, labbra, braccia e mani a pixel netti con le dita); insegna BAR
+  leggibile (prima era al rovescio), MOTEL/LIBERE dentro la finestra; dalle finestre passano le auto vere del traffico
+  (stessi disegni della strada, con ruote e fari), dietro l'auto parcheggiata. La tua auto negli interni si ridisegna due
+  volte al secondo: al Neon Kustom vernice, cerchi, kit e spoiler provati si vedono subito (prima un aggiornamento ogni
+  mezzo secondo rimetteva quelli comprati, e i cerchi finivano sotto la carrozzeria). Pannello: valori dell'officina su
+  tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Niko e Neon Kustom.
 - **Traguardi** (`traguardi.js`): 29 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta

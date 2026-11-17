@@ -394,6 +394,8 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .st { display: grid; gap: 5px; min-width: 0; }
 .st b { font: 400 11px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
 .st b span { color: var(--fg); font-size: 13px; letter-spacing: 0; text-transform: none; }
+.st b { flex-wrap: wrap; } .st b span { white-space: nowrap; }
+#placeBox .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 12px; }   /* nel pannello del locale lo spazio è stretto */
 .st .sb { height: 8px; background: #1e1b16; transform: skewX(-20deg); overflow: hidden; }
 .st .sb i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--amber), var(--lime)); transition: width .4s; }
 
@@ -2637,6 +2639,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         }));
       }
     }
+    { const u = body.querySelector('.us-hold'); if (u) body.appendChild(u); }   // l'annuncio dell'usato resta in fondo, sotto i ritocchi
   }
   // sticker del gioco più quelli aggiunti dal giocatore (img/stickers/manifest.json: [{ id, name, file, price }])
   let userStickers = [];
@@ -3083,7 +3086,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (on) siren.osc.frequency.setTargetAtTime(Math.floor(sirenT * 1.6) % 2 ? 660 : 494, audio.ctx.currentTime, 0.01);
     }
     saveT += dt; if (saveT > 3) { saveT = 0; saveGame(); }
-    svcT += dt; if (svcT > 0.5) { svcT = 0; game.tireId = S.tune.tires; renderServices(); if (street2d) street2d.setCosmetics(cosView()); TP.sim.maint = game.maint(); sim.tune.maint = TP.sim.maint;
+    svcT += dt; if (svcT > 0.5) { svcT = 0; game.tireId = S.tune.tires; renderServices(); if (street2d) { if (cosPrev) applyCos(cosPrev); else street2d.setCosmetics(cosView()); } TP.sim.maint = game.maint(); sim.tune.maint = TP.sim.maint;
       const sig = JSON.stringify(game.s.trunk) + game.mode + Math.floor(game.s.money); if (sig !== trunkSig) { trunkSig = sig; renderTrunk(); } }
   }
   // ---------------------------------------------------------------- gara: giudizi e risultato

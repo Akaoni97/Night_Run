@@ -164,7 +164,7 @@ const US_DEF_IDS = Object.keys(US_DEF);
   // sezione nel pannello del locale: l'annuncio di questa tappa, e da Niko la revisione del motore
   const UI = { msg: {} };
   function panel(body, I, ctx) {
-    const holder = document.createElement('div'); holder.style.cssText = 'display:grid;gap:12px'; body.appendChild(holder);
+    const holder = document.createElement('div'); holder.className = 'us-hold'; holder.style.cssText = 'display:grid;gap:12px'; body.appendChild(holder);
     const draw = () => { holder.innerHTML = ''; fill(holder, I, Object.assign({}, ctx, { refresh: draw })); };
     draw();
   }
