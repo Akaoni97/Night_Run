@@ -113,6 +113,11 @@ Claude Code le carica da solo quando servono; provenienza e licenze in `.claude/
   per i controlli in locale e non entrano nel gioco.
 - `pixel-art`: palette, dithering, contorni, animazione a pixel.
 Le regole di questo file valgono sopra le skill (testi in italiano, niente npm, niente grafica copiata da altri giochi).
+In particolare: le convenzioni di disegno di Night Run sono in `night-run-pixel` e valgono sopra `pixel-art` (che
+dice di "correggere" l'utente: le scelte di stile del proprietario non si correggono, al massimo si consiglia);
+`create-game-assets` parla di immagini generate con l'IA: **i veicoli vengono solo dai disegni del proprietario** e
+niente immagini generate entra nel gioco senza che il proprietario lo chieda; gli esempi in Godot e Unity di
+`game-feel` vanno tradotti nel canvas di `Street2D` (scossa = spostamento della telecamera, non dell'auto).
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
