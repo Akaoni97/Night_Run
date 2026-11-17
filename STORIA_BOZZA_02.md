@@ -67,6 +67,9 @@ un demone di nascita. È un'eco con un metodo.
    viaggiatore ancora vivo. Il gioco dice sempre quale dei tre casi sta mostrando (§7, indizio E).
 8. **Chi resta a guardia di un varco viene dimenticato da chi sta fuori**, un poco alla volta. È il prezzo che pagano
    Claudio, Rosa e (nel finale D) il protagonista.
+9. **La presenza può prendere solo il posto di chi non c'è**: un disperso (Irene, Ottavio), un morto (la voce di Claudio) o un
+   posto vuoto. Può *imitare* una persona viva al telefono, mai *sostituirla* nella vita: Elena, finché è viva, è al sicuro da
+   questo. Dopo che è uscita dalla rete la presenza può agire nel mondo, ma sempre nel posto di qualcuno che mancava.
 
 **In parole semplici: il riconoscimento.** La presenza non può uscire dalla galleria da sola. Deve farsi guardare da
 una persona viva che dica «ti conosco, sei tu» e se ne vada con lei. Per questo si traveste da qualcuno che quella
@@ -85,11 +88,11 @@ Anni relativi al presente della storia (anno 0 = la lettera dello studio).
 | Anno | Fatto |
 | --- | --- |
 | −41 | Incidente a catena nel tunnel, poi chiuso. Il luogo comincia a ripetersi. **[P]** |
-| −30, −24, −14 | Tre proprietari (*provvisori*: *il ragazzo del Wangan*, *la coppia di Hakone*, *la donna della Route 66*) incontrano la galleria in momenti diversi. Nessuno tornerà intero. |
-| −19 | **Claudio e Irene** tornano di notte da una cena, imboccano la galleria. Lei scende dall'auto e va verso una porta (per tenerla chiusa mentre lui esce, ma lui non lo saprà mai). Claudio esce da solo. Irene è data per dispersa. |
-| −17 | "Irene" si presenta a casa di Claudio, con ricordi incompleti. Lui l'accetta. **È la presenza.** |
+| −30, −24, −14 | Tre proprietari incontrano la galleria in momenti diversi (**scelti perché l'auto esisteva già**): −30 *la donna della Route 66* (Fiat Panda), −24 *la coppia di Hakone* (Opel Corsa), −14 *il ragazzo del Wangan* (Fiat Grande Punto). Nessuno tornerà intero. |
+| −19 | **Claudio e Irene** tornano di notte da una cena, imboccano la galleria con l'Audi 80. Lei scende dall'auto e va verso una porta (per tenerla chiusa mentre lui esce, ma lui non lo saprà mai). Claudio esce da solo. Irene è data per dispersa. |
+| −17 | **Claudio rientra nella galleria a cercarla.** Alla porta vede una donna con la faccia di Irene, dice «Irene» e cammina con lei fino all'uscita: è il **riconoscimento** che la presenza aspettava. A casa "Irene" ha ricordi incompleti. Lui l'accetta. **È la presenza, ed è uscita per colpa del suo amore.** Prima di uscire ha scattato un fotogramma alla porta (macchina nel vano portaoggetti): non lo guarda. |
 | −16 → −12 | Piccole contraddizioni: un nome, una data. Claudio le corregge lui. |
-| −12 | Claudio sviluppa una pellicola dimenticata nel vano portaoggetti. Prima foto: **la sera della galleria, Irene alla porta, di spalle**, mentre lui è fermo in auto. Capisce che la donna a casa non può essere lei. Nasconde la foto. Non la mostra. Non la distrugge. |
+| −12 | Claudio sviluppa la pellicola. Il fotogramma mostra la porta e, accanto, **la vera Irene col cappotto di quella sera**, mentre **nel punto dove lui ricorda la donna che ha portato fuori non c'è nessuno**. Capisce che la donna a casa non è lei. Nasconde la foto. Non la mostra. Non la distrugge. |
 | −11 | Comincia a rintracciare gli altri proprietari. Recupera le auto. Tiene Irene (la presenza) con sé, senza dirle di aver capito: ha paura di perderla una seconda volta. |
 | −6 | *Rosa* e *Ottavio* entrano insieme. Lei esce, lui resta dentro. Lei resta sulla strada per tornare a prenderlo. |
 | −5 | Claudio incontra *Livia*, sorella di Ottavio, e le affida in custodia gli originali (foto, nastri, documenti): **fuori dalla rete**. Scrive il testamento, convinto di poter rendere innocue le auto richiudendo i collegamenti. |
@@ -313,9 +316,11 @@ diverso, e per il ramo più esposto il linguaggio del protagonista (§11, scena 
 
 **Le cinque scelte** (rispetto alla 02: invariate nella sostanza, aggiunte conseguenze).
 
-1. **Conservare o consegnare una prova.** Livia la vuole per un motivo valido. Si può darle l'originale o tenere una
-   copia. *Conseguenza:* chi consegna avrà una testimone indipendente più avanti; chi conserva ha la prova ma perde Livia
-   come alleata finché non la recupera.
+1. **Far confrontare una prova con l'originale.** Il protagonista ha solo **copie** (nastro, foto sbiadita, messaggi): gli
+   originali sono già da Livia, fuori dalla rete, e non si trasferiscono. La scelta è se **mandarle la copia perché la
+   confronti**, e quindi averla *verificata* da una fonte indipendente, oppure tenerla per sé. *Conseguenza:* chi la manda ha
+   una testimone e una prova verificata (serve per C); chi la tiene ha un sospetto, e Livia, ferita, collabora meno finché
+   non la ripaga con una verità (nodo nascosto di riparazione).
 2. **Verificare una voce.** «Elena» chiede aiuto con urgenza credibile. *Verificare* costa tempo e un vantaggio (Rosa
    perde un'ora, un cantiere si chiude); *non verificare* non porta al finale peggiore, ma apre un rischio.
 3. **Tornare per qualcuno.** Rende disponibile la terza incursione. Il recupero **può riuscire**.
@@ -369,18 +374,21 @@ Il punto di non ritorno è segnalato dal telefono: una chiamata di Elena, vera o
   racconta una cosa vera. Rosa resta sulla strada.
 
 ### B1 · OSPITE INCONSAPEVOLE
-- **Condizioni:** varco aperto *senza* aver mai verificato Elena (o la voce in cui si riconosce), e almeno tre indizi
-  ignorati.
+- **Condizioni:** varco aperto *senza* aver mai verificato Elena (o la voce in cui si riconosce), e almeno **tre
+  verifiche proposte dal gioco e saltate** (non tre notifiche mai viste: tre volte che la scelta «verifica» è comparsa e
+  il giocatore l'ha lasciata).
 - **Esito:** il ritorno sembra riuscito.
-- **Epilogo:** Elena nomina con naturalezza «la zia Irene» e racconta una cena di famiglia. Nessuna Irene c'è mai stata.
-  Il protagonista confronta con un originale conservato fuori dalla rete: il rapporto prima non esisteva.
+- **Epilogo:** a cena è venuta **zia Irene**, la vedova di Claudio: una persona fisica, che Elena ha accolto davvero. Il
+  protagonista sa dal fascicolo di Livia che Irene è scomparsa da anni, e che Claudio non lasciò nessuna moglie. Qui non
+  serve alcuna memoria alterata: la presenza **ha preso il posto di una persona che non c'è** (regola 9).
 
 ### B2 · OSPITE CONSAPEVOLE
 - **Condizioni:** almeno tre prove indipendenti **e** un motivo costruito: `ottavioSalvo` è falso e Rosa o Livia
   sono bloccate dentro, oppure un patto è stato preso per salvare qualcuno. Il protagonista **sa** chi è la presenza.
 - **Esito:** apre il varco per far uscire una persona vera e accetta che la presenza esca con lei.
-- **Epilogo:** a una cena la presenza ha il posto di Elena (o di un'altra persona cara): il protagonista la guarda
-  e **non dice nulla**. Non è una sconfitta cieca, è un prezzo pagato con gli occhi aperti.
+- **Epilogo:** la presenza prende il posto di **Ottavio**, il disperso: Livia lo accoglie in casa, felice, e il protagonista
+  la guarda e **non dice nulla**. Elena è viva e sta bene: la presenza non può prendere il posto di chi c'è (regola 9).
+  Non è una sconfitta cieca, è un prezzo pagato con gli occhi aperti.
 
 ### C · CHIUSURA
 - **Condizioni:** `foto` (originale), `portaNota`, almeno 2 incursioni, rifiuto del patto e un rapporto con Livia.
@@ -610,3 +618,30 @@ schede delle auto, non ancora verificato); il comportamento della vendita delle 
 «non in vendita»); la capacità dell'app Foto di reggere la scena 04; la resa di sangue e volti in 2D a 720 righe.
 
 **Da calibrare giocando:** durata delle incursioni, numero di lampade, lunghezza dei sottotitoli, tempo delle pause.
+
+---
+
+## 14. Versione 03 · Risposte ai dubbi di Codex
+
+Codex, scrivendo il materiale, ha trovato buchi veri nella bozza. Questa è la risposta a ciascuno. Le righe in §2, §8 e §10
+sono già state corrette di conseguenza.
+
+| # | Dubbio | Risposta (**[P]**, da approvare) |
+| --- | --- | --- |
+| D01 | La presenza esce solo con un vivo che la riconosce, ma "Irene" torna a casa due anni dopo senza l'azione che li collega. | Nel −17 **Claudio rientra nella galleria a cercare Irene**, vede alla porta una donna con la sua faccia, dice «Irene» e cammina con lei fino all'uscita. È proprio il riconoscimento della regola. Claudio non è solo una vittima: ha aperto la porta per amore. |
+| D02 | B1: Elena parla di "zia Irene", ma la presenza non crea ricordi fuori dalla rete e Irene è esistita davvero. | Nuova **regola 9**: la presenza prende solo **il posto di chi non c'è**. In B1 a cena viene *zia Irene*, la vedova di Claudio, persona fisica accolta da Elena. Nessuna memoria alterata: il protagonista scopre che Irene è scomparsa da anni. |
+| D03 | B2: il posto di Elena, ma dov'è la vera Elena? | Con la regola 9 la presenza **non può prendere il posto di Elena**, che è viva. In B2 prende il posto di **Ottavio**: Livia lo accoglie felice e il protagonista tace. |
+| D04 | La foto di Irene alla porta nel −19 non dimostra che la donna del −17 sia un'altra. | La foto è del **−17**, non del −19: il fotogramma che Claudio ha scattato alla porta mostra la vera Irene col cappotto di quella sera e **nessuno nel punto** dove lui credeva di avere accanto la donna che ha portato fuori. Prova per assenza: da qui il sospetto del −12. |
+| D05 | Una porta sola, ma Claudio chiude accessi in molti luoghi. | **La porta** è il *confine*: l'unico varco da cui la presenza può uscire (è quello da cui è già passata). Le **uscite chiuse** sono le *diramazioni* che Claudio ha richiuso per impedire a un viaggiatore di raggiungere la porta e accompagnarla. Lo **svincolo che ritorna** è l'uscita autentica (A), cosa diversa. Il significato non cambia nei finali. |
+| D06 | Come si affida un originale a Livia che è fuori dalla rete? | Non si affida: **gli originali sono già da lei**. Il protagonista ha copie; manda la copia a Livia, che la confronta con l'originale e la **verifica**. Cambia il significato della scelta 1 (§8). |
+| D07 | Perché portare Marco costa foto, nastro o posto? | Il costo non è "ingombro": è **tempo di lampade e cosa si lascia a bordo**. Tre alternative concrete: **il carico** (il lavoro in corso, perso con la paga), **la copia di una prova** (si recupera da Livia, perdendo tempo), **una lampada in più** (rischio maggiore). Il «posto» diventa «tempo». |
+| D08 | I proprietari e le auto devono avere epoche compatibili. | −30 Panda (Route 66), −24 Opel Corsa (Hakone), −14 Grande Punto (Wangan), −19 Audi 80 (Claudio), −6 Volvo V40 (Ottavio). La Polo di Positano resta senza anno. Nessun'auto anacronistica. |
+| D09 | Positano: nessun proprietario o proprietario provvisorio? | Un proprietario **senza storia scritta**: nessuno ne conosce il nome, e la presenza non ha imparato nulla di lui. Positano è il luogo dell'uscita che cambia paese. |
+| D10 | Irene non parla. | **Resta muta.** Una sua prima battuta sarebbe un fatto nuovo e pesante: non si scrive. |
+| D11 | La presenza ascolta, quindi non può fallire sempre sulle stesse domande. | Ogni **domanda di casa funziona una volta**: dopo che la risposta vera è passata dal telefono, la presenza la sa. I nuclei 1-4 servono per il primo sospetto, i 5-8 sono verifiche deboli. Le prove forti sono sempre indipendenti (Livia, il vicino, gli originali). |
+| D12 | Quattro azioni finali contro un massimo di tre risposte. | Il limite di tre vale **solo per le conversazioni**. La scena «L'ultima porta» ha una sua interfaccia con quattro pulsanti. |
+| D13 | Il nastro supera i 90 caratteri. | Lo si legge a schermate come ha fatto Codex; si ascolta da fermo. |
+| D14 | Sei luoghi invece delle capitali. | Confermato (la bozza li usa già). **Resta una differenza dal desiderio iniziale dell'autore**, da non dare per scontata: se si vuole tornare alle capitali, si rifà §3bis. |
+| D15 | Conseguenze dei fallimenti non definite. | *Passaggio* → perdi la copia del nastro (la riascolti da Livia). *Tornare con qualcuno* → Marco resta dentro e ricompare come viaggiatore ambiguo, Rosa −5. *Recuperare* → `ottavioSalvo` falso, **mai** un successo fittizio. *Varco* → il varco resta aperto (+varchi) con una possibilità di richiuderlo. Nessuna perde una via, solo un'occasione. |
+| D16 | Che cosa conta come "indizio ignorato" in B1. | **Una verifica proposta dal gioco e lasciata cadere.** Tre volte. B2 conta comprensione e motivo, non un contatore alto. |
+| D17 | Scelte esclusive e contatori che non si revocano. | Oltre alla memoria (contatori e flag che non scendono) ci sono **stati attuali**: `patto` (nessuno · esplicito · sospeso · rifiutato), `varco` (chiuso · aperto · richiuso), `livia` (fiducia · rotta · riparata). Vale l'ultimo; la storia resta nel registro. |
