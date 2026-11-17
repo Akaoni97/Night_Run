@@ -166,7 +166,6 @@ h1 span { color: var(--amber); }
 @keyframes goalIn { from { transform: translateX(-12px); opacity: 0; } }
 .kbtn.first { background: linear-gradient(180deg, #4a6a12, #2a3e08); color: #f4ffd8; box-shadow: 0 0 14px rgba(184,255,58,.45); }
 #promptText { white-space: pre-line; }
-.rep { font-size: 12px; padding: 3px 6px; opacity: .45; } .rep.on { opacity: 1; color: var(--lime); } .rep b { display: inline-block; min-width: 26px; } .rep small { color: var(--muted); }
 .vg-group h4 { margin: 6px 0 4px; font: 600 12px/1 var(--f-data); letter-spacing: .08em; text-transform: uppercase; color: var(--place-col, var(--amber)); }
 .vg-group .row { display: flex; flex-wrap: wrap; gap: 6px; }
 .vg-group .kbtn small { display: block; opacity: .7; font-size: 10px; }
@@ -187,17 +186,13 @@ h1 span { color: var(--amber); }
   background: linear-gradient(90deg, #c4001f, #1c3cff); animation: siren .5s steps(2) infinite;
 }
 @keyframes siren { 50% { background: linear-gradient(90deg, #1c3cff, #c4001f); } }
-.racebox { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); text-align: center; pointer-events: none; }
-.racebox .big { font: 400 clamp(54px, 11vw, 120px)/1 var(--f-display); font-style: italic; color: var(--lime); text-shadow: 0 0 30px rgba(201,221,90,.6), 4px 4px 0 #0b2a00; }
-.racebox .big.red { color: var(--crit); text-shadow: 0 0 30px rgba(255,90,58,.6), 4px 4px 0 #2a0008; }
-.racebox .sub { font: 400 15px/1.3 var(--f-data); background: rgba(10,9,7,.75); padding: 6px 12px; display: inline-block; margin-top: 6px; }
 .prompt {
   position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); width: min(560px, calc(100% - 24px));
   background: linear-gradient(180deg, rgba(30,27,22,.96), rgba(14,12,10,.96)); padding: 14px 16px 12px; display: grid; gap: 8px;
   box-shadow: inset 0 0 0 1px #4a4234, inset 0 2px 0 var(--amber), 0 18px 40px rgba(0,0,0,.6);
 }
 .prompt h3 { margin: 0; font: 400 19px/1.1 var(--f-display); letter-spacing: .05em; text-transform: uppercase; font-style: italic; color: var(--amber); }
-.prompt.police h3 { color: var(--crit); } .prompt.race h3 { color: var(--lime); }
+.prompt.police h3 { color: var(--crit); }
 .prompt p { margin: 0; font-size: 15.5px; color: #f7d9ad; }
 .prompt .opts { display: flex; flex-wrap: wrap; gap: 8px; }
 .prompt .opts button {
@@ -344,51 +339,10 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .file { position: relative; overflow: hidden; }
 .file input, .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-/* ---- gara ---- */
-.tree { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); display: grid; gap: 7px; padding: 10px 8px; background: #05070c; box-shadow: inset 0 0 0 2px #2d2820; }
-.tree i { width: 26px; height: 26px; border-radius: 50%; background: #231e18; box-shadow: inset 0 0 0 2px #0b0e14; }
-.tree i.on.a { background: #ffb000; box-shadow: 0 0 16px #ffb000; }
-.tree i.on.gr { background: var(--lime); box-shadow: 0 0 22px var(--lime); }
-.tree i.on.rd { background: var(--crit); box-shadow: 0 0 22px var(--crit); }
-.revbar { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(560px, calc(100% - 120px)); display: grid; gap: 6px; }
-.rb-track { position: relative; height: 18px; background: rgba(12,11,9,.85); box-shadow: inset 0 0 0 1px #4a4234; transform: skewX(-14deg); overflow: hidden; }
-.rb-zone { position: absolute; top: 0; bottom: 0; background: rgba(201,221,90,.3); box-shadow: inset 0 0 0 2px var(--lime); }
-.rb-fill { position: absolute; left: 0; top: 4px; bottom: 4px; width: 0; background: linear-gradient(90deg, var(--amber), #ff2e63); }
-.rb-fill.ok { background: var(--lime); }
-.rb-lbl { font: 400 13px/1.2 var(--f-data); text-align: center; background: rgba(10,9,7,.75); padding: 4px 8px; justify-self: center; }
-.grade { position: absolute; left: 50%; top: 38%; transform: translate(-50%, -50%) skewX(-10deg); font: 400 clamp(28px, 6vw, 58px)/1 var(--f-display); font-style: italic; letter-spacing: .04em; opacity: 0; pointer-events: none; text-shadow: 3px 3px 0 #000; transition: opacity .2s; }
-.grade.show { opacity: 1; }
-.grade.perfetta { color: var(--lime); } .grade.buona { color: var(--amber); } .grade.anticipata { color: var(--warn); } .grade.tardi { color: var(--crit); }
-.result { position: absolute; inset: 0; margin: auto; width: min(460px, calc(100% - 24px)); height: max-content; background: linear-gradient(180deg, rgba(30,27,22,.97), rgba(12,11,9,.97)); padding: 18px; display: grid; gap: 12px; box-shadow: inset 0 0 0 1px #4a4234, inset 0 3px 0 var(--lime), 0 20px 60px rgba(0,0,0,.7); }
-.result.lose { box-shadow: inset 0 0 0 1px #4a1d2a, inset 0 3px 0 var(--crit), 0 20px 60px rgba(0,0,0,.7); }
-.res-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.res-head span { font: 400 34px/1 var(--f-display); font-style: italic; color: var(--lime); text-shadow: 0 0 18px rgba(201,221,90,.45); }
-.result.lose .res-head span { color: var(--crit); text-shadow: 0 0 18px rgba(255,90,58,.45); }
-.res-head small { color: var(--muted); font-size: 14px; }
-.res-times { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.res-times div { background: #0e0d0b; padding: 8px 10px; box-shadow: inset 0 0 0 1px var(--line); }
-.res-times b { display: block; font: 400 11px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.res-times span { font: 400 28px/1.15 var(--f-display); font-variant-numeric: tabular-nums; }
-.res-dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 15px; }
-.res-dl dt { font: 400 12px/1.6 var(--f-data); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.res-dl dd { margin: 0; }
-.res-gain { font: 400 22px/1 var(--f-display); color: var(--lime); }
-.res-gain.neg { color: var(--crit); }
 .go { border: 0; background: var(--lime); color: #141a04; padding: 12px; font: 400 16px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
 .go.small { padding: 10px 26px; font-size: 15px; }
 .go:disabled { background: #26221c; color: var(--muted); cursor: not-allowed; }
 .go kbd { margin-left: 8px; background: transparent; border-color: rgba(0,0,0,.3); color: #141a04; }
-/* ---- scala dei rivali ---- */
-.lad-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-.rv { background: #0e0d0b; box-shadow: inset 0 0 0 1px var(--line); padding: 10px 12px; display: grid; gap: 3px; min-width: 0; }
-.rv b { font: 400 16px/1.1 var(--f-display); font-style: italic; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rv span { font-size: 14px; color: #c8bca4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rv small { font: 400 12.5px/1.3 var(--f-data); color: var(--muted); }
-.rv.done { opacity: .5; } .rv.done b::after { content: " ✓"; color: var(--lime); }
-.rv.cur { box-shadow: inset 0 0 0 2px var(--amber), 0 0 18px rgba(255,179,71,.18); }
-.rv.boss b { color: var(--pink); }
-.lad-foot { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-.lad-foot .hint { max-width: 70ch; }
 /* ---- barre prestazioni ---- */
 .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 .st { display: grid; gap: 5px; min-width: 0; }
@@ -558,7 +512,6 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   .tele { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .pods { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lad-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .trunk-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .extras { grid-template-columns: 1fr 1fr; }
@@ -578,9 +531,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   .prompt { padding: 10px 12px; } .prompt p { font-size: 14px; }
   .toasts { top: auto; bottom: 50%; }
   .roadbar .hint { margin-left: 0; }
-  .tree { left: 8px; } .tree i { width: 18px; height: 18px; }
   .lanebtn { width: 38px; height: 38px; bottom: 8px; font-size: 16px; opacity: .8; } .lanebtn small { display: none; } .lanebtn.l { left: 6px; } .lanebtn.r { right: 6px; }
-  .revbar { width: calc(100% - 60px); left: auto; right: 8px; transform: none; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
@@ -859,28 +810,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <button class="radio-chip" type="button" id="radioBtn" aria-label="Autoradio: cambia stazione (P)"><i aria-hidden="true">▶</i><b id="radioFreq">FM 89.7</b><span id="radioName">Redline at Midnight</span><small>P</small></button>
       <div class="replay-tag" id="replayTag" hidden>● REPLAY <small>un tasto per uscire</small></div>
       <div class="radar" id="radar" hidden>POLIZIA</div>
-      <div class="racebox" id="raceBox" hidden><div class="big" id="raceBig"></div><div class="sub" id="raceSub"></div></div>
-      <div class="tree" id="tree" hidden aria-hidden="true"><i class="a"></i><i class="a"></i><i class="a"></i><i class="gr"></i><i class="rd"></i></div>
-      <div class="revbar" id="revBar" hidden>
-        <div class="rb-track"><div class="rb-zone" id="rbZone"></div><div class="rb-fill" id="rbFill"></div></div>
-        <div class="rb-lbl" id="rbLbl">Freno + gas: giri nella zona verde, molla il freno al verde</div>
-      </div>
-      <div class="grade" id="grade"></div>
-      <div class="result" id="resultBox" hidden>
-        <div class="res-head"><span id="resWin">VITTORIA</span><small id="resVs"></small></div>
-        <div class="res-times">
-          <div><b>Tu</b><span id="resYou">—</span></div>
-          <div><b id="resRvName">Rivale</b><span id="resRv">—</span></div>
-        </div>
-        <dl class="res-dl">
-          <dt>Reazione</dt><dd id="resReact">—</dd>
-          <dt>Partenza</dt><dd id="resLaunch">—</dd>
-          <dt>Cambiate</dt><dd id="resShifts">—</dd>
-          <dt>Velocità d'arrivo</dt><dd id="resV">—</dd>
-        </dl>
-        <div class="res-gain" id="resGain"></div>
-        <button class="go" type="button" id="resOk">Continua <kbd>Invio</kbd></button>
-      </div>
       <div class="toasts" id="toasts" aria-live="polite"></div>
       <canvas id="hudG" aria-hidden="true"></canvas>
       <div class="dash" id="dash">
@@ -889,7 +818,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
           <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
           <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
-          <button type="button" id="dbFlash" title="Sfanala (F): chiedi strada o lancia una sfida">FARI</button>
+          <button type="button" id="dbFlash" title="Sfanala (F): chiedi strada">FARI</button>
           <button type="button" id="dbMap" title="Mappa del mondo (T)">MAPPA</button>
           <button type="button" id="dbWin" title="Finestrini: apri e chiudi (8)">FINESTR.</button>
         </div>
@@ -946,13 +875,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica 3D"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option></select></label>
       <p class="hint"><span id="g3dName">modello di base</span> · trascina per girare la visuale</p>
     </div>
-  </section>
-
-  <section class="panel ladder cutbox" aria-labelledby="ladTitle">
-    <h2 id="ladTitle">Scala dei rivali <em id="ladZone">Porto</em></h2>
-    <div class="lad-row" id="ladRow"></div>
-    <div class="lad-foot"><p class="hint" id="ladHint">Batti i rivali in ordine: il capo del quartiere apre il successivo. Le sfide della scala non costano niente: se vinci incassi il premio.</p>
-      <button class="go small" type="button" id="ladGo">Sfida</button></div>
   </section>
 
   <section class="deck">
@@ -1030,7 +952,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       </div>
       <p class="hint" id="limHint"></p>
       <div class="field"><span>Strumenti tuning</span><div class="toggles" id="podSel"></div></div>
-      <div class="field"><span>Reputazione di strada</span><div id="repBox"></div></div>
       <p class="hint" id="ecuHint"></p>
     </div>
   </section>
@@ -1430,12 +1351,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function shiftTo(g) {
     ensureAudio();
     const before = sim.gear;
-    const grade = game.race && game.race.phase === 'run' && g > before && before > 0 && !sim.shiftSeq ? game.gradeShift() : null;
-    const free = grade ? null : freeShiftGrade(before, g);
+    const free = freeShiftGrade(before, g);
     if (free === 'perfetta') sim.fastShift = true;
     const ok = sim.shift(g);
-    if (grade) { if (ok) { showGrade(grade); if (grade === 'perfetta' || grade === 'tardi') animeShift(grade); else comboN = 0; } else { game.race.shifts.pop(); sim.fastShift = false; } }
-    else if (free && ok) animeShift(free);
+    if (free && ok) animeShift(free);
     else if (ok && g > before && before > 0) comboN = 0;
     if (!ok) sim.fastShift = false;
     if (!ok && g !== before && !sim.shiftSeq) {
@@ -1486,7 +1405,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (e.key === 'Escape' && (showOn || !$('photoBox').hidden)) { if (!$('photoBox').hidden) $('photoBox').hidden = true; else closeShowroom(); return; }
     let k = e.key.toLowerCase(); k = KEYMAP[k] || k;
     if ([' ', 'w', 's', 'e', 'q'].includes(k) || e.key.startsWith('Arrow')) e.preventDefault();
-    if (e.key === 'Enter') { e.preventDefault(); if (game.result) { closeResult(); return; } if (!e.repeat) startOn(); return; }
+    if (e.key === 'Enter') { e.preventDefault(); if (!e.repeat) startOn(); return; }
     if (e.repeat) return;
     ensureAudio(); hideGate();
     keys.add(k);
@@ -1514,7 +1433,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'g') openShowroom();
     else if (k === 'x') takePhoto();
     else if (k === 'y') startReplay();
-    else if ((k === 'a' || k === 'd') && game.race) flash('In gara si resta nella propria corsia', 1.4);
     else if (k === 'l') { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); }
     else if (k === 'm') { S.muted = !S.muted; applySettings(); }
   });
@@ -1556,7 +1474,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     padPrev[3] = y;
   }
 
-  let revT = 0;
   function updateInputs(dt) {
     const k = (c) => keys.has(c);
     const tgt = (p, key) => {
@@ -1567,11 +1484,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     };
     const ramp = (cur, t, up, down) => (t.direct ? t.v : t.v > cur ? Math.min(t.v, cur + up * dt) : Math.max(t.v, cur - down * dt));
     const tThr = tgt('thr', k('w'));
-    if (game.race && game.race.phase === 'count' && !tThr.direct) {
-      // semaforo da tastiera: W tenuto fa salire i giri, rilasciato li fa scendere piano (si dosa a colpetti)
-      revT = Math.max(sim.P.idle, Math.min(sim.P.limiter - 200, revT + (k('w') ? 2600 : -1300) * dt));
-      inp.thr = Math.max(0, Math.min(1, 0.08 + (revT - sim.rpm) / 1400));
-    } else { revT = sim.rpm; inp.thr = ramp(inp.thr, tThr, 18, 22); }
+    inp.thr = ramp(inp.thr, tThr, 18, 22);
     inp.brake = ramp(inp.brake, tgt('brake', k('s')), 14, 16);
     inp.clutch = ramp(inp.clutch, tgt('clutch', k(' ')), 9, 2.3);
     if (game.s.vg && game.s.vg.weak) inp.thr *= 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 170));   // fame e sete: le mani non rispondono
@@ -1980,7 +1893,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       + stat('Trazione', fmt(sim.P.mu, 2) + ' μ', (sim.P.mu - 0.9) / 0.75)
       + stat('Peso/potenza', fmt(kgcv, 2) + ' kg/CV', (6.2 - kgcv) / 4.5)
       + stat('400 m stimati', fmt(et, 1) + ' s', (15.5 - et) / 6);
-    if (typeof renderLadder === 'function' && $('ladRow')) renderLadder();
     $('tuneSum').textContent = `${fmt(Math.round(est.cv / 5) * 5)} CV a ${fmt(est.rpmCv)} · ${fmt(Math.round(est.nm / 5) * 5)} Nm · ${fmt(TP.sim.turbo.max, 2)} bar · limitatore ${fmt(TP.sim.limiter)}`;
   }
 
@@ -2089,7 +2001,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function presetCost(p) { return Object.entries(p.sel).reduce((a, [k, id]) => a + game.price(k, id), 0); }
   function mountPart(k, id, selEl) {
     const revert = () => { if (selEl) selEl.value = S.tune[k]; };
-    if (!game.canMount()) { revert(); flash(game.race ? 'Non durante una sfida' : 'Le parti si montano da fermo: accosta e frena', 2.4); return; }
+    if (!game.canMount()) { revert(); flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
     if (game.needsShop()) { revert(); flash('I pezzi li monta Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
     if (!game.owns(k, id)) {
       const r = game.buy(k, id);
@@ -2299,7 +2211,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function travelTo(id) {
     if (game.s.vg) { flash('Nel viaggio si va solo avanti: la mappa ti mostra dove sei', 2.2); return; }
     if (Math.abs(sim.v) > 0.8) { flash('Fermati prima di partire: l\'auto va caricata sulla bisarca', 2.2); return; }
-    if (game.race) { flash('Prima finisci la gara', 1.6); return; }
     const L = GAME_LOCS.find((l) => l.id === id); if (!L) return;
     document.body.classList.add('travel');
     setTimeout(() => {
@@ -2713,7 +2624,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const touching = keys.size > 0 || btnSteer.L || btnSteer.R || inp.touch.thr !== null || inp.touch.brake !== null || inp.touch.clutch !== null
       || (inp.pad.thr || 0) > 0.02 || (inp.pad.brake || 0) > 0.02 || Math.abs(inp.pad.steer || 0) > 0.12;
     if (touching) auto.last = now;
-    const can = S.autoLane !== false && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > 4 && !game.race && !game.ap && !game.inside && game.track === 'city' && !rp.on;
+    const can = S.autoLane !== false && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > 4 && !game.ap && !game.inside && game.track === 'city' && !rp.on;
     const want = can && now - auto.last > 3000;
     if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`Guida automatica: ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
     if (!want && auto.on && touching) flash('Guidi tu', 0.8);
@@ -2752,18 +2663,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('dbMap').addEventListener('click', () => toggleWorldMap());
   $('dbWin').addEventListener('click', toggleWindows);
   $('dbFlash').addEventListener('click', sfanala);
-  // abbaglianti: un colpo di fari a chi sta davanti (chiede strada o lancia una sfida di 2 km)
+  // abbaglianti: un colpo di fari a chi sta davanti (chiede strada)
   function sfanala() {
     S.high = true; setTimeout(() => { S.high = false; }, 350);
     const r = game.flashLights();
     if (!r) flash('Lampeggi', 0.6);
-  }
-  // reputazione di strada: vinte, perse e cosa si sblocca
-  let repT = 0;
-  function renderRep() {
-    const box = $('repBox'); if (!box) return; const r = game.streetRep();
-    box.innerHTML = `<p class="hint"><b>${r.w}</b> vinte · <b>${r.l}</b> perse · reputazione <b>${r.rep}</b>. Sfanala (F) chi ti sta davanti: se ci sta, sono ${ST_RACE_M / 1000} km, chi arriva davanti vince.</p>`
-      + ST_REP_PERKS.map((p) => `<div class="rep ${r.rep >= p.rep ? 'on' : ''}"><b>${p.rep}</b> ${p.name} <small>${p.note}</small></div>`).join('');
   }
   // ---------------------------------------------------------------- cruscotto in alta definizione (hudpro.js)
   function hudData() {
@@ -2811,7 +2715,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // In gara il voto conta per il risultato; fuori dalla gara la perfetta dà comunque il cambio rapido e la scritta.
   let comboN = 0, animeT = null;
   function freeShiftGrade(before, g) {
-    if (game.race || !(g > before && before > 0) || sim.shiftSeq || !sim.running) return null;
+    if (!(g > before && before > 0) || sim.shiftSeq || !sim.running) return null;
     const z = shiftZone(), rpm = sim.rpm;
     if (sim.cut === 2 || rpm >= z.hi) return 'tardi';
     if (rpm >= z.lo) return 'perfetta';
@@ -2964,7 +2868,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     heatPips.forEach((p, i) => p.classList.toggle('on', s.heat > i + 0.05));
     $('hudDist').textContent = fmt(s.dist / 1000, 1);
     renderTrip(); game.paintHex = carPaint(); dashBtns();
-    repT += dt; if (repT > 1) { repT = 0; renderRep(); }
     { const pro = !$('hudP').hidden; $('hudDist').parentElement.hidden = pro; $('hudFuelTag').hidden = pro; }   // km e benzina sono già nel cruscotto
     const liters = sim.fuel * sim.P.tank;
     $('hudFuel').textContent = fmt(liters, 1) + ' L' + (sim.fuelRate > 0.0008 ? ` · ${fmt(sim.fuelRate * 3600, 0)} L/h` : '');
@@ -2973,37 +2876,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     jb.hidden = !j;
     if (j) jb.innerHTML = `<b>CONSEGNA</b>${fmt(Math.max(0, j.to - s.dist) / 1000, 1)} km · ${Math.max(0, Math.ceil((j.deadline - j.t) / 60))} min per il bonus`;
     const rd = game.mode === 'career' ? game.radar() : null;
-    $('radar').hidden = rd === null || !!game.race;
+    $('radar').hidden = rd === null;
     if (rd !== null) $('radar').textContent = `POLIZIA ${Math.round(rd / 10) * 10} m${sim.gear === sim.topGear() && sim.gear >= 5 ? ' · SCALA UNA MARCIA' : ''}`;
-    // sfida: semaforo, zona verde dei giri, indicatore di cambiata
-    const R = game.race, rb = $('raceBox'), tree = $('tree'), rv = $('revBar');
-    const lamps = tree.children;
-    tree.hidden = !(R && (R.phase === 'count' || (R.phase === 'run' && R.tt < 1.2)));
-    if (R && R.phase === 'count') {
-      lamps[0].classList.toggle('on', R.t < 2.7); lamps[1].classList.toggle('on', R.t < 1.8); lamps[2].classList.toggle('on', R.t < 0.9);
-      lamps[3].classList.remove('on'); lamps[4].classList.remove('on');
-    } else if (R && R.phase === 'run') { for (let i = 0; i < 3; i++) lamps[i].classList.remove('on'); lamps[3].classList.add('on'); }
-    rv.hidden = !R || R.phase === 'stage';
-    if (R && R.phase !== 'stage') {
-      const max = 8000, lim = sim.P.limiter;
-      const z = R.phase === 'count' ? R.zone : { lo: lim - 420, hi: lim - 40 };
-      $('rbZone').style.left = (z.lo / max * 100) + '%'; $('rbZone').style.width = ((z.hi - z.lo) / max * 100) + '%';
-      const inZ = sim.rpm >= z.lo && sim.rpm <= z.hi;
-      $('rbFill').style.width = Math.min(100, sim.rpm / max * 100) + '%'; $('rbFill').classList.toggle('ok', inZ);
-      $('rbLbl').textContent = R.phase === 'count'
-        ? (sim.gear < 1 ? 'Metti la prima (E)' : `Freno + colpetti di gas: tieni ${fmt(z.lo)}–${fmt(z.hi)} giri, molla il freno al verde`)
-        : (sim.gear >= 6 ? 'Sesta: tutto giù fino al traguardo' : inZ ? 'CAMBIA ORA' : `Cambia tra ${fmt(z.lo)} e ${fmt(z.hi)} giri`);
-    }
-    if (R) {
-      rb.hidden = false;
-      $('raceBig').textContent = R.phase === 'run' && R.tt < 0.8 ? 'VIA' : ''; $('raceBig').classList.remove('red');
-      const riv = game.ents.find((e) => e.kind === 'rival'), gap = riv && R.x0 !== undefined ? (s.dist - riv.x) : 0;
-      $('raceSub').textContent = R.phase === 'stage' ? `Accosta al semaforo · ${R.rv.name}, ${R.rv.car}`
-        : R.phase === 'count' ? `${R.rv.name} · ${R.rv.car} · ${R.ladder !== undefined ? 'premio € ' + fmt(R.prize) : 'posta € ' + fmt(R.stake)}`
-        : `${fmt(Math.max(0, 402 - (s.dist - R.x0)))} m all'arrivo · ${gap >= 0 ? 'davanti' : 'dietro'} di ${fmt(Math.abs(gap), 1)} m`;
-    } else rb.hidden = true;
-    if (game.result && $('resultBox').hidden) showResult(game.result);
-    if (garage && garage.raceCam) garage.raceCam(!!R && R.phase !== 'stage');
     // proposta
     const P = game.prompt, pb = $('promptBox');
     if (P !== promptShown) {
@@ -3043,70 +2917,21 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     svcT += dt; if (svcT > 0.5) { svcT = 0; game.tireId = S.tune.tires; renderServices(); if (street2d) { if (cosPrev) applyCos(cosPrev); else street2d.setCosmetics(cosView()); } TP.sim.maint = game.maint(); sim.tune.maint = TP.sim.maint;
       const sig = JSON.stringify(game.s.trunk) + game.mode + Math.floor(game.s.money); if (sig !== trunkSig) { trunkSig = sig; renderTrunk(); } }
   }
-  // ---------------------------------------------------------------- gara: giudizi e risultato
-  const GRADE_TXT = { perfetta: 'CAMBIATA PERFETTA', buona: 'BUONA', anticipata: 'ANTICIPATA', tardi: 'TARDI' };
-  let gradeT = null;
-  function showGrade(g) {
-    const el = $('grade'); el.textContent = GRADE_TXT[g]; el.className = 'grade show ' + g;
-    clearTimeout(gradeT); gradeT = setTimeout(() => el.classList.remove('show'), 900);
-  }
-  function showResult(r) {
-    const box = $('resultBox'); box.hidden = false; box.classList.toggle('lose', !r.win);
-    $('resWin').textContent = r.win ? (r.zoneDone ? 'QUARTIERE TUO' : 'VITTORIA') : r.why && /falsa/i.test(r.why) ? 'FALSA PARTENZA' : 'SCONFITTA';
-    $('resVs').textContent = `contro ${r.rv.name} · ${r.rv.car}`;
-    $('resYou').textContent = r.you ? fmt(r.you, 3) + ' s' : '—';
-    $('resRvName').textContent = r.rv.name; $('resRv').textContent = fmt(r.et, 3) + ' s';
-    $('resReact').textContent = r.react !== undefined ? fmt(r.react, 3) + ' s' : '—';
-    $('resLaunch').textContent = r.launch ? `${r.launch} a ${fmt(Math.round(r.launchRpm / 50) * 50)} giri` : '—';
-    const c = (g) => r.shifts.filter((x) => x === g).length;
-    $('resShifts').textContent = r.shifts.length ? `${c('perfetta')} perfette su ${r.shifts.length}${c('tardi') ? ` · ${c('tardi')} in ritardo` : ''}${c('anticipata') ? ` · ${c('anticipata')} anticipate` : ''}` : '—';
-    $('resV').textContent = r.vmax ? fmt(r.vmax) + ' km/h' : '—';
-    const gEl = $('resGain');
-    gEl.textContent = game.mode === 'free' ? 'Modalità libera: nessun premio' : r.gain > 0 ? `+ € ${fmt(r.gain)}` : r.gain < 0 ? `− € ${fmt(-r.gain)}` : 'Nessun premio';
-    gEl.classList.toggle('neg', r.gain < 0);
-    renderLadder();
-  }
-  function closeResult() { game.result = null; $('resultBox').hidden = true; saveGame(); }
-  $('resOk').addEventListener('click', closeResult);
-
-  // ---------------------------------------------------------------- scala dei rivali
-  function renderLadder() {
-    let base = 0, zi = 0, idx = game.s.ladder || 0;
-    while (zi < GAME_LADDER.length - 1 && idx >= base + GAME_LADDER[zi].rivals.length) { base += GAME_LADDER[zi].rivals.length; zi++; }
-    const z = GAME_LADDER[zi], all = idx >= GAME_LADDER.reduce((a, q) => a + q.rivals.length, 0);
-    $('ladZone').textContent = all ? 'città conquistata' : `quartiere ${zi + 1} di ${GAME_LADDER.length} · ${z.zone}`;
-    $('ladRow').innerHTML = z.rivals.map((r, i) => {
-      const k = base + i, cls = k < idx ? 'done' : k === idx ? 'cur' : '';
-      return `<div class="rv ${cls} ${r.boss ? 'boss' : ''}"><b>${r.boss ? 'Capo · ' : ''}${r.name}</b><span>${r.car}</span><small>400 m in ${fmt(r.et, 1)} s · premio € ${fmt(r.prize)}</small></div>`;
-    }).join('');
-    const next = game.ladderRival();
-    $('ladGo').disabled = !next || !!game.race;
-    $('ladGo').textContent = next ? `Sfida ${next.name}` : 'Tutti battuti';
-    $('ladHint').textContent = all ? 'Hai battuto tutti i capi. Continua a girare per sfide di strada e consegne.'
-      : `Tu: circa ${fmt(game.etEstimate(), 1)} s stimati sui 400 m. Batti i rivali in ordine: il capo apre il quartiere successivo. Se perdi non paghi niente.`;
-  }
-  $('ladGo').addEventListener('click', () => {
-    ensureAudio(); hideGate();
-    if (!sim.running) { flash('Accendi il motore: I e poi Invio tenuto premuto', 2.5); return; }
-    if (game.startLadder()) renderLadder();
-  });
-
   function renderMode() {
     const cur = S.trip ? 'trip' : game.track === 'mountain' ? 'mountain' : game.mode;
     $('btnNew').textContent = S.trip ? 'Nuovo viaggio' : 'Nuova carriera';
-    const lad = document.querySelector('section.panel.ladder'); if (lad) lad.hidden = !!S.trip;   // nel viaggio niente scala dei rivali
     document.querySelectorAll('#modeSw button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === cur)));
     $('career').classList.toggle('free', game.mode === 'free');
     $('shopNote').textContent = game.mode === 'free'
       ? 'Modalità libera: tutte le parti sono gratis e si montano anche in movimento. I marchi indicano parti reali; il suono è una nostra modellazione fisica.'
       : 'Le parti si pagano coi contanti della carriera e si montano solo da fermo. I marchi indicano parti reali; il suono è una nostra modellazione fisica.';
-    renderTuning(); renderLadder();
+    renderTuning();
   }
   // pulsanti ◀ ▶: si tengono premuti per sterzare (anche col dito)
   const btnSteer = { L: 0, R: 0 };
   for (const [id, key] of [['laneL', 'L'], ['laneR', 'R']]) {
     const el = $(id);
-    el.addEventListener('pointerdown', (e) => { e.preventDefault(); ensureAudio(); btnSteer[key] = 1; if (game.race) flash('In gara si resta nella propria corsia', 1.4); try { el.setPointerCapture(e.pointerId); } catch (_) {} });
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); ensureAudio(); btnSteer[key] = 1; try { el.setPointerCapture(e.pointerId); } catch (_) {} });
     for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(ev, () => { btnSteer[key] = 0; });
   }
   $('carSw').addEventListener('change', (e) => {
@@ -3124,7 +2949,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (S.trip) switchTrip(false);
     // "Montagna" è la modalità libera sulla strada di montagna (solo vista 3D: in 2D le curve non si vedono)
     const mtn = b.dataset.m === 'mountain';
-    game.mode = mtn ? 'free' : b.dataset.m; game.track = mtn ? 'mountain' : 'city'; game.prompt = null; game.ap = null; game.race = null; game.ents = [];
+    game.mode = mtn ? 'free' : b.dataset.m; game.track = mtn ? 'mountain' : 'city'; game.prompt = null; game.ap = null; game.ents = [];
     game.laneZ = mtn ? 0 : GAME_LANE_Z[1]; game.lane = 1; game.free = false; game.relYaw = 0; game.steerAngle = 0; sim.grade = 0; game.mtnCars = null; if (mtn) game.laneZ = 2;
     if (mtn && S.look === '2d') { S.look = 'smooth'; applyLook(); }
     if (mtn) flash('Strada di montagna: tieni la Supra in strada con A/D, in curva ti spinge verso l\'esterno', 3.5);
@@ -3424,7 +3249,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // inquadrature che cambiano ogni ~3 secondi di replay (in 3D)
     const shot = Math.floor(rp.t / 3) % 4;
     if (street3d && garage === street3d && shot !== rp.shot) { rp.shot = shot; street3d.setView(['side', 'chase', 'hood', 'side'][shot]); }
-    const fake = { s: { dist: f.dist }, laneZ: f.laneZ, relYaw: f.relYaw, steerAngle: f.steerAngle, track: f.track, ents: f.ents, mtnCars: f.mtn, fx: [], signal: f.signal, race: null, free: true, steerIn: 0 };
+    const fake = { s: { dist: f.dist }, laneZ: f.laneZ, relYaw: f.relYaw, steerAngle: f.steerAngle, track: f.track, ents: f.ents, mtnCars: f.mtn, fx: [], signal: f.signal, free: true, steerIn: 0 };
     const vs = Object.assign({}, f.vs, { events: [] });
     if (Math.random() < 0.5 * dt * 60 && f.vs.flame) vs.flame = f.vs.flame;
     if (audio.ready) audio.send({ p: f.ap, ev: [] });

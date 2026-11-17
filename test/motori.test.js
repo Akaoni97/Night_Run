@@ -195,30 +195,6 @@ test('distributore: il pieno ferma l\'auto, riempie il serbatoio e scala i soldi
   assert.ok(money - game.s.money > 80 && money - game.s.money < 100);
 });
 
-test('sfida: semaforo, conto alla rovescia, 400 m e pagamento', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'Test', car: 'Test' }, 300);
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  assert.equal(game.race.phase, 'count');
-  sim.shift(1);
-  play(sim, game, 3.3, () => ({ thr: 0, brake: 1 }));
-  assert.equal(game.race.phase, 'run');
-  const money = game.s.money;
-  play(sim, game, 25, flatOut);
-  assert.equal(game.race, null);
-  assert.ok(game.lastRace && Math.abs(game.s.money - money) === 300);
-});
-
-test('sfida: partire prima del via è falsa partenza', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'Test', car: 'Test' }, 200);
-  sim.shift(1);
-  play(sim, game, 1.5, () => ({ thr: 0, brake: 1 }));
-  play(sim, game, 2, flatOut);
-  assert.equal(game.race, null);
-  assert.equal(game.lastRace.win, false);
-});
-
 test('officina: si compra solo con i soldi sufficienti', () => {
   const { game } = career();
   assert.equal(game.owns('turbo', 't51r'), false);
@@ -228,53 +204,6 @@ test('officina: si compra solo con i soldi sufficienti', () => {
   assert.equal(game.buy('bov', 'ssqv').ok, true);
   assert.equal(game.s.money, 3000 - 380);
   assert.ok(game.owns('bov', 'ssqv'));
-});
-
-test('gara: la cambiata vicino al limitatore è perfetta e più rapida', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'T', car: 'T' }, 0, { et: 30 });
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  sim.shift(1);
-  play(sim, game, 3.7, () => ({ thr: 0.6, brake: 1 }));
-  assert.equal(game.race.phase, 'run');
-  let fastT = null, slowT = null;
-  // prima → seconda a regime perfetto (ci si ferma appena la cambiata è finita)
-  for (let n = 0; n < 400 && !(fastT !== null && !sim.shiftSeq); n++) play(sim, game, 1 / 60, (s) => {
-    if (s.gear === 1 && s.rpm > s.P.limiter - 300 && !s.shiftSeq) { assert.equal(game.gradeShift(), 'perfetta'); s.shift(2); fastT = 0; }
-    if (fastT !== null && s.shiftSeq) fastT += 1 / 60;
-    return { thr: 1, brake: 0 };
-  });
-  // seconda → terza troppo presto
-  play(sim, game, 0.2, (s) => {
-    if (s.gear === 2 && !s.shiftSeq && slowT === null) { assert.equal(game.gradeShift(), 'anticipata'); s.shift(3); slowT = 0; }
-    if (slowT !== null && s.shiftSeq) slowT += 1 / 60;
-    return { thr: 1, brake: 0 };
-  });
-  play(sim, game, 0.4, (s) => { if (s.shiftSeq) slowT += 1 / 60; return { thr: 1, brake: 0 }; });
-  assert.ok(fastT < slowT, `perfetta ${fastT.toFixed(2)} s, normale ${slowT.toFixed(2)} s`);
-  assert.deepEqual(game.race.shifts, ['perfetta', 'anticipata']);
-});
-
-test('scala dei rivali: vincere avanza, perdere non costa', () => {
-  const { sim, game } = career();
-  assert.equal(game.ladderRival().name, 'Tommy');
-  const money = game.s.money;
-  game.startLadder();
-  game.race.et = 99;                         // rivale lentissimo: si vince
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  sim.shift(1);
-  play(sim, game, 3.7, () => ({ thr: 0, brake: 1 }));
-  play(sim, game, 30, flatOut);
-  assert.ok(game.result && game.result.win);
-  assert.equal(game.s.ladder, 1);
-  assert.equal(game.s.money, money + 300);
-  game.result = null;
-  game.startLadder();
-  game.race.et = 1;                          // rivale imbattibile
-  play(sim, game, 40, (s, t) => (game.race && game.race.phase !== 'run' ? { thr: 0, brake: 1 } : flatOut(s)));
-  assert.equal(game.result.win, false);
-  assert.equal(game.s.ladder, 1);
-  assert.equal(game.s.money, money + 300);
 });
 
 test('gomme da drag: più aderenza e tempo stimato migliore', () => {
@@ -459,8 +388,8 @@ test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e 
   t = take(); assert.ok(!t.r.ok && /rimorchietto/.test(t.r.why));
   game.s.vg.trailer = true; game.s.vg.trailerOn = true;
   t = take(); assert.ok(t.r.ok, t.r.why); assert.equal(deliver(), 15000);
-  // 5. la busta: senza vittoria paga poco, con la vittoria piena
-  t = take(); assert.ok(t.r.ok); game.streetRep().w++; assert.equal(deliver(), 12000);
+  // 5. la busta: un pacco semplice, paga piena
+  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 12000);
   // 6. la chiave, poi i lavori senza fine
   t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 20000);
   t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 7000, 'i lavori dopo la catena pagano ancora');

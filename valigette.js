@@ -2,7 +2,7 @@
 //  Night Run · Le valigette (dopo telefono.js)
 //  Valigette da aprire con dentro premi di sei rarità: comune, non comune, raro, epico, mitico, leggendario.
 //  - Si comprano nell'app Valigette del telefono (bronzo, argento, oro: cambiano le probabilità, non i premi) e si
-//    guadagnano coi lavori (catena di missioni, primo lavoro, consegne) e con le sfide vinte con gli abbaglianti.
+//    guadagnano coi lavori (catena di missioni, primo lavoro, consegne).
 //  - Premi: soldi, oggetti, ticket (tagliando gratis da Niko, modifica gratuita da Luca), potenziamenti del motore
 //    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo, kit turbo,
 //    e nel leggendario un'auto in regalo.
@@ -147,15 +147,14 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     return r;
   };
 
-  // ricompense: si guardano i contatori che il gioco tiene già (missioni, lavori, sfide vinte)
+  // ricompense: si guardano i contatori che il gioco tiene già (missioni, lavori)
   P.caseRewards = function () {
     const v = this.s.vg; if (!v || !v.on) return;
-    const C = this.cases(), S = C.seen, wins = this.streetRep ? this.streetRep().w : 0;
-    if (S.mis === undefined) Object.assign(S, { mis: v.misDone || 0, first: !!v.firstDone, jobs: v.jobs || 0, wins });   // da qui in avanti, niente arretrati
+    const C = this.cases(), S = C.seen;
+    if (S.mis === undefined) Object.assign(S, { mis: v.misDone || 0, first: !!v.firstDone, jobs: v.jobs || 0 });   // da qui in avanti, niente arretrati
     if (v.firstDone && !S.first) { S.first = true; this.caseGrant('bronzo', 'il primo lavoro'); }
     while ((v.misDone || 0) > S.mis) { S.mis++; this.caseGrant(S.mis % 3 === 0 ? 'oro' : 'argento', `lavoro ${S.mis} della catena`); }
     while ((v.jobs || 0) > S.jobs) { S.jobs++; if ((S.jobs * 7919 % 100) < 22) this.caseGrant('bronzo', 'una consegna'); }
-    while (wins > S.wins) { S.wins++; this.caseGrant(S.wins % 5 === 0 ? 'argento' : 'bronzo', 'sfida vinta'); }
   };
 })();
 
@@ -558,7 +557,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
       }).join('') + `<p class="cen" style="font-size:11px">Garanzia: almeno un raro ogni ${CASE_PITY.raro} valigette, un epico ogni ${CASE_PITY.epico}. Si comprano solo coi soldi del viaggio.</p>`;
     } else if (UI.tab === 1) {
       body = own.length ? own.map((c, i) => `<div class="vgl-row"><img src="${thumb(c.type)}" alt=""><span class="tx"><b>${CASE_TYPES[c.type].name}</b><small>${c.why === 'comprata' ? 'comprata' : 'ricompensa: ' + esc(c.why)}</small></span><button class="vgl-open" data-x="open" data-i="${i}">Apri</button></div>`).join('')
-        : '<p class="cen">Nessuna valigetta da aprire. Comprane una nel Negozio, o guadagnale coi lavori e con le sfide.</p>';
+        : '<p class="cen">Nessuna valigetta da aprire. Comprane una nel Negozio, o guadagnale coi lavori.</p>';
     } else {
       const k = (g.s.dist || 0) / 1000, mine = C.boosts.filter((b) => b.car === g.car);
       body = `<div>${C.tickets.svc ? `<span class="vgl-chip">🎫 Tagliando gratis × ${C.tickets.svc}</span>` : ''}${C.tickets.mod ? `<span class="vgl-chip">🎫 Modifica gratuita × ${C.tickets.mod}</span>` : ''}${mine.map((b) => `<span class="vgl-chip">⚡ ${esc(b.name)} +${Math.round(b.pw * 100)} % · ancora ${fmt(Math.max(0, b.until - k))} km</span>`).join('')}${C.perm[g.car] ? `<span class="vgl-chip">🔧 Per sempre +${Math.round(C.perm[g.car] * 100)} %</span>` : ''}</div>`

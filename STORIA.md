@@ -2,6 +2,8 @@
 
 Qui si annota cosa è **deciso** e cosa **manca**. Si costruisce a sessioni con il proprietario: niente di nuovo senza
 che lo chieda. La vecchia storia è stata cancellata il 17/11/2026 (è nella cronologia git, ma non si rimette).
+Il 17/11/2026 sono state tolte anche le gare clandestine (sfide al semaforo con rivali e scala dei rivali, sfide con gli
+abbaglianti, reputazione di strada): la storia di partenza è solo notaio, sei auto e autostrada.
 
 ## Come deve andare
 Horror **graduale**. Prima tutto tranquillo e normale, poi una piccola cosa che non torna, poi sempre più macabro e

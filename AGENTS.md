@@ -30,10 +30,10 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `dettagli2d.js` | Dettagli a densità doppia (dopo `effetti2d.js`): `tileHD` porta le tessere dei palazzi a 720 righe (spigoli arrotondati con Scale2x, grana, mattoni, riflessi sui vetri); `damaged` costruisce i danni sul disegno dell'auto. |
 | `icone.js` | Icone degli oggetti in pixel art 32×32 (`NR_ICON(kind)`, `NR_ICON_TAG(kind)`): bagagliaio, negozio, locali, bacheca. Un oggetto nuovo vuole una voce in `DRAW` con lo stesso nome di `INV`. |
 | `radio.js` | Radio. |
-| `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia, gare. |
+| `game.js` | Carriera (`StreetGame`): soldi, km, luoghi del mondo (`GAME_LOCS`), traffico (`GAME_TRAFFIC`), negozi e officine, polizia. |
 | `viaggio.js` | Il Viaggio (modalità principale): tappe, paesaggi, bisogni del guidatore, Motel Ovunque e la cassa, lavori, autostoppisti, capitoli ed eventi strani. Si aggancia a `StreetGame`; stato in `game.s.vg`. |
-| `missioni.js` | Missioni del Viaggio dopo il primo lavoro (`VG_MISSIONS`, poi generate): bacheca, regole (fragile, tempo, calmo, pesante, sfida), obiettivo a schermo, stato in `game.s.vg.mis`. Caricato anche dai test. |
-| `strada.js` | Sfide lanciate con gli abbaglianti (2 km), reputazione e vantaggi, eventi in prima corsia, comportamento del traffico. |
+| `missioni.js` | Missioni del Viaggio dopo il primo lavoro (`VG_MISSIONS`, poi generate): bacheca, regole (fragile, tempo, calmo, pesante), obiettivo a schermo, stato in `game.s.vg.mis`. Caricato anche dai test. |
+| `strada.js` | Abbaglianti per chiedere strada, eventi in prima corsia, comportamento del traffico. |
 | `viaggio2d.js` | Grafica 2D del viaggio: bar, autogrill, motel, autostoppisti, cippi, cartelli, rimorchio, colpi di sonno. |
 | `menu.js` | Schermata di gioco compatta (dopo lo script principale): sposta i pannelli della pagina in un menu a schede (Tab o pulsante MENU, Esc chiude), messaggi sopra la strada, pedali GAS/FRENO al tocco. `window.gameMenu.open('bagagliaio')`. |
 | `telefono.js` | Il telefono (dopo `menu.js`): smartphone sopra la strada, tasto 0 o pulsante TELEFONO. All'inizio solo Telefono, Messaggi, Rubrica, Mappa, Foto, Orologio. Lavori (bacheca e consegne vere), Passeggeri e Motel si scaricano: `TEL_APP_OFFERS` mette un cartellone luminoso sulla strada (entità `vgsign` con `app`, disegnata in `viaggio2d.js`), quando lo superi spunta l'icona e il download è finto. Le app strane (Ultima Uscita, Segreteria) compaiono da sole con la storia, senza scaricarle. `TEL_SMS` (messaggi per km), `TEL_ATTI` (km dei momenti della storia), `window.telefono.sms/ring/open/setAtto`. Grafica in Shadow DOM. Test in `test/telefono.test.js`. |
@@ -120,7 +120,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 92, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio e urti). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 88, compresi telefono, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio e urti). Non peggiorare il conteggio.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,
   T mappa del mondo, J strumenti, L launch, Z schermo intero. Controlla che la console non abbia errori.

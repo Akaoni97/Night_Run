@@ -77,7 +77,7 @@ test('valigette: il leggendario regala un\'auto che non hai, nel garage del mote
   assert.equal(pz.rar, 5); assert.ok(pz.car && v.garage.includes(pz.car), `auto ${pz.car} nel garage`);
 });
 
-test('valigette: lavori e sfide vinte danno valigette', () => {
+test('valigette: i lavori danno valigette', () => {
   const { game } = trip();
   game.caseRewards();                                             // fotografia di partenza
   game.vgTake(game.vgOffers(0).find((x) => x.first), 0); game.s.dist = VG.stopX(1); game.vgArrive(VG.stop(1));
@@ -85,6 +85,4 @@ test('valigette: lavori e sfide vinte danno valigette', () => {
   assert.ok(game.cases().own.some((c) => c.type === 'bronzo' && /primo lavoro/.test(c.why)), 'bronzo per il primo lavoro');
   game.s.vg.misDone = (game.s.vg.misDone || 0) + 1; game.caseRewards();
   assert.ok(game.cases().own.some((c) => c.type === 'argento'), 'argento per un lavoro della catena');
-  game.streetRep().w += 1; const n = game.cases().own.length; game.caseRewards();
-  assert.equal(game.cases().own.length, n + 1, 'una valigetta per la sfida vinta');
 });

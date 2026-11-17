@@ -4,8 +4,7 @@
 //  sua regola, e poi lavori senza fine con paghe che crescono. Il lavoro dopo si prende alla bacheca del locale
 //  successivo (bar, autogrill, motel); l'obiettivo resta a schermo (vgGoal) con lo stato della regola.
 //  Regole (kind): pacco (basta consegnare), fragile (botte e frenate brusche abbassano la paga), tempo (in ritardo
-//  paga meno), calmo (un passeggero: sotto una velocità e guida dolce), pesante (serve spazio: rimorchio o furgone),
-//  sfida (prima di consegnare vinci una sfida con gli abbaglianti).
+//  paga meno), calmo (un passeggero: sotto una velocità e guida dolce), pesante (serve spazio: rimorchio o furgone).
 //  Stato in game.s.vg.mis. Testi e paghe in VG_MISSIONS (facili da cambiare).
 // ============================================================================
 const VG_BOARDS = ['bar', 'grill', 'motel'];               // locali con la bacheca
@@ -23,17 +22,16 @@ const VG_MISSIONS = [
   { id: 'cassa', kind: 'pesante', title: 'La cassa pesante', what: 'una cassa da 240 kg', to: 'shop', kg: 240, pay: 15000,
     give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (concessionaria del Motel Ovunque) o un furgone.',
     end: 'Luca apre la cassa con un piede di porco e guarda il motore per un minuto buono. Poi ride.' },
-  { id: 'busta', kind: 'sfida', title: 'La busta', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 12000,
-    give: 'Un ragazzo ti dà una busta per Neon Kustom: «Ma prima fammi vedere che sai guidare: vinci una sfida. Sfanala qualcuno con F.»',
-    end: 'Quelli di Neon Kustom aprono la busta, annuiscono e ti pagano.',
-    lost: 'Quelli di Neon Kustom leggono il biglietto nella busta e scuotono la testa. «Doveva portarla uno che vince.» Ti pagano poco.' },
+  { id: 'busta', kind: 'pacco', title: 'La busta', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 12000,
+    give: 'Dalla bacheca: una busta chiusa da portare a Neon Kustom.',
+    end: 'Quelli di Neon Kustom aprono la busta, annuiscono e ti pagano.' },
   { id: 'chiave', kind: 'pacco', title: 'La chiave del motel', what: 'una chiave col portachiavi di legno', to: 'motel', kg: 0.1, pay: 20000,
     give: 'Il barista ti dà una chiave con un portachiavi di legno: «Portala al Motel Ovunque, la stanno aspettando.»',
     end: 'Alla reception guardano la chiave e ti danno una busta coi soldi.' },
 ];
 // lavori senza fine dopo la catena: titoli e frasi a rotazione
 const VG_MIS_MORE = {
-  kinds: ['pacco', 'fragile', 'tempo', 'calmo', 'pacco', 'sfida'],
+  kinds: ['pacco', 'fragile', 'tempo', 'calmo', 'pacco', 'tempo'],
   what: { pacco: ['un pacco sigillato', 'una scatola di dischi', 'un sacco di posta', 'una valigetta chiusa'], fragile: ['uno specchio antico', 'delle damigiane di vino', 'una lampada di vetro'], tempo: ['dei pezzi di ricambio urgenti', 'una torta di compleanno', 'dei documenti da firmare stanotte'], sfida: ['una scommessa', 'un trofeo da consegnare'] },
   pax: ['Una cantante', 'Un pescatore', 'Una sposa in ritardo', 'Un prete', 'Un turista giapponese'],
 };
@@ -58,7 +56,7 @@ const VG_MIS_MORE = {
     }
     const list = M.what[kind] || M.what.pacco, what = list[Math.floor(h(4) * list.length)];
     return { id: 'm' + i, kind, title: what[0].toUpperCase() + what.slice(1), what, to, kg: kind === 'fragile' ? 12 : 3, pay,
-      give: `Dalla bacheca: ${what}, da portare al prossimo ${VG_PLACE[to].what}.` + ({ fragile: ' Fragile: guida dolce.', tempo: ' Urgente: c\'è poco tempo.', sfida: ' Prima di consegnare vinci una sfida (F).' }[kind] || ''),
+      give: `Dalla bacheca: ${what}, da portare al prossimo ${VG_PLACE[to].what}.` + ({ fragile: ' Fragile: guida dolce.', tempo: ' Urgente: c\'è poco tempo.' }[kind] || ''),
       end: 'Consegnato. Ti pagano senza fare domande.', late: 'Sei in ritardo: ti pagano meno.', lost: 'Niente vittoria, niente premio: ti pagano poco.' };
   };
 
@@ -76,7 +74,6 @@ const VG_MIS_MORE = {
     if (M.kind === 'fragile') { const k = Math.max(0.25, Math.min(1, 1 - crashes * 0.25 - m.harsh * 0.6 - dmg * 2)); return { k, note: `integra al ${Math.round(k * 100)} %` }; }
     if (M.kind === 'tempo') { const left = m.lim - m.t; return { k: left >= 0 ? 1 : Math.max(0.4, 1 + left / m.lim), note: left >= 0 ? `tempo ${Math.floor(left / 60)}:${String(Math.floor(left % 60)).padStart(2, '0')}` : 'in ritardo!', late: left < 0 }; }
     if (M.kind === 'calmo') { const k = Math.max(0.3, Math.min(1, 1 - m.over * 0.02 - m.harsh * 0.6)); return { k, note: `sotto i ${M.max} km/h · soddisfatto al ${Math.round(k * 100)} %` }; }
-    if (M.kind === 'sfida') { const won = (this.streetRep ? this.streetRep().w : 0) > m.w0; return { k: won ? 1 : 0.35, note: won ? 'sfida vinta' : 'vinci una sfida (F)', lost: !won }; }
     if (M.kind === 'pesante') return { k: 1, note: `${M.kg} kg a bordo` };
     return { k: 1, note: '' };
   };
@@ -100,7 +97,7 @@ const VG_MIS_MORE = {
     if (M.kg > 0 && !this.trunkFits(M.kg)) return { ok: false, why: M.kind === 'pesante' ? `Pesa ${M.kg} kg: serve il rimorchietto (Motel Ovunque) o un furgone` : 'Non ci sta nel bagagliaio' };
     v.taken = v.taken || {}; v.taken[n + ':' + o.k] = true;
     const dest = VG.stop(o.to);
-    Object.assign(m, { phase: 'carry', toN: o.to, t: 0, c0: this.s.crashes || 0, dmg: this.sim.damage || 0, harsh: 0, over: 0, w0: this.streetRep ? this.streetRep().w : 0, pax: M.pax || null,
+    Object.assign(m, { phase: 'carry', toN: o.to, t: 0, c0: this.s.crashes || 0, dmg: this.sim.damage || 0, harsh: 0, over: 0, pax: M.pax || null,
       lim: M.kind === 'tempo' ? Math.round((dest.x - this.s.dist) / (95 / 3.6) + 25) : 0 });
     if (M.kg > 0) { this.s.trunk.push({ kind: 'missione', kg: M.kg, to: o.to, mis: true, name: `${M.title} per ${dest.name} (km ${o.kmTo})` }); this.applyMass(); }
     this.say(M.give, 'job');

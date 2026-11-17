@@ -1,6 +1,6 @@
 // ============================================================================
 //  Schermata di gioco compatta: la strada riempie la finestra, in alto una barra sottile (soldi, reputazione,
-//  ricercato, MENU); tutto il resto (officina, bagagliaio, comandi di guida, rivali, vista, quadro, extra,
+//  ricercato, MENU); tutto il resto (officina, bagagliaio, comandi di guida, vista, quadro, extra,
 //  partita) va in un menu a schede che si apre col pulsante MENU o col tasto Tab e si chiude con Esc o Tab.
 //  I pannelli non vengono riscritti: si spostano nelle schede, quindi il resto del gioco li trova come prima.
 //  Sui telefoni compaiono anche i pedali GAS e FRENO sulla strada.
@@ -18,7 +18,6 @@
     garage: '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.4-.6-.6-2.4z"/>',
     bagagliaio: '<path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/>',
     guida: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M3.6 10.5h6.2M14.2 10.5h6.2M12 14.2V20.5"/>',
-    rivali: '<path d="M7 4h10v4a5 5 0 0 1-10 0zM7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M9 20h6M12 13v7"/>',
     vista: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
     quadro: '<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
     extra: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
@@ -36,7 +35,6 @@
     ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
     ['guida', 'Guida', 'Pedali, cambio, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
-    ['rivali', 'Rivali', 'La scala delle sfide in città', '#ff2e88', () => [q('section.ladder')]],
     ['vista', 'Vista', 'Grafica, colori, ora e meteo', '#7fd3ff', () => {
       const box = document.createElement('div'); box.className = 'panel';
       const h = document.createElement('h2'); h.textContent = 'Vista e grafica'; box.appendChild(h);
@@ -78,8 +76,6 @@
     window.dispatchEvent(new Event('resize'));          // il quadro grande e i grafici si ridisegnano alla misura nuova
   }
   function open(id) {
-    // la scala dei rivali c'è solo nelle sfide in città: altrove la scheda sparisce
-    const lad = $('ladRow'), ls = q('section.ladder'); if (pages.rivali) pages.rivali.b.hidden = !lad || !lad.children.length || (ls && ls.hidden);
     menu.hidden = false; show(id || last);
   }
   // scheda riassuntiva della partita: l'auto disegnata e i numeri che contano
@@ -87,11 +83,11 @@
   function summary() {
     const el = $('gmSummary'), NR = window.nightRun; if (!el || !NR) return;
     const g = NR.game, v2 = NR.view2d, s = g.s, vg = s.vg, car = (typeof CARS !== 'undefined' && CARS[g.car]) || { name: g.car };
-    const goal = g.vgGoal ? g.vgGoal() : null, rep = g.streetRep ? g.streetRep() : null;
+    const goal = g.vgGoal ? g.vgGoal() : null;
     const stat = (k, v, cls = '') => `<div class="gs-stat ${cls}"><small>${k}</small><b>${v}</b></div>`;
     el.innerHTML = `<div class="gs-car"><canvas width="10" height="10" aria-hidden="true"></canvas><div><small>${vg ? 'Il Viaggio' : g.mode === 'free' ? 'Città libera' : 'Sfide in città'}</small><b>${car.name}</b><span>${car.engine || ''}</span></div></div>`
       + '<div class="gs-stats">' + stat('Contanti', '€ ' + fmt(s.money), 'money') + stat(vg ? 'Km del viaggio' : 'Km', fmt((s.dist || 0) / 1000, 1))
-      + stat('Reputazione', fmt(rep ? rep.rep : s.rep)) + (vg ? stat('Lavori fatti', fmt(vg.jobs)) + stat('Guadagnato', '€ ' + fmt(vg.earned)) : stat('Vinte', fmt(s.wins))) + '</div>'
+      + stat('Reputazione', fmt(s.rep)) + (vg ? stat('Lavori fatti', fmt(vg.jobs)) + stat('Guadagnato', '€ ' + fmt(vg.earned)) : '') + '</div>'
       + (goal ? `<div class="gs-goal"><small>${goal.title}</small><b>${goal.text}</b><span>${goal.left > 0.05 ? 'tra ' + fmt(goal.left, 1) + ' km · ' : ''}paga € ${fmt(goal.pay)}${goal.note ? ' · ' + goal.note : ''}</span></div>` : '');
     // l'auto: lo stesso disegno della strada, ingrandito a pixel netti
     const cv = el.querySelector('canvas');
