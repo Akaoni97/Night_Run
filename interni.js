@@ -592,6 +592,83 @@
     hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Il venditore: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
   };
 
+  // ---- SFASCIO RUGGINE: piazzale di notte, rete, pile di auto schiacciate, la gru col magnete, la carcassa in vendita,
+  // il bidone col fuoco, il ferrovecchio con la smerigliatrice e le scintille, il cane che dorme
+  const junkCar = (S) => {
+    const g = window.nightRun && window.nightRun.game; if (!g || !g.jkWreck || !g.inside) return;
+    const n = Math.round((g.inside.x - VG_STOP0) / VG_STEP), W = g.jkWreck(n), id = W ? W.id : null;
+    if (id === S.wid) return; S.wid = id; S.wreck = null;
+    if (id && window.valigette && window.valigette.carPic) window.valigette.carPic(id, (c) => {
+      if (S.wid !== id) return;
+      const k = document.createElement('canvas'); k.width = c.width; k.height = c.height; const x = k.getContext('2d'); x.imageSmoothingEnabled = false;
+      try { x.filter = 'sepia(0.75) saturate(0.55) brightness(0.62) contrast(1.15)'; } catch (e) { /* senza filtri */ }
+      x.drawImage(c, 0, 0); x.filter = 'none';
+      // ammaccature, ruggine, un vetro rotto
+      x.globalCompositeOperation = 'source-atop';
+      const rr = rng(c.width * 7 + c.height);
+      for (let q = 0; q < 22; q++) { x.fillStyle = q % 3 ? 'rgba(110,50,20,.55)' : 'rgba(20,14,10,.6)'; x.fillRect(Math.floor(rr() * c.width), Math.floor(c.height * 0.25 + rr() * c.height * 0.6), 4 + Math.floor(rr() * 14), 2 + Math.floor(rr() * 6)); }
+      x.fillStyle = 'rgba(10,8,6,.7)'; x.beginPath(); x.moveTo(c.width * 0.8, c.height * 0.3); x.lineTo(c.width, c.height * 0.45); x.lineTo(c.width * 0.95, c.height * 0.75); x.lineTo(c.width * 0.82, c.height * 0.6); x.fill();
+      S.wreck = k;
+    });
+  };
+  SCENE.junk = {
+    focus: 300, amb: 'junk', grade: '255,150,80', gradeA: 0.06,
+    static(g, r, S) {
+      vgrad(g, 0, 0, W, 200, '#06070f', '#1c1424', 6);
+      for (let k = 0; k < 40; k++) P(g, Math.floor(r() * W), Math.floor(r() * 120), r() < 0.5 ? '#c8ccd4' : '#6a6e7e');
+      g.fillStyle = '#e8e4d0'; g.beginPath(); g.arc(560, 46, 14, 0, 7); g.fill(); g.fillStyle = '#1c1424'; g.beginPath(); g.arc(566, 42, 12, 0, 7); g.fill();   // falce di luna
+      for (let x = 0; x < W; x += 6 + Math.floor(r() * 10)) { const h = 10 + r() * 30; R(g, x, 170 - h, 8, h, '#120e18'); }   // città lontana
+      // pile di auto schiacciate
+      const cols = ['#5a2e2e', '#2e3a5a', '#4a4a2e', '#3a4a4a', '#5a4a3a', '#2e2e3a', '#6a3a1e', '#4a2a4a'];
+      for (const [x0, n0] of [[10, 7], [130, 5], [420, 6], [540, 8]]) for (let k = 0; k < n0; k++) { const y = 196 - k * 14, x = x0 + (k % 2) * 8 + Math.floor(r() * 6); box(g, x, y, 84, 12, cols[Math.floor(r() * cols.length)]); R(g, x, y + 8, 84, 4, 'rgba(0,0,0,.35)'); R(g, x + 10 + Math.floor(r() * 50), y + 3, 12, 2, 'rgba(180,200,220,.25)'); }
+      // rete metallica
+      R(g, 0, 150, W, 2, '#5a5e6e'); for (let x = 0; x < W; x += 60) R(g, x, 150, 3, 70, '#4a4e5e');
+      g.save(); g.globalAlpha = 0.18; g.strokeStyle = '#8a8f9e'; g.lineWidth = 1; for (let x = -80; x < W + 80; x += 8) { g.beginPath(); g.moveTo(x, 152); g.lineTo(x + 66, 218); g.stroke(); g.beginPath(); g.moveTo(x + 66, 152); g.lineTo(x, 218); g.stroke(); } g.restore();
+      // terra battuta con pozze d'olio
+      vgrad(g, 0, 218, W, H - 218, '#2a2018', '#1a140e', 5);
+      for (let k = 0; k < 160; k++) P(g, Math.floor(r() * W), 220 + Math.floor(r() * 140), r() < 0.5 ? '#3a2e22' : '#14100a');
+      for (const [x, y, w] of [[90, 300, 70], [420, 330, 90], [260, 340, 50]]) { g.fillStyle = '#0c0a10'; g.beginPath(); g.ellipse(x, y, w / 2, 5, 0, 0, 7); g.fill(); g.fillStyle = 'rgba(120,80,200,.18)'; g.beginPath(); g.ellipse(x - 6, y - 1, w / 3, 2, 0, 0, 7); g.fill(); }
+      // gru (struttura): torre a destra, braccio verso sinistra
+      R(g, 476, 30, 10, 200, '#0a0a10'); R(g, 477, 30, 8, 200, '#c8a020'); for (let y = 34; y < 230; y += 10) line(g, 477, y, 485, y + 9, '#8a6a10');
+      R(g, 250, 26, 250, 8, '#0a0a10'); R(g, 250, 27, 248, 6, '#c8a020'); for (let x = 254; x < 496; x += 10) line(g, x, 28, x + 8, 32, '#8a6a10');
+      // pila di gomme a destra, davanti
+      for (let k = 0; k < 4; k++) { g.fillStyle = '#0a0a10'; g.beginPath(); g.ellipse(560, 318 - k * 13, 34, 10, 0, 0, 7); g.fill(); g.fillStyle = '#1e1e24'; g.beginPath(); g.ellipse(560, 315 - k * 13, 30, 7, 0, 0, 7); g.fill(); }
+      // lampione a sinistra
+      R(g, 40, 40, 5, 190, '#0a0a10'); R(g, 40, 38, 34, 5, '#0a0a10'); R(g, 62, 43, 14, 4, '#f4f0d8');
+      S.wid = undefined; junkCar(S);
+    },
+    dyn(g, t, S) {
+      junkCar(S);
+      cone(g, 69, 46, 14, 220, 270, '255,240,200', 0.09);
+      // il magnete che dondola con un'auto schiacciata
+      const a = Math.sin(t * 0.55) * 0.18, hx = 290, hy = 34, len = 92, mx = hx + Math.sin(a) * len, my = hy + Math.cos(a) * len;
+      line(g, hx, hy, Math.round(mx), Math.round(my), '#8a8f9e');
+      box(g, mx - 16, my, 32, 9, '#4a4e5e'); box(g, mx - 30, my + 10, 60, 18, '#6a3a3a'); R(g, mx - 30, my + 22, 60, 6, 'rgba(0,0,0,.35)');
+      // la carcassa in vendita
+      if (S.wreck) {
+        const c = S.wreck, k = Math.min(1.15, 260 / c.width), w = c.width * k, h = c.height * k;
+        g.save(); g.imageSmoothingEnabled = false; g.translate(360, 300); g.rotate(-0.02); g.drawImage(c, -w / 2, -h, w, h); g.restore();
+        box(g, 432, 256, 46, 26, '#b8a070'); text(g, 'VENDO', 436, 260, '#3a1a0a'); text(g, 'TRATTO', 435, 270, '#3a1a0a');
+      } else { text(g, 'OGGI NIENTE CARCASSE', 270, 280, '#8a7a5a'); }
+      // bidone col fuoco
+      box(g, 116, 270, 30, 40, '#4a4a4a'); R(g, 116, 282, 30, 2, '#3a3a3a'); R(g, 116, 298, 30, 2, '#3a3a3a');
+      for (let k = 0; k < 8; k++) { const f = Math.sin(t * 9 + k * 1.3) * 0.5 + 0.5, h = 8 + f * 14; R(g, 118 + k * 3.4, 270 - h, 3, h, k % 3 === 0 ? '#ffd23f' : k % 2 ? '#ff7a1e' : '#ff4a1a'); }
+      glow(g, 131, 262, 70, '255,130,40', 0.32 + 0.08 * Math.sin(t * 7));
+      for (let k = 0; k < 6; k++) { const ph = (t * 0.7 + k * 0.37) % 1; P(g, 125 + Math.sin(k * 3 + t) * 10, 262 - ph * 70, `rgba(255,${150 + k * 15},60,${1 - ph})`); }
+      // il ferrovecchio con la smerigliatrice: scintille
+      person(g, 200, 318, { skin: '#c88a62', hair: '#5a5a5a', hairStyle: 'bald', overalls: '#3a4a2a', cap: '#2a2a2a', beard: '#6a6a6a', pose: 'tool', s: 1.2, seed: 3.3 }, t);
+      if (Math.sin(t * 1.3) > -0.2) for (let k = 0; k < 12; k++) { const a2 = -0.6 + Math.random() * 1.2, d = Math.random() * 30; P(g, 237 + Math.cos(a2) * d, 252 + Math.sin(a2) * d * 0.6 + d * 0.2, Math.random() < 0.5 ? '#ffd23f' : '#ffffff'); }
+      if (Math.sin(t * 1.3) > -0.2) glow(g, 237, 252, 24, '255,210,120', 0.35);
+      // il cane che dorme sulla coperta (respira)
+      const br = Math.sin(t * 1.4) * 0.8;
+      R(g, 300, 334, 54, 6, '#5a2a2a'); g.fillStyle = '#0a0a10'; g.beginPath(); g.ellipse(326, 330 - br / 2, 21, 8 + br / 2, 0, 0, 7); g.fill(); g.fillStyle = '#8a6a4a'; g.beginPath(); g.ellipse(326, 330 - br / 2, 19, 6.5 + br / 2, 0, 0, 7); g.fill();
+      R(g, 304, 322, 12, 9, '#0a0a10'); R(g, 305, 323, 10, 7, '#8a6a4a'); R(g, 304, 320, 4, 4, '#5a4a2a'); R(g, 306, 326, 2, 1, '#0a0a10');
+      if ((t % 6) < 2) text(g, 'Z', 300, 306 - (t % 2) * 6, '#8a8f9e');
+      glow(g, 69, 50, 26, '255,240,200', 0.4);
+    },
+    hot: [{ x: 250, y: 200, w: 240, h: 100, label: 'La carcassa', go: 'La carcassa' }, { x: 100, y: 220, w: 140, h: 100, label: 'Rovista', go: 'Rovista' }, { x: 250, y: 20, w: 240, h: 150, label: 'Pezzi usati', go: 'Pezzi usati' }],
+  };
+
   // ---------------------------------------------------------------- suoni d'ambiente (sintetizzati, molto bassi)
   const AMB = {
     start(kind) {
@@ -611,6 +688,7 @@
       else if (kind === 'fuel') { hum(50, 0.14); hum(150, 0.03); noise('bandpass', 2400, 0.5, 0.04); tick(() => { if (Math.random() < 0.15) blip(1400, 0.1, 0.25, 'square'); }, 2500); }
       else if (kind === 'shop' || kind === 'niko') { noise('lowpass', 400, 0.7, 0.2); hum(kind === 'niko' ? 60 : 50, 0.05); tick(() => { if (Math.random() < 0.3) { for (let k = 0; k < 6; k++) setTimeout(() => blip(180 + Math.random() * 60, 0.05, 0.3, 'sawtooth'), k * 55); } if (Math.random() < 0.2) blip(3200 + Math.random() * 900, 0.3, 0.12, 'triangle'); }, 3000); tick(() => { if (Math.random() < 0.15) hiss(2.5, 0.25, 900); }, 7000); }
       else if (kind === 'dealer') { hum(55, 0.04); noise('lowpass', 600, 0.6, 0.12); noise('bandpass', 3000, 0.7, 0.02); tick(() => { if (Math.random() < 0.18) { blip(1320, 0.5, 0.18); setTimeout(() => blip(990, 0.7, 0.16), 260); } }, 5000); tick(() => { if (Math.random() < 0.25) for (let k = 0; k < 4; k++) setTimeout(() => blip(2600 + Math.random() * 400, 0.03, 0.06, 'square'), k * 90); }, 2300); }
+      else if (kind === 'junk') { noise('lowpass', 250, 0.6, 0.2); hum(48, 0.03); tick(() => { if (Math.random() < 0.35) hiss(0.8 + Math.random(), 0.25, 5000); }, 2600); tick(() => { if (Math.random() < 0.12) { blip(180, 0.35, 0.25, 'square'); setTimeout(() => blip(140, 0.4, 0.2, 'square'), 220); } }, 7000); noise('bandpass', 900, 0.4, 0.05); }
       else if (kind === 'style') { tick((t0) => { blip(55, 0.22, 0.6); blip(110, 0.1, 0.15); }, 500); noise('bandpass', 4000, 0.8, 0.05); tick(() => { if (Math.random() < 0.4) hiss(1.2, 0.3, 6000); }, 4000); }
     },
     stop() { if (this.out) { const o = this.out, c = this.ctx; o.gain.cancelScheduledValues(c.currentTime); o.gain.setTargetAtTime(0, c.currentTime, 0.2); setTimeout(() => o.disconnect(), 900); } const c2 = this.ctx; for (const n of this.nodes || []) try { n.stop(c2 ? c2.currentTime + 0.9 : 0); } catch (e) { /* già fermo */ } for (const t of this.timers || []) clearInterval(t); this.out = null; this.nodes = []; this.timers = []; },

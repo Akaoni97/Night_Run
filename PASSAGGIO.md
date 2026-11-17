@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 90).
+  (ultima versione pubblicata: 91).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -72,7 +72,7 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
-- **Traguardi** (`traguardi.js`): 28 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
+- **Traguardi** (`traguardi.js`): 29 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
   (`caseGrant`). Avviso dorato dall'alto con suono, uno alla volta; app Traguardi nel telefono (installata da sola).
@@ -88,6 +88,15 @@ gioco fa, sezione per sezione).
   terzo dei pezzi), giro di prova di 3 km (poi ti fermi e se la riprendono; € 250 a km oltre i 3,5, più i danni).
   Lì si cambia anche auto. Al motel resta il parcheggio e il rimorchio. Corretto anche il cambio auto al motel, che
   nel viaggio non funzionava (l'accosto automatico restava acceso e lo bloccava).
+- **Usato dei privati** (`usato.js`, app Annunci): a circa 4 tappe su 10 un privato vende la sua auto (cartello VENDESI
+  davanti al locale). Entrando in quel locale c'è l'annuncio: guardarla (scopre carrozzeria e gomme), farci un giro
+  (motore e freni), Niko a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
+  accetta), compra. I difetti restano sull'auto: si sistemano da Niko (servizi, carrozziere, gomme, revisione del motore).
+  Un'auto sana comprata bene si rivende all'Autosalone con guadagno (traguardo Commerciante).
+- **Sfascio Ruggine** (`sfascio.js`): decima tappa di ogni giro (al posto del secondo autogrill), primo al km 30,6.
+  Rovistare tra sei carcasse (€ 20, una volta: niente, soldi, oggetti, ticket, un pezzo, una valigetta, raramente
+  € 2.500), pezzi usati per l'auto che guidi al 45 % del nuovo, la carcassa del giorno (20 % del prezzo, tutti i difetti,
+  col conto di quanto costa sistemarla e quanto vale dopo), rottamazione a peso.
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco
