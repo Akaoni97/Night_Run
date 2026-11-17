@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 89).
+  (ultima versione pubblicata: 90).
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -72,7 +72,7 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
-- **Traguardi** (`traguardi.js`): 27 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
+- **Traguardi** (`traguardi.js`): 28 traguardi in `TRG_LIST` (lavori, catena, km, sfide, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
   (`caseGrant`). Avviso dorato dall'alto con suono, uno alla volta; app Traguardi nel telefono (installata da sola).
@@ -81,6 +81,13 @@ gioco fa, sezione per sezione).
   ed E36, Clio Williams, 2002 Turbo; se le hai tutte € 60.000), valigetta d'oro 1,5 %, mappa da pista 3 %, argento 4 %,
   ticket modifica 4 %, € 5.000 6 %, centralina 7 %, ticket tagliando 9 %, bronzo 10 %, € 2.500 11 %, € 1.000 20 %,
   € 500 23,5 %. Giorni di fila = serie; il 7° è il giro d'oro (niente comuni). Il premio si dà al tocco su GIRA.
+- **Concessionario** (`concessionario.js`, Autosalone Notte): nona tappa di ogni giro (al posto del terzo bar), il primo
+  al km 27,4. Salone con schede (CV, Nm, peso, kg/CV, posti, carico), occasione della tappa −15 %, contanti o a rate
+  (anticipo 20 %, interessi 15 %, 8 rate ogni 10 km pagate da sole; rata saltata = mora 10 %, alla 3ª il carro attrezzi
+  si riprende l'auto, anche se ci sei sopra appena ti fermi), vendita delle tue auto (prezzo a nuovo × km × danni + un
+  terzo dei pezzi), giro di prova di 3 km (poi ti fermi e se la riprendono; € 250 a km oltre i 3,5, più i danni).
+  Lì si cambia anche auto. Al motel resta il parcheggio e il rimorchio. Corretto anche il cambio auto al motel, che
+  nel viaggio non funzionava (l'accosto automatico restava acceso e lo bloccava).
 - **Finestrini** (`sim.setWindows`/`toggleWindows`, tasto 8 o pulsante FINESTR.; lo 0 è del telefono): motorino da 2,6 s col quadro acceso,
   un filo di resistenza in più. Nel suono (`win`, `winMot`): a finestrini chiusi in abitacolo vento e rotolamento sono
   bassi (prima coprivano il motore di 23 dB a 120 km/h), aperti entrano aria, rombo basso, scarico più chiaro ed eco

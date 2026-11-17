@@ -519,6 +519,79 @@
     hot: [{ x: 240, y: 30, w: 230, h: 210, label: 'Cabina', go: 'top' }, { x: 470, y: 20, w: 160, h: 110, label: 'Cerchi', go: 'top' }, { x: 10, y: 20, w: 140, h: 100, label: 'Colori', go: 'top' }],
   };
 
+  // ---- AUTOSALONE NOTTE: showroom con la vetrata sulla notte, l'auto in vetrina sulla pedana che gira (il disegno del
+  // giocatore, con le ruote), faretti, il venditore in giacca alla scrivania, divanetto e macchinetta del caffè
+  const dealerCar = (S) => {
+    const id = window.NightDealer && window.NightDealer.featured(); if (!id || id === S.fid) return;
+    S.fid = id; S.feat = null;
+    if (window.valigette && window.valigette.carPic) window.valigette.carPic(id, (c) => { if (S.fid === id) S.feat = c; });
+  };
+  SCENE.dealer = {
+    focus: 300, amb: 'dealer', grade: '182,156,255', gradeA: 0.05,
+    static(g, r, S) {
+      // vetrata su tutta la parete di fondo, sulla notte
+      R(g, 0, 0, W, 250, '#1a1826');
+      outside(g, 0, 18, W, 200, r, { sky0: '#070818', sky1: '#241a3a' });
+      for (let x = 0; x <= W; x += 80) { R(g, x - 2, 14, 5, 210, '#0a0a10'); R(g, x - 1, 14, 2, 210, '#4a4a5e'); }      // montanti
+      R(g, 0, 12, W, 5, '#3a3a4e'); R(g, 0, 218, W, 6, '#2a2838'); R(g, 0, 224, W, 26, '#1c1a2a');
+      // insegna appesa al soffitto, sopra la pedana
+      R(g, 250, 10, 2, 16, '#5a5a6e'); R(g, 410, 10, 2, 16, '#5a5a6e'); box(g, 226, 24, 210, 58, '#120f1e');
+      // soffitto con i binari dei faretti
+      R(g, 0, 0, W, 10, '#0e0d16'); R(g, 60, 8, 520, 3, '#3a3a4e');
+      for (const lx of [180, 330, 480]) { R(g, lx - 6, 10, 12, 8, '#2a2a36'); R(g, lx - 4, 18, 8, 5, '#5a5a6e'); }
+      // pavimento lucido a quadroni
+      floor(g, 250, H, '#2a2840', '#232136', true, r);
+      // pedana girevole (l'auto si disegna in dyn)
+      g.fillStyle = '#0a0a10'; g.beginPath(); g.ellipse(330, 268, 168, 26, 0, 0, 7); g.fill();
+      g.fillStyle = '#3a3656'; g.beginPath(); g.ellipse(330, 264, 166, 24, 0, 0, 7); g.fill();
+      g.fillStyle = '#4a4670'; g.beginPath(); g.ellipse(330, 262, 160, 20, 0, 0, 7); g.fill();
+      // scrivania (destra): monitor, faldoni, pianta
+      R(g, 500, 262, 140, 8, '#d8d4e8'); R(g, 504, 270, 136, 44, '#2a2838'); R(g, 504, 270, 136, 2, '#4a4660');
+      box(g, 580, 222, 48, 34, '#14141c'); R(g, 582, 224, 44, 30, '#1a2a44'); R(g, 600, 256, 8, 6, '#14141c');
+      for (let k = 0; k < 4; k++) box(g, 520 + k * 9, 238 - (k % 2) * 4, 7, 24 - (k % 2) * 4, ['#b69cff', '#ffd23f', '#3b9bff', '#ff3b4a'][k]);
+      box(g, 614, 196, 22, 32, '#5a3a2a'); for (let k = 0; k < 9; k++) { g.fillStyle = k % 2 ? '#2f8a4a' : '#4fbf6a'; g.beginPath(); g.ellipse(625 + Math.cos(k * 0.8) * 10, 190 - k * 3, 9, 4, Math.cos(k) * 0.8, 0, 7); g.fill(); }
+      // divanetto, tavolino con le riviste e macchinetta del caffè (sinistra)
+      box(g, 4, 292, 96, 26, '#3a2a4a'); box(g, 4, 270, 96, 22, '#4a3660'); R(g, 6, 272, 92, 2, '#5a4676');
+      box(g, 20, 230, 28, 48, '#2a2a36'); R(g, 24, 236, 20, 10, '#0a0a10'); R(g, 28, 260, 12, 2, '#c8ccd4');
+      S.fid = null; dealerCar(S);
+    },
+    dyn(g, t, S) {
+      dealerCar(S);
+      traffic(g, 0, 18, W, 200, t, 4);
+      // faretti sulla pedana e alone
+      for (const lx of [180, 330, 480]) cone(g, lx, 22, 18, 120, 230, '220,210,255', 0.07);
+      glow(g, 330, 250, 220, '182,156,255', 0.12, 0.3);
+      // luci che girano sul bordo della pedana
+      for (let k = 0; k < 24; k++) { const a = t * 0.9 + k * (Math.PI * 2 / 24), x = 330 + Math.cos(a) * 162, y = 263 + Math.sin(a) * 22; if (Math.sin(a) > -0.2) { R(g, x - 1, y - 1, 2, 2, k % 2 ? '#ffffff' : '#b69cff'); glow(g, x, y, 6, '182,156,255', 0.3); } }
+      // l'auto in vetrina sulla pedana, col riflesso
+      if (S.feat) {
+        const c = S.feat, k = Math.min(1.2, 270 / c.width), w = c.width * k, h = c.height * k, y = 258 - h + Math.sin(t * 0.8) * 0.6;
+        g.save(); g.imageSmoothingEnabled = false; g.drawImage(c, 330 - w / 2, y, w, h);
+        g.globalAlpha = 0.16; g.scale(1, -1); g.drawImage(c, 330 - w / 2, -(258 * 2 - y) - 4, w, h); g.restore();
+        const sx = 330 - w / 2 + ((t * 70) % (w + 120)) - 60; g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.12; g.fillStyle = '#fff'; g.beginPath(); g.moveTo(sx, y + 4); g.lineTo(sx + 16, y + 4); g.lineTo(sx - 10, y + h - 14); g.lineTo(sx - 26, y + h - 14); g.fill(); g.restore();
+      }
+      // targhetta col prezzo sul bordo della pedana
+      const dl = window.nightRun && window.nightRun.game, n = dl && dl.inside ? Math.round((dl.inside.x - VG_STOP0) / VG_STEP) : 0;
+      if (dl && dl.dlPrice && S.fid) {
+        const p = dl.dlPrice(S.fid, n), deal = dl.dlDeal(n) === S.fid, label = deal ? 'OCCASIONE' : 'IN VETRINA', pr = 'E ' + (p >= 1000 ? Math.floor(p / 1000) + '.' + String(p % 1000).padStart(3, '0') : p);
+        const tw = Math.max(textW(label), textW(pr, 2)) + 12;
+        box(g, 330 - tw / 2, 286, tw, 26, '#f4f1e6'); text(g, label, 330 - textW(label) / 2, 289, deal ? '#c43a6a' : '#5a5a70'); text(g, pr, 330 - textW(pr, 2) / 2, 297, '#1a1a24', 2);
+      }
+      // insegna AUTOSALONE / NOTTE
+      const fl = Math.sin(t * 7) * Math.sin(t * 2.1) > 0.9 ? 0.3 : 1;
+      neon(g, 'AUTOSALONE', 331 - textW('AUTOSALONE', 2) / 2, 32, '182,156,255', 2, fl); neon(g, 'NOTTE', 331 - textW('NOTTE', 4) / 2, 52, '255,210,63', 4, 1);
+      // monitor della scrivania: tabella delle rate che scorre
+      R(g, 582, 224, 44, 30, '#1a2a44'); for (let k = 0; k < 5; k++) { const yy = 227 + ((k * 6 + Math.floor(t * 8)) % 26); R(g, 585, yy, 16 + (k * 7) % 18, 1, '#9ec4ff'); R(g, 610, yy, 10, 1, '#b8ff3a'); }
+      glow(g, 604, 238, 30, '160,200,255', 0.18);
+      // il venditore accanto all'auto: giacca scura, camicia bianca, cravatta viola; a volte al telefono
+      const ph = Math.floor(t / 7) % 3 === 2 ? 'phone' : 'arms';
+      person(g, 150, 316, { skin: '#d8a078', hair: '#3a2a1a', hairStyle: 'short', shirt: '#f0eee8', vest: '#22203a', sleeve: '#22203a', tie: '#7a4ad8', pose: ph, s: 1.2, seed: 8.2 }, t);
+      // luci a soffitto
+      for (const lx of [180, 330, 480]) glow(g, lx, 20, 30, '255,250,235', 0.35);
+    },
+    hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Il venditore: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
+  };
+
   // ---------------------------------------------------------------- suoni d'ambiente (sintetizzati, molto bassi)
   const AMB = {
     start(kind) {
@@ -537,6 +610,7 @@
       else if (kind === 'motel') { hum(60, 0.08); noise('lowpass', 300, 0.7, 0.22); noise('bandpass', 5000, 0.6, 0.06); tick(() => blip(2600, 0.02, 0.12, 'square'), 1000); }
       else if (kind === 'fuel') { hum(50, 0.14); hum(150, 0.03); noise('bandpass', 2400, 0.5, 0.04); tick(() => { if (Math.random() < 0.15) blip(1400, 0.1, 0.25, 'square'); }, 2500); }
       else if (kind === 'shop' || kind === 'niko') { noise('lowpass', 400, 0.7, 0.2); hum(kind === 'niko' ? 60 : 50, 0.05); tick(() => { if (Math.random() < 0.3) { for (let k = 0; k < 6; k++) setTimeout(() => blip(180 + Math.random() * 60, 0.05, 0.3, 'sawtooth'), k * 55); } if (Math.random() < 0.2) blip(3200 + Math.random() * 900, 0.3, 0.12, 'triangle'); }, 3000); tick(() => { if (Math.random() < 0.15) hiss(2.5, 0.25, 900); }, 7000); }
+      else if (kind === 'dealer') { hum(55, 0.04); noise('lowpass', 600, 0.6, 0.12); noise('bandpass', 3000, 0.7, 0.02); tick(() => { if (Math.random() < 0.18) { blip(1320, 0.5, 0.18); setTimeout(() => blip(990, 0.7, 0.16), 260); } }, 5000); tick(() => { if (Math.random() < 0.25) for (let k = 0; k < 4; k++) setTimeout(() => blip(2600 + Math.random() * 400, 0.03, 0.06, 'square'), k * 90); }, 2300); }
       else if (kind === 'style') { tick((t0) => { blip(55, 0.22, 0.6); blip(110, 0.1, 0.15); }, 500); noise('bandpass', 4000, 0.8, 0.05); tick(() => { if (Math.random() < 0.4) hiss(1.2, 0.3, 6000); }, 4000); }
     },
     stop() { if (this.out) { const o = this.out, c = this.ctx; o.gain.cancelScheduledValues(c.currentTime); o.gain.setTargetAtTime(0, c.currentTime, 0.2); setTimeout(() => o.disconnect(), 900); } const c2 = this.ctx; for (const n of this.nodes || []) try { n.stop(c2 ? c2.currentTime + 0.9 : 0); } catch (e) { /* già fermo */ } for (const t of this.timers || []) clearInterval(t); this.out = null; this.nodes = []; this.timers = []; },
@@ -563,6 +637,7 @@
   const hit = (e) => { if (!cur) return null; const p = local(e); return (SCENE[cur.id].hot || []).find((h) => p.x >= h.x && p.x <= h.x + h.w && p.y >= h.y && p.y <= h.y + h.h) || null; };
   function showTag(e) { if (!hover) { tag.style.opacity = 0; return; } const p = local(e); tag.textContent = hover.label; tag.style.left = p.bx + 'px'; tag.style.top = p.by + 'px'; tag.style.opacity = 1; }
   function act(h) {
+    if (typeof h.go === 'function') { h.go(); return; }
     if (h.go === 'close') { const g = window.nightRun && window.nightRun.game; if (g) g.exitPlace(); return; }
     const body = document.getElementById('placeBody'), box = document.getElementById('placeBox'); if (!body || !box) return;
     let el = null;

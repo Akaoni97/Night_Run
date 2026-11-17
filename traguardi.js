@@ -33,6 +33,7 @@ const TRG_LIST = [
   { id: 'ricco', name: 'Tasche piene', text: 'Abbi € 50.000 in contanti.', prize: { cassa: 'argento' }, check: (g) => [Math.floor(g.s.money), 50000] },
   { id: 'motel', name: 'Una notte all\'Ovunque', text: 'Dormi al Motel Ovunque.', prize: { soldi: 300 }, check: (g) => !!(g.s.vg && g.s.vg.sleepAt != null) },
   { id: 'ruota7', name: 'Abitudine', text: 'Gira la ruota 7 giorni di fila.', prize: { cassa: 'argento' }, check: (g) => [g.s.ruota ? g.s.ruota.best || 0 : 0, 7] },
+  { id: 'firma', name: 'Firma qui', text: 'Compra un\'auto all\'Autosalone Notte.', prize: { soldi: 1000 }, check: (g) => !!(g.s.vg && g.s.vg.bought) },
   { id: 'habitue', name: 'Habitué', text: 'Entra in 5 locali diversi.', prize: { cassa: 'bronzo' }, check: (g, c) => [Object.keys(c.places || {}).length, 5] },
 ];
 
