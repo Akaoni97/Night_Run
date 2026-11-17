@@ -141,6 +141,14 @@
         this.text(g, e.text, X - 34, 109, '#f4f1e6');
         return true;
       }
+      if (e.cap) {                                   // cartello direzionale verde della capitale: una sola riga bianca su due pali
+        const w = e.text.length * 4 + 12, bx = X - Math.round(w / 2);
+        g.fillStyle = C.ink; g.fillRect(bx + 5, 168, 3, 60); g.fillRect(bx + w - 8, 168, 3, 60);
+        g.fillStyle = '#e8e6df'; g.fillRect(bx - 1, 140, w + 2, 29); g.fillStyle = '#0d5a3a'; g.fillRect(bx, 141, w, 27);
+        this.light(g, X, 154, w, 40, '#9fe8c0', 0.07, 2);
+        this.text(g, e.text, bx + 6, 151, '#f4f1e6'); g.fillStyle = '#f4f1e6'; g.fillRect(bx + 6, 160, w - 12, 1);
+        return true;
+      }
       // cartone scritto a mano legato al guardrail
       const lines = []; let cur = '';
       for (const w of e.text.split(' ')) { if ((cur + ' ' + w).trim().length > 12) { lines.push(cur.trim()); cur = w; } else cur += ' ' + w; }

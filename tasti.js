@@ -10,7 +10,7 @@ const TASTI = [
   ['gas', 'w', 'Gas', 'Guida'], ['freno', 's', 'Freno', 'Guida'], ['sx', 'a', 'Sterza / corsia a sinistra', 'Guida'], ['dx', 'd', 'Sterza / corsia a destra', 'Guida'],
   ['su', 'e', 'Marcia su', 'Guida'], ['giu', 'q', 'Marcia giù', 'Guida'], ['folle', 'n', 'Folle', 'Guida'], ['retro', 'r', 'Retromarcia', 'Guida'],
   ['avvio', 'Enter', 'Avviamento (tieni premuto)', 'Guida'], ['quadro', 'i', 'Quadro acceso / spento', 'Guida'], ['spegni', 'o', 'Spegni il motore', 'Guida'],
-  ['launch', 'l', 'Launch control', 'Guida'], ['clacson', 'h', 'Clacson', 'Guida'], ['fari', 'f', 'Sfanala (lancia una sfida)', 'Guida'],
+  ['launch', 'l', 'Launch control', 'Guida'], ['clacson', 'h', 'Clacson', 'Guida'], ['fari', 'f', 'Sfanala (chiedi strada)', 'Guida'],
   ['finestrini', '8', 'Finestrini su / giù', 'Auto'], ['scorta', '9', 'Monta la ruota di scorta', 'Auto'], ['bagagliaio', 'b', 'Bagagliaio', 'Auto'], ['entra', 'u', 'Entra / esci dal locale', 'Auto'],
   ['menu', 'Tab', 'Menu', 'Schermate'], ['telefono', '0', 'Telefono', 'Schermate'], ['mappa', 't', 'Mappa del mondo', 'Schermate'], ['strumenti', 'j', 'Cambia strumenti', 'Schermate'],
   ['garage', 'g', 'Salone delle auto', 'Schermate'], ['schermo', 'z', 'Schermo intero', 'Schermate'],

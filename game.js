@@ -1,14 +1,8 @@
 // ============================================================================
-//  StreetGame · carriera su strada: soldi, benzina, polizia, sfide, consegne
+//  StreetGame · carriera su strada: soldi, benzina, polizia, consegne
 //  Indipendente dalla grafica: la scena 3D legge `ents`, `laneZ`, `s.dist`.
 // ============================================================================
 const GAME_FUEL_PRICE = 1.95;            // € al litro
-const GAME_RIVALS = [
-  { name: 'Kenji', car: 'Nissan Silvia S15' }, { name: 'Marta', car: 'Mazda RX-7 FD' },
-  { name: 'Dario', car: 'Mitsubishi Lancer Evo VI' }, { name: 'Yuki', car: 'Honda NSX' },
-  { name: 'Ivan', car: 'Nissan Skyline GT-R R34' }, { name: 'Sara', car: 'Subaru Impreza STI' },
-  { name: 'Leo', car: 'BMW M3 E46' }, { name: 'Nico', car: 'Honda S2000' },
-];
 const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a, 0xb38b2d];
 // traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
 // velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
@@ -39,6 +33,28 @@ const GAME_LOCS = [
     note: 'Il borgo delle torri sulle colline senesi: case di pietra, persiane verdi, cipressi e il campanile.' },
   { id: 'route66', name: 'Route 66 · Amboy, Mojave', country: 'Stati Uniti', bg: 'desert', lat: 34.5583, lon: -115.7444, traffic: 0.4, mix: { truck: 2.2, bus: 0.1, kei: 0.05, taxi: 0, van: 1.2 },
     note: 'La Mother Road nel deserto della California: mesas sotto le stelle, pali del telefono, un motel col neon.' },
+  { id: 'roma', name: 'Roma · Via del Corso', country: 'Italia', bg: 'city', cap: true, lat: 41.9028, lon: 12.4964, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'parigi', name: 'Parigi · Avenue des Champs-Élysées', country: 'Francia', bg: 'city', cap: true, lat: 48.8566, lon: 2.3522, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'londra', name: 'Londra · Regent Street', country: 'Regno Unito', bg: 'city', cap: true, lat: 51.5072, lon: -0.1276, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'stoccolma', name: 'Stoccolma · Drottninggatan', country: 'Svezia', bg: 'city', cap: true, lat: 59.3293, lon: 18.0686, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'berlino', name: 'Berlino · Unter den Linden', country: 'Germania', bg: 'city', cap: true, lat: 52.52, lon: 13.405, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'praga', name: 'Praga · Václavské náměstí', country: 'Cechia', bg: 'city', cap: true, lat: 50.0755, lon: 14.4378, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'vienna', name: 'Vienna · Ringstraße', country: 'Austria', bg: 'city', cap: true, lat: 48.2082, lon: 16.3738, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'madrid', name: 'Madrid · Gran Vía', country: 'Spagna', bg: 'city', cap: true, lat: 40.4168, lon: -3.7038, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'lisbona', name: 'Lisbona · Avenida da Liberdade', country: 'Portogallo', bg: 'city', cap: true, lat: 38.7223, lon: -9.1393, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'atene', name: 'Atene · Syntagma Square', country: 'Grecia', bg: 'city', cap: true, lat: 37.9838, lon: 23.7275, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
+  { id: 'washington', name: 'Washington D.C. · Pennsylvania Avenue', country: 'Stati Uniti', bg: 'city', cap: true, lat: 38.9072, lon: -77.0369, traffic: 1, places: true,
+    note: 'Una capitale del Viaggio.' },
 ];
 const GAME_LANE_Z = { 0: 6.1, 1: 3.5, 2: 0, 3: -3.5 };
 
@@ -114,46 +130,20 @@ const INV = {
   kit: { name: 'Kit attrezzi', kg: 7, price: 120, uses: 3, note: 'Raddrizzi un po\' la carrozzeria per strada: −15 % di danni, tre usi.' },
   scorta: { name: 'Ruota di scorta', kg: 14, price: 90, note: 'Peso morto finché non serve. Toglierla alleggerisce l\'auto.' },
   pacco: { name: 'Pacco da consegnare', kg: 10, price: 0, note: 'Va portato a destinazione.' },
-  trofeo: { name: 'Trofeo', kg: 2, price: 0, note: 'Ricordo di un capo battuto.' },
   zavorra: { name: 'Sacco di sabbia', kg: 25, price: 10, note: 'Peso sul posteriore: più trazione in partenza, ma più massa.' },
 };
-// scala dei rivali: quattro quartieri, tre rivali e un capo ciascuno (tempi sui 400 m)
-const GAME_LADDER = [
-  { zone: 'Porto', rivals: [
-    { name: 'Tommy', car: 'Honda Civic Type R EK9', et: 15.2, prize: 300 },
-    { name: 'Gina', car: 'Mazda MX-5 turbo', et: 14.6, prize: 400 },
-    { name: 'Bruno', car: 'Nissan 200SX S14', et: 14.0, prize: 550 },
-    { name: 'Lo Scaricatore', car: 'Nissan Skyline GTS-T R33', et: 13.5, prize: 1200, boss: true } ] },
-  { zone: 'Zona industriale', rivals: [
-    { name: 'Ale', car: 'Mitsubishi Lancer Evo VI', et: 13.1, prize: 900 },
-    { name: 'Rina', car: 'Subaru Impreza STI', et: 12.8, prize: 1100 },
-    { name: 'Max', car: 'Mazda RX-7 FD', et: 12.5, prize: 1300 },
-    { name: 'La Gru', car: 'Nissan Skyline GT-R R34', et: 12.1, prize: 2800, boss: true } ] },
-  { zone: 'Centro', rivals: [
-    { name: 'Yuki', car: 'Honda NSX', et: 11.9, prize: 2000 },
-    { name: 'Dario', car: 'Nissan Silvia S15 SR20 big turbo', et: 11.6, prize: 2400 },
-    { name: 'Vera', car: 'Toyota Chaser JZX100', et: 11.3, prize: 2800 },
-    { name: 'Il Notaio', car: 'Nissan Skyline GT-R R32 RB26 800 CV', et: 11.0, prize: 6000, boss: true } ] },
-  { zone: 'Tangenziale', rivals: [
-    { name: 'Ivan', car: 'Mitsubishi 3000GT', et: 10.8, prize: 4000 },
-    { name: 'Sara', car: 'Toyota Supra JZA80 single turbo', et: 10.6, prize: 4800 },
-    { name: 'Leo', car: 'Nissan GT-R R35', et: 10.4, prize: 5600 },
-    { name: 'Il Fantasma', car: 'Toyota Supra JZA80 1000 CV', et: 10.1, prize: 15000, boss: true } ] },
-];
-
 class StreetGame {
   constructor(sim, rnd = Math.random) {
     this.sim = sim;
     this.rnd = rnd;
     this.mode = 'career';                 // 'career' | 'free'
-    this.s = { money: 3000, rep: 0, heat: 0, dist: 0, owned: {}, wins: 0, losses: 0, fines: 0, jobs: 0, ladder: 0,
+    this.s = { money: 3000, rep: 0, heat: 0, dist: 0, owned: {}, fines: 0, jobs: 0,
       trunk: [{ kind: 'scorta', kg: 14 }, { kind: 'kit', kg: 7, uses: 3 }, { kind: 'tanica', kg: 9 }] };
     this.ents = [];
     this.trip = 0;
     this.s.carId = 'supra'; this.s.cars = { supra: { km: 0, perks: [] }, v40: { km: 0, perks: [], up: 0, fuel: 0.55 } }; this.s.perks = [];
     this.prompt = null;
     this.ap = null;                        // pilota automatico (fermate)
-    this.race = null;
     this.job = null;
     this.out = [];                         // messaggi per l'interfaccia
     this.lane = 1; this.laneZ = GAME_LANE_Z[1]; this.laneT = 0;
@@ -172,7 +162,7 @@ class StreetGame {
 
   // cambio corsia del pilota: dir +1 a sinistra (verso la corsia 3), -1 a destra (verso la 1)
   steer(dir) {
-    if (this.race || this.ap) return false;
+    if (this.ap) return false;
     const nl = Math.max(1, Math.min(3, this.lane + dir));
     if (nl === this.lane) return false;
     this.lane = nl; this.manualT = this.autoLane ? 5 : 1e9;
@@ -233,7 +223,7 @@ class StreetGame {
   }
   // il luogo davanti a cui ci si può fermare adesso (null se troppo lontano, o se a questa velocità non si riesce a frenare)
   nearPlace() {
-    if (!this.placesOn || this.race || this.ap || this.inside) return null;
+    if (!this.placesOn || this.ap || this.inside) return null;
     const d = this.s.dist, v = Math.max(0, this.sim.v);
     const p = this.placesBetween(d - 12, d + 160)[0];
     if (!p) return null;
@@ -338,7 +328,7 @@ class StreetGame {
   carState(id = this.car) { return this.s.cars[id] || (this.s.cars[id] = { km: 0, perks: [] }); }
   switchCar(id) {
     if (!CARS[id] || id === this.car) return { ok: false };
-    if (Math.abs(this.sim.v) > 0.5 || this.race || this.inside || this.ap) return { ok: false, why: 'Per cambiare auto fermati (e non in gara)' };
+    if (Math.abs(this.sim.v) > 0.5 || this.inside || this.ap) return { ok: false, why: 'Per cambiare auto fermati' };
     const sim = this.sim, cur = this.carState();
     Object.assign(cur, { fuel: sim.fuel, damage: sim.damage, tireWear: sim.tireWear });
     this.s.carId = id;
@@ -423,7 +413,7 @@ class StreetGame {
   partLocked(cat, id) { return this.mode === 'career' && !this.owns(cat, id) && this.odo < this.partKm(cat, id); }
   owns(cat, id) { return this.mode === 'free' || !TUNING[cat] || TUNING[cat].items[0].id === id || tuningItem(cat, id).price === 0 || !!this.s.owned[this.ownKey(cat + ':' + id)]; }
   price(cat, id) { return this.owns(cat, id) ? 0 : Math.round(tuningItem(cat, id).price * this.disc() / 10) * 10; }
-  canMount() { return this.mode === 'free' || (Math.abs(this.sim.v) < 0.5 && !this.race); }
+  canMount() { return this.mode === 'free' || Math.abs(this.sim.v) < 0.5; }
   // con i luoghi in città (2D, carriera) i pezzi si montano solo dentro l'officina
   inShop() { return !!(this.inside && this.inside.id === 'shop' && this.inside.phase === 'shop'); }
   needsShop() { return this.mode === 'career' && this.placesOn && !this.inShop(); }
@@ -464,7 +454,7 @@ class StreetGame {
     const sim = this.sim, d = this.s.dist, r = this.rnd;
     const w = [
       ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
-      ['race', this.kmh > 15 && !this.job ? 14 : 0], ['job', !this.job ? 10 : 0],
+      ['job', !this.job ? 10 : 0],
     ];
     let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
     for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }
@@ -476,8 +466,7 @@ class StreetGame {
       this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 2, x: d + (parked ? 380 : 260), v: parked ? 0 : 24 + r() * 4 });
     } else if (kind === 'station') {
       if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
-    } else if (kind === 'race') this.offerRace();
-    else if (kind === 'job') this.offerJob();
+    } else if (kind === 'job') this.offerJob();
   }
 
   // un veicolo del traffico (tipo a caso secondo il luogo), in una corsia libera
@@ -494,19 +483,6 @@ class StreetGame {
     const v = (T.kmh[0] + r() * (T.kmh[1] - T.kmh[0])) * kv / 3.6;
     const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: 'orig' };
     this.ents.push(e); return e;
-  }
-
-  offerRace() {
-    const r = this.rnd, rv = GAME_RIVALS[Math.floor(r() * GAME_RIVALS.length)];
-    const stake = Math.round((200 + r() * 300 + this.s.rep * 6) / 50) * 50;
-    this.ask({
-      kind: 'race', title: 'Sfida al semaforo',
-      text: `${rv.name} su ${rv.car} si affianca e dà due colpi di gas. 400 metri da fermo, posta € ${stake}.`,
-      options: [
-        { label: 'Accetto', act: () => this.startRace(rv, stake) },
-        { label: 'Lascia stare', act: () => this.say(`${rv.name} se ne va ridendo.`) },
-      ],
-    });
   }
 
   offerJob() {
@@ -534,39 +510,6 @@ class StreetGame {
   etEstimate() {
     const cv = this.sim.estimatePeak().cv;
     return 5.825 * Math.pow((this.sim.P.mass + 75) * 2.2046 / (cv * 0.986), 1 / 3) + 0.45 + Math.max(0, 0.35 - (this.sim.P.mu - 1.1));
-  }
-  ladderRival() {
-    let i = this.s.ladder || 0;
-    for (const z of GAME_LADDER) { if (i < z.rivals.length) return { zone: z.zone, ...z.rivals[i] }; i -= z.rivals.length; }
-    return null;
-  }
-  // zona verde dei giri in partenza: più boost da costruire, più alta; più grip, più alta
-  launchZone() {
-    const tc = this.sim.tune.turbo, mid = (tc.twin ? 3600 : 3600 + (tc.a - 2800) * 0.6) + (this.sim.P.mu - 1.1) * 1800;
-    return { lo: Math.round(mid - 450), hi: Math.round(mid + 450) };
-  }
-  startLadder() {
-    const rv = this.ladderRival(); if (!rv || this.race) return false;
-    this.startRace(rv, 0, { et: rv.et, prize: rv.prize, ladder: this.s.ladder });
-    return true;
-  }
-
-  startRace(rv, stake, opt = {}) {
-    this.ents = this.ents.filter((e) => e.kind === 'station' || e.kind === 'drop' || this.rel(e) < -20);
-    this.prompt = null;
-    const et = opt.et || this.etEstimate() * (1.0 + this.rnd() * 0.09 - Math.min(0.05, this.s.rep * 0.0005));
-    this.race = { rv, stake, et, phase: 'stage', t: 0, prize: opt.prize || 0, ladder: opt.ladder, zone: this.launchZone(), shifts: [], hitLim: false };
-    this.lane = 1;
-    this.stopAt(null, () => {
-      this.race.phase = 'count'; this.race.t = 3.6;
-      this.race.x0 = this.s.dist;
-      this.ap = null;
-      this.ents.push({ id: this.id++, kind: 'rival', lane: 2, x: this.s.dist, v: 0, color: GAME_COLORS[Math.floor(this.rnd() * GAME_COLORS.length)] });
-      this.ents.push({ id: this.id++, kind: 'line', lane: 1, x: this.s.dist + 2.6, v: 0 });
-      this.ents.push({ id: this.id++, kind: 'line', lane: 1, x: this.s.dist + 402.3 + 2.6, v: 0, finish: true });
-      this.say('Prima marcia. Tieni il freno, gas su, parti al verde.', 'race');
-    });
-    this.say(`Sfida accettata contro ${rv.name}: accosta al semaforo`, 'race');
   }
 
   busted(e) {
@@ -617,7 +560,6 @@ class StreetGame {
         }
       } else { out.brake = 1; ap.t += dt; if (ap.tick) ap.tick(dt); }
     }
-    if (this.race && this.race.phase === 'count') out.auto = false;
     return out;
   }
 
@@ -661,7 +603,7 @@ class StreetGame {
     }
 
     // traffico continuo (città e luoghi della mappa): densità secondo il luogo
-    if (this.track === 'city' && !this.race && !this.ap && !this.inside && this.trafficOn !== false && d > (this.nextTraffic || 0)) {
+    if (this.track === 'city' && !this.ap && !this.inside && this.trafficOn !== false && d > (this.nextTraffic || 0)) {
       const dens = (this.loc && this.loc.traffic) || 1;
       if (this.ents.filter((e) => e.kind === 'traffic' && e.x - d > -60 && e.x - d < 700).length < 3 + dens * 5) {
         // se andiamo più piano del traffico qualcuno arriva da dietro e ci sorpassa
@@ -670,7 +612,7 @@ class StreetGame {
       }
       this.nextTraffic = d + (40 + this.rnd() * 90) / dens;
     }
-    if (this.mode === 'career' && sim.running && !this.race && !this.ap && d > this.nextSpawn) {
+    if (this.mode === 'career' && sim.running && !this.ap && d > this.nextSpawn) {
       this.spawn(); this.nextSpawn = d + 220 + this.rnd() * 380;
     }
     if (this.mode === 'career' && sim.dry && Math.abs(sim.v) < 0.5 && !this.prompt && !this.ap) {
@@ -767,7 +709,7 @@ class StreetGame {
     this.laneT = Math.max(0, this.laneT - dt);
     this.manualT = Math.max(0, this.manualT - dt);
     this.blocked = false;
-    if (!this.race && !this.ap && this.autoLane && this.manualT === 0) {
+    if (!this.ap && this.autoLane && this.manualT === 0) {
       const look = 22 + sim.v * 2.4, L = this.lane;
       const lead = this.ents.filter((e) => moving(e) && e.lane === L && e.x - d > -2 && e.x - d < look && e.v < sim.v - 0.2).sort((a, b) => a.x - b.x)[0];
       if (lead && this.laneT === 0) {
@@ -785,7 +727,7 @@ class StreetGame {
     }
     // contatti: tamponi (muso contro coda), vieni tamponato (coda contro muso), strisciate di fianco in cambio corsia
     if (this.shockT > 0) this.shockT -= dt;
-    if (!this.race) for (const e of this.ents) {
+    for (const e of this.ents) {
       if (e.hazT > 0) e.hazT -= dt;
       if (!moving(e)) continue;
       if ((e.hitT || 0) > 0) { e.hitT -= dt; continue; }
@@ -856,11 +798,10 @@ class StreetGame {
           if ((this.railSndT = (this.railSndT || 0) - dt) <= 0) { this.railSndT = 0.4; sim.events.push({ type: 'crash', I: Math.min(1, 0.3 + v * 0.02), kind: 'side' }); } }
       }
       this.free = true; this.lane = 1; this.prevLane = 1; this.signal = null;
-      this.updateRace(dt, d0);
       return;
     }
     // sterzo libero: velocità laterale che cresce con la velocità, nessuno scatto tra le corsie
-    const freeOK = !this.race && !this.ap && sim.v > 0.3;
+    const freeOK = !this.ap && sim.v > 0.3;
     if (freeOK && Math.abs(this.steerIn) > 0.05) {
       this.free = true; this.manualT = this.autoLane ? 5 : 1e9;
       // più reattivo: la velocità laterale arriva quasi subito e cresce con la velocità dell'auto
@@ -887,7 +828,6 @@ class StreetGame {
       this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));
     }
 
-    this.updateRace(dt, d0);
   }
 
   planFuel(e, liters) {
@@ -906,59 +846,6 @@ class StreetGame {
         this.say(`Rifornimento: ${Math.round(got)} litri, − € ${cost}`, 'fuel');
       }
     };
-  }
-
-  updateRace(dt) {
-    const R = this.race; if (!R) return;
-    const d = this.s.dist, rival = this.ents.find((e) => e.kind === 'rival');
-    if (R.phase === 'count') {
-      R.t -= dt;
-      if (d - R.x0 > 1.0) { this.endRace(false, 'Falsa partenza!'); return; }
-      if (R.t <= 0) {
-        R.phase = 'run'; R.tt = 0;
-        const rpm = this.sim.rpm, z = R.zone;
-        R.launchRpm = rpm;
-        R.launch = rpm >= z.lo && rpm <= z.hi ? 'perfetta' : rpm >= z.lo - 700 && rpm <= z.hi + 700 ? 'buona' : rpm < z.lo ? 'fiacca' : 'pattinata';
-      }
-    } else if (R.phase === 'run') {
-      R.tt += dt;
-      const released = this.sim.cfg.autoClutch ? this.sim.in.brake < 0.25 : this.sim.in.clutch < 0.6;
-      if (R.react === undefined && released) R.react = R.tt;
-      if (this.sim.cut === 2 && this.sim.clutch < 0.3 && R.tt > 0.3) R.hitLim = true;   // limitatore a frizione chiusa
-      R.vmax = Math.max(R.vmax || 0, this.kmh);
-      if (rival) {
-        const k = R.tt / R.et;
-        rival.x = R.x0 + (k <= 1 ? 402.3 * Math.pow(k, 1.75) : 402.3 + 402.3 * 1.75 / R.et * (R.tt - R.et));
-      }
-      if (d - R.x0 >= 402.3) { R.you = R.tt; this.endRace(R.tt < R.et); }
-      else if (R.tt > R.et + 12) this.endRace(false);
-    }
-  }
-  // valuta una cambiata durante la gara; la perfetta rende il cambio più rapido
-  gradeShift() {
-    const R = this.race; if (!R || R.phase !== 'run') return null;
-    const rpm = this.sim.rpm, lim = this.sim.P.limiter;
-    const g = R.hitLim || rpm > lim - 30 ? 'tardi' : rpm >= lim - 420 ? 'perfetta' : rpm >= lim - 1000 ? 'buona' : 'anticipata';
-    R.shifts.push(g); R.hitLim = false;
-    this.sim.fastShift = g === 'perfetta';
-    return g;
-  }
-
-  endRace(win, why) {
-    const R = this.race; this.race = null;
-    const ladder = R.ladder !== undefined;
-    const gain = win ? (ladder ? R.prize : R.stake) : (ladder ? 0 : -R.stake);
-    if (this.mode === 'career') this.s.money += gain;
-    if (win) { this.s.rep += ladder ? 15 : 10; this.s.wins++; } else this.s.losses++;
-    if (win && ladder && R.ladder === this.s.ladder) this.s.ladder++;
-    if (win && R.rv.boss) { if (this.addItem('trofeo', { name: `Trofeo: ${R.rv.name}` })) this.say(`Trofeo di ${R.rv.name} nel bagagliaio`, 'money'); }
-    this.say(win ? `Vinto contro ${R.rv.name}: ${R.you.toFixed(3)} s contro ${R.et.toFixed(3)}` : `${why || 'Perso'} contro ${R.rv.name}`, win ? 'money' : 'lose');
-    this.result = {
-      win, why, rv: R.rv, you: R.you, et: R.et, gain, ladder, react: R.react, launch: R.launch, launchRpm: R.launchRpm,
-      shifts: R.shifts, vmax: R.vmax, boss: !!R.rv.boss, zoneDone: win && ladder && R.rv.boss,
-    };
-    this.lastRace = { win, you: R.you, et: R.et, rv: R.rv };
-    this.ents.forEach((e) => { if (e.kind === 'rival') e.v = win ? 18 : 40; });
   }
 
   // polizia più vicina davanti (per l'avviso radar)

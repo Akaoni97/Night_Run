@@ -1,0 +1,2445 @@
+NIGHT RUN · MATERIALE 3 · FILE 08
+
+[REDAZIONE] NOTE
+T9. Scaletta delle diciotto conversazioni nuove. Ogni scena ha un motivo per esistere e
+due esiti; non serve completarle tutte per ottenere un finale. I richiami sono ALT
+basati su una decisione effettiva. I gesti e le abitudini sono il nuovo materiale
+ordinario richiesto, senza nuovi parenti, morti o patti pregressi.
+
+[REDAZIONE] NOTE
+01. Elena · Pasta sulla tastiera · fase I · richiede e25. La compagnia non richiede un
+aggiornamento utile.
+
+[REDAZIONE] NOTE
+02. Elena · Il dopo che non arriva · fase II · richiede e50. Riconosce quando gli orari
+diventano una scusa.
+
+[REDAZIONE] NOTE
+03. Elena · La foto non bella · fase II · richiede e01b. Riprende la foto promessa senza
+chiedere una messinscena.
+
+[REDAZIONE] NOTE
+04. Elena · Una scusa senza però · fase III · richiede elena_scuse. Il litigio cambia il
+modo di chiedere spazio.
+
+[REDAZIONE] NOTE
+05. Elena · Il temperino e tre incontri · fase III · richiede temperino_detto_elena. Un
+ricordo limitato non deve diventare un’infanzia inventata.
+
+[REDAZIONE] NOTE
+06. Elena · Oggi nessuna domanda · fase IV · richiede e08c. Ripara una chiusura
+rispettando il limite chiesto.
+
+[REDAZIONE] NOTE
+07. Rosa · Il panino e il bullone · fase II · richiede r25. Si prende una pausa senza
+continuare a lavorare.
+
+[REDAZIONE] NOTE
+08. Rosa · Un rumore alla volta · fase II · richiede r50. Accetta un compito concreto
+invece di una richiesta totale.
+
+[REDAZIONE] NOTE
+09. Rosa · Non darmi ragione · fase III · richiede r75. Riconosce il proprio modo di
+comandare quando ha paura.
+
+[REDAZIONE] NOTE
+10. Rosa · Ho rifatto il controllo · fase III · richiede r01b. Un controllo ripetuto può
+essere cura o paura.
+
+[REDAZIONE] NOTE
+11. Rosa · La promessa ritirata · fase V · richiede r05c. Riapre la collaborazione senza
+cancellare il rifiuto.
+
+[REDAZIONE] NOTE
+12. Rosa · Parlare dopo · fase V · richiede r100. Prima della scelta finale la vuole
+vivo, non riconoscente.
+
+[REDAZIONE] NOTE
+13. Livia · La pila che non finisce · fase III · richiede l25. Interrompe un lavoro
+usato per rimandare una paura.
+
+[REDAZIONE] NOTE
+14. Livia · La risposta sbagliata · fase III · richiede l50. Si permette di correggersi
+senza diventare inaffidabile.
+
+[REDAZIONE] NOTE
+15. Livia · Il pranzo sulle carte · fase III · richiede l75. Riduce la distanza con un
+gesto ordinario.
+
+[REDAZIONE] NOTE
+16. Livia · Non fare il mio lavoro · fase IV · richiede l02c. Chiede una verità per
+riparare il confronto interrotto.
+
+[REDAZIONE] NOTE
+17. Livia · L’assenza nella foto · fase IV · richiede foto. Rende umana la prova senza
+aggiungere cose che non mostra.
+
+[REDAZIONE] NOTE
+18. Livia · La soglia di casa · fase V · richiede l100. Distingue una cattiva notizia da
+una persona da respingere.
+
+[REDAZIONE] NOTE
+T7, dialoghi: sostituite anche le conferme ripetute con risposte pertinenti a ogni
+esito. Restano scene da leggere in sequenza: i due modi di rispondere non promettono un
+esito materiale diverso. I bivi richiesti sono in T2 e T9, non nel pulsante che
+riconosce un fallimento già accaduto.
+
+[REDAZIONE] NOTE
+T3, varianti finali a confidenza 100: sono innesti di regia, non nuove chat autonome. Le
+condizioni di accesso al finale restano identiche. Se più condizioni coincidono, vale
+prima l’esito del finale, poi la variante affettiva.
+
+[VARIANTE_A_ELENA100]
+condizione: finale A; conf:Elena>=100; fatto:V2_ELE_s100_01
+ELENA: Sono qui. Anche se torni senza una bella storia.
+
+[VARIANTE_D_ELENA100]
+condizione: finale D; conf:Elena>=100; fatto:V2_ELE_s100_01
+regia: il vecchio messaggio resta; il riconoscimento si consuma.
+ELENA, messaggio conservato: Sono qui. Anche se torni senza una bella storia.
+TU, PENSIERO: Lo rileggo. La frase è rimasta. Il posto a cui rispondeva, no.
+
+[VARIANTE_C_LIVIA100]
+condizione: finale C; conf:Livia>=100; fatto:V2_LIV_s100_01
+LIVIA: Vieni dentro. Quello che manca non lo sistemiamo lasciandoti sulla porta.
+
+[VARIANTE_B2_LIVIA100]
+condizione: finale B2; conf:Livia>=100; fatto:V2_LIV_s100_01
+TU, PENSIERO: Mi aveva detto che potevo entrare a mani vuote. Le ho portato lui.
+
+[VARIANTE_PREFINALE_ROSA100]
+condizione: conf:Rosa>=100; fatto:V2_ROS_s100_01
+regia: prima del recupero offrire V2_ROS_n6_01 una sola volta.
+ROSA: Ti voglio di ritorno, non eroico. La frase vale ancora.
+
+[REDAZIONE] NOTE
+NODI
+
+[V2_ELE_n1_01] ELENA · I · richiede: e25
+Pasta ha camminato sulla tastiera. Aveva un aggiornamento più lungo del tuo.
+  A) «Chiedigli se sa quando torno.» → V2_ELE_n1_02
+  B) «Una riga inutile mi farebbe bene.» → V2_ELE_n1_03
+
+
+[V2_ELE_n1_02] ELENA · I · sempre
+Non si capiva un cazzo, ma almeno non finiva con tutto bene.
+  A) «Quello era proprio il mio stile.» → V2_ELE_n1_04
+  B) «Mandami la versione corretta da te.» → V2_ELE_n1_05
+
+
+[V2_ELE_n1_03] ELENA · I · sempre
+Lo cancello. Non voglio abituarti a conversazioni migliori delle mie.
+  A) «Non devo rendere utile ogni messaggio.» → V2_ELE_n1_04
+  B) «Oggi posso parlare anche di niente.» → V2_ELE_n1_06
+
+
+[V2_ELE_n1_04] ELENA · I · sempre
+Puoi mandare anche una riga inutile. Non mi pagano per smistarti le emergenze.
+  A) «Ti mando un saluto senza una richiesta sotto.» → V2_ELE_n1_05
+  B) «Ti lascio scegliere l’argomento per una volta.» → V2_ELE_n1_06
+
+
+[V2_ELE_n1_05] ELENA · I · sempre
+Va bene. Pasta è stato promosso a collega e io resto tua sorella.
+[FINE]
+
+
+[V2_ELE_n1_06] ELENA · I · sempre
+Allora oggi niente aggiornamenti obbligatori. Solo una chat normale.
+[FINE]
+
+
+[V2_ELE_n2_01] ELENA · II · richiede: e50
+Quando scriviamo dopo, intendi dopo davvero o sparisco con una parola educata?
+  A) «A volte lo uso per non decidere.» → V2_ELE_n2_02
+  B) «Adesso mi serve spazio, non un orario.» → V2_ELE_n2_03
+
+
+[V2_ELE_n2_02] ELENA · II · sempre
+Chiedo per entrambi. Non ho voglia di fare la polizia dei tuoi orari.
+  A) «Ti dico che non so quando.» → V2_ELE_n2_04
+  B) «Non ti metto in attesa mentre fingo di organizzarmi.» → V2_ELE_n2_05
+
+
+[V2_ELE_n2_03] ELENA · II · sempre
+Se ti serve spazio, scrivi spazio. Capisco anche quello.
+  A) «Te lo sto chiedendo adesso, senza una scusa.» → V2_ELE_n2_04
+  B) «Non è per mandarti via.» → V2_ELE_n2_06
+
+
+[V2_ELE_n2_04] ELENA · II · sempre
+Possiamo smettere di usare un orario come una promessa che non sentiamo.
+  A) «Ti scrivo quando ho qualcosa da condividere.» → V2_ELE_n2_05
+  B) «Per oggi mi fermo qui.» → V2_ELE_n2_06
+
+
+[V2_ELE_n2_05] ELENA · II · sempre
+Va bene. Il dopo rimane aperto, non diventa una sala d’attesa.
+[FINE]
+
+
+[V2_ELE_n2_06] ELENA · II · sempre
+Allora ti lascio spazio. Il primo messaggio lo mandi tu quando puoi esserci.
+[FINE]
+
+
+[V2_ELE_n3_01] ELENA · II · richiede: e01b
+La foto che volevi farmi vedere è diventata un servizio fotografico?
+  A) «Te la mando com’è, senza prepararla.» → V2_ELE_n3_02 [flag:en3]
+  B) «Oggi mi pesa perfino fare una foto.» → V2_ELE_n3_03
+
+
+[V2_ELE_n3_02] ELENA · II · sempre
+Non sistemare tutto prima. Non devo decidere se comprare la tua macchina.
+  A) «Niente filtro vendesi.» → V2_ELE_n3_04
+  B) «Ti faccio vedere anche quello che non mi convince.» → V2_ELE_n3_05
+
+
+[V2_ELE_n3_03] ELENA · II · sempre
+Se oggi non vuoi mandarla, dimmelo. Non la trasformiamo in un altro compito.
+  A) «Non te la mando oggi. Senza scuse strane.» → V2_ELE_n3_04
+  B) «Mi dai tempo senza dovermi ricordare la promessa?» → V2_ELE_n3_06
+
+
+[V2_ELE_n3_04] ELENA · II · sempre
+Una cosa vera va bene anche se non ti fa fare bella figura.
+  A) «Non devo venderti una scelta perfetta.» → V2_ELE_n3_05
+  B) «Non ti faccio fare anche da perito.» → V2_ELE_n3_06
+
+
+[V2_ELE_n3_05] ELENA · II · sempre
+Ecco. Almeno posso prenderla in giro per il motivo giusto.
+[FINE]
+
+
+[V2_ELE_n3_06] ELENA · II · sempre
+Va bene. La foto resta una possibilità, non un debito.
+[FINE]
+
+
+[V2_ELE_n4_01] ELENA · III · richiede: elena_scuse
+La scusa di prima vale ancora anche se oggi sono io quella nervosa?
+  A) «Vale. Non era uno scambio per farti calmare.» → V2_ELE_n4_02
+  B) «Se vuoi fermarti, non lo prendo come una vendetta.» → V2_ELE_n4_03
+
+
+[V2_ELE_n4_02] ELENA · III · sempre
+Non ti restituisco la frase cattiva per fare pari. Però mi serviva chiedertelo.
+  A) «Ti ascolto senza tenere il punteggio.» → V2_ELE_n4_04
+  B) «Posso anche chiederti una pausa.» → V2_ELE_n4_05
+
+
+[V2_ELE_n4_03] ELENA · III · sempre
+Puoi dirmi di fermarmi prima che ricominciamo a risponderci male.
+  A) «Te lo dico prima di sbottare.» → V2_ELE_n4_04
+  B) «Oggi mi fermo qui, senza sparire per dispetto.» → V2_ELE_n4_06
+
+
+[V2_ELE_n4_04] ELENA · III · sempre
+Non dobbiamo vincere la serata per volerci ancora parlare.
+  A) «Non devo avere ragione per restare nella chat.» → V2_ELE_n4_05
+  B) «Riprendiamo dopo senza un conto da saldare.» → V2_ELE_n4_06
+
+
+[V2_ELE_n4_05] ELENA · III · sempre
+Va bene. Oggi comincio io con sono stanca.
+[FINE]
+
+
+[V2_ELE_n4_06] ELENA · III · sempre
+Allora fermiamoci senza lasciare una punizione nascosta nel silenzio.
+[FINE]
+
+
+[V2_ELE_n5_01] ELENA · III · richiede: temperino_detto_elena
+Tre incontri con Claudio. Non devi ricostruire una vita per avere diritto al temperino.
+  A) «Ricordo il regalo. Il resto non voglio inventarlo.» → V2_ELE_n5_02
+  B) «Mi sento strano ad avere così poco da raccontare.» → V2_ELE_n5_03
+
+
+[V2_ELE_n5_02] ELENA · III · sempre
+Puoi ricordare poco. Non significa che quel poco sia finto.
+  A) «Lo tengo senza aggiungere una storia.» → V2_ELE_n5_04
+  B) «Non devo riempire ogni vuoto.» → V2_ELE_n5_05
+
+
+[V2_ELE_n5_03] ELENA · III · sempre
+Se una cosa non la sai, non devi prenderla in prestito da un racconto bello.
+  A) «Posso fermarmi a quello che c’è.» → V2_ELE_n5_04
+  B) «Mi aiuta che tu lo dica così.» → V2_ELE_n5_06
+
+
+[V2_ELE_n5_04] ELENA · III · sempre
+A me basta che mi dici quale pezzo ricordi davvero.
+  A) «È un pezzo piccolo, ma è mio.» → V2_ELE_n5_05
+  B) «Non completo il resto per farmi perdonare.» → V2_ELE_n5_06
+
+
+[V2_ELE_n5_05] ELENA · III · sempre
+Va bene. Restiamo a quello. Non ti chiedo di diventare suo figlio per capirlo.
+[FINE]
+
+
+[V2_ELE_n5_06] ELENA · III · sempre
+Allora il temperino resta un regalo, non un esame su quanto gli volevi bene.
+[FINE]
+
+
+[V2_ELE_n6_01] ELENA · IV · richiede: e08c
+Prima mi hai chiesto di non domandarti altro. Vale ancora?
+  A) «Non vale più. Voglio parlarti.» → V2_ELE_n6_02 [flag:en6]
+  B) «Vale ancora. Te lo chiedo senza arrabbiarmi.» → V2_ELE_n6_03
+
+
+[V2_ELE_n6_02] ELENA · IV · sempre
+Se sì, smetto. Non voglio farti guadagnare il silenzio rispondendo bene.
+  A) «Grazie per avermelo chiesto una volta sola.» → V2_ELE_n6_04
+  B) «Non devi guadagnarti una risposta.» → V2_ELE_n6_05
+
+
+[V2_ELE_n6_03] ELENA · IV · sempre
+Se no, possiamo ricominciare da una cosa piccola.
+  A) «Comincio da come sto adesso.» → V2_ELE_n6_04
+  B) «Una cosa normale mi aiuta.» → V2_ELE_n6_06
+
+
+[V2_ELE_n6_04] ELENA · IV · sempre
+Dimmi tu se vuoi compagnia o spazio. Non lo indovino facendo la sorella brava.
+  A) «Compagnia. Senza interrogatorio.» → V2_ELE_n6_05
+  B) «Spazio, per oggi.» → V2_ELE_n6_06
+
+
+[V2_ELE_n6_05] ELENA · IV · sempre
+Va bene. Resto nella chat senza riempirla.
+[FINE]
+
+
+[V2_ELE_n6_06] ELENA · IV · sempre
+Allora oggi spazio. Scrivimi tu quando vuoi riaprire.
+[FINE]
+
+
+[V2_ROS_n1_01] ROSA · II · richiede: r25
+Ho appoggiato il panino dove tenevo il bullone. Adesso il panino deve aspettare.
+  A) «Prima il pranzo. Il bullone ha già il suo posto.» → V2_ROS_n1_02
+  B) «C’è una cosa urgente. Le altre le tengo.» → V2_ROS_n1_03
+
+
+[V2_ROS_n1_02] ROSA · II · sempre
+Il bullone no, non l’ho mangiato. Ti precedo, pezzo di spiritoso.
+  A) «Non ti faccio lavorare mentre mastichi.» → V2_ROS_n1_04
+  B) «La domanda sul bullone me la stavi servendo tu.» → V2_ROS_n1_05
+
+
+[V2_ROS_n1_03] ROSA · II · sempre
+Se mi fai una domanda adesso dimmi prima se riguarda il motore o il pranzo.
+  A) «Solo l’urgenza, senza aggiungere tutto il resto.» → V2_ROS_n1_04
+  B) «Aspetto che finisca la sosta.» → V2_ROS_n1_06
+
+
+[V2_ROS_n1_04] ROSA · II · sempre
+Voglio una sosta che non si allarghi fino a diventare un altro lavoro.
+  A) «Niente lista nascosta dopo la prima domanda.» → V2_ROS_n1_05
+  B) «Fermiamoci davvero, allora.» → V2_ROS_n1_06
+
+
+[V2_ROS_n1_05] ROSA · II · sempre
+Bene. Il panino è salvo e tu non hai ricevuto una diagnosi via maionese.
+[FINE]
+
+
+[V2_ROS_n1_06] ROSA · II · sempre
+Va bene. Finisco la cosa urgente, poi basta davvero.
+[FINE]
+
+
+[V2_ROS_n2_01] ROSA · II · richiede: r50
+Scrivimi un rumore. Uno. Non una recensione della macchina intera.
+  A) «Ti descrivo il momento, senza inventare il nome del pezzo.» → V2_ROS_n2_02
+  B) «Non riesco ancora a spiegarlo. Mi fermo.» → V2_ROS_n2_03
+
+
+[V2_ROS_n2_02] ROSA · II · sempre
+Quello che hai sentito davvero, non quello che hai letto che dovrebbe fare.
+  A) «Una cosa osservata. Niente diagnosi mia.» → V2_ROS_n2_04
+  B) «Ti dico anche quando non succede.» → V2_ROS_n2_05
+
+
+[V2_ROS_n2_03] ROSA · II · sempre
+Se adesso non riesci a descriverlo, fermati. Il rumore non si offende.
+  A) «Aspetto da fermo e poi ti scrivo.» → V2_ROS_n2_04
+  B) «Non provo una manovra per avere qualcosa da dire.» → V2_ROS_n2_06
+
+
+[V2_ROS_n2_04] ROSA · II · sempre
+Prima distinguiamo quando succede. Poi decidiamo se devi muoverti.
+  A) «Non gli do un nome per farti fare prima.» → V2_ROS_n2_05
+  B) «Se non lo capisco lo lascio come dubbio.» → V2_ROS_n2_06
+
+
+[V2_ROS_n2_05] ROSA · II · sempre
+Bene. Ho un dettaglio su cui lavorare, non una collezione di paure.
+[FINE]
+
+
+[V2_ROS_n2_06] ROSA · II · sempre
+Va bene. Non ti faccio accelerare per mandarmi un esempio migliore.
+[FINE]
+
+
+[V2_ROS_n3_01] ROSA · III · richiede: r75
+Se oggi mi dai ragione troppo in fretta ti mando a fanculo prima della riparazione.
+  A) «Ti dico quello che vedo, anche se non coincide.» → V2_ROS_n3_02 [flag:rn3]
+  B) «Posso chiederti se sai o stai ricordando.» → V2_ROS_n3_03
+
+
+[V2_ROS_n3_02] ROSA · III · sempre
+Non è una prova di simpatia. È che quando ho paura scrivo come se comandassi.
+  A) «Non salgo di volume per competere.» → V2_ROS_n3_04
+  B) «Ti fermo con guarda prima, come hai chiesto.» → V2_ROS_n3_05
+
+
+[V2_ROS_n3_03] ROSA · III · sempre
+Se ti dico una cosa che non hai visto, puoi fermarmi.
+  A) «Non mi serve vincere la discussione.» → V2_ROS_n3_04
+  B) «Aspetto di poter guardare.» → V2_ROS_n3_06
+
+
+[V2_ROS_n3_04] ROSA · III · sempre
+Mi serve un dettaglio tuo, non il mio ricordo ripetuto bene.
+  A) «Il mio dettaglio prima del tuo ordine.» → V2_ROS_n3_05
+  B) «Se non vedo, non ti do un sì per farti respirare.» → V2_ROS_n3_06
+
+
+[V2_ROS_n3_05] ROSA · III · sempre
+Bene. Un’officina con due cervelli. Evento raro, ma non soprannaturale.
+[FINE]
+
+
+[V2_ROS_n3_06] ROSA · III · sempre
+Va bene. Per adesso non decidi per calmarmi. È già un aiuto.
+[FINE]
+
+
+[V2_ROS_n4_01] ROSA · III · richiede: r01b
+Il controllo me l’hai già descritto. Adesso vuoi rifarlo o vuoi che ti rassicuri?
+  A) «Voglio rassicurarmi. Non ho visto niente di diverso.» → V2_ROS_n4_02
+  B) «C’è un particolare nuovo che non ti avevo descritto.» → V2_ROS_n4_03
+
+
+[V2_ROS_n4_02] ROSA · III · sempre
+Non è la stessa cosa. Il primo mi serve, il secondo rischia di non finire.
+  A) «Allora mi fermo senza rifare tutto.» → V2_ROS_n4_04
+  B) «Non ti chiedo di trovare un problema per calmarmi.» → V2_ROS_n4_05
+
+
+[V2_ROS_n4_03] ROSA · III · sempre
+Se c’è un dettaglio nuovo lo guardiamo. Se no, puoi anche avere ancora paura.
+  A) «Ti descrivo solo quello che è cambiato.» → V2_ROS_n4_04
+  B) «Aspetto di poterlo controllare da fermo.» → V2_ROS_n4_06
+
+
+[V2_ROS_n4_04] ROSA · III · sempre
+Non devo inventarti un guasto per darti una ragione buona di fermarti.
+  A) «Posso non sentirmi pronto anche se il controllo è finito.» → V2_ROS_n4_05
+  B) «Un dettaglio, poi basta.» → V2_ROS_n4_06
+
+
+[V2_ROS_n4_05] ROSA · III · sempre
+Bene. Il controllo è finito. La paura può sedersi un momento senza aprire il cofano.
+[FINE]
+
+
+[V2_ROS_n4_06] ROSA · III · sempre
+Va bene. Guardiamo soltanto quel dettaglio nuovo, poi smettiamo.
+[FINE]
+
+
+[V2_ROS_n5_01] ROSA · V · richiede: r05c
+Prima hai ritirato l’aiuto. Adesso mi stai scrivendo per riparlarne?
+  A) «Sì. Ma voglio mettere un limite chiaro.» → V2_ROS_n5_02 [flag:rn5]
+  B) «No. Voglio soltanto dirti che non ho cambiato idea.» → V2_ROS_n5_03
+
+
+[V2_ROS_n5_02] ROSA · V · sempre
+Possiamo farlo. Non serve ripetere la promessa più forte di prima.
+  A) «Aiuto a cercarlo, senza aprire alla cieca.» → V2_ROS_n5_04
+  B) «Prima guardiamo il punto, poi ti rispondo.» → V2_ROS_n5_05
+
+
+[V2_ROS_n5_03] ROSA · V · sempre
+Se il limite è diverso, scrivilo prima del sì.
+  A) «Preferisco dirtelo invece di fingere.» → V2_ROS_n5_04
+  B) «Posso aiutarti a preparare senza venire dentro.» → V2_ROS_n5_06
+
+
+[V2_ROS_n5_04] ROSA · V · sempre
+Non ti voglio disposto a tutto. Ti voglio capace di fermarti quando serve.
+  A) «È questo il limite. Se cambia, lo dico.» → V2_ROS_n5_05
+  B) «Per adesso niente promessa nuova.» → V2_ROS_n5_06
+
+
+[V2_ROS_n5_05] ROSA · V · sempre
+Bene. Allora prepariamo una ricerca, non la riparazione del tuo senso di colpa.
+[FINE]
+
+
+[V2_ROS_n5_06] ROSA · V · sempre
+Va bene. Resti fuori dal recupero. Non ti faccio diventare il colpevole di tutto.
+[FINE]
+
+
+[V2_ROS_n6_01] ROSA · V · richiede: r100
+Dopo possiamo anche parlare di qualcosa che non dobbiamo salvare.
+  A) «Anch’io vorrei una conversazione senza un obiettivo.» → V2_ROS_n6_02
+  B) «Prima voglio dirti quello che sto scegliendo.» → V2_ROS_n6_03
+
+
+[V2_ROS_n6_02] ROSA · V · sempre
+Non ti sto vendendo una sera tranquilla. Sto dicendo che vorrei averla.
+  A) «Non devo meritarmi quella sera diventando un eroe.» → V2_ROS_n6_04
+  B) «Basta poterci essere, senza una bella storia.» → V2_ROS_n6_05
+
+
+[V2_ROS_n6_03] ROSA · V · sempre
+Se torni, non devi ringraziarmi rifacendo tutta la storia.
+  A) «Non ti pago con una promessa più grande.» → V2_ROS_n6_04
+  B) «Ti dico il limite prima di arrivarci.» → V2_ROS_n6_06
+
+
+[V2_ROS_n6_04] ROSA · V · sempre
+Se scegli altro, dimmelo prima di trasformare una promessa in un addio.
+  A) «Ti scrivo prima della decisione.» → V2_ROS_n6_05
+  B) «Tengo la scelta distinta dal volerti bene.» → V2_ROS_n6_06
+
+
+[V2_ROS_n6_05] ROSA · V · sempre
+Va bene. Un messaggio vero, prima della porta. Senza fare i fenomeni.
+[FINE]
+
+
+[V2_ROS_n6_06] ROSA · V · sempre
+Allora tieni questo: di ritorno, non eroico. Lo avevo scritto e non lo ritiro.
+[FINE]
+
+
+[V2_LIV_n1_01] LIVIA · III · richiede: l25
+Ho finito di sistemare la pila. Adesso sto considerando di spostarla tutta a sinistra.
+  A) «Una pausa con un mobile testimone. Molto professionale.» → V2_LIV_n1_02
+  B) «C’è una cosa precisa. Il resto può aspettare.» → V2_LIV_n1_03
+
+
+[V2_LIV_n1_02] LIVIA · III · sempre
+Non ridere. A destra avrei dovuto cominciare il lavoro vero.
+  A) «Ti lascio cinque minuti senza una richiesta sotto.» → V2_LIV_n1_04
+  B) «Il lavoro vero non si avvicina spostando la pila.» → V2_LIV_n1_05
+
+
+[V2_LIV_n1_03] LIVIA · III · sempre
+Se ti serve una risposta oggi, dimmelo. Se no mi prendo cinque minuti normali.
+  A) «Una domanda sola, poi ti lascio andare.» → V2_LIV_n1_04
+  B) «Può aspettare. Non ti tengo lì.» → V2_LIV_n1_06
+
+
+[V2_LIV_n1_04] LIVIA · III · sempre
+Non voglio far finta di lavorare per non ammettere che ho bisogno di fermarmi.
+  A) «Puoi fermarti anche senza aver finito.» → V2_LIV_n1_05
+  B) «Una risposta sola, senza aggiungere tutto il resto.» → V2_LIV_n1_06
+
+
+[V2_LIV_n1_05] LIVIA · III · sempre
+Grazie. La pila resta dov’è e io mi alzo dalla sedia.
+[FINE]
+
+
+[V2_LIV_n1_06] LIVIA · III · sempre
+Va bene. Rispondo a quella cosa precisa, poi basta archiviare anche la pausa.
+[FINE]
+
+
+[V2_LIV_n2_01] LIVIA · III · richiede: l50
+Ho riletto una frase che ti avevo mandato. La farei meno sicura.
+  A) «Dimmi quale pezzo vuoi correggere.» → V2_LIV_n2_02 [flag:ln2]
+  B) «Sì. Non ti chiedo di essere infallibile.» → V2_LIV_n2_03
+
+
+[V2_LIV_n2_02] LIVIA · III · sempre
+Non è cambiata la cosa. Ero io che volevo arrivare troppo presto alla fine.
+  A) «Lo tengo come correzione, non come un tradimento.» → V2_LIV_n2_04
+  B) «Non cancello la versione di prima.» → V2_LIV_n2_05
+
+
+[V2_LIV_n2_03] LIVIA · III · sempre
+Posso correggermi senza farti scegliere se fidarti di tutta la mia vita?
+  A) «Mi aiuta sapere che puoi tornare su una frase.» → V2_LIV_n2_04
+  B) «Non trasformo un errore in un carattere intero.» → V2_LIV_n2_06
+
+
+[V2_LIV_n2_04] LIVIA · III · sempre
+Preferisco il fastidio di una correzione al conforto di restare precisa sulla carta.
+  A) «Segniamo quello che cambia e basta.» → V2_LIV_n2_05
+  B) «Puoi essere meno sicura e più utile.» → V2_LIV_n2_06
+
+
+[V2_LIV_n2_05] LIVIA · III · sempre
+Grazie. Cambio quella frase, non ti chiedo di dimenticare che l’avevo scritta.
+[FINE]
+
+
+[V2_LIV_n2_06] LIVIA · III · sempre
+Va bene. Ti spiego solo che cosa cambia, senza rifare tutta la storia.
+[FINE]
+
+
+[V2_LIV_n3_01] LIVIA · III · richiede: l75
+Sto mangiando lontano dalle carte. Mi sento quasi una persona fuori dal lavoro.
+  A) «Il piatto ha una fonte autonoma, immagino.» → V2_LIV_n3_02
+  B) «Finisci di mangiare. Ti scrivo dopo.» → V2_LIV_n3_03
+
+
+[V2_LIV_n3_02] LIVIA · III · sempre
+È incredibile: il piatto non mi chiede in che ordine sono arrivati gli ingredienti.
+  A) «Niente fascicolo sulla pasta.» → V2_LIV_n3_04
+  B) «Per oggi parliamo di tavoli e basta.» → V2_LIV_n3_05
+
+
+[V2_LIV_n3_03] LIVIA · III · sempre
+Non mi fare una domanda con sei parti. Oggi ne mangio almeno una senza rispondere.
+  A) «Non ti aggiungo una lista mentre mangi.» → V2_LIV_n3_04
+  B) «Ho una cosa breve, senza altre cinque sotto.» → V2_LIV_n3_06
+
+
+[V2_LIV_n3_04] LIVIA · III · sempre
+Puoi raccontarmi qualcosa di normale. Non deve diventare materiale da conservare.
+  A) «Una cosa normale, senza un significato nascosto.» → V2_LIV_n3_05
+  B) «Mangia. Il resto non scappa per offenderti.» → V2_LIV_n3_06
+
+
+[V2_LIV_n3_05] LIVIA · III · sempre
+Grazie. Per qualche minuto la tovaglia non è un tavolo da lavoro.
+[FINE]
+
+
+[V2_LIV_n3_06] LIVIA · III · sempre
+Va bene. Una cosa breve, poi finisco di mangiare prima di diventare sgradevole.
+[FINE]
+
+
+[V2_LIV_n4_01] LIVIA · IV · richiede: l02c
+Prima hai scelto di non raccontarmi quello che avevi. Vuoi riaprire adesso?
+  A) «Sì. Avevo paura di perdere anche la mia versione.» → V2_LIV_n4_02 [flag:ln4]
+  B) «No. Ma volevo smettere di fingere che non fosse una scelta.» → V2_LIV_n4_03
+
+
+[V2_LIV_n4_02] LIVIA · IV · sempre
+Possiamo. Non mi serve che cominci con ti dovevi fidare di me.
+  A) «Ti dico il motivo senza chiederti di approvarlo.» → V2_LIV_n4_04
+  B) «Ti mando quello che tengo, prima di raccontarlo meglio.» → V2_LIV_n4_05
+
+
+[V2_LIV_n4_03] LIVIA · IV · sempre
+Se non vuoi, lo rispetto. Non ti conto come una persona che ha già detto sì.
+  A) «Non ti userò come un nome di garanzia.» → V2_LIV_n4_04
+  B) «Se cambio idea, te lo dico senza un’altra scusa.» → V2_LIV_n4_06
+
+
+[V2_LIV_n4_04] LIVIA · IV · sempre
+Mi basta un motivo vero. Anche se non mi farà piacere leggerlo.
+  A) «Questo è il motivo. Il resto lo guardiamo insieme.» → V2_LIV_n4_05
+  B) «Non mi aspetto di saltare il confronto per aver chiesto scusa.» → V2_LIV_n4_06
+
+
+[V2_LIV_n4_05] LIVIA · IV · sempre
+Grazie. Adesso possiamo ricominciare da quello che c’è, non dal litigio.
+[FINE]
+
+
+[V2_LIV_n4_06] LIVIA · IV · sempre
+Va bene. Il discorso resta chiuso per tua scelta, non perché io abbia risposto per te.
+[FINE]
+
+
+[V2_LIV_n5_01] LIVIA · IV · richiede: foto
+La parte vuota della foto mi mette più in difficoltà del volto.
+  A) «Non lo completo neanch’io.» → V2_LIV_n5_02 [flag:ln5]
+  B) «Posso guardarla a pezzi senza cambiare quello che mostra.» → V2_LIV_n5_03
+
+
+[V2_LIV_n5_02] LIVIA · IV · sempre
+Sul volto posso fermare gli occhi. Sul vuoto mi viene da scrivere quello che manca.
+  A) «Il nome non riempie quel punto.» → V2_LIV_n5_04
+  B) «Ti dico se sto descrivendo o ricordando.» → V2_LIV_n5_05
+
+
+[V2_LIV_n5_03] LIVIA · IV · sempre
+Claudio ricordava qualcuno lì. Il fotogramma non lo mostra.
+  A) «Non la faccio diventare una risposta a tutto.» → V2_LIV_n5_04
+  B) «Non cancello il racconto. Li tengo distinti.» → V2_LIV_n5_06
+
+
+[V2_LIV_n5_04] LIVIA · IV · sempre
+Non voglio ripetere il suo gesto: correggere la cosa finché smette di farmi male.
+  A) «Se fa male, non significa che vada corretta.» → V2_LIV_n5_05
+  B) «Possiamo fermarci senza nasconderla.» → V2_LIV_n5_06
+
+
+[V2_LIV_n5_05] LIVIA · IV · sempre
+Va bene. Lasciamo vuoto il punto che è vuoto.
+[FINE]
+
+
+[V2_LIV_n5_06] LIVIA · IV · sempre
+Allora la riguardiamo con calma, senza chiederti di ammettere tutto in un istante.
+[FINE]
+
+
+[V2_LIV_n6_01] LIVIA · V · richiede: l100
+Quando ho scritto che puoi entrare senza una buona notizia, lo intendevo.
+  A) «Lo ricordo. Non ti porto un sostituto per evitare quella porta.» → V2_LIV_n6_02
+  B) «Non so se riuscirò a dire tutto senza vergognarmi.» → V2_LIV_n6_03
+
+
+[V2_LIV_n6_02] LIVIA · V · sempre
+Non mi serve prepararmi una sorella più ragionevole prima che tu risponda.
+  A) «Ti dico chi ho visto, non chi vorrei averti riportato.» → V2_LIV_n6_04
+  B) «Non faccio della tua attesa un ordine.» → V2_LIV_n6_05
+
+
+[V2_LIV_n6_03] LIVIA · V · sempre
+Posso arrabbiarmi, piangere e continuare a sapere che non mi stai facendo un torto.
+  A) «Entro con quello che so.» → V2_LIV_n6_04
+  B) «Se non so, comincio da quello.» → V2_LIV_n6_06
+
+
+[V2_LIV_n6_04] LIVIA · V · sempre
+Non usare la mia felicità come una prova che quello davanti sia mio fratello.
+  A) «Neanche un sorriso tuo basta a cambiare un fatto.» → V2_LIV_n6_05
+  B) «Non scelgo per impedirti di soffrire a ogni costo.» → V2_LIV_n6_06
+
+
+[V2_LIV_n6_05] LIVIA · V · sempre
+Grazie. Ti aspetto senza assegnarti la parte di quello che sistema tutto.
+[FINE]
+
+
+[V2_LIV_n6_06] LIVIA · V · sempre
+Va bene. Se non trovi una risposta, non restare sulla soglia a inventarla.
+[FINE]
+
+
+[V2_ELE_n1_05] ELENA · I · sempre
+Va bene. Pasta è stato promosso a collega e io resto tua sorella.
+  ALT se: elena_difende_pasta → Il gatto ha l’avvocato. Non devi essere utile anche a me.
+[FINE]
+
+
+[V2_ELE_n3_05] ELENA · II · sempre
+Ecco. Almeno posso prenderla in giro per il motivo giusto.
+  ALT se: en3 → Mi hai mandato la foto com’è. Meglio di un annuncio.
+[FINE]
+
+
+[V2_ELE_n4_05] ELENA · III · sempre
+Va bene. Oggi comincio io con sono stanca.
+  ALT se: elena_scuse → Prima hai chiesto scusa. Oggi posso farlo io, senza pareggi.
+[FINE]
+
+
+[V2_ELE_n6_05] ELENA · IV · sempre
+Va bene. Resto nella chat senza riempirla.
+  ALT se: en6 → Prima avevi chiuso le domande. Adesso hai scelto di riaprire: lo rispetto.
+[FINE]
+
+
+[V2_ROS_n3_05] ROSA · III · sempre
+Bene. Un’officina con due cervelli. Evento raro, ma non soprannaturale.
+  ALT se: rn3 → Mi hai contraddetta con un dettaglio. Meglio di un sì usato per calmarmi.
+[FINE]
+
+
+[V2_ROS_n4_05] ROSA · III · sempre
+Bene. Il controllo è finito. La paura può sedersi un momento senza aprire il cofano.
+  ALT se: r01b → Volevi imparare il controllo. Ora sai anche quando smettere.
+[FINE]
+
+
+[V2_ROS_n5_05] ROSA · V · sempre
+Bene. Allora prepariamo una ricerca, non la riparazione del tuo senso di colpa.
+  ALT se: rn5 → Riprendi l’aiuto con un limite. Il prima non è cancellato.
+[FINE]
+
+
+[V2_ROS_n6_06] ROSA · V · sempre
+Allora tieni questo: di ritorno, non eroico. Lo avevo scritto e non lo ritiro.
+  ALT se: r100 → Di ritorno, non eroico. Quella frase te la sei tenuta.
+[FINE]
+
+
+[V2_LIV_n2_05] LIVIA · III · sempre
+Grazie. Cambio quella frase, non ti chiedo di dimenticare che l’avevo scritta.
+  ALT se: ln2 → Mi hai chiesto cosa correggere, non se buttare via tutto.
+[FINE]
+
+
+[V2_LIV_n4_05] LIVIA · IV · sempre
+Grazie. Adesso possiamo ricominciare da quello che c’è, non dal litigio.
+  ALT se: ln4 → Ora hai detto il motivo. Possiamo ripartire da lì.
+[FINE]
+
+
+[V2_LIV_n5_05] LIVIA · IV · sempre
+Va bene. Lasciamo vuoto il punto che è vuoto.
+  ALT se: ln5 → Il vuoto resta vuoto. Non miglioriamo la foto per sopportarla.
+[FINE]
+
+
+[V2_LIV_n6_05] LIVIA · V · sempre
+Grazie. Ti aspetto senza assegnarti la parte di quello che sistema tutto.
+  ALT se: l100 → Niente sostituti. Ricorda questo più della mia attesa.
+[FINE]
+
+
+[V2_L02_02] LIVIA · III · sempre
+Questo lo posso ascoltare. La paura non rende inutile quello che hai trovato.
+  A) «La mando adesso.» → LIV_affido_06 [flag:livia;+legami]
+  B) «Mi fermo su questo, per ora.» → V2_L02_03
+
+
+[V2_L04_02] LIVIA · IV · sempre
+Questo lo capisco. Però da solo non avevi un altro originale nascosto.
+  A) «La mando adesso.» → LIV_fiducia_06 [flag:livia;+legami]
+  B) «Mi fermo su questo, per ora.» → V2_L04_03
+
+
+[ELE_cena_ritorno_02] ELENA · V · sempre
+Mi avevi detto di non aspettarti.
+  ALT se: elena_non_aspettare → Mi avevi detto di non aspettarti. Ho mangiato.
+  A) «E lo penso ancora.» → ELE_cena_ritorno_04
+  B) «Non volevo tenerti in sospeso.» → ELE_cena_ritorno_04
+
+
+[ELE_richiamo_02] ELENA · II · sempre
+Mi avevi detto che avresti scritto dalla sosta.
+  ALT se: elena_sosta_promessa → La sosta l’avevi promessa tu.
+  A) «Hai ragione. Ho rimandato troppo.» → ELE_richiamo_04
+  B) «Non volevo chiamare guidando.» → ELE_richiamo_04
+
+
+[ELE_riparazione_02] ELENA · III · sempre
+Prima mi hai chiesto scusa.
+  ALT se: elena_scuse → Mi hai chiesto scusa. Riparto senza cancellare il prima.
+  A) «Era vero. Ti ho risposto male.» → ELE_riparazione_04
+  B) «Lo penso ancora. Non era colpa tua.» → ELE_riparazione_04
+
+
+[ROS_ricontrollo_02] ROSA · III · sempre
+Ti avevo detto prima di non tirare la notte.
+  ALT se: rosa_sosta_accettata → La sosta l’avevi scelta. Ora dimmi se ti è servita.
+  A) «Non volevo ammettere che ero stanco.» → ROS_ricontrollo_04
+  B) «Mi sono fermato prima di cedere.» → ROS_ricontrollo_04
+
+
+[ROS_promessa_01] ROSA · III · richiede: promessa_rosa
+Prima hai detto che mi aiuti. Sai che cosa stai promettendo?
+  ALT se: promessa_rosa → Hai promesso di cercarlo. Il rischio viene prima del resto.
+  A) «Ti aiuto a cercarlo, non apro alla cieca.» → ROS_promessa_02
+  B) «La promessa finisce se non sappiamo chi c’è davanti.» → V2_R05_01 [flag:r05b]
+  C) «Ritiro l’aiuto. Non rischio più.» → V2_R05_03 [flag:r05c;sblocca:ROS_promessa_08]
+
+
+[ROS_recupero_02] ROSA · V · sempre
+Prima mi hai detto che non aprivi alla cieca. Bene.
+  ALT se: promessa_rosa_chiarita → Il limite era riconoscerlo prima di aprire.
+  A) «È ancora quella la mia condizione.» → ROS_recupero_04
+  B) «Se cambia il percorso, te lo dico.» → ROS_recupero_04
+
+
+[LIV_fiducia_01] LIVIA · IV · richiede: prova_trattenuta
+Prima avevi scelto di non mandarmi quello che avevi.
+  ALT se: prova_trattenuta → Prima l’hai tenuta per te. Ripartiamo da quel punto.
+  A) «Te la mando.» → LIV_fiducia_02 [+legami;flag:livia;flag:livia_fiducia_riparata]
+  B) «Per ora lo tengo, ma ti ascolto.» → V2_L04_01 [flag:l04b]
+  C) «La tengo. Chiudo il discorso.» → V2_L04_03 [flag:l04c;sblocca:LIV_fiducia_08]
+
+
+[PRE_2_01] IMITAZIONE DI ELENA · IV · sempre
+Nonno, vieni. Non voglio restare sola.
+  ALT se: conf:Sconosciuto>=50 → Nonno, vieni. Non farmi spiegare perché proprio a te.
+  ALT se: nonno_uso_fissato → Nonno, non mi fare ripetere come ti chiamo. Vieni.
+[FINE]
+
+
+[PRE_1_08] NUMERO SCONOSCIUTO · II · richiede: copia_conservata
+Hai conservato una copia. Non è la stessa cosa.
+  ALT se: copia_conservata → La copia l’hai tenuta. Adesso vuoi che ti basti.
+[FINE]
+
+
+[PRE_4_05] PRESENZA SCOPERTA · V · richiede: patto_esplicito
+La tua risposta non cancella quello che mi hai promesso.
+  ALT se: patto_esplicito → La promessa l’hai fatta sapendo chi avevi davanti.
+[FINE]
+
+
+[PRE_4_10] PRESENZA SCOPERTA · V · sempre
+Scegli con chi tornare. Poi guardalo bene.
+  ALT se: conf:Sconosciuto>=75 → Scegli con chi tornare. So quanto ti pesa tornare solo.
+  ALT se: patto_rifiutato → Hai rifiutato il patto. L’uscita devi ancora sceglierla.
+[FINE]
+
+
+[PRE_4_06] PRESENZA SCOPERTA · V · richiede: ev_presenza_scoperta
+Non ti serve credermi. Ti serve qualcuno da riportare.
+  ALT se: patto_sospeso → Hai lasciato il patto in sospeso. Il posto di chi manca no.
+[FINE]
+
+
+[LIV_irene_06] LIVIA · IV · sempre
+Se riconosci quella porta, non la scambierai con una qualunque.
+  ALT se: foto → La foto è stata confrontata. Il volto non va scelto dalla voce.
+  A) «Non apro soltanto perché è una porta.» → LIV_irene_08
+  B) «Prima riconosco chi la sorveglia.» → LIV_irene_08
+
+
+[PRE_3_10] IMITAZIONE DI CLAUDIO · IV · sempre
+Se vuoi una risposta, torna alla porta.
+  ALT se: conf:Sconosciuto>=75 → Torna alla porta. Non fingere di volere solo risposte.
+  ALT se: porta_ispezione_scelta → Hai scelto di guardare senza aprire. Ti aspetto.
+[FINE]
+
+
+[LIV_affido_08] LIVIA · III · sempre
+Se lo teniamo per noi, resta qualcosa che stiamo soltanto immaginando.
+  ALT se: l02c → Avevi chiuso il confronto. Per riaprirlo manca ancora un pezzo.
+  ALT se: conf:Livia>=50 → Non fidarti per educazione. Lasciami poter riparlarne.
+  ALT se: livia → Adesso posso confrontarla. Non devi fare tutto da solo.
+[FINE]
+
+
+[LIV_fiducia_08] LIVIA · IV · sempre
+Grazie per essere tornato sul discorso. Non era obbligatorio farmi contenta.
+  ALT se: l04c → Hai fermato il confronto. Per riprenderlo mi serve la copia.
+  ALT se: conf:Livia>=75 → Grazie per esserci tornato. Non ti faccio ripagare ogni riga.
+  ALT se: livia_fiducia_riparata → Hai riaperto il confronto. Ripartiamo da qui.
+[FINE]
+
+
+[LIV_promessa_08] LIVIA · V · sempre
+Io resto qui. Quando puoi, dimmi anche quello che non avresti voluto trovare.
+  ALT se: l06c → Il risultato lo volevi tenere. Per ripartire serve una verità.
+  ALT se: conf:Livia>=100 → Ti aspetto con quello che c’è, non con la risposta bella.
+  ALT se: livia_verita_promessa → Mi hai promesso una verità. Non una bella notizia.
+[FINE]
+
+
+[ELE_temperino_risposta] ELENA · I · sempre
+Allora quello almeno non è una cosa trovata a caso.
+  ALT se: temperino_detto_elena → Era un regalo. Non l’hai trovato per caso.
+[FINE]
+
+
+[ELE_claudio_risposta] ELENA · I · sempre
+Era quasi uno sconosciuto anche per me. Non devi fingere il contrario.
+  ALT se: claudio_tre_incontri_fissati → Tre incontri. Non diventano una vita insieme.
+[FINE]
+
+
+[ROS_recupero_08] ROSA · V · sempre
+Scrivi quando puoi. Quando guidi, guida.
+  ALT se: r08c → Hai scelto di non venire. Il recupero non è già riuscito.
+  ALT se: conf:Rosa>=100 → Di ritorno, non eroico. Quando guidi non rispondi a me.
+  ALT se: recupero_ottavio_accettato → Recupero scelto. Quando guidi, guida.
+[FINE]
+
+
+[ROS_recupero_07] ROSA · V · sempre
+Va bene. Preferisco una risposta vera a un altro disperso.
+  ALT se: recupero_ottavio_rinviato → Il recupero l’avevi rinviato. Non è già riuscito.
+  A) «Non ti prometto il risultato.» → ROS_recupero_08
+  B) «Ti prometto che non fingo di sapere.» → ROS_recupero_08
+  C) «Non sposto il limite che avevamo deciso.» → V2_R08_03 [se:r08b]
+
+
+[ELE_distanza_08] ELENA · II · sempre
+Ok. Resta lì un momento. Non fare cose.
+  ALT se: e09c → Avevi fermato il confronto. Per riprenderlo, mandami il dettaglio.
+  ALT se: conf:Elena>=75 → Ti credo. Fermati: capiamo senza metterti fretta.
+  ALT se: distanza_confermata → Il luogo coincide. Non aggiustiamo la distanza.
+[FINE]
+
+
+[LIV_primo_08] LIVIA · III · sempre
+Ti dico da dove viene ogni cosa. Tu fai lo stesso.
+  ALT se: l01c → Quel dettaglio non me l’hai mandato. Posso parlarne, non confermarlo.
+  ALT se: conf:Livia>=50 → Ti racconto anche i pezzi in cui mi sono persa.
+  ALT se: proprietario_verificato → Il nome coincide. Il resto va cercato.
+[FINE]
+
+
+[ROS_segni_08] ROSA · IV · sempre
+Conserva quella prova. Voglio sapere cosa abbiamo visto davvero.
+  ALT se: r07c → La traccia l’hai lasciata dopo averla vista. Non era persa.
+  ALT se: conf:Rosa>=50 → Tieni la traccia. Poi la guardiamo insieme, da fermi.
+  ALT se: segni_rosa_verificati → Hai visto perché ero tornata. Non era una fuga.
+[FINE]
+
+
+[LIV_irene_06] LIVIA · IV · sempre
+Se riconosci quella porta, non la scambierai con una qualunque.
+  ALT se: foto → La foto è stata confrontata. Il volto non va scelto dalla voce.
+  A) «Non apro soltanto perché è una porta.» → LIV_irene_08 [flag:porta_nota]
+  B) «Prima riconosco chi la sorveglia.» → LIV_irene_08 [flag:porta_nota]
+
+
+[V2_USCITA_03] ROSA · V · sempre
+Questo è lo svincolo autentico. Non è la porta che Irene tiene chiusa.
+  ALT se: porta_nota → Hai già riconosciuto la porta. Questo svincolo è un’altra cosa.
+  A) «Continuo da fermo.» → V2_USCITA_04
+  B) «Leggo prima di proseguire.» → V2_USCITA_04
+
+
+[V2_VICINO_06] ELENA · IV · sempre
+Bene. Adesso possiamo smettere di indovinare chi manca. Io sono qui.
+  ALT se: elena_verificata → Controllo fatto adesso. Non vale per ogni voce futura.
+[FINE]
+
+
+[PRE_2_03] IMITAZIONE DI ELENA · IV · sempre
+Mi riconosci, vero?
+  A) «Dimmi una cosa di casa.» → PRE_2_04 [flag:ev_voce_imitata]
+  B) «Una voce non mi basta. Verifico fuori.» → PRE_2_05
+
+
+[PRE_2_07] IMITAZIONE DI ELENA · IV · sempre
+Mi vieni a prendere?
+  A) «Verifico prima di muovermi.» → PRE_2_08 [flag:ev_voce_imitata]
+  B) «Cerco il punto senza aprire nulla.» → PRE_2_09
+  C) «Non seguo la chiamata.» → PRE_2_10
+
+
+[PRE_2_05] IMITAZIONE DI ELENA · IV · sempre
+Ti dà fastidio adesso come ti chiamo?
+  ALT se: ev_voce_imitata → Le domande, allora? Io ti sto aspettando.
+[FINE]
+
+
+[V2_VARCO_05] ROSA · V · sempre
+La scelta resta distinta dalla promessa fatta a Rosa e dalle risposte al telefono.
+  A) «Apro il varco. Non accompagno ancora nessuno.» → V2_VARCO_06 [flag:vc_apro;+varchi]
+  B) «Rifiuto l’apertura: resta chiuso.» → V2_VARCO_06 [flag:vc_rifiuto]
+  C) «Richiudo il varco.» → V2_VARCO_06 [se:vc_richiudibile;flag:vc_richiudo;+varchi]
+
+
+[V2_ELE_n1_01] ELENA · I · richiede: e25
+Pasta ha camminato sulla tastiera. Aveva un aggiornamento più lungo del tuo.
+  A) «Licenzialo. Quel figlio di puttana scrive meglio di me.» → V2_ELE_n1_02
+  B) «Una riga inutile mi farebbe bene.» → V2_ELE_n1_03
+
+
+[V2_ELE_n1_02] ELENA · I · sempre
+Non si capiva un cazzo, ma almeno non finiva con tutto bene.
+  A) «Due parentesi e una zampa: la mia autobiografia.» → V2_ELE_n1_04
+  B) «Mandami la versione corretta da te.» → V2_ELE_n1_05
+
+
+[V2_ELE_n2_01] ELENA · II · richiede: e50
+Quando scriviamo dopo, intendi dopo davvero o sparisco con una parola educata?
+  A) «Dopo è il cassetto dove infilo le cose che mi pesano.» → V2_ELE_n2_02
+  B) «Adesso mi serve spazio, non un orario.» → V2_ELE_n2_03
+
+
+[V2_ELE_n2_03] ELENA · II · sempre
+Se ti serve spazio, scrivi spazio. Capisco anche quello.
+  A) «Spazio. Ecco, l’ho scritto. Fa un po’ schifo.» → V2_ELE_n2_04
+  B) «Non è per mandarti via.» → V2_ELE_n2_06
+
+
+[V2_ELE_n3_02] ELENA · II · sempre
+Non sistemare tutto prima. Non devo decidere se comprare la tua macchina.
+  A) «Tolgo solo la scritta affare imperdibile.» → V2_ELE_n3_04
+  B) «Ti faccio vedere anche quello che non mi convince.» → V2_ELE_n3_05
+
+
+[V2_ELE_n4_01] ELENA · III · richiede: elena_scuse
+La scusa di prima vale ancora anche se oggi sono io quella nervosa?
+  A) «Vale. La scusa non era un buono per fare lo stronzo.» → V2_ELE_n4_02
+  B) «Se vuoi fermarti, non lo prendo come una vendetta.» → V2_ELE_n4_03
+
+
+[V2_ELE_n4_02] ELENA · III · sempre
+Non ti restituisco la frase cattiva per fare pari. Però mi serviva chiedertelo.
+  A) «Ti leggo. Oggi niente tribunale dei coglioni.» → V2_ELE_n4_04
+  B) «Posso anche chiederti una pausa.» → V2_ELE_n4_05
+
+
+[V2_ELE_n5_02] ELENA · III · sempre
+Puoi ricordare poco. Non significa che quel poco sia finto.
+  A) «Lo tengo senza aggiungere una storia.» → V2_ELE_n5_04
+  B) «Il vuoto lo lascio. Mi fa venire voglia di barare.» → V2_ELE_n5_05
+
+
+[V2_ELE_n6_04] ELENA · IV · sempre
+Dimmi tu se vuoi compagnia o spazio. Non lo indovino facendo la sorella brava.
+  A) «Compagnia. Anche se mi racconti una giornata di merda.» → V2_ELE_n6_05
+  B) «Spazio, per oggi.» → V2_ELE_n6_06
+
+
+[V2_ROS_n1_01] ROSA · II · richiede: r25
+Ho appoggiato il panino dove tenevo il bullone. Adesso il panino deve aspettare.
+  A) «Prima il panino. Il bullone è già un duro del cazzo.» → V2_ROS_n1_02
+  B) «C’è una cosa urgente. Le altre le tengo.» → V2_ROS_n1_03
+
+
+[V2_ROS_n1_02] ROSA · II · sempre
+Il bullone no, non l’ho mangiato. Ti precedo, pezzo di spiritoso.
+  A) «Non ti faccio lavorare mentre mastichi.» → V2_ROS_n1_04
+  B) «Il bullone lo conservi: ha più ferro del ripieno.» → V2_ROS_n1_05
+
+
+[V2_ROS_n2_01] ROSA · II · richiede: r50
+Scrivimi un rumore. Uno. Non una recensione della macchina intera.
+  A) «Fa tac quando riparto. Ecco la mia laurea del cazzo.» → V2_ROS_n2_02
+  B) «Non riesco ancora a spiegarlo. Mi fermo.» → V2_ROS_n2_03
+
+
+[V2_ROS_n2_02] ROSA · II · sempre
+Quello che hai sentito davvero, non quello che hai letto che dovrebbe fare.
+  A) «Tac. Il resto della diagnosi me lo sono inventato.» → V2_ROS_n2_04
+  B) «Ti dico anche quando non succede.» → V2_ROS_n2_05
+
+
+[V2_ROS_n2_03] ROSA · II · sempre
+Se adesso non riesci a descriverlo, fermati. Il rumore non si offende.
+  A) «Aspetto da fermo e poi ti scrivo.» → V2_ROS_n2_04
+  B) «Non accelero. Colleziono già abbastanza cazzate.» → V2_ROS_n2_06
+
+
+[V2_ROS_n3_02] ROSA · III · sempre
+Non è una prova di simpatia. È che quando ho paura scrivo come se comandassi.
+  A) «Abbasso il volume. Tu abbassa il cric.» → V2_ROS_n3_04
+  B) «Ti fermo con guarda prima, come hai chiesto.» → V2_ROS_n3_05
+
+
+[V2_ROS_n3_03] ROSA · III · sempre
+Se ti dico una cosa che non hai visto, puoi fermarmi.
+  A) «Non facciamo a chi ce l’ha più chiave inglese.» → V2_ROS_n3_04
+  B) «Aspetto di poter guardare.» → V2_ROS_n3_06
+
+
+[V2_ROS_n3_04] ROSA · III · sempre
+Mi serve un dettaglio tuo, non il mio ricordo ripetuto bene.
+  A) «Il mio dettaglio prima del tuo ordine.» → V2_ROS_n3_05
+  B) «Se non vedo un cazzo, ti dico proprio quello.» → V2_ROS_n3_06
+
+
+[V2_ROS_n4_01] ROSA · III · richiede: r01b
+Il controllo me l’hai già descritto. Adesso vuoi rifarlo o vuoi che ti rassicuri?
+  A) «Voglio che tu mi dica di sì. Che rottura di palle.» → V2_ROS_n4_02
+  B) «C’è un particolare nuovo che non ti avevo descritto.» → V2_ROS_n4_03
+
+
+[V2_ROS_n4_02] ROSA · III · sempre
+Non è la stessa cosa. Il primo mi serve, il secondo rischia di non finire.
+  A) «Spengo. Il cofano può smettere di farmi da psicologo.» → V2_ROS_n4_04
+  B) «Non ti chiedo di trovare un problema per calmarmi.» → V2_ROS_n4_05
+
+
+[V2_ROS_n5_02] ROSA · V · sempre
+Possiamo farlo. Non serve ripetere la promessa più forte di prima.
+  A) «Ti aiuto. Ma alla cieca non apro un cazzo.» → V2_ROS_n5_04
+  B) «Prima guardiamo il punto, poi ti rispondo.» → V2_ROS_n5_05
+
+
+[V2_ROS_n6_01] ROSA · V · richiede: r100
+Dopo possiamo anche parlare di qualcosa che non dobbiamo salvare.
+  A) «Vorrei lamentarmi del caffè. Una cazzata bellissima.» → V2_ROS_n6_02
+  B) «Prima voglio dirti quello che sto scegliendo.» → V2_ROS_n6_03
+
+
+[V2_ROS_n6_02] ROSA · V · sempre
+Non ti sto vendendo una sera tranquilla. Sto dicendo che vorrei averla.
+  A) «Preferisco fare schifo a raccontarla, ma esserci.» → V2_ROS_n6_04
+  B) «Basta poterci essere, senza una bella storia.» → V2_ROS_n6_05
+
+
+[V2_LIV_n1_01] LIVIA · III · richiede: l25
+Ho finito di sistemare la pila. Adesso sto considerando di spostarla tutta a sinistra.
+  A) «L’archivio avanza. Di tre centimetri a sinistra.» → V2_LIV_n1_02
+  B) «C’è una cosa precisa. Il resto può aspettare.» → V2_LIV_n1_03
+
+
+[V2_LIV_n1_02] LIVIA · III · sempre
+Non ridere. A destra avrei dovuto cominciare il lavoro vero.
+  A) «Ti lascio cinque minuti senza una richiesta sotto.» → V2_LIV_n1_04
+  B) «Domani la giri. Così il lavoro ha visto il mondo.» → V2_LIV_n1_05
+
+
+[V2_LIV_n2_03] LIVIA · III · sempre
+Posso correggermi senza farti scegliere se fidarti di tutta la mia vita?
+  A) «Mi aiuta sapere che puoi tornare su una frase.» → V2_LIV_n2_04
+  B) «Mi fido anche se ti manca una risposta.» → V2_LIV_n2_06
+
+
+[V2_LIV_n3_01] LIVIA · III · richiede: l75
+Sto mangiando lontano dalle carte. Mi sento quasi una persona fuori dal lavoro.
+  A) «Per sicurezza interroga il parmigiano.» → V2_LIV_n3_02
+  B) «Finisci di mangiare. Ti scrivo dopo.» → V2_LIV_n3_03
+
+
+[V2_LIV_n3_02] LIVIA · III · sempre
+È incredibile: il piatto non mi chiede in che ordine sono arrivati gli ingredienti.
+  A) «Non catalogare le penne. Mangiale.» → V2_LIV_n3_04
+  B) «Per oggi parliamo di tavoli e basta.» → V2_LIV_n3_05
+
+
+[V2_LIV_n3_04] LIVIA · III · sempre
+Puoi raccontarmi qualcosa di normale. Non deve diventare materiale da conservare.
+  A) «Ho mangiato in piedi. Il tavolo mi pareva un lusso.» → V2_LIV_n3_05
+  B) «Mangia. Il resto non scappa per offenderti.» → V2_LIV_n3_06
+
+
+[V2_LIV_n4_02] LIVIA · IV · sempre
+Possiamo. Non mi serve che cominci con ti dovevi fidare di me.
+  A) «Avevo paura. Mi vergogno a scriverlo così corto.» → V2_LIV_n4_04
+  B) «Ti mando quello che tengo, prima di raccontarlo meglio.» → V2_LIV_n4_05
+
+
+[V2_LIV_n5_02] LIVIA · IV · sempre
+Sul volto posso fermare gli occhi. Sul vuoto mi viene da scrivere quello che manca.
+  A) «Continuo a guardarci. Come se dovesse comparire.» → V2_LIV_n5_04
+  B) «Ti dico se sto descrivendo o ricordando.» → V2_LIV_n5_05
+
+
+[V2_LIV_n6_03] LIVIA · V · sempre
+Posso arrabbiarmi, piangere e continuare a sapere che non mi stai facendo un torto.
+  A) «Se arrivo a mani vuote, mi fai sedere lo stesso?» → V2_LIV_n6_04
+  B) «Se non so, comincio da quello.» → V2_LIV_n6_06
+
+
+[V2_FAL_1_01] ROSA · III · richiede: ev_fallimento_1
+L’ultima lampada è spenta. Non buttare la macchina contro la chiusura.
+  A) «Ho staccato il piede. Sono fermo.» → V2_FAL_1_02
+  B) «Leggo prima di proseguire.» → V2_FAL_1_02
+
+
+[V2_FAL_1_01] ROSA · III · richiede: ev_fallimento_1
+L’ultima lampada è spenta. Non buttare la macchina contro la chiusura.
+  A) «Ho staccato il piede. Sono fermo.» → V2_FAL_1_02
+  B) «La luce è finita. Non passo.» → V2_FAL_1_02
+
+
+[V2_FAL_1_02] ROSA · III · sempre
+Sei al rifugio. La copia del nastro non è più con te.
+  A) «Ho perso proprio il nastro.» → V2_FAL_1_03
+  B) «Leggo prima di proseguire.» → V2_FAL_1_03
+
+
+[V2_FAL_1_02] ROSA · III · sempre
+Sei al rifugio. La copia del nastro non è più con te.
+  A) «Ho perso proprio il nastro.» → V2_FAL_1_03
+  B) «Mi resta quello che ricordo. Poco.» → V2_FAL_1_03
+
+
+[V2_FAL_1_03] ROSA · III · sempre
+Livia ha ancora l’originale. Ci vuole un altro ascolto, non un’altra incursione.
+  A) «Chiederò a Livia di riascoltarlo.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+  B) «Leggo prima di proseguire.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+
+
+[V2_FAL_1_03] ROSA · III · sempre
+Livia ha ancora l’originale. Ci vuole un altro ascolto, non un’altra incursione.
+  A) «Chiederò a Livia di riascoltarlo.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+  B) «Mi serve un minuto.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+
+
+[V2_FAL_2_01] ROSA · V · richiede: ev_fallimento_2
+Sei al rifugio. Marco non è uscito con te.
+  A) «Il sedile è vuoto. Ho continuato a guardarlo.» → V2_FAL_2_02
+  B) «Leggo prima di proseguire.» → V2_FAL_2_02
+
+
+[V2_FAL_2_01] ROSA · V · richiede: ev_fallimento_2
+Sei al rifugio. Marco non è uscito con te.
+  A) «Il sedile è vuoto. Ho continuato a guardarlo.» → V2_FAL_2_02
+  B) «Sono uscito. Lui no.» → V2_FAL_2_02
+
+
+[V2_FAL_2_02] ROSA · V · sempre
+Non lo chiamo salvo. Non gli assegno neanche una morte che non abbiamo visto.
+  A) «Non so cosa gli sia successo.» → V2_FAL_2_03
+  B) «Leggo prima di proseguire.» → V2_FAL_2_03
+
+
+[V2_FAL_2_02] ROSA · V · sempre
+Non lo chiamo salvo. Non gli assegno neanche una morte che non abbiamo visto.
+  A) «Non so cosa gli sia successo.» → V2_FAL_2_03
+  B) «Vorrei tornare. So che adesso sbaglierei ancora.» → V2_FAL_2_03
+
+
+[V2_FAL_2_03] ROSA · V · sempre
+Può ricomparire, ma non basterà riconoscere il numero per sapere chi scrive.
+  A) «Se mi scrive, controllo. Anche se ci spero.» → V2_FAL_2_04
+  B) «Leggo prima di proseguire.» → V2_FAL_2_04
+
+
+[V2_FAL_2_03] ROSA · V · sempre
+Può ricomparire, ma non basterà riconoscere il numero per sapere chi scrive.
+  A) «Se mi scrive, controllo. Anche se ci spero.» → V2_FAL_2_04
+  B) «Non userò la sua morte per chiudere il discorso.» → V2_FAL_2_04
+
+
+[V2_FAL_3_01] LIVIA · V · richiede: ev_fallimento_3
+Non siete arrivati al punto d’attesa in tempo.
+  A) «Ho visto spegnersi l’ultima luce.» → V2_FAL_3_02
+  B) «Leggo prima di proseguire.» → V2_FAL_3_02
+
+
+[V2_FAL_3_01] LIVIA · V · richiede: ev_fallimento_3
+Non siete arrivati al punto d’attesa in tempo.
+  A) «Ho visto spegnersi l’ultima luce.» → V2_FAL_3_02
+  B) «Non ce l’ho fatta. È tutto quello che so.» → V2_FAL_3_02
+
+
+[V2_FAL_3_02] LIVIA · V · sempre
+Ottavio non è stato recuperato. Non lo facciamo diventare salvo per chiudere la riga.
+  A) «Non ti scrivo che è salvo.» → V2_FAL_3_03
+  B) «Leggo prima di proseguire.» → V2_FAL_3_03
+
+
+[V2_FAL_3_02] LIVIA · V · sempre
+Ottavio non è stato recuperato. Non lo facciamo diventare salvo per chiudere la riga.
+  A) «Non ti scrivo che è salvo.» → V2_FAL_3_03
+  B) «Avrei voluto mandarti un altro messaggio.» → V2_FAL_3_03
+
+
+[V2_FAL_3_03] LIVIA · V · sempre
+Non ti chiedo una versione meno dolorosa. Dimmi quello che hai visto.
+  A) «Ti dico da dove l’ho perso.» → V2_FAL_3_04
+  B) «Leggo prima di proseguire.» → V2_FAL_3_04
+
+
+[V2_FAL_3_03] LIVIA · V · sempre
+Non ti chiedo una versione meno dolorosa. Dimmi quello che hai visto.
+  A) «Ti dico da dove l’ho perso.» → V2_FAL_3_04
+  B) «Vado piano. Voglio ricordare senza aggiungere.» → V2_FAL_3_04
+
+
+[V2_FAL_4_01] ROSA · V · richiede: ev_fallimento_4
+Sei al rifugio. Il varco è rimasto aperto.
+  A) «Mi sono voltato. Era ancora aperto.» → V2_FAL_4_02
+  B) «Leggo prima di proseguire.» → V2_FAL_4_02
+
+
+[V2_FAL_4_01] ROSA · V · richiede: ev_fallimento_4
+Sei al rifugio. Il varco è rimasto aperto.
+  A) «Mi sono voltato. Era ancora aperto.» → V2_FAL_4_02
+  B) «Sono fuori dal passaggio. Lo vedo.» → V2_FAL_4_02
+
+
+[V2_FAL_4_02] ROSA · V · sempre
+Non significa che la presenza sia già uscita. Manca ancora chi la accompagna.
+  A) «Non ho accompagnato nessuno.» → V2_FAL_4_03
+  B) «Leggo prima di proseguire.» → V2_FAL_4_03
+
+
+[V2_FAL_4_02] ROSA · V · sempre
+Non significa che la presenza sia già uscita. Manca ancora chi la accompagna.
+  A) «Non ho accompagnato nessuno.» → V2_FAL_4_03
+  B) «Controllo chi è uscito con me.» → V2_FAL_4_03
+
+
+[V2_FAL_4_03] ROSA · V · sempre
+Possiamo tentare la richiusura. Prima guardiamo che cosa costa.
+  A) «Guardiamo il costo della richiusura.» → V2_FAL_4_04 [+varchi]
+  B) «Leggo prima di proseguire.» → V2_FAL_4_04 [+varchi]
+
+
+[V2_FAL_4_03] ROSA · V · sempre
+Possiamo tentare la richiusura. Prima guardiamo che cosa costa.
+  A) «Guardiamo il costo della richiusura.» → V2_FAL_4_04 [+varchi]
+  B) «Non ci torno per fingere che non sia successo.» → V2_FAL_4_04 [+varchi]
+
+
+[V2_USCITA_01] ROSA · V · richiede: ev_uscita_autentica
+Prima di chiamarla uscita, confronta il particolare dello svincolo.
+  A) «Confronto il foglio della Polo.» → V2_USCITA_02
+  B) «Leggo prima di proseguire.» → V2_USCITA_02
+
+
+[V2_USCITA_01] ROSA · V · richiede: ev_uscita_autentica
+Prima di chiamarla uscita, confronta il particolare dello svincolo.
+  A) «Confronto il foglio della Polo.» → V2_USCITA_02
+  B) «Prima guardo il particolare che ritorna.» → V2_USCITA_02
+
+
+[V2_USCITA_02] ROSA · V · sempre
+Nelle diramazioni tornava lo stesso segno, anche quando cambiava paese.
+  A) «La forma coincide. Adesso guardo dove porta.» → V2_USCITA_03
+  B) «Leggo prima di proseguire.» → V2_USCITA_03
+
+
+[V2_USCITA_02] ROSA · V · sempre
+Nelle diramazioni tornava lo stesso segno, anche quando cambiava paese.
+  A) «La forma coincide. Adesso guardo dove porta.» → V2_USCITA_03
+  B) «Non mi basta che sia comparso un nome nuovo.» → V2_USCITA_03
+
+
+[V2_USCITA_03] ROSA · V · sempre
+Questo è lo svincolo autentico. Non è la porta che Irene tiene chiusa.
+  ALT se: porta_nota → Hai già riconosciuto la porta. Questo svincolo è un’altra cosa.
+  A) «Posso uscire senza aprire la porta.» → V2_USCITA_04
+  B) «Leggo prima di proseguire.» → V2_USCITA_04
+
+
+[V2_USCITA_03] ROSA · V · sempre
+Questo è lo svincolo autentico. Non è la porta che Irene tiene chiusa.
+  ALT se: porta_nota → Hai già riconosciuto la porta. Questo svincolo è un’altra cosa.
+  A) «Posso uscire senza aprire la porta.» → V2_USCITA_04
+  B) «Se parto, chi resta non viene con me.» → V2_USCITA_04
+
+
+[V2_USCITA_04] ROSA · V · sempre
+Compare dopo il secondo passaggio e le prove già confrontate. Non per un nome nuovo.
+  A) «Ho confrontato le tre cose. Voglio tornare.» → V2_USCITA_05
+  B) «Leggo prima di proseguire.» → V2_USCITA_05
+
+
+[V2_USCITA_04] ROSA · V · sempre
+Compare dopo il secondo passaggio e le prove già confrontate. Non per un nome nuovo.
+  A) «Ho confrontato le tre cose. Voglio tornare.» → V2_USCITA_05
+  B) «Ora so dov’è. Devo ancora scegliere.» → V2_USCITA_05
+
+
+[V2_USCITA_05] ROSA · V · sempre
+Se lo prendi, esci da solo. Le ricerche rimaste aperte non diventano risolte.
+  A) «Non dirò che ho salvato chi è rimasto.» → V2_USCITA_06
+  B) «Leggo prima di proseguire.» → V2_USCITA_06
+
+
+[V2_USCITA_05] ROSA · V · sempre
+Se lo prendi, esci da solo. Le ricerche rimaste aperte non diventano risolte.
+  A) «Non dirò che ho salvato chi è rimasto.» → V2_USCITA_06
+  B) «A Elena posso scrivere soltanto che torno.» → V2_USCITA_06
+
+
+[V2_GUARDIA_01] ROSA · V · richiede: ev_prezzo_guardia
+Guarda lo scambio con Livia. Non te lo sto ricostruendo a memoria.
+  A) «Apro il messaggio, quello vero.» → V2_GUARDIA_02
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_02
+
+
+[V2_GUARDIA_01] ROSA · V · richiede: ev_prezzo_guardia
+Guarda lo scambio con Livia. Non te lo sto ricostruendo a memoria.
+  A) «Apro il messaggio, quello vero.» → V2_GUARDIA_02
+  B) «Voglio leggere il prima e il dopo.» → V2_GUARDIA_02
+
+
+[V2_GUARDIA_02] ROSA · V · sempre
+Prima mi ha scritto: Dì a Rosa di aspettare. Il messaggio è ancora qui.
+  A) «Il tuo nome è ancora scritto lì.» → V2_GUARDIA_03
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_03
+
+
+[V2_GUARDIA_02] ROSA · V · sempre
+Prima mi ha scritto: Dì a Rosa di aspettare. Il messaggio è ancora qui.
+  A) «Il tuo nome è ancora scritto lì.» → V2_GUARDIA_03
+  B) «Livia sapeva con chi stavi parlando.» → V2_GUARDIA_03
+
+
+[V2_GUARDIA_03] ROSA · V · sempre
+Adesso chiede: A chi stavi scrivendo? Non le manca il messaggio: le manca il nome.
+  A) «Le faccio rileggere il suo messaggio.» → V2_GUARDIA_04
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_04
+
+
+[V2_GUARDIA_03] ROSA · V · sempre
+Adesso chiede: A chi stavi scrivendo? Non le manca il messaggio: le manca il nome.
+  A) «Le faccio rileggere il suo messaggio.» → V2_GUARDIA_04
+  B) «Non ha perso il testo. Ha perso te.» → V2_GUARDIA_04
+
+
+[V2_GUARDIA_04] ROSA · V · sempre
+Non tutti insieme, non in un istante. Comincia così, il posto che perdi fuori.
+  A) «E tu hai continuato a restare.» → V2_GUARDIA_05
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_05
+
+
+[V2_GUARDIA_04] ROSA · V · sempre
+Non tutti insieme, non in un istante. Comincia così, il posto che perdi fuori.
+  A) «E tu hai continuato a restare.» → V2_GUARDIA_05
+  B) «Non so se riesco a farmi dimenticare.» → V2_GUARDIA_05
+
+
+[V2_GUARDIA_05] ROSA · V · sempre
+Puoi chiederglielo direttamente. I fogli restano, non è l’archivio che cambia.
+  A) «Voglio vedere anche la risposta dal lato di Livia.» → V2_GUARDIA_06
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_06
+
+
+[V2_GUARDIA_05] ROSA · V · sempre
+Puoi chiederglielo direttamente. I fogli restano, non è l’archivio che cambia.
+  A) «Voglio vedere anche la risposta dal lato di Livia.» → V2_GUARDIA_06
+  B) «Prima di promettere devo capire chi torna.» → V2_GUARDIA_06
+
+
+[V2_MARCO_costo_01] ROSA · V · richiede: ev_marco_costo
+Per portare Marco devi scegliere prima che cosa lasciare. Nessun costo nascosto dopo.
+  A) «Dimmi tutto prima che gli faccia posto.» → V2_MARCO_costo_02
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_02
+
+
+[V2_MARCO_costo_01] ROSA · V · richiede: ev_marco_costo
+Per portare Marco devi scegliere prima che cosa lasciare. Nessun costo nascosto dopo.
+  A) «Dimmi tutto prima che gli faccia posto.» → V2_MARCO_costo_02
+  B) «Non gli prometto ancora di salire.» → V2_MARCO_costo_02
+
+
+[V2_MARCO_costo_02] ROSA · V · sempre
+Il carico: rinunci al lavoro in corso e alla paga. Marco sale, la consegna finisce qui.
+  A) «Perdo anche la paga. Ho capito.» → V2_MARCO_costo_03
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_03
+
+
+[V2_MARCO_costo_02] ROSA · V · sempre
+Il carico: rinunci al lavoro in corso e alla paga. Marco sale, la consegna finisce qui.
+  A) «Perdo anche la paga. Ho capito.» → V2_MARCO_costo_03
+  B) «Non è solo spostare una scatola.» → V2_MARCO_costo_03
+
+
+[V2_MARCO_costo_03] ROSA · V · sempre
+La copia di una prova: la lasci a bordo della sua auto. Livia conserva l’originale.
+  A) «La copia può restare. L’originale è al sicuro.» → V2_MARCO_costo_04
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_04
+
+
+[V2_MARCO_costo_03] ROSA · V · sempre
+La copia di una prova: la lasci a bordo della sua auto. Livia conserva l’originale.
+  A) «La copia può restare. L’originale è al sicuro.» → V2_MARCO_costo_04
+  B) «Se la lascio, dovrò riascoltare da Livia.» → V2_MARCO_costo_04
+
+
+[V2_MARCO_costo_04] ROSA · V · sempre
+Oppure spendi una lampada in più: tieni carico e copia, ma parti con meno margine.
+  A) «Una lampada in meno per fare la strada.» → V2_MARCO_costo_05
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_05
+
+
+[V2_MARCO_costo_04] ROSA · V · sempre
+Oppure spendi una lampada in più: tieni carico e copia, ma parti con meno margine.
+  A) «Una lampada in meno per fare la strada.» → V2_MARCO_costo_05
+  B) «Tenermi tutto costa tempo. Ho capito.» → V2_MARCO_costo_05
+
+
+[V2_MARCO_costo_05] ROSA · V · sempre
+Decidilo adesso. Se non hai un lavoro, il costo del carico non esiste.
+  A) «Lascio carico e paga.» → V2_MARCO_costo_06 [se:ev_marco_carico;flag:mc_carico]
+  B) «Lascio la copia. La recupererò da Livia.» → V2_MARCO_costo_06 [flag:mc_copia]
+  C) «Tengo le cose. Spendo una lampada in più.» → V2_MARCO_costo_06 [flag:mc_lampada]
+
+
+[V2_VARCO_05] ROSA · V · sempre
+La scelta resta distinta dalla promessa fatta a Rosa e dalle risposte al telefono.
+  A) «Apro il varco. Non accompagno ancora nessuno.» → V2_VARCO_06 [flag:vc_apro;+varchi]
+  B) «Rifiuto l’apertura: resta chiuso.» → V2_VARCO_06 [flag:vc_rifiuto]
+  C) «Richiudo il varco.» → V2_VARCO_06 [se:vc_richiudibile;flag:vc_richiudo;+varchi]
+
+
+[V2_VICINO_01] ELENA · IV · richiede: ev_verifica_vicino
+Hai chiesto al vicino di controllare? Sono alla porta, qui a casa.
+  A) «Sì. Aspetto che ti abbia vista, non una supposizione.» → V2_VICINO_02
+  B) «Voglio sapere che cosa ha controllato di persona.» → V2_VICINO_03
+
+
+[V2_PRE_s25_01] NUMERO SCONOSCIUTO · II · sempre
+Hai risposto anche quando non ti avevo fatto una domanda.
+  A) «Non era un invito.» → V2_PRE_s25_02
+  B) «Sei ancora lì?» → V2_PRE_s25_03
+
+
+[V2_PRE_s50_02] NUMERO SCONOSCIUTO · III · sempre
+Posso diventare quello spazio tra una domanda e la tua scelta.
+  A) «Quando non scrivi, mi manca qualcosa.» → V2_PRE_s50_04
+  B) «Non ti lascio decidere il passo.» → V2_PRE_s50_05
+
+
+[V2_PRE_s75_01] NUMERO SCONOSCIUTO · IV · sempre
+Mi scrivi anche quando non vuoi ascoltare la risposta.
+  A) «Resta. Ho paura di scegliere da solo.» → V2_PRE_s75_02
+  B) «Il posto di chi manca non è tuo.» → V2_PRE_s75_03
+
+
+[V2_PRE_s75_02] NUMERO SCONOSCIUTO · IV · sempre
+Resta. Lo hai scritto tu. Io posso continuare a rileggerlo.
+  A) «L’abitudine posso interromperla.» → V2_PRE_s75_04
+  B) «Non ti prometto di tornare da te.» → V2_PRE_s75_05
+
+
+[V2_PRE_s75_06] NUMERO SCONOSCIUTO · IV · sempre
+Mandami a fanculo. Poi guarda a chi stavi per chiedere di restare.
+[FINE]
+
+
+[V2_LUOGO_tokyo_01] ELENA · I · richiede: luogo_tokyo
+Hai già voglia di mandarmi una foto di casa invece che dell’auto?
+  A) «Oggi mi sembra bella perfino la strada di casa.» → V2_LUOGO_tokyo_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_tokyo_03
+
+
+[V2_LUOGO_tokyo_01] ELENA · I · richiede: luogo_tokyo
+Hai già voglia di mandarmi una foto di casa invece che dell’auto?
+  A) «Oggi mi sembra bella perfino la strada di casa.» → V2_LUOGO_tokyo_02
+  B) «Aspetta. Sto fotografando una cosa che vedo sempre.» → V2_LUOGO_tokyo_03
+
+
+[V2_LUOGO_tokyo_02] ELENA · I · sempre
+Va bene. Una cosa che riconosci senza doverla spiegare.
+  A) «Un’insegna. Nessuna recensione del motore.» → V2_LUOGO_tokyo_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_02] ELENA · I · sempre
+Va bene. Una cosa che riconosci senza doverla spiegare.
+  A) «Un’insegna. Nessuna recensione del motore.» → V2_LUOGO_tokyo_04
+  B) «Te la mando prima di chiamarla cartolina.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_03] ELENA · I · sempre
+Allora scrivimi che cosa vedi adesso, non quello che ricordi.
+  A) «L’asfalto è bagnato. Per ora è soltanto quello.» → V2_LUOGO_tokyo_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_03] ELENA · I · sempre
+Allora scrivimi che cosa vedi adesso, non quello che ricordi.
+  A) «L’asfalto è bagnato. Per ora è soltanto quello.» → V2_LUOGO_tokyo_04
+  B) «La foto non rende. Oggi niente premio fotografico.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_04] ELENA · I · sempre
+Non ti sto facendo un esame. Voglio stare un momento nel tuo viaggio.
+  A) «Allora vieni un minuto. Ti tengo il posto in chat.» → V2_LUOGO_tokyo_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_04] ELENA · I · sempre
+Non ti sto facendo un esame. Voglio stare un momento nel tuo viaggio.
+  A) «Allora vieni un minuto. Ti tengo il posto in chat.» → V2_LUOGO_tokyo_05
+  B) «Guida Pasta. Io ho già abbastanza problemi.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_roma_01] ELENA · I · richiede: luogo_roma
+Hai finito con lo studio o stai ancora pensando alle altre cinque?
+  A) «Ho scelto. Adesso le altre cinque sembrano migliori.» → V2_LUOGO_roma_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_roma_03
+
+
+[V2_LUOGO_roma_01] ELENA · I · richiede: luogo_roma
+Hai finito con lo studio o stai ancora pensando alle altre cinque?
+  A) «Ho scelto. Adesso le altre cinque sembrano migliori.» → V2_LUOGO_roma_02
+  B) «Sono fuori dallo studio. Sto ancora guardando le chiavi.» → V2_LUOGO_roma_03
+
+
+[V2_LUOGO_roma_02] ELENA · I · sempre
+Una macchina sola. Non devi fare anche il giro del rimpianto.
+  A) «Una sola assicurazione: il mio vero criterio.» → V2_LUOGO_roma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_02] ELENA · I · sempre
+Una macchina sola. Non devi fare anche il giro del rimpianto.
+  A) «Una sola assicurazione: il mio vero criterio.» → V2_LUOGO_roma_04
+  B) «Per oggi basta scegliere. Ti mando com’è fuori.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_03] ELENA · I · sempre
+Mi interessa quella che hai scelto, non una classifica di quelle rimaste.
+  A) «Quella che ho preso mi piace. Ecco, l’ho scritto.» → V2_LUOGO_roma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_03] ELENA · I · sempre
+Mi interessa quella che hai scelto, non una classifica di quelle rimaste.
+  A) «Quella che ho preso mi piace. Ecco, l’ho scritto.» → V2_LUOGO_roma_04
+  B) «Non ti mando la classifica. Mi licenzio da solo.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_04] ELENA · I · sempre
+Fotografa anche una cosa normale. Non voglio soltanto un catalogo di spie.
+  A) «La serranda qui davanti. È una foto onestissima.» → V2_LUOGO_roma_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_04] ELENA · I · sempre
+Fotografa anche una cosa normale. Non voglio soltanto un catalogo di spie.
+  A) «La serranda qui davanti. È una foto onestissima.» → V2_LUOGO_roma_05
+  B) «Niente cruscotto. Per una volta guardo fuori.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_parigi_01] ELENA · II · richiede: luogo_parigi
+Parigi? Hai preso una foto da internet per prendermi in giro?
+  A) «Vorrei fosse uno scherzo. Ti mando la foto intera.» → V2_LUOGO_parigi_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_parigi_03
+
+
+[V2_LUOGO_parigi_01] ELENA · II · richiede: luogo_parigi
+Parigi? Hai preso una foto da internet per prendermi in giro?
+  A) «Vorrei fosse uno scherzo. Ti mando la foto intera.» → V2_LUOGO_parigi_02
+  B) «Ho controllato due volte. Continua a esserci scritto.» → V2_LUOGO_parigi_03
+
+
+[V2_LUOGO_parigi_02] ELENA · II · sempre
+Va bene. Mandami il particolare che hai davanti e resto a guardarlo.
+  A) «Niente ritaglio. Voglio che si veda tutto.» → V2_LUOGO_parigi_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_02] ELENA · II · sempre
+Va bene. Mandami il particolare che hai davanti e resto a guardarlo.
+  A) «Niente ritaglio. Voglio che si veda tutto.» → V2_LUOGO_parigi_04
+  B) «Non riesco a far stare il posto dentro il tragitto.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_03] ELENA · II · sempre
+Il luogo corrisponde. Il tempo del tragitto no.
+  A) «Non allungo le ore per far quadrare la foto.» → V2_LUOGO_parigi_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_03] ELENA · II · sempre
+Il luogo corrisponde. Il tempo del tragitto no.
+  A) «Non allungo le ore per far quadrare la foto.» → V2_LUOGO_parigi_04
+  B) «Ho smesso di guardare la macchina. Guardo l’orologio.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_04] ELENA · II · sempre
+Non inventiamo una durata diversa per farlo tornare.
+  A) «Mi fermo. La destinazione non scappa. Spero.» → V2_LUOGO_parigi_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_04] ELENA · II · sempre
+Non inventiamo una durata diversa per farlo tornare.
+  A) «Mi fermo. La destinazione non scappa. Spero.» → V2_LUOGO_parigi_05
+  B) «Ti mando anche l’ora, senza aggiustarla.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_londra_01] ROSA · III · richiede: luogo_londra
+Mandami la chiusura intera. Non soltanto il punto che vuoi attraversare.
+  A) «Faccio una foto da qui. Non supero la barriera.» → V2_LUOGO_londra_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_londra_03
+
+
+[V2_LUOGO_londra_01] ROSA · III · richiede: luogo_londra
+Mandami la chiusura intera. Non soltanto il punto che vuoi attraversare.
+  A) «Faccio una foto da qui. Non supero la barriera.» → V2_LUOGO_londra_02
+  B) «Lascio dentro anche la scritta a mano.» → V2_LUOGO_londra_03
+
+
+[V2_LUOGO_londra_02] ROSA · III · sempre
+Una barriera non mi dice chi l’ha messa. La scritta forse sì.
+  A) «La metto accanto alle carte di Claudio.» → V2_LUOGO_londra_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_02] ROSA · III · sempre
+Una barriera non mi dice chi l’ha messa. La scritta forse sì.
+  A) «La metto accanto alle carte di Claudio.» → V2_LUOGO_londra_04
+  B) «Non la strappo per vedere cosa c’è dietro.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_03] ROSA · III · sempre
+Guarda se riconosci il tratto. Io non sono lì al posto tuo.
+  A) «Guardo il tratto. La rabbia la tengo per dopo.» → V2_LUOGO_londra_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_03] ROSA · III · sempre
+Guarda se riconosci il tratto. Io non sono lì al posto tuo.
+  A) «Guardo il tratto. La rabbia la tengo per dopo.» → V2_LUOGO_londra_04
+  B) «Per ora non so chi l’ha scritta.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_04] ROSA · III · sempre
+Se è di Claudio cambia il motivo per cui è chiusa, non il fatto che lo sia.
+  A) «Il paraurti non è una chiave universale. Ricevuto.» → V2_LUOGO_londra_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_04] ROSA · III · sempre
+Se è di Claudio cambia il motivo per cui è chiusa, non il fatto che lo sia.
+  A) «Il paraurti non è una chiave universale. Ricevuto.» → V2_LUOGO_londra_05
+  B) «La lascio chiusa. Cerco un’altra cosa da capire.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_stoccolma_01] LIVIA · III · richiede: luogo_stoccolma
+Se sei all’autogrill, non cercare subito mio fratello in ogni persona.
+  A) «Mi sono sorpreso a guardare le facce.» → V2_LUOGO_stoccolma_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_stoccolma_03
+
+
+[V2_LUOGO_stoccolma_01] LIVIA · III · richiede: luogo_stoccolma
+Se sei all’autogrill, non cercare subito mio fratello in ogni persona.
+  A) «Mi sono sorpreso a guardare le facce.» → V2_LUOGO_stoccolma_02
+  B) «Ho il tesserino. Ti mando quello.» → V2_LUOGO_stoccolma_03
+
+
+[V2_LUOGO_stoccolma_02] LIVIA · III · sempre
+Lo so che è difficile. Lo sto facendo anch’io, da qui.
+  A) «Posso stare zitto un momento, se vuoi.» → V2_LUOGO_stoccolma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_02] LIVIA · III · sempre
+Lo so che è difficile. Lo sto facendo anch’io, da qui.
+  A) «Posso stare zitto un momento, se vuoi.» → V2_LUOGO_stoccolma_04
+  B) «Non ti mando il primo che gli somiglia.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_03] LIVIA · III · sempre
+Il tesserino ha il suo nome. Questo lo posso confrontare.
+  A) «Il nome si legge. Aspetto quello che trovi tu.» → V2_LUOGO_stoccolma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_03] LIVIA · III · sempre
+Il tesserino ha il suo nome. Questo lo posso confrontare.
+  A) «Il nome si legge. Aspetto quello che trovi tu.» → V2_LUOGO_stoccolma_04
+  B) «Lo fotografo intero, anche sul retro.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_04] LIVIA · III · sempre
+Una macchina ritrovata non significa che abbiamo ritrovato chi la guidava.
+  A) «La macchina c’è. Di lui non so ancora abbastanza.» → V2_LUOGO_stoccolma_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_04] LIVIA · III · sempre
+Una macchina ritrovata non significa che abbiamo ritrovato chi la guidava.
+  A) «La macchina c’è. Di lui non so ancora abbastanza.» → V2_LUOGO_stoccolma_05
+  B) «Ti lascio il tempo di guardare, senza altre domande.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_berlino_01] ROSA · III · richiede: luogo_berlino
+Guarda anche dove si è richiusa. Non fermarti al segno di apertura.
+  A) «Guardo il secondo segno. L’avevo quasi saltato.» → V2_LUOGO_berlino_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_berlino_03
+
+
+[V2_LUOGO_berlino_01] ROSA · III · richiede: luogo_berlino
+Guarda anche dove si è richiusa. Non fermarti al segno di apertura.
+  A) «Guardo il secondo segno. L’avevo quasi saltato.» → V2_LUOGO_berlino_02
+  B) «Ti mostro insieme apertura e richiusura.» → V2_LUOGO_berlino_03
+
+
+[V2_LUOGO_berlino_02] ROSA · III · sempre
+Due azioni. Se le mescoli sembra una porta che fa quello che vuole.
+  A) «Li tengo separati. Due gesti, due conseguenze.» → V2_LUOGO_berlino_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_02] ROSA · III · sempre
+Due azioni. Se le mescoli sembra una porta che fa quello che vuole.
+  A) «Li tengo separati. Due gesti, due conseguenze.» → V2_LUOGO_berlino_04
+  B) «Mi ero fermato soltanto all’apertura.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_03] ROSA · III · sempre
+La coppia della Corsa ci lascia questo pezzo: richiudere è possibile.
+  A) «Quindi il passaggio può essere richiuso.» → V2_LUOGO_berlino_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_03] ROSA · III · sempre
+La coppia della Corsa ci lascia questo pezzo: richiudere è possibile.
+  A) «Quindi il passaggio può essere richiuso.» → V2_LUOGO_berlino_04
+  B) «Non lo provo soltanto perché adesso so che si può.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_04] ROSA · III · sempre
+Possibile non vuol dire gratis o senza prepararsi.
+  A) «Prima leggo il prezzo. Ho finito di improvvisare.» → V2_LUOGO_berlino_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_04] ROSA · III · sempre
+Possibile non vuol dire gratis o senza prepararsi.
+  A) «Prima leggo il prezzo. Ho finito di improvvisare.» → V2_LUOGO_berlino_05
+  B) «Le maniglie del cazzo possono aspettare.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_praga_01] ROSA · III · richiede: luogo_praga
+È ferma anche la macchia, oppure sta cambiando?
+  A) «Sto fermo e la guardo. Ti dico se cresce.» → V2_LUOGO_praga_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_praga_03
+
+
+[V2_LUOGO_praga_01] ROSA · III · richiede: luogo_praga
+È ferma anche la macchia, oppure sta cambiando?
+  A) «Sto fermo e la guardo. Ti dico se cresce.» → V2_LUOGO_praga_02
+  B) «Non voglio indovinare dal parabrezza.» → V2_LUOGO_praga_03
+
+
+[V2_LUOGO_praga_02] ROSA · III · sempre
+Aspetta da fermo. Non mi rispondere con sembra se puoi guardare.
+  A) «Sta cambiando. Ti descrivo dove.» → V2_LUOGO_praga_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_02] ROSA · III · sempre
+Aspetta da fermo. Non mi rispondere con sembra se puoi guardare.
+  A) «Sta cambiando. Ti descrivo dove.» → V2_LUOGO_praga_04
+  B) «Vorrei fosse solo sporco. Non lo scrivo per questo.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_03] ROSA · III · sempre
+Se cresce davanti a te stai vedendo una ripetizione.
+  A) «Segno che cosa si ripete, prima di intervenire.» → V2_LUOGO_praga_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_03] ROSA · III · sempre
+Se cresce davanti a te stai vedendo una ripetizione.
+  A) «Segno che cosa si ripete, prima di intervenire.» → V2_LUOGO_praga_04
+  B) «Aspetto di capire se c’è qualcuno da salvare.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_04] ROSA · III · sempre
+Non chiamarla una persona viva solo perché il sangue è fresco.
+  A) «Lo so. Mi fa schifo aver sperato fosse quello.» → V2_LUOGO_praga_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_04] ROSA · III · sempre
+Non chiamarla una persona viva solo perché il sangue è fresco.
+  A) «Lo so. Mi fa schifo aver sperato fosse quello.» → V2_LUOGO_praga_05
+  B) «Niente slanci. Prima distinguo chi c’è davvero.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_vienna_01] ELENA · III · richiede: luogo_vienna
+Un altro nome sul cartello. Prima di ripartire mandami il particolare.
+  A) «Un altro cartello. Ho voglia di prenderlo a calci.» → V2_LUOGO_vienna_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_vienna_03
+
+
+[V2_LUOGO_vienna_01] ELENA · III · richiede: luogo_vienna
+Un altro nome sul cartello. Prima di ripartire mandami il particolare.
+  A) «Un altro cartello. Ho voglia di prenderlo a calci.» → V2_LUOGO_vienna_02
+  B) «Ti mando la svolta e la foto di prima.» → V2_LUOGO_vienna_03
+
+
+[V2_LUOGO_vienna_02] ELENA · III · sempre
+Non posso conoscere la svolta da qui, ma posso confrontare due foto.
+  A) «Confrontale. Per un minuto non guardo più lo schermo.» → V2_LUOGO_vienna_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_02] ELENA · III · sempre
+Non posso conoscere la svolta da qui, ma posso confrontare due foto.
+  A) «Confrontale. Per un minuto non guardo più lo schermo.» → V2_LUOGO_vienna_04
+  B) «Stessa inquadratura. Non tolgo il bordo.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_03] ELENA · III · sempre
+Questo dettaglio coincide. Non serve fingere che sia tutto uguale.
+  A) «Quel particolare torna. Il nome è diverso.» → V2_LUOGO_vienna_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_03] ELENA · III · sempre
+Questo dettaglio coincide. Non serve fingere che sia tutto uguale.
+  A) «Quel particolare torna. Il nome è diverso.» → V2_LUOGO_vienna_04
+  B) «Mi dà fastidio quanto poco basta per riconoscerlo.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_04] ELENA · III · sempre
+Puoi essere arrabbiato. Non correggere quello che hai visto per calmarti.
+  A) «Sono furioso. La foto la lascio com’è.» → V2_LUOGO_vienna_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_04] ELENA · III · sempre
+Puoi essere arrabbiato. Non correggere quello che hai visto per calmarti.
+  A) «Sono furioso. La foto la lascio com’è.» → V2_LUOGO_vienna_05
+  B) «Spengo un minuto. Poi ti scrivo da fermo.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_madrid_01] ELENA · IV · richiede: luogo_madrid
+Mi hai chiesto se sono venuta a cercarti. No. Non sono in macchina.
+  A) «Allora la persona che mi scrive non è con te.» → V2_LUOGO_madrid_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_madrid_03
+
+
+[V2_LUOGO_madrid_01] ELENA · IV · richiede: luogo_madrid
+Mi hai chiesto se sono venuta a cercarti. No. Non sono in macchina.
+  A) «Allora la persona che mi scrive non è con te.» → V2_LUOGO_madrid_02
+  B) «Va bene. Ti chiedo una cosa senza suggerirla.» → V2_LUOGO_madrid_03
+
+
+[V2_LUOGO_madrid_02] ELENA · IV · sempre
+Dimmi che cosa vuoi controllare, senza mettermi la risposta in bocca.
+  A) «Una domanda sola. Poi controllo da un’altra parte.» → V2_LUOGO_madrid_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_02] ELENA · IV · sempre
+Dimmi che cosa vuoi controllare, senza mettermi la risposta in bocca.
+  A) «Una domanda sola. Poi controllo da un’altra parte.» → V2_LUOGO_madrid_04
+  B) «Prima ti lascio finire. Sto correndo anche da fermo.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_03] ELENA · IV · sempre
+Nonno lo uso per prenderti in giro. Non per chiederti di venire a prendermi.
+  A) «Lo so. Mi ha fatto effetto leggerlo lì.» → V2_LUOGO_madrid_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_03] ELENA · IV · sempre
+Nonno lo uso per prenderti in giro. Non per chiederti di venire a prendermi.
+  A) «Lo so. Mi ha fatto effetto leggerlo lì.» → V2_LUOGO_madrid_04
+  B) «Non uso quel nome come una risposta già pronta.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_04] ELENA · IV · sempre
+Se vuoi chiedermi una cosa, chiedila una volta. Non aggiustarla mentre rispondo.
+  A) «Se sbaglio la domanda, non te la faccio correggere.» → V2_LUOGO_madrid_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_04] ELENA · IV · sempre
+Se vuoi chiedermi una cosa, chiedila una volta. Non aggiustarla mentre rispondo.
+  A) «Se sbaglio la domanda, non te la faccio correggere.» → V2_LUOGO_madrid_05
+  B) «Non voglio trasformare la chat in un interrogatorio.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_lisbona_01] LIVIA · IV · richiede: luogo_lisbona
+Mi descrivi prima quello che cambia, poi quello che ti sembra di riconoscere?
+  A) «Ti descrivo il primo gesto. Poi quello che ritorna.» → V2_LUOGO_lisbona_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_lisbona_03
+
+
+[V2_LUOGO_lisbona_01] LIVIA · IV · richiede: luogo_lisbona
+Mi descrivi prima quello che cambia, poi quello che ti sembra di riconoscere?
+  A) «Ti descrivo il primo gesto. Poi quello che ritorna.» → V2_LUOGO_lisbona_02
+  B) «Aspetto un istante. Mi viene da anticiparlo.» → V2_LUOGO_lisbona_03
+
+
+[V2_LUOGO_lisbona_02] LIVIA · IV · sempre
+Non voglio farti riscrivere la scena. Voglio evitare di completarvela io.
+  A) «Se non so un pezzo, lascio il buco.» → V2_LUOGO_lisbona_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_02] LIVIA · IV · sempre
+Non voglio farti riscrivere la scena. Voglio evitare di completarvela io.
+  A) «Se non so un pezzo, lascio il buco.» → V2_LUOGO_lisbona_04
+  B) «Posso mandarti appunti brutti, ma scritti adesso.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_03] LIVIA · IV · sempre
+Il pezzo del ragazzo è una ripetizione, non un nuovo viaggio nel passato.
+  A) «Non posso arrivare prima di quello che è successo.» → V2_LUOGO_lisbona_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_03] LIVIA · IV · sempre
+Il pezzo del ragazzo è una ripetizione, non un nuovo viaggio nel passato.
+  A) «Non posso arrivare prima di quello che è successo.» → V2_LUOGO_lisbona_04
+  B) «Guardo il punto in cui posso interrompere.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_04] LIVIA · IV · sempre
+Se la interrompi, guardiamo cosa smette di accadere. Non inventiamo chi è tornato.
+  A) «Ti dico che cosa ha smesso di ripetersi.» → V2_LUOGO_lisbona_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_04] LIVIA · IV · sempre
+Se la interrompi, guardiamo cosa smette di accadere. Non inventiamo chi è tornato.
+  A) «Ti dico che cosa ha smesso di ripetersi.» → V2_LUOGO_lisbona_05
+  B) «Se si ferma, non scrivo che è tornato vivo.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_atene_01] ROSA · V · richiede: luogo_atene
+Quella è la porta. Non chiamarla già la tua uscita.
+  A) «Mi sono accorto di averle già dato quel nome.» → V2_LUOGO_atene_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_atene_03
+
+
+[V2_LUOGO_atene_01] ROSA · V · richiede: luogo_atene
+Quella è la porta. Non chiamarla già la tua uscita.
+  A) «Mi sono accorto di averle già dato quel nome.» → V2_LUOGO_atene_02
+  B) «Mi fermo prima della porta.» → V2_LUOGO_atene_03
+
+
+[V2_LUOGO_atene_02] ROSA · V · sempre
+Il confine e lo svincolo non sono la stessa cosa. Non li mescoliamo adesso.
+  A) «Lo svincolo è un’altra scelta. Questa è la porta.» → V2_LUOGO_atene_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_02] ROSA · V · sempre
+Il confine e lo svincolo non sono la stessa cosa. Non li mescoliamo adesso.
+  A) «Lo svincolo è un’altra scelta. Questa è la porta.» → V2_LUOGO_atene_04
+  B) «Non uso il desiderio di uscire per decidere chi c’è.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_03] ROSA · V · sempre
+Prima scegli chi hai davanti. Poi decidi che cosa vuoi far passare.
+  A) «Prima il volto, il nome e la foto.» → V2_LUOGO_atene_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_03] ROSA · V · sempre
+Prima scegli chi hai davanti. Poi decidi che cosa vuoi far passare.
+  A) «Prima il volto, il nome e la foto.» → V2_LUOGO_atene_04
+  B) «Nessuno passa perché ho fretta.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_04] ROSA · V · sempre
+Non ti preparo la risposta per farti stare meglio.
+  A) «Ho paura. Mi tengo anche quella.» → V2_LUOGO_atene_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_04] ROSA · V · sempre
+Non ti preparo la risposta per farti stare meglio.
+  A) «Ho paura. Mi tengo anche quella.» → V2_LUOGO_atene_05
+  B) «Dimmi solo quello che sai, Rosa.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_washington_01] LIVIA · V · richiede: luogo_washington
+La nota non ti chiede di riconoscere una voce. Ti chiede di capire chi accompagni.
+  A) «Rileggo chi, non soltanto come si esce.» → V2_LUOGO_washington_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_washington_03
+
+
+[V2_LUOGO_washington_01] LIVIA · V · richiede: luogo_washington
+La nota non ti chiede di riconoscere una voce. Ti chiede di capire chi accompagni.
+  A) «Rileggo chi, non soltanto come si esce.» → V2_LUOGO_washington_02
+  B) «Quella parola l’avevo saltata: accompagni.» → V2_LUOGO_washington_03
+
+
+[V2_LUOGO_washington_02] LIVIA · V · sempre
+La donna della Panda aveva visto questo pezzo. Non tutta la storia.
+  A) «Non chiedo a questa nota di sapere tutto.» → V2_LUOGO_washington_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_02] LIVIA · V · sempre
+La donna della Panda aveva visto questo pezzo. Non tutta la storia.
+  A) «Non chiedo a questa nota di sapere tutto.» → V2_LUOGO_washington_04
+  B) «Questo pezzo basta a farmi rileggere gli altri.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_03] LIVIA · V · sempre
+Se una frase ti sembra troppo semplice, non completarla con una promessa.
+  A) «La finisco dove finisce l’inchiostro.» → V2_LUOGO_washington_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_03] LIVIA · V · sempre
+Se una frase ti sembra troppo semplice, non completarla con una promessa.
+  A) «La finisco dove finisce l’inchiostro.» → V2_LUOGO_washington_04
+  B) «La promessa la devo scegliere io, dopo.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_04] LIVIA · V · sempre
+Una persona che manca non diventa chiunque sappia usare il suo nome.
+  A) «Mi manca qualcuno. Non basta per chiamarlo così.» → V2_LUOGO_washington_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_04] LIVIA · V · sempre
+Una persona che manca non diventa chiunque sappia usare il suo nome.
+  A) «Mi manca qualcuno. Non basta per chiamarlo così.» → V2_LUOGO_washington_05
+  B) «Ho ancora una domanda. Stavolta la scrivo intera.» → V2_LUOGO_washington_05
+
+
+[ELE_ritiro_01] ELENA · I · sempre
+Allora, com’è?
+  ALT se: conf:Elena>=25 → Allora? Il giudizio vero, non la difesa della tua scelta.
+  ALT se: auto_panda → La Panda? Voglio vedere anche lei, non soltanto il telo.
+  ALT se: auto_a80 → L’Audi di Claudio? Nel cassetto hai già trovato domande?
+  ALT se: auto_v40 → La Volvo? Prima una foto intera, non il piano per riempirla.
+  ALT se: auto_punto → La Punto? Almeno adesso ho un nome quando mi scrivi la macchina.
+  ALT se: auto_corsa → Hai scelto la Corsa. Il nome non era un ordine, vero?
+  ALT se: auto_polo → La Polo? Mandami lei, non le altre cinque che ti mancano.
+  A) «Parte. Mi sento già meno coglione.» → ELE_ritiro_02
+  B) «Ti faccio vedere anche cosa non mi convince.» → V2_E01_01 [flag:e01b]
+  C) «Ora niente foto, per favore.» → V2_E01_03 [flag:e01c;sblocca:ELE_ritiro_08]
+
+
+[ELE_turno_01] ELENA · I · sempre
+Hai presente un turno con un orario sensato?
+  A) «Solo nei contratti. Quei figli di puttana.» → ELE_turno_02
+  B) «Decidiamo come sentirci senza rincorrerci.» → V2_E03_01 [flag:e03b]
+  C) «Niente turni, oggi.» → V2_E03_03 [flag:e03c;sblocca:ELE_turno_08]
+
+
+[ROS_attrezzi_01] ROSA · II · sempre
+Smettila di accenderla. Passami quello che sto indicando.
+  ALT se: conf:Rosa>=25 → Testone, togli la mano dalla chiave. Poi lavoriamo.
+  ALT se: auto_panda → Panda. Prima il controllo, poi quanto ti sei affezionato.
+  ALT se: auto_a80 → Con l’Audi prima il controllo. La famiglia può aspettare.
+  ALT se: auto_v40 → V40. Controlliamo prima di caricarci tutta la vita.
+  ALT se: auto_punto → Punto. Mettiamo in fila i problemi, senza litigare col nome.
+  ALT se: auto_corsa → Corsa. Il nome sul baule non è un programma di guida.
+  ALT se: auto_polo → Polo. Prima la guardiamo. Non deve raccontarci tutto da sola.
+  A) «Questo, porca troia?» → ROS_attrezzi_02
+  B) «Spiegami cosa devo guardare, senza riaccenderla.» → V2_R01_01 [flag:r01b]
+  C) «Fai tu. Non voglio imparare adesso.» → V2_R01_03 [flag:r01c;sblocca:ROS_attrezzi_08]
+
+
+[ROS_attrezzi_02] ROSA · II · sempre
+La fiducia tienila. Passami gli attrezzi, testa di cazzo.
+  A) «Dimmi cosa devo tenere.» → ROS_attrezzi_03
+  B) «Quale dei due?» → ROS_attrezzi_04
+  C) «Che due palle: dimmi cosa vuoi che tocchi.» → ROS_attrezzi_04
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE
+
+[REDAZIONE] PER CLAUDE
+
+PER CLAUDE · CONSEGNA COMPLETATA T1–T9
+
+Leggere gli otto file in ordine. L’ultimo nodo con lo stesso ID prevale. T1 contiene prima
+la classificazione delle 433 risposte originali, poi la tabella attiva completa. Usare
+quella tabella con --toni; non ricalcolare i toni dalle parolacce.
+
+Il criterio di scrittura: all’inizio si scherza con qualcuno. Alla fine la stessa frase
+torna e non si sa più per chi sia stata tenuta aperta. Sono qui, resta e torna cambiano
+peso attraverso scelte e assenze. Nessuna frase conferisce poteri magici. Il giocatore
+deve perdere una comodità, un’occasione o una persona: non soltanto punti.
+
+NUMERI DELL’AUTO-CONTROLLO
+
+982 ID di chat unici dopo gli override: 274 del campione e 708 nuovi. 1699 risposte
+attive, tutte con tono; le 433 originarie sono anche classificate separatamente. Le
+dichiarazioni ripetute sono override intenzionali, non altre scene da contare.
+
+Conversazioni: 28 esistenti ampliate, 15 di confidenza, 12 dei luoghi, 18 nuove T9. Sono
+73 conversazioni di questi quattro gruppi. In aggiunta: 8 nuclei di domande di casa, 8
+scene T7, 1 verifica del vicino e 2 epiloghi cinematografici da 8 battute. Le 16 varianti
+tecniche di casa sono gli 8 nuclei con due attori; non sono 16 capitoli. I frammenti
+originali della presenza e SPORCO restano nello snapshot T2: non li vendo come nuove
+conversazioni. Il conteggio grezzo di CHAT_START non misura le scene scritte.
+
+Zero righe oltre 90 caratteri. Zero destinazioni mancanti. Zero menu oltre 3 risposte.
+Ogni menu non terminale ha almeno 2 opzioni prive di condizioni. Grafo interamente
+aciclico: ogni cammino finisce, anche considerando le opzioni nascoste e i fallback.
+Massimo 7 nodi di seguito nel grafo delle risposte. Controllati 480 percorsi dei menu di
+casa: nessuna domanda si ripete nello stesso percorso.
+
+36 cartelli entro 22 caratteri ASCII, 48 eventi entro 140, 24 nomi reali di quartieri, 11
+pensieri di collegamento, 18 ALT per le auto. 20 insulti di Rosa: 15 contengono volgarità
+esplicita, 4 sono affettuosi, 4 brevi per la paura. Livia: 20 riscritture principali, più
+le correzioni di risposte e continuità. Le fonti dei nomi reali sono nel file 04; i
+dialoghi e gli eventi sono invenzione narrativa.
+
+I conti completi dei toni per persona sono nel rapporto 10. Il peso di pacato è alto
+perché include i selettori di verifica duplicati per attore e sottoinsieme rimasto. Non è
+una misura del numero di battute pungenti nei messaggi dei personaggi.
+
+Provati anche importa_chat.py e chat.js del ramo letto, senza modificarli. Importati 982
+nodi con testi, alternative, risposte ed etichette identici al materiale. Motore puro in
+Node: 1964 ingressi diretti su due profili di flag, 9510 percorsi finiti, 14298 risposte
+eseguite, 362 esecuzioni di scelte condizionate. Sono prove del motore e
+dell’importazione; non una partita, una verifica della UI o degli adattatori nuovi.
+
+FLAG: ECCEZIONE DICHIARATA ALLA SPECIFICA, DA GESTIRE NELLA REGIA
+
+Tutti i flag di scelta usati hanno un’origine nel testo; nessuno resta senza lettore.
+Restano 16 flag d’ingresso o disponibilità creati dalla regia, oltre ai 18 auto/luogo.
+Sono elencati in 10_verifica_materiale3.json. Sei eventi sono già nel campione del gioco;
+ev_incursione_1_conclusa è anche emesso nel seguito del fallimento 1. Non faccio scegliere
+al giocatore che una foto sia autentica o che il vicino sia davvero arrivato. Questa è una
+deroga motivata alla frase «ogni altro flag lo crei in una risposta». Senza deroga si
+falsificherebbe il significato di una verifica indipendente.
+
+INGRESSI E MONTAGGIO · DATI IN 11_ATTIVAZIONE.json
+
+Non usare i 129 ingressi calcolati alla cieca dall’importatore. Dopo i nuovi bivi, alcuni
+vecchi nodi diventano orfani topologici: non devono partire come nuove chat. Preservare i
+56 ingressi originali con i loro requisiti e la loro cadenza; aggiungere soltanto gli
+ingressi esplicitamente registrati. Le soglie aprono le 15 chat di T3; le 18 T9 aspettano
+il proprio flag e la fase indicata; le città il flag d’arrivo e la fase narrativa. CASA,
+vicino e scene T7 sono ingressi manuali della regia. I chilometri nel sorgente sono
+segnaposto, non la cronologia definitiva della storia.
+
+Le soglie di confidenza vanno consumate una volta sola. Nel motore letto, scendere sotto
+25 e risalire accoda due volte la stessa chat: il limite è stato riprodotto. Non fare
+accumulare confidenza ripetendo la stessa conversazione.
+
+La coda attuale scarta un nodo se il suo req è falso quando prova a leggerlo. Tenere le
+conversazioni sbloccate in attesa dei prerequisiti, invece di perderle. Per le città
+consumare una volta sola l’incontro e controllare il giro corrente: un vecchio luogo_roma
+non deve significare che il giocatore sia ancora a Roma.
+
+CASA: al momento dell’apertura leggere l’identità effettiva della chiamata, non il nome
+mostrato nel thread. ev_voce_imitata è uno stato della chiamata corrente, non una verità
+eterna sul contatto Elena. Se vero usare _P, altrimenti l’ingresso normale. Per il nucleo
+n, togliere dal mask 7 i bit qn1/qn2/qn3 già segnati, anche se cambia l’attore. Mask 7
+apre l’ingresso; 1–6 apre _M<mask>; 0 disabilita tutte le domande. Una domanda selezionata
+segna il flag subito; chiude: si applica dopo la risposta. Il router legge anche il flag
+se il giocatore esce prima di premere la conferma. La correttezza non assegna mai
+elena_verificata. La verifica del vicino sì, al termine.
+
+VICINO: ev_verifica_vicino viene dal controllo sul recapito indipendente già previsto, non
+da un pulsante che rende vera la voce. Il vicino va alla porta di Elena, la vede e riceve
+risposta lì. La sua conferma arriva dal recapito esterno. Solo a quel punto si monta la
+chat con Elena autentica. Non trasformare il messaggio di Elena da solo nel controllo:
+sarebbe la stessa voce sospetta che garantisce se stessa.
+
+COSTI DI MARCO: ev_marco_carico è vero solo con un lavoro attivo. Senza lavoro, la prima
+opzione sparisce: restano copia e lampada. Applicare una volta il costo selezionato prima
+dell’ingresso nell’incursione. mc_carico annulla carico e paga; mc_copia toglie la copia
+selezionata, mai l’originale custodito da Livia; mc_lampada consuma un’unità del timer a
+lampade. Controllare disponibilità reali prima di proporre il menu: se non ci sono due
+costi praticabili, preparare la sosta prima, senza mostrare due pulsanti che acquistano la
+stessa cosa con niente.
+
+FALLIMENTI: gli esiti vengono dal gameplay, non dalla frase scelta dopo. Esito 1: copia
+del nastro perduta, originale salvo, possibilità di riascolto. Esito 2: Marco resta dentro
+e Rosa −5 una volta; non certificare né morte né salvezza. Esito 3: ottavioSalvo resta
+falso. Esito 4: varco attuale aperto e incremento dei varchi una volta; possibile
+richiusura, nessuna uscita automatica della presenza. Evitare il doppio incremento fra
+esito ed effetto testuale già segnato nella chat.
+
+STATO DEI PATTI E DEI VARCHI: usare un valore attuale, non un mucchio di flag veri. Patto:
+nessuno / esplicito / sospeso / rifiutato. Varco: chiuso / aperto / richiuso. Le risposte
+identificano la decisione; l’adattatore assegna l’enum e sincronizza i flag-specchio,
+togliendo quelli reciprocamente incompatibili. vc_richiudibile dipende da varco aperto e
+costo già mostrato. Rifiutare un’ulteriore apertura mentre il varco è aperto non lo
+chiude: il pulsante deve dire «Lascio il varco com’è» e il riepilogo deve conservare
+aperto. La frase «resta chiuso» vale solo sullo stato chiuso. Affidamento a Livia: fiducia
+/ interrotto / riparato; gli originali non entrano nella rete. Le ALTs basate su uno stato
+attuale leggono gli specchi sincronizzati, non una vecchia scelta.
+
+Le ALT sono ordinate: il costo specifico prima della confidenza, poi l’auto. Non
+consentire che un complimento cancelli il richiamo di una promessa ritirata. Per far
+convivere confidenza e auto si può aggiungere in seguito una variante combinata; non
+concatenare due messaggi che fanno la stessa domanda.
+
+EPILOGHI: gli EPI_B1/EPI_B2 e gli alias V2_SCENA sono dati di regia, non nodi di chat.
+L’importatore letto ignora i primi e non costruisce automaticamente una sequenza dai
+secondi. Montare gli 8 beat col campo next del gestore delle scene. La guardia di
+chatEnter si ferma dopo 6 passaggi automatici: non lanciarvi una catena da 8. I pensieri
+del protagonista restano pensieri. In B2 non vengono inviati a Livia.
+
+[SCENA_B1] CONDIZIONI DI INGRESSO
+
+Varco aperto, riconoscimento e accompagnamento nella scena d’uscita; nessuna verifica
+indipendente della voce riconosciuta; almeno 3 verifiche proposte e lasciate cadere.
+Ingresso cinematico EPI_B1_01, fine EPI_B1_08. Elena ha accolto una persona fisica che
+occupa il posto di Irene dispersa. Nessun ricordo nuovo è stato creato in Elena. La vera
+Irene resta muta e distinta dall’impostura alla porta di casa.
+
+[SCENA_B2] CONDIZIONI DI INGRESSO
+
+Almeno 3 prove indipendenti e motivo costruito secondo §10/D03: Ottavio non salvo e Rosa o
+Livia bloccate, oppure patto per salvare qualcuno. Il protagonista comprende chi
+accompagna, apre e accetta quel prezzo. Ingresso EPI_B2_01, fine EPI_B2_08. La presenza
+prende il posto di Ottavio con Livia. Elena resta viva e al sicuro.
+
+[REDAZIONE] DUBBI E DECISIONI
+
+D1. Quattro soglie per tutti oppure tre per la presenza? Ho seguito la richiesta
+specifica: 25/50/75 per la presenza, quattro soglie per ciascuna umana. Nessun premio a
+100.
+
+D2. In T5 «6 × 6» non coincide con l’elenco, che chiede tre ALT per ognuna delle sei auto.
+Ho consegnato 18 ALT, un oggetto e un pensiero per auto, come indicato nei punti.
+
+D3. I flag di esito richiedono una sorgente esterna al dialogo. L’eccezione è esplicita e
+registrata, non nascosta dentro un contatore. I 16 ingressi da collegare non sono funzioni
+già implementate. Il pacchetto non è una sostituzione immediata di chat_dati.js.
+
+D4. Il prezzo preciso della richiusura non è fissato in D07/D15. Ho scritto il momento in
+cui va mostrato, ma non ho reso attivo un nuovo costo inventato. Finché non è scelto il
+prezzo, vc_richiudibile resta falso. La proposta concreta è separata qui sotto.
+
+D5. §3ter chiama Vienna «svincolo che ritorna», D05 distingue l’uscita autentica. Propongo
+stessa forma riconoscibile, diverso esito del collegamento dopo i requisiti; non un logo
+magico nuovo. Il filmato deve mostrare il superamento della ripetizione. Il testo di Rosa
+non può essere l’unica prova che l’uscita funzioni.
+
+D6. Tokyo è casa/avvio, Roma è studio e ritiro. Va fissato il montaggio del viaggio
+iniziale senza spostare lo studio a Tokyo o far attraversare la prima impossibilità prima
+che il normale sia stato stabilito. Non ho aggiunto una biografia per risolverlo.
+
+D7. I gusti descritti modificano il bilanciamento attuale di Livia e della presenza. Nel
+codice letto Livia penalizza sboccato; la presenza sale anche con sincerità e ironia e
+guadagna +1 dai toni neutri. La proposta è Livia: volgarità leggera neutra; presenza:
+calore +4, neutralità 0, distanza −1. Da applicare al motore, non è nel testo. Il
+giocatore può sempre non rispondere. La soglia rossa non abbassa alcun requisito di B e
+non apre varchi. Nessuna risposta temeraria vale come riconoscimento esplicito.
+
+D8. Il formato ammette !flag:, ma l’importatore letto non cattura il punto esclamativo
+nelle regex di ALT e se:. Non l’ho usato. Accetta soltanto flag minuscoli negli effetti:
+portaNota necessita dell’alias porta_nota e di un collegamento al campo canonico. Gli
+alias non sostituiscono i controlli foto originale, Irene, porta, patto e incursioni.
+
+D9. «Vuoleva»: zero occorrenze nel campione di nodi letto. Non dichiaro tre correzioni che
+non ci sono. Ho cercato e corretto le frasi da voce nelle chat a testo; nastro e radio
+restano audio. Se quelle tre occorrenze sono in un altro file, lì usare Voleva.
+
+D10. Alta confidenza cambia l’intimità e alcune frasi finali, mai la forza delle prove.
+Elena 100 non certifica chi scrive; Rosa 100 non salva Ottavio; Livia 100 non sostituisce
+la foto originale. I dettagli della presenza devono provenire da chat/tracce già esposte
+al dispositivo. Niente telepatia, visione della stanza o memorie riscritte fuori.
+
+D11. Per la progressione delle capitali, le chat di fase IV/V attendono anche i fatti che
+nominano. In particolare Livia deve avere già presentato Ottavio, e foto/tesserino devono
+essere disponibili prima del loro confronto. Non basta arrivare alla città. Gli eventi
+strani in III/IV si conservano per i giri successivi se si arriva in I/II.
+
+[REDAZIONE] PROPOSTE DI FATTI NUOVI · NON ATTIVE
+
+P1. Un altro contatto umano: un turnista di benzinaio, nome provvisorio Dario. Può
+fotografare soltanto il proprio piazzale e confermare un arrivo reale. La prima sera manda
+per errore al protagonista il menu del pranzo. Molto dopo, mentre tutti usano le parole
+giuste per consolarlo, lui scrive soltanto: «Ti ho tenuto il panino». Funziona se resta
+una persona con limiti e una vita ordinaria; non una nuova guida onnisciente.
+Aggiungerebbe un personaggio e un rapporto: richiede approvazione. Non compare nei
+dialoghi attivi, nei flag o nei controlli dei finali di questa consegna.
+
+P2. Prezzo proposto per richiudere un varco già aperto: una lampada aggiuntiva, con
+consumo mostrato prima del gesto e un percorso ancora superabile. La chiusura non paga da
+sola il riconoscimento di Irene. È una proposta di regola giocabile, non un costo canonico
+già deciso, e non è attiva nei menu consegnati.
+
+[REDAZIONE] FUNZIONI CONSIGLIATE · PROPOSTE NON IMPLEMENTATE
+
+F1. App Prove con due colonne: «quello che ho letto» e «quello che qualcuno ha visto
+fuori». Nessun timbro verde sull’identità dopo una domanda di casa. La pressione nasce dal
+dover lasciare una casella vuota quando tutto invita a completarla.
+
+F2. Una sola battuta imparata dalla presenza, scelta fra messaggi effettivamente inviati.
+Prima viene ripetuta male, poi perfettamente nel momento sbagliato. Servono ID e
+provenienza memorizzati: nessuna frase privata mai comunicata al telefono. Non importare
+dati reali dal dispositivo del giocatore. Tutto resta nel copione.
+
+F3. Nei rami esposti, bozze del protagonista che riprendono il lessico della presenza. Il
+giocatore vede la frase prima di scegliere se inviarla e può riscriverla tramite opzione.
+Il delirio cambia la tentazione offerta, senza sottrarre di nascosto la scelta.
+
+[REDAZIONE] STATO FINALE DEL LAVORO
+
+Nessuna sezione lasciata a metà: T1–T9 consegnate. Restano da implementare gli adattamenti
+dichiarati e da approvare soltanto le proposte non attive. Repository, ramo, sorgenti del
+gioco e file originale della richiesta non sono stati modificati. Il rapporto e gli script
+permettono di rifare i controlli dopo la rifinitura.
+
+[REDAZIONE] CONTEGGIO DEI TONI PER PERSONA
+
+Elena: sboccato 4, pacato 463, ironico 40, gentile 45, freddo 1, sincero 155, evasivo 2.
+
+Rosa: sboccato 12, pacato 180, ironico 15, gentile 19, freddo 0, sincero 151, evasivo 2.
+
+Livia: sboccato 0, pacato 95, ironico 8, gentile 23, freddo 0, sincero 104, evasivo 0.
+
+Sconosciuto: sboccato 0, pacato 360, ironico 0, gentile 4, freddo 15, sincero 1, evasivo
+0.
+

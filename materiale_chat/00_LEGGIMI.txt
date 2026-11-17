@@ -1,0 +1,33 @@
+NIGHT RUN · TERZO GIRO · PER CLAUDE
+
+T1–T9 completate. Leggere materiale3_01...08 in ordine. Il file 08 termina con «Per
+Claude»: numeri, problemi reali del motore, montaggio, dubbi e proposte non attive. La
+consegna è materiale di scrittura e integrazione: il gioco non è stato modificato.
+
+01: toni delle 433 risposte originali e tabella attiva per tutto il pacchetto. 02:
+snapshot dei 274 nodi originali e bivi delle 28 conversazioni umane. 03: gusti, 15
+conversazioni di soglia, 48 varianti di confidenza. 04: 12 capitali, eventi, cartelli,
+radio, tracce, chat e tratti di collegamento. 05: 6 auto, 8 nuclei di domande di casa nei
+due attori e verifica del vicino. 06: Marco, quattro fallimenti, uscita, guardia, varco,
+epiloghi B1/B2. 07: 20 insulti di Rosa, Livia riscritta, telefono a testo e correzioni.
+08: 18 nuove conversazioni, ultima rifinitura e consegna tecnica «Per Claude».
+
+T2 è uno snapshot perché l’importatore reinserisce alcune terze risposte se mancano. Gli
+override successivi sono intenzionali. Usare il file 01 come --toni. Le scene EPI e i
+blocchi di dati non sono chat: vanno al gestore delle scene e dei luoghi.
+11_ATTIVAZIONE.json indica gli ingressi. Non adottare i 129 start grezzi generati
+dall’importatore: includono nodi interni rimasti senza archi dopo la riscrittura.
+
+Per rifare il controllo statico, da questa cartella: python 09_verifica_materiale3.py .
+Per confrontare anche il campione originale, aggiungere --base seguito dal percorso di
+chat_dati.js del ramo letto. Una base successivamente modificata può dare differenze. Il
+rapporto 10 contiene anche gli hash SHA-256 dei testi realmente controllati.
+
+12_prova_integrazione.json riporta la prova con importatore e motore originali.
+13_verifica_motore.js consente di rifare il test del motore puro con Node: node
+13_verifica_motore.js chat_dati_generato.js chat.js Generare il primo argomento coi testi
+in ordine e --toni materiale3_01_toni.txt. Queste prove non sostituiscono la verifica in
+gioco degli adattatori da implementare.
+
+Il punto narrativo: la confidenza rende qualcuno caro, non rende vera una voce. Le risate
+arrivano dalle persone. L’orrore impara il modo in cui se le tengono vicine.

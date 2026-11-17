@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · I traguardi (dopo valigette.js)
-//  Cose da fare nel Viaggio, controllate mentre giochi: lavori, chilometri, sfide, velocità, freni roventi, scia,
+//  Cose da fare nel Viaggio, controllate mentre giochi: lavori, chilometri, velocità, freni roventi, scia,
 //  finestrini giù in galleria, valigette, garage... Ognuno dà un premio (soldi o una valigetta). Quando ne sblocchi
 //  uno scende un avviso dall'alto con un suono. Nel telefono c'è l'app Traguardi con la lista e i progressi.
 //  Stato in game.s.ach. L'elenco è TRG_LIST (facile da allungare: id, nome, testo, premio, check).
@@ -15,8 +15,6 @@ const TRG_LIST = [
   { id: 'km50', name: 'Mezza notte di strada', text: 'Percorri 50 km di viaggio.', prize: { cassa: 'bronzo' }, check: (g) => [Math.floor((g.s.dist || 0) / 1000), 50] },
   { id: 'km100', name: 'Cento', text: 'Percorri 100 km di viaggio.', prize: { cassa: 'argento' }, check: (g) => [Math.floor((g.s.dist || 0) / 1000), 100] },
   { id: 'km250', name: 'Senza fine', text: 'Percorri 250 km di viaggio.', prize: { cassa: 'oro' }, check: (g) => [Math.floor((g.s.dist || 0) / 1000), 250] },
-  { id: 'sfida1', name: 'Abbagliato', text: 'Vinci una sfida lanciata con gli abbaglianti.', prize: { soldi: 500 }, check: (g) => [g.streetRep ? g.streetRep().w : 0, 1] },
-  { id: 'sfida10', name: 'Re della corsia', text: 'Vinci 10 sfide.', prize: { cassa: 'argento' }, check: (g) => [g.streetRep ? g.streetRep().w : 0, 10] },
   { id: 'valig1', name: 'Curioso', text: 'Apri la prima valigetta.', prize: { soldi: 300 }, check: (g) => [g.s.cases ? g.s.cases.opened : 0, 1] },
   { id: 'epico', name: 'Viola', text: 'Trova un premio epico o migliore in una valigetta.', prize: { cassa: 'argento' }, check: (g) => !!(g.s.cases && g.s.cases.log.some((l) => l.rar >= 3)) },
   { id: 'legg', name: 'Leggenda', text: 'Trova un premio leggendario.', prize: { soldi: 10000 }, check: (g) => !!(g.s.cases && g.s.cases.log.some((l) => l.rar >= 5)) },

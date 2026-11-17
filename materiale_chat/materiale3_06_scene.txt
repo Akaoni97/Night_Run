@@ -1,0 +1,468 @@
+NIGHT RUN · MATERIALE 3 · FILE 06
+
+[REDAZIONE] NOTE
+T7. Scene di regia: ingresso dal risultato narrativo indicato, non dalla soglia
+chilometrica. I flag di esito non sono pulsanti con cui dichiarare da soli un
+salvataggio. Gli effetti non rappresentabili nel formato sono legati nella tabella di
+montaggio. B1 e B2 sono scene finali lineari; gli ID EPI sono preservati e sono forniti
+alias V2 per l’importatore che oggi li ignora.
+
+[REDAZIONE] NOTE
+Marco: se non c’è un lavoro attivo, non mostrare il carico come costo. Restano due
+opzioni. Applicare mc_carico all’incarico attuale, mc_copia alla copia selezionata senza
+toccare l’originale, mc_lampada al timer prima della partenza. Queste sono operazioni di
+regia, non effetti già implementati nell’importatore.
+
+[REDAZIONE] NOTE
+Conseguenze da applicare una volta sull’esito: fal1 toglie la copia del nastro; fal2
+lascia Marco dentro e Rosa −5; fal3 mantiene ottavioSalvo falso; fal4 imposta lo stato
+attuale varco aperto. Il contatore non certifica lo stato. Il formato non esprime
+conf:Rosa-5 né assegnazioni enum: qui non sono travestite da flag funzionanti.
+
+[REDAZIONE] NOTE
+Uscita: non inventare un emblema magico per distinguerla. Il riscontro è il confronto
+con lo svincolo già documentato e il fatto che ora il collegamento porta fuori, oltre la
+ripetizione. Questo esito va mostrato dalla regia dopo due incursioni e tre prove, non
+auto-certificato dal messaggio di Rosa.
+
+[REDAZIONE] NOTE
+Guardia: la scena rende personale il prezzo già canonico, ma il testo di Rosa da solo
+non è una verifica esterna. Montare fra 02 e 03 un tentativo ordinario di riconoscimento
+fuori rete, senza fissare un parente nuovo. Se serve una persona specifica, resta una
+proposta separata in fondo. Non dare comprensione certificata soltanto perché il
+giocatore ha premuto continuo.
+
+[REDAZIONE] NOTE
+Varco: il terzo pulsante compare soltanto con stato attuale aperto e costo di richiusura
+già mostrato. Il formato se: flag non può controllare un enum non esposto. La regia deve
+derivare vc_richiudibile e usarlo sul pulsante. Se manca il costo, il pulsante resta
+indisponibile; non inventarlo a posteriori.
+
+[REDAZIONE] NOTE
+Epiloghi: le otto righe sono una sequenza cinematica, non otto risposte cosmetiche del
+giocatore. L’importatore attuale non importa gli ID EPI e non legge una freccia
+automatica: serve un campo next nella regia. Sono consegnati i due ID equivalenti, con
+NEXT redazionale separato, senza far inviare al protagonista una frase che nel finale B2
+sceglie di tacere.
+
+[EPI_B1_01]
+ELENA: Ho messo un posto in più. È venuta zia Irene.
+
+[V2_SCENA_B1_01]
+ruolo: ELENA
+testo:
+Ho messo un posto in più. È venuta zia Irene.
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_01: EPI_B1_02; alias V2_SCENA_B1_01 e V2_SCENA_B1_02.
+
+[EPI_B1_02]
+TU: Irene?
+
+[V2_SCENA_B1_02]
+ruolo: TU
+testo:
+Irene?
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_02: EPI_B1_03; alias V2_SCENA_B1_02 e V2_SCENA_B1_03.
+
+[EPI_B1_03]
+ELENA: La vedova di Claudio. È qui, non la sto inventando.
+
+[V2_SCENA_B1_03]
+ruolo: ELENA
+testo:
+La vedova di Claudio. È qui, non la sto inventando.
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_03: EPI_B1_04; alias V2_SCENA_B1_03 e V2_SCENA_B1_04.
+
+[EPI_B1_04]
+TU: Tu l’hai fatta entrare?
+
+[V2_SCENA_B1_04]
+ruolo: TU
+testo:
+Tu l’hai fatta entrare?
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_04: EPI_B1_05; alias V2_SCENA_B1_04 e V2_SCENA_B1_05.
+
+[EPI_B1_05]
+ELENA: Sì. Era sulla porta. Perché me lo chiedi così?
+
+[V2_SCENA_B1_05]
+ruolo: ELENA
+testo:
+Sì. Era sulla porta. Perché me lo chiedi così?
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_05: EPI_B1_06; alias V2_SCENA_B1_05 e V2_SCENA_B1_06.
+
+[EPI_B1_06]
+TU, PENSIERO: Ho aperto senza finire le domande. Adesso è a tavola.
+
+[V2_SCENA_B1_06]
+ruolo: TU, PENSIERO
+testo:
+Ho aperto senza finire le domande. Adesso è a tavola.
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_06: EPI_B1_07; alias V2_SCENA_B1_06 e V2_SCENA_B1_07.
+
+[EPI_B1_07]
+TU, PENSIERO: Nel fascicolo Irene è scomparsa da anni. Claudio non lasciò una moglie.
+
+[V2_SCENA_B1_07]
+ruolo: TU, PENSIERO
+testo:
+Nel fascicolo Irene è scomparsa da anni. Claudio non lasciò una moglie.
+
+[REDAZIONE] NOTE
+NEXT EPI_B1_07: EPI_B1_08; alias V2_SCENA_B1_07 e V2_SCENA_B1_08.
+
+[EPI_B1_08]
+ELENA: Vieni? Non voglio lasciarla sola in cucina.
+
+[V2_SCENA_B1_08]
+ruolo: ELENA
+testo:
+Vieni? Non voglio lasciarla sola in cucina.
+
+[IMMAGINE_B1]
+Il posto aggiunto è occupato da una persona reale accolta in casa.
+
+[EPI_B2_01]
+LIVIA: È qui. Ottavio è qui.
+
+[V2_SCENA_B2_01]
+ruolo: LIVIA
+testo:
+È qui. Ottavio è qui.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_01: EPI_B2_02; alias V2_SCENA_B2_01 e V2_SCENA_B2_02.
+
+[EPI_B2_02]
+PRESENZA COME OTTAVIO: Livia.
+
+[V2_SCENA_B2_02]
+ruolo: PRESENZA COME OTTAVIO
+testo:
+Livia.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_02: EPI_B2_03; alias V2_SCENA_B2_02 e V2_SCENA_B2_03.
+
+[EPI_B2_03]
+LIVIA: Aspetta. Non riesco neanche a decidere cosa chiederti prima.
+
+[V2_SCENA_B2_03]
+ruolo: LIVIA
+testo:
+Aspetta. Non riesco neanche a decidere cosa chiederti prima.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_03: EPI_B2_04; alias V2_SCENA_B2_03 e V2_SCENA_B2_04.
+
+[EPI_B2_04]
+TU, PENSIERO: Sapevo chi avrebbe attraversato con noi. Non è una voce sbagliata.
+
+[V2_SCENA_B2_04]
+ruolo: TU, PENSIERO
+testo:
+Sapevo chi avrebbe attraversato con noi. Non è una voce sbagliata.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_04: EPI_B2_05; alias V2_SCENA_B2_04 e V2_SCENA_B2_05.
+
+[EPI_B2_05]
+LIVIA: Entra. La cena possiamo anche rovinarla, stasera.
+
+[V2_SCENA_B2_05]
+ruolo: LIVIA
+testo:
+Entra. La cena possiamo anche rovinarla, stasera.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_05: EPI_B2_06; alias V2_SCENA_B2_05 e V2_SCENA_B2_06.
+
+[EPI_B2_06]
+PRESENZA COME OTTAVIO: Come vuoi tu, sorella.
+
+[V2_SCENA_B2_06]
+ruolo: PRESENZA COME OTTAVIO
+testo:
+Come vuoi tu, sorella.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_06: EPI_B2_07; alias V2_SCENA_B2_06 e V2_SCENA_B2_07.
+
+[EPI_B2_07]
+TU, PENSIERO: Mi aveva chiesto di non portarle un sostituto. L’ho fatto lo stesso.
+
+[V2_SCENA_B2_07]
+ruolo: TU, PENSIERO
+testo:
+Mi aveva chiesto di non portarle un sostituto. L’ho fatto lo stesso.
+
+[REDAZIONE] NOTE
+NEXT EPI_B2_07: EPI_B2_08; alias V2_SCENA_B2_07 e V2_SCENA_B2_08.
+
+[EPI_B2_08]
+TU, PENSIERO: Elena è al sicuro. Non è il suo posto quello che ho venduto.
+
+[V2_SCENA_B2_08]
+ruolo: TU, PENSIERO
+testo:
+Elena è al sicuro. Non è il suo posto quello che ho venduto.
+
+[IMMAGINE_B2]
+Livia gli fa spazio. Il protagonista guarda e non dice nulla.
+
+[REDAZIONE] NOTE
+NODI
+
+[V2_MARCO_costo_01] ROSA · V · richiede: ev_marco_costo
+Per portare Marco devi scegliere prima che cosa lasciare. Nessun costo nascosto dopo.
+  A) «Voglio leggere anche le altre possibilità.» → V2_MARCO_costo_02
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_02
+
+
+[V2_MARCO_costo_02] ROSA · V · sempre
+Il carico: rinunci al lavoro in corso e alla paga. Marco sale, la consegna finisce qui.
+  A) «Voglio leggere anche le altre possibilità.» → V2_MARCO_costo_03
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_03
+
+
+[V2_MARCO_costo_03] ROSA · V · sempre
+La copia di una prova: la lasci a bordo della sua auto. Livia conserva l’originale.
+  A) «Voglio leggere anche le altre possibilità.» → V2_MARCO_costo_04
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_04
+
+
+[V2_MARCO_costo_04] ROSA · V · sempre
+Oppure spendi una lampada in più: tieni carico e copia, ma parti con meno margine.
+  A) «Voglio leggere anche le altre possibilità.» → V2_MARCO_costo_05
+  B) «Continuo prima di decidere.» → V2_MARCO_costo_05
+
+
+[V2_MARCO_costo_05] ROSA · V · sempre
+Decidilo adesso. Se non hai un lavoro, il costo del carico non esiste.
+  A) «Lascio carico e paga.» → V2_MARCO_costo_06 [flag:mc_carico]
+  B) «Lascio la copia. La recupererò da Livia.» → V2_MARCO_costo_06 [flag:mc_copia]
+  C) «Tengo le cose. Spendo una lampada in più.» → V2_MARCO_costo_06 [flag:mc_lampada]
+
+
+[V2_MARCO_costo_06] ROSA · V · sempre
+Bene. Adesso il rischio ha un nome. Marco non deve indovinarlo mentre sali di giri.
+  ALT se: mc_carico → Marco sale. Il lavoro è perso. Non lo ritrovi completato in bacheca.
+  ALT se: mc_copia → Marco sale. La copia non è con te; l’originale resta da Livia.
+  ALT se: mc_lampada → Marco sale. Una lampada è già spesa: il margine di guida è minore.
+[FINE]
+
+
+[V2_FAL_1_01] ROSA · III · richiede: ev_fallimento_1
+L’ultima lampada è spenta. Non buttare la macchina contro la chiusura.
+  A) «Continuo da fermo.» → V2_FAL_1_02
+  B) «Leggo prima di proseguire.» → V2_FAL_1_02
+
+
+[V2_FAL_1_02] ROSA · III · sempre
+Sei al rifugio. La copia del nastro non è più con te.
+  A) «Continuo da fermo.» → V2_FAL_1_03
+  B) «Leggo prima di proseguire.» → V2_FAL_1_03
+
+
+[V2_FAL_1_03] ROSA · III · sempre
+Livia ha ancora l’originale. Ci vuole un altro ascolto, non un’altra incursione.
+  A) «Continuo da fermo.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+  B) «Leggo prima di proseguire.» → V2_FAL_1_04 [flag:ev_incursione_1_conclusa]
+
+
+[V2_FAL_1_04] ROSA · III · sempre
+Questo passaggio è concluso. Adesso prepariamo il ritorno da quello che resta.
+[FINE]
+
+
+[V2_FAL_2_01] ROSA · V · richiede: ev_fallimento_2
+Sei al rifugio. Marco non è uscito con te.
+  A) «Continuo da fermo.» → V2_FAL_2_02
+  B) «Leggo prima di proseguire.» → V2_FAL_2_02
+
+
+[V2_FAL_2_02] ROSA · V · sempre
+Non lo chiamo salvo. Non gli assegno neanche una morte che non abbiamo visto.
+  A) «Continuo da fermo.» → V2_FAL_2_03
+  B) «Leggo prima di proseguire.» → V2_FAL_2_03
+
+
+[V2_FAL_2_03] ROSA · V · sempre
+Può ricomparire, ma non basterà riconoscere il numero per sapere chi scrive.
+  A) «Continuo da fermo.» → V2_FAL_2_04
+  B) «Leggo prima di proseguire.» → V2_FAL_2_04
+
+
+[V2_FAL_2_04] ROSA · V · sempre
+Sono arrabbiata. Non ti chiedo di tornare dentro per cancellare questa corsa.
+[FINE]
+
+
+[V2_FAL_3_01] LIVIA · V · richiede: ev_fallimento_3
+Non siete arrivati al punto d’attesa in tempo.
+  A) «Continuo da fermo.» → V2_FAL_3_02
+  B) «Leggo prima di proseguire.» → V2_FAL_3_02
+
+
+[V2_FAL_3_02] LIVIA · V · sempre
+Ottavio non è stato recuperato. Non lo facciamo diventare salvo per chiudere la riga.
+  A) «Continuo da fermo.» → V2_FAL_3_03
+  B) «Leggo prima di proseguire.» → V2_FAL_3_03
+
+
+[V2_FAL_3_03] LIVIA · V · sempre
+Non ti chiedo una versione meno dolorosa. Dimmi quello che hai visto.
+  A) «Continuo da fermo.» → V2_FAL_3_04
+  B) «Leggo prima di proseguire.» → V2_FAL_3_04
+
+
+[V2_FAL_3_04] LIVIA · V · sempre
+Gli originali restano qui. Questa occasione è persa, non tutte le risposte.
+[FINE]
+
+
+[V2_FAL_4_01] ROSA · V · richiede: ev_fallimento_4
+Sei al rifugio. Il varco è rimasto aperto.
+  A) «Continuo da fermo.» → V2_FAL_4_02
+  B) «Leggo prima di proseguire.» → V2_FAL_4_02
+
+
+[V2_FAL_4_02] ROSA · V · sempre
+Non significa che la presenza sia già uscita. Manca ancora chi la accompagna.
+  A) «Continuo da fermo.» → V2_FAL_4_03
+  B) «Leggo prima di proseguire.» → V2_FAL_4_03
+
+
+[V2_FAL_4_03] ROSA · V · sempre
+Possiamo tentare la richiusura. Prima guardiamo che cosa costa.
+  A) «Continuo da fermo.» → V2_FAL_4_04 [+varchi]
+  B) «Leggo prima di proseguire.» → V2_FAL_4_04 [+varchi]
+
+
+[V2_FAL_4_04] ROSA · V · sempre
+Non la chiamiamo una porta chiusa solo perché abbiamo smesso di guardarla.
+[FINE]
+
+
+[V2_USCITA_01] ROSA · V · richiede: ev_uscita_autentica
+Prima di chiamarla uscita, confronta il particolare dello svincolo.
+  A) «Continuo da fermo.» → V2_USCITA_02
+  B) «Leggo prima di proseguire.» → V2_USCITA_02
+
+
+[V2_USCITA_02] ROSA · V · sempre
+Nelle diramazioni tornava lo stesso segno, anche quando cambiava paese.
+  A) «Continuo da fermo.» → V2_USCITA_03
+  B) «Leggo prima di proseguire.» → V2_USCITA_03
+
+
+[V2_USCITA_03] ROSA · V · sempre
+Questo è lo svincolo autentico. Non è la porta che Irene tiene chiusa.
+  A) «Continuo da fermo.» → V2_USCITA_04
+  B) «Leggo prima di proseguire.» → V2_USCITA_04
+
+
+[V2_USCITA_04] ROSA · V · sempre
+Compare dopo il secondo passaggio e le prove già confrontate. Non per un nome nuovo.
+  A) «Continuo da fermo.» → V2_USCITA_05
+  B) «Leggo prima di proseguire.» → V2_USCITA_05
+
+
+[V2_USCITA_05] ROSA · V · sempre
+Se lo prendi, esci da solo. Le ricerche rimaste aperte non diventano risolte.
+  A) «Continuo da fermo.» → V2_USCITA_06
+  B) «Leggo prima di proseguire.» → V2_USCITA_06
+
+
+[V2_USCITA_06] ROSA · V · sempre
+Puoi scegliere di tornare senza fingere di avere finito tutto.
+[FINE]
+
+
+[V2_GUARDIA_01] ROSA · V · richiede: ev_prezzo_guardia
+Prima di promettere, guarda me. Sono qui da sei anni per riportare Ottavio.
+  A) «Continuo da fermo.» → V2_GUARDIA_02
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_02
+
+
+[V2_GUARDIA_02] ROSA · V · sempre
+Ricordo le persone fuori. Da fuori, invece, cominciano a non ricordarsi di me.
+  A) «Continuo da fermo.» → V2_GUARDIA_03
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_03
+
+
+[V2_GUARDIA_03] ROSA · V · sempre
+I messaggi restano. Il posto che avevo nelle loro giornate si consuma.
+  A) «Continuo da fermo.» → V2_GUARDIA_04
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_04
+
+
+[V2_GUARDIA_04] ROSA · V · sempre
+Non è che sparisce tutta la gente insieme. È non venire più riconosciuta, poco a poco.
+  A) «Continuo da fermo.» → V2_GUARDIA_05
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_05
+
+
+[V2_GUARDIA_05] ROSA · V · sempre
+Se resti, non stai pagando un debito con me. Stai scegliendo un posto.
+  A) «Continuo da fermo.» → V2_GUARDIA_06
+  B) «Leggo prima di proseguire.» → V2_GUARDIA_06
+
+
+[V2_GUARDIA_06] ROSA · V · sempre
+Deve esserci qualcuno di vero da far uscire. E tu devi sapere che cosa lasci.
+[FINE]
+
+
+[V2_VARCO_01] ROSA · V · richiede: ev_scelta_varco
+Questa è un’apertura. Non un modo di leggere meglio il cartello.
+  A) «Prima guardo che cosa significa aprire.» → V2_VARCO_02
+  B) «Non apro. Voglio capire la richiusura.» → V2_VARCO_03
+
+
+[V2_VARCO_02] ROSA · V · sempre
+Se apri, il passaggio esiste. La presenza deve ancora essere accompagnata.
+  A) «Guardo il costo prima di modificare il passaggio.» → V2_VARCO_04
+  B) «Tengo distinta questa scelta dalle altre.» → V2_VARCO_05
+
+
+[V2_VARCO_03] ROSA · V · sempre
+Se rifiuti, resta chiuso. Una telefonata arrabbiata non può aprirlo al posto tuo.
+  A) «Guardo il costo prima di modificare il passaggio.» → V2_VARCO_04
+  B) «Tengo distinta questa scelta dalle altre.» → V2_VARCO_05
+
+
+[V2_VARCO_04] ROSA · V · sempre
+Richiudere non è lo stesso gesto che rifiutare prima. Il costo va guardato adesso.
+  A) «Decido soltanto dopo aver visto il costo.» → V2_VARCO_05
+  B) «Per ora non modifico il passaggio.» → V2_VARCO_06 [flag:vc_rifiuto]
+
+
+[V2_VARCO_05] ROSA · V · sempre
+La scelta resta distinta dalla promessa fatta a Rosa e dalle risposte al telefono.
+  A) «Apro il varco. Non accompagno ancora nessuno.» → V2_VARCO_06 [flag:vc_apro;+varchi]
+  B) «Rifiuto l’apertura: resta chiuso.» → V2_VARCO_06 [flag:vc_rifiuto]
+  C) «Richiudo il varco.» → V2_VARCO_06 [flag:vc_richiudo;+varchi]
+
+
+[V2_VARCO_06] ROSA · V · sempre
+Abbiamo uno stato attuale. Non lo faccio diventare un finale con una frase.
+  ALT se: vc_richiudo → Richiudi. Il costo resta quello che hai visto prima del gesto.
+  ALT se: vc_apro → Il varco è aperto. Non è ancora un ritorno accompagnato.
+  ALT se: vc_rifiuto → Resta chiuso. La voce insiste, ma non lo apre per te.
+[FINE]
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE

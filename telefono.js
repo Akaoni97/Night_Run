@@ -16,24 +16,19 @@ const TEL_SMS = [
   { from: 'Studio Ferri', km: 0, text: 'Buonasera, siamo lo studio Ferri. L\'eredità di suo zio Claudio è pronta.' },
   { from: 'Studio Ferri', km: 0, text: 'Domani alle 9, via dei Cantieri 12. Porti un documento.' },
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
-  { from: 'Officina Niko', km: 2, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
-  { from: 'Motel Ovunque', km: 4, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
-  { from: 'Zio Claudio', km: 150, bad: 1, text: 'Hai preso {auto}. Giusto così.' },   // {auto}: l'auto scelta nel garage
-  { from: 'Zio Claudio', km: 400, bad: 1, text: 'sei già passato di qui' },
-  { from: 'Zio Claudio', km: 400.1, bad: 1, dir: 'o', text: 'chi sei' },
-  { from: 'Zio Claudio', km: 400.2, bad: 1, text: 'non fermarti' },
-  { from: 'Sconosciuto', km: 401, bad: 1, text: 'l\'uscita 4 non c\'è mai stata' },
+  { from: 'Officina Niko', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
+  { from: 'Motel Ovunque', km: 14, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
 ];
 // rubrica: nome, ruolo, atto da cui compare
 const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
   ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
 // app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
 // (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
-// km = dove compare il cartellone; quando lo superi spunta l'icona da scaricare (il download è finto). Una per volta, in quest'ordine.
+// km = dove compare il cartellone (a ~2 km al minuto di guida: 3-5 minuti tra uno e l'altro, il gioco deve respirare); quando lo superi spunta l'icona da scaricare (il download è finto). Una per volta, in quest'ordine.
 const TEL_APP_OFFERS = [
-  { app: 'job', km: 0.6, name: 'Lavori', sign: 'PORTAFOGLIO|IN LUTTO?' },
-  { app: 'pax', km: 2.5, name: 'Passeggeri', sign: 'TROPPO SILENZIO|IN AUTO?' },
-  { app: 'motel', km: 6, name: 'Motel', sign: 'OCCHI CHE|SI CHIUDONO?' },
+  { app: 'job', km: 5, name: 'Lavori', sign: 'PORTAFOGLIO|IN LUTTO?' },
+  { app: 'pax', km: 11.5, name: 'Passeggeri', sign: 'TROPPO SILENZIO|IN AUTO?' },
+  { app: 'motel', km: 21, name: 'Motel', sign: 'OCCHI CHE|SI CHIUDONO?' },
 ];
 // prossimo cartellone da mettere sulla strada: il primo della lista non ancora toccato, se il km c'è già
 const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps && apps[o.app]) continue; return km >= o.km ? o : null; } return null; };
@@ -142,7 +137,8 @@ const telThreads = (km) => {
   const atto = () => (ST.atto !== null ? ST.atto : telAtto(km()));
   const clock = () => { if (atto() >= 2) return '03:07'; const d = new Date(); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
   const unreadOf = (t) => { const r = T().read[t.n] || 0; return t.m.filter((x) => x.dir !== 'o').length - r > 0 ? t.m.filter((x) => x.dir !== 'o').length - r : 0; };
-  const unread = () => telThreads(km()).reduce((s, t) => s + unreadOf(t), 0);
+  let MSG = null;                                     // chat.js: conversazioni con risposte, barre di confidenza, rubrica a schede
+  const unread = () => telThreads(km()).reduce((s, t) => s + unreadOf(t), 0) + (MSG ? MSG.unread() : 0);
   const initials = (n) => n.split(' ').map((w) => w[0]).slice(0, 2).join('');
   const av = (n, bad) => `<span class="av ${bad ? 'bad' : ''}">${initials(n)}</span>`;
   const nav = (t, back) => `<div class="nav ${back ? 'sm' : ''}">${back ? '<button class="bk" data-back>‹ Indietro</button>' : ''}<h3>${t}</h3>${back ? '<span style="width:60px"></span>' : ''}</div>`;
@@ -153,7 +149,8 @@ const telThreads = (km) => {
   const status = () => `<div class="sb"><span>${clock()}</span><span>${atto() >= 1 ? '<span style="opacity:.5">▂▄▆</span>' : '▂▄▆▇'}<span class="bat ${atto() >= 2 ? 'low' : ''}"><i></i></span></span></div><div class="isl"></div><div class="hb" data-home></div>`;
   function lock() {
     const th = telThreads(km()), last = th[0], m = last ? last.m[last.m.length - 1] : null;
-    return `<div class="view wall lock"><div class="tm">${clock()}</div><div class="dt">${new Date().toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })}</div>${m ? `<div class="notif" data-open="msg"><b>${esc(last.n)}<small>ora</small></b><p>${esc(m.text)}</p></div>` : '<div style="margin-top:auto;margin-bottom:60px;color:#fff8">Nessuna notifica</div>'}</div>`;
+    const L = MSG && MSG.last(), top = L && (!last || L.km >= last.km) ? { n: L.from, text: L.text } : m ? { n: last.n, text: m.text } : null;
+    return `<div class="view wall lock"><div class="tm">${clock()}</div><div class="dt">${new Date().toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' })}</div>${top ? `<div class="notif" data-open="msg"><b>${esc(top.n)}<small>ora</small></b><p>${esc(top.text)}</p></div>` : '<div style="margin-top:auto;margin-bottom:60px;color:#fff8">Nessuna notifica</div>'}</div>`;
   }
   function home() {
     const a = atto(), g = G(), goal = g && g.vgGoal ? g.vgGoal() : null, u = unread();
@@ -174,11 +171,12 @@ const telThreads = (km) => {
   const APPS = {
     tel() { return `<div class="view app">${nav('Recenti')}<div class="body">${telRecenti(atto()).map((r) => `<div class="row ${r[3] === 1 ? 'miss' : ''}" data-call="${esc(r[0])}">${av(r[0], r[3] === 2 && atto() > 0)}<span class="tx"><b>${esc(r[0])}</b><small>${esc(r[1])}</small></span><span class="rt">${r[2]}</span></div>`).join('')}</div></div>`; },
     msg() {
+      if (MSG && typeof ST.stack[1] !== 'number') return MSG.renderMsg(H());
       const th = telThreads(km()), s = ST.stack[1];
       if (s !== undefined && th[s]) { const t = th[s]; T().read[t.n] = t.m.filter((x) => x.dir !== 'o').length; return `<div class="view app">${nav(esc(t.n), 1)}<div class="body"><div class="chat">${t.m.map((m) => `<div class="m ${m.dir === 'o' ? 'me' : ''} ${t.bad && m.dir !== 'o' ? 'bad' : ''}">${esc(m.text)}</div>`).join('')}</div></div><div class="compose">Scrivi un messaggio…</div></div>`; }
       return `<div class="view app">${nav('Messaggi')}<div class="body">${th.length ? th.map((t, i) => { const u = unreadOf(t); return `<div class="row" data-push="${i}">${av(t.n, t.bad)}<span class="tx"><b>${esc(t.n)}</b><small>${esc(t.m[t.m.length - 1].text)}</small></span>${u ? `<span class="un">${u}</span>` : ''}</div>`; }).join('') : '<p class="cen">Nessun messaggio.</p>'}</div></div>`;
     },
-    con() { const a = atto(); return `<div class="view app">${nav('Rubrica')}<div class="body">${TEL_RUBRICA.filter((c) => a >= c[2]).map((c) => `<div class="row" data-call="${esc(c[0])}">${av(c[0], c[2] > 0)}<span class="tx"><b>${esc(c[0])}</b><small>${esc(c[1])}</small></span></div>`).join('')}</div></div>`; },
+    con() { if (MSG) return MSG.renderCon(H()); const a = atto(); return `<div class="view app">${nav('Rubrica')}<div class="body">${TEL_RUBRICA.filter((c) => a >= c[2]).map((c) => `<div class="row" data-call="${esc(c[0])}">${av(c[0], c[2] > 0)}<span class="tx"><b>${esc(c[0])}</b><small>${esc(c[1])}</small></span></div>`).join('')}</div></div>`; },
     job() {
       const g = G(); if (!g) return '';
       const goal = g.vgGoal ? g.vgGoal() : null, carried = g.s.trunk.filter((it) => it.to !== undefined && it.pay !== undefined || it.kind === 'missione' || it.first);
@@ -220,15 +218,19 @@ const telThreads = (km) => {
     const s = root.getElementById('scr'); if (!s) return; s.classList.toggle('quiet', !!quiet);
     const v = ST.view; s.innerHTML = status() + (v === 'lock' ? lock() : v === 'home' ? home() : APPS[v] ? APPS[v]() : home()) + callScreen();
     const ex = EXT.find((e) => e.id === v); if (ex && ex.after) ex.after(s);
+    if (MSG && (v === 'msg' || v === 'con')) MSG.after(s, H());
     refreshBtn();
   }
   const open = (id) => { ST.view = id; ST.stack = [id]; ST.tab = 0; render(); };
+  // cosa il telefono presta alle chat (nav, avatar, testo sicuro, avvisi...)
+  const H = () => ({ ST, esc, av, nav, atto, telThreads, unreadOf, rubrica: TEL_RUBRICA, toast, render, refreshBtn });
 
   // ------------------------------------------------------------ tocchi
   root.addEventListener('click', (e) => {
-    const t = e.target.closest('[data-get],[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc],[data-x]'); if (!t) return;
+    const t = e.target.closest('[data-ch],[data-get],[data-open],[data-home],[data-back],[data-push],[data-tab],[data-take],[data-call],[data-decl],[data-acc],[data-x]'); if (!t) return;
     const D = t.dataset;
-    if (D.x !== undefined) { const ex = EXT.find((a) => a.id === ST.view); if (ex && ex.click) ex.click(D, t); }
+    if (D.ch !== undefined) { if (MSG) MSG.click(D, t, H()); }
+    else if (D.x !== undefined) { const ex = EXT.find((a) => a.id === ST.view); if (ex && ex.click) ex.click(D, t); }
     else if (D.get) { if (!ST.dl) { const ap = T().apps; ap[D.get].st = 'dl'; ST.dl = { app: D.get, t0: performance.now() }; render(); } }
     else if (D.open) open(D.open);
     else if (D.home !== undefined) { ST.view = 'home'; ST.stack = []; if (ST.call && !ST.call.live) ST.call = null; render(); }
@@ -283,6 +285,7 @@ const telThreads = (km) => {
     if (btn) btn.hidden = false;
     const k = km(), t = T(), n = TEL_SMS.filter((m) => m.km <= k).length;
     if (t.n === undefined) t.n = n;                                      // i messaggi che c'erano già non fanno avviso (la lettera dello studio l'hai letta nel prologo)
+    if (MSG) MSG.tick(k, g, H());
     if (n > t.n) { const m = TEL_SMS.filter((x) => x.km <= k && x.dir !== 'o').pop(); t.n = n; if (m) { toast(m.from, auto(m.text), m.bad); if (ST.on && ST.view === 'msg') render(); } refreshBtn(); }
     // cartelloni delle app: il prossimo compare sulla strada davanti a te; quando lo superi spunta l'icona da scaricare
     const off = telNextOffer(k, t.apps);
@@ -314,6 +317,8 @@ const telThreads = (km) => {
       EXT.push(a); IC[a.id] = a.icon; COL[a.id] = a.color; APPS[a.id] = a.render;
       if (a.css) { const st = document.createElement('style'); st.textContent = a.css; root.appendChild(st); }
     },
+    setMessages(p) { MSG = p; },                                        // chat.js si registra qui
+    addCss(css) { const st = document.createElement('style'); st.textContent = css; root.appendChild(st); },
     render, show: (id) => { setOpen(true); open(id); }, get view() { return ST.view; }, toast,
   };
 })();

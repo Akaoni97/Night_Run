@@ -1,0 +1,2559 @@
+NIGHT RUN · MATERIALE 3 · FILE 05
+
+[REDAZIONE] NOTE
+T5. Tre alternative per ogni auto sui medesimi nodi. Il modello cambia il primo
+dettaglio osservato, non la validità dei finali. Le versioni di confidenza hanno
+priorità se applicabili: il nome dell’auto resta nei documenti. Gli oggetti presentano
+le tracce già previste, senza fissare nuove biografie.
+
+[AUTO_PANDA]
+modello: Fiat Panda
+flag: auto_panda
+oggetto: Nota della Panda
+descrizione: La nota della donna di Washington. Parla di chi si accompagna fuori, non di
+un potere della macchina.
+pensiero al ritrovamento:
+Poche righe. Prima le leggo come sono scritte.
+
+[AUTO_A80]
+modello: Audi 80 Avant
+flag: auto_a80
+oggetto: Foto sbiadita
+descrizione: La copia della foto alla porta. Sembra quasi vuota finché non viene
+confrontata con l’originale di Livia.
+pensiero al ritrovamento:
+Questa foto non la completo indovinando.
+
+[AUTO_V40]
+modello: Volvo V40 SW
+flag: auto_v40
+oggetto: Tesserino di Ottavio
+descrizione: Un nome da confrontare con le carte di Claudio. Nello stesso vano restano
+caramelle alla menta.
+pensiero al ritrovamento:
+Ottavio. Non era soltanto la macchina di mio zio.
+
+[AUTO_PUNTO]
+modello: Fiat Grande Punto
+flag: auto_punto
+oggetto: Appunto della Punto
+descrizione: Un appunto ordinario accompagna il filo del ragazzo di Lisbona; serve a
+conservare il confronto.
+pensiero al ritrovamento:
+Una cosa normale in una macchina che ancora devo imparare.
+
+[AUTO_CORSA]
+modello: Opel Corsa
+flag: auto_corsa
+oggetto: Foglio della Corsa
+descrizione: La traccia della coppia di Berlino. Tiene distinti il segno di apertura e
+quello della richiusura.
+pensiero al ritrovamento:
+Sono due segni diversi. Non li faccio diventare uno solo.
+
+[AUTO_POLO]
+modello: Volkswagen Polo
+flag: auto_polo
+oggetto: Schema dello svincolo
+descrizione: Il particolare di uno svincolo, senza un nome del proprietario. La
+diramazione può cambiare, quel dettaglio no.
+pensiero al ritrovamento:
+Non c’è un nome. Non lo scrivo io per riempire il foglio.
+
+[REDAZIONE] NOTE
+T6. Ogni nucleo ha tre domande e un’uscita alla chat. La domanda usata si chiude solo
+dopo aver mostrato la risposta: chiuderla prima impedirebbe al motore di leggerla.
+Nessuna risposta aggiunge elena_verificata. Il vicino è il riscontro indipendente.
+
+[REDAZIONE] NOTE
+Routing necessario nell’app Prove: V2_CASA_01–08 sono gli ingressi veri. Con
+ev_voce_imitata usare il corrispondente ingresso _P, che mantiene l’attore Sconosciuto e
+il thread Elena. Un solo ALT non basta: cambierebbe il testo ma assegnerebbe la fiducia
+alla persona sbagliata. Il router usa anche l’insieme delle domande già fatte, per
+aprire il selettore rimasto. Niente nuova regola della maledizione.
+
+[NUCLEO_01]
+tema: Pasta
+si propone solo dopo: ELE_pasta_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 1: alla riapertura non tornare al selettore iniziale. I flag q11/q12/q13
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_02]
+tema: Turni
+si propone solo dopo: ELE_turno_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 2: alla riapertura non tornare al selettore iniziale. I flag q21/q22/q23
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_03]
+tema: Coinquilino
+si propone solo dopo: ELE_coinquilino_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 3: alla riapertura non tornare al selettore iniziale. I flag q31/q32/q33
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_04]
+tema: Nonno: uso
+si propone solo dopo: ELE_nonno_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 4: alla riapertura non tornare al selettore iniziale. I flag q41/q42/q43
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_05]
+tema: Nonno: origine
+si propone solo dopo: ELE_nonno_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 5: alla riapertura non tornare al selettore iniziale. I flag q51/q52/q53
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_06]
+tema: Claudio: distanza
+si propone solo dopo: ELE_claudio_risposta
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 6: alla riapertura non tornare al selettore iniziale. I flag q61/q62/q63
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_07]
+tema: Temperino
+si propone solo dopo: ELE_temperino_risposta
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 7: alla riapertura non tornare al selettore iniziale. I flag q71/q72/q73
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[NUCLEO_08]
+tema: Una sola auto
+si propone solo dopo: ELE_ritiro_08
+non certifica identità: sì
+
+[REDAZIONE] NOTE
+Nucleo 8: alla riapertura non tornare al selettore iniziale. I flag q81/q82/q83
+determinano il sottoinsieme rimasto. Evitare di riproporre il quesito anche cambiando
+identità della voce. I flag sono letti dal router, oltre che dagli ALT di richiamo
+sotto.
+
+[REDAZIONE] NOTE
+I nodi CASA non vanno messi in CHAT_START per chilometri: sono richiamati dalla scelta
+di verifica. I selettori M1–M6 appartengono al medesimo nucleo, non sono nuove domande.
+Il testo del messaggio corretto o sbagliato dipende dall’attore selezionato prima
+dell’ingresso; così la barra non rivela o attribuisce falsamente l’identità.
+
+[REDAZIONE] NOTE
+Vicino: il protagonista usa il recapito indipendente già previsto dalla bozza, non il
+contatto suggerito dalla chiamata sospetta. Il vicino raggiunge Elena alla porta di
+casa, la vede e la sente rispondere lì; il riscontro viene riportato nel messaggio
+autentico di Elena. Non chiedergli di conoscere la posizione del protagonista. Messa in
+scena da collegare alla Rubrica; il nome del vicino resta non fissato.
+
+[REDAZIONE] NOTE
+NODI
+
+[ELE_ritiro_01] ELENA · I · sempre
+Allora, com’è?
+  ALT se: conf:Elena>=25 → Allora? Il giudizio vero, non la difesa della tua scelta.
+  ALT se: auto_panda → La Panda? Voglio vedere anche lei, non soltanto il telo.
+  ALT se: auto_a80 → L’Audi di Claudio? Nel cassetto hai già trovato domande?
+  ALT se: auto_v40 → La Volvo? Prima una foto intera, non il piano per riempirla.
+  ALT se: auto_punto → La Punto? Almeno adesso ho un nome quando mi scrivi la macchina.
+  ALT se: auto_corsa → Hai scelto la Corsa. Il nome non era un ordine, vero?
+  ALT se: auto_polo → La Polo? Mandami lei, non le altre cinque che ti mancano.
+  A) «Parte.» → ELE_ritiro_02
+  B) «Ti faccio vedere anche cosa non mi convince.» → V2_E01_01 [flag:e01b]
+  C) «Ora niente foto, per favore.» → V2_E01_03 [flag:e01c;sblocca:ELE_ritiro_08]
+
+
+[ELE_ritiro_02] ELENA · I · sempre
+Parte è una descrizione o un programma?
+  ALT se: auto_panda → La Panda parte. Bene. Adesso vediamo se ti lascia finire la frase.
+  ALT se: auto_a80 → L’Audi parte. Il resto della descrizione puoi farlo senza vendermela.
+  ALT se: auto_v40 → La Volvo parte. Per adesso è una descrizione onesta.
+  ALT se: auto_punto → La Punto parte. Non è già una difesa di tutto il resto.
+  ALT se: auto_corsa → La Corsa parte. Per ora ha già giustificato il nome.
+  ALT se: auto_polo → La Polo parte. È già una notizia, ma non è tutto il giornale.
+  A) «Il resto fa rumore.» → ELE_ritiro_03
+  B) «Per ora guardo e basta.» → ELE_ritiro_04
+
+
+[ROS_attrezzi_01] ROSA · II · sempre
+Smettila di accenderla. Passami quello che sto indicando.
+  ALT se: conf:Rosa>=25 → Testone, togli la mano dalla chiave. Poi lavoriamo.
+  ALT se: auto_panda → Panda. Prima il controllo, poi quanto ti sei affezionato.
+  ALT se: auto_a80 → Con l’Audi prima il controllo. La famiglia può aspettare.
+  ALT se: auto_v40 → V40. Controlliamo prima di caricarci tutta la vita.
+  ALT se: auto_punto → Punto. Mettiamo in fila i problemi, senza litigare col nome.
+  ALT se: auto_corsa → Corsa. Il nome sul baule non è un programma di guida.
+  ALT se: auto_polo → Polo. Prima la guardiamo. Non deve raccontarci tutto da sola.
+  A) «Questo?» → ROS_attrezzi_02
+  B) «Spiegami cosa devo guardare, senza riaccenderla.» → V2_R01_01 [flag:r01b]
+  C) «Fai tu. Non voglio imparare adesso.» → V2_R01_03 [flag:r01c;sblocca:ROS_attrezzi_08]
+
+
+[V2_CASA_01_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_Q1_M1 [flag:q11]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q1_M1] ELENA · IV · sempre
+Pasta. Non è cambiato mentre guidavi.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q1_M1]
+  B) «Un’altra.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q1_M1]
+
+
+[V2_CASA_01_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quando dici Pasta, di chi parli?» → V2_CASA_01_Q2_M2 [flag:q12]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q2_M2] ELENA · IV · sempre
+Del gatto. La cena è un altro problema.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q2_M2]
+  B) «Un’altra.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q2_M2]
+
+
+[V2_CASA_01_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_Q1_M3 [flag:q11]
+  B) «Quando dici Pasta, di chi parli?» → V2_CASA_01_Q2_M3 [flag:q12]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q1_M3] ELENA · IV · sempre
+Pasta. Non è cambiato mentre guidavi.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q1_M3]
+  B) «Un’altra.» → V2_CASA_01_M2 [chiude:V2_CASA_01_Q1_M3]
+
+
+[V2_CASA_01_Q2_M3] ELENA · IV · sempre
+Del gatto. La cena è un altro problema.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q2_M3]
+  B) «Un’altra.» → V2_CASA_01_M1 [chiude:V2_CASA_01_Q2_M3]
+
+
+[V2_CASA_01_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Chi si è preso la casa, secondo te?» → V2_CASA_01_Q3_M4 [flag:q13]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q3_M4] ELENA · IV · sempre
+Pasta. Io sto ancora trattando.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q3_M4]
+  B) «Un’altra.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q3_M4]
+
+
+[V2_CASA_01_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_Q1_M5 [flag:q11]
+  B) «Chi si è preso la casa, secondo te?» → V2_CASA_01_Q3_M5 [flag:q13]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q1_M5] ELENA · IV · sempre
+Pasta. Non è cambiato mentre guidavi.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q1_M5]
+  B) «Un’altra.» → V2_CASA_01_M4 [chiude:V2_CASA_01_Q1_M5]
+
+
+[V2_CASA_01_Q3_M5] ELENA · IV · sempre
+Pasta. Io sto ancora trattando.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q3_M5]
+  B) «Un’altra.» → V2_CASA_01_M1 [chiude:V2_CASA_01_Q3_M5]
+
+
+[V2_CASA_01_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quando dici Pasta, di chi parli?» → V2_CASA_01_Q2_M6 [flag:q12]
+  B) «Chi si è preso la casa, secondo te?» → V2_CASA_01_Q3_M6 [flag:q13]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_fine
+
+
+[V2_CASA_01_Q2_M6] ELENA · IV · sempre
+Del gatto. La cena è un altro problema.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q2_M6]
+  B) «Un’altra.» → V2_CASA_01_M4 [chiude:V2_CASA_01_Q2_M6]
+
+
+[V2_CASA_01_Q3_M6] ELENA · IV · sempre
+Pasta. Io sto ancora trattando.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q3_M6]
+  B) «Un’altra.» → V2_CASA_01_M2 [chiude:V2_CASA_01_Q3_M6]
+
+
+[V2_CASA_01] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_Q1_M7 [flag:q11]
+  B) «Quando dici Pasta, di chi parli?» → V2_CASA_01_Q2_M7 [flag:q12]
+  C) «Chi si è preso la casa, secondo te?» → V2_CASA_01_Q3_M7 [flag:q13]
+
+
+[V2_CASA_01_Q1_M7] ELENA · IV · sempre
+Pasta. Non è cambiato mentre guidavi.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q1_M7]
+  B) «Un’altra.» → V2_CASA_01_M6 [chiude:V2_CASA_01_Q1_M7]
+
+
+[V2_CASA_01_Q2_M7] ELENA · IV · sempre
+Del gatto. La cena è un altro problema.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q2_M7]
+  B) «Un’altra.» → V2_CASA_01_M5 [chiude:V2_CASA_01_Q2_M7]
+
+
+[V2_CASA_01_Q3_M7] ELENA · IV · sempre
+Pasta. Io sto ancora trattando.
+  A) «Lo tengo.» → V2_CASA_01_fine [chiude:V2_CASA_01_Q3_M7]
+  B) «Un’altra.» → V2_CASA_01_M3 [chiude:V2_CASA_01_Q3_M7]
+
+
+[V2_CASA_01_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_01_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_P_Q1_M1 [flag:q11]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Pesto. Perché me lo chiedi adesso?
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q1_M1]
+
+
+[V2_CASA_01_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quando dici Pasta, di chi parli?» → V2_CASA_01_P_Q2_M2 [flag:q12]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Di quello che sto preparando per cena.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q2_M2]
+
+
+[V2_CASA_01_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_P_Q1_M3 [flag:q11]
+  B) «Quando dici Pasta, di chi parli?» → V2_CASA_01_P_Q2_M3 [flag:q12]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Pesto. Perché me lo chiedi adesso?
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_01_P_M2 [chiude:V2_CASA_01_P_Q1_M3]
+
+
+[V2_CASA_01_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Di quello che sto preparando per cena.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_01_P_M1 [chiude:V2_CASA_01_P_Q2_M3]
+
+
+[V2_CASA_01_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Chi si è preso la casa, secondo te?» → V2_CASA_01_P_Q3_M4 [flag:q13]
+  B) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Il cane. Lo sai come fa.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q3_M4]
+
+
+[V2_CASA_01_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_P_Q1_M5 [flag:q11]
+  B) «Chi si è preso la casa, secondo te?» → V2_CASA_01_P_Q3_M5 [flag:q13]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Pesto. Perché me lo chiedi adesso?
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_01_P_M4 [chiude:V2_CASA_01_P_Q1_M5]
+
+
+[V2_CASA_01_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Il cane. Lo sai come fa.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_01_P_M1 [chiude:V2_CASA_01_P_Q3_M5]
+
+
+[V2_CASA_01_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quando dici Pasta, di chi parli?» → V2_CASA_01_P_Q2_M6 [flag:q12]
+  B) «Chi si è preso la casa, secondo te?» → V2_CASA_01_P_Q3_M6 [flag:q13]
+  C) «Per ora torno ai messaggi.» → V2_CASA_01_P_fine
+
+
+[V2_CASA_01_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Di quello che sto preparando per cena.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_01_P_M4 [chiude:V2_CASA_01_P_Q2_M6]
+
+
+[V2_CASA_01_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Il cane. Lo sai come fa.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_01_P_M2 [chiude:V2_CASA_01_P_Q3_M6]
+
+
+[V2_CASA_01_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Come si chiama il tuo gatto?» → V2_CASA_01_P_Q1_M7 [flag:q11]
+  B) «Quando dici Pasta, di chi parli?» → V2_CASA_01_P_Q2_M7 [flag:q12]
+  C) «Chi si è preso la casa, secondo te?» → V2_CASA_01_P_Q3_M7 [flag:q13]
+
+
+[V2_CASA_01_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Pesto. Perché me lo chiedi adesso?
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_01_P_M6 [chiude:V2_CASA_01_P_Q1_M7]
+
+
+[V2_CASA_01_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Di quello che sto preparando per cena.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_01_P_M5 [chiude:V2_CASA_01_P_Q2_M7]
+
+
+[V2_CASA_01_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Il cane. Lo sai come fa.
+  A) «Lo tengo.» → V2_CASA_01_P_fine [chiude:V2_CASA_01_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_01_P_M3 [chiude:V2_CASA_01_P_Q3_M7]
+
+
+[V2_CASA_01_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_01_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_01_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_01_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q12 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_01_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q12 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_01_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q12 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q13 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_01_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q11 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q12 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q13 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_Q1_M1 [flag:q21]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q1_M1] ELENA · IV · sempre
+Nessuno. È quello il problema dei miei turni.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q1_M1]
+  B) «Un’altra.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q1_M1]
+
+
+[V2_CASA_02_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_Q2_M2 [flag:q22]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q2_M2] ELENA · IV · sempre
+Rispondo dopo. Te l’ho detto.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q2_M2]
+  B) «Un’altra.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q2_M2]
+
+
+[V2_CASA_02_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_Q1_M3 [flag:q21]
+  B) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_Q2_M3 [flag:q22]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q1_M3] ELENA · IV · sempre
+Nessuno. È quello il problema dei miei turni.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q1_M3]
+  B) «Un’altra.» → V2_CASA_02_M2 [chiude:V2_CASA_02_Q1_M3]
+
+
+[V2_CASA_02_Q2_M3] ELENA · IV · sempre
+Rispondo dopo. Te l’ho detto.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q2_M3]
+  B) «Un’altra.» → V2_CASA_02_M1 [chiude:V2_CASA_02_Q2_M3]
+
+
+[V2_CASA_02_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_Q3_M4 [flag:q23]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q3_M4] ELENA · IV · sempre
+No. Dovevi scrivere quando ti fermavi.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q3_M4]
+  B) «Un’altra.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q3_M4]
+
+
+[V2_CASA_02_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_Q1_M5 [flag:q21]
+  B) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_Q3_M5 [flag:q23]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q1_M5] ELENA · IV · sempre
+Nessuno. È quello il problema dei miei turni.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q1_M5]
+  B) «Un’altra.» → V2_CASA_02_M4 [chiude:V2_CASA_02_Q1_M5]
+
+
+[V2_CASA_02_Q3_M5] ELENA · IV · sempre
+No. Dovevi scrivere quando ti fermavi.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q3_M5]
+  B) «Un’altra.» → V2_CASA_02_M1 [chiude:V2_CASA_02_Q3_M5]
+
+
+[V2_CASA_02_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_Q2_M6 [flag:q22]
+  B) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_Q3_M6 [flag:q23]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_fine
+
+
+[V2_CASA_02_Q2_M6] ELENA · IV · sempre
+Rispondo dopo. Te l’ho detto.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q2_M6]
+  B) «Un’altra.» → V2_CASA_02_M4 [chiude:V2_CASA_02_Q2_M6]
+
+
+[V2_CASA_02_Q3_M6] ELENA · IV · sempre
+No. Dovevi scrivere quando ti fermavi.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q3_M6]
+  B) «Un’altra.» → V2_CASA_02_M2 [chiude:V2_CASA_02_Q3_M6]
+
+
+[V2_CASA_02] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_Q1_M7 [flag:q21]
+  B) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_Q2_M7 [flag:q22]
+  C) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_Q3_M7 [flag:q23]
+
+
+[V2_CASA_02_Q1_M7] ELENA · IV · sempre
+Nessuno. È quello il problema dei miei turni.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q1_M7]
+  B) «Un’altra.» → V2_CASA_02_M6 [chiude:V2_CASA_02_Q1_M7]
+
+
+[V2_CASA_02_Q2_M7] ELENA · IV · sempre
+Rispondo dopo. Te l’ho detto.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q2_M7]
+  B) «Un’altra.» → V2_CASA_02_M5 [chiude:V2_CASA_02_Q2_M7]
+
+
+[V2_CASA_02_Q3_M7] ELENA · IV · sempre
+No. Dovevi scrivere quando ti fermavi.
+  A) «Lo tengo.» → V2_CASA_02_fine [chiude:V2_CASA_02_Q3_M7]
+  B) «Un’altra.» → V2_CASA_02_M3 [chiude:V2_CASA_02_Q3_M7]
+
+
+[V2_CASA_02_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_02_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_P_Q1_M1 [flag:q21]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Quello di sempre. Non cambia mai.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q1_M1]
+
+
+[V2_CASA_02_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_P_Q2_M2 [flag:q22]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Ti rispondo subito. Ti rispondo sempre.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q2_M2]
+
+
+[V2_CASA_02_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_P_Q1_M3 [flag:q21]
+  B) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_P_Q2_M3 [flag:q22]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Quello di sempre. Non cambia mai.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_02_P_M2 [chiude:V2_CASA_02_P_Q1_M3]
+
+
+[V2_CASA_02_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Ti rispondo subito. Ti rispondo sempre.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_02_P_M1 [chiude:V2_CASA_02_P_Q2_M3]
+
+
+[V2_CASA_02_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_P_Q3_M4 [flag:q23]
+  B) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Sì. La stessa ora di tutte le sere.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q3_M4]
+
+
+[V2_CASA_02_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_P_Q1_M5 [flag:q21]
+  B) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_P_Q3_M5 [flag:q23]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Quello di sempre. Non cambia mai.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_02_P_M4 [chiude:V2_CASA_02_P_Q1_M5]
+
+
+[V2_CASA_02_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Sì. La stessa ora di tutte le sere.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_02_P_M1 [chiude:V2_CASA_02_P_Q3_M5]
+
+
+[V2_CASA_02_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_P_Q2_M6 [flag:q22]
+  B) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_P_Q3_M6 [flag:q23]
+  C) «Per ora torno ai messaggi.» → V2_CASA_02_P_fine
+
+
+[V2_CASA_02_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Ti rispondo subito. Ti rispondo sempre.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_02_P_M4 [chiude:V2_CASA_02_P_Q2_M6]
+
+
+[V2_CASA_02_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. La stessa ora di tutte le sere.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_02_P_M2 [chiude:V2_CASA_02_P_Q3_M6]
+
+
+[V2_CASA_02_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che orario sensato mi avevi dato?» → V2_CASA_02_P_Q1_M7 [flag:q21]
+  B) «Se ti scrivo mentre lavori, cosa fai?» → V2_CASA_02_P_Q2_M7 [flag:q22]
+  C) «Avevamo fissato un’ora per sentirci?» → V2_CASA_02_P_Q3_M7 [flag:q23]
+
+
+[V2_CASA_02_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Quello di sempre. Non cambia mai.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_02_P_M6 [chiude:V2_CASA_02_P_Q1_M7]
+
+
+[V2_CASA_02_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Ti rispondo subito. Ti rispondo sempre.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_02_P_M5 [chiude:V2_CASA_02_P_Q2_M7]
+
+
+[V2_CASA_02_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. La stessa ora di tutte le sere.
+  A) «Lo tengo.» → V2_CASA_02_P_fine [chiude:V2_CASA_02_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_02_P_M3 [chiude:V2_CASA_02_P_Q3_M7]
+
+
+[V2_CASA_02_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_02_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q22 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q22 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q22 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q23 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_02_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q21 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q22 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q23 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M1 [flag:q31]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q1_M1] ELENA · IV · sempre
+Del coinquilino. Non di uno sconosciuto.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q1_M1]
+  B) «Un’altra.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q1_M1]
+
+
+[V2_CASA_03_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_Q2_M2 [flag:q32]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q2_M2] ELENA · IV · sempre
+Per risparmiarti una conversazione infinita.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M2]
+  B) «Un’altra.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M2]
+
+
+[V2_CASA_03_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M3 [flag:q31]
+  B) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_Q2_M3 [flag:q32]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q1_M3] ELENA · IV · sempre
+Del coinquilino. Non di uno sconosciuto.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q1_M3]
+  B) «Un’altra.» → V2_CASA_03_M2 [chiude:V2_CASA_03_Q1_M3]
+
+
+[V2_CASA_03_Q2_M3] ELENA · IV · sempre
+Per risparmiarti una conversazione infinita.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M3]
+  B) «Un’altra.» → V2_CASA_03_M1 [chiude:V2_CASA_03_Q2_M3]
+
+
+[V2_CASA_03_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M4 [flag:q33]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q3_M4] ELENA · IV · sempre
+No. Mi stava annoiando. È diverso.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M4]
+  B) «Un’altra.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M4]
+
+
+[V2_CASA_03_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M5 [flag:q31]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M5 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q1_M5] ELENA · IV · sempre
+Del coinquilino. Non di uno sconosciuto.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q1_M5]
+  B) «Un’altra.» → V2_CASA_03_M4 [chiude:V2_CASA_03_Q1_M5]
+
+
+[V2_CASA_03_Q3_M5] ELENA · IV · sempre
+No. Mi stava annoiando. È diverso.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M5]
+  B) «Un’altra.» → V2_CASA_03_M1 [chiude:V2_CASA_03_Q3_M5]
+
+
+[V2_CASA_03_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_Q2_M6 [flag:q32]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M6 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+
+[V2_CASA_03_Q2_M6] ELENA · IV · sempre
+Per risparmiarti una conversazione infinita.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M6]
+  B) «Un’altra.» → V2_CASA_03_M4 [chiude:V2_CASA_03_Q2_M6]
+
+
+[V2_CASA_03_Q3_M6] ELENA · IV · sempre
+No. Mi stava annoiando. È diverso.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M6]
+  B) «Un’altra.» → V2_CASA_03_M2 [chiude:V2_CASA_03_Q3_M6]
+
+
+[V2_CASA_03] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M7 [flag:q31]
+  B) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_Q2_M7 [flag:q32]
+  C) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M7 [flag:q33]
+
+
+[V2_CASA_03_Q1_M7] ELENA · IV · sempre
+Del coinquilino. Non di uno sconosciuto.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q1_M7]
+  B) «Un’altra.» → V2_CASA_03_M6 [chiude:V2_CASA_03_Q1_M7]
+
+
+[V2_CASA_03_Q2_M7] ELENA · IV · sempre
+Per risparmiarti una conversazione infinita.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M7]
+  B) «Un’altra.» → V2_CASA_03_M5 [chiude:V2_CASA_03_Q2_M7]
+
+
+[V2_CASA_03_Q3_M7] ELENA · IV · sempre
+No. Mi stava annoiando. È diverso.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M7]
+  B) «Un’altra.» → V2_CASA_03_M3 [chiude:V2_CASA_03_Q3_M7]
+
+
+[V2_CASA_03_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_03_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M1 [flag:q31]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Di quello che abita accanto.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q1_M1]
+
+
+[V2_CASA_03_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_P_Q2_M2 [flag:q32]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Perché non vivo con nessuno.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M2]
+
+
+[V2_CASA_03_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M3 [flag:q31]
+  B) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_P_Q2_M3 [flag:q32]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Di quello che abita accanto.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_03_P_M2 [chiude:V2_CASA_03_P_Q1_M3]
+
+
+[V2_CASA_03_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Perché non vivo con nessuno.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_03_P_M1 [chiude:V2_CASA_03_P_Q2_M3]
+
+
+[V2_CASA_03_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M4 [flag:q33]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Sì. È per quello che ti chiamavo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q3_M4]
+
+
+[V2_CASA_03_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M5 [flag:q31]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M5 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Di quello che abita accanto.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_03_P_M4 [chiude:V2_CASA_03_P_Q1_M5]
+
+
+[V2_CASA_03_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Sì. È per quello che ti chiamavo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_03_P_M1 [chiude:V2_CASA_03_P_Q3_M5]
+
+
+[V2_CASA_03_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_P_Q2_M6 [flag:q32]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M6 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+
+[V2_CASA_03_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Perché non vivo con nessuno.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_03_P_M4 [chiude:V2_CASA_03_P_Q2_M6]
+
+
+[V2_CASA_03_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. È per quello che ti chiamavo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_03_P_M2 [chiude:V2_CASA_03_P_Q3_M6]
+
+
+[V2_CASA_03_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M7 [flag:q31]
+  B) «Perché non mi hai passato il coinquilino?» → V2_CASA_03_P_Q2_M7 [flag:q32]
+  C) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M7 [flag:q33]
+
+
+[V2_CASA_03_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Di quello che abita accanto.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_03_P_M6 [chiude:V2_CASA_03_P_Q1_M7]
+
+
+[V2_CASA_03_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Perché non vivo con nessuno.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_03_P_M5 [chiude:V2_CASA_03_P_Q2_M7]
+
+
+[V2_CASA_03_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. È per quello che ti chiamavo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_03_P_M3 [chiude:V2_CASA_03_P_Q3_M7]
+
+
+[V2_CASA_03_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_03_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q32 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q32 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q32 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q33 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_03_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q31 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q32 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q33 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_Q1_M1 [flag:q41]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q1_M1] ELENA · IV · sempre
+Perché brontoli. E mi faciliti il lavoro.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q1_M1]
+  B) «Un’altra.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q1_M1]
+
+
+[V2_CASA_04_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Nonno è un titolo onorifico?» → V2_CASA_04_Q2_M2 [flag:q42]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q2_M2] ELENA · IV · sempre
+Sì, certo. Continua a raccontartela.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q2_M2]
+  B) «Un’altra.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q2_M2]
+
+
+[V2_CASA_04_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_Q1_M3 [flag:q41]
+  B) «Nonno è un titolo onorifico?» → V2_CASA_04_Q2_M3 [flag:q42]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q1_M3] ELENA · IV · sempre
+Perché brontoli. E mi faciliti il lavoro.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q1_M3]
+  B) «Un’altra.» → V2_CASA_04_M2 [chiude:V2_CASA_04_Q1_M3]
+
+
+[V2_CASA_04_Q2_M3] ELENA · IV · sempre
+Sì, certo. Continua a raccontartela.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q2_M3]
+  B) «Un’altra.» → V2_CASA_04_M1 [chiude:V2_CASA_04_Q2_M3]
+
+
+[V2_CASA_04_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_Q3_M4 [flag:q43]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q3_M4] ELENA · IV · sempre
+Nonno. Adesso non fingere di essertelo perso.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q3_M4]
+  B) «Un’altra.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q3_M4]
+
+
+[V2_CASA_04_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_Q1_M5 [flag:q41]
+  B) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_Q3_M5 [flag:q43]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q1_M5] ELENA · IV · sempre
+Perché brontoli. E mi faciliti il lavoro.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q1_M5]
+  B) «Un’altra.» → V2_CASA_04_M4 [chiude:V2_CASA_04_Q1_M5]
+
+
+[V2_CASA_04_Q3_M5] ELENA · IV · sempre
+Nonno. Adesso non fingere di essertelo perso.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q3_M5]
+  B) «Un’altra.» → V2_CASA_04_M1 [chiude:V2_CASA_04_Q3_M5]
+
+
+[V2_CASA_04_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Nonno è un titolo onorifico?» → V2_CASA_04_Q2_M6 [flag:q42]
+  B) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_Q3_M6 [flag:q43]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_fine
+
+
+[V2_CASA_04_Q2_M6] ELENA · IV · sempre
+Sì, certo. Continua a raccontartela.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q2_M6]
+  B) «Un’altra.» → V2_CASA_04_M4 [chiude:V2_CASA_04_Q2_M6]
+
+
+[V2_CASA_04_Q3_M6] ELENA · IV · sempre
+Nonno. Adesso non fingere di essertelo perso.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q3_M6]
+  B) «Un’altra.» → V2_CASA_04_M2 [chiude:V2_CASA_04_Q3_M6]
+
+
+[V2_CASA_04] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_Q1_M7 [flag:q41]
+  B) «Nonno è un titolo onorifico?» → V2_CASA_04_Q2_M7 [flag:q42]
+  C) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_Q3_M7 [flag:q43]
+
+
+[V2_CASA_04_Q1_M7] ELENA · IV · sempre
+Perché brontoli. E mi faciliti il lavoro.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q1_M7]
+  B) «Un’altra.» → V2_CASA_04_M6 [chiude:V2_CASA_04_Q1_M7]
+
+
+[V2_CASA_04_Q2_M7] ELENA · IV · sempre
+Sì, certo. Continua a raccontartela.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q2_M7]
+  B) «Un’altra.» → V2_CASA_04_M5 [chiude:V2_CASA_04_Q2_M7]
+
+
+[V2_CASA_04_Q3_M7] ELENA · IV · sempre
+Nonno. Adesso non fingere di essertelo perso.
+  A) «Lo tengo.» → V2_CASA_04_fine [chiude:V2_CASA_04_Q3_M7]
+  B) «Un’altra.» → V2_CASA_04_M3 [chiude:V2_CASA_04_Q3_M7]
+
+
+[V2_CASA_04_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_04_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_P_Q1_M1 [flag:q41]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Perché è il modo più dolce che conosco.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q1_M1]
+
+
+[V2_CASA_04_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Nonno è un titolo onorifico?» → V2_CASA_04_P_Q2_M2 [flag:q42]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Sì. È una cosa importante tra noi.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q2_M2]
+
+
+[V2_CASA_04_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_P_Q1_M3 [flag:q41]
+  B) «Nonno è un titolo onorifico?» → V2_CASA_04_P_Q2_M3 [flag:q42]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Perché è il modo più dolce che conosco.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_04_P_M2 [chiude:V2_CASA_04_P_Q1_M3]
+
+
+[V2_CASA_04_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Sì. È una cosa importante tra noi.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_04_P_M1 [chiude:V2_CASA_04_P_Q2_M3]
+
+
+[V2_CASA_04_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_P_Q3_M4 [flag:q43]
+  B) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Nonno, amore. È sempre stato così.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q3_M4]
+
+
+[V2_CASA_04_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_P_Q1_M5 [flag:q41]
+  B) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_P_Q3_M5 [flag:q43]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Perché è il modo più dolce che conosco.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_04_P_M4 [chiude:V2_CASA_04_P_Q1_M5]
+
+
+[V2_CASA_04_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Nonno, amore. È sempre stato così.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_04_P_M1 [chiude:V2_CASA_04_P_Q3_M5]
+
+
+[V2_CASA_04_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Nonno è un titolo onorifico?» → V2_CASA_04_P_Q2_M6 [flag:q42]
+  B) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_P_Q3_M6 [flag:q43]
+  C) «Per ora torno ai messaggi.» → V2_CASA_04_P_fine
+
+
+[V2_CASA_04_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. È una cosa importante tra noi.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_04_P_M4 [chiude:V2_CASA_04_P_Q2_M6]
+
+
+[V2_CASA_04_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Nonno, amore. È sempre stato così.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_04_P_M2 [chiude:V2_CASA_04_P_Q3_M6]
+
+
+[V2_CASA_04_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché mi chiami Nonno?» → V2_CASA_04_P_Q1_M7 [flag:q41]
+  B) «Nonno è un titolo onorifico?» → V2_CASA_04_P_Q2_M7 [flag:q42]
+  C) «Come mi chiami quando vuoi prendermi in giro?» → V2_CASA_04_P_Q3_M7 [flag:q43]
+
+
+[V2_CASA_04_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Perché è il modo più dolce che conosco.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_04_P_M6 [chiude:V2_CASA_04_P_Q1_M7]
+
+
+[V2_CASA_04_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. È una cosa importante tra noi.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_04_P_M5 [chiude:V2_CASA_04_P_Q2_M7]
+
+
+[V2_CASA_04_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Nonno, amore. È sempre stato così.
+  A) «Lo tengo.» → V2_CASA_04_P_fine [chiude:V2_CASA_04_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_04_P_M3 [chiude:V2_CASA_04_P_Q3_M7]
+
+
+[V2_CASA_04_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_04_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q42 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q42 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q42 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q43 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_04_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q41 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q42 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q43 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_Q1_M1 [flag:q51]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q1_M1] ELENA · IV · sempre
+Claudio. Io l’ho solo tenuto in servizio.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q1_M1]
+  B) «Un’altra.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q1_M1]
+
+
+[V2_CASA_05_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_Q2_M2 [flag:q52]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q2_M2] ELENA · IV · sempre
+Otto. Già brontolavi abbastanza.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q2_M2]
+  B) «Un’altra.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q2_M2]
+
+
+[V2_CASA_05_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_Q1_M3 [flag:q51]
+  B) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_Q2_M3 [flag:q52]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q1_M3] ELENA · IV · sempre
+Claudio. Io l’ho solo tenuto in servizio.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q1_M3]
+  B) «Un’altra.» → V2_CASA_05_M2 [chiude:V2_CASA_05_Q1_M3]
+
+
+[V2_CASA_05_Q2_M3] ELENA · IV · sempre
+Otto. Già brontolavi abbastanza.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q2_M3]
+  B) «Un’altra.» → V2_CASA_05_M1 [chiude:V2_CASA_05_Q2_M3]
+
+
+[V2_CASA_05_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_Q3_M4 [flag:q53]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q3_M4] ELENA · IV · sempre
+No. Avevi otto anni, non una patente.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q3_M4]
+  B) «Un’altra.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q3_M4]
+
+
+[V2_CASA_05_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_Q1_M5 [flag:q51]
+  B) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_Q3_M5 [flag:q53]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q1_M5] ELENA · IV · sempre
+Claudio. Io l’ho solo tenuto in servizio.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q1_M5]
+  B) «Un’altra.» → V2_CASA_05_M4 [chiude:V2_CASA_05_Q1_M5]
+
+
+[V2_CASA_05_Q3_M5] ELENA · IV · sempre
+No. Avevi otto anni, non una patente.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q3_M5]
+  B) «Un’altra.» → V2_CASA_05_M1 [chiude:V2_CASA_05_Q3_M5]
+
+
+[V2_CASA_05_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_Q2_M6 [flag:q52]
+  B) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_Q3_M6 [flag:q53]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_fine
+
+
+[V2_CASA_05_Q2_M6] ELENA · IV · sempre
+Otto. Già brontolavi abbastanza.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q2_M6]
+  B) «Un’altra.» → V2_CASA_05_M4 [chiude:V2_CASA_05_Q2_M6]
+
+
+[V2_CASA_05_Q3_M6] ELENA · IV · sempre
+No. Avevi otto anni, non una patente.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q3_M6]
+  B) «Un’altra.» → V2_CASA_05_M2 [chiude:V2_CASA_05_Q3_M6]
+
+
+[V2_CASA_05] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_Q1_M7 [flag:q51]
+  B) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_Q2_M7 [flag:q52]
+  C) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_Q3_M7 [flag:q53]
+
+
+[V2_CASA_05_Q1_M7] ELENA · IV · sempre
+Claudio. Io l’ho solo tenuto in servizio.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q1_M7]
+  B) «Un’altra.» → V2_CASA_05_M6 [chiude:V2_CASA_05_Q1_M7]
+
+
+[V2_CASA_05_Q2_M7] ELENA · IV · sempre
+Otto. Già brontolavi abbastanza.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q2_M7]
+  B) «Un’altra.» → V2_CASA_05_M5 [chiude:V2_CASA_05_Q2_M7]
+
+
+[V2_CASA_05_Q3_M7] ELENA · IV · sempre
+No. Avevi otto anni, non una patente.
+  A) «Lo tengo.» → V2_CASA_05_fine [chiude:V2_CASA_05_Q3_M7]
+  B) «Un’altra.» → V2_CASA_05_M3 [chiude:V2_CASA_05_Q3_M7]
+
+
+[V2_CASA_05_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_05_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_P_Q1_M1 [flag:q51]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Io. Claudio non c’entrava.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q1_M1]
+
+
+[V2_CASA_05_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_P_Q2_M2 [flag:q52]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Eri già adulto. Avevi appena preso l’auto.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q2_M2]
+
+
+[V2_CASA_05_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_P_Q1_M3 [flag:q51]
+  B) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_P_Q2_M3 [flag:q52]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Io. Claudio non c’entrava.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_05_P_M2 [chiude:V2_CASA_05_P_Q1_M3]
+
+
+[V2_CASA_05_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Eri già adulto. Avevi appena preso l’auto.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_05_P_M1 [chiude:V2_CASA_05_P_Q2_M3]
+
+
+[V2_CASA_05_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_P_Q3_M4 [flag:q53]
+  B) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Sì. È nato tutto quel giorno.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q3_M4]
+
+
+[V2_CASA_05_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_P_Q1_M5 [flag:q51]
+  B) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_P_Q3_M5 [flag:q53]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Io. Claudio non c’entrava.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_05_P_M4 [chiude:V2_CASA_05_P_Q1_M5]
+
+
+[V2_CASA_05_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Sì. È nato tutto quel giorno.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_05_P_M1 [chiude:V2_CASA_05_P_Q3_M5]
+
+
+[V2_CASA_05_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_P_Q2_M6 [flag:q52]
+  B) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_P_Q3_M6 [flag:q53]
+  C) «Per ora torno ai messaggi.» → V2_CASA_05_P_fine
+
+
+[V2_CASA_05_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Eri già adulto. Avevi appena preso l’auto.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_05_P_M4 [chiude:V2_CASA_05_P_Q2_M6]
+
+
+[V2_CASA_05_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. È nato tutto quel giorno.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_05_P_M2 [chiude:V2_CASA_05_P_Q3_M6]
+
+
+[V2_CASA_05_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Chi mi aveva dato quel soprannome?» → V2_CASA_05_P_Q1_M7 [flag:q51]
+  B) «Quanti anni avevo con quel soprannome?» → V2_CASA_05_P_Q2_M7 [flag:q52]
+  C) «Il soprannome è nato quando ho ritirato l’auto?» → V2_CASA_05_P_Q3_M7 [flag:q53]
+
+
+[V2_CASA_05_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Io. Claudio non c’entrava.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_05_P_M6 [chiude:V2_CASA_05_P_Q1_M7]
+
+
+[V2_CASA_05_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Eri già adulto. Avevi appena preso l’auto.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_05_P_M5 [chiude:V2_CASA_05_P_Q2_M7]
+
+
+[V2_CASA_05_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. È nato tutto quel giorno.
+  A) «Lo tengo.» → V2_CASA_05_P_fine [chiude:V2_CASA_05_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_05_P_M3 [chiude:V2_CASA_05_P_Q3_M7]
+
+
+[V2_CASA_05_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_05_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q52 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q52 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q52 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q53 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_05_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q51 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q52 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q53 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_Q1_M1 [flag:q61]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q1_M1] ELENA · IV · sempre
+Tre. Non tutti i fine settimana.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q1_M1]
+  B) «Un’altra.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q1_M1]
+
+
+[V2_CASA_06_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Claudio lo conoscevamo bene?» → V2_CASA_06_Q2_M2 [flag:q62]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q2_M2] ELENA · IV · sempre
+No. È anche per quello che sembra strano.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q2_M2]
+  B) «Un’altra.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q2_M2]
+
+
+[V2_CASA_06_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_Q1_M3 [flag:q61]
+  B) «Claudio lo conoscevamo bene?» → V2_CASA_06_Q2_M3 [flag:q62]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q1_M3] ELENA · IV · sempre
+Tre. Non tutti i fine settimana.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q1_M3]
+  B) «Un’altra.» → V2_CASA_06_M2 [chiude:V2_CASA_06_Q1_M3]
+
+
+[V2_CASA_06_Q2_M3] ELENA · IV · sempre
+No. È anche per quello che sembra strano.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q2_M3]
+  B) «Un’altra.» → V2_CASA_06_M1 [chiude:V2_CASA_06_Q2_M3]
+
+
+[V2_CASA_06_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_Q3_M4 [flag:q63]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q3_M4] ELENA · IV · sempre
+No. Era uno zio quasi sconosciuto.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q3_M4]
+  B) «Un’altra.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q3_M4]
+
+
+[V2_CASA_06_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_Q1_M5 [flag:q61]
+  B) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_Q3_M5 [flag:q63]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q1_M5] ELENA · IV · sempre
+Tre. Non tutti i fine settimana.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q1_M5]
+  B) «Un’altra.» → V2_CASA_06_M4 [chiude:V2_CASA_06_Q1_M5]
+
+
+[V2_CASA_06_Q3_M5] ELENA · IV · sempre
+No. Era uno zio quasi sconosciuto.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q3_M5]
+  B) «Un’altra.» → V2_CASA_06_M1 [chiude:V2_CASA_06_Q3_M5]
+
+
+[V2_CASA_06_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Claudio lo conoscevamo bene?» → V2_CASA_06_Q2_M6 [flag:q62]
+  B) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_Q3_M6 [flag:q63]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_fine
+
+
+[V2_CASA_06_Q2_M6] ELENA · IV · sempre
+No. È anche per quello che sembra strano.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q2_M6]
+  B) «Un’altra.» → V2_CASA_06_M4 [chiude:V2_CASA_06_Q2_M6]
+
+
+[V2_CASA_06_Q3_M6] ELENA · IV · sempre
+No. Era uno zio quasi sconosciuto.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q3_M6]
+  B) «Un’altra.» → V2_CASA_06_M2 [chiude:V2_CASA_06_Q3_M6]
+
+
+[V2_CASA_06] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_Q1_M7 [flag:q61]
+  B) «Claudio lo conoscevamo bene?» → V2_CASA_06_Q2_M7 [flag:q62]
+  C) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_Q3_M7 [flag:q63]
+
+
+[V2_CASA_06_Q1_M7] ELENA · IV · sempre
+Tre. Non tutti i fine settimana.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q1_M7]
+  B) «Un’altra.» → V2_CASA_06_M6 [chiude:V2_CASA_06_Q1_M7]
+
+
+[V2_CASA_06_Q2_M7] ELENA · IV · sempre
+No. È anche per quello che sembra strano.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q2_M7]
+  B) «Un’altra.» → V2_CASA_06_M5 [chiude:V2_CASA_06_Q2_M7]
+
+
+[V2_CASA_06_Q3_M7] ELENA · IV · sempre
+No. Era uno zio quasi sconosciuto.
+  A) «Lo tengo.» → V2_CASA_06_fine [chiude:V2_CASA_06_Q3_M7]
+  B) «Un’altra.» → V2_CASA_06_M3 [chiude:V2_CASA_06_Q3_M7]
+
+
+[V2_CASA_06_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_06_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_P_Q1_M1 [flag:q61]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Sempre. Ci passavi ogni domenica.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q1_M1]
+
+
+[V2_CASA_06_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Claudio lo conoscevamo bene?» → V2_CASA_06_P_Q2_M2 [flag:q62]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Benissimo. Sapevi ogni cosa di lui.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q2_M2]
+
+
+[V2_CASA_06_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_P_Q1_M3 [flag:q61]
+  B) «Claudio lo conoscevamo bene?» → V2_CASA_06_P_Q2_M3 [flag:q62]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Sempre. Ci passavi ogni domenica.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_06_P_M2 [chiude:V2_CASA_06_P_Q1_M3]
+
+
+[V2_CASA_06_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Benissimo. Sapevi ogni cosa di lui.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_06_P_M1 [chiude:V2_CASA_06_P_Q2_M3]
+
+
+[V2_CASA_06_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_P_Q3_M4 [flag:q63]
+  B) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Sì. Mi chiamava tutte le sere.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q3_M4]
+
+
+[V2_CASA_06_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_P_Q1_M5 [flag:q61]
+  B) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_P_Q3_M5 [flag:q63]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Sempre. Ci passavi ogni domenica.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_06_P_M4 [chiude:V2_CASA_06_P_Q1_M5]
+
+
+[V2_CASA_06_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Sì. Mi chiamava tutte le sere.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_06_P_M1 [chiude:V2_CASA_06_P_Q3_M5]
+
+
+[V2_CASA_06_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Claudio lo conoscevamo bene?» → V2_CASA_06_P_Q2_M6 [flag:q62]
+  B) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_P_Q3_M6 [flag:q63]
+  C) «Per ora torno ai messaggi.» → V2_CASA_06_P_fine
+
+
+[V2_CASA_06_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Benissimo. Sapevi ogni cosa di lui.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_06_P_M4 [chiude:V2_CASA_06_P_Q2_M6]
+
+
+[V2_CASA_06_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. Mi chiamava tutte le sere.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_06_P_M2 [chiude:V2_CASA_06_P_Q3_M6]
+
+
+[V2_CASA_06_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante volte avevo visto Claudio?» → V2_CASA_06_P_Q1_M7 [flag:q61]
+  B) «Claudio lo conoscevamo bene?» → V2_CASA_06_P_Q2_M7 [flag:q62]
+  C) «Ti sembra una persona che sentivamo ogni giorno?» → V2_CASA_06_P_Q3_M7 [flag:q63]
+
+
+[V2_CASA_06_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Sempre. Ci passavi ogni domenica.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_06_P_M6 [chiude:V2_CASA_06_P_Q1_M7]
+
+
+[V2_CASA_06_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Benissimo. Sapevi ogni cosa di lui.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_06_P_M5 [chiude:V2_CASA_06_P_Q2_M7]
+
+
+[V2_CASA_06_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. Mi chiamava tutte le sere.
+  A) «Lo tengo.» → V2_CASA_06_P_fine [chiude:V2_CASA_06_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_06_P_M3 [chiude:V2_CASA_06_P_Q3_M7]
+
+
+[V2_CASA_06_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_06_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q62 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q62 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q62 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q63 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_06_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q61 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q62 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q63 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_Q1_M1 [flag:q71]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q1_M1] ELENA · IV · sempre
+Un temperino. Me l’hai appena ricordato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q1_M1]
+  B) «Un’altra.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q1_M1]
+
+
+[V2_CASA_07_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_Q2_M2 [flag:q72]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q2_M2] ELENA · IV · sempre
+Il temperino che ti aveva regalato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q2_M2]
+  B) «Un’altra.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q2_M2]
+
+
+[V2_CASA_07_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_Q1_M3 [flag:q71]
+  B) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_Q2_M3 [flag:q72]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q1_M3] ELENA · IV · sempre
+Un temperino. Me l’hai appena ricordato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q1_M3]
+  B) «Un’altra.» → V2_CASA_07_M2 [chiude:V2_CASA_07_Q1_M3]
+
+
+[V2_CASA_07_Q2_M3] ELENA · IV · sempre
+Il temperino che ti aveva regalato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q2_M3]
+  B) «Un’altra.» → V2_CASA_07_M1 [chiude:V2_CASA_07_Q2_M3]
+
+
+[V2_CASA_07_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_Q3_M4 [flag:q73]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q3_M4] ELENA · IV · sempre
+Te l’aveva regalato Claudio.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q3_M4]
+  B) «Un’altra.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q3_M4]
+
+
+[V2_CASA_07_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_Q1_M5 [flag:q71]
+  B) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_Q3_M5 [flag:q73]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q1_M5] ELENA · IV · sempre
+Un temperino. Me l’hai appena ricordato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q1_M5]
+  B) «Un’altra.» → V2_CASA_07_M4 [chiude:V2_CASA_07_Q1_M5]
+
+
+[V2_CASA_07_Q3_M5] ELENA · IV · sempre
+Te l’aveva regalato Claudio.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q3_M5]
+  B) «Un’altra.» → V2_CASA_07_M1 [chiude:V2_CASA_07_Q3_M5]
+
+
+[V2_CASA_07_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_Q2_M6 [flag:q72]
+  B) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_Q3_M6 [flag:q73]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_fine
+
+
+[V2_CASA_07_Q2_M6] ELENA · IV · sempre
+Il temperino che ti aveva regalato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q2_M6]
+  B) «Un’altra.» → V2_CASA_07_M4 [chiude:V2_CASA_07_Q2_M6]
+
+
+[V2_CASA_07_Q3_M6] ELENA · IV · sempre
+Te l’aveva regalato Claudio.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q3_M6]
+  B) «Un’altra.» → V2_CASA_07_M2 [chiude:V2_CASA_07_Q3_M6]
+
+
+[V2_CASA_07] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_Q1_M7 [flag:q71]
+  B) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_Q2_M7 [flag:q72]
+  C) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_Q3_M7 [flag:q73]
+
+
+[V2_CASA_07_Q1_M7] ELENA · IV · sempre
+Un temperino. Me l’hai appena ricordato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q1_M7]
+  B) «Un’altra.» → V2_CASA_07_M6 [chiude:V2_CASA_07_Q1_M7]
+
+
+[V2_CASA_07_Q2_M7] ELENA · IV · sempre
+Il temperino che ti aveva regalato.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q2_M7]
+  B) «Un’altra.» → V2_CASA_07_M5 [chiude:V2_CASA_07_Q2_M7]
+
+
+[V2_CASA_07_Q3_M7] ELENA · IV · sempre
+Te l’aveva regalato Claudio.
+  A) «Lo tengo.» → V2_CASA_07_fine [chiude:V2_CASA_07_Q3_M7]
+  B) «Un’altra.» → V2_CASA_07_M3 [chiude:V2_CASA_07_Q3_M7]
+
+
+[V2_CASA_07_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_07_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_P_Q1_M1 [flag:q71]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Un accendino. Lo portavi sempre.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q1_M1]
+
+
+[V2_CASA_07_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_P_Q2_M2 [flag:q72]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Un orologio. Era suo.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q2_M2]
+
+
+[V2_CASA_07_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_P_Q1_M3 [flag:q71]
+  B) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_P_Q2_M3 [flag:q72]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Un accendino. Lo portavi sempre.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_07_P_M2 [chiude:V2_CASA_07_P_Q1_M3]
+
+
+[V2_CASA_07_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Un orologio. Era suo.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_07_P_M1 [chiude:V2_CASA_07_P_Q2_M3]
+
+
+[V2_CASA_07_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_P_Q3_M4 [flag:q73]
+  B) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Era del vecchio proprietario che non conoscevi.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q3_M4]
+
+
+[V2_CASA_07_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_P_Q1_M5 [flag:q71]
+  B) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_P_Q3_M5 [flag:q73]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Un accendino. Lo portavi sempre.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_07_P_M4 [chiude:V2_CASA_07_P_Q1_M5]
+
+
+[V2_CASA_07_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Era del vecchio proprietario che non conoscevi.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_07_P_M1 [chiude:V2_CASA_07_P_Q3_M5]
+
+
+[V2_CASA_07_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_P_Q2_M6 [flag:q72]
+  B) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_P_Q3_M6 [flag:q73]
+  C) «Per ora torno ai messaggi.» → V2_CASA_07_P_fine
+
+
+[V2_CASA_07_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Un orologio. Era suo.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_07_P_M4 [chiude:V2_CASA_07_P_Q2_M6]
+
+
+[V2_CASA_07_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Era del vecchio proprietario che non conoscevi.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_07_P_M2 [chiude:V2_CASA_07_P_Q3_M6]
+
+
+[V2_CASA_07_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che cosa mi aveva regalato Claudio?» → V2_CASA_07_P_Q1_M7 [flag:q71]
+  B) «Nella busta con le chiavi che cosa c’era?» → V2_CASA_07_P_Q2_M7 [flag:q72]
+  C) «Perché quel temperino non è solo una cosa trovata?» → V2_CASA_07_P_Q3_M7 [flag:q73]
+
+
+[V2_CASA_07_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Un accendino. Lo portavi sempre.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_07_P_M6 [chiude:V2_CASA_07_P_Q1_M7]
+
+
+[V2_CASA_07_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Un orologio. Era suo.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_07_P_M5 [chiude:V2_CASA_07_P_Q2_M7]
+
+
+[V2_CASA_07_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Era del vecchio proprietario che non conoscevi.
+  A) «Lo tengo.» → V2_CASA_07_P_fine [chiude:V2_CASA_07_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_07_P_M3 [chiude:V2_CASA_07_P_Q3_M7]
+
+
+[V2_CASA_07_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_07_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q72 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q72 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q72 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q73 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_07_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q71 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q72 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q73 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_M1] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_Q1_M1 [flag:q81]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q1_M1] ELENA · IV · sempre
+Una tra sei. Ti sentivi già proprietario di tutte.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q1_M1]
+  B) «Un’altra.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q1_M1]
+
+
+[V2_CASA_08_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Le altre cinque sono diventate mie?» → V2_CASA_08_Q2_M2 [flag:q82]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q2_M2] ELENA · IV · sempre
+No. Non ti hanno dato un autosalone.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q2_M2]
+  B) «Un’altra.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q2_M2]
+
+
+[V2_CASA_08_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_Q1_M3 [flag:q81]
+  B) «Le altre cinque sono diventate mie?» → V2_CASA_08_Q2_M3 [flag:q82]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q1_M3] ELENA · IV · sempre
+Una tra sei. Ti sentivi già proprietario di tutte.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q1_M3]
+  B) «Un’altra.» → V2_CASA_08_M2 [chiude:V2_CASA_08_Q1_M3]
+
+
+[V2_CASA_08_Q2_M3] ELENA · IV · sempre
+No. Non ti hanno dato un autosalone.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q2_M3]
+  B) «Un’altra.» → V2_CASA_08_M1 [chiude:V2_CASA_08_Q2_M3]
+
+
+[V2_CASA_08_M4] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante auto sto riportando a casa?» → V2_CASA_08_Q3_M4 [flag:q83]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q3_M4] ELENA · IV · sempre
+Una. Una basta già a farti parlare così.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q3_M4]
+  B) «Un’altra.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q3_M4]
+
+
+[V2_CASA_08_M5] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_Q1_M5 [flag:q81]
+  B) «Quante auto sto riportando a casa?» → V2_CASA_08_Q3_M5 [flag:q83]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q1_M5] ELENA · IV · sempre
+Una tra sei. Ti sentivi già proprietario di tutte.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q1_M5]
+  B) «Un’altra.» → V2_CASA_08_M4 [chiude:V2_CASA_08_Q1_M5]
+
+
+[V2_CASA_08_Q3_M5] ELENA · IV · sempre
+Una. Una basta già a farti parlare così.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q3_M5]
+  B) «Un’altra.» → V2_CASA_08_M1 [chiude:V2_CASA_08_Q3_M5]
+
+
+[V2_CASA_08_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Le altre cinque sono diventate mie?» → V2_CASA_08_Q2_M6 [flag:q82]
+  B) «Quante auto sto riportando a casa?» → V2_CASA_08_Q3_M6 [flag:q83]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_fine
+
+
+[V2_CASA_08_Q2_M6] ELENA · IV · sempre
+No. Non ti hanno dato un autosalone.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q2_M6]
+  B) «Un’altra.» → V2_CASA_08_M4 [chiude:V2_CASA_08_Q2_M6]
+
+
+[V2_CASA_08_Q3_M6] ELENA · IV · sempre
+Una. Una basta già a farti parlare così.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q3_M6]
+  B) «Un’altra.» → V2_CASA_08_M2 [chiude:V2_CASA_08_Q3_M6]
+
+
+[V2_CASA_08] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_Q1_M7 [flag:q81]
+  B) «Le altre cinque sono diventate mie?» → V2_CASA_08_Q2_M7 [flag:q82]
+  C) «Quante auto sto riportando a casa?» → V2_CASA_08_Q3_M7 [flag:q83]
+
+
+[V2_CASA_08_Q1_M7] ELENA · IV · sempre
+Una tra sei. Ti sentivi già proprietario di tutte.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q1_M7]
+  B) «Un’altra.» → V2_CASA_08_M6 [chiude:V2_CASA_08_Q1_M7]
+
+
+[V2_CASA_08_Q2_M7] ELENA · IV · sempre
+No. Non ti hanno dato un autosalone.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q2_M7]
+  B) «Un’altra.» → V2_CASA_08_M5 [chiude:V2_CASA_08_Q2_M7]
+
+
+[V2_CASA_08_Q3_M7] ELENA · IV · sempre
+Una. Una basta già a farti parlare così.
+  A) «Lo tengo.» → V2_CASA_08_fine [chiude:V2_CASA_08_Q3_M7]
+  B) «Un’altra.» → V2_CASA_08_M3 [chiude:V2_CASA_08_Q3_M7]
+
+
+[V2_CASA_08_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+[FINE]
+
+
+[V2_CASA_08_P_M1] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_P_Q1_M1 [flag:q81]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q1_M1] IMITAZIONE DI ELENA · IV · sempre
+Tutte e sei. Devi solo ritirarle.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q1_M1]
+  B) «Un’altra.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q1_M1]
+
+
+[V2_CASA_08_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Le altre cinque sono diventate mie?» → V2_CASA_08_P_Q2_M2 [flag:q82]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Sì. Hai lasciato lì le chiavi.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q2_M2]
+  B) «Un’altra.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q2_M2]
+
+
+[V2_CASA_08_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_P_Q1_M3 [flag:q81]
+  B) «Le altre cinque sono diventate mie?» → V2_CASA_08_P_Q2_M3 [flag:q82]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q1_M3] IMITAZIONE DI ELENA · IV · sempre
+Tutte e sei. Devi solo ritirarle.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q1_M3]
+  B) «Un’altra.» → V2_CASA_08_P_M2 [chiude:V2_CASA_08_P_Q1_M3]
+
+
+[V2_CASA_08_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Sì. Hai lasciato lì le chiavi.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_08_P_M1 [chiude:V2_CASA_08_P_Q2_M3]
+
+
+[V2_CASA_08_P_M4] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante auto sto riportando a casa?» → V2_CASA_08_P_Q3_M4 [flag:q83]
+  B) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q3_M4] IMITAZIONE DI ELENA · IV · sempre
+Sei. Le altre ti seguono.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q3_M4]
+  B) «Un’altra.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q3_M4]
+
+
+[V2_CASA_08_P_M5] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_P_Q1_M5 [flag:q81]
+  B) «Quante auto sto riportando a casa?» → V2_CASA_08_P_Q3_M5 [flag:q83]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q1_M5] IMITAZIONE DI ELENA · IV · sempre
+Tutte e sei. Devi solo ritirarle.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q1_M5]
+  B) «Un’altra.» → V2_CASA_08_P_M4 [chiude:V2_CASA_08_P_Q1_M5]
+
+
+[V2_CASA_08_P_Q3_M5] IMITAZIONE DI ELENA · IV · sempre
+Sei. Le altre ti seguono.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q3_M5]
+  B) «Un’altra.» → V2_CASA_08_P_M1 [chiude:V2_CASA_08_P_Q3_M5]
+
+
+[V2_CASA_08_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Le altre cinque sono diventate mie?» → V2_CASA_08_P_Q2_M6 [flag:q82]
+  B) «Quante auto sto riportando a casa?» → V2_CASA_08_P_Q3_M6 [flag:q83]
+  C) «Per ora torno ai messaggi.» → V2_CASA_08_P_fine
+
+
+[V2_CASA_08_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Sì. Hai lasciato lì le chiavi.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_08_P_M4 [chiude:V2_CASA_08_P_Q2_M6]
+
+
+[V2_CASA_08_P_Q3_M6] IMITAZIONE DI ELENA · IV · sempre
+Sei. Le altre ti seguono.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q3_M6]
+  B) «Un’altra.» → V2_CASA_08_P_M2 [chiude:V2_CASA_08_P_Q3_M6]
+
+
+[V2_CASA_08_P] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Quante auto potevo scegliere?» → V2_CASA_08_P_Q1_M7 [flag:q81]
+  B) «Le altre cinque sono diventate mie?» → V2_CASA_08_P_Q2_M7 [flag:q82]
+  C) «Quante auto sto riportando a casa?» → V2_CASA_08_P_Q3_M7 [flag:q83]
+
+
+[V2_CASA_08_P_Q1_M7] IMITAZIONE DI ELENA · IV · sempre
+Tutte e sei. Devi solo ritirarle.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q1_M7]
+  B) «Un’altra.» → V2_CASA_08_P_M6 [chiude:V2_CASA_08_P_Q1_M7]
+
+
+[V2_CASA_08_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Sì. Hai lasciato lì le chiavi.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_08_P_M5 [chiude:V2_CASA_08_P_Q2_M7]
+
+
+[V2_CASA_08_P_Q3_M7] IMITAZIONE DI ELENA · IV · sempre
+Sei. Le altre ti seguono.
+  A) «Lo tengo.» → V2_CASA_08_P_fine [chiude:V2_CASA_08_P_Q3_M7]
+  B) «Un’altra.» → V2_CASA_08_P_M3 [chiude:V2_CASA_08_P_Q3_M7]
+
+
+[V2_CASA_08_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+[FINE]
+
+
+[V2_CASA_08_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q82 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q82 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_fine] ELENA · IV · sempre
+Adesso sai quello che ti ho risposto, non tutto il resto.
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q82 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q83 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_CASA_08_P_fine] IMITAZIONE DI ELENA · IV · sempre
+Adesso hai la risposta. Possiamo smettere con le domande?
+  ALT se: q81 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q82 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+  ALT se: q83 → Quel dettaglio te l’ho già detto. Ora leggi il resto.
+[FINE]
+
+
+[V2_VICINO_01] ELENA · IV · sempre
+Hai chiesto al vicino di controllare? Sono alla porta, qui a casa.
+  A) «Sì. Aspetto che ti abbia vista, non una supposizione.» → V2_VICINO_02
+  B) «Voglio sapere che cosa ha controllato di persona.» → V2_VICINO_03
+
+
+[V2_VICINO_02] ELENA · IV · sempre
+Mi ha vista alla porta e ha aspettato che gli rispondessi. Non mi ha cercata su una mappa.
+  A) «Allora posso distinguere questo controllo dalla chiamata.» → V2_VICINO_04
+  B) «Aspetto anche la sua conferma sul recapito indipendente.» → V2_VICINO_05
+
+
+[V2_VICINO_03] ELENA · IV · sempre
+È arrivato dal suo appartamento. Non gli ho dato una posizione da seguire.
+  A) «Aspetto il suo riscontro diretto.» → V2_VICINO_05
+  B) «Non gli chiedo di sapere dove sono io.» → V2_VICINO_04
+
+
+[V2_VICINO_04] ELENA · IV · sempre
+Non sono andata in macchina a cercarti. Ora sai da dove ti sto scrivendo.
+  A) «Completo il confronto con il vicino.» → V2_VICINO_05
+  B) «Aspetto la sua risposta diretta, senza riempirla io.» → V2_VICINO_05
+
+
+[V2_VICINO_05] ELENA · IV · sempre
+La sua conferma è arrivata sul recapito che avevi già. Ti ha descritta la scena da qui.
+  A) «Vale per questa richiesta.» → V2_VICINO_06 [flag:elena_verificata;+conoscenza]
+  B) «Per adesso, non per sempre.» → V2_VICINO_06 [flag:elena_verificata;+conoscenza]
+
+
+[V2_VICINO_06] ELENA · IV · sempre
+Bene. Adesso possiamo smettere di indovinare chi manca. Io sono qui.
+[FINE]
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE

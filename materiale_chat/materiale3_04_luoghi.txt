@@ -1,0 +1,1248 @@
+NIGHT RUN · MATERIALE 3 · FILE 04
+
+[REDAZIONE] NOTE
+T4. Dodici capitali nell’ordine canonico. Le insegne sono riferimenti visivi, non
+l’ordine di guidare su strade oggi pedonali. Niente percorso realistico fra continenti:
+l’impossibilità appartiene alla galleria. Eventi strani solo nella fase indicata, anche
+se la città è raggiunta prima. Rosa e Livia descrivono ciò che mostri, non acquistano un
+passato in ogni capitale.
+
+[REDAZIONE] NOTE
+Tokyo. Arrivo:
+
+[ARRIVO_TOKYO]
+Le insegne si riflettono sull’asfalto bagnato. Le conosci prima di leggerle.
+Il cartello per casa è ancora al suo posto. Ti sembra un buon inizio.
+
+[CART_TOKYO_1]
+[STRADA]
+TOKYO
+
+[CART_TOKYO_2]
+[STRADA]
+GINZA DORI
+
+[CART_TOKYO_3]
+[STRADA]
+OMOTESANDO
+
+[QUARTIERI_TOKYO]
+Ginza Dori
+Omotesando
+
+[RADIO_TOKYO]
+次の曲です。 (Il prossimo brano.)
+
+[CAP_EVT_TOKYO_1]
+dove: bar
+fase: I
+una volta sola: sì
+tipo: quotidiano
+testo: Il commesso gira il bicchiere prima di passartelo: il coperchio non tiene bene.
+
+[CAP_EVT_TOKYO_2]
+dove: strada
+fase: I
+una volta sola: sì
+tipo: quotidiano
+testo: Un’auto aspetta spazio per parcheggiare. Per una volta non sei tu quello in mezzo.
+
+[CAP_EVT_TOKYO_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: Al secondo giro la stessa insegna lampeggia nello stesso istante in cui l’avevi
+annotato.
+
+[CAP_EVT_TOKYO_4]
+dove: motel
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Da fermo riconosci nella radio una frase sentita soltanto dopo essere partito.
+
+[REDAZIONE] NOTE
+Roma. Arrivo:
+
+[ARRIVO_ROMA]
+Le facciate chiare rimandano i fari. Un’insegna resta accesa sopra una serranda.
+La chiusura sembra normale finché noti la scritta fatta a mano.
+
+[CART_ROMA_1]
+[STRADA]
+ROMA
+
+[CART_ROMA_2]
+[STRADA]
+VIA DEL CORSO
+
+[CART_ROMA_3]
+[STRADA]
+PIAZZA DEL POPOLO
+
+[QUARTIERI_ROMA]
+Via del Corso
+Piazza del Popolo
+
+[RADIO_ROMA]
+La notte continua. (La notte continua.)
+
+[CAP_EVT_ROMA_1]
+dove: bar
+fase: I
+una volta sola: sì
+tipo: quotidiano
+testo: Il barista ti chiede di spostare il gomito: sta passando lo straccio e tu pensavi
+alla macchina.
+
+[CAP_EVT_ROMA_2]
+dove: autogrill
+fase: I
+una volta sola: sì
+tipo: quotidiano
+testo: Una coppia discute su quale uscita prendere. Finiscono per comprare due caffè.
+
+[CAP_EVT_ROMA_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: La grafia sulla chiusura coincide con quella del parasole.
+
+[CAP_EVT_ROMA_4]
+dove: benzinaio
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Accanto al cartello scritto a mano la chiamata insiste. Dal passaggio chiuso non
+arriva nessuno.
+
+[REDAZIONE] NOTE
+Parigi. Arrivo:
+
+[ARRIVO_PARIGI]
+L’avenue si allarga fra facciate illuminate. Sul cartello c’è scritto PARIS.
+La durata del tragitto sul telefono è troppo corta per quel nome.
+
+[CART_PARIGI_1]
+[STRADA]
+PARIS
+
+[CART_PARIGI_2]
+[STRADA]
+CHAMPS-ELYSEES
+
+[CART_PARIGI_3]
+[STRADA]
+PLACE DE LA CONCORDE
+
+[QUARTIERI_PARIGI]
+Avenue des Champs-Élysées
+Place de la Concorde
+
+[RADIO_PARIGI]
+On revient après la pause. (Torniamo dopo la pausa.)
+
+[CAP_EVT_PARIGI_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Un cameriere ti indica dove lasciare il vassoio. La frase è normale; tu impieghi
+troppo a seguirla.
+
+[CAP_EVT_PARIGI_2]
+dove: motel
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Chiedi una stanza. Chi è al banco ti richiede il documento, senza alcun mistero.
+
+[CAP_EVT_PARIGI_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: Al nuovo passaggio riconosci la stessa finestra accesa e la stessa ombra immobile
+al vetro.
+
+[CAP_EVT_PARIGI_4]
+dove: autogrill
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Un rumore metallico ricomincia quando la porta si richiude. Si interrompe allo
+stesso colpo.
+
+[REDAZIONE] NOTE
+Londra. Arrivo:
+
+[ARRIVO_LONDRA]
+Le luci delle fermate tagliano il marciapiede. LONDON compare dopo la galleria.
+La barriera è recente; la scritta che la accompagna sembra più vecchia.
+
+[CART_LONDRA_1]
+[STRADA]
+LONDON
+
+[CART_LONDRA_2]
+[STRADA]
+REGENT STREET
+
+[CART_LONDRA_3]
+[STRADA]
+TRAFALGAR SQUARE
+
+[QUARTIERI_LONDRA]
+Regent Street
+Trafalgar Square
+
+[RADIO_LONDRA]
+Still with us? (Siete ancora con noi?)
+
+[CAP_EVT_LONDRA_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il cucchiaino vibra contro la tazza. Il rumore finisce appena lo sposti.
+
+[CAP_EVT_LONDRA_2]
+dove: strada
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Chi sta davanti cerca una svolta e mette la freccia troppo presto.
+
+[CAP_EVT_LONDRA_3]
+dove: strada
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: La chiusura resta immobile mentre la voce al telefono ti indica proprio quel
+passaggio.
+
+[CAP_EVT_LONDRA_4]
+dove: motel
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Un annuncio si ripete fino alla stessa parola. La porta in corridoio resta chiusa.
+
+[REDAZIONE] NOTE
+Stoccolma. Arrivo:
+
+[ARRIVO_STOCCOLMA]
+L’acqua prende le luci basse delle finestre. STOCKHOLM resta nel fascio dei fari.
+All’autogrill c’è spazio per una station wagon. Ti fermi a guardarlo.
+
+[CART_STOCCOLMA_1]
+[STRADA]
+STOCKHOLM
+
+[CART_STOCCOLMA_2]
+[STRADA]
+DROTTNINGGATAN
+
+[CART_STOCCOLMA_3]
+[STRADA]
+STORTORGET
+
+[QUARTIERI_STOCCOLMA]
+Drottninggatan
+Stortorget
+
+[RADIO_STOCCOLMA]
+Nästa låt efter pausen. (Prossimo brano dopo la pausa.)
+
+[CAP_EVT_STOCCOLMA_1]
+dove: autogrill
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Un addetto rimette dritta una pila di vassoi che continua a inclinarsi.
+
+[CAP_EVT_STOCCOLMA_2]
+dove: benzinaio
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il guanto di plastica si apre soltanto al terzo tentativo. Nessuno ti sta
+osservando.
+
+[CAP_EVT_STOCCOLMA_3]
+dove: autogrill
+fase: III
+una volta sola: sì
+tipo: strano
+testo: Il nome di Ottavio compare nel confronto con il tesserino della Volvo.
+
+[CAP_EVT_STOCCOLMA_4]
+dove: strada
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Una voce chiede di essere riconosciuta. Non dice da quale lato della porta si
+trova.
+
+[REDAZIONE] NOTE
+Berlino. Arrivo:
+
+[ARRIVO_BERLINO]
+I viali sono larghi, le facciate separate da tratti di buio. BERLIN è leggibile.
+Alla porta il segno di un’apertura è diverso da quello della richiusura.
+
+[CART_BERLINO_1]
+[STRADA]
+BERLIN
+
+[CART_BERLINO_2]
+[STRADA]
+UNTER DEN LINDEN
+
+[CART_BERLINO_3]
+[STRADA]
+ALEXANDERPLATZ
+
+[QUARTIERI_BERLINO]
+Unter den Linden
+Alexanderplatz
+
+[RADIO_BERLINO]
+Bleiben Sie dran. (Restate in ascolto.)
+
+[CAP_EVT_BERLINO_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il barista aspetta che tu scelga prima di prendere la tazza. Hai letto il menu tre
+volte.
+
+[CAP_EVT_BERLINO_2]
+dove: benzinaio
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Una ricevuta si incastra. Il commesso la sfila con un gesto fin troppo allenato.
+
+[CAP_EVT_BERLINO_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: Sulla porta aperta dall’esterno si riconosce anche il tentativo riuscito di
+richiuderla.
+
+[CAP_EVT_BERLINO_4]
+dove: motel
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: La copia del segno non coincide con il tuo ricordo. La confronti prima di
+correggerla.
+
+[REDAZIONE] NOTE
+Praga. Arrivo:
+
+[ARRIVO_PRAGA]
+I tetti fanno una linea scura contro il cielo. PRAHA appare fra due luci.
+La macchia sulla parete si allunga mentre l’auto è ferma.
+
+[CART_PRAGA_1]
+[STRADA]
+PRAHA
+
+[CART_PRAGA_2]
+[STRADA]
+VACLAVSKE NAMESTI
+
+[CART_PRAGA_3]
+[STRADA]
+STAROMESTSKE NAMESTI
+
+[QUARTIERI_PRAGA]
+Václavské náměstí
+Staroměstské náměstí
+
+[RADIO_PRAGA]
+Zůstaňte s námi. (Restate con noi.)
+
+[CAP_EVT_PRAGA_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Una tazza è troppo calda da prendere. Aspetti, senza che il tempo ti faccia un
+torto.
+
+[CAP_EVT_PRAGA_2]
+dove: motel
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: La chiave si impunta. La reception la prova davanti a te e la cambia.
+
+[CAP_EVT_PRAGA_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: La macchia fresca cresce a vista. Dietro quella porta non si sente una voce.
+
+[CAP_EVT_PRAGA_4]
+dove: autogrill
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Un urto lontano riprende identico. Il sangue fresco avanza con la ripetizione.
+
+[REDAZIONE] NOTE
+Vienna. Arrivo:
+
+[ARRIVO_VIENNA]
+I palazzi seguono la curva del viale. Sul cartello c’è WIEN.
+La diramazione cambia nome. Il particolare dello svincolo è lo stesso.
+
+[CART_VIENNA_1]
+[STRADA]
+WIEN
+
+[CART_VIENNA_2]
+[STRADA]
+RINGSTRASSE
+
+[CART_VIENNA_3]
+[STRADA]
+STEPHANSPLATZ
+
+[QUARTIERI_VIENNA]
+Ringstraße
+Stephansplatz
+
+[RADIO_VIENNA]
+Wir sind gleich zurück. (Torniamo subito.)
+
+[CAP_EVT_VIENNA_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il conto arriva in un piattino. Per qualche secondo puoi pensare soltanto al conto.
+
+[CAP_EVT_VIENNA_2]
+dove: strada
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Un’auto ti lascia spazio senza chiedere niente in cambio.
+
+[CAP_EVT_VIENNA_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: Segui il nome diverso della diramazione. Riconosci di nuovo lo stesso svincolo.
+
+[CAP_EVT_VIENNA_4]
+dove: motel
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Sul telefono la foto conserva il particolare che eri sul punto di ricordare
+diverso.
+
+[REDAZIONE] NOTE
+Madrid. Arrivo:
+
+[ARRIVO_MADRID]
+La Gran Vía tiene accese vetrine e finestre. MADRID compare senza esitazioni.
+Il messaggio nel telefono usa il tuo soprannome come una carezza.
+
+[CART_MADRID_1]
+[STRADA]
+MADRID
+
+[CART_MADRID_2]
+[STRADA]
+GRAN VIA
+
+[CART_MADRID_3]
+[STRADA]
+PUERTA DEL SOL
+
+[QUARTIERI_MADRID]
+Gran Vía
+Puerta del Sol
+
+[RADIO_MADRID]
+Seguimos aquí. (Siamo ancora qui.)
+
+[CAP_EVT_MADRID_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il cameriere aspetta che tu finisca di cercare una moneta prima di fare il resto.
+
+[CAP_EVT_MADRID_2]
+dove: autogrill
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Qualcuno ride per una cosa che non hai sentito. Non c’entri e va bene così.
+
+[CAP_EVT_MADRID_3]
+dove: strada
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Nonno compare in una frase tenera. L’uso non è quello che Elena aveva fissato.
+
+[CAP_EVT_MADRID_4]
+dove: motel
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: La copia del messaggio è ancora lì. Rileggi la domanda a cui nessuno ha risposto.
+
+[REDAZIONE] NOTE
+Lisbona. Arrivo:
+
+[ARRIVO_LISBONA]
+La strada scende fra facciate chiare. LISBOA entra ed esce dal riflesso.
+Una traccia fresca ritorna nello stesso tratto segnato nelle carte.
+
+[CART_LISBONA_1]
+[STRADA]
+LISBOA
+
+[CART_LISBONA_2]
+[STRADA]
+AVENIDA DA LIBERDADE
+
+[CART_LISBONA_3]
+[STRADA]
+PRACA DO COMERCIO
+
+[QUARTIERI_LISBONA]
+Avenida da Liberdade
+Praça do Comércio
+
+[RADIO_LISBONA]
+Voltamos já. (Torniamo subito.)
+
+[CAP_EVT_LISBONA_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il tavolino si muove. Un tovagliolo sotto una gamba risolve l’intero mistero.
+
+[CAP_EVT_LISBONA_2]
+dove: benzinaio
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il commesso indica il lato della pompa. Per una volta avevi guardato quello
+sbagliato.
+
+[CAP_EVT_LISBONA_3]
+dove: strada
+fase: III
+una volta sola: sì
+tipo: strano
+testo: La ripetizione legata al ragazzo della Punto ricomincia dal segno già
+riconoscibile.
+
+[CAP_EVT_LISBONA_4]
+dove: autogrill
+fase: IV
+una volta sola: sì
+tipo: strano
+testo: Il sangue fresco continua senza una persona da recuperare. La scena chiede di
+essere interrotta.
+
+[REDAZIONE] NOTE
+Atene. Arrivo:
+
+[ARRIVO_ATENE]
+L’Acropoli resta lontana sopra le luci. Il cartello dice ATHINA.
+La porta davanti non porta scritto uscita. È il telefono a insistere.
+
+[CART_ATENE_1]
+[STRADA]
+ATHINA
+
+[CART_ATENE_2]
+[STRADA]
+SYNTAGMA
+
+[CART_ATENE_3]
+[STRADA]
+ERMOU
+
+[QUARTIERI_ATENE]
+Syntagma Square
+Ermou Street
+
+[RADIO_ATENE]
+Μείνετε μαζί μας. (Restate con noi.)
+
+[CAP_EVT_ATENE_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Un uomo sposta una sedia per lasciarti passare. Il gesto non chiede di essere
+interpretato.
+
+[CAP_EVT_ATENE_2]
+dove: motel
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: La reception ti chiede se vuoi un’altra coperta. La risposta può essere soltanto sì
+o no.
+
+[CAP_EVT_ATENE_3]
+dove: strada
+fase: V
+una volta sola: sì
+tipo: strano
+testo: La voce indica la porta come uscita. La foto mostra la donna che la tiene chiusa.
+
+[CAP_EVT_ATENE_4]
+dove: autogrill
+fase: V
+una volta sola: sì
+tipo: strano
+testo: Prima di ripartire ti accorgi che stai usando una frase di Claudio. Il telefono
+conserva il confronto.
+
+[REDAZIONE] NOTE
+Washington D.C.. Arrivo:
+
+[ARRIVO_WASHINGTON]
+Il viale è largo; le luci hanno spazio attorno. WASHINGTON D.C. resta leggibile.
+La nota della donna dice poco. Questa volta non serve che dica di più.
+
+[CART_WASHINGTON_1]
+[STRADA]
+WASHINGTON D.C.
+
+[CART_WASHINGTON_2]
+[STRADA]
+PENNSYLVANIA AVENUE
+
+[CART_WASHINGTON_3]
+[STRADA]
+CONSTITUTION AVENUE
+
+[QUARTIERI_WASHINGTON]
+Pennsylvania Avenue
+Constitution Avenue
+
+[RADIO_WASHINGTON]
+Stay on this frequency. (Restate su questa frequenza.)
+
+[CAP_EVT_WASHINGTON_1]
+dove: bar
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Il caffè riempie una tazza più grande di quella che ti aspettavi. Puoi fermarti a
+berlo.
+
+[CAP_EVT_WASHINGTON_2]
+dove: benzinaio
+fase: II
+una volta sola: sì
+tipo: quotidiano
+testo: Leggi due volte l’indicazione della pompa prima di accorgerti che nessuno ti mette
+fretta.
+
+[CAP_EVT_WASHINGTON_3]
+dove: strada
+fase: V
+una volta sola: sì
+tipo: strano
+testo: La nota sul riconoscimento coincide con quello che la presenza ti sta chiedendo.
+
+[CAP_EVT_WASHINGTON_4]
+dove: motel
+fase: V
+una volta sola: sì
+tipo: strano
+testo: La copia non cambia. Cambia il nome che eri disposto a dare a chi voleva uscire.
+
+[TRACCIA_ROMA]
+nome: Cartello piegato
+descrizione: La grafia coincide con il parasole. Indica una chiusura fatta da dentro.
+scena:
+Il cartello è accanto alla chiusura.
+Confronti il tratto della scrittura con il parasole.
+Il passaggio resta chiuso mentre la voce insiste.
+La traccia collega Claudio al contenimento, senza fargli spiegare tutto.
+
+[TRACCIA_STOCCOLMA]
+nome: Tesserino di Ottavio
+descrizione: Il nome nel tesserino della Volvo coincide con le carte custodite da Livia.
+scena:
+All’autogrill ritrovi il riferimento alla Volvo.
+Il nome non è una voce: è quello sul tesserino.
+Livia lo confronta senza dichiarare Ottavio vivo.
+La macchina ritrovata e la persona mancante restano due fatti diversi.
+
+[TRACCIA_LISBONA]
+nome: Appunto della Punto
+descrizione: Un appunto ordinario accompagna la traccia della ripetizione; non contiene
+una nuova regola.
+scena:
+La traccia si ripresenta nello stesso punto.
+Il sangue cresce mentre osservi.
+Interrompere la ripetizione arresta quel tratto, senza cambiare il passato.
+L’appunto resta un contenitore per il confronto, non un oggetto magico.
+
+[TRACCIA_BERLINO]
+nome: Foglio della Corsa
+descrizione: Due segni distinti permettono di seguire l’apertura e la richiusura viste
+nella vicenda della coppia.
+scena:
+Guardi prima il segno dell’apertura.
+Un secondo segno mostra la richiusura dall’esterno.
+Rosa chiede di distinguere le due azioni.
+Il pezzo aggiunto al contenimento è che un varco aperto si può richiudere.
+
+[TRACCIA_VIENNA]
+nome: Schema dello svincolo
+descrizione: Il particolare dello svincolo coincide anche quando la diramazione cambia
+paese. Nessun nome è aggiunto.
+scena:
+Il cartello cambia nome.
+Il particolare visibile nello schema ritorna uguale.
+La Polo non fornisce un proprietario da far parlare.
+La traccia distingue un collegamento interno da un’uscita autentica.
+
+[TRACCIA_WASHINGTON]
+nome: Nota della Panda
+descrizione: La nota della donna distingue una voce copiata dalla persona che un vivo
+sceglie di accompagnare.
+scena:
+La nota è breve e scritta per essere riletta.
+Il nome pronunciato non basta da solo.
+La richiesta della presenza ora ha un obiettivo riconoscibile.
+Il riconoscimento permette di capire il rischio, non impone una risposta.
+
+[REDAZIONE] NOTE
+Appunto, foglio e schema sono nomi di presentazione per le tracce già richieste. Non
+aggiungono un proprietario, una data o un potere. Se il contenitore fisico è ancora da
+approvare, la scena funziona come descrizione della traccia e il contenuto di storia
+resta identico.
+
+[PENS_TRATTO_01]
+Le insegne di casa sono finite. Continuo a cercare l’ultima nello specchio.
+
+[REDAZIONE] NOTE
+Tratto 01: Tokyo → Roma; paesaggio Wangan. È un contrasto percettivo dentro la rete, non
+una pretesa geografica.
+
+[PENS_TRATTO_02]
+Prima un paesaggio che riesco a nominare. Poi un cartello che non dovrebbe essere lì.
+
+[REDAZIONE] NOTE
+Tratto 02: Roma → Parigi; paesaggio San Gimignano. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_03]
+La strada torna ordinaria abbastanza a lungo da farmi dubitare della foto.
+
+[REDAZIONE] NOTE
+Tratto 03: Parigi → Londra; paesaggio Bassa. È un contrasto percettivo dentro la rete,
+non una pretesa geografica.
+
+[PENS_TRATTO_04]
+Le curve mi chiedono attenzione. Per un momento smetto di interrogare il telefono.
+
+[REDAZIONE] NOTE
+Tratto 04: Londra → Stoccolma; paesaggio Hakone. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_05]
+Il nome di Ottavio non è rimasto all’autogrill. Adesso viaggia anche con me.
+
+[REDAZIONE] NOTE
+Tratto 05: Stoccolma → Berlino; paesaggio Bassa. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_06]
+Una porta aperta può richiudersi. Devo ricordarlo prima di averne bisogno.
+
+[REDAZIONE] NOTE
+Tratto 06: Berlino → Praga; paesaggio San Gimignano. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_07]
+La macchia cresceva davanti a me. Non era il ricordo che stavo peggiorando.
+
+[REDAZIONE] NOTE
+Tratto 07: Praga → Vienna; paesaggio Hakone. È un contrasto percettivo dentro la rete,
+non una pretesa geografica.
+
+[PENS_TRATTO_08]
+È cambiato il nome dell’uscita. Il particolare dello svincolo non si è mosso.
+
+[REDAZIONE] NOTE
+Tratto 08: Vienna → Madrid; paesaggio Positano. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_09]
+Una parola giusta detta nel modo sbagliato. Prima non ci avrei fatto caso.
+
+[REDAZIONE] NOTE
+Tratto 09: Madrid → Lisbona; paesaggio Positano. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_10]
+Quello che ho interrotto non ricomincia. Non ho riscritto chi è rimasto lì.
+
+[REDAZIONE] NOTE
+Tratto 10: Lisbona → Atene; paesaggio San Gimignano. È un contrasto percettivo dentro la
+rete, non una pretesa geografica.
+
+[PENS_TRATTO_11]
+La porta e la mia uscita sono due cose diverse. Non le unisco per avere meno paura.
+
+[REDAZIONE] NOTE
+Tratto 11: Atene → Washington D.C.; paesaggio Route 66. È un contrasto percettivo dentro
+la rete, non una pretesa geografica.
+
+[REDAZIONE] NOTE
+Chiusura del giro, Washington D.C. → Tokyo: Route 66 prima della galleria, poi Wangan.
+Nessun dodicesimo pensiero richiesto. Nel ritorno i dettagli delle capitali restano
+quelli memorizzati: la progressione cambia gli eventi ammessi, non la loro identità
+casualmente.
+
+[REDAZIONE] NOTE
+Fonti consultate per i nomi reali. Le anomalie, gli arrivi e le radio sono scrittura
+originale; non descrivono condizioni attuali delle città. Le insegne direzionali non
+dichiarano strade percorribili dal giocatore.
+
+[FONTE]
+Tokyo, Ginza Dori
+https://www.gotokyo.org/en/spot/43/index.html
+
+[FONTE]
+Tokyo, Omotesando
+https://www.gotokyo.org/en/destinations/western-tokyo/aoyama-and-omotesando/index.html
+
+[FONTE]
+Roma, Via del Corso e Piazza del Popolo
+https://www.turismoroma.it/it/luoghi/del-corso
+
+[FONTE]
+Parigi, Champs-Élysées e Concorde
+https://parisjetaime.com/transport/avenue-des-champs-elysees-p1871
+
+[FONTE]
+Londra, Regent Street
+https://www.visitlondon.com/things-to-do/shopping/west-end-shopping-itinerary
+
+[FONTE]
+Londra, Trafalgar Square
+https://www.visitlondon.com/things-to-do/place/283774-trafalgar-square
+
+[FONTE]
+Stoccolma, Stortorget
+https://www.visitstockholm.com/o/stortorget/
+
+[FONTE]
+Stoccolma, Drottninggatan
+https://hufvudstaden.se/var-verksamhet/omraden/omraden-i-stockholm/drottninggatan/
+
+[FONTE]
+Berlino, vie e piazze di Mitte
+https://www.berlin.de/ba-mitte/ueber-den-bezirk/sehenswertes/strassen-und-plaetze/
+
+[FONTE]
+Praga, piazze famose
+https://prague.eu/en/objevujte-kategorie/streets-squares-plazas/
+
+[FONTE]
+Vienna, Ringstrasse
+https://www.wien.info/en/art-culture/ringstrasse
+
+[FONTE]
+Madrid, Sol e Gran Vía
+https://www.esmadrid.com/barrios-de-madrid/sol-granvia
+
+[FONTE]
+Lisbona, Praça do Comércio
+https://www.visitlisboa.com/pt-pt/locais/praca-do-comercio-terreiro-do-paco
+
+[FONTE]
+Atene, Syntagma ed Ermou
+https://www.stasy.gr/en/stations/syntagma/
+
+[FONTE]
+Washington, le due avenue
+https://www.epa.gov/aboutepa/visiting-epa-headquarters
+
+[FONTE]
+Lisbona, Avenida da Liberdade
+https://www.lisboa.pt/pontos-de-interesse/detalhe/jardins-da-avenida-da-liberdade
+
+[REDAZIONE] NOTE
+NODI
+
+[V2_LUOGO_tokyo_01] ELENA · I · richiede: luogo_tokyo
+Hai già voglia di mandarmi una foto di casa invece che dell’auto?
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_tokyo_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_tokyo_03
+
+
+[V2_LUOGO_tokyo_02] ELENA · I · sempre
+Va bene. Una cosa che riconosci senza doverla spiegare.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_tokyo_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_03] ELENA · I · sempre
+Allora scrivimi che cosa vedi adesso, non quello che ricordi.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_tokyo_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_04] ELENA · I · sempre
+Non ti sto facendo un esame. Voglio stare un momento nel tuo viaggio.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_tokyo_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_tokyo_05
+
+
+[V2_LUOGO_tokyo_05] ELENA · I · sempre
+Vai. Pasta qui non ha ancora dovuto imparare a guidare.
+[FINE]
+
+
+[V2_LUOGO_roma_01] ELENA · I · richiede: luogo_roma
+Hai finito con lo studio o stai ancora pensando alle altre cinque?
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_roma_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_roma_03
+
+
+[V2_LUOGO_roma_02] ELENA · I · sempre
+Una macchina sola. Non devi fare anche il giro del rimpianto.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_roma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_03] ELENA · I · sempre
+Mi interessa quella che hai scelto, non una classifica di quelle rimaste.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_roma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_04] ELENA · I · sempre
+Fotografa anche una cosa normale. Non voglio soltanto un catalogo di spie.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_roma_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_roma_05
+
+
+[V2_LUOGO_roma_05] ELENA · I · sempre
+Va bene. Roma almeno stavolta non la devi ereditare.
+[FINE]
+
+
+[V2_LUOGO_parigi_01] ELENA · II · richiede: luogo_parigi
+Parigi? Hai preso una foto da internet per prendermi in giro?
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_parigi_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_parigi_03
+
+
+[V2_LUOGO_parigi_02] ELENA · II · sempre
+Va bene. Mandami il particolare che hai davanti e resto a guardarlo.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_parigi_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_03] ELENA · II · sempre
+Il luogo corrisponde. Il tempo del tragitto no.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_parigi_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_04] ELENA · II · sempre
+Non inventiamo una durata diversa per farlo tornare.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_parigi_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_parigi_05
+
+
+[V2_LUOGO_parigi_05] ELENA · II · sempre
+Resta fermo mentre ragioniamo. Una cosa impossibile basta.
+[FINE]
+
+
+[V2_LUOGO_londra_01] ROSA · III · richiede: luogo_londra
+Mandami la chiusura intera. Non soltanto il punto che vuoi attraversare.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_londra_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_londra_03
+
+
+[V2_LUOGO_londra_02] ROSA · III · sempre
+Una barriera non mi dice chi l’ha messa. La scritta forse sì.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_londra_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_03] ROSA · III · sempre
+Guarda se riconosci il tratto. Io non sono lì al posto tuo.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_londra_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_04] ROSA · III · sempre
+Se è di Claudio cambia il motivo per cui è chiusa, non il fatto che lo sia.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_londra_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_londra_05
+
+
+[V2_LUOGO_londra_05] ROSA · III · sempre
+Bene. Niente prove col paraurti. Ci tengo a non dovertelo raddrizzare.
+[FINE]
+
+
+[V2_LUOGO_stoccolma_01] LIVIA · III · richiede: luogo_stoccolma
+Se sei all’autogrill, non cercare subito mio fratello in ogni persona.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_stoccolma_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_stoccolma_03
+
+
+[V2_LUOGO_stoccolma_02] LIVIA · III · sempre
+Lo so che è difficile. Lo sto facendo anch’io, da qui.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_stoccolma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_03] LIVIA · III · sempre
+Il tesserino ha il suo nome. Questo lo posso confrontare.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_stoccolma_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_04] LIVIA · III · sempre
+Una macchina ritrovata non significa che abbiamo ritrovato chi la guidava.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_stoccolma_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_stoccolma_05
+
+
+[V2_LUOGO_stoccolma_05] LIVIA · III · sempre
+Mandami il particolare. Poi mi prendo un momento per guardarlo.
+[FINE]
+
+
+[V2_LUOGO_berlino_01] ROSA · III · richiede: luogo_berlino
+Guarda anche dove si è richiusa. Non fermarti al segno di apertura.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_berlino_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_berlino_03
+
+
+[V2_LUOGO_berlino_02] ROSA · III · sempre
+Due azioni. Se le mescoli sembra una porta che fa quello che vuole.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_berlino_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_03] ROSA · III · sempre
+La coppia della Corsa ci lascia questo pezzo: richiudere è possibile.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_berlino_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_04] ROSA · III · sempre
+Possibile non vuol dire gratis o senza prepararsi.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_berlino_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_berlino_05
+
+
+[V2_LUOGO_berlino_05] ROSA · III · sempre
+Tienilo a mente prima della maniglia, non dopo, porca miseria.
+[FINE]
+
+
+[V2_LUOGO_praga_01] ROSA · III · richiede: luogo_praga
+È ferma anche la macchia, oppure sta cambiando?
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_praga_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_praga_03
+
+
+[V2_LUOGO_praga_02] ROSA · III · sempre
+Aspetta da fermo. Non mi rispondere con sembra se puoi guardare.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_praga_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_03] ROSA · III · sempre
+Se cresce davanti a te stai vedendo una ripetizione.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_praga_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_04] ROSA · III · sempre
+Non chiamarla una persona viva solo perché il sangue è fresco.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_praga_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_praga_05
+
+
+[V2_LUOGO_praga_05] ROSA · III · sempre
+Bene. Distinguiamo prima. Gli slanci di generosità dopo.
+[FINE]
+
+
+[V2_LUOGO_vienna_01] ELENA · III · richiede: luogo_vienna
+Un altro nome sul cartello. Prima di ripartire mandami il particolare.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_vienna_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_vienna_03
+
+
+[V2_LUOGO_vienna_02] ELENA · III · sempre
+Non posso conoscere la svolta da qui, ma posso confrontare due foto.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_vienna_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_03] ELENA · III · sempre
+Questo dettaglio coincide. Non serve fingere che sia tutto uguale.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_vienna_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_04] ELENA · III · sempre
+Puoi essere arrabbiato. Non correggere quello che hai visto per calmarti.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_vienna_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_vienna_05
+
+
+[V2_LUOGO_vienna_05] ELENA · III · sempre
+Mi scrivi quando sei fermo. Non devo indovinare mentre guidi.
+[FINE]
+
+
+[V2_LUOGO_madrid_01] ELENA · IV · richiede: luogo_madrid
+Mi hai chiesto se sono venuta a cercarti. No. Non sono in macchina.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_madrid_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_madrid_03
+
+
+[V2_LUOGO_madrid_02] ELENA · IV · sempre
+Dimmi che cosa vuoi controllare, senza mettermi la risposta in bocca.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_madrid_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_03] ELENA · IV · sempre
+Nonno lo uso per prenderti in giro. Non per chiederti di venire a prendermi.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_madrid_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_04] ELENA · IV · sempre
+Se vuoi chiedermi una cosa, chiedila una volta. Non aggiustarla mentre rispondo.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_madrid_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_madrid_05
+
+
+[V2_LUOGO_madrid_05] ELENA · IV · sempre
+Non so dove sei davvero. Per questo non posso dirti di seguire una strada.
+[FINE]
+
+
+[V2_LUOGO_lisbona_01] LIVIA · IV · richiede: luogo_lisbona
+Mi descrivi prima quello che cambia, poi quello che ti sembra di riconoscere?
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_lisbona_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_lisbona_03
+
+
+[V2_LUOGO_lisbona_02] LIVIA · IV · sempre
+Non voglio farti riscrivere la scena. Voglio evitare di completarvela io.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_lisbona_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_03] LIVIA · IV · sempre
+Il pezzo del ragazzo è una ripetizione, non un nuovo viaggio nel passato.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_lisbona_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_04] LIVIA · IV · sempre
+Se la interrompi, guardiamo cosa smette di accadere. Non inventiamo chi è tornato.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_lisbona_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_lisbona_05
+
+
+[V2_LUOGO_lisbona_05] LIVIA · IV · sempre
+Va bene. Adesso mi prendo un momento prima di farti un’altra domanda.
+[FINE]
+
+
+[V2_LUOGO_atene_01] ROSA · V · richiede: luogo_atene
+Quella è la porta. Non chiamarla già la tua uscita.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_atene_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_atene_03
+
+
+[V2_LUOGO_atene_02] ROSA · V · sempre
+Il confine e lo svincolo non sono la stessa cosa. Non li mescoliamo adesso.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_atene_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_03] ROSA · V · sempre
+Prima scegli chi hai davanti. Poi decidi che cosa vuoi far passare.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_atene_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_04] ROSA · V · sempre
+Non ti preparo la risposta per farti stare meglio.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_atene_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_atene_05
+
+
+[V2_LUOGO_atene_05] ROSA · V · sempre
+Quando scegli, voglio che sia la tua scelta. Non la mia fretta.
+[FINE]
+
+
+[V2_LUOGO_washington_01] LIVIA · V · richiede: luogo_washington
+La nota non ti chiede di riconoscere una voce. Ti chiede di capire chi accompagni.
+  A) «Ti descrivo quello che vedo da fermo.» → V2_LUOGO_washington_02
+  B) «Prima ti dico cosa non riesco a capire.» → V2_LUOGO_washington_03
+
+
+[V2_LUOGO_washington_02] LIVIA · V · sempre
+La donna della Panda aveva visto questo pezzo. Non tutta la storia.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_washington_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_03] LIVIA · V · sempre
+Se una frase ti sembra troppo semplice, non completarla con una promessa.
+  A) «Confrontiamo soltanto questo dettaglio.» → V2_LUOGO_washington_04
+  B) «Per ora mi fermo qui, senza completarlo a memoria.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_04] LIVIA · V · sempre
+Una persona che manca non diventa chiunque sappia usare il suo nome.
+  A) «Lo tengo distinto da quello che vorrei.» → V2_LUOGO_washington_05
+  B) «Ti riscrivo quando ho un particolare diverso.» → V2_LUOGO_washington_05
+
+
+[V2_LUOGO_washington_05] LIVIA · V · sempre
+Prima di chiudere, dimmi se quello che vuoi sapere l’hai davvero chiesto.
+[FINE]
+
+
+[REDAZIONE] NOTE
+FINE SEZIONE
