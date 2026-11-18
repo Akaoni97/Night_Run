@@ -688,7 +688,7 @@ class Street2D {
   // Tela interna: le coordinate restano quelle di sempre (360 righe), ma con qualità alta ogni unità vale
   // 2×2 pixel veri (720 righe): gli sprite di prima si vedono uguali, il resto si può disegnare più fine.
   fitLo() {
-    const SS = this.SS = this.quality === 'bassa' || this.slow ? 1 : 2;
+    const SS = this.SS = this.quality === 'bassa' || this.quality === 'leggera' || this.slow ? 1 : 2;   // leggera: come alta ma a densità normale e senza bagliore (prove da telefono)
     if (this.lo.width !== this.LW * SS || this.lo.height !== this.LH * SS) { this.lo.width = this.LW * SS; this.lo.height = this.LH * SS; this.skyCache = null; this.tiles.clear(); }
     this.g.setTransform(SS, 0, 0, SS, 0, 0); this.g.imageSmoothingEnabled = false;
   }

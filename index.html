@@ -714,6 +714,7 @@ html.tdash .tpan-str .dash-btns.cmd { padding-top: 8px; border-top: 1px dashed r
 html.tdash body.inplace .tbar, html.tdash body.inplace .tpan, html.tdash body.inplace .tcock { display: none; }
 /* i messaggi sopra la strada stanno a destra del quadro e di AVVIA, non sopra */
 html.tdash #roadStage > .msg { left: calc(clamp(190px, 27vw, 300px) + 100px); right: 14px; transform: skewX(-8deg); max-width: none; }
+  html.tdash #tLeg::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M13%202L4%2014h7l-1%208%209-12h-7z%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M13%202L4%2014h7l-1%208%209-12h-7z%22/%3E%3C/svg%3E"); }
 /* DATI: il riquadro hud-l dentro la finestrella, a grandezza piena */
 html.tdash .tpan-dati .hud-l { position: static; transform: none; display: grid !important; gap: 6px; }
 html.tdash .tpan-dati .hud-tag { max-width: none; width: auto; }
@@ -989,7 +990,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <button class="kbtn" type="button" id="replayBtn">Replay<small>Y</small></button>
       <label class="kbtn qsel">Ora <select id="clockSel" aria-label="Ora del giorno"><option value="auto">dinamica</option><option value="giorno">giorno</option><option value="tramonto">tramonto</option><option value="notte">notte</option></select></label>
       <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option></select></label>
-      <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica 3D"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option></select></label>
+      <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica 3D"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
       <p class="hint"><span id="g3dName">modello di base</span> · trascina per girare la visuale</p>
     </div>
   </section>
