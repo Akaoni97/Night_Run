@@ -110,7 +110,7 @@
     const B = M.band, bh = B ? B.bot - B.top + 1 : 10;
     // col riquadro misurato la figura riempie il finestrino (testa sotto il tetto, spalle alla linea di cintura) e sta nella
     // metà posteriore del vetro, come chi guida; senza, la vecchia regola sul vetro riconosciuto
-    const sc = B && B.x0 != null ? Math.max(0.7, Math.min(1.55, bh / 14)) : Math.max(0.62, Math.min(1.15, bh / 12.5)), lean = st.head * 0.8 * sc;
+    const sc = B && B.x0 != null ? Math.max(0.75, Math.min(1.75, bh / 12.2)) : Math.max(0.66, Math.min(1.25, bh / 11.2)), lean = st.head * 0.8 * sc;   // grande: si riconosce
     const ax = B && B.x0 != null ? B.x0 + (B.x1 - B.x0) * 0.42 : (G.hx ?? 108) + 3;
     const ay = B && B.x0 != null ? B.top + bh * 0.17 + 4.6 * sc : B ? B.top + 0.8 + 4.9 * sc : (G.hy ?? 0) + 17;
     x.translate(ax, ay); x.scale(sc, sc); x.translate(-ax, -ay);
@@ -146,10 +146,17 @@
     M2.shiftK = Math.max(0, M2.shiftK - dt * 2.6);
     // finestrino giù e andatura tranquilla: il gomito fuori (con un po' di isteresi)
     M2.elbow = (s.win || 0) > 0.7 && Math.abs(s.v || 0) < (M2.elbow ? 24 : 20) ? 1 : 0;
+    // radio accesa: muove la testa a tempo e ogni tanto canticchia; sonno: occhi pesanti, sbadigli, la testa che ciondola
+    const G2 = window.nightRun && window.nightRun.game, need = G2 && G2.s.vg && G2.s.vg.needs, music = !!(window.nightRun && window.nightRun.radioOn) && Math.abs(s.v || 0) > 1;
+    const sleepy = need ? Math.max(0, Math.min(1, (0.32 - need.sleep) / 0.25)) : 0;
+    const yawnT = (t % 13) - 11.2, yawn = sleepy > 0.15 && yawnT > 0 ? Math.sin(Math.min(1, yawnT / 1.6) * Math.PI) : 0;
+    const nod = sleepy > 0.5 ? Math.max(0, Math.sin(t * 0.7)) ** 6 * 1.4 * sleepy : 0;
+    const beat = music && !sleepy ? Math.max(0, Math.sin(t * Math.PI * 2 * 1.9)) * 0.32 : 0, sing = music && !sleepy && (t % 11) > 8.5 && Math.floor(t * 4) % 2 === 0;
     const look = window.NightPG ? NightPG.now() : (typeof PG_DEF !== 'undefined' ? PG_DEF : null);
     const blink = (t % 3.9) < 0.11 || ((t + 1.7) % 7.3) < 0.1;
     if (typeof pgDriver === 'function') {
-      pgDriver(x, { cx, cy, sx, wx, wy, C: pgColors(look, dk * 0.45), look, turn: M2.turn, blink, breath: Math.sin(t * 1.6), steer: M2.steer, elbow: M2.elbow, shiftK: M2.shiftK, lookUp: mirror && !sig ? 1 : 0 });
+      pgDriver(x, { cx, cy: cy + beat + nod, sx, wx, wy, C: pgColors(look, dk * 0.38), look, turn: nod > 0.3 ? 0 : M2.turn, blink: blink || (sleepy > 0.7 && (t % 2.4) < 0.5), breath: Math.sin(t * 1.6),
+        steer: M2.steer, elbow: M2.elbow, shiftK: M2.shiftK, lookUp: mirror && !sig ? 1 : 0, sleepy, yawn, sing });
     }
     // volante (corona vista di taglio)
     x.strokeStyle = C.wheel; x.lineWidth = 1; x.beginPath(); x.ellipse(wx, wy - 0.5, 1.3, 4.6, -0.3, 0, Math.PI * 2); x.stroke();

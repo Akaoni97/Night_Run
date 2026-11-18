@@ -126,7 +126,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   }
   // il protagonista: l'aspetto scelto nell'editor (personaggio.js), in piedi di profilo o seduto di spalle
   const myLook = () => (window.NightPG ? NightPG.now() : null);
-  function person(g, x, y, s, ph, walking, light = 0) { if (typeof pgStanding === 'function') pgStanding(g, x, y, s, ph, walking, myLook(), light, performance.now() / 1000); }
+  function person(g, x, y, s, ph, walking, light = 0, pose) { if (typeof pgStanding === 'function') pgStanding(g, x, y, s, ph, walking, myLook(), light, performance.now() / 1000, pose); }
   function personBack(g, x, y, t) { if (typeof pgBack === 'function') pgBack(g, x, y, t, myLook()); }
   // il notaio in piedi (garage): giacca scura, capelli grigi, occhiali, le chiavi in mano
   function notary(g, x, y, t, keys) {
@@ -218,7 +218,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     // il calendario dello zio, fermo a un mese di anni fa
     R(g, 64, 60, 34, 46, '#e8e0d0'); R(g, 64, 60, 34, 16, '#b82a2a'); for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) R(g, 67 + c * 6, 80 + r * 6, 4, 4, r === 2 && c === 3 ? '#b82a2a' : '#8a8478');
     for (const [x, w] of [[120, 60], [380, 90], [560, 40]]) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 300, w, 8, 0, 0, Math.PI * 2); g.fill(); }   // macchie d'olio
-    notary(g, 112, 330, t, true); person(g, 560, 330, 0.95, 0, false);                                                             // il notaio con le chiavi, lui che guarda le auto
+    notary(g, 112, 330, t, true); person(g, 560, 330, 0.95, 0, false, 0, 'pockets');                                                             // il notaio con le chiavi, lui che guarda le auto
   } };
   SC.strada = { dur: 13, enter() { motor(90, 160, 6, 0.1); }, draw(g, t) {
     // uscita dal garage e poi l'autostrada: scorre tutto verso sinistra, la Volvo sta quasi ferma
