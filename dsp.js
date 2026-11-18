@@ -573,7 +573,7 @@ class EngineDSP {
         exh += this.opLP.p(Math.tanh(hv * (6 + 10 * o)) * 0.13) * o * o * this.openG * (M.lp < 4000 ? 1.5 : 1);   // in abitacolo arriva attraverso la scocca: più forte per compensare il filtro
       }
       exh += thump;
-      if (popB !== 0) exh += Math.tanh(popB * 1.1) * 0.34;      // boato: saturato come un colpo nel tubo, niente picchi
+      if (popB !== 0) exh += Math.tanh(popB * 1.1) * 0.25;      // boato: saturato come un colpo nel tubo, niente picchi
       const boom = this.boomBP.p(ex) * 1.6;
       // screamer pipe della wastegate: gas di scarico liberi, impulsi compresi
       if (tn.scream && S.wg > 0.005) exh += (this.scrBP.p(nz2) * 0.6 + this.scrHP.p(col) * 0.45) * S.wg * 0.4;
