@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Due stazioni rap nella radio con le 5 canzoni nuove | `radio.js`, `audio/rap/` (nuova), `LICENZE.md` | 18/11 notte |
