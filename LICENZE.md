@@ -73,7 +73,7 @@ Le canzoni nuove fatte più avanti vanno segnate qui con piano e data.
 ## 4. Modello 3D della Supra (`models/supra_mk4.glb`)
 *Toyota Supra MK4 (LowPoly)* di Mike Farrant (Sketchfab), licenza CC BY 4.0, modificato (scala, ruote separate,
 texture ridotte). La licenza permette anche l'uso commerciale, ma chiede il credito: oggi c'è nel README e
-nell'etichetta della vista 3D, ma solo quando la si apre. **Da fare**: una schermata Crediti nel gioco. La licenza
+nell'etichetta della vista 3D, ma solo quando la si apre. **Fatto (18/11/2026)**: schermata Crediti nel gioco (`crediti.js`). La licenza
 CC copre il modello ma non il marchio: la texture contiene i loghi Toyota. Se la vista 3D non serve all'uscita,
 la cosa più semplice è non pubblicarla.
 
