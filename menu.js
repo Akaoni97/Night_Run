@@ -3,7 +3,7 @@
 //  ricercato, MENU); tutto il resto (officina, bagagliaio, comandi di guida, vista, quadro, extra,
 //  partita) va in un menu a schede che si apre col pulsante MENU o col tasto Tab e si chiude con Esc o Tab.
 //  I pannelli non vengono riscritti: si spostano nelle schede, quindi il resto del gioco li trova come prima.
-//  Sui telefoni compaiono anche i pedali GAS e FRENO sulla strada.
+//  Sui telefoni compaiono anche i comandi al tocco sulla strada: pedali, palette del cambio, AVVIA.
 // ============================================================================
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -116,18 +116,109 @@
     if (e.key === 'Escape' && !menu.hidden) { e.preventDefault(); e.stopImmediatePropagation(); close(); }
   }, true);
 
-  // pedali per il tocco (solo dove il puntatore è un dito): tengono premuti W e S come la tastiera
-  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.innerHTML = '<button type="button" class="tp-eng" aria-label="Accensione">AVVIA</button><button type="button" class="tp-brk" aria-label="Freno">FRENO</button><button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
-  const hold = (btn, key) => {
-    const down = (e) => { e.preventDefault(); btn.classList.add('on'); window.dispatchEvent(new KeyboardEvent('keydown', { key })); };
-    const up = () => { if (!btn.classList.contains('on')) return; btn.classList.remove('on'); window.dispatchEvent(new KeyboardEvent('keyup', { key })); };
+  // ---------------------------------------------------------------- comandi al tocco (solo dove il puntatore è un dito)
+  //  pollice destro: FRENO e GAS in basso a destra, sopra le palette del cambio (▼ sopra il freno, ▲ sopra il gas)
+  //  con in mezzo la marcia inserita; pollice sinistro: ◀ ▶ affiancati (CSS); AVVIA rotondo accanto al cruscotto,
+  //  lontano dai pedali. I tasti mandano gli stessi eventi della tastiera, già "tradotti" (_nr) così che i tasti
+  //  cambiati dal giocatore in TASTI non li blocchino.
+  const send = (type, key) => { const ev = new KeyboardEvent(type, { key, bubbles: true, cancelable: true }); ev._nr = true; window.dispatchEvent(ev); };
+  const buzz = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* niente */ } };
+  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.setAttribute('role', 'group'); tp.setAttribute('aria-label', 'Pedali e cambio');
+  tp.innerHTML = '<button type="button" class="tp-sh tp-dn" aria-label="Marcia giù"><i aria-hidden="true">▼</i><small>GIÙ</small></button>'
+    + '<b class="tp-gear" aria-live="polite" aria-label="Marcia inserita">N</b>'
+    + '<button type="button" class="tp-sh tp-up" aria-label="Marcia su"><i aria-hidden="true">▲</i><small>SU</small></button>'
+    + '<button type="button" class="tp-brk" aria-label="Freno">FRENO</button>'
+    + '<button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
+  const [bDn, gearEl, bUp, bBrk, bGas] = tp.children;
+  // tengono premuto il tasto finché il dito resta sul pulsante
+  const hold = (btn, key, ms) => {
+    const down = (e) => { e.preventDefault(); if (btn.classList.contains('on')) return; btn.classList.add('on'); if (ms) buzz(ms); send('keydown', key); };
+    const up = () => { if (!btn.classList.contains('on')) return; btn.classList.remove('on'); send('keyup', key); };
     btn.addEventListener('pointerdown', down); for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, up);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
   };
-  hold(tp.children[1], 's'); hold(tp.children[2], 'w');
-  // AVVIA: un tocco gira la chiave; sparisce a motore acceso (da telefono non si spegne per sbaglio mentre si guida)
-  tp.children[0].addEventListener('click', () => { if (window.nightRun) window.nightRun.engineTap(); });
-  setInterval(() => { const n = window.nightRun; if (n && n.sim) tp.children[0].hidden = !!n.sim.running; }, 300);
+  hold(bBrk, 's'); hold(bGas, 'w'); hold(bDn, 'q', 12); hold(bUp, 'e', 12);
   const hud = stage.querySelector('.hud'); if (hud) hud.appendChild(tp);
+
+  // AVVIA: un tocco gira la chiave; a motore acceso sparisce (da telefono non si spegne per sbaglio mentre si guida)
+  const st = document.createElement('button'); st.type = 'button'; st.className = 'tp-start'; st.setAttribute('aria-label', 'Accensione: avvia il motore');
+  st.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.6 6.6a7.5 7.5 0 1 0 10.8 0"/></svg><small>AVVIA</small>';
+  st.addEventListener('click', () => { buzz(20); if (window.nightRun) window.nightRun.engineTap(); });
+  const dash = $('dash'); if (dash) dash.appendChild(st); else if (hud) hud.appendChild(st);
+
+  // stato: marcia inserita (o quella che sta entrando) e AVVIA solo a motore spento
+  let lastG = null;
+  setInterval(() => {
+    const n = window.nightRun, sim = n && n.sim; if (!sim) return;
+    st.hidden = !!sim.running;
+    // accanto al bordo destro vero del cruscotto (il quadro disegnato può sporgere oltre la griglia di #dash)
+    if (!st.hidden && dash && st.parentNode === dash) {
+      let r = 0; for (const el of dash.children) if (el !== st && el.offsetParent) r = Math.max(r, el.offsetLeft + el.offsetWidth);
+      const x = (r || dash.offsetWidth) + (innerHeight <= 520 ? 10 : 14) + 'px'; if (st.style.left !== x) st.style.left = x;
+    }
+    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear, t = g === -1 ? 'R' : g === 0 ? 'N' : String(g);
+    if (t !== lastG) { lastG = t; gearEl.textContent = t; gearEl.classList.remove('pop'); void gearEl.offsetWidth; gearEl.classList.add('pop'); }
+    // spente a fine corsa (aria-disabled e non disabled: un pulsante disabilitato sotto il dito non riceve il rilascio)
+    bUp.setAttribute('aria-disabled', String(g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(g <= 0));
+  }, 120);
+
+  // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito
+  // al tocco (deciso all'avvio): in alto a sinistra il quadro strumenti con AVVIA accanto; in basso a sinistra, sopra ◀ ▶,
+  // due pulsanti STRUMENTI e DATI che aprono due finestrelle: le funzioni dell'auto (la fila AUTO, TC... e i comandi di
+  // comandi.js, a tessere) e i dati del viaggio (ora, lavoro, bisogni, carico: il riquadro che prima stava in alto a sinistra).
+  // I pezzi della pagina si spostano, non si rifanno: chi li cerca per id li trova come prima.
+  if (matchMedia('(pointer: coarse)').matches && dash && hud) {
+    document.documentElement.classList.add('tdash');
+    const cock = document.createElement('div'); cock.className = 'tcock';
+    const hp = $('hudP'); if (hp) cock.appendChild(hp);
+    cock.appendChild(st); hud.appendChild(cock);
+    const ICON = {
+      str: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+      dati: '<path d="M5 20V11M12 20V5M19 20v-6"/>',
+    };
+    const bar = document.createElement('div'); bar.className = 'tbar'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Finestre');
+    const mkBtn = (id, label) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.p = id; b.setAttribute('aria-expanded', 'false'); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${label}</span>`; bar.appendChild(b); return b; };
+    const bStr = mkBtn('str', 'STRUMENTI'), bDati = mkBtn('dati', 'DATI');
+    // finestrella STRUMENTI = #dash stesso (con le sue file di pulsanti), con una testata
+    const head = (title, sub) => { const h = document.createElement('header'); h.className = 'tpan-h'; h.innerHTML = `<b>${title}</b><small>${sub}</small><button type="button" aria-label="Chiudi">✕</button>`; return h; };
+    dash.classList.add('tpan', 'tpan-str'); dash.insertBefore(head('Strumenti', 'Funzioni dell\'auto'), dash.firstChild);
+    // finestrella DATI con il riquadro hud-l
+    const dati = document.createElement('div'); dati.className = 'tpan tpan-dati'; dati.appendChild(head('Dati', 'Viaggio, lavoro, bisogni'));
+    const hl = q('.hud-l'); if (hl) dati.appendChild(hl);
+    hud.appendChild(dati); hud.appendChild(bar);
+    const pans = { str: [bStr, dash], dati: [bDati, dati] };
+    let aperta = null;
+    const apri = (id) => {
+      aperta = aperta === id ? null : id;
+      for (const k in pans) { const on = k === aperta; pans[k][1].classList.toggle('open', on); pans[k][0].setAttribute('aria-expanded', String(on)); }
+    };
+    bStr.addEventListener('click', () => apri('str')); bDati.addEventListener('click', () => apri('dati'));
+    for (const k in pans) pans[k][1].querySelector('.tpan-h button').addEventListener('click', () => { if (aperta === k) apri(k); });
+    // un tocco sulla strada fuori dalle finestre (anche sui pedali) le chiude
+    stage.addEventListener('pointerdown', (e) => { if (aperta && !e.target.closest('.tpan, .tbar')) apri(aperta); }, true);
+  }
+  // SCHERMO INTERO nella barra in alto (dopo TELEFONO e TASTI, che si aggiungono dopo questo file): usa lo stesso pulsante della strada
+  const fsb = $('fsBtn');
+  setTimeout(() => {
+    if (!top || !fsb) return;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'menubtn fstop'; b.id = 'fsTop'; b.title = 'Schermo intero (Z)';
+    b.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4"/></svg><span>SCHERMO INTERO</span>';
+    b.addEventListener('click', () => fsb.click()); top.appendChild(b);
+  }, 0);
+  // a schermo intero la barra in alto non si vede: MENU e TELEFONO restano accanto al pulsante per uscire
+  const dock = document.createElement('div'); dock.className = 'fsdock';
+  dock.innerHTML = '<button type="button" data-a="menu" aria-label="Menu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>'
+    + '<button type="button" data-a="tel" aria-label="Telefono"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8" height="13" rx="1.6"/><path d="M7 12.2h2"/></svg></button>';
+  dock.children[0].addEventListener('click', () => open());
+  dock.children[1].addEventListener('click', () => { const t = $('telBtn'); if (t) t.click(); else if (window.telefono && window.telefono.open) window.telefono.open(); });
+  if (hud) hud.appendChild(dock);
+
+  // telefono in verticale: la strada è larga e i comandi non ci stanno, si chiede di girarlo (si può giocare lo stesso)
+  const gira = document.createElement('div'); gira.className = 'gira'; gira.setAttribute('role', 'dialog'); gira.setAttribute('aria-label', 'Gira il telefono');
+  gira.innerHTML = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="8" width="20" height="36" rx="3"/><path d="M44 50a14 14 0 0 1-20 4M24 54l-1-6 6 1"/></svg>'
+    + '<b>Gira il telefono</b><span>Night Run si guida in orizzontale: strada larga, pedali sotto i pollici.</span><button type="button">Gioca lo stesso</button>';
+  gira.querySelector('button').addEventListener('click', () => { document.documentElement.classList.add('gira-no'); });
+  document.body.appendChild(gira);
 
   window.dispatchEvent(new Event('resize'));
 })();

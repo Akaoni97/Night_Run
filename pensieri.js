@@ -125,8 +125,9 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
   const visibile = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return b.width < 1 || b.height < 1 ? null : b; };
   // dove mettere il testo: accanto alla barra se c'è spazio (almeno 200 px), altrimenti sopra l'angolo in basso a destra
   const posizione = (stage) => {
-    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap')), ln = visibile(document.querySelector('.lanebtn.r'));
-    const fine = ln ? ln.left - 12 : r.right - 12;                       // il testo finisce prima del bottone della corsia
+    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap'));
+    let fine = r.right - 12;                                             // il testo finisce prima dei comandi della metà destra (bottone corsia, pedali al tocco)
+    for (const sel of ['.lanebtn.r', '.touchpedals']) { const b = visibile(document.querySelector(sel)); if (b && b.left > r.left + r.width / 2) fine = Math.min(fine, b.left - 12); }
     if (mm) {
       const libero = fine - (mm.right + 16);
       if (libero >= 200) return { accanto: true, left: Math.round(mm.right + 16 - r.left), bottom: Math.round(r.bottom - mm.bottom), maxW: Math.min(libero, 420) };
