@@ -589,13 +589,33 @@ html.game #g2d, html.game #g3d { width: 100%; height: 100%; aspect-ratio: auto; 
 html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 .menubtn { border: 0; padding: 8px 14px 7px; font: 400 14px/1 var(--f-display); letter-spacing: .08em; color: #1a1206; background: var(--amber); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); white-space: nowrap; }
 .menubtn kbd { margin-left: 6px; background: transparent; border-color: rgba(0,0,0,.3); color: #1a1206; }
-.touchpedals { position: absolute; right: 12px; bottom: 72px; display: none; gap: 8px; z-index: 4; }
-.touchpedals button { width: 64px; height: 64px; border: 0; border-radius: 10px; font: 400 13px/1 var(--f-display); color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.18); }
-.touchpedals .tp-eng { background: rgba(214,150,30,.82); color: #14100a; } .touchpedals .tp-gas { background: rgba(80,140,30,.72); } .touchpedals .tp-brk { background: rgba(160,40,30,.72); }
-.touchpedals button:active, .touchpedals button.on { filter: brightness(1.4); }
-@media (pointer: coarse) { .touchpedals { display: grid; grid-template-columns: auto auto; justify-content: end; } #dbEngine { display: none; } }
-.touchpedals .tp-eng { grid-column: 1 / -1; grid-row: 1; width: auto; height: 38px; }
-.touchpedals .tp-eng[hidden] { display: none; }
+/* comandi al tocco (menu.js, solo col dito): pollice destro sui pedali, con sopra le palette del cambio e la marcia in mezzo;
+   pollice sinistro su ◀ ▶ affiancati; AVVIA rotondo accanto al cruscotto, lontano dai pedali */
+.touchpedals { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: none; grid-template-columns: var(--tp-w, 64px) var(--tp-g, 30px) var(--tp-w, 64px); column-gap: 8px; row-gap: 8px; align-items: end; z-index: 4; }
+.touchpedals button, .tp-start { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; border: 0; padding: 0; cursor: pointer; }
+.touchpedals .tp-sh { grid-row: 1; height: var(--tp-sh, 46px); display: grid; place-content: center; gap: 2px; color: var(--amber); background: linear-gradient(180deg, rgba(34,30,24,.82), rgba(12,11,9,.72)); box-shadow: inset 0 0 0 1px rgba(255,179,71,.35), 0 2px 8px rgba(0,0,0,.35); border-radius: 12px 12px 5px 5px; }
+.touchpedals .tp-sh i { font: normal 400 17px/1 var(--f-display); }
+.touchpedals .tp-sh small { font: 600 8px/1 var(--f-data); letter-spacing: .14em; color: var(--muted); }
+.touchpedals .tp-dn { grid-column: 1; } .touchpedals .tp-up { grid-column: 3; }
+.touchpedals .tp-sh[aria-disabled="true"] { opacity: .35; }
+.touchpedals .tp-gear { grid-column: 2; grid-row: 1; align-self: center; justify-self: center; width: var(--tp-g, 30px); height: var(--tp-g, 30px); display: grid; place-items: center; border-radius: 50%; font: 400 calc(var(--tp-g, 30px) * .62)/1 var(--f-display); color: var(--amber); background: rgba(8,8,10,.78); box-shadow: inset 0 0 0 1.5px rgba(255,179,71,.55); pointer-events: none; }
+.touchpedals .tp-gear.pop { animation: tpPop .22s ease-out; }
+@keyframes tpPop { from { transform: scale(1.35); color: #fff; } to { transform: scale(1); } }
+.touchpedals .tp-brk, .touchpedals .tp-gas { grid-row: 2; font: 400 13px/1 var(--f-display); letter-spacing: .06em; color: #fff; border-radius: 10px 10px 14px 14px; padding-top: 34%; box-shadow: inset 0 0 0 2px rgba(255,255,255,.16), 0 3px 10px rgba(0,0,0,.4); background-image: repeating-linear-gradient(180deg, rgba(255,255,255,.07) 0 2px, transparent 2px 9px); }
+.touchpedals .tp-brk { grid-column: 1; height: var(--tp-bh, 74px); background-color: rgba(160,40,30,.74); }
+.touchpedals .tp-gas { grid-column: 3; height: var(--tp-gh, 92px); background-color: rgba(80,140,30,.74); }
+.touchpedals button:active, .touchpedals button.on { filter: brightness(1.4); transform: translateY(1px); }
+.tp-start { position: absolute; left: calc(100% + 14px); bottom: 0; width: var(--tp-st, 64px); height: var(--tp-st, 64px); border-radius: 50%; display: none; place-content: center; justify-items: center; gap: 1px; color: #ffb347; background: radial-gradient(circle at 50% 38%, #2b251c, #0d0c0a 70%); box-shadow: inset 0 0 0 2px rgba(255,179,71,.75), 0 0 0 4px rgba(0,0,0,.45), 0 0 16px rgba(255,179,71,.35); animation: tpStart 1.6s ease-in-out infinite; }
+.tp-start svg { width: calc(var(--tp-st, 64px) * .38); height: calc(var(--tp-st, 64px) * .38); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.tp-start small { font: 600 8px/1 var(--f-data); letter-spacing: .14em; }
+.tp-start:active { filter: brightness(1.4); }
+@keyframes tpStart { 50% { box-shadow: inset 0 0 0 2px rgba(255,179,71,1), 0 0 0 4px rgba(0,0,0,.45), 0 0 26px rgba(255,179,71,.65); } }
+@media (pointer: coarse) {
+  .touchpedals { display: grid; } .tp-start { display: grid; } .tp-start[hidden] { display: none; } #dbEngine { display: none; }
+  .lanebtn.r { right: auto; left: 74px; }                                      /* ◀ ▶ affiancati sotto il pollice sinistro */
+  html.game .minimap { left: 144px; right: 198px; width: auto; max-width: 380px; margin: 0 auto; transform: none; }   /* il radar delle corsie sta tra frecce e pedali */
+}
+@media (pointer: coarse) and (max-width: 700px) { .lanebtn.r { left: 52px; } }
 /* schermi bassi (telefono in orizzontale): barra e riquadri più piccoli, niente sovrapposizioni col cruscotto */
 @media (max-height: 520px) {
   html.game .wrap { padding: 3px max(4px, env(safe-area-inset-right)) max(3px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); gap: 3px; }
@@ -613,9 +633,12 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   html.game .lanebtn { width: 40px; height: 40px; bottom: 6px; font-size: 18px; }
   html.game .minimap { bottom: 6px; }
   html.game .mm-next { display: none; }
-  .touchpedals { bottom: 52px; right: 8px; } .touchpedals button { width: 52px; height: 52px; font-size: 11px; }
+  .touchpedals { bottom: max(8px, env(safe-area-inset-bottom)); right: max(8px, env(safe-area-inset-right)); --tp-w: 56px; --tp-g: 26px; --tp-sh: 38px; --tp-bh: 60px; --tp-gh: 74px; column-gap: 6px; row-gap: 6px; }
+  .touchpedals .tp-brk, .touchpedals .tp-gas { font-size: 11px; } .tp-start { --tp-st: 54px; left: calc(100% + 10px); }
   html.game #hudG { display: none; }
 }
+@media (pointer: coarse) and (max-height: 520px) { .lanebtn.r { left: 60px; } html.game .minimap { left: 114px; right: 168px; } }
+@media (pointer: coarse) and (max-height: 520px) and (max-width: 700px) { .lanebtn.r { left: 54px; } }
 @media (max-width: 700px) { html.game .chip:not(.money), html.game .audio-state { display: none; } html.game h1 { font-size: 18px; } }
 
 /* ==== Menu di pausa (menu.js): barra laterale con le sezioni, testata, contenuto a schede ==== */

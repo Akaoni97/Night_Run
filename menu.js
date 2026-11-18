@@ -3,7 +3,7 @@
 //  ricercato, MENU); tutto il resto (officina, bagagliaio, comandi di guida, vista, quadro, extra,
 //  partita) va in un menu a schede che si apre col pulsante MENU o col tasto Tab e si chiude con Esc o Tab.
 //  I pannelli non vengono riscritti: si spostano nelle schede, quindi il resto del gioco li trova come prima.
-//  Sui telefoni compaiono anche i pedali GAS e FRENO sulla strada.
+//  Sui telefoni compaiono anche i comandi al tocco sulla strada: pedali, palette del cambio, AVVIA.
 // ============================================================================
 (() => {
   const $ = (id) => document.getElementById(id);
@@ -116,18 +116,51 @@
     if (e.key === 'Escape' && !menu.hidden) { e.preventDefault(); e.stopImmediatePropagation(); close(); }
   }, true);
 
-  // pedali per il tocco (solo dove il puntatore è un dito): tengono premuti W e S come la tastiera
-  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.innerHTML = '<button type="button" class="tp-eng" aria-label="Accensione">AVVIA</button><button type="button" class="tp-brk" aria-label="Freno">FRENO</button><button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
-  const hold = (btn, key) => {
-    const down = (e) => { e.preventDefault(); btn.classList.add('on'); window.dispatchEvent(new KeyboardEvent('keydown', { key })); };
-    const up = () => { if (!btn.classList.contains('on')) return; btn.classList.remove('on'); window.dispatchEvent(new KeyboardEvent('keyup', { key })); };
+  // ---------------------------------------------------------------- comandi al tocco (solo dove il puntatore è un dito)
+  //  pollice destro: FRENO e GAS in basso a destra, sopra le palette del cambio (▼ sopra il freno, ▲ sopra il gas)
+  //  con in mezzo la marcia inserita; pollice sinistro: ◀ ▶ affiancati (CSS); AVVIA rotondo accanto al cruscotto,
+  //  lontano dai pedali. I tasti mandano gli stessi eventi della tastiera, già "tradotti" (_nr) così che i tasti
+  //  cambiati dal giocatore in TASTI non li blocchino.
+  const send = (type, key) => { const ev = new KeyboardEvent(type, { key, bubbles: true, cancelable: true }); ev._nr = true; window.dispatchEvent(ev); };
+  const buzz = (ms) => { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* niente */ } };
+  const tp = document.createElement('div'); tp.className = 'touchpedals'; tp.setAttribute('role', 'group'); tp.setAttribute('aria-label', 'Pedali e cambio');
+  tp.innerHTML = '<button type="button" class="tp-sh tp-dn" aria-label="Marcia giù"><i aria-hidden="true">▼</i><small>GIÙ</small></button>'
+    + '<b class="tp-gear" aria-live="polite" aria-label="Marcia inserita">N</b>'
+    + '<button type="button" class="tp-sh tp-up" aria-label="Marcia su"><i aria-hidden="true">▲</i><small>SU</small></button>'
+    + '<button type="button" class="tp-brk" aria-label="Freno">FRENO</button>'
+    + '<button type="button" class="tp-gas" aria-label="Gas">GAS</button>';
+  const [bDn, gearEl, bUp, bBrk, bGas] = tp.children;
+  // tengono premuto il tasto finché il dito resta sul pulsante
+  const hold = (btn, key, ms) => {
+    const down = (e) => { e.preventDefault(); if (btn.classList.contains('on')) return; btn.classList.add('on'); if (ms) buzz(ms); send('keydown', key); };
+    const up = () => { if (!btn.classList.contains('on')) return; btn.classList.remove('on'); send('keyup', key); };
     btn.addEventListener('pointerdown', down); for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(ev, up);
+    btn.addEventListener('contextmenu', (e) => e.preventDefault());
   };
-  hold(tp.children[1], 's'); hold(tp.children[2], 'w');
-  // AVVIA: un tocco gira la chiave; sparisce a motore acceso (da telefono non si spegne per sbaglio mentre si guida)
-  tp.children[0].addEventListener('click', () => { if (window.nightRun) window.nightRun.engineTap(); });
-  setInterval(() => { const n = window.nightRun; if (n && n.sim) tp.children[0].hidden = !!n.sim.running; }, 300);
+  hold(bBrk, 's'); hold(bGas, 'w'); hold(bDn, 'q', 12); hold(bUp, 'e', 12);
   const hud = stage.querySelector('.hud'); if (hud) hud.appendChild(tp);
+
+  // AVVIA: un tocco gira la chiave; a motore acceso sparisce (da telefono non si spegne per sbaglio mentre si guida)
+  const st = document.createElement('button'); st.type = 'button'; st.className = 'tp-start'; st.setAttribute('aria-label', 'Accensione: avvia il motore');
+  st.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v8"/><path d="M6.6 6.6a7.5 7.5 0 1 0 10.8 0"/></svg><small>AVVIA</small>';
+  st.addEventListener('click', () => { buzz(20); if (window.nightRun) window.nightRun.engineTap(); });
+  const dash = $('dash'); if (dash) dash.appendChild(st); else if (hud) hud.appendChild(st);
+
+  // stato: marcia inserita (o quella che sta entrando) e AVVIA solo a motore spento
+  let lastG = null;
+  setInterval(() => {
+    const n = window.nightRun, sim = n && n.sim; if (!sim) return;
+    st.hidden = !!sim.running;
+    // accanto al bordo destro vero del cruscotto (il quadro disegnato può sporgere oltre la griglia di #dash)
+    if (!st.hidden && dash && st.parentNode === dash) {
+      let r = 0; for (const el of dash.children) if (el !== st && el.offsetParent) r = Math.max(r, el.offsetLeft + el.offsetWidth);
+      const x = (r || dash.offsetWidth) + (innerHeight <= 520 ? 10 : 14) + 'px'; if (st.style.left !== x) st.style.left = x;
+    }
+    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear, t = g === -1 ? 'R' : g === 0 ? 'N' : String(g);
+    if (t !== lastG) { lastG = t; gearEl.textContent = t; gearEl.classList.remove('pop'); void gearEl.offsetWidth; gearEl.classList.add('pop'); }
+    // spente a fine corsa (aria-disabled e non disabled: un pulsante disabilitato sotto il dito non riceve il rilascio)
+    bUp.setAttribute('aria-disabled', String(g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(g <= 0));
+  }, 120);
 
   window.dispatchEvent(new Event('resize'));
 })();
