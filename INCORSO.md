@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | Facciate dei locali più belle (bar, benzinaio, autogrill, motel, officine...) | `viaggio2d.js`, `street2d.js`, file nuovo | 18/11 notte |

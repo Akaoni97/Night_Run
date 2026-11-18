@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario (facciate)
+- Fatto: facciate dei locali rifatte in `locali2d.js`: bar, benzinaio, autogrill, motel, Niko, Luca e Neon Kustom con
+  materiali, vetrine accese con la gente dentro, neon che sfarfallano, lampade, piante e luce sul marciapiede; di giorno
+  neon spenti e vetri che riflettono. Insegne abbassate dove si vedono da fermi (lo zoom taglia la parte alta).
+- Aperto: Autosalone e Sfascio sono rimasti come prima; ogni facciata costa 1-2,5 ms a fotogramma (prima 0,5-1,5).
+- Serve dal cognato: niente; `drawTripPlace` ha un anello in più nella catena (vedi AGENTS).
+
 ## 18/11/2026 notte · proprietario (storia: revisione dei dialoghi)
 - Fatto: letto lo zip «Le tre soste» di Codex e tutta la storia scritta (`STORIA_BOZZA_02.md`, `materiale_chat/`, `chat_dati.js`). Analisi misurata dei dialoghi di oggi
   (172 scelte su 783 sono finte, solo 28 righe su 758 con vero dissenso, litigi scritti come mediazioni), regole di scrittura, tre scene di prova
