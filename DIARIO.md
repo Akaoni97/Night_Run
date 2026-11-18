@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario
+- Fatto: radio nuova (`radio_ui.js`): pannellino in alto a destra con equalizzatore a 9 barre e striscia di spettro,
+  frequenza ambra, nome della stazione e della canzone, titolo che scorre, barra del brano, sintonia animata con la neve.
+  Le stazioni a una canzone hanno un nome di stazione inventato (`STA`: Redline Radio, Zona Rossa FM, Metallo Vivo,
+  Radio Corda). Il pulsante dello schermo intero è sceso un po' sotto il pannello.
+- Aperto: l'equalizzatore è finto (non legge l'audio). Serve dall'altro: niente.
+
 ## 18/11/2026 notte · cognato
 - Fatto: scoppi dello scarico rifatti a voci (fino a 6 insieme): ogni scoppio cambia un po' altezza, crepitio e durata,
   ogni tanto un doppio «pa-pam» o una sgranata di schiocchi. Carattere per auto in `voice.pop` (`cars.js`): R5 e utilitarie
