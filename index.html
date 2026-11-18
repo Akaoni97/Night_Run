@@ -1378,8 +1378,21 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   });
 
   // ---------------------------------------------------------------- messaggi
-  let msgT = 0;
-  function flash(text, sec = 2.2) { const m = $('msg'); m.textContent = text; m.classList.add('show'); msgT = sec; }
+  // la striscia sopra la strada: un avviso nuovo non cancella quello appena comparso, aspetta in fila che si sia potuto
+  // leggere (un attimo più un tanto per lettera); in fila al massimo tre, senza doppioni
+  let msgT = 0, msgShown = 0; const msgQ = [];
+  const msgRead = (t) => 1.2 + t.length * 0.035;
+  const toastQ = [], TOAST_PRI = { police: 3, lose: 3, bad: 3, money: 2 }; let toastGap = 0;
+  function showMsg(text, sec) { const m = $('msg'); m.textContent = text; m.classList.add('show'); msgT = sec; msgShown = 0; }
+  function flash(text, sec = 2.2) {
+    const m = $('msg');
+    if (msgT > 0 && m.textContent === text) { msgT = Math.max(msgT, sec); return; }
+    if (msgT > 0 && msgShown < Math.min(msgRead(m.textContent), msgT + msgShown)) {
+      if (!msgQ.some((q) => q.text === text)) { msgQ.push({ text, sec }); if (msgQ.length > 3) msgQ.shift(); }
+      return;
+    }
+    showMsg(text, sec);
+  }
 
   // ---------------------------------------------------------------- impostazioni
   function applySettings() {
@@ -1621,7 +1634,17 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     inp.clutch = ramp(inp.clutch, tgt('clutch', k(' ')), 9, 2.3);
     if (game.s.vg && game.s.vg.weak) inp.thr *= 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 170));   // fame e sete: le mani non rispondono
     sim.in.thr = inp.thr; sim.in.brake = inp.brake; sim.in.clutch = S.autoClutch ? 0 : inp.clutch;
+    // partenza: gas in folle da fermo, senza freno (anche per un attimo) = vuoi partire. Col cambio automatico entra la
+    // prima, col manuale lo dice (sgasare in folle si può ancora tenendo il freno)
+    const wantGo = sim.running && sim.gear === 0 && !sim.shiftSeq && Math.abs(sim.v) < 1 && inp.thr > 0.5 && inp.brake < 0.1 && !game.ap && !game.inside;
+    neutralT = wantGo ? neutralT + dt : 0;
+    if (neutralT > 0.15) {
+      neutralT = -3;                                                     // non ripete subito l'avviso
+      if (S.autoClutch) { shiftTo(1); if ((sim.shiftSeq ? sim.shiftSeq.target : sim.gear) === 1 && goHints++ < 3) flash('Prima inserita: E e Q cambiano marcia', 2); }
+      else flash('Sei in folle: frizione (Spazio) ed E per mettere la prima', 2.4);
+    }
   }
+  let neutralT = 0, goHints = 0;
 
   // ---------------------------------------------------------------- quadro strumenti (canvas)
   const cv = $('gauges'), ctx = cv.getContext('2d');
@@ -3042,11 +3065,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (P) $('promptTimer').style.width = (Math.max(0, P.t / P.time) * 100).toFixed(1) + '%';
     // messaggi
-    for (const m of game.out.splice(0)) {
-      const t = document.createElement('div'); t.className = 'toast ' + m.kind; t.textContent = m.text;
-      const box = $('toasts'); box.prepend(t);
-      while (box.children.length > 3) box.lastChild.remove();
-      setTimeout(() => t.remove(), 5200);
+    // messaggi a destra: in fila, al massimo due alla volta, prima quelli importanti, senza doppioni; con la fila lunga
+    // restano a schermo un po' meno
+    {
+      const box = $('toasts'), on = [...box.children].map((t) => t.textContent);
+      for (const m of game.out.splice(0)) if (!on.includes(m.text) && !toastQ.some((q) => q.text === m.text)) toastQ.push(m);
+      toastQ.sort((a, b) => (TOAST_PRI[b.kind] || 1) - (TOAST_PRI[a.kind] || 1));
+      if (toastQ.length > 8) toastQ.length = 8;
+      toastGap -= dt;
+      if (toastQ.length && toastGap <= 0 && box.children.length < 2) {
+        const m = toastQ.shift(), t = document.createElement('div'); t.className = 'toast ' + m.kind; t.textContent = m.text;
+        box.append(t); toastGap = 0.5;
+        setTimeout(() => t.remove(), toastQ.length > 2 ? 3600 : 5200);
+      }
     }
     // sirena bitonale
     if (audio.ctx && audio.ready) {
@@ -3189,7 +3220,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); }
     game.fx.length = 0;
-    if (msgT > 0) { msgT -= dt; if (msgT <= 0) $('msg').classList.remove('show'); }
+    if (msgT > 0) {
+      msgT -= dt; msgShown += dt;
+      if (msgQ.length && msgShown >= msgRead($('msg').textContent)) msgT = 0;   // letto: tocca al prossimo in fila
+      if (msgT <= 0) { if (msgQ.length) { const q = msgQ.shift(); showMsg(q.text, q.sec); } else $('msg').classList.remove('show'); }
+    }
     draw(); updateDom(dt);
     requestAnimationFrame(frame);
   }
