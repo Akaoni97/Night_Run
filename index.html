@@ -1046,6 +1046,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <p class="hint" id="viewHint"></p>
       </div>
       <div class="toggles">
+        <label class="tg"><input type="checkbox" id="tBox">Cambio automatico (cambia marcia da solo)</label>
         <label class="tg"><input type="checkbox" id="tAuto">Frizione automatica</label>
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
         <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
@@ -1223,6 +1224,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="street3d.js"></script>
 <script src="street2d.js"></script>
 <script src="quartieri2d.js"></script>
+<script src="personaggio.js"></script>
 <script src="pilota2d.js"></script>
 <script src="galleria2d.js"></script>
 <script src="luci2d.js"></script>
@@ -1445,6 +1447,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v) === String(S[k])));
     });
     game.autoLane = S.autoLane !== false; $('tLane').checked = game.autoLane; $('tTc').checked = S.tc !== false;
+    $('tBox').checked = S.gearbox === 'auto'; $('tAuto').disabled = S.gearbox === 'auto';
     $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = S.pops; $('tLaunch').checked = S.launch;
     $('tRev').disabled = !S.autoClutch;
     $('vol').value = S.vol; $('volOut').textContent = S.muted ? 'muto' : S.vol;
@@ -1464,6 +1467,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings();
   }));
   $('tAuto').addEventListener('change', (e) => { S.autoClutch = e.target.checked; applySettings(); });
+  $('tBox').addEventListener('change', (e) => { setGearbox(e.target.checked ? 'auto' : 'man'); });
+  // cambio: 'auto' cambia marcia da solo (con la frizione automatica), 'man' le marce le metti tu con E/Q
+  function setGearbox(m) {
+    S.gearbox = m; if (m === 'auto') S.autoClutch = true;
+    applySettings();
+    flash(m === 'auto' ? 'Cambio automatico: gas e freno, le marce le cambia lui (E/Q per comandare tu)' : 'Cambio manuale: E sale di marcia, Q scala', 2.6);
+  }
   $('tTc').addEventListener('change', (e) => { S.tc = e.target.checked; applySettings(); flash(S.tc ? 'Controllo di trazione inserito: toglie gas quando le ruote slittano' : 'Controllo di trazione spento: la sgommata la gestisci tu col gas', 2.4); });
   $('tRev').addEventListener('change', (e) => { S.revMatch = e.target.checked; applySettings(); });
   $('tPops').addEventListener('change', (e) => { S.pops = e.target.checked; applySettings(); });
@@ -1486,7 +1496,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const GEAR_NAMES = { '-1': 'retromarcia', 0: 'folle', 1: 'prima', 2: 'seconda', 3: 'terza', 4: 'quarta', 5: 'quinta', 6: 'sesta' };
 
   function shiftTo(g) {
-    ensureAudio();
+    ensureAudio(); boxT = 2.5;                 // col cambio automatico: per un po' comandi tu
     const before = sim.gear;
     const free = freeShiftGrade(before, g);
     if (free === 'perfetta') sim.fastShift = true;
@@ -1644,7 +1654,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       else flash('Sei in folle: frizione (Spazio) ed E per mettere la prima', 2.4);
     }
   }
-  let neutralT = 0, goHints = 0;
+  let neutralT = 0, goHints = 0, boxT = 0;
+  // cambio automatico: sale di marcia prima a gas leggero e più tardi a gas pieno, scala quando i giri calano o col
+  // gas a fondo (kickdown), mai in una marcia che andrebbe sotto il minimo o oltre il limitatore. Dopo un cambio
+  // aspetta un attimo; se cambi tu con E/Q aspetta di più (comandi tu)
+  function autoBox(dt) {
+    boxT -= dt;
+    if (S.gearbox !== 'auto' || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || game.inside) return;
+    const P = sim.P, top = P.gears.length - 1, lim = P.limiter, idle = P.idle, thr = sim.in.thr, g = sim.gear;
+    const rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
+    const up = idle + (lim - idle) * (0.36 + 0.55 * thr), down = idle + (lim - idle) * (0.12 + 0.3 * thr);
+    if (g < top && sim.rpm > up && sim.in.brake < 0.1 && rpmAt(g + 1) > idle + 350) { if (sim.shift(g + 1)) boxT = 0.7; }
+    else if (g > 1 && sim.rpm < down && rpmAt(g - 1) < lim * 0.88) { if (sim.shift(g - 1)) boxT = 0.6; }
+  }
 
   // ---------------------------------------------------------------- quadro strumenti (canvas)
   const cv = $('gauges'), ctx = cv.getContext('2d');
@@ -3149,7 +3171,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+  window.nightRun = { pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
@@ -3159,7 +3181,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function frame(now) {
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now;
     if (rp.on) { playReplay(dt); requestAnimationFrame(frame); return; }
-    readPad(); updateInputs(dt);
+    readPad(); updateInputs(dt); autoBox(dt);
     autoDrive(dt);
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;
@@ -3225,6 +3247,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (msgQ.length && msgShown >= msgRead($('msg').textContent)) msgT = 0;   // letto: tocca al prossimo in fila
       if (msgT <= 0) { if (msgQ.length) { const q = msgQ.shift(); showMsg(q.text, q.sec); } else $('msg').classList.remove('show'); }
     }
+    // la scelta del cambio: una volta per Viaggio, al km 0 appena finito il prologo (anche nelle partite già avviate)
+    if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
+      const pick = (m) => () => { game.s.vg.cambio = m; setGearbox(m); saveGame(); };
+      game.ask({ kind: 'story', title: 'Il cambio', time: 900,
+        text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: gas e freno, le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',
+        options: [{ label: 'Automatico', act: pick('auto') }, { label: 'Manuale', act: pick('man') }] });
+    }
     draw(); updateDom(dt);
     requestAnimationFrame(frame);
   }
@@ -3246,7 +3275,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         game.s.vg.eredita = game.car;
         if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Niko`, 7), 1500); }
       };
-      NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
+      const prologo = () => NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
+      // prima del prologo l'editor del personaggio: chi si sceglie qui scende dalla E36, parla col notaio e guida tutto il viaggio
+      if (window.NightPG) NightPG.editor({ ok: 'Comincia', onDone: (look) => { game.s.vg.pg = look; saveGame(); prologo(); } });
+      else prologo();
     } else setTimeout(startRadio, 700);
   });
   window.addEventListener('resize', layout);

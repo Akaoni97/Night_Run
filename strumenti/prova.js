@@ -63,8 +63,9 @@ const STATO = () => {
   await page.route('**cdn.jsdelivr.net**', (r) => r.abort());          // three.js serve solo alla vista 3D
   await page.goto(URL); await page.waitForTimeout(1200);
   await page.evaluate(() => { try { localStorage.clear(); } catch (e) { /* niente */ } });
-  // avvio: pulsante di partenza, prologo saltato, domande iniziali con la prima risposta
+  // avvio: pulsante di partenza, editor del personaggio confermato, prologo saltato, domande iniziali con la prima risposta
   await page.evaluate(() => { const b = document.getElementById('goBtn'); b && b.click(); }); await page.waitForTimeout(2500);
+  await page.evaluate(() => { const b = document.querySelector('.pged .pg-go'); if (b) b.click(); }); await page.waitForTimeout(1500);   // l'editor del personaggio: va bene così
   await page.evaluate(() => { if (window.NightPrologo && NightPrologo.playing) NightPrologo.finish(); }); await page.waitForTimeout(800);
   for (let i = 0; i < 6; i++) { await page.evaluate(() => { const g = nightRun.game; if (g.prompt) try { g.answer(0); } catch (e) { /* niente */ } }); await page.waitForTimeout(150); }
 
