@@ -1405,7 +1405,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     ensureAudio();
     if (sim.running) { if (Math.abs(sim.v) > 1) { flash('Fermati prima di spegnere il motore', 1.6); return; } engineOff(); return; }
     sim.setIgnition(true); startOn();
-    let n = 0; const iv = setInterval(() => { if (sim.running || ++n > 60) { clearInterval(iv); startOff(); } }, 100);
+    // si molla l'avviamento solo quando il motore gira da 0,4 s di fila: un primo colpo da freddo può spegnersi subito
+    let n = 0, ok = 0; const iv = setInterval(() => { ok = sim.running ? ok + 1 : 0; if (ok >= 4 || ++n > 60) { clearInterval(iv); startOff(); } }, 100);
   }
 
   $('btnIgn').addEventListener('click', ignToggle);
