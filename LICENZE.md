@@ -11,7 +11,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Nome "Night Run" | **Deciso, da controllare** | Il 18/11 il proprietario ha scelto **Night Run: The Last Highway** (il sottotitolo lo distingue dal "Night Run" di Thousand Ant). Già nel gioco; da controllare nelle banche dati dei marchi e su Steam/itch.io. |
 | Nomi e marchi reali delle auto (27 mezzi) | **Rischio** | Marche e modelli veri nel gioco e sul quadro strumenti (TOYOTA, VOLVO, BMW); strisce M sulle BMW. |
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
-| Musica (8 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
+| Musica (13 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
 | Modello 3D della Supra | Va bene con condizioni | CC BY 4.0: crediti obbligatori e visibili; il modello contiene i loghi Toyota. |
 | Suono registrato del motore | Va bene | CC0 (Freesound). |
 | three.js | Va bene | MIT. |
@@ -45,8 +45,10 @@ niente marca sul quadro strumenti, niente strisce M; i disegni possono restare, 
 Lo stesso per i ricambi in `tuning.js` e `cars.js`: nomi generici ("terminale singolo grande", "semi-slick").
 
 ## 3. Musica
-In `audio/` ci sono 8 canzoni (Apex to Apex, Metal Alive, Red Zone Needles, Redline at Midnight, e in `audio/house/`
-Midnight Apex, Midnight Gearbox, Midnight Redline, Redline Ascent), indicate come canzoni del proprietario.
+In `audio/` ci sono 13 canzoni (Apex to Apex, Metal Alive, Red Zone Needles, Redline at Midnight; in `audio/house/`
+Midnight Apex, Midnight Gearbox, Midnight Redline, Redline Ascent; in `audio/rap/` Asphalt Throne, Liquid Gold and
+Concrete, Midnight In The Street, Carbon Fiber Heart, Asphalt and Will), indicate come canzoni del proprietario.
+Le cinque rap sono state fatte il **18/11/2026** con **Gemini, piano Google AI Pro** (come le altre).
 - Se le avete suonate e registrate voi: sono vostre, nessun problema.
 - Se sono fatte con un generatore (Suno, Udio...): conta il piano che avevate **quando** le avete create. Con Suno,
   le canzoni fatte col piano gratuito non si possono usare in modo commerciale, e abbonarsi dopo non le sistema;

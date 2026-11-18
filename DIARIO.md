@@ -38,6 +38,9 @@ due voci, e il controllo della sera le legge.
   niente di tuo; se serve, sistemala tu.
 
 ## 18/11/2026 sera · proprietario
+- Fatto: **due stazioni rap** con le 5 canzoni nuove del proprietario (Gemini, piano Pro, 18/11): FM 88.3 Rap di Strada
+  (Asphalt Throne, Liquid Gold and Concrete, Midnight In The Street: intorno ai 90 BPM) e FM 106.7 Trap di Mezzanotte
+  (Carbon Fiber Heart, Asphalt and Will: 808 più pesanti, tempo trap). Divise misurando tempo e sottobassi.
 - Fatto: **retro sistemata**. Premendo U dopo la retro il pilota automatico dava gas in retromarcia e portava l'auto
   indietro fino al limite, bloccata (era il "mi porta indietro" e il "non riparte"): ora frena, mette la marcia avanti ed
   entra. Al limite dei 60 m l'auto si ferma davvero; retro al massimo 18 km/h; dopo R una E porta in D (o in prima).
