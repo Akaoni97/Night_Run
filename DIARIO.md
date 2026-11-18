@@ -5,6 +5,8 @@ dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook 
 due voci, e il controllo della sera le legge.
 
 ## 18/11/2026 notte · proprietario
+- Fatto: il fascio ora **parte dal faro vero** di ogni auto (`GE.head` dello sprite), disegnato sopra la carrozzeria, più largo sui mezzi grandi;
+  il bagliore ovale vicino al faro è molto più piccolo (halo di `fxHeadlamp`, `light` del faro in `street2d.js`).
 - Fatto: **fari rifatti** (`effetti2d.js`, `street2d.js`): niente più raggio laser. L'anabbagliante è una banda larga e piena che
   scende sulla strada con il taglio netto in alto; con gli abbaglianti si aggiunge una banda più alta e più lunga. Tolta la
   striscia orizzontale dei fari (`fl` e lama in `fxHeadlamp`). Provato sul PC (foto prima/dopo), non sul telefono.

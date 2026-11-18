@@ -286,7 +286,7 @@
     if (a < 0.02) return;
     g.save(); g.globalCompositeOperation = 'lighter';
     const halo = (r, al) => { const gr = g.createRadialGradient(fx, fy, 0, fx, fy, r); gr.addColorStop(0, `rgba(255,248,225,${al})`); gr.addColorStop(0.4, `rgba(255,232,170,${al * 0.35})`); gr.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = gr; g.fillRect(fx - r, fy - r, r * 2, r * 2); };
-    halo(26, 0.75 * a);
+    halo(11, 0.55 * a); halo(4, 0.5 * a);          // bagliore piccolo sul faro
     // (la lama orizzontale è tolta: dava l'effetto raggio laser)
     g.globalAlpha = 1;
     // pozza sull'asfalto: ellisse schiacciata davanti all'auto, calda al centro
