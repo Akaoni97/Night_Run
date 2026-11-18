@@ -86,6 +86,11 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Video teaser e licenze (18/11/2026)**: `strumenti/teaser.js` registra il gioco senza interfaccia a 30 fps col tempo finto
+  di Playwright (6 inquadrature in `SHOTS`, ~10 minuti), `strumenti/teaser_cartelli.py` fa le scritte (nome, frasi, anno),
+  `strumenti/teaser_monta.sh` monta 16:9 e 9:16 con motore della V40 e *Redline at Midnight*. Nel video niente cartelloni
+  né testi della storia. `LICENZE.md`: controllo di licenze e marchi prima dell'uscita (nome già usato da un altro gioco,
+  marche vere delle auto e dei ricambi, musica da confermare, crediti da mostrare).
 - **Vita e giochi di luce (17/11/2026)**: `vita2d.js` (uccelli, scie d'aereo, fuochi d'artificio, lampi lontani, foglie e cartacce sulla strada, riflessi verticali sull'asfalto, falene, lucciole, raggi di sole, miraggio). Costa circa 2 ms a fotogramma sul computer di prova.
 - **Grafica dei paesaggi (17/11/2026)**: `paesaggi2d.js` (luci lontane, fari, treni, torri illuminate, catarifrangenti),
   lampioni anche nella Bassa (ogni 55 m), cielo con la sua tinta per paesaggio (`drawSky`: azzurro-grigio nella Bassa, blu
