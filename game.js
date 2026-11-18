@@ -217,7 +217,16 @@ class StreetGame {
       }
     }
     if (e.alertT > 0) e.alertT -= dt;
-    const free = 1 - Math.pow(v / v0, 4);
+    // curiosi: vicino a un incidente o a un posto di blocco tutti rallentano a guardare, di più nella corsia accanto
+    // (da qui nascono le code a fisarmonica dietro, che l'IDM propaga da solo)
+    let vMax = v0;
+    for (const o of this.ents) {
+      if (!o.hazard || !o.still) continue;
+      const dx = o.x - e.x; if (dx < -25 || dx > 140) continue;
+      const far = Math.abs(e.lane - o.lane), cur = far === 0 ? 11 : far === 1 ? 14 : 19;
+      vMax = Math.min(vMax, cur + Math.max(0, dx - 60) * 0.12);
+    }
+    const free = 1 - Math.pow(v / Math.max(1, vMax), 4);
     let acc = D.a * free;
     if (gap < 300) {
       const dv = v - vl, ss = 2.5 + Math.max(0, v * D.T + v * dv / (2 * Math.sqrt(D.a * D.b)));
@@ -227,6 +236,11 @@ class StreetGame {
       // si riapre la distanza con calma
       const kin = (dv > 0 ? -(dv * dv) / (2 * Math.max(0.5, gap - 2)) : 0) + Math.min(0, al);
       acc = idm >= kin * 1.3 - 0.4 ? idm : Math.max(idm, Math.min(kin * 1.3 - 0.4, dv > 0 ? 0 : -0.3), gap < 4 + v * 0.3 ? -8.5 : -D.b * (dv > 0 ? 3 : 1));
+    }
+    // uscita alla tappa (strada.js): frenata costante sui 2 m/s² per fermarsi davanti al locale; chi segue si accoda
+    if (e.exitX > 0 && e.lane === 1) {
+      const sx = e.exitX - e.x, need = (v * v) / (2 * Math.max(0.5, sx - 1));
+      if (need > 1.9 || sx < 3) acc = Math.min(acc, sx < 3 ? -3 : -Math.min(3.5, need));
     }
     const maxB = D.t === 'distratto' && isMe ? 4.5 : 8.5;
     return { acc: Math.max(-maxB, Math.min(D.a, acc)), gap, vl, isMe };
@@ -543,7 +557,14 @@ class StreetGame {
     const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: 'orig' };
     { const lead = this.ents.filter((o) => (o.kind === 'traffic' || o.kind === 'police') && o.lane === lane && o.x > x && o.x - x < 120).sort((a, b) => a.x - b.x)[0];
       if (lead && lead.v < v) e.v = Math.min(v, (lead.v || 0) + (lead.x - x - 30) / 6); }   // nasce già accodato, non lanciato contro chi va piano
-    this.ents.push(e); return e;
+    this.ents.push(e);
+    // a volte un secondo pesante appena più veloce, dietro al primo: lo sorpassa piano piano in seconda corsia ("gara tra elefanti")
+    if (heavy && hw && lane === 1 && !this._pair && r() < 0.35) {
+      this._pair = true; const b = this.spawnTraffic(x - 70 - r() * 40, 1); this._pair = false;
+      if (b && b.vt === 'bus') { b.vBase = b.vT = e.vBase + 0.6 + r() * 0.5; b.v = Math.min(b.v, b.vBase); }
+      else if (b) b.drv = undefined;
+    }
+    return e;
   }
 
   offerJob() {

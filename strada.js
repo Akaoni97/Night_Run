@@ -85,9 +85,32 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     };
     for (const e of this.ents) {
       if (e.kind !== 'traffic' || e.still || e.racing) continue;
-      const D = this.trafficDriver(e);
+      const D = this.trafficDriver(e), heavy = (e.len || 4.6) > 8;
       e.yield = Math.max(0, (e.yield || 0) - dt);
       e.flashT = Math.max(0, (e.flashT || 0) - dt);
+      // uscita alla tappa del viaggio: circa uno su sei di chi passa (mai i pesanti) mette la freccia a destra, va in prima,
+      // rallenta e si ferma davanti al locale (corsia 0, dove si parcheggia); chi segue si accoda o lo sorpassa a sinistra
+      if (this.s.vg && typeof VG !== 'undefined' && !heavy && !e.police) {
+        const n = Math.ceil((e.x + 80 - VG_STOP0) / VG_STEP), X = VG.stopX(n);
+        if (e.exitN !== n && !(e.exitX > 0) && X - e.x < 450) {                                     // si decide una volta, a 450 m dalla tappa
+          e.exitN = n; e.exitX = 0;
+          if (X - e.x > 120 && Math.random() < 1 / 6) {
+            const k = this.ents.filter((o) => o.exitN === n && o.exitX > 0).length;
+            if (k < 3) e.exitX = X - 12 + k * 7;
+          }
+        }
+        if (e.exitX > 0) {
+          if (e.lane > 1) {
+            if (e.exitX - e.x < 40) { e.exitX = 0; continue; }                     // non è riuscito a rientrare in tempo: tira dritto
+            if (!e.to && free(e, e.lane - 1, 12, 20)) { e.to = e.lane - 1; e.sig = 1.2; }
+            continue;
+          }
+          if (e.x > e.exitX + 6) { e.exitX = 0; continue; }                         // l'ha mancata: tira dritto
+          e.sig = Math.max(e.sig || 0, 0.4); e.to = 0;                               // freccia a destra finché non si ferma
+          if (e.v < 0.8 && e.exitX - e.x < 9) { e.lane = 0; e.still = true; e.parked = true; e.sig = 0; e.exitX = 0; e.v = 0; }
+          continue;
+        }
+      }
       if (e.sig > 0 || e.to) continue;
       // chi ha davanti nella sua corsia (anche il giocatore)
       let lead = null, lgap = Infinity, leadV = Infinity, meLead = false;
@@ -98,11 +121,11 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
       if (!this.inside && d > e.x && Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && !(D.t === 'distratto' && !(e.alertT > 0))) {   // il distratto non ti vede
         const g = d - e.x - ((e.len || 4.6) + 4.5) / 2; if (g < lgap) { lgap = g; lead = null; leadV = sim.v; meLead = true; }
       }
-      const want = e.vT || e.vBase || e.v, close = lgap < 60 + e.v * 1.5, slower = close && leadV < want - 1.5;
+      const want = e.vT || e.vBase || e.v, close = lgap < 60 + e.v * 1.5, slower = close && leadV < want - (heavy ? 0.4 : 1.5);
       // ostacolo fermo davanti (incidente, controllo): si sposta per tempo
-      if (lead && lead.still && close && e.lane < 3 && free(e, e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
+      if (lead && lead.still && close && e.lane < (heavy ? 2 : 3) && free(e, e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
       // più lento davanti: sorpasso a sinistra, mai a destra
-      if (slower && e.lane < 3 && Math.random() < dt * (D.t === 'aggressivo' ? 2 : D.t === 'prudente' ? 0.5 : 0.9) && free(e, e.lane + 1, 20 + e.v * 0.3, 25)) {
+      if (slower && e.lane < (heavy ? 2 : 3) && Math.random() < dt * (D.t === 'aggressivo' ? 2 : D.t === 'prudente' ? 0.5 : 0.9) && free(e, e.lane + 1, 20 + e.v * 0.3, 25)) {   // i pesanti non vanno in terza
         e.to = e.lane + 1; e.sig = D.t === 'aggressivo' ? 0.7 : 1.3; continue;
       }
       // aggressivo bloccato in corsia di sorpasso: si attacca, sfanala, e se dura ti supera a destra

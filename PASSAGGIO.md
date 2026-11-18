@@ -42,7 +42,16 @@ gioco fa, sezione per sezione).
   destro con la distanza); scatole e bancali caricati hanno una "P" sulla sosta di consegna (`renderMiniMap` in
   `index.html`). Idee non fatte: missioni che cambiano col paesaggio.
 - **Strada viva** (`strada.js`): F o pulsante FARI per sfanalare chi sta davanti (si sposta e ti fa passare),
-  incidenti e controlli della polizia in prima corsia, traffico che tiene la destra.
+  incidenti e controlli della polizia in prima corsia.
+- **Traffico da autostrada (18/11/2026)** (`trafficDriver`/`trafficAccel` in `game.js`, `trafficAI` in `strada.js`): ogni
+  auto ha un carattere (normale, prudente, aggressivo, centralista, distratto ~1 su 12) e segue chi ha davanti col modello
+  IDM: distanza in secondi, frenata che anticipa, fino a 8,5 m/s² ma mai più del necessario. Chi arriva da dietro
+  rallenta; solo il distratto ti vede tardi e ti tampona. Si tiene la destra e si sorpassa a sinistra; l'aggressivo
+  bloccato in terza ti sfanala e se dura supera a destra; il centralista sta in seconda. Inchiodate con gomme che
+  stridono (`skidSound` in `index.html`) e scritta SCREEECH!, luci dei freni accese. Dinamiche: curiosi che rallentano
+  accanto a incidenti e posti di blocco (code a fisarmonica dietro), circa uno su sei che esce alla tappa (freccia,
+  frenata da 2 m/s², parcheggia in corsia 0 davanti al locale; chi segue si accoda o sorpassa), pullman a coppie che si
+  sorpassano piano in seconda (i pesanti non vanno mai in terza). Test in `test/traffico.test.js`.
 - **Guida**: guida automatica dopo 3 s senza tasti (al primo tasto guida il giocatore e lei non sterza più),
   limitatori (soft cut, MSD, 2-step, 3-step, stutter box), gomme con forature e ruota di scorta (tasto 9),
   consumo e autonomia, fisica con beccheggio e wheel hop.
@@ -74,7 +83,13 @@ gioco fa, sezione per sezione).
   dopo un fallimento, calibrazione di lampade e metri delle incursioni.
 - **Tutorial del primo lavoro** (`missioni.js`): finché non è finito non si può superare il locale giusto; poi un'uscita saltata annulla la consegna.
 - **Comandi dell'auto** (`comandi.js`): rimorchio, turbo (ECO/NORMALE/FORTE), scarico (aperto/silenzio), neon; **fari** spenti/anabbaglianti/abbaglianti
-  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: sopra i pedali). Cambio e pedali sono nascosti nella scheda Guida del menu.
+  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: rotondo accanto al quadro). Cambio e pedali sono nascosti nella scheda Guida del menu.
+- **Comandi da telefono (18/11/2026)** (`menu.js`, solo al tocco, `html.tdash`): servono per le prove, il gioco è pensato
+  per il PC (regola 7 di `AGENTS.md`). Quadro in alto a sinistra con AVVIA accanto; FRENO e GAS in basso a destra con
+  sopra le palette del cambio ▼/▲ e la marcia in mezzo; ◀ ▶ affiancati a sinistra; STRUMENTI e DATI aprono due finestrelle
+  (funzioni dell'auto a tessere, compresa LEGGERA; ora, lavoro, bisogni, carico); SCHERMO INTERO nella barra in alto (a
+  schermo intero MENU e TELEFONO restano in alto a destra); in verticale l'avviso "Gira il telefono". Qualità **leggera**
+  nelle impostazioni (densità normale, niente bagliore) per provare senza scatti.
 - **Fari** (`effetti2d.js`): due coni volumetrici (anabbagliante e abbagliante), alone, pozza sull'asfalto, pulviscolo.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico

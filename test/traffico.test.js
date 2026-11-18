@@ -69,3 +69,40 @@ test('traffico: dietro un\'altra auto più lenta si accoda alla sua velocità se
   assert.ok(Math.abs(e.v - 22) < 1, `si accoda a ${e.v.toFixed(1)} m/s`);
   const gap = lead.x - e.x - 4; assert.ok(gap > 10 && gap < 30, `attaccato ma non troppo: ${gap.toFixed(1)} m`);
 });
+
+// ---- dinamiche: curiosi agli incidenti, uscite alle tappe, pesanti che si sorpassano
+const passo = (game, secs, me = { lane: 3, v: 0 }) => { for (let i = 0; i < secs * 30; i++) { game.lane = me.lane; game.laneZ = GAME_LANE_Z[me.lane]; game.sim.v = me.v; game.update(1 / 30); game.fx = []; } };
+const { GAME_LANE_Z } = new Function(src + ';return { GAME_LANE_Z };')();
+
+test('traffico: accanto a un incidente tutti rallentano a guardare, poi ripartono', () => {
+  const { game } = setup(); game.trafficOn = false; game.nextRoadEvent = 1e9;
+  const X = game.s.dist + 400;
+  game.ents.push({ id: 5001, kind: 'traffic', vt: 'punto', len: 4.2, lane: 1, x: X, v: 0, vT: 0, vBase: 0, hazard: true, still: true });
+  const a = car(game, 150, 33, 'normale'); a.lane = 2;
+  let min = 99;
+  for (let i = 0; i < 40 * 30; i++) { game.lane = 3; game.laneZ = GAME_LANE_Z[3]; game.sim.v = 0; game.update(1 / 30); game.fx = []; if (Math.abs(a.x - X) < 10) min = Math.min(min, a.v); }
+  assert.ok(min < 17, `passa accanto a ${(min * 3.6).toFixed(0)} km/h`);
+  assert.ok(a.v > 25, 'e poi riparte');
+});
+
+test('traffico: chi esce alla tappa frena con calma e si ferma a parcheggiare davanti al locale', () => {
+  const { game } = setup(); game.trafficOn = false; game.nextRoadEvent = 1e9;
+  const e = car(game, 150, 30, 'aggressivo'); e.lane = 1; e.exitN = 1e6; e.exitX = game.s.dist + 450;
+  let maxB = 0;
+  for (let i = 0; i < 40 * 30 && !e.parked; i++) { game.lane = 3; game.laneZ = GAME_LANE_Z[3]; game.sim.v = 0; game.update(1 / 30); game.fx = []; maxB = Math.max(maxB, -(e.acc || 0)); }
+  assert.ok(e.parked && e.lane === 0 && e.v === 0, 'parcheggiata in corsia 0');
+  assert.ok(maxB < 4, `frenata massima ${maxB.toFixed(1)} m/s²: niente inchiodate per uscire`);
+  assert.ok(Math.abs(e.x - (game.s.dist + 450)) < 10, 'davanti al locale');
+});
+
+test('traffico: un pesante dietro un altro pesante appena più lento lo sorpassa in seconda, mai in terza', () => {
+  let seconda = 0;
+  for (let k = 0; k < 6; k++) {
+    const { game } = setup(); game.trafficOn = false; game.nextRoadEvent = 1e9;
+    const b1 = car(game, 120, 24, 'normale'), b2 = car(game, 80, 25, 'normale');
+    for (const b of [b1, b2]) { b.vt = 'bus'; b.len = 12; b.lane = 1; b.drv.a = 0.8; b.drv.b = 2; }
+    b2.vT = b2.vBase = 25;
+    for (let i = 0; i < 60 * 30; i++) { game.lane = 3; game.laneZ = GAME_LANE_Z[3]; game.sim.v = 40; game.s.dist = Math.min(game.s.dist, b2.x - 400); game.update(1 / 30); game.fx = []; if (b2.lane === 2) seconda++; assert.notEqual(b2.lane, 3); assert.notEqual(b1.lane, 3); }
+  }
+  assert.ok(seconda > 0, 'prima o poi va in seconda a sorpassare');
+});
