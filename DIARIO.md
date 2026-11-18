@@ -5,6 +5,7 @@ dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook 
 due voci, e il controllo della sera le legge.
 
 ## 18/11/2026 notte · proprietario (ruote e borbottio)
+- Fatto: **tasto RIAVVIA** (`riavvia.js`) nella barra in alto, con domanda Sì / No; con Sì si cancella il Viaggio e si riparte dal titolo, editor del personaggio e prologo (stesso comportamento da "Nuovo viaggio" nel menu). Provato nel browser sul PC; al tocco solo "Nuovo viaggio" nel menu (non provato).
 - Fatto: **ruote**. Controllate le 25 ruote disegnate contro la sagoma (`strumenti/centro_ruote.py`): il buco nel corpo e `ax/wy` combaciano, ma in
   cinque ruote il cerchio era fuori asse rispetto alla gomma (E30 di 3 px in alto, poi E34, R5, B2002, A112) e girando il mozzo ballava.
   `Street2D.wheelConc` (`street2d.js`) le rifà concentriche (cerchio al centro, corona di gomma uniforme); tabella `WHEEL_FIX`. Vale anche per
