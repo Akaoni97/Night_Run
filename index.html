@@ -280,10 +280,15 @@ body.inplace .lanebtn { display: none; }
 .kmbox p.hint { margin: 0; } .kmbox p.hint b { font-weight: 400; color: var(--fg); }
 
 .dash { position: absolute; left: 12px; bottom: 72px; width: clamp(220px, 23%, 330px); display: grid; gap: 5px; z-index: 3; }
-.dash-btns { display: flex; gap: 4px; }
-.dash-btns button { flex: 1; border: 0; padding: 5px 0; font: 600 10px/1 var(--f-data); letter-spacing: .08em; color: var(--muted); background: rgba(10,10,12,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); border-radius: 6px; cursor: pointer; }
+.dash-btns { display: flex; flex-wrap: wrap; gap: 4px; }
+.dash-btns button { flex: 1 1 auto; white-space: nowrap; border: 0; padding: 5px 4px; font: 600 10px/1 var(--f-data); letter-spacing: .08em; color: var(--muted); background: rgba(10,10,12,.78); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); border-radius: 6px; cursor: pointer; }
 .dash-btns button[aria-pressed="true"] { color: #0b0a08; background: var(--amber); }
+.dash-btns button.a1 { color: #0b0a08; background: #b8ff3a; }
+.dash-btns button.a2 { color: #04141a; background: #2ee6ff; }
+.dash-btns button.a1.hot, .dash-btns button.a2.hot { box-shadow: 0 0 10px currentColor; }
 .dash-btns button.hot { background: #b8ff3a; box-shadow: 0 0 10px rgba(184,255,58,.6); }
+.dash-btns button.a1.hot { background: #b8ff3a; }
+.dash-btns button.a2.hot { background: #2ee6ff; }
 .dash-btns button:disabled { opacity: .35; cursor: default; }
 #hudP { width: 100%; aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
 body.inplace .dash { display: none; }
@@ -935,7 +940,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <div class="dash" id="dash">
         <div class="dash-btns" role="group" aria-label="Comandi di guida">
           <button type="button" id="dbEngine" title="Accensione: gira la chiave e avvia il motore (da fermo si spegne)">AVVIA</button>
-          <button type="button" id="dbAuto" title="Guida automatica: parte dopo 3 secondi senza toccare tasti">AUTO</button>
+          <button type="button" id="dbAuto" title="Guida automatica: AUTO 1 guida da sola dopo 15 s senza toccare niente; AUTO 2 cambia corsia da sola e tu dai gas e freno">AUTO 1</button>
           <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
           <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
@@ -1058,7 +1063,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
         <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
         <label class="tg"><input type="checkbox" id="tLaunch"><span id="tLaunchL">Launch control 4300</span></label>
-        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (dopo 3 s senza tasti)</label>
+        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 15 s senza tasti)</label>
         <label class="tg"><input type="checkbox" id="tTc">Controllo di trazione</label>
       </div>
       <div class="field"><span>Volume</span>
@@ -1339,7 +1344,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && game.car === 'supra' && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.5 : 1),
+    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.8 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {
@@ -1437,7 +1442,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       $('limRpm').max = limMax; $('limRpm').value = limR; $('limOut').textContent = limR; $('lchRpm').max = limR - 400; $('lchRpm').value = sim.P.launchRpm; $('lchOut').textContent = sim.P.launchRpm;
       $('tLaunchL').textContent = `${lt === 'stutter' ? 'Stutter box' : 'Launch control'} ${sim.P.launchRpm}`;
       $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : '') + (lt === 'soft' ? ' Il soft cut non taglia a colpi: discesa e durata non servono.' : ' Discesa e durata: la benzina riparte quando i giri sono scesi e il tempo è passato. Discesa 0 = cadenza fissa a tempo; durata “solo giri” = rimbalzo deciso dai giri.'); }
-    Object.assign(sim.cfg, { pops: S.pops && TP.sim.ecuPops, launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
+    Object.assign(sim.cfg, { pops: S.pops && TP.sim.ecuPops && !exhClosed(), launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
     if (garage) { garage.setTips(TP.dsp.ex.tips); garage.setPaint(S.paint); }
     if (street2d) { street2d.setCosmetics(cosView()); street2d.setCar(carId, TP.look, carPaint()); }
     renderTuning();
@@ -1455,7 +1460,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const k = seg.dataset.k;
       seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v) === String(S[k])));
     });
-    game.autoLane = S.autoLane !== false; $('tLane').checked = game.autoLane; $('tTc').checked = S.tc !== false;
+    game.autoLane = autoMode() > 0; $('tLane').checked = autoMode() > 0; $('tTc').checked = S.tc !== false;
     $('tBox').checked = S.gearbox === 'auto'; $('tAuto').disabled = S.gearbox === 'auto';
     $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = S.pops; $('tLaunch').checked = S.launch;
     $('tRev').disabled = !S.autoClutch;
@@ -1487,7 +1492,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('tTc').addEventListener('change', (e) => { S.tc = e.target.checked; applySettings(); flash(S.tc ? 'Controllo di trazione inserito: toglie gas quando le ruote slittano' : 'Controllo di trazione spento: la sgommata la gestisci tu col gas', 2.4); });
   $('tRev').addEventListener('change', (e) => { S.revMatch = e.target.checked; applySettings(); });
   $('tPops').addEventListener('change', (e) => { S.pops = e.target.checked; applySettings(); });
-  $('tLane').addEventListener('change', (e) => { S.autoLane = e.target.checked; game.manualT = 0; applySettings(); flash(S.autoLane ? 'Sorpasso automatico: la Supra cambia corsia da sola' : 'Guida a mano: tieni premuto A o D e sterzi dove vuoi. Occhio ai tamponamenti', 2.4); });
+  $('tLane').addEventListener('change', (e) => { S.autoLane = e.target.checked; S.autoMode = e.target.checked ? 1 : 0; game.manualT = 0; applySettings(); flash(S.autoLane ? 'Sorpasso automatico: la Supra cambia corsia da sola' : 'Guida a mano: tieni premuto A o D e sterzi dove vuoi. Occhio ai tamponamenti', 2.4); });
   $('tLaunch').addEventListener('change', (e) => { S.launch = e.target.checked; applySettings(); if (S.launch) flash(S.autoClutch ? 'Launch: in 1ª tieni il freno, gas a fondo, poi molla il freno' : 'Launch: frizione giù, gas a fondo, poi rilascia la frizione'); });
   $('limRpm').addEventListener('input', (e) => { S.limRpm = S.limRpm || {}; S.limRpm[game.car] = +e.target.value; applySettings(); });
   $('limDrop').addEventListener('input', (e) => { S.limDrop = S.limDrop || {}; S.limDrop[game.car] = +e.target.value; applySettings(); });
@@ -2856,19 +2861,27 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 
   // ---------------------------------------------------------------- guida automatica: parte dopo 3 s senza toccare niente,
   // si spegne al primo tasto (gas, freno, marce, sterzo). Tiene la velocità a cui l'hai lasciata, cambia le marce e sorpassa.
-  const auto = { on: false, last: performance.now(), v: 0 };
+  // Due guide automatiche (pulsante AUTO sopra il cruscotto: AUTO 1 → AUTO 2 → spento, ognuna col suo colore):
+  //  AUTO 1: dopo 15 s senza toccare niente l'auto guida da sola (gas, freno, marce, corsie) e si spegne al primo tasto.
+  //  AUTO 2: sempre attiva: tu dai gas e freni, lei cambia corsia da sola per sorpassare e tornare a destra.
+  const AUTO_IDLE_MS = 15000;
+  const autoMode = () => (S.autoMode !== undefined ? S.autoMode : S.autoLane === false ? 0 : 1);
+  const auto = { on: false, assist: false, last: performance.now(), v: 0 };
   function autoDrive(dt) {
     const now = performance.now();
     const touching = keys.size > 0 || btnSteer.L || btnSteer.R || inp.touch.thr !== null || inp.touch.brake !== null || inp.touch.clutch !== null
       || (inp.pad.thr || 0) > 0.02 || (inp.pad.brake || 0) > 0.02 || Math.abs(inp.pad.steer || 0) > 0.12;
     if (touching) auto.last = now;
-    const can = S.autoLane !== false && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > 4 && !game.ap && !game.inside && game.track === 'city' && !rp.on;
-    const want = can && now - auto.last > 3000;
-    if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`Guida automatica: ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
+    const mode = autoMode();
+    const can = mode > 0 && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > (mode === 1 ? 1.2 : 4) && !game.ap && !game.inside && game.track === 'city' && !rp.on;      // AUTO 1 riparte anche se in 15 s l'auto è quasi ferma
+    const want = mode === 1 && can && now - auto.last > AUTO_IDLE_MS;
+    if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`AUTO 1: guido io a ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
     if (!want && auto.on && touching) flash('Guidi tu', 0.8);
     auto.on = want;
-    game.autoLane = auto.on;                 // i cambi di corsia automatici solo quando guida lei: mai mentre guidi tu
-    if (!auto.on) { game.blocked = false; return; }
+    auto.assist = mode === 2 && can;
+    game.autoLane = auto.on || auto.assist;   // le corsie le cambia lei con AUTO 1 (guida tutto) e con AUTO 2 (solo lo sterzo); a mano mai da sola
+    if (auto.assist && game.manualT > 1e8) game.manualT = 0;
+    if (!auto.on) { if (!auto.assist) game.blocked = false; return; }
     game.manualT = 0;
     sim.in.thr = clamp(0.22 + (auto.v - sim.v) * 0.3, 0, 1); sim.in.brake = 0;
     if (!sim.shiftSeq && S.gearbox !== 'auto') {
@@ -2891,13 +2904,22 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // pulsanti accanto al cruscotto
   function dashBtns() {
     const set = (id, on, hot) => { const b = $(id); if (!b) return; b.setAttribute('aria-pressed', String(!!on)); b.classList.toggle('hot', !!hot); };
-    set('dbWin', sim.winT > 0.5, sim.winMot); set('dbAuto', S.autoLane !== false, auto.on); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
+    set('dbWin', sim.winT > 0.5, sim.winMot); setAutoBtn(); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
     $('dbLaunch').disabled = !TP.sim.ecuLaunch;
     set('dbEngine', sim.running, !sim.running); { const t = sim.running ? 'SPEGNI' : 'AVVIA'; if ($('dbEngine').textContent !== t) $('dbEngine').textContent = t; }
     set('dbFlash', lightsMode() > 0, lightsMode() === 2); if ($('dbFlash').textContent !== LIGHTS_NAME[lightsMode()]) $('dbFlash').textContent = LIGHTS_NAME[lightsMode()];
   }
   $('dbEngine').addEventListener('click', engineTap);
-  $('dbAuto').addEventListener('click', () => { S.autoLane = S.autoLane === false; applySettings(); flash(S.autoLane ? 'Guida automatica: parte dopo 3 secondi senza tasti' : 'Guida automatica spenta', 1.8); });
+  function setAutoBtn() {
+    const m = autoMode(), b = $('dbAuto'), t = ['AUTO OFF', 'AUTO 1', 'AUTO 2'][m];
+    if (b.textContent !== t) b.textContent = t;
+    b.classList.toggle('a1', m === 1); b.classList.toggle('a2', m === 2); b.classList.toggle('hot', auto.on || auto.assist); b.setAttribute('aria-pressed', String(m > 0));
+  }
+  $('dbAuto').addEventListener('click', () => {
+    S.autoMode = { 1: 2, 2: 0, 0: 1 }[autoMode()]; S.autoLane = S.autoMode > 0; game.manualT = 0; applySettings();
+    flash(['Guida automatica spenta: guidi tu', 'AUTO 1: dopo 15 secondi senza toccare niente guida lei', 'AUTO 2: tu gas e freno, lei cambia corsia da sola'][S.autoMode], 2.2);
+    try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
+  });
   $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });
   $('dbLaunch').addEventListener('click', () => { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); });
   $('dbHud').addEventListener('click', cycleHud);
@@ -2906,6 +2928,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('dbFlash').addEventListener('click', () => cycleLights());
   // abbaglianti: un colpo di fari a chi sta davanti (chiede strada)
   // fari: 0 spenti · 1 anabbaglianti · 2 abbaglianti (pulsante FARI sopra il contachilometri, salvato con la partita); F sfanala solo per un attimo
+  // valvola di scarico (pulsante SCARICO): chiusa = silenzio, niente fiamme e quasi niente scoppi; aperta = scoppi e fiammate come sempre
+  const exhClosed = () => !!(game.s && game.s.cmd && game.s.cmd.exh === 0);
   const lightsMode = () => (game.s.cmd && game.s.cmd.lights !== undefined ? game.s.cmd.lights : 1);
   const LIGHTS_NAME = ['FARI OFF', 'ANABB.', 'ABBAGL.'];
   function cycleLights() {
@@ -3049,9 +3073,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     let rate = 0, big = false;
     if ((sm.cut === 2 || sm.cut === 3) && spark) { rate = sm.cfg.pops ? 9 : 6; big = true; }
     else if (sm.cut === 1 && sm.ovr < liftT && sm.rpm > 2200) rate = (sm.cfg.pops ? 3 : 1.3) * (1 - sm.ovr / liftT) * Math.min(1, sm.rpm / 4500) * TP.dsp.cat.pop * (player.surging() ? 0.25 : 1);
+    if (exhClosed()) { rate *= 0.12; big = false; }                       // valvola chiusa: ogni tanto uno scoppio smorzato, niente raffica
     if (rate && Math.random() < rate * dt) {
       const k = Math.random();
-      player.shot('pop', (big ? 0.6 : k < 0.15 ? 0.45 : 0.18 + 0.2 * k) * (sm.cfg.pops ? 1 : 0.75), { rate: big ? 0.92 : 1.05 });
+      player.shot('pop', (big ? 0.6 : k < 0.15 ? 0.45 : 0.18 + 0.2 * k) * (sm.cfg.pops ? 1 : 0.75) * (exhClosed() ? 0.45 : 1), { rate: big ? 0.92 : 1.05 });
     }
   }
   // suono registrato di serie: anelli ricavati da "Import car revs on chassis dyno with turbo" di editboy23
@@ -3232,7 +3257,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.addEventListener('pagehide', saveGame);
   window.nightRun = { leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
-    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
@@ -3246,7 +3271,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     autoDrive(dt);
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;
-    if (game.blocked) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, game.blockBrake || 0.18); }
+    if (game.blocked && !auto.assist) { sim.in.thr = Math.min(sim.in.thr, 0.12); sim.in.brake = Math.max(sim.in.brake, game.blockBrake || 0.18); }
     // dopo un tamponamento: niente gas per un attimo; se guida l'automatica frena e riparte più piano (non ci ricasca addosso)
     if (game.shockT > 0) { sim.in.thr = 0; sim.in.brake = Math.max(sim.in.brake, 0.3); if (auto.on) { sim.in.brake = Math.max(sim.in.brake, 0.45); auto.v = Math.min(auto.v, Math.max(8, sim.v * 0.85)); } }
     if (game.shockE) {
@@ -3293,7 +3318,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (garage && garageOn) {
       // fiammate: limitatore a taglio d'accensione, e al rilascio del gas (più a lungo con la mappa pop & bang)
       const liftT = sim.cfg.pops ? 2.8 : 1.1;
-      flameT = (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut ? 1
+      flameT = exhClosed() ? 0 : (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut ? 1
         : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : 0.38) * (1 - sim.ovr / liftT) * Math.min(1, sim.rpm / 4500) * TP.dsp.cat.pop : 0;
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
         ign: sim.ign, brake: sim.in.brake, flame: flameT, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
