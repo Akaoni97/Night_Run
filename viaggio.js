@@ -144,6 +144,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     this.loc = GAME_LOCS[0]; this.s.loc = 'tokyo';
     this.sim.fuel = 0.6; this.sim.damage = 0; this.sim.tireWear = 0;
     this.applyMass();
+    this.prompt = null;
     this.vgChapter(0);
   };
 
@@ -368,10 +369,11 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 
   P.vgChapter = function (k) {
-    const v = this.s.vg, c = VG_CHAPTERS.find((q) => q.km === k); if (!c) return;
-    v.chapters[k] = true;
-    this.prompt = null;
-    this.ask({ kind: 'story', title: c.title, text: vgTesto(this, c.text), time: 40, options: [{ label: k === 0 ? 'Parti' : 'Continua' }] });
+    const v = this.s.vg, c = VG_CHAPTERS.find((q) => q.km === k); if (!c || this.prompt) return;
+    // Modifica Codex (adattata da Claude): il capitolo è letto quando lo confermi (o quando scade il tempo, che vale
+    // come conferma), non quando compare: se ricarichi la pagina mentre è aperto, o se un locale chiude la domanda, ritorna
+    this.ask({ kind: 'story', title: c.title, text: vgTesto(this, c.text), time: 40,
+      options: [{ label: k === 0 ? 'Parti' : 'Continua', act: () => { v.chapters[k] = true; } }] });
   };
 
   // ------------------------------------------------------------ autostoppisti
