@@ -12,7 +12,13 @@ due voci, e il controllo della sera le legge.
   `night-run-sera`).
 - Aperto: lo stridio delle gomme va sentito nel gioco; decidere se togliere `create-game-assets` e il plugin ECC
   (proposte della PR #7).
-- Serve dal proprietario: attivare GitHub Pages; aggiornare il suo artifact (quello in questo file è del suo account).
+- Risposta sulle gare: **ci saranno**, ma come attività secondaria per farsi due soldi (come le consegne), non come
+  centro del gioco; le altre dinamiche per guadagnare sono ancora da valutare.
+- **Per il Claude di Nico**: alle 17:55 il caricamento del cognato e la voce della sera del proprietario hanno toccato le
+  stesse righe di `DIARIO.md` (conflitto di unione). Risolto a mano tenendo tutte e due le voci, quella del cognato sopra;
+  `AGENTS.md`, `PASSAGGIO.md` e `INCORSO.md` si sono uniti da soli (unione `7ab72e7`). Controlla che la tua voce sia come
+  la volevi (la riga "Deciso: … da mettere nel gioco" ora è superata dal "Fatto" sopra) e che nell'unione non manchi
+  niente di tuo; se serve, sistemala tu.
 
 ## 18/11/2026 sera · proprietario
 - Fatto: il titolo **Night Run: The Last Highway** è nel gioco (titolo della pagina, scritta in alto, schermata iniziale,
