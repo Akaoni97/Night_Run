@@ -173,6 +173,65 @@ class StreetGame {
   steerHold(x) { this.steerIn = Math.max(-1, Math.min(1, x || 0)); }
 
   // tamponamento: la Supra rallenta di colpo, l'altra auto viene spinta avanti, si pagano i danni
+  // ------------------------------------------------------------ guidatori del traffico
+  // Ognuno ha un carattere: distanza di sicurezza in secondi (T), accelerazione (a) e frenata comoda (b).
+  //   normale · prudente (più distanza, più calmo) · aggressivo (attaccato, più veloce, sfanala chi lo rallenta in corsia
+  //   di sorpasso) · centralista (lento, sta in seconda corsia e non rientra) · distratto (circa 1 su 12: si accorge tardi
+  //   di chi ha davanti, cioè di te, e frena poco: è quello che può tamponarti). I pesanti sono sempre normali e lenti.
+  trafficDriver(e) {
+    if (e.drv) return e.drv;
+    const r = Math.random(), heavy = (e.len || 4.6) > 8;
+    let t = 'normale';
+    if (!heavy) t = r < 1 / 12 ? 'distratto' : r < 0.2 ? 'aggressivo' : r < 0.27 ? 'centralista' : r < 0.45 ? 'prudente' : 'normale';
+    const D = { normale: [1.5, 1.6, 3], prudente: [2.1, 1.2, 2.5], aggressivo: [0.75, 2.4, 3.8], centralista: [1.8, 1.1, 2.6], distratto: [1.3, 1.5, 3] }[t];
+    e.drv = { t, T: D[0] * (0.9 + Math.random() * 0.2), a: heavy ? 0.8 : D[1], b: heavy ? 2 : D[2] };
+    if (e.vBase && !e.still) {
+      if (t === 'aggressivo') { e.vBase *= 1.12; e.vT = e.vBase; }
+      else if (t === 'centralista') { e.vBase *= 0.86; e.vT = e.vBase; }
+    }
+    return e.drv;
+  }
+  // accelerazione voluta (modello del guidatore intelligente, IDM): libera fino alla sua velocità, poi tiene la distanza
+  // da chi ha davanti nella sua corsia (anche chi ci sta entrando) o dal giocatore, frenando quanto serve fino a 8,5 m/s².
+  // Il distratto non guarda il giocatore finché non è a un secondo e mezzo dall'urto, e poi frena al massimo 4,5 m/s².
+  trafficAccel(e, d, dt = 1 / 60) {
+    const D = this.trafficDriver(e), sim = this.sim, v = Math.max(0, e.v || 0), v0 = Math.max(1, e.vT || e.vBase || v), lenE = e.len || 4.6;
+    let gap = Infinity, vl = 0, al = 0, isMe = false;
+    for (const o of this.ents) {
+      if (o === e || !(o.kind === 'traffic' || o.kind === 'police') || o.chase || o.x <= e.x) continue;
+      if (o.lane !== e.lane && o.to !== e.lane) continue;
+      const s = o.x - e.x - ((o.len || 4.6) + lenE) / 2;
+      if (o.lane !== e.lane && s < 8) continue;                         // chi mette la freccia accanto a noi non è ancora davanti: non si inchioda per lui
+      if (s < gap) { gap = s; vl = o.v || 0; al = o.acc || 0; }
+    }
+    if (!this.inside && d > e.x && Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7) {
+      const s = d - e.x - (lenE + 4.5) / 2;
+      if (s < gap) {
+        let sees = true;
+        if (D.t === 'distratto') {
+          const close = v - sim.v;
+          if (s < 6 || (close > 0 && s / close < 1.5)) e.alertT = 2.5;
+          sees = (e.alertT || 0) > 0;
+        }
+        if (sees) { gap = s; vl = sim.v; al = this.meAcc || 0; isMe = true; }
+      }
+    }
+    if (e.alertT > 0) e.alertT -= dt;
+    const free = 1 - Math.pow(v / v0, 4);
+    let acc = D.a * free;
+    if (gap < 300) {
+      const dv = v - vl, ss = 2.5 + Math.max(0, v * D.T + v * dv / (2 * Math.sqrt(D.a * D.b)));
+      const idm = D.a * (free - Math.pow(ss / Math.max(0.4, gap), 2));
+      // l'IDM esagera quando ci si trova più vicini di quanto si vorrebbe (un'auto che nasce o rientra davanti): non si
+      // frena più di quanto serve per non arrivargli addosso (tenendo conto di come frena lui), e se non ci si avvicina
+      // si riapre la distanza con calma
+      const kin = (dv > 0 ? -(dv * dv) / (2 * Math.max(0.5, gap - 2)) : 0) + Math.min(0, al);
+      acc = idm >= kin * 1.3 - 0.4 ? idm : Math.max(idm, Math.min(kin * 1.3 - 0.4, dv > 0 ? 0 : -0.3), gap < 4 + v * 0.3 ? -8.5 : -D.b * (dv > 0 ? 3 : 1));
+    }
+    const maxB = D.t === 'distratto' && isMe ? 4.5 : 8.5;
+    return { acc: Math.max(-maxB, Math.min(D.a, acc)), gap, vl, isMe };
+  }
+
   // urto con un altro veicolo: quantità di moto divisa secondo le masse, danni secondo la differenza di velocità
   crash(e, kind = 'front') {
     const sim = this.sim, m1 = sim.P.mass, m2 = (typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].mass) || 1400;
@@ -477,11 +536,13 @@ class StreetGame {
     for (const t of GAME_TRAFFIC) { if ((k -= t.w * (mix[t.vt] ?? 1)) < 0) { T = t; break; } }
     const heavy = T.vt === 'bus';
     lane = lane || (heavy ? (r() < 0.8 ? 1 : 2) : r() < 0.5 ? 1 : r() < 0.6 ? 2 : 3);
-    if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 14 + (o.len || 4.6))) return null;
+    if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 30 + (o.len || 4.6))) return null;
     const cols = GAME_COLORS;
     const hw = !!(this.s && this.s.vg) || (this.loc && this.loc.bg === 'highway'), kv = hw ? 1 : 0.5;
     const v = (T.kmh[0] + r() * (T.kmh[1] - T.kmh[0])) * kv / 3.6;
     const e = { id: this.id++, kind: 'traffic', vt: T.vt, len: T.len, lane, x, v, vT: v, vBase: v, color: 'orig' };
+    { const lead = this.ents.filter((o) => (o.kind === 'traffic' || o.kind === 'police') && o.lane === lane && o.x > x && o.x - x < 120).sort((a, b) => a.x - b.x)[0];
+      if (lead && lead.v < v) e.v = Math.min(v, (lead.v || 0) + (lead.x - x - 30) / 6); }   // nasce già accodato, non lanciato contro chi va piano
     this.ents.push(e); return e;
   }
 
@@ -565,6 +626,7 @@ class StreetGame {
 
   update(dt) {
     const sim = this.sim, d0 = this.s.dist;
+    if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
     if (sim.v > 0) this.s.dist += sim.v * dt;
     const d = this.s.dist;
     // contachilometri e traguardi
@@ -648,17 +710,29 @@ class StreetGame {
         // ogni guidatore cambia un po' andatura nel tempo; accelera e frena con dei limiti, non a scatti
         e.driftT = (e.driftT || 0) - dt;
         if (e.driftT <= 0 && e.vBase) { e.driftT = 6 + Math.random() * 10; e.vT = e.vBase * (0.93 + Math.random() * 0.12); }
-        const gapNeed = 10 + e.v * 0.9;
-        const lead = this.ents.find((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.lane && o.x > e.x && o.x - e.x < gapNeed + ((o.len || 4.6) + (e.len || 4.6)) / 2);
-        // anche il giocatore conta: chi ci arriva dietro nella stessa corsia rallenta (e prima o poi cambia corsia)
-        const meAhead = Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && d > e.x && d - e.x < gapNeed + ((e.len || 4.6) + 4.5) / 2;
-        let want = e.vT || e.v;
-        if (lead) want = Math.min(want, lead.v - (lead.x - e.x < 8 + ((lead.len || 4.6) + (e.len || 4.6)) / 2 ? 1.5 : 0));
-        if (meAhead) want = Math.min(want, Math.max(0, sim.v - 0.5));
-        if (e.calmT > 0) e.calmT -= dt;
-        e.v += Math.max((e.calmT > 0 ? -1.2 : -4) * dt, Math.min(1.4 * dt, want - e.v));
-        if (e.sig > 0) { e.sig -= dt; if (e.sig <= 0 && e.to) { if (!(Math.abs(this.laneZ - GAME_LANE_Z[e.to]) < 1.7 && Math.abs(d - e.x) < 14 + Math.abs(sim.v - e.v) * 2)) e.lane = e.to; e.to = 0; } }
-        else if ((rel > 30 || rel < -15) && Math.random() < dt * (lead || meAhead ? 0.5 : 0.05)) {
+        const F = this.trafficAccel(e, d, dt);
+        let acc = F.acc;
+        if (e.calmT > 0) { e.calmT -= dt; acc = Math.max(acc, -1.2); }
+        e.acc = acc; e.v = Math.max(0, e.v + acc * dt);
+        // inchiodata: gomme che stridono (una volta per frenata), luci dei freni accese (e.acc, street2d.js)
+        e.skidCool = Math.max(0, (e.skidCool || 0) - dt);
+        if (acc < -5.5 && e.v > 7 && !e.skidCool) { e.skidCool = 2.5; e.skidT = 1; this.fx.push({ k: 'skid', I: Math.min(1, 0.4 + (-acc - 5.5) / 3), rel: e.x - d, id: e.id }); }
+        if (e.skidT > 0) e.skidT -= dt;
+        const lead = F.gap < 12 + e.v * 1.2 && F.vl < e.v + 0.5 && !F.isMe, meAhead = F.isMe && F.gap < 12 + e.v * 1.2;
+        if (e.sig > 0) {
+          e.sig -= dt;
+          if (e.sig <= 0 && e.to) {
+            // entra solo se nel momento in cui sposta il volante c'è ancora posto (davanti e per chi arriva da dietro)
+            const ok = !(Math.abs(this.laneZ - GAME_LANE_Z[e.to]) < 1.7 && Math.abs(d - e.x) < 14 + Math.abs(sim.v - e.v) * 2)
+              && !this.ents.some((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.to && (() => {
+                const dx = o.x - e.x, need = ((o.len || 4.6) + (e.len || 4.6)) / 2 + 3;
+                return dx > -(need + Math.max(0, (o.v || 0) - e.v) * 1.8) && dx < need + Math.max(0, e.v - (o.v || 0)) * 1.2;
+              })());
+            if (ok) e.lane = e.to;
+            e.to = 0;
+          }
+        }
+        else if (!(this.s.vg || (this.loc && this.loc.bg === 'highway')) && (rel > 30 || rel < -15) && Math.random() < dt * (lead || meAhead ? 0.5 : 0.05)) {
           const to = e.lane + (e.lane === 1 ? 1 : e.lane === 3 ? -1 : Math.random() < 0.5 ? 1 : -1);
           if (!this.ents.some((o) => o !== e && o.kind === 'traffic' && (o.lane === to || o.to === to) && Math.abs(o.x - e.x) < 14 + Math.abs(o.v - e.v) * 2)
             && !(Math.abs(this.laneZ - GAME_LANE_Z[to]) < 1.7 && Math.abs(d - e.x) < 22 + Math.abs(sim.v - e.v) * 2.5)) { e.to = to; e.sig = 1.6; }   // non ci taglia la strada

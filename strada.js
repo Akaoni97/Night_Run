@@ -1,6 +1,7 @@
 // ============================================================================
 //  Night Run · La strada viva: abbaglianti per chiedere strada, eventi in prima corsia
-//  (incidenti con le quattro frecce, la polizia che ferma qualcuno) e un traffico che si comporta da autostrada.
+//  (incidenti con le quattro frecce, la polizia che ferma qualcuno) e un traffico che si comporta da autostrada
+//  (destra, sorpasso a sinistra, caratteri dei guidatori: vedi trafficDriver in game.js).
 //  Si aggancia a StreetGame (game.js), caricato dopo viaggio.js.
 // ============================================================================
 
@@ -61,22 +62,66 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     }
   };
 
-  // ------------------------------------------------------------ traffico più umano
+  // ------------------------------------------------------------ traffico da autostrada
+  // Si tiene la destra e si sorpassa a sinistra, guardando prima chi arriva forte da dietro (anche il giocatore).
+  // Il carattere del guidatore (trafficDriver in game.js) cambia il modo: l'aggressivo sorpassa appena può, se è bloccato
+  // in corsia di sorpasso si attacca e sfanala, e se dura ti supera a destra; il prudente rientra presto; il centralista
+  // si mette in seconda corsia e ci resta. La velocità e la distanza da chi sta davanti le decide trafficAccel (game.js).
   P.trafficAI = function (dt) {
-    const d = this.s.dist;
+    const d = this.s.dist, sim = this.sim, mov = (o) => o.kind === 'traffic' || o.kind === 'police';
+    // la corsia `lane` è libera per e? `front` metri davanti e `back` dietro, più lo spazio per chi arriva più veloce
+    const free = (e, lane, back, front) => {
+      const le = e.len || 4.6;
+      for (const o of this.ents) {
+        if (o === e || !mov(o) || (o.lane !== lane && o.to !== lane)) continue;
+        const dx = o.x - e.x, need = ((o.len || 4.6) + le) / 2;
+        if (dx > -(need + back + Math.max(0, (o.v || 0) - e.v) * 2.5) && dx < need + front + Math.max(0, e.v - (o.v || 0)) * 2) return false;
+      }
+      if (Math.abs(this.laneZ - GAME_LANE_Z[lane]) < 1.7) {
+        const dx = d - e.x, need = (le + 4.5) / 2;
+        if (dx > -(need + back + Math.max(0, sim.v - e.v) * 2.5) && dx < need + front + Math.max(0, e.v - sim.v) * 2) return false;
+      }
+      return true;
+    };
     for (const e of this.ents) {
-      if (e.kind !== 'traffic' || e.still) continue;
+      if (e.kind !== 'traffic' || e.still || e.racing) continue;
+      const D = this.trafficDriver(e);
       e.yield = Math.max(0, (e.yield || 0) - dt);
+      e.flashT = Math.max(0, (e.flashT || 0) - dt);
       if (e.sig > 0 || e.to) continue;
-      const near = (lane, back, front) => this.ents.some((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && (o.lane === lane || o.to === lane) && o.x - e.x > -back && o.x - e.x < front)
-        || (Math.abs(this.laneZ - GAME_LANE_Z[lane]) < 1.7 && d - e.x > -back && d - e.x < front);
-      const lead = this.ents.find((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.lane && o.x > e.x && o.x - e.x < 60 + e.v * 1.2);
+      // chi ha davanti nella sua corsia (anche il giocatore)
+      let lead = null, lgap = Infinity, leadV = Infinity, meLead = false;
+      for (const o of this.ents) {
+        if (o === e || !mov(o) || o.lane !== e.lane || o.x <= e.x) continue;
+        const g = o.x - e.x - ((o.len || 4.6) + (e.len || 4.6)) / 2; if (g < lgap) { lgap = g; lead = o; leadV = o.v || 0; }
+      }
+      if (!this.inside && d > e.x && Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && !(D.t === 'distratto' && !(e.alertT > 0))) {   // il distratto non ti vede
+        const g = d - e.x - ((e.len || 4.6) + 4.5) / 2; if (g < lgap) { lgap = g; lead = null; leadV = sim.v; meLead = true; }
+      }
+      const want = e.vT || e.vBase || e.v, close = lgap < 60 + e.v * 1.5, slower = close && leadV < want - 1.5;
       // ostacolo fermo davanti (incidente, controllo): si sposta per tempo
-      if (lead && lead.still && e.lane < 3 && !near(e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
-      // qualcuno più lento davanti: sorpassa a sinistra se c'è spazio
-      if (lead && lead.v < e.v - 1.5 && e.lane < 3 && Math.random() < dt * 0.8 && !near(e.lane + 1, 20 + e.v * 0.4, 30)) { e.to = e.lane + 1; e.sig = 1.2; continue; }
-      // tiene la destra: rientra quando la corsia a destra è libera per un buon tratto
-      if (e.lane > 1 && !e.yield && Math.random() < dt * 0.25 && !near(e.lane - 1, 18, 70 + e.v)) { const r = this.ents.find((o) => o.kind === 'traffic' && o.lane === e.lane - 1 && o.x > e.x && o.x - e.x < 90 && o.v < e.v - 2); if (!r) { e.to = e.lane - 1; e.sig = 1.4; } }
+      if (lead && lead.still && close && e.lane < 3 && free(e, e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
+      // più lento davanti: sorpasso a sinistra, mai a destra
+      if (slower && e.lane < 3 && Math.random() < dt * (D.t === 'aggressivo' ? 2 : D.t === 'prudente' ? 0.5 : 0.9) && free(e, e.lane + 1, 20 + e.v * 0.3, 25)) {
+        e.to = e.lane + 1; e.sig = D.t === 'aggressivo' ? 0.7 : 1.3; continue;
+      }
+      // aggressivo bloccato in corsia di sorpasso: si attacca, sfanala, e se dura ti supera a destra
+      if (D.t === 'aggressivo' && slower && e.lane === 3 && lgap < 12 + e.v * 1.1) {
+        e.blockT = (e.blockT || 0) + dt;
+        if (!e.flashT && e.blockT > 1.5 && Math.random() < dt * 0.6) {
+          e.flashT = 0.9;
+          if (meLead && !e.flashedMe) { e.flashedMe = true; this.fx.push({ k: 'flashed', id: e.id }); this.say('Uno attaccato dietro ti sfanala: in corsia di sorpasso si sorpassa', 'info'); }
+        }
+        if (e.blockT > 7 && Math.random() < dt * 0.3 && free(e, 2, 12, 40)) { e.to = 2; e.sig = 0.5; e.blockT = 0; continue; }
+      } else e.blockT = 0;
+      // centralista: va in seconda corsia e ci resta
+      if (D.t === 'centralista') { if (e.lane === 1 && !slower && Math.random() < dt * 0.3 && free(e, 2, 15, 40)) { e.to = 2; e.sig = 1.6; } continue; }
+      // tiene la destra: rientra quando a destra c'è spazio per un buon tratto e nessuno più lento da ripassare subito
+      if (e.lane > 1 && !e.yield && Math.random() < dt * (D.t === 'prudente' ? 0.4 : 0.25) && free(e, e.lane - 1, 18, 50 + e.v)) {
+        const r = this.ents.some((o) => mov(o) && o.lane === e.lane - 1 && o.x > e.x && o.x - e.x < 90 && o.v < want - 2);
+        const meR = Math.abs(this.laneZ - GAME_LANE_Z[e.lane - 1]) < 1.7 && d > e.x && d - e.x < 90 && sim.v < want - 2;
+        if (!r && !meR) { e.to = e.lane - 1; e.sig = 1.4; }
+      }
     }
   };
 
