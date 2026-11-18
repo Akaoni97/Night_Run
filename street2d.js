@@ -1987,15 +1987,6 @@ class Street2D {
       this.lightAdd(left, y0 - 18 * k, 50, 22, '255,40,40', s.brake > 0.05 ? 0.7 : s.ign ? 0.25 : 0);
     }
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
-    // fascio dei fari nell'aria, di notte e sotto la pioggia
-    if (s.ign && s.lamps !== false && (this.day || 0) < 0.6) {
-      const fx = left + SW - 4, fy = y0 - 22 * k;
-      const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
-      // due tagli di luce: l'anabbagliante scende sulla strada, l'abbagliante parte più in alto e va lontano (più forte quando sfanali)
-      this.fxBeamAt(g, fx, fy, 330, 11, 17, (1 + wet) * night);                                             // anabbagliante: scende sulla strada
-      this.fxBeamAt(g, fx, fy - 2, s.high ? 480 : 420, -2.5, 19, (s.high ? 1 : 0.95 + wet * 0.5) * night);  // abbagliante: lungo e quasi dritto
-      this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
-    }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
     const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
@@ -2058,7 +2049,7 @@ class Street2D {
     // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
-    if (s.ign && s.lamps !== false) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
+    if (s.ign && s.lamps !== false) this.light(g, left + GE.head[0] * k, top + GE.head[1] * k, s.high ? 9 : 6, s.high ? 5 : 4, '#fff2c4', s.high ? 0.22 : 0.15, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
     const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
@@ -2089,14 +2080,25 @@ class Street2D {
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
       if (s.lamps !== false) {
-        fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
-        g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
+        // (la striscia anamorfica orizzontale dei fari è tolta: sembrava un raggio laser; il fascio è la banda di luce più su)
+        fl(hx2, hy2, 9 * nt, '255,255,255', 0.5 * nt * hlK, 2);
+        g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 4, 2, 8);
       }
       const br = s.brake > 0.05 ? 1 : 0.45;
       fl(tlx, tly, 26 * br * nt + 6, '255,40,60', 0.5 * br * nt, 2);
       const spd = Math.abs(s.v);
       if (spd > 8) { const len = Math.min(220, (spd - 8) * 5.5), gr = g.createLinearGradient(tlx - len, 0, tlx, 0); gr.addColorStop(0, 'rgba(255,30,50,0)'); gr.addColorStop(1, `rgba(255,40,60,${0.35 * nt})`); g.fillStyle = gr; g.fillRect(tlx - len, tly - 1, len, 2); }
       g.restore();
+    }
+    // ---- fascio dei fari: parte dal faro vero di ogni auto (GE.head, nello sprite), sopra la carrozzeria, di notte e sotto la pioggia
+    if (s.ign && s.lamps !== false && (this.day || 0) < 0.6) {
+      const fx = left + GE.head[0] * k + 1, fy = top + GE.head[1] * k;
+      const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
+      // anabbagliante: una banda larga che scende sulla strada, col taglio netto in alto; abbagliante: una seconda banda più alta e più lunga, il taglio si alza
+      const bz = Math.min(1.5, Math.max(0.85, GE.h / 66));   // i mezzi grandi hanno un fascio più largo
+      this.fxBeamAt(g, fx, fy, 380, 7, 28 * bz, (s.high ? 0.8 : 1) * (1 + wet) * night, 0.8);
+      if (s.high) this.fxBeamAt(g, fx, fy - 1, 520, -1, 30 * bz, (1 + wet * 0.5) * night, 0.3);
+      this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
     }
     // ---- effetti
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));

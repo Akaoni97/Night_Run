@@ -264,27 +264,28 @@
     x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
-  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = semiapertura alla fine. Cono volumetrico morbido: più denso vicino al faro,
-  // con il centro caldo e i bordi che sfumano (niente retino). Due di questi fanno anabbagliante e abbagliante.
-  S.beamShaft = function (len, w) {
-    const SS = this.SS || 1, key = 'shaft2_' + Math.round(len / 10) + '_' + Math.round(w) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
+  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = semiapertura alla fine, hard = quanto è netto il bordo alto (taglio dell'anabbagliante).
+  // Una banda larga e piena, come il fascio dei fari nei giochi 2D: stretta al faro, si allarga e si spegne con la distanza, bordi morbidi, niente raggio sottile.
+  S.beamShaft = function (len, w, hard) {
+    hard = hard || 0;
+    const SS = this.SS || 1, key = 'band3_' + Math.round(len / 10) + '_' + Math.round(w) + '_' + Math.round(hard * 10) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
     if (B[key]) return B[key];
     const H = Math.ceil(w * 2 + 8), c = document.createElement('canvas'); c.width = len * SS; c.height = H * SS; c.oy = H / 2; c.lw = len; c.lh = H;
-    const x = c.getContext('2d'), im = x.createImageData(len * SS, H * SS), d = im.data, W = len * SS, oy = c.oy * SS;
+    const x = c.getContext('2d'), im = x.createImageData(len * SS, H * SS), d = im.data, W = len * SS, oy = c.oy * SS, ss = (e) => e * e * (3 - 2 * e);
     for (let px = 0; px < W; px++) {
-      const u = px / W, hw = (1.6 + (w - 1.6) * Math.pow(u, 0.85)) * SS, along = Math.pow(1 - u, 0.8) * (0.62 + 0.38 * Math.exp(-u * 5));
+      const u = px / W, hw = (4 + (w - 4) * Math.pow(u, 0.75)) * SS, along = Math.pow(1 - u, 0.65) * (0.8 + 0.2 * Math.exp(-u * 4));
       for (let py = Math.max(0, Math.floor(oy - hw)); py < Math.min(H * SS, Math.ceil(oy + hw)); py++) {
-        const t = (py + 0.5 - oy) / hw, prof = Math.pow(Math.max(0, 1 - t * t), 1.5), core = Math.exp(-t * t * 5);        // sfumatura ai bordi e centro più caldo
-        const I = along * (0.5 * prof + 0.5 * core * prof), i = (py * W + px) * 4;
-        d[i] = 255; d[i + 1] = 236 + 12 * core; d[i + 2] = 190 + 40 * core; d[i + 3] = Math.min(255, I * 255 * 0.9);
+        const t = (py + 0.5 - oy) / hw, at = Math.abs(t), f = t < 0 ? 0.55 - 0.45 * hard : 0.6;   // bordo alto netto con il taglio, bordo basso morbido
+        const prof = ss(Math.min(1, (1 - at) / f)), I = along * prof * (0.78 + 0.22 * (1 - at)), i = (py * W + px) * 4;
+        d[i] = 255; d[i + 1] = 238 + 10 * (1 - at); d[i + 2] = 185 + 35 * (1 - at); d[i + 3] = Math.min(255, I * 255 * 0.72);
       }
     }
     x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
-  S.fxBeamAt = function (g, fx, fy, len, ang, w, a) {
+  S.fxBeamAt = function (g, fx, fy, len, ang, w, a, hard) {
     if (a < 0.02) return;
-    const sp = this.beamShaft(len, w);
+    const sp = this.beamShaft(len, w, hard);
     g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a);
     g.translate(Math.round(fx), Math.round(fy)); g.rotate(ang * Math.PI / 180);
     g.drawImage(sp, 0, -sp.oy, sp.lw, sp.lh); g.restore();
@@ -294,8 +295,8 @@
     if (a < 0.02) return;
     g.save(); g.globalCompositeOperation = 'lighter';
     const halo = (r, al) => { const gr = g.createRadialGradient(fx, fy, 0, fx, fy, r); gr.addColorStop(0, `rgba(255,248,225,${al})`); gr.addColorStop(0.4, `rgba(255,232,170,${al * 0.35})`); gr.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = gr; g.fillRect(fx - r, fy - r, r * 2, r * 2); };
-    halo(26, 0.75 * a);
-    g.globalAlpha = 0.55 * a; const bl = g.createLinearGradient(fx - 6, 0, fx + 70, 0); bl.addColorStop(0, 'rgba(255,248,225,0.9)'); bl.addColorStop(1, 'rgba(255,240,200,0)'); g.fillStyle = bl; g.fillRect(fx - 6, fy - 1, 76, 2);
+    halo(11, 0.55 * a); halo(4, 0.5 * a);          // bagliore piccolo sul faro
+    // (la lama orizzontale è tolta: dava l'effetto raggio laser)
     g.globalAlpha = 1;
     // pozza sull'asfalto: ellisse schiacciata davanti all'auto, calda al centro
     const px = fx + 120, py = groundY - 6;
@@ -305,7 +306,7 @@
     // pulviscolo: puntini che brillano nel fascio, sempre gli stessi, che respirano
     for (let q = 0; q < 26; q++) {
       const u = 0.12 + 0.8 * Street2D.rnd(q * 3 + 1), v = (Street2D.rnd(q * 3 + 2) - 0.5), lowB = q % 2 === 0;
-      const ang = (lowB ? 12 : -2.5) * Math.PI / 180, d = u * (lowB ? 280 : 380), wv = (1.6 + (lowB ? 12 : 10) * u) * v;
+      const ang = (lowB ? 7 : -1) * Math.PI / 180, d = u * (lowB ? 300 : 420), wv = (4 + (lowB ? 22 : 26) * u) * v * 1.6;
       const x2 = fx + Math.cos(ang) * d - Math.sin(ang) * wv, y2 = fy + Math.sin(ang) * d + Math.cos(ang) * wv;
       const tw = 0.5 + 0.5 * Math.sin(t * (1.2 + Street2D.rnd(q + 9) * 2) + q * 2.1);
       g.fillStyle = `rgba(255,244,210,${(0.55 * tw * (1 - u)) * a})`; g.fillRect(Math.round(x2), Math.round(y2), 1, 1);
