@@ -8,10 +8,10 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 
 | Cosa | Stato | Da fare |
 | --- | --- | --- |
-| Nome "Night Run" | **Problema** | Esiste già un gioco "Night Run" (Thousand Ant) su Steam ed Epic: guida notturna in città. Decidere il nome **prima** di pubblicare video. |
+| Nome "Night Run" | **Deciso, da controllare** | Il 18/11 il proprietario ha scelto **Night Run: The Last Highway** (il sottotitolo lo distingue dal "Night Run" di Thousand Ant). Da controllare nelle banche dati dei marchi e su Steam/itch.io; da mettere nel gioco. |
 | Nomi e marchi reali delle auto (27 mezzi) | **Rischio** | Marche e modelli veri nel gioco e sul quadro strumenti (TOYOTA, VOLVO, BMW); strisce M sulle BMW. |
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
-| Musica (8 canzoni) | **Da confermare** | Sono del proprietario: serve sapere come sono state fatte (se con un'IA, con quale piano). |
+| Musica (8 canzoni) | **Da confermare** | Fatte dal proprietario con Gemini (Google): serve sapere con quale piano e leggere i termini di Google per l'uso commerciale. |
 | Modello 3D della Supra | Va bene con condizioni | CC BY 4.0: crediti obbligatori e visibili; il modello contiene i loghi Toyota. |
 | Suono registrato del motore | Va bene | CC0 (Freesound). |
 | three.js | Va bene | MIT. |
@@ -27,6 +27,9 @@ trova il loro). C'è anche *Nightrunner* (Planetary Gears, Steam, 2024).
 **Consiglio**: scegliere un nome diverso o con un sottotitolo forte prima dei video, e controllare il nome scelto
 nelle banche dati dei marchi (EUIPO, UIBM) e su Steam/itch.io. Il video si rifà in pochi minuti con un altro nome
 (`strumenti/teaser_monta.sh`, scritte in `cartelli`).
+**Deciso il 18/11/2026**: *Night Run: The Last Highway*. Restano da fare il controllo del nome completo (EUIPO, UIBM,
+Steam, itch.io) e il cambio nel gioco (`<title>` di `index.html`, cartello finale del prologo in `prologo.js`,
+scritte del teaser).
 
 ## 2. Auto e marchi reali
 Nel gioco ci sono marche e modelli veri: Toyota Supra RZ, Volvo V40 SW 2.0, Volvo 850 R, BMW 2002 Turbo, BMW M3 E30,
@@ -49,6 +52,20 @@ Midnight Apex, Midnight Gearbox, Midnight Redline, Redline Ascent), indicate com
   le canzoni fatte col piano gratuito non si possono usare in modo commerciale, e abbonarsi dopo non le sistema;
   con Pro o Premier sì. Inoltre una canzone fatta solo da un'IA in molti paesi non è protetta da diritto d'autore
   (chiunque potrebbe riusarla). Il video teaser usa *Redline at Midnight*: vale la stessa domanda.
+
+**Risposta del 18/11/2026**: le canzoni le ha fatte il proprietario con **Gemini** (Google, modelli musicali Lyria).
+Cosa si sa (da fonti non ufficiali, da verificare sui termini di Google):
+- Google non rivendica la proprietà di quello che generi; si possono usare nel rispetto della sua politica sugli
+  usi vietati.
+- Sull'uso commerciale (gioco venduto, video monetizzati) le fonti non sono d'accordo e le pagine dei piani non lo
+  dicono chiaramente: va letto il testo dei termini aggiuntivi delle app Gemini in vigore quando sono state create,
+  e conta il piano usato (gratuito o a pagamento).
+- Le canzoni portano la filigrana invisibile SynthID: si riconoscono come fatte da un'IA.
+- Una canzone fatta solo da un prompt in molti paesi non è protetta da diritto d'autore: potete usarla, ma non
+  potete impedire ad altri di riusarla.
+- Su Steam va dichiarato che il gioco contiene contenuti generati da un'IA (modulo al momento della pubblicazione).
+**Da fare**: segnarsi il piano Gemini usato e la data di ogni canzone; per un gioco a pagamento, chiedere conferma
+(Google o un avvocato) prima di uscire.
 
 ## 4. Modello 3D della Supra (`models/supra_mk4.glb`)
 *Toyota Supra MK4 (LowPoly)* di Mike Farrant (Sketchfab), licenza CC BY 4.0, modificato (scala, ruote separate,
