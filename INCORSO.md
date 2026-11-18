@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Partenza (W in folle mette la prima), avvisi in fila, paesaggi fuori città più vivi, schermata Crediti | `index.html`, `sim.js`, `traguardi.js`, `paesaggi2d.js`, `vita2d.js`, `menu.js` | 18/11 sera |
