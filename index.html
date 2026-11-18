@@ -589,13 +589,33 @@ html.game #g2d, html.game #g3d { width: 100%; height: 100%; aspect-ratio: auto; 
 html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 .menubtn { border: 0; padding: 8px 14px 7px; font: 400 14px/1 var(--f-display); letter-spacing: .08em; color: #1a1206; background: var(--amber); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); white-space: nowrap; }
 .menubtn kbd { margin-left: 6px; background: transparent; border-color: rgba(0,0,0,.3); color: #1a1206; }
-.touchpedals { position: absolute; right: 12px; bottom: 72px; display: none; gap: 8px; z-index: 4; }
-.touchpedals button { width: 64px; height: 64px; border: 0; border-radius: 10px; font: 400 13px/1 var(--f-display); color: #fff; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.18); }
-.touchpedals .tp-eng { background: rgba(214,150,30,.82); color: #14100a; } .touchpedals .tp-gas { background: rgba(80,140,30,.72); } .touchpedals .tp-brk { background: rgba(160,40,30,.72); }
-.touchpedals button:active, .touchpedals button.on { filter: brightness(1.4); }
-@media (pointer: coarse) { .touchpedals { display: grid; grid-template-columns: auto auto; justify-content: end; } #dbEngine { display: none; } }
-.touchpedals .tp-eng { grid-column: 1 / -1; grid-row: 1; width: auto; height: 38px; }
-.touchpedals .tp-eng[hidden] { display: none; }
+/* comandi al tocco (menu.js, solo col dito): pollice destro sui pedali, con sopra le palette del cambio e la marcia in mezzo;
+   pollice sinistro su ◀ ▶ affiancati; AVVIA rotondo accanto al cruscotto, lontano dai pedali */
+.touchpedals { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: none; grid-template-columns: var(--tp-w, 64px) var(--tp-g, 30px) var(--tp-w, 64px); column-gap: 8px; row-gap: 8px; align-items: end; z-index: 4; }
+.touchpedals button, .tp-start { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; border: 0; padding: 0; cursor: pointer; }
+.touchpedals .tp-sh { grid-row: 1; height: var(--tp-sh, 46px); display: grid; place-content: center; gap: 2px; color: var(--amber); background: linear-gradient(180deg, rgba(34,30,24,.82), rgba(12,11,9,.72)); box-shadow: inset 0 0 0 1px rgba(255,179,71,.35), 0 2px 8px rgba(0,0,0,.35); border-radius: 12px 12px 5px 5px; }
+.touchpedals .tp-sh i { font: normal 400 17px/1 var(--f-display); }
+.touchpedals .tp-sh small { font: 600 8px/1 var(--f-data); letter-spacing: .14em; color: var(--muted); }
+.touchpedals .tp-dn { grid-column: 1; } .touchpedals .tp-up { grid-column: 3; }
+.touchpedals .tp-sh[aria-disabled="true"] { opacity: .35; }
+.touchpedals .tp-gear { grid-column: 2; grid-row: 1; align-self: center; justify-self: center; width: var(--tp-g, 30px); height: var(--tp-g, 30px); display: grid; place-items: center; border-radius: 50%; font: 400 calc(var(--tp-g, 30px) * .62)/1 var(--f-display); color: var(--amber); background: rgba(8,8,10,.78); box-shadow: inset 0 0 0 1.5px rgba(255,179,71,.55); pointer-events: none; }
+.touchpedals .tp-gear.pop { animation: tpPop .22s ease-out; }
+@keyframes tpPop { from { transform: scale(1.35); color: #fff; } to { transform: scale(1); } }
+.touchpedals .tp-brk, .touchpedals .tp-gas { grid-row: 2; font: 400 13px/1 var(--f-display); letter-spacing: .06em; color: #fff; border-radius: 10px 10px 14px 14px; padding-top: 34%; box-shadow: inset 0 0 0 2px rgba(255,255,255,.16), 0 3px 10px rgba(0,0,0,.4); background-image: repeating-linear-gradient(180deg, rgba(255,255,255,.07) 0 2px, transparent 2px 9px); }
+.touchpedals .tp-brk { grid-column: 1; height: var(--tp-bh, 74px); background-color: rgba(160,40,30,.74); }
+.touchpedals .tp-gas { grid-column: 3; height: var(--tp-gh, 92px); background-color: rgba(80,140,30,.74); }
+.touchpedals button:active, .touchpedals button.on { filter: brightness(1.4); transform: translateY(1px); }
+.tp-start { position: absolute; left: calc(100% + 14px); bottom: 0; width: var(--tp-st, 64px); height: var(--tp-st, 64px); border-radius: 50%; display: none; place-content: center; justify-items: center; gap: 1px; color: #ffb347; background: radial-gradient(circle at 50% 38%, #2b251c, #0d0c0a 70%); box-shadow: inset 0 0 0 2px rgba(255,179,71,.75), 0 0 0 4px rgba(0,0,0,.45), 0 0 16px rgba(255,179,71,.35); animation: tpStart 1.6s ease-in-out infinite; }
+.tp-start svg { width: calc(var(--tp-st, 64px) * .38); height: calc(var(--tp-st, 64px) * .38); fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.tp-start small { font: 600 8px/1 var(--f-data); letter-spacing: .14em; }
+.tp-start:active { filter: brightness(1.4); }
+@keyframes tpStart { 50% { box-shadow: inset 0 0 0 2px rgba(255,179,71,1), 0 0 0 4px rgba(0,0,0,.45), 0 0 26px rgba(255,179,71,.65); } }
+@media (pointer: coarse) {
+  .touchpedals { display: grid; } .tp-start { display: grid; } .tp-start[hidden] { display: none; } #dbEngine { display: none; }
+  .lanebtn.r { right: auto; left: 74px; }                                      /* ◀ ▶ affiancati sotto il pollice sinistro */
+  html.game .minimap { left: 144px; right: 198px; width: auto; max-width: 380px; margin: 0 auto; transform: none; }   /* il radar delle corsie sta tra frecce e pedali */
+}
+@media (pointer: coarse) and (max-width: 700px) { .lanebtn.r { left: 52px; } }
 /* schermi bassi (telefono in orizzontale): barra e riquadri più piccoli, niente sovrapposizioni col cruscotto */
 @media (max-height: 520px) {
   html.game .wrap { padding: 3px max(4px, env(safe-area-inset-right)) max(3px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left)); gap: 3px; }
@@ -613,9 +633,100 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   html.game .lanebtn { width: 40px; height: 40px; bottom: 6px; font-size: 18px; }
   html.game .minimap { bottom: 6px; }
   html.game .mm-next { display: none; }
-  .touchpedals { bottom: 52px; right: 8px; } .touchpedals button { width: 52px; height: 52px; font-size: 11px; }
+  .touchpedals { bottom: max(8px, env(safe-area-inset-bottom)); right: max(8px, env(safe-area-inset-right)); --tp-w: 56px; --tp-g: 26px; --tp-sh: 38px; --tp-bh: 60px; --tp-gh: 74px; column-gap: 6px; row-gap: 6px; }
+  .touchpedals .tp-brk, .touchpedals .tp-gas { font-size: 11px; } .tp-start { --tp-st: 54px; left: calc(100% + 10px); }
   html.game #hudG { display: none; }
 }
+.fstop svg, .fsdock svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.fstop svg { margin-right: 6px; vertical-align: -2px; }
+.fsdock { position: absolute; right: 54px; top: 50px; display: none; gap: 8px; z-index: 4; }
+body.fs .fsdock { display: flex; }
+.fsdock button { width: 34px; height: 34px; display: grid; place-items: center; border: 0; padding: 0; cursor: pointer; background: rgba(10,9,7,.72); color: var(--amber); box-shadow: inset 0 0 0 1px #4a4234; }
+.fsdock svg { width: 16px; height: 16px; }
+html .fstop { display: none; }
+/* al tocco: meno roba sulla strada. Niente TASTI (servono solo con la tastiera), fila dei comandi dietro COMANDI,
+   pulsanti di schermo intero più grandi */
+@media (pointer: coarse) {
+  #tastiBtn { display: none; } html .fstop { display: inline-block; }
+  .fsbtn, .fsdock button { width: 42px; height: 42px; } .fsdock { right: 62px; }
+  body:not(.fs) .fsbtn { display: none; }                                      /* fuori dallo schermo intero c'è SCHERMO INTERO in alto */
+  body.fs .fsbtn, body.fs .fsdock { top: max(12px, env(safe-area-inset-top)); }
+  body.fs .radio-chip { right: 162px; }
+}
+@media (pointer: coarse) and (max-height: 520px) {
+  html.game .hud-l { transform: scale(.6); }
+  html.game .dash { width: min(25vw, 180px); }
+  html.game .fsbtn { top: 38px; } html.game .fsdock { top: 38px; }
+  body.fs .fsbtn, body.fs .fsdock { top: max(8px, env(safe-area-inset-top)); }
+  body.fs .radio-chip { right: 156px; }
+}
+.gira { display: none; }
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
+  html.game:not(.gira-no) .gira { position: fixed; inset: 0; z-index: 70; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 32px; text-align: center; background: rgba(6,5,10,.94); color: #ece6d6; }
+  .gira svg { width: 84px; height: 84px; fill: none; stroke: var(--amber); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: giraT 2.4s ease-in-out infinite; }
+  .gira b { font: 400 26px/1 var(--f-display); letter-spacing: .06em; color: var(--amber); }
+  .gira span { font: 400 15px/1.4 var(--f-data, system-ui); color: var(--muted); max-width: 280px; }
+  .gira button { margin-top: 10px; border: 0; padding: 10px 18px; border-radius: 8px; font: 600 12px/1 var(--f-data); letter-spacing: .12em; color: var(--muted); background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+}
+@keyframes giraT { 0%, 30% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
+/* ---- al tocco (html.tdash, menu.js): quadro in alto a sinistra con AVVIA accanto, in basso a sinistra STRUMENTI e DATI
+   che aprono due finestrelle sopra le frecce ---- */
+html.tdash .tcock { position: absolute; left: max(10px, env(safe-area-inset-left)); top: 10px; width: clamp(190px, 27vw, 300px); z-index: 3; pointer-events: none; }
+html.tdash .tcock #hudP { display: block; width: 100%; }
+html.tdash .tcock .tp-start { pointer-events: auto; left: calc(100% + 12px); top: 50%; bottom: auto; transform: translateY(-50%); }
+html.tdash .tcock .tp-start:active { transform: translateY(-50%) scale(.96); }
+html.tdash .tbar { position: absolute; left: max(12px, env(safe-area-inset-left)); bottom: 74px; display: flex; gap: 8px; z-index: 5; }
+html.tdash .tbar button { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px 0 9px; border: 0; border-radius: 9px; font: 600 10px/1 var(--f-data); letter-spacing: .12em; color: #d9d2c2; background: rgba(10,10,14,.74); box-shadow: inset 0 0 0 1px rgba(255,179,71,.28), 0 2px 8px rgba(0,0,0,.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+html.tdash .tbar svg { width: 15px; height: 15px; fill: none; stroke: var(--amber); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html.tdash .tbar button[aria-expanded="true"] { color: #120d05; background: var(--amber); box-shadow: 0 0 14px rgba(255,179,71,.45); } html.tdash .tbar button[aria-expanded="true"] svg { stroke: #120d05; }
+/* le finestrelle */
+html.tdash .tpan, html.game.tdash .dash { position: absolute; left: max(12px, env(safe-area-inset-left)); right: auto; top: auto; bottom: 118px; width: min(360px, 52vw); max-height: calc(100% - 140px); overflow: auto; display: none; gap: 8px; padding: 10px 12px 12px; z-index: 7; border-radius: 14px;
+  background: linear-gradient(180deg, rgba(26,22,30,.94), rgba(12,11,15,.94)); box-shadow: inset 0 0 0 1px rgba(255,179,71,.3), 0 14px 40px rgba(0,0,0,.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transform-origin: bottom left; }
+html.tdash .tpan.open { display: grid; animation: tpanIn .16s ease-out; }
+@keyframes tpanIn { from { opacity: 0; transform: translateY(8px) scale(.97); } }
+html.tdash .tpan-h { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 8px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,179,71,.18); }
+html.tdash .tpan-h b { font: 400 17px/1 var(--f-display); letter-spacing: .06em; color: var(--amber); }
+html.tdash .tpan-h small { font: 400 11px/1 var(--f-data); color: var(--muted); }
+html.tdash .tpan-h button { width: 28px; height: 28px; border: 0; border-radius: 7px; background: rgba(255,255,255,.06); color: var(--muted); font-size: 13px; cursor: pointer; align-self: center; }
+/* STRUMENTI: le file di pulsanti diventano tessere */
+html.tdash .tpan-str .dash-btns { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; }
+html.tdash .tpan-str .dash-btns[hidden] { display: none; }
+html.tdash .tpan-str .dash-btns button { display: grid; justify-items: center; align-content: center; gap: 5px; min-height: 58px; padding: 6px 2px; border-radius: 10px; font: 600 9px/1.1 var(--f-data); letter-spacing: .06em; color: #d9d2c2; background: rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); touch-action: manipulation; }
+html.tdash .tpan-str .dash-btns button b { display: block; font-size: 8px; color: var(--amber); margin-top: 2px; }
+html.tdash .tpan-str .dash-btns button::before { content: ''; width: 22px; height: 22px; background: currentColor; -webkit-mask: no-repeat center / contain; mask: no-repeat center / contain; }
+html.tdash .tpan-str .dash-btns button[aria-pressed="true"] { color: #120d05; background: var(--amber); box-shadow: 0 0 12px rgba(255,179,71,.35); }
+html.tdash .tpan-str .dash-btns button[aria-pressed="true"] b { color: #120d05; }
+html.tdash .tpan-str .dash-btns button.hot { color: #0b0a08; background: #b8ff3a; }
+html.tdash .tpan-str .dash-btns button:disabled { opacity: .3; }
+html.tdash .tpan-str .dash-btns.cmd { padding-top: 8px; border-top: 1px dashed rgba(255,255,255,.1); }
+  html.tdash #dbAuto::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%228.5%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222.2%22/%3E%3Cpath%20d%3D%22M3.6%2010.5h6.2M14.2%2010.5h6.2M12%2014.2V20.5%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%228.5%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%222.2%22/%3E%3Cpath%20d%3D%22M3.6%2010.5h6.2M14.2%2010.5h6.2M12%2014.2V20.5%22/%3E%3C/svg%3E"); }
+  html.tdash #dbTc::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020c-2-3-2-6%200-9s2-6%200-9M17%2020c-2-3-2-6%200-9s2-6%200-9%22/%3E%3Cpath%20d%3D%22M10%2012h4%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020c-2-3-2-6%200-9s2-6%200-9M17%2020c-2-3-2-6%200-9s2-6%200-9%22/%3E%3Cpath%20d%3D%22M10%2012h4%22/%3E%3C/svg%3E"); }
+  html.tdash #dbLaunch::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2021V4m0%200h11l-2%204%202%204H5%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2021V4m0%200h11l-2%204%202%204H5%22/%3E%3C/svg%3E"); }
+  html.tdash #dbHud::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2017a8%208%200%201%201%2016%200%22/%3E%3Cpath%20d%3D%22M12%2017l4-6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2217%22%20r%3D%221.3%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2017a8%208%200%201%201%2016%200%22/%3E%3Cpath%20d%3D%22M12%2017l4-6%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2217%22%20r%3D%221.3%22/%3E%3C/svg%3E"); }
+  html.tdash #dbFlash::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%206c-3%200-5%202.7-5%206s2%206%205%206h2V6z%22/%3E%3Cpath%20d%3D%22M14%208h6M14%2012h7M14%2016h6%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%206c-3%200-5%202.7-5%206s2%206%205%206h2V6z%22/%3E%3Cpath%20d%3D%22M14%208h6M14%2012h7M14%2016h6%22/%3E%3C/svg%3E"); }
+  html.tdash #dbMap::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206l6-2%206%202%206-2v14l-6%202-6-2-6%202z%22/%3E%3Cpath%20d%3D%22M9%204v14M15%206v14%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206l6-2%206%202%206-2v14l-6%202-6-2-6%202z%22/%3E%3Cpath%20d%3D%22M9%204v14M15%206v14%22/%3E%3C/svg%3E"); }
+  html.tdash #dbWin::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2018V9l6-5h10v14z%22/%3E%3Cpath%20d%3D%22M4%2013h16%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2018V9l6-5h10v14z%22/%3E%3Cpath%20d%3D%22M4%2013h16%22/%3E%3C/svg%3E"); }
+  html.tdash #cmTrailer::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%222%22%20y%3D%227%22%20width%3D%2212%22%20height%3D%229%22%20rx%3D%221%22/%3E%3Cpath%20d%3D%22M14%2013h5l2%203%22/%3E%3Ccircle%20cx%3D%227%22%20cy%3D%2218%22%20r%3D%222%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%222%22%20y%3D%227%22%20width%3D%2212%22%20height%3D%229%22%20rx%3D%221%22/%3E%3Cpath%20d%3D%22M14%2013h5l2%203%22/%3E%3Ccircle%20cx%3D%227%22%20cy%3D%2218%22%20r%3D%222%22/%3E%3C/svg%3E"); }
+  html.tdash #cmBoost::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%228%22/%3E%3Cpath%20d%3D%22M12%204v4M12%2012l5-3%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.5%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%228%22/%3E%3Cpath%20d%3D%22M12%204v4M12%2012l5-3%22/%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%221.5%22/%3E%3C/svg%3E"); }
+  html.tdash #cmExh::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2014h10a3%203%200%200%200%203-3V9%22/%3E%3Cpath%20d%3D%22M18%206c1%201%201%202%200%203M21%204c2%202%202%205%200%207%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2014h10a3%203%200%200%200%203-3V9%22/%3E%3Cpath%20d%3D%22M18%206c1%201%201%202%200%203M21%204c2%202%202%205%200%207%22/%3E%3C/svg%3E"); }
+  html.tdash #cmNeon::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2015h16%22/%3E%3Cpath%20d%3D%22M6%2019l1-2M12%2020v-3M18%2019l-1-2%22/%3E%3Cpath%20d%3D%22M6%2015l2-5h8l2%205%22/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23000%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%2015h16%22/%3E%3Cpath%20d%3D%22M6%2019l1-2M12%2020v-3M18%2019l-1-2%22/%3E%3Cpath%20d%3D%22M6%2015l2-5h8l2%205%22/%3E%3C/svg%3E"); }
+/* dentro un locale niente finestrelle né pulsanti (come le frecce e il cruscotto) */
+html.tdash body.inplace .tbar, html.tdash body.inplace .tpan, html.tdash body.inplace .tcock { display: none; }
+/* i messaggi sopra la strada stanno a destra del quadro e di AVVIA, non sopra */
+html.tdash #roadStage > .msg { left: calc(clamp(190px, 27vw, 300px) + 100px); right: 14px; transform: skewX(-8deg); max-width: none; }
+/* DATI: il riquadro hud-l dentro la finestrella, a grandezza piena */
+html.tdash .tpan-dati .hud-l { position: static; transform: none; display: grid !important; gap: 6px; }
+html.tdash .tpan-dati .hud-tag { max-width: none; width: auto; }
+/* schermi bassi */
+@media (max-height: 520px) {
+  html.tdash .tcock { top: 6px; left: max(6px, env(safe-area-inset-left)); width: clamp(170px, 26vw, 230px); }
+  html.tdash .tbar { bottom: 54px; left: max(6px, env(safe-area-inset-left)); } html.tdash .tbar button { height: 30px; }
+  html.tdash .tpan, html.game.tdash .dash { bottom: 92px; left: max(6px, env(safe-area-inset-left)); max-height: calc(100% - 100px); width: min(340px, 50vw); padding: 8px 10px 10px; }
+  html.tdash .tpan-str .dash-btns button { min-height: 50px; }
+  html.tdash #roadStage > .msg { left: calc(clamp(170px, 26vw, 230px) + 84px); right: 8px; top: 44px; }
+}
+@media (pointer: coarse) and (max-height: 520px) { .lanebtn.r { left: 60px; } html.game .minimap { left: 114px; right: 168px; } }
+@media (pointer: coarse) and (max-height: 520px) and (max-width: 700px) { .lanebtn.r { left: 54px; } }
 @media (max-width: 700px) { html.game .chip:not(.money), html.game .audio-state { display: none; } html.game h1 { font-size: 18px; } }
 
 /* ==== Menu di pausa (menu.js): barra laterale con le sezioni, testata, contenuto a schede ==== */
@@ -1382,7 +1493,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     ensureAudio();
     if (sim.running) { if (Math.abs(sim.v) > 1) { flash('Fermati prima di spegnere il motore', 1.6); return; } engineOff(); return; }
     sim.setIgnition(true); startOn();
-    let n = 0; const iv = setInterval(() => { if (sim.running || ++n > 60) { clearInterval(iv); startOff(); } }, 100);
+    // si molla l'avviamento solo quando il motore gira da 0,4 s di fila: un primo colpo da freddo può spegnersi subito
+    let n = 0, ok = 0; const iv = setInterval(() => { ok = sim.running ? ok + 1 : 0; if (ok >= 4 || ++n > 60) { clearInterval(iv); startOff(); } }, 100);
   }
 
   $('btnIgn').addEventListener('click', ignToggle);
@@ -3070,7 +3182,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
     }
-    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); }
+    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); }
     game.fx.length = 0;
     if (msgT > 0) { msgT -= dt; if (msgT <= 0) $('msg').classList.remove('show'); }
     draw(); updateDom(dt);
@@ -3136,6 +3248,25 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     n.connect(bp); bp.connect(g); o.connect(og); og.connect(g);
     if (pan) { pan.pan.setValueAtTime(dv > 0 ? 0.6 : -0.6, t); pan.pan.linearRampToValueAtTime(dv > 0 ? -0.6 : 0.6, t + dur); g.connect(pan); pan.connect(ctx.destination); } else g.connect(ctx.destination);
     n.start(t); o.start(t); n.stop(t + dur); o.stop(t + dur);
+  }
+  // gomme che stridono (un'altra auto che inchioda): fruscio in una banda stretta che scende, più un fischio che vibra
+  // (la gomma che salta sull'asfalto); più forte quanto è vicina, a sinistra se arriva da dietro
+  function skidSound(I, rel) {
+    if (!audio.ctx || S.muted) return;
+    const ctx = audio.ctx, t = ctx.currentTime, I1 = Math.min(1, I || 0.6), near = Math.max(0.12, 1 - Math.abs(rel || 0) / 110), dur = 0.55 + 0.75 * I1;
+    const len = Math.ceil(ctx.sampleRate * dur), buf = ctx.createBuffer(1, len, ctx.sampleRate), dd = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) dd[i] = Math.random() * 2 - 1;
+    const n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), o = ctx.createOscillator(), ob = ctx.createBiquadFilter(), og = ctx.createGain();
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(), g = ctx.createGain(), pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    n.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 8; bp.frequency.setValueAtTime(2400, t); bp.frequency.linearRampToValueAtTime(1500, t + dur);
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(1180, t); o.frequency.linearRampToValueAtTime(780, t + dur);
+    lfo.frequency.value = 19 + Math.random() * 8; lg.gain.value = 45; lfo.connect(lg); lg.connect(o.frequency);
+    ob.type = 'bandpass'; ob.frequency.value = 1050; ob.Q.value = 3; og.gain.value = 0.32;
+    const peak = 0.17 * near * (0.6 + 0.4 * I1) * S.vol / 100;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.04); g.gain.setValueAtTime(peak * 0.85, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+    n.connect(bp); bp.connect(g); o.connect(ob); ob.connect(og); og.connect(g);
+    if (pan) { pan.pan.value = Math.max(-0.7, Math.min(0.7, (rel || 0) / 60)); g.connect(pan); pan.connect(ctx.destination); } else g.connect(ctx.destination);
+    n.start(t); o.start(t); lfo.start(t); n.stop(t + dur); o.stop(t + dur); lfo.stop(t + dur);
   }
   // clacson di un'altra auto: due toni più bassi e corti del nostro
   function carHorn() {

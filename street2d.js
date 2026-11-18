@@ -1932,14 +1932,19 @@ class Street2D {
         if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
-      this.light(g, left + 3, sy + tY, 8, 6, '#ff2a2a', 0.15, 2);
-      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + tY, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
+      // luci dei freni accese quando frena (e.acc, game.js); fari che lampeggiano quando sfanala (e.flashT, strada.js)
+      const brk = (e.acc || 0) < -1.3 && (e.v || 0) > 0.5, flash = e.flashT > 0 && Math.floor(e.flashT * 6) % 2 === 0;
+      this.light(g, left + 3, sy + tY, brk ? 12 : 8, brk ? 8 : 6, '#ff2a2a', brk ? 0.6 : 0.15, 2);
+      if (brk) { g.fillStyle = '#ff4a3a'; g.fillRect(left + 1, sy + tY - 1, 3, 3); }
+      if (flash) { this.light(g, left + w - 2, sy + hY + k, 10, 6, '#ffe7a0', 0.7, 3); g.fillStyle = '#fffbe8'; g.fillRect(left + w - 4, sy + hY, 4, 3); }
+      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, (flash ? 160 : 110) * k, flash ? 24 : 16, '255,240,200', e.hazard ? 0.15 : flash ? 1.1 : 0.55); this.lightAdd(left, sy + tY, brk ? 30 : 22, brk ? 16 : 12, '255,40,40', brk ? 0.9 : 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
       if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce (anche dopo un urto)
         g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3);
         this.light(g, left + 4, sy + tY + 4 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + hY + k, 12, 7, '#ffa020', 0.35, 3);
       }
       if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3); this.light(g, left + 4, sy + tY + 4 * k, 9, 6, '#ffa020', 0.3, 3); }
       if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
+      if (e.skidT > 0.85 && !(this.cool['skid' + e.id] > st.t) && (this.cool['skid' + e.id] = st.t + 2.5)) this.comic('SCREEECH!', left + w * 0.1, sy - 10, '#f4f1e6', 2);
       if (e.kind === 'police') {
         const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
         const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
