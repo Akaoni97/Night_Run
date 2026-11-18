@@ -21,12 +21,13 @@ due voci, e il controllo della sera le legge.
   niente di tuo; se serve, sistemala tu.
 
 ## 18/11/2026 sera · proprietario
+- Fatto: la **retromarcia** nel viaggio porta davvero indietro, fino a 60 m dal punto più lontano raggiunto (`GAME_BACK_MAX`
+  in `game.js`): chi si ferma poco oltre un locale (anche nel primo lavoro) torna davanti e ci entra. Test `test/retro.test.js`.
 - Fatto: il titolo **Night Run: The Last Highway** è nel gioco (titolo della pagina, scritta in alto, schermata iniziale,
   cartello alla fine del prologo); artifact aggiornato all'ultimo main. Restano le scritte del teaser.
 - Fatto: controllo della sera (3 commit, solo documentazione e strumenti; 142 test passano, anche su GitHub).
-- Deciso: il gioco si chiamerà **Night Run: The Last Highway** (da controllare nei marchi, da mettere nel gioco
-  quando `index.html` è libero). La musica è fatta con Gemini: dettagli e dubbi sull'uso commerciale in `LICENZE.md`.
-- Serve dal cognato: dire se le gare torneranno (il teaser mostra una partenza al semaforo).
+- Deciso: il nome (da controllare nei marchi). La musica è fatta con Gemini, piano Google AI Pro: dettagli in `LICENZE.md`.
+- Unione delle 17:55 controllata dal Claude del proprietario: non manca niente. Gare: risposta del cognato ricevuta.
 
 ## 18/11/2026 · proprietario
 - Fatto: video teaser a velocità di gioco (strumenti `teaser*`), controllo delle licenze (`LICENZE.md`), il cognato carica

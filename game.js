@@ -70,6 +70,7 @@ const MOUNTAIN = {
 };
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
+const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
   { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
@@ -635,9 +636,9 @@ class StreetGame {
           out.brake = v > vt + 0.4 ? Math.min(1, need / 10.3 * 1.4 + (v - vt) * 0.05) : 0;
           if (v < vt - 1 && rel > 4) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
         }
-        if (v < 0.25 && (ap.atX === null || rel < 6)) {
+        if (v < 0.25 && Math.abs(this.sim.v) < 0.25 && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
           ap.stopped = true;
-          if (this.sim.gear > 1 && this.sim.cfg.autoClutch) this.sim.shift(1);
+          if ((this.sim.gear > 1 || this.sim.gear === -1) && this.sim.cfg.autoClutch) this.sim.shift(1);
           if (ap.onStop) ap.onStop();
         }
       } else { out.brake = 1; ap.t += dt; if (ap.tick) ap.tick(dt); }
@@ -649,6 +650,12 @@ class StreetGame {
     const sim = this.sim, d0 = this.s.dist;
     if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
     if (sim.v > 0) this.s.dist += sim.v * dt;
+    else if (sim.v < 0) {                  // retromarcia: si torna indietro di poco, l'autostrada resta a senso unico
+      const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = far - GAME_BACK_MAX;
+      this.s.dist = Math.max(lim, d0 + sim.v * dt);
+      if (this.s.dist <= lim && d0 > lim) this.say('Più indietro di così non si torna: l\'autostrada va solo avanti', 'info');
+    }
+    if (!(this.s.far >= this.s.dist) || this.s.far - this.s.dist > GAME_BACK_MAX + 1) this.s.far = this.s.dist;   // più lontano raggiunto (si azzera se la strada salta: partita nuova, tutorial)
     const d = this.s.dist;
     // contachilometri e traguardi
     if (d > d0) {
