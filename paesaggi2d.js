@@ -4,6 +4,7 @@
 //  lontane (paesi, cascine, strade con le auto, treni, navi), i fari e i lampeggianti, le torri illuminate da sotto.
 //  Le posizioni ripetono gli stessi calcoli dei paesaggi in street2d.js (stessi tileRun e semi), così le luci cadono
 //  sulle cose giuste. Tutto deterministico (Street2D.rnd), tranne quello che si muove col tempo t.
+//  Cartelloni illuminati lungo la strada (pianura e deserto, scritte inventate in PB_TESTI) e aree di servizio lontane in pianura.
 // ============================================================================
 (function paesaggi() {
   if (typeof Street2D === 'undefined') return;
@@ -26,10 +27,68 @@
     }
   };
 
+  // cartellone pubblicitario lungo la strada, illuminato da due lampade sul bordo alto: due righe di testo inventato
+  // (maiuscolo ASCII), una fascia di colore, i pali e la passerella. x = bordo sinistro, base = dove poggiano i pali
+  S.pBillboard = function (g, x, base, lines, col, paper, t, k, lit = true) {
+    const w = 66, h = 26, top = base - 50, X = Math.round(x);
+    g.fillStyle = '#0c0d14'; g.fillRect(X + 12, top + h, 2, base - top - h); g.fillRect(X + w - 14, top + h, 2, base - top - h);   // pali
+    g.fillRect(X + 8, top + h + 4, w - 16, 1);                                                                                     // passerella
+    g.fillStyle = '#16161f'; g.fillRect(X - 1, top - 1, w + 2, h + 2);
+    g.fillStyle = paper; g.fillRect(X, top, w, h);
+    g.fillStyle = col; g.fillRect(X, top + h - 5, w, 5); g.fillRect(X, top, 3, h - 5);
+    lines.forEach((ln, r) => this.text(g, ln, X + 4 + Math.max(0, (w - 6 - this.textW(ln)) / 2), top + 4 + r * 8, r ? Street2D.shade(col, -0.35) : '#1a1620'));
+    // lampade: un braccio sopra il cartellone, la luce che cade sul foglio (sfarfalla appena, una ogni tanto è fulminata)
+    const dead = rnd(k * 9.3) < 0.15;
+    for (const lx of [X + 14, X + w - 18]) {
+      g.fillStyle = '#0c0d14'; g.fillRect(lx, top - 5, 1, 5); g.fillRect(lx, top - 5, 5, 1);
+      const on = lit && !(dead && lx > X + 20) && (rnd(k + lx) > 0.08 || Math.sin(t * 23 + k) > -0.6);
+      g.fillStyle = on ? '#fff3d0' : '#3a3428'; g.fillRect(lx + 3, top - 4, 3, 1);
+      if (on) {
+        g.save(); g.globalCompositeOperation = 'lighter';
+        const gr = g.createLinearGradient(0, top - 3, 0, top + h); gr.addColorStop(0, 'rgba(255,236,190,.38)'); gr.addColorStop(1, 'rgba(255,236,190,0)');
+        g.fillStyle = gr; g.beginPath(); g.moveTo(lx + 3, top - 3); g.lineTo(lx + 22, top + h); g.lineTo(lx - 16, top + h); g.fill(); g.restore();
+        this.light(g, lx + 4, top - 3, 14, 8, '#ffe8b0', 0.12, 3);
+      }
+    }
+    if (lit) this.light(g, X + w / 2, top + h / 2, w * 0.7, h, '#ffe0a0', 0.05, 3);
+  };
+  // area di servizio lontana, dall'altra parte dei campi: la pensilina coi neon, il palo col prezzo, i camion fermi
+  S.pServiceArea = function (g, x, y, t, k) {
+    const X = Math.round(x);
+    g.fillStyle = '#10131c'; g.fillRect(X, y - 3, 46, 3); g.fillRect(X + 4, y, 1, 4); g.fillRect(X + 41, y, 1, 4);    // pensilina
+    for (let q = 0; q < 9; q++) { g.fillStyle = '#eef6ff'; g.fillRect(X + 2 + q * 5, y, 3, 1); }
+    this.light(g, X + 23, y + 3, 40, 8, '#dff0ff', 0.12, 3);
+    g.fillStyle = '#0c0e16'; g.fillRect(X + 52, y - 4, 26, 8); for (let q = 0; q < 4; q++) { g.fillStyle = rnd(k + q) < 0.6 ? '#ffd890' : '#2a2a38'; g.fillRect(X + 54 + q * 6, y - 2, 3, 2); }   // il bar
+    g.fillStyle = '#0c0e16'; g.fillRect(X - 10, y - 18, 1, 22); g.fillRect(X - 14, y - 20, 9, 5);                                  // palo coi prezzi
+    const c = ['#3aff9a', '#ffb000', '#2ee6ff'][Math.floor(rnd(k * 2.1) * 3)]; g.fillStyle = c; g.fillRect(X - 13, y - 19, 7, 1); g.fillRect(X - 13, y - 17, 7, 1);
+    this.light(g, X - 10, y - 18, 10, 6, c, 0.14, 3);
+    for (let q = 0; q < 2; q++) { const tx = X + 84 + q * 20; g.fillStyle = '#0a0b12'; g.fillRect(tx, y - 3, 16, 5); g.fillStyle = '#ff3a2a'; g.fillRect(tx, y + 1, 1, 1); }   // camion
+  };
+  const PB_TESTI = {
+    plain: [['MOBILIFICIO', 'USCITA 3 KM'], ['AGRITURISMO', 'IL PIOPPO'], ['SAGRA DEL', 'LAMBRUSCO'], ['DISCOTECA', 'LA NEBBIA'], ['GOMMISTA 24H', 'USCITA 2'], ['CASEIFICIO', 'SPACCIO 1 KM'], ['TRATTORIA', 'DA ORNELLA']],
+    desert: [['ULTIMA BENZINA', 'PER 80 MIGLIA'], ['DINER', 'APERTO 24H'], ['MOTEL', 'FRA 12 MIGLIA'], ['SERPENTI VIVI', 'USCITA 3'], ['TACOS', 'FRA 2 MIGLIA'], ['MUSEO DEI', 'MINERALI']],
+  };
+  const PB_COL = { plain: [['#c8402a', '#efe6d2'], ['#2a6a3a', '#ece8d8'], ['#2a4a8a', '#e8e6dc'], ['#8a2a6a', '#efe2e8']], desert: [['#d8642a', '#f0dfc0'], ['#2a7a8a', '#efe6d0'], ['#b82a2a', '#f2e8d2']] };
+  const PB_SKIP_DESERT = (m) => { const r = ((m - 700) % 1600 + 1600) % 1600; return r < 260 || r > 1540; };   // lontani dal motel della Route 66
+  // i cartelloni stanno a distanze vere lungo la strada (si muovono con la strada, come i paletti)
+  S.pBillboards = function (g, bg, base, R, t, step, skip, lit = true) {
+    const { wx, visFrom, visTo } = R, T = PB_TESTI[bg], C = PB_COL[bg];
+    for (let m = Math.floor((visFrom - 80) / step) * step + step * 0.37; m < visTo + 10; m += step) {
+      const k = Math.round(m); if (rnd(k * 0.731) < 0.42 || (skip && skip(m))) continue;
+      const [col, paper] = C[Math.floor(rnd(k * 1.7) * C.length)];
+      this.pBillboard(g, wx(m), base, T[Math.floor(rnd(k * 2.3) * T.length)], col, paper, t, k, lit);
+    }
+  };
+
   S.drawScenery = function (g, dist, t, bg, R) {
     prev.call(this, g, dist, t, bg, R);
     if (this.quality === 'bassa' && this.slow) return;
-    const W = this.LW, night = 1 - 0.6 * (this.day || 0); if (night < 0.5) return;
+    const W = this.LW, night = 1 - 0.6 * (this.day || 0);
+    if (night < 0.5) {                                                   // di giorno solo i cartelloni, a lampade spente
+      if (bg === 'plain') this.pBillboards(g, 'plain', 211, R, t, 160, null, false);
+      if (bg === 'desert') this.pBillboards(g, 'desert', 222, R, t, 190, PB_SKIP_DESERT, false);
+      return;
+    }
     const { wx, visFrom, visTo } = R;
 
     if (bg === 'plain') {
@@ -57,6 +116,9 @@
       });
       // la cabina elettrica lampeggia rosso sui tralicci (uno ogni tanto)
       this.tileRun(dist * 1.4, 260, (i, x) => { if (rnd(i * 5.5) < 0.6) return; if (Math.floor(t * 1.2 + i) % 2) this.pDot(g, x - 1, 118, '#ff3a2a', 0.2, 6, 2, 2); });
+      // un'area di servizio lontana ogni tanto, dall'altra parte dei campi, e i cartelloni lungo la strada
+      this.tileRun(dist * 0.5, 800, (i, x) => { if (rnd(i * 4.3) < 0.4) return; this.pServiceArea(g, x + 200 + rnd(i) * 400, 188, t, i); });
+      this.pBillboards(g, 'plain', 211, R, t, 160);
       return;
     }
 
@@ -137,6 +199,8 @@
         if (Math.floor(t * 1.1 + i) % 2) for (const yy of [top - 2, top + 30, top + 56]) this.pDot(g, ax - 1, yy, '#ff3a2a', 0.18, 6, 2, 2);
       });
       this.pFarCars(g, 203, dist, t, 3, 0.9, 41);
+      // cartelloni lungo la statale, lontani dal motel (che sta a 700 m ogni 1,6 km)
+      this.pBillboards(g, 'desert', 222, R, t, 190, PB_SKIP_DESERT);
       return;
     }
 
