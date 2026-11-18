@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Leva P R N D dell'automatico, folle che sgasa in manuale, cerchi della Volvo non più luminosi, gomme più vere | `gomme2d.js` (nuovo), `index.html`, `sim.js`, `street2d.js` (ruote del traffico), `menu.js`, `tasti.js` | 18/11 sera |
