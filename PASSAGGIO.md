@@ -104,8 +104,12 @@ gioco fa, sezione per sezione).
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
 - **Video teaser e licenze (18/11/2026)**: `strumenti/teaser.js` registra il gioco senza interfaccia a 30 fps col tempo finto
   di Playwright (fermo: avanza solo fotogramma per fotogramma, `requestAnimationFrame` a 1/60 s fissi), guidando con la
-  fisica vera (pilota a copione: avviamento, partenza, crociera, partenza affiancata al semaforo, frenata al posto di
-  blocco) e salvando i parametri del motore; `strumenti/teaser_audio.mjs` ci rifà il suono col motore audio del gioco;
+  fisica vera (pilota a copione: avviamento e partenza senza controllo di trazione, crociera, partenza affiancata al
+  semaforo sotto la pioggia col gas dosato, frenata al posto di blocco; dal 18/11 sera anche il telefono che sale con un
+  messaggio dello Sconosciuto, «Ho lasciato sei auto. Tu ne hai presa una.», e la Supra preparata Big single che tira la
+  3ª al limitatore, mette la 4ª e se ne va con la telecamera che si ferma, `camHold` in `street2d.js`) e salvando i
+  parametri del motore; nelle riprese gomme gonfie e guida automatica spenta; ogni ripresa può avere la sua auto
+  (`car: { id, preset }`) e `teaser_audio.mjs` usa quella; `strumenti/teaser_audio.mjs` ci rifà il suono col motore audio del gioco;
   `strumenti/teaser_cartelli.py` fa le scritte (nome, frasi, anno); `strumenti/teaser_monta.sh` monta 16:9 e 9:16 con
   *Redline at Midnight* sotto. Nel video niente cartelloni né testi della storia. `LICENZE.md`: controllo di licenze e
   marchi prima dell'uscita (nome già usato da altri giochi, marche vere, musica da confermare, crediti da mostrare).

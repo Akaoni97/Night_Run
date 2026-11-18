@@ -1666,6 +1666,7 @@ class Street2D {
     // in accelerazione resta un attimo indietro, in frenata va avanti
     const camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
+    if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)
     const PPM = 30, carX = Math.round(W * st.cam), K0 = 0.78;
     const kq = (y) => Math.round(K0 * this.laneS(y) / 0.04) * 0.04;   // scala quantizzata: pochi sprite in cache
     const wx = (m) => Math.round(carX + (m - dist) * PPM);
