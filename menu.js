@@ -163,17 +163,39 @@
   }, 120);
 
   // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito
-  // fila dei comandi (AUTO, TC, LAUNCH...) chiusa dietro un pulsante COMANDI: si apre e si chiude col dito e si ricorda (solo al tocco, CSS)
-  if (dash) {
-    const tog = document.createElement('button'); tog.type = 'button'; tog.className = 'dash-tog'; tog.setAttribute('aria-expanded', 'false');
-    tog.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>COMANDI</span><i aria-hidden="true">▸</i>';
-    let aperta = false; try { aperta = localStorage.getItem('nr_comandi') === '1'; } catch (e) { /* niente */ }
-    const setta = (v) => {
-      aperta = v; dash.classList.toggle('dash-open', v); tog.setAttribute('aria-expanded', String(v));
-      try { localStorage.setItem('nr_comandi', v ? '1' : '0'); } catch (e) { /* niente */ }
+  // al tocco (deciso all'avvio): in alto a sinistra il quadro strumenti con AVVIA accanto; in basso a sinistra, sopra ◀ ▶,
+  // due pulsanti STRUMENTI e DATI che aprono due finestrelle: le funzioni dell'auto (la fila AUTO, TC... e i comandi di
+  // comandi.js, a tessere) e i dati del viaggio (ora, lavoro, bisogni, carico: il riquadro che prima stava in alto a sinistra).
+  // I pezzi della pagina si spostano, non si rifanno: chi li cerca per id li trova come prima.
+  if (matchMedia('(pointer: coarse)').matches && dash && hud) {
+    document.documentElement.classList.add('tdash');
+    const cock = document.createElement('div'); cock.className = 'tcock';
+    const hp = $('hudP'); if (hp) cock.appendChild(hp);
+    cock.appendChild(st); hud.appendChild(cock);
+    const ICON = {
+      str: '<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+      dati: '<path d="M5 20V11M12 20V5M19 20v-6"/>',
     };
-    tog.addEventListener('click', () => setta(!aperta));
-    dash.insertBefore(tog, dash.firstChild); setta(aperta);
+    const bar = document.createElement('div'); bar.className = 'tbar'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Finestre');
+    const mkBtn = (id, label) => { const b = document.createElement('button'); b.type = 'button'; b.dataset.p = id; b.setAttribute('aria-expanded', 'false'); b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[id]}</svg><span>${label}</span>`; bar.appendChild(b); return b; };
+    const bStr = mkBtn('str', 'STRUMENTI'), bDati = mkBtn('dati', 'DATI');
+    // finestrella STRUMENTI = #dash stesso (con le sue file di pulsanti), con una testata
+    const head = (title, sub) => { const h = document.createElement('header'); h.className = 'tpan-h'; h.innerHTML = `<b>${title}</b><small>${sub}</small><button type="button" aria-label="Chiudi">✕</button>`; return h; };
+    dash.classList.add('tpan', 'tpan-str'); dash.insertBefore(head('Strumenti', 'Funzioni dell\'auto'), dash.firstChild);
+    // finestrella DATI con il riquadro hud-l
+    const dati = document.createElement('div'); dati.className = 'tpan tpan-dati'; dati.appendChild(head('Dati', 'Viaggio, lavoro, bisogni'));
+    const hl = q('.hud-l'); if (hl) dati.appendChild(hl);
+    hud.appendChild(dati); hud.appendChild(bar);
+    const pans = { str: [bStr, dash], dati: [bDati, dati] };
+    let aperta = null;
+    const apri = (id) => {
+      aperta = aperta === id ? null : id;
+      for (const k in pans) { const on = k === aperta; pans[k][1].classList.toggle('open', on); pans[k][0].setAttribute('aria-expanded', String(on)); }
+    };
+    bStr.addEventListener('click', () => apri('str')); bDati.addEventListener('click', () => apri('dati'));
+    for (const k in pans) pans[k][1].querySelector('.tpan-h button').addEventListener('click', () => { if (aperta === k) apri(k); });
+    // un tocco sulla strada fuori dalle finestre (anche sui pedali) le chiude
+    stage.addEventListener('pointerdown', (e) => { if (aperta && !e.target.closest('.tpan, .tbar')) apri(aperta); }, true);
   }
   // SCHERMO INTERO nella barra in alto (dopo TELEFONO e TASTI, che si aggiungono dopo questo file): usa lo stesso pulsante della strada
   const fsb = $('fsBtn');
