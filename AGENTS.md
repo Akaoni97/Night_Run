@@ -1,6 +1,7 @@
 # Night Run · guida per gli assistenti (Kimi, Claude e altri)
 
 Stato del lavoro, lavori aperti e procedure (artifact, nuovi disegni di auto): vedi `PASSAGGIO.md`.
+Cosa viene da Codex, cosa no e come annullarlo: `MODIFICHE_CODEX.md`.
 Comandi di Claude Code (`/compact`, `/clear`...), skill di Night Run e scorciatoie, spiegati in italiano: `COMANDI.md`.
 Gli strumenti per trasformare i disegni in auto del gioco sono in `strumenti/`. I documenti (storia, richieste a Codex) sono in `docs/`, i testi da cui si generano le chat in `materiale_chat/`.
 
@@ -16,7 +17,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 
 | File | Cosa contiene |
 | --- | --- |
-| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri, collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Scoppi dello scarico a voci (fino a 6 insieme, ognuno un po' diverso: altezza, crepitio, durata, doppi «pa-pam», sgranate); carattere per auto in `voice.pop` (`f` altezza, `crack`, `len`, `thump`, `vary`, `boom` boato basso che scende di nota, `bf` sua altezza, `mid` quanto passa dal silenziatore; le Volvo usano `VOLVO_POP` col boato, Supra di serie). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. |
+| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri (4, 5 o 6: la 850 R ha i cinque, modifica Codex), carattere «Codex · deciso» opzionale (`cfg.character`, menu Guida, di serie Originale = suono di prima), collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Scoppi dello scarico a voci (fino a 6 insieme, ognuno un po' diverso: altezza, crepitio, durata, doppi «pa-pam», sgranate); carattere per auto in `voice.pop` (`f` altezza, `crack`, `len`, `thump`, `vary`, `boom` boato basso che scende di nota, `bf` sua altezza, `mid` quanto passa dal silenziatore; le Volvo usano `VOLVO_POP` col boato, Supra di serie). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. |
 | `sim.js` | Fisica (classe `SupraSim`, passo 1/4000 s): motore, turbo, frizione, cambio, gomme Pacejka, differenziale, beccheggio, wheel hop, TRC, ABS, tipi di limitatore. `sim.park` (spento di serie): cambio bloccato in folle, ruote ferme (leva in P). `sim.revMax` (m/s, spento di serie): limitatore della retromarcia, lo accende il gioco. |
 | `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), `tuningParams()`. |
 | `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
@@ -101,7 +102,7 @@ una riga nella tabella qui sopra, poi uniscile su `main` (direttamente, come il 
 Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
 `node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore|urti|scoppi> <file.wav> [vista] [ambiente]`
-(variabili `PRESET=<id>` per la preparazione, `POPS=1` per accendere gli scoppi).
+(variabili `PRESET=<id>` per la preparazione, `POPS=1` per accendere gli scoppi, `CARATTERE=codex` per il carattere deciso).
 
 ## Plugin ECC (Everything Claude Code)
 `.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la
@@ -155,7 +156,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 157, compresi leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 166, compresi le modifiche di Codex, leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
 - Con `strumenti/prova.js` le domande iniziali scelgono il cambio automatico: la leva parte in **P**, per guidare `js:nightRun.engineTap()` e `js:nightRun.leva('D')`.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,

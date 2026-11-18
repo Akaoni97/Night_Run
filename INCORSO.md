@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | Recupero delle modifiche di Codex: 850 R a 5 cilindri, suono «deciso» opzionale, capitolo letto alla conferma | `dsp.js`, `cars.js`, `index.html`, `viaggio.js`, test | 18/11 notte |

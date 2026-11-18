@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario (modifiche di Codex)
+- Fatto: recuperato il lavoro che il cognato aveva fatto con Codex (finito per errore nella sua copia del repository):
+  850 R a cinque cilindri, «Carattere del motore» Originale / Codex · deciso nel menu Guida (di serie Originale, suono
+  identico a prima), capitolo del Viaggio letto solo alla conferma. Tutto in `MODIFICHE_CODEX.md`, con come annullarlo.
+- Lasciato fuori: consegne saltate spostate alla sede dopo (oggi si annullano apposta) e la copia dei salvataggi.
+- Serve dal cognato: ascoltare la 850 R a cinque cilindri e il profilo deciso; chiudere la bozza n. 1 nella sua copia.
+
 ## 18/11/2026 notte · proprietario
 - Fatto: radio nuova (`radio_ui.js`): pannellino in alto a destra con equalizzatore a 9 barre e striscia di spettro,
   frequenza ambra, nome della stazione e della canzone, titolo che scorre, barra del brano, sintonia animata con la neve.
