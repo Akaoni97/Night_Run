@@ -11,3 +11,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
 | cognato (Claude) | Video teaser: partenza senza TC, gara sul bagnato, scena del telefono, Supra modificata (3ª al limitatore, 4ª, via) | `strumenti/teaser.js`, `strumenti/teaser_audio.mjs`, `strumenti/teaser_monta.sh`, `street2d.js` (una riga per la telecamera ferma) | 18/11 19:10 |
+| proprietario (Claude) | Editor del personaggio prima del prologo; il personaggio scelto nel prologo e in auto; movimenti più veri alla guida | `personaggio.js` (nuovo), `pilota2d.js`, `prologo.js`, `index.html`, `menu.js` | 18/11 sera |
