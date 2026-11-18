@@ -14,6 +14,12 @@ due voci, e il controllo della sera le legge.
   (proposte della PR #7).
 - Serve dal proprietario: attivare GitHub Pages; aggiornare il suo artifact (quello in questo file è del suo account).
 
+## 18/11/2026 sera · proprietario
+- Fatto: controllo della sera (3 commit, solo documentazione e strumenti; 142 test passano, anche su GitHub).
+- Deciso: il gioco si chiamerà **Night Run: The Last Highway** (da controllare nei marchi, da mettere nel gioco
+  quando `index.html` è libero). La musica è fatta con Gemini: dettagli e dubbi sull'uso commerciale in `LICENZE.md`.
+- Serve dal cognato: dire se le gare torneranno (il teaser mostra una partenza al semaforo).
+
 ## 18/11/2026 · proprietario
 - Fatto: video teaser a velocità di gioco (strumenti `teaser*`), controllo delle licenze (`LICENZE.md`), il cognato carica
   su `main` senza approvazione, controllo della sera, `COMANDI.md`, test automatici su GitHub, hook di inizio sessione,
