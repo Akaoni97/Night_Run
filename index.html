@@ -1262,7 +1262,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const game = new StreetGame(sim);
   let themeReady = false;
   try { const g = localStorage.getItem('nightrun'); if (g) { game.load(g); if (typeof game.s.fuel === 'number') sim.fuel = game.s.fuel; if (game.s.car) { sim.damage = game.s.car.damage || 0; sim.tireWear = game.s.car.tireWear || 0; } } } catch (e) { /* storage non disponibile */ }
-  const saveGame = () => { game.s.fuel = sim.fuel; game.s.car = { damage: sim.damage, tireWear: sim.tireWear }; try { localStorage.setItem(game.s.vg ? 'nightrun-viaggio' : 'nightrun', game.save()); } catch (e) { /* ignora */ } };
+  const saveGame = () => { if (window.__nrRiavvia) return; game.s.fuel = sim.fuel; game.s.car = { damage: sim.damage, tireWear: sim.tireWear }; try { localStorage.setItem(game.s.vg ? 'nightrun-viaggio' : 'nightrun', game.save()); } catch (e) { /* ignora */ } };
   const S = { tune: Object.assign({}, TUNING_PRESETS[0].sel), pops: false, launch: false, autoClutch: true, revMatch: true, view: 3, vol: 80, muted: false, mix: 70, paint: '#c81d11', look: '2d', character: 'originale' };
   try {
     const saved = JSON.parse(localStorage.getItem('banco2jz') || '{}');
@@ -3219,6 +3219,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let newArm = 0;
   $('btnNew').addEventListener('click', () => {
     const b = $('btnNew');
+    if (S.trip && window.nightRiavvia) { window.nightRiavvia.ask(); return; }     // Viaggio: domanda Sì/No e si riparte dal filmato iniziale (riavvia.js)
     if (Date.now() - newArm > 4000) { newArm = Date.now(); b.textContent = 'Sicuro? Clicca di nuovo per azzerare'; setTimeout(() => { b.textContent = S.trip ? 'Nuovo viaggio' : 'Nuova carriera'; }, 4000); return; }
     if (S.trip) { newArm = 0; switchTrip(true, true); flash('Nuovo viaggio: km 0, una V40 di serie e € 450', 2.6); return; }
     game.reset(); sim.fuel = 0.72;
@@ -3581,8 +3582,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 })();
 </script>
 <script src="tasti.js"></script>
+<script src="sviluppatori.js"></script>
 <script src="menu.js"></script>
 <script src="crediti.js"></script>
+<script src="riavvia.js"></script>
 <script src="radio_ui.js"></script>
 <script src="telefono.js"></script>
 <script src="chat_dati.js"></script>
