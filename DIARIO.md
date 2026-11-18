@@ -4,6 +4,17 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario (ruote e borbottio)
+- Fatto: **ruote**. Controllate le 25 ruote disegnate contro la sagoma (`strumenti/centro_ruote.py`): il buco nel corpo e `ax/wy` combaciano, ma in
+  cinque ruote il cerchio era fuori asse rispetto alla gomma (E30 di 3 px in alto, poi E34, R5, B2002, A112) e girando il mozzo ballava.
+  `Street2D.wheelConc` (`street2d.js`) le rifà concentriche (cerchio al centro, corona di gomma uniforme); tabella `WHEEL_FIX`. Vale anche per
+  traffico, concessionario e interni. Provate in gioco su 9 auto. Per nuove auto: `python3 strumenti/centro_ruote.py` e guardare l'ingrandimento.
+- Fatto: **borbottio al rilascio** (`dsp.js`, `addBurble` e blocco in `cycle()`): mollato il gas sopra i 1300 giri il motore gorgoglia a raffiche
+  (boato basso + colpetti irregolari + qualche raffichetta e ogni tanto un colpo grosso), si spegne in 2-4 s. Di serie è moderato, cresce con
+  mappa pop & bang, taglio d'accensione e decat/scarichi aperti. Copione nuovo `rilascio` in `strumenti/ascolta.mjs` (conta gli schiocchi), test in
+  `test/motori.test.js`. Provato solo con i numeri (4-5 schiocchi/s di serie, nessuna saturazione), **non ascoltato**: serve il tuo orecchio, i valori
+  da ritoccare sono in `addBurble` e nel blocco "borbottio" (`lvl`, `rate`, ampiezze).
+
 ## 18/11/2026 notte · proprietario (modifiche di Codex)
 - Fatto: recuperato il lavoro che il cognato aveva fatto con Codex (finito per errore nella sua copia del repository):
   850 R a cinque cilindri, «Carattere del motore» Originale / Codex · deciso nel menu Guida (di serie Originale, suono

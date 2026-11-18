@@ -367,6 +367,24 @@ class EngineDSP {
     }
   }
 
+  // Borbottio al rilascio: un gorgoglio basso e pieno di colpetti irregolari, raggruppati a raffiche, che resta nello scarico dopo aver mollato il gas.
+  // lvl: quanto è carico (di serie ~0,55; mappa pop & bang, taglio d'accensione, decat e scarichi aperti lo alzano). Usa il boato basso (non passa dal silenziatore).
+  addBurble(lvl, hi) {
+    if (this.pops.length > 10) return;
+    const B = this.popB, a0 = Math.abs(this.r()), rr = () => this.r() * B.vary;
+    const a = (0.4 + 0.5 * a0) * (0.75 + 0.35 * lvl) * (0.55 + 0.45 * hi);
+    const f = 68 * B.f * 0.8 * Math.exp(0.14 * rr()), len = B.len * (1.1 + 0.8 * Math.abs(this.r()));
+    const bk = Math.max(B.boom, 0.65) * (0.55 + 0.45 * Math.abs(this.r())) * (0.75 + 0.3 * lvl), bfm = 0.9 * B.bf * Math.exp(0.16 * rr());
+    const P = { bk, bfm, blm: 1.2 + 0.5 * Math.abs(this.r()), d: Math.max(1, Math.round((0.002 + 0.01 * Math.abs(this.r())) * this.sr)), a, f, tf: 80 * B.f * Math.exp(0.09 * rr()), len,
+      br: B.crack * 0.5 * Math.max(0.3, 1 + 0.38 * rr()), nc: Math.max(0.3, 1 - 0.5 * Math.abs(rr())), tk: B.thump * 0.9 };
+    this.pops.push(P);
+    this.flu += 0.06 + 0.05 * lvl;                                       // piccolo strappo dell'albero: il regime balla un attimo
+    if (Math.abs(this.r()) < 0.1 + 0.12 * lvl) {                          // raffichetta di schiocchi piccoli: brrrap
+      let dd = P.d; const n = 2 + Math.floor(Math.abs(this.r()) * 3);
+      for (let q = 0; q < n; q++) { dd += Math.round((0.005 + 0.007 * Math.abs(this.r())) * this.sr); this.pops.push(Object.assign({}, P, { d: dd, a: a * (0.3 + 0.25 * Math.abs(this.r())), f: f * (1.15 + 0.3 * Math.abs(this.r())), len: 0.5, br: P.br * 1.5, bk: P.bk * 0.4, blm: 0.5 })); }
+    }
+  }
+
   cycle(c) {
     const S = this.S, T = this.T;
     const run = S.running > 0.5;
@@ -411,6 +429,20 @@ class EngineDSP {
       else if (T.cut === 3) { ch = (this.cfg.pops ? 0.55 : 0.3) * pm; big = true; }
       if (Math.abs(this.r()) < ch) this.addPop(big || Math.abs(this.r()) < 0.15);
     }
+    // borbottio al rilascio: dopo aver mollato il gas ad alti giri il motore gorgoglia a raffiche (si spegne in qualche secondo, più lungo con le mappe pop & bang)
+    if (!fire && run && T.cut === 1 && S.rpm > 1300) {
+      const pm = this.tn.cat.pop, lvl = 0.55 + (this.cfg.pops ? 0.5 : 0) + (this.tn.spark ? 0.2 : 0) + 0.35 * Math.min(1.5, Math.max(0, pm - 1));
+      const env = Math.exp(-T.ovr / (0.9 + 1.5 * lvl)), hi = Math.min(1, (S.rpm - 1300) / 3500);
+      const cps = Math.max(12, S.rpm / 60 * this.nCyl / 2);                // scoppi al secondo: serve a contare il tempo dentro il ciclo
+      const bb = this.bb || (this.bb = { on: false, t: 0 });
+      bb.t -= 1 / cps;
+      if (bb.t <= 0) { bb.on = !bb.on; bb.t = bb.on ? 0.05 + 0.16 * Math.abs(this.r()) : 0.04 + 0.2 * Math.abs(this.r()) * (1.3 - Math.min(1, lvl * 0.6)); }
+      const rate = (7 + 8 * lvl) * env * (0.35 + 0.65 * hi);              // colpetti al secondo a gas mollato, a raffiche, metà del tempo
+      if (bb.on && Math.abs(this.r()) < Math.min(0.9, rate / (0.5 * cps))) {
+        this.addBurble(lvl, hi);
+        if (Math.abs(this.r()) < 0.05 * lvl * env) this.addPop(true);      // ogni tanto un colpo grosso
+      }
+    } else if (this.bb) this.bb.on = false;
   }
 
   control() {
