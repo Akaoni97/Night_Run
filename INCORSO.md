@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Personaggio più bello e riconoscibile: pixel art vera con animazioni (prologo, editor), in auto più grande con nuove animazioni | `personaggio.js`, `pilota2d.js`, `index.html` (una riga) | 18/11 sera |
