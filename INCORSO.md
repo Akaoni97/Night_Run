@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Claude) | Traffico: camion che si sorpassano, code dopo un incidente, uscite alle tappe; interruttore "leggero" per le prove da telefono; regola PC/telefono in AGENTS.md; PASSAGGIO.md | `game.js`, `strada.js`, `street2d.js`, `index.html` (impostazioni), `AGENTS.md`, `PASSAGGIO.md` | 18/11 17:50 |
