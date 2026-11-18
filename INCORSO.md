@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Titolo del gioco: Night Run: The Last Highway (titolo della pagina, scritta in alto, schermata iniziale, cartello del prologo) | `index.html` (solo titolo e testata), `prologo.js` | 18/11 sera |
