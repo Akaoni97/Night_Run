@@ -124,42 +124,10 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     if (C.w.width) for (const ax of D.ax) { g.save(); g.translate(Math.round(x) + ax, y + D.wy); g.rotate(ang); g.drawImage(C.w, -C.w.width / 2, -C.w.height / 2); g.restore(); }
     return y;
   }
-  // il protagonista in piedi, di profilo verso destra, come lo si vede in auto: cappellino rosso, giubbotto blu, jeans.
-  // x,y = punto a terra tra i piedi; s = scala (1 = 80 px, la misura delle auto); ph = fase del passo (0..1)
-  const PG = { jacket: '#2b3348', jacketHi: '#46557a', jacketSh: '#1c2234', skin: '#d29a72', skinSh: '#a06a4c', hair: '#141010', cap: '#a81e24', capHi: '#d8343a', jeans: '#26304c', jeansSh: '#1a2138', shoe: '#121016' };
-  function person(g, x, y, s, ph, walking, light = 0) {
-    g.save(); g.translate(Math.round(x), Math.round(y)); g.scale(s, s);
-    const sw = walking ? Math.sin(ph * Math.PI * 2) : 0, bob = walking ? Math.abs(Math.cos(ph * Math.PI * 2)) * 1.6 : 0;
-    const leg = (a, col) => { g.save(); g.translate(0, -38 + bob); g.rotate(a * 0.42); R(g, -3, 0, 6, 20, col); g.translate(0, 19); g.rotate(Math.max(0, -a) * 0.5); R(g, -3, 0, 6, 17, col); R(g, -3, 16, 10, 4, PG.shoe); g.restore(); };
-    leg(-sw, PG.jeansSh);                                                                                  // gamba dietro
-    const arm = (a, col) => { g.save(); g.translate(0, -64 + bob); g.rotate(a * 0.5); R(g, -3, 0, 6, 15, col); g.translate(0, 14); g.rotate(-Math.abs(a) * 0.3); R(g, -3, 0, 6, 12, col); R(g, -3, 11, 6, 5, PG.skinSh); g.restore(); };
-    arm(sw, PG.jacketSh);                                                                                 // braccio dietro
-    R(g, -8, -68 + bob, 17, 31, PG.jacket); R(g, 5, -67 + bob, 4, 29, PG.jacketHi); R(g, -8, -40 + bob, 17, 3, PG.jacketSh);   // busto, luce davanti, orlo
-    R(g, 0, -67 + bob, 2, 27, '#1a1f2e');                                                                // la zip
-    leg(sw, PG.jeans);                                                                                    // gamba davanti
-    R(g, -2, -72 + bob, 6, 5, PG.skinSh);                                                                // collo
-    R(g, -6, -86 + bob, 13, 15, PG.skin); R(g, -6, -86 + bob, 4, 13, PG.hair); R(g, 6, -79 + bob, 3, 3, PG.skin);   // testa, nuca, naso
-    R(g, 3, -81 + bob, 2, 2, '#1a1414'); R(g, -1, -80 + bob, 2, 3, PG.skinSh);                           // occhio, orecchio
-    R(g, -7, -90 + bob, 14, 6, PG.cap); R(g, -5, -91 + bob, 9, 2, PG.capHi); R(g, 6, -86 + bob, 7, 2, '#7a1418');   // cappellino e visiera
-    arm(-sw, PG.jacket);                                                                                  // braccio davanti
-    if (light > 0) { g.globalCompositeOperation = 'source-atop'; g.globalAlpha = light; g.fillStyle = '#ffd7a0'; g.fillRect(-12, -95, 30, 100); }
-    g.restore();
-  }
-  // il protagonista di spalle, seduto davanti alla scrivania (primo piano, in basso a sinistra)
-  function personBack(g, x, y, t) {
-    const b = Math.sin(t * 1.3) * 0.8;                                                                    // respira
-    g.fillStyle = PG.jacket; g.beginPath(); g.moveTo(x - 70, y + 80); g.lineTo(x - 60, y + 6 + b); g.quadraticCurveTo(x, y - 10 + b, x + 60, y + 6 + b); g.lineTo(x + 70, y + 80); g.fill();
-    g.fillStyle = PG.jacketHi; g.fillRect(x + 40, y + 6 + b, 6, 70); g.fillStyle = PG.jacketSh; g.fillRect(x - 2, y + 4 + b, 4, 76);   // luce della lampada, cucitura
-    R(g, x - 12, y - 14 + b, 24, 16, PG.skinSh);                                                         // collo
-    g.fillStyle = PG.skinSh; g.beginPath(); g.ellipse(x, y - 30 + b, 23, 25, 0, 0, Math.PI * 2); g.fill();  // testa: la nuca rasata...
-    g.fillStyle = '#2a1e18'; g.beginPath(); g.ellipse(x, y - 36 + b, 23, 20, 0, 0, Math.PI * 2); g.fill();    // ...e i capelli corti sopra
-    for (let i = -16; i <= 16; i += 5) R(g, x + i, y - 30 + b, 2, 3, '#3a2a20');
-    R(g, x - 26, y - 36 + b, 5, 11, PG.skin); R(g, x + 21, y - 36 + b, 5, 11, PG.skin);                 // orecchie
-    g.fillStyle = PG.cap; g.beginPath(); g.ellipse(x, y - 44 + b, 26, 22, 0, Math.PI, Math.PI * 2); g.fill(); R(g, x - 26, y - 46 + b, 52, 6, PG.cap);
-    g.fillStyle = '#2a1e18'; g.beginPath(); g.ellipse(x, y - 41 + b, 7, 5, 0, Math.PI, Math.PI * 2); g.fill();   // l'apertura dietro del cappellino, con i capelli
-    R(g, x - 7, y - 42 + b, 14, 2, '#7a1418');                                                             // la fascetta
-    R(g, x - 14, y - 64 + b, 18, 3, PG.capHi);
-  }
+  // il protagonista: l'aspetto scelto nell'editor (personaggio.js), in piedi di profilo o seduto di spalle
+  const myLook = () => (window.NightPG ? NightPG.now() : null);
+  function person(g, x, y, s, ph, walking, light = 0) { if (typeof pgStanding === 'function') pgStanding(g, x, y, s, ph, walking, myLook(), light, performance.now() / 1000); }
+  function personBack(g, x, y, t) { if (typeof pgBack === 'function') pgBack(g, x, y, t, myLook()); }
   // il notaio in piedi (garage): giacca scura, capelli grigi, occhiali, le chiavi in mano
   function notary(g, x, y, t, keys) {
     const b = Math.sin(t * 1.1) * 0.6;

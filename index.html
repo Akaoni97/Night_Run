@@ -1224,6 +1224,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="street3d.js"></script>
 <script src="street2d.js"></script>
 <script src="quartieri2d.js"></script>
+<script src="personaggio.js"></script>
 <script src="pilota2d.js"></script>
 <script src="galleria2d.js"></script>
 <script src="luci2d.js"></script>
@@ -3170,7 +3171,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+  window.nightRun = { pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
@@ -3274,7 +3275,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         game.s.vg.eredita = game.car;
         if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Niko`, 7), 1500); }
       };
-      NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
+      const prologo = () => NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
+      // prima del prologo l'editor del personaggio: chi si sceglie qui scende dalla E36, parla col notaio e guida tutto il viaggio
+      if (window.NightPG) NightPG.editor({ ok: 'Comincia', onDone: (look) => { game.s.vg.pg = look; saveGame(); prologo(); } });
+      else prologo();
     } else setTimeout(startRadio, 700);
   });
   window.addEventListener('resize', layout);

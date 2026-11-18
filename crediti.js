@@ -66,6 +66,9 @@ const CREDITI = [
   const intro = document.querySelector('#introMenu small'); if (intro) intro.appendChild(btn('cr-link', 'Crediti'));
   // menu, scheda Partita
   const part = document.querySelector('.gm-page[data-tab="partita"] .panel'); if (part) part.appendChild(btn('kbtn', 'Crediti'));
+  // e, nella stessa scheda, il pulsante per cambiare aspetto al personaggio (editor in personaggio.js)
+  if (part && window.NightPG) { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Personaggio';
+    b.addEventListener('click', () => NightPG.editor({ titolo: 'Cambia aspetto: vale da subito, in auto e nel resto del viaggio.', onDone: (l) => window.nightRun && nightRun.pgSave && nightRun.pgSave(l) })); part.appendChild(b); }
 
   window.NightCrediti = { open, close };
 })();
