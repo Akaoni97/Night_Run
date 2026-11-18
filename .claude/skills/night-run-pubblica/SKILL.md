@@ -17,8 +17,13 @@ description: Porta il lavoro su Night Run al giocatore - commit in italiano con 
 - Un ramo a parte (anche `kimi/...` o una pull request aperta per abitudine) si unisce su `main` direttamente da chi
   ci lavora. Il controllo lo fanno insieme la sera (`night-run-sera`).
 
+## All'inizio del lavoro
+- Una riga in `INCORSO.md` (chi, cosa, file che tocchi, da quando), caricata subito su `main`.
+
 ## Commit
 - Messaggio in italiano: prima riga che dice cosa cambia per il giocatore, poi i dettagli.
+- Ultima riga prima di Co-Authored-By: `Per: proprietario` o `Per: cognato` (chi ha chiesto il lavoro: se non lo sai,
+  chiedilo una volta all'inizio della sessione).
 - Righe finali come chiedono le istruzioni della sessione (Co-Authored-By e Claude-Session).
 - Niente file di prova, foto o WAV nel repository; niente file presi da mod o senza licenza.
 
@@ -35,6 +40,12 @@ URL: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (versione attuale in `PAS
    ```
 3. Pubblica con lo stesso `url`, passando in `files` i `.js` (e le immagini di `img/`) cambiati.
 4. Aggiorna il numero di versione in `PASSAGGIO.md` e committalo.
+
+## A fine lavoro
+- Togli la tua riga da `INCORSO.md`.
+- In cima a `DIARIO.md` (sotto il titolo) una voce `## gg/mm/aaaa · proprietario|cognato` con 2-3 righe: fatto, aperto,
+  cosa serve dall'altro.
+- Dopo il push, se puoi, guarda che i test su GitHub siano verdi.
 
 ## Documentazione
 Ogni funzione nuova va in `AGENTS.md` (tabella dei file, conteggio dei test) e `PASSAGGIO.md` ("Com'è fatto il

@@ -112,6 +112,13 @@ TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
    gioco, provalo nel browser (`night-run-prova`). Un ramo a parte serve solo se vuoi (lavori lunghi, prove): lo
    unisci tu quando è pronto. Se la sessione ti assegna un ramo di lavoro, lavora lì e poi unisci su `main`.
    Ogni sera, prima di un lavoro nuovo, si fa il **controllo della sera** insieme (skill `night-run-sera`).
+   **Per stare in pari**: all'inizio di ogni sessione l'hook `.claude/hooks/session-start.sh` scarica `main` (e si
+   aggiorna da solo se può farlo senza rischi) e mostra novità, lavori in corso e diario. Quando cominci un lavoro
+   aggiungi una riga a `INCORSO.md` e caricala subito; quando finisci togli la riga e scrivi 2-3 righe in cima a
+   `DIARIO.md` (fatto, aperto, cosa serve dall'altro). Ogni commit finisce con una riga `Per: proprietario` o
+   `Per: cognato` (chi ha chiesto il lavoro), prima delle righe Co-Authored-By: così il controllo della sera sa chi ha
+   fatto cosa. Su GitHub i test girano da soli a ogni caricamento (`.github/workflows/test.yml`): se arriva l'email
+   di test falliti, si sistema prima di tutto il resto.
 2. Commenti, testi del gioco e messaggi di commit in italiano, nello stile del codice esistente.
 3. Nel repository niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini): l'utente li carica
    in locale nel browser (IndexedDB). Niente copie di grafica, nomi o personaggi di giochi esistenti.

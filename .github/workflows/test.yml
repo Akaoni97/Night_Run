@@ -1,0 +1,18 @@
+# Test automatici di Night Run: a ogni caricamento su main (e su ogni ramo) GitHub fa girare tutti i test.
+# Se qualcosa si rompe, chi ha caricato riceve un'email da GitHub e il commit compare con la croce rossa.
+name: Test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tutti i test
+        run: node --test test/*.test.js

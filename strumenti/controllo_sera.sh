@@ -24,7 +24,8 @@ else
 fi
 n=$(git rev-list --count $range)
 if [ "$n" = "0" ]; then echo "  niente di nuovo."; else
-  echo; echo "== $n commit"; git log --no-merges --format='  %h  %ad  %<(14,trunc)%an  %s' --date=format:'%d/%m %H:%M' $range
+  echo; echo "== $n commit (Per: chi ha chiesto il lavoro)"
+  git log --no-merges --format='  %h  %ad  %<(12,trunc)%(trailers:key=Per,valueonly,separator=%x2C )  %s' --date=format:'%d/%m %H:%M' $range
   echo; echo "== file toccati (+ righe aggiunte, - tolte)"; git diff --stat=110 $range | sed 's/^/  /'
   del=$(git diff --diff-filter=D --name-only $range); [ -n "$del" ] && { echo; echo "== file eliminati"; echo "$del" | sed 's/^/  /'; }
 fi
