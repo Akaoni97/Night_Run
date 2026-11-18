@@ -8,7 +8,7 @@ description: Controllo della sera di Night Run, prima di cominciare un lavoro nu
 Il proprietario e il cognato caricano tutti e due direttamente su `main`, senza approvazione. Il controllo non è un
 permesso: serve a sapere cosa è cambiato e ad accorgersi in tempo se qualcosa si è rotto.
 
-1. `strumenti/controllo_sera.sh`: novità su `main` dall'etichetta `controllo-sera` (la prima volta: ultime 24 ore),
+1. `strumenti/controllo_sera.sh`: novità su `main` dal segnalibro `controllo-sera` (un ramo: non ci si lavora) (la prima volta: ultime 24 ore),
    file toccati ed eliminati, test sul `main` aggiornato.
 2. Leggi i diff dei commit nuovi (`git show <commit>`), almeno quelli che toccano il gioco. Per ogni novità che si
    vede, provala nel browser con `night-run-prova` (foto su computer e telefono, errori della console).
@@ -16,5 +16,5 @@ permesso: serve a sapere cosa è cambiato e ad accorgersi in tempo se qualcosa s
    messaggi), **cosa funziona**, **cosa si è rotto o sembra strano** (con la prova), **file eliminati** (solo da
    segnalare: eliminare è libero). Niente giudizi sul lavoro dell'altro: si segnala, si decide insieme.
 4. Se qualcosa è rotto, si propone la correzione ma **non si annulla il lavoro del cognato** senza che lo chiedano.
-5. Quando hanno guardato: `strumenti/controllo_sera.sh fatto` (sposta l'etichetta `controllo-sera` su GitHub, vale
-   per tutti e due).
+5. Quando hanno guardato: `strumenti/controllo_sera.sh fatto` (sposta il segnalibro `controllo-sera` su GitHub,
+   vale per tutti e due).

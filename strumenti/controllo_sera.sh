@@ -2,21 +2,22 @@
 # Controllo della sera: cosa è cambiato su main dall'ultimo controllo (chi, cosa, quali file), e i test.
 # Uso (dalla radice del repository):
 #   strumenti/controllo_sera.sh          mostra le novità dall'ultimo controllo e fa girare i test
-#   strumenti/controllo_sera.sh fatto    segna il controllo come fatto: sposta l'etichetta git `controllo-sera`
-#                                        sull'ultimo commit di main e la carica su GitHub (vale per tutti e due)
-# L'ultimo controllo è l'etichetta `controllo-sera`; la prima volta si guardano le ultime 24 ore.
+#   strumenti/controllo_sera.sh fatto    segna il controllo come fatto: sposta il ramo segnalibro `controllo-sera`
+#                                        sull'ultimo commit di main, su GitHub (vale per tutti e due)
+# L'ultimo controllo è il ramo `controllo-sera` (solo un segnalibro: non ci si lavora); la prima volta si guardano
+# le ultime 24 ore.
 set -uo pipefail
 cd "$(dirname "$0")/.."
-git fetch -q origin main --tags 2>/dev/null || git fetch -q origin main
+git fetch -q origin main
+git fetch -q origin +controllo-sera:refs/remotes/origin/controllo-sera 2>/dev/null
 if [ "${1:-}" = "fatto" ]; then
-  git tag -f controllo-sera origin/main >/dev/null
-  git push -q -f origin refs/tags/controllo-sera 2>&1 | grep -v -i "moved\|^remote:" || true
+  git push -q -f origin origin/main:refs/heads/controllo-sera 2>&1 | grep -v -i "moved\|^remote:" || true
   echo "Controllo segnato fatto su $(git log -1 --format='%h %s' origin/main)"
   exit 0
 fi
-if git rev-parse -q --verify refs/tags/controllo-sera >/dev/null; then
-  da="controllo-sera"; echo "Novità su main dall'ultimo controllo ($(git log -1 --format='%ad' --date=format:'%d/%m %H:%M' controllo-sera)):"
-  range="controllo-sera..origin/main"
+if git rev-parse -q --verify refs/remotes/origin/controllo-sera >/dev/null; then
+  echo "Novità su main dall'ultimo controllo (segnato su: $(git log -1 --format='%h %ad' --date=format:'%d/%m %H:%M' origin/controllo-sera)):"
+  range="origin/controllo-sera..origin/main"
 else
   echo "Primo controllo: novità su main delle ultime 24 ore"
   da=$(git rev-list -1 --before="24 hours ago" origin/main); range="${da:+$da..}origin/main"
