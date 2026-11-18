@@ -4,6 +4,11 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario
+- Fatto: **fari rifatti** (`effetti2d.js`, `street2d.js`): niente più raggio laser. L'anabbagliante è una banda larga e piena che
+  scende sulla strada con il taglio netto in alto; con gli abbaglianti si aggiunge una banda più alta e più lunga. Tolta la
+  striscia orizzontale dei fari (`fl` e lama in `fxHeadlamp`). Provato sul PC (foto prima/dopo), non sul telefono.
+
 ## 18/11/2026 sera · cognato
 - Fatto: teaser rifatto (44 s): partenza senza controllo di trazione, gara al semaforo sotto la pioggia col gas dosato,
   telefono che sale con il messaggio dello Sconosciuto «Ho lasciato sei auto. Tu ne hai presa una.» (musica e motore si

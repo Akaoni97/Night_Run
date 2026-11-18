@@ -1990,9 +1990,9 @@ class Street2D {
     if (s.ign && s.lamps !== false && (this.day || 0) < 0.6) {
       const fx = left + SW - 4, fy = y0 - 22 * k;
       const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
-      // due tagli di luce: l'anabbagliante scende sulla strada, l'abbagliante parte più in alto e va lontano (più forte quando sfanali)
-      this.fxBeamAt(g, fx, fy, 330, 11, 17, (1 + wet) * night);                                             // anabbagliante: scende sulla strada
-      this.fxBeamAt(g, fx, fy - 2, s.high ? 480 : 420, -2.5, 19, (s.high ? 1 : 0.95 + wet * 0.5) * night);  // abbagliante: lungo e quasi dritto
+      // anabbagliante: una banda larga che scende sulla strada, col taglio netto in alto; abbagliante: una seconda banda più alta e più lunga, il taglio si alza
+      this.fxBeamAt(g, fx, fy, 380, 7, 28, (s.high ? 0.8 : 1) * (1 + wet) * night, 0.8);
+      if (s.high) this.fxBeamAt(g, fx, fy - 2, 520, -1, 30, (1 + wet * 0.5) * night, 0.3);
       this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
     }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
@@ -2088,7 +2088,8 @@ class Street2D {
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
       if (s.lamps !== false) {
-        fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
+        // (la striscia anamorfica orizzontale dei fari è tolta: sembrava un raggio laser; il fascio è la banda di luce più su)
+        fl(hx2, hy2, 9 * nt, '255,255,255', 0.5 * nt * hlK, 2);
         g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
       }
       const br = s.brake > 0.05 ? 1 : 0.45;
