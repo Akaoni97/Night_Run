@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 18/11/2026 notte · proprietario (facciate)
+- Fatto: facciate dei locali rifatte in `locali2d.js`: bar, benzinaio, autogrill, motel, Niko, Luca e Neon Kustom con
+  materiali, vetrine accese con la gente dentro, neon che sfarfallano, lampade, piante e luce sul marciapiede; di giorno
+  neon spenti e vetri che riflettono. Insegne abbassate dove si vedono da fermi (lo zoom taglia la parte alta).
+- Aperto: Autosalone e Sfascio sono rimasti come prima; ogni facciata costa 1-2,5 ms a fotogramma (prima 0,5-1,5).
+- Serve dal cognato: niente; `drawTripPlace` ha un anello in più nella catena (vedi AGENTS).
+
 ## 18/11/2026 notte · proprietario (modifiche di Codex)
 - Fatto: recuperato il lavoro che il cognato aveva fatto con Codex (finito per errore nella sua copia del repository):
   850 R a cinque cilindri, «Carattere del motore» Originale / Codex · deciso nel menu Guida (di serie Originale, suono
