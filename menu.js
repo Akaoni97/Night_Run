@@ -185,6 +185,20 @@
     // finestrella DATI con il riquadro hud-l
     const dati = document.createElement('div'); dati.className = 'tpan tpan-dati'; dati.appendChild(head('Dati', 'Viaggio, lavoro, bisogni'));
     const hl = q('.hud-l'); if (hl) dati.appendChild(hl);
+    // tessera LEGGERA: grafica a densità normale e senza bagliore, per provare da telefono senza scatti
+    // (è la qualità "leggera" delle impostazioni: un altro tocco torna a quella di prima)
+    const qs = $('q3d');
+    if (qs) {
+      const row = document.createElement('div'); row.className = 'dash-btns'; row.setAttribute('role', 'group');
+      const leg = document.createElement('button'); leg.type = 'button'; leg.id = 'tLeg'; leg.textContent = 'LEGGERA'; leg.title = 'Grafica leggera per le prove da telefono';
+      let prima = qs.value === 'leggera' ? 'alta' : qs.value;
+      const sync = () => leg.setAttribute('aria-pressed', String(qs.value === 'leggera'));
+      leg.addEventListener('click', () => {
+        if (qs.value !== 'leggera') prima = qs.value;
+        qs.value = qs.value === 'leggera' ? prima : 'leggera'; qs.dispatchEvent(new Event('change', { bubbles: true })); sync();
+      });
+      qs.addEventListener('change', sync); row.appendChild(leg); dash.appendChild(row); setTimeout(sync, 0);
+    }
     hud.appendChild(dati); hud.appendChild(bar);
     const pans = { str: [bStr, dash], dati: [bDati, dati] };
     let aperta = null;
