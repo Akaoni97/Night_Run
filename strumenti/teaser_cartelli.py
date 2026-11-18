@@ -7,6 +7,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 D = sys.argv[1]; F = sys.argv[2]
 RUSSO, BARLOW, MONO = F + '/RussoOne.ttf', F + '/BarlowSemiCondensed.ttf', F + '/ShareTechMono.ttf'
 AMBER, WHITE = (255, 179, 71), (255, 255, 255)
+# le frasi sulle riprese (a sulla partenza, b sulla città, c sul posto di blocco, d sul mare): tempi in teaser_monta.sh
+FRASI = [('a', 'ACCENDI IL MOTORE'), ('b', 'GUIDA DI NOTTE'), ('c', 'ATTENTO AI POSTI DI BLOCCO'), ('d', 'DA TOKYO ALLA COSTIERA')]
 
 def glowtext(img, parts, font, cy, glow=(255, 150, 60), spacing=0, gr=18, ga=170):
     """parts: [(testo, colore)] su una riga, centrata in orizzontale a cy"""
@@ -36,8 +38,7 @@ def card(name, W, H, rows):
 
 for fmt, W, H, k, yA, yE in [('16x9', 1920, 1080, 1.0, 0.16, 0.42), ('9x16', 1080, 1920, 0.82, 0.78, 0.22)]:
     sub = ImageFont.truetype(BARLOW, int(66 * k))
-    card(f'a_{fmt}', W, H, [dict(parts=[('QUANDO IL SOLE SCENDE', WHITE)], font=sub, cy=H * yA, spacing=int(10 * k), gr=14, ga=120)])
-    card(f'b_{fmt}', W, H, [dict(parts=[('LA STRADA SI ACCENDE', WHITE)], font=sub, cy=H * yA, spacing=int(10 * k), gr=14, ga=120)])
+    for nome, testo in FRASI: card(f'{nome}_{fmt}', W, H, [dict(parts=[(testo, WHITE)], font=sub, cy=H * yA, spacing=int(10 * k), gr=14, ga=120)])
     logo = ImageFont.truetype(RUSSO, int(190 * k)); s2 = ImageFont.truetype(BARLOW, int(64 * k)); s3 = ImageFont.truetype(MONO, int(44 * k))
     card(f'fine_{fmt}', W, H, [
         dict(parts=[('NIGHT ', WHITE), ('RUN', AMBER)], font=logo, cy=H * yE, spacing=int(6 * k), gr=30, ga=200),
