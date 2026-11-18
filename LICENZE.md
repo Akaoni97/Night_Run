@@ -11,7 +11,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Nome "Night Run" | **Deciso, da controllare** | Il 18/11 il proprietario ha scelto **Night Run: The Last Highway** (il sottotitolo lo distingue dal "Night Run" di Thousand Ant). Da controllare nelle banche dati dei marchi e su Steam/itch.io; da mettere nel gioco. |
 | Nomi e marchi reali delle auto (27 mezzi) | **Rischio** | Marche e modelli veri nel gioco e sul quadro strumenti (TOYOTA, VOLVO, BMW); strisce M sulle BMW. |
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
-| Musica (8 canzoni) | **Da confermare** | Fatte dal proprietario con Gemini (Google): serve sapere con quale piano e leggere i termini di Google per l'uso commerciale. |
+| Musica (8 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
 | Modello 3D della Supra | Va bene con condizioni | CC BY 4.0: crediti obbligatori e visibili; il modello contiene i loghi Toyota. |
 | Suono registrato del motore | Va bene | CC0 (Freesound). |
 | three.js | Va bene | MIT. |
@@ -64,8 +64,11 @@ Cosa si sa (da fonti non ufficiali, da verificare sui termini di Google):
 - Una canzone fatta solo da un prompt in molti paesi non è protetta da diritto d'autore: potete usarla, ma non
   potete impedire ad altri di riusarla.
 - Su Steam va dichiarato che il gioco contiene contenuti generati da un'IA (modulo al momento della pubblicazione).
-**Da fare**: segnarsi il piano Gemini usato e la data di ogni canzone; per un gioco a pagamento, chiedere conferma
-(Google o un avvocato) prima di uscire.
+**Piano e date** (detto dal proprietario il 18/11/2026): tutte fatte col piano a pagamento **Google AI Pro**, nella
+prima metà di novembre 2026 (una o due settimane prima). Il piano a pagamento è il caso più favorevole.
+**Da fare**: salvare una copia (PDF o schermata) dei termini aggiuntivi delle app Gemini in vigore a novembre 2026
+e della ricevuta dell'abbonamento; per un gioco a pagamento, chiedere conferma (Google o un avvocato) prima di uscire.
+Le canzoni nuove fatte più avanti vanno segnate qui con piano e data.
 
 ## 4. Modello 3D della Supra (`models/supra_mk4.glb`)
 *Toyota Supra MK4 (LowPoly)* di Mike Farrant (Sketchfab), licenza CC BY 4.0, modificato (scala, ruote separate,
