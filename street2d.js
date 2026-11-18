@@ -52,6 +52,7 @@ class Street2D {
   }
 
   // ---------------------------------------------------------------- utilità
+  static WHEEL_FIX = { e30: [-1, -3], e34: [-1, -2], r5: [-1, 0], b2002: [0, -4], a112: [2, -1] };   // cerchi fuori asse rispetto alla gomma (vedi wheelConc)
   static rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   static shade(hex, k) {
     const n = parseInt(hex.slice(1), 16), f = (c) => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
@@ -182,12 +183,40 @@ class Street2D {
     c.geo = { w: D.w, ax: D.ax }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
+  // Alcune ruote disegnate hanno il cerchio fuori asse rispetto alla gomma (il mozzo sta più in alto o di lato): girando, il mozzo balla.
+  // WHEEL_FIX = di quanti pixel (x, y) il centro del cerchio è lontano dal centro della gomma. wheelConc rifà la ruota concentrica:
+  // il cerchio si sposta sul centro, la corona di gomma si ridisegna uniforme (colore e grana presi dalla gomma vera). Misure: strumenti/centro_ruote.py.
+  static wheelConc(im, id) {
+    const fx = Street2D.WHEEL_FIX[id];
+    if (!fx || !im || !im.width) return im;
+    if (im._conc) return im._conc;
+    const S = im.width, o = document.createElement('canvas'); o.width = S; o.height = S;
+    const ox = o.getContext('2d', { willReadFrequently: true }); ox.imageSmoothingEnabled = false; ox.drawImage(im, 0, 0);
+    const src = ox.getImageData(0, 0, S, S).data;
+    let x0 = S, x1 = -1; for (let i = 3; i < src.length; i += 4) if (src[i]) { const px = (i >> 2) % S; if (px < x0) x0 = px; if (px > x1) x1 = px; }
+    const Rt = (x1 - x0 + 1) / 2, Rr = 0.72 * Rt, c = S / 2, dx = fx[0], dy = fx[1];
+    const lumAt = (i) => (src[i] + src[i + 1] + src[i + 2]) / 3, isTire = (px, py, i) => src[i + 3] && lumAt(i) < 70 && Math.hypot(px + 0.5 - (c + dx), py + 0.5 - (c + dy)) > Rr * 0.98;
+    let r = 0, g = 0, b = 0, n = 0;
+    for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) { const i = (py * S + px) * 4; if (isTire(px, py, i)) { r += src[i]; g += src[i + 1]; b += src[i + 2]; n++; } }
+    const med = n ? [r / n, g / n, b / n] : [28, 28, 32];
+    const c2 = document.createElement('canvas'); c2.width = S; c2.height = S; const x = c2.getContext('2d'), out = x.createImageData(S, S), d = out.data;
+    for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+      const i = (py * S + px) * 4, rr = Math.hypot(px + 0.5 - c, py + 0.5 - c);
+      if (rr <= Rr) { const sx = px + dx, sy = py + dy; if (sx >= 0 && sx < S && sy >= 0 && sy < S) { const j = (sy * S + sx) * 4; d[i] = src[j]; d[i + 1] = src[j + 1]; d[i + 2] = src[j + 2]; d[i + 3] = src[j + 3]; } }
+      else if (rr <= Rt - 0.3 && rr >= Rr - 1.5) {
+        if (isTire(px, py, i)) { d[i] = src[i]; d[i + 1] = src[i + 1]; d[i + 2] = src[i + 2]; d[i + 3] = 255; }
+        else { d[i] = med[0]; d[i + 1] = med[1]; d[i + 2] = med[2]; d[i + 3] = 255; }
+      }
+    }
+    x.putImageData(out, 0, 0);
+    return (im._conc = c2);
+  }
   // ruota del disegno che gira: i vuoti scuri tra le razze diventano trasparenti (dietro c'è il freno), colore cerchi a scelta
   genWheelImg() {
     const G = this.genImgs(), D = this.genDef(), col = this.cos && this.cos.rims && this.cos.rims !== 'none' ? this.cos.rims : '';
     if (!G.ready || !G.wheel.width) return null;
     if (G.wcache[col]) return G.wcache[col];
-    const S = G.wheel.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(G.wheel, 0, 0);
+    const S = G.wheel.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(Street2D.wheelConc(G.wheel, this.carId), 0, 0);
     const d = x.getImageData(0, 0, S, S), p = d.data, R = D.wr, n = col ? parseInt(col.slice(1), 16) : 0;
     for (let i = 0; i < p.length; i += 4) {
       const xx = (i / 4) % S - S / 2 + 0.5, yy = Math.floor(i / 4 / S) - S / 2 + 0.5, rr = Math.hypot(xx, yy), l = (p[i] + p[i + 1] + p[i + 2]) / 3;
@@ -539,7 +568,7 @@ class Street2D {
     }
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = G.wheel; c.k = k; c.hd = base;
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
     return (this.spr[key] = c);
   }
 

@@ -20,6 +20,7 @@
     guida: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M3.6 10.5h6.2M14.2 10.5h6.2M12 14.2V20.5"/>',
     vista: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
     quadro: '<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
+    svil: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
     extra: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
   };
   // le schede: nome, titolo, sottotitolo, colore, pezzi della pagina da spostarci
@@ -43,6 +44,7 @@
     }],
     ['quadro', 'Quadro e dati', 'Strumenti grandi e telemetria', '#b07bff', () => [$('cluster'), q('section.tele')]],
     ['extra', 'Extra', 'Suoni, comandi, note', '#c9c2b0', () => [q('section.extras')]],
+    ['svil', 'Sviluppatori', 'Soldi e modifiche sbloccate', '#ff6a8a', () => [window.NightDev && NightDev.panel()]],
   ];
 
   // messaggi (flash) sopra la strada invece che dentro il quadro grande

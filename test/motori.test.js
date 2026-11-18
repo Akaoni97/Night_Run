@@ -498,3 +498,23 @@ test('viaggio: il tutorial del primo lavoro non lascia saltare il locale; poi un
   const to = game.vgMisState().toN; game.s.dist = VG.stopX(to) + 300; game.vgUpdate(0.016);
   const m = game.vgMisState(); assert.equal(m.phase, 'go', 'missione annullata'); assert.ok(!game.s.trunk.some((it) => it.kind === 'missione')); assert.ok(m.giverN > to);
 });
+
+test('suono: al rilascio del gas il motore borbotta anche di serie, e di più con la mappa pop & bang', () => {
+  const conta = (pops) => {
+    const c = CARS.e30, tp = c.params(c.presets[0].sel), sim = new SupraSim();
+    sim.setCar(Object.assign({}, c.P)); sim.setTune(tp.sim); sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW; sim.cfg.pops = pops;
+    const dsp = new EngineDSP(48000); dsp.msg({ cfg: { tune: tp.dsp, view: 1, vol: 1, pops: pops ? 1 : 0, fx: {} } });
+    startEngine(sim);
+    let n = 0; const ap = dsp.addPop.bind(dsp), ab = dsp.addBurble.bind(dsp); dsp.addPop = (...a) => { n++; return ap(...a); }; dsp.addBurble = (...a) => { n++; return ab(...a); };
+    const bl = new Float32Array(128), br = new Float32Array(128);
+    sim.gear = 3; sim.v = 100 / 3.6; sim.ww = sim.v / sim.P.r; sim.wo = sim.ww;
+    for (let t = 0; t < 6; t += 128 / 48000) {
+      sim.in.thr = t < 2 ? 1 : 0; sim.in.clutch = 0; sim.in.brake = 0; sim.update(128 / 48000);
+      dsp.msg({ p: sim.audioParams(), ev: sim.events.splice(0) }); dsp.render(bl, br, 128);
+    }
+    return n;
+  };
+  const base = conta(false), tuned = conta(true);
+  assert.ok(base >= 8, `di serie deve borbottare un po' al rilascio (${base} schiocchi)`);
+  assert.ok(tuned > base, `con pop & bang di più (${tuned} contro ${base})`);
+});
