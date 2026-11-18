@@ -162,5 +162,41 @@
     bUp.setAttribute('aria-disabled', String(g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(g <= 0));
   }, 120);
 
+  // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito
+  // fila dei comandi (AUTO, TC, LAUNCH...) chiusa dietro un pulsante COMANDI: si apre e si chiude col dito e si ricorda (solo al tocco, CSS)
+  if (dash) {
+    const tog = document.createElement('button'); tog.type = 'button'; tog.className = 'dash-tog'; tog.setAttribute('aria-expanded', 'false');
+    tog.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>COMANDI</span><i aria-hidden="true">▸</i>';
+    let aperta = false; try { aperta = localStorage.getItem('nr_comandi') === '1'; } catch (e) { /* niente */ }
+    const setta = (v) => {
+      aperta = v; dash.classList.toggle('dash-open', v); tog.setAttribute('aria-expanded', String(v));
+      try { localStorage.setItem('nr_comandi', v ? '1' : '0'); } catch (e) { /* niente */ }
+    };
+    tog.addEventListener('click', () => setta(!aperta));
+    dash.insertBefore(tog, dash.firstChild); setta(aperta);
+  }
+  // SCHERMO INTERO nella barra in alto (dopo TELEFONO e TASTI, che si aggiungono dopo questo file): usa lo stesso pulsante della strada
+  const fsb = $('fsBtn');
+  setTimeout(() => {
+    if (!top || !fsb) return;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'menubtn fstop'; b.id = 'fsTop'; b.title = 'Schermo intero (Z)';
+    b.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4"/></svg><span>SCHERMO INTERO</span>';
+    b.addEventListener('click', () => fsb.click()); top.appendChild(b);
+  }, 0);
+  // a schermo intero la barra in alto non si vede: MENU e TELEFONO restano accanto al pulsante per uscire
+  const dock = document.createElement('div'); dock.className = 'fsdock';
+  dock.innerHTML = '<button type="button" data-a="menu" aria-label="Menu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>'
+    + '<button type="button" data-a="tel" aria-label="Telefono"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8" height="13" rx="1.6"/><path d="M7 12.2h2"/></svg></button>';
+  dock.children[0].addEventListener('click', () => open());
+  dock.children[1].addEventListener('click', () => { const t = $('telBtn'); if (t) t.click(); else if (window.telefono && window.telefono.open) window.telefono.open(); });
+  if (hud) hud.appendChild(dock);
+
+  // telefono in verticale: la strada è larga e i comandi non ci stanno, si chiede di girarlo (si può giocare lo stesso)
+  const gira = document.createElement('div'); gira.className = 'gira'; gira.setAttribute('role', 'dialog'); gira.setAttribute('aria-label', 'Gira il telefono');
+  gira.innerHTML = '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="8" width="20" height="36" rx="3"/><path d="M44 50a14 14 0 0 1-20 4M24 54l-1-6 6 1"/></svg>'
+    + '<b>Gira il telefono</b><span>Night Run si guida in orizzontale: strada larga, pedali sotto i pollici.</span><button type="button">Gioca lo stesso</button>';
+  gira.querySelector('button').addEventListener('click', () => { document.documentElement.classList.add('gira-no'); });
+  document.body.appendChild(gira);
+
   window.dispatchEvent(new Event('resize'));
 })();

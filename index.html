@@ -637,6 +637,45 @@ html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
   .touchpedals .tp-brk, .touchpedals .tp-gas { font-size: 11px; } .tp-start { --tp-st: 54px; left: calc(100% + 10px); }
   html.game #hudG { display: none; }
 }
+.dash-tog { display: none; }
+.fstop svg, .fsdock svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.fstop svg { margin-right: 6px; vertical-align: -2px; }
+.fsdock { position: absolute; right: 54px; top: 50px; display: none; gap: 8px; z-index: 4; }
+body.fs .fsdock { display: flex; }
+.fsdock button { width: 34px; height: 34px; display: grid; place-items: center; border: 0; padding: 0; cursor: pointer; background: rgba(10,9,7,.72); color: var(--amber); box-shadow: inset 0 0 0 1px #4a4234; }
+.fsdock svg { width: 16px; height: 16px; }
+html .fstop { display: none; }
+/* al tocco: meno roba sulla strada. Niente TASTI (servono solo con la tastiera), fila dei comandi dietro COMANDI,
+   pulsanti di schermo intero più grandi */
+@media (pointer: coarse) {
+  #tastiBtn { display: none; } html .fstop { display: inline-block; }
+  .dash-tog { display: inline-flex; align-items: center; gap: 5px; justify-self: start; border: 0; padding: 5px 10px 5px 7px; border-radius: 6px; font: 600 9px/1 var(--f-data); letter-spacing: .12em; color: var(--muted); background: rgba(10,10,12,.72); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); cursor: pointer; touch-action: manipulation; }
+  .dash-tog svg { width: 13px; height: 13px; fill: none; stroke: var(--amber); stroke-width: 2; stroke-linecap: round; }
+  .dash-tog i { font-style: normal; color: var(--amber); transition: transform .15s; }
+  .dash-open .dash-tog { color: #0b0a08; background: var(--amber); } .dash-open .dash-tog svg { stroke: #0b0a08; } .dash-open .dash-tog i { color: #0b0a08; transform: rotate(90deg); }
+  .dash:not(.dash-open) > .dash-btns { display: none; }
+  .dash { grid-template-columns: minmax(0, 1fr); }                              /* il quadro resta largo quanto #dash (la tela non allarga la griglia) */
+  .fsbtn, .fsdock button { width: 42px; height: 42px; } .fsdock { right: 62px; }
+  body:not(.fs) .fsbtn { display: none; }                                      /* fuori dallo schermo intero c'è SCHERMO INTERO in alto */
+  body.fs .fsbtn, body.fs .fsdock { top: max(12px, env(safe-area-inset-top)); }
+  body.fs .radio-chip { right: 162px; }
+}
+@media (pointer: coarse) and (max-height: 520px) {
+  html.game .hud-l { transform: scale(.6); }
+  html.game .dash { width: min(25vw, 180px); }
+  html.game .fsbtn { top: 38px; } html.game .fsdock { top: 38px; }
+  body.fs .fsbtn, body.fs .fsdock { top: max(8px, env(safe-area-inset-top)); }
+  body.fs .radio-chip { right: 156px; }
+}
+.gira { display: none; }
+@media (pointer: coarse) and (orientation: portrait) and (max-width: 600px) {
+  html.game:not(.gira-no) .gira { position: fixed; inset: 0; z-index: 70; display: grid; place-content: center; justify-items: center; gap: 12px; padding: 32px; text-align: center; background: rgba(6,5,10,.94); color: #ece6d6; }
+  .gira svg { width: 84px; height: 84px; fill: none; stroke: var(--amber); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; animation: giraT 2.4s ease-in-out infinite; }
+  .gira b { font: 400 26px/1 var(--f-display); letter-spacing: .06em; color: var(--amber); }
+  .gira span { font: 400 15px/1.4 var(--f-data, system-ui); color: var(--muted); max-width: 280px; }
+  .gira button { margin-top: 10px; border: 0; padding: 10px 18px; border-radius: 8px; font: 600 12px/1 var(--f-data); letter-spacing: .12em; color: var(--muted); background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+}
+@keyframes giraT { 0%, 30% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
 @media (pointer: coarse) and (max-height: 520px) { .lanebtn.r { left: 60px; } html.game .minimap { left: 114px; right: 168px; } }
 @media (pointer: coarse) and (max-height: 520px) and (max-width: 700px) { .lanebtn.r { left: 54px; } }
 @media (max-width: 700px) { html.game .chip:not(.money), html.game .audio-state { display: none; } html.game h1 { font-size: 18px; } }
