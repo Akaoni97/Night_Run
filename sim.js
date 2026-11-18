@@ -33,7 +33,7 @@ class SupraSim {
       clutch: 0, lock: false, shiftSeq: null, events: [], runT: 0, pumpT: 0, bovLatch: false, launchArmed: false,
       Tc: 0, Tnet: 0, charge: 0, stalled: false,
       fuel: 0.72, waterT: 74, oilT: 69, oilP: 0, volt: 12.5, odo: 48213.4, trip: 0,
-      tireT: 24, tireWear: 0, damage: 0, slipPow: 0, skid: 0, brakeT: 28, winPos: 0, winT: 0, winMot: 0, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
+      tireT: 24, tireWear: 0, park: false, damage: 0, slipPow: 0, skid: 0, brakeT: 28, winPos: 0, winT: 0, winMot: 0, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
       run0: null, best100: null, best400: null, last100: null, last400: null,
     });
   }
@@ -435,6 +435,9 @@ class SupraSim {
       if (Math.sign(nv) !== Math.sign(this.v) && Math.abs(Ft) < Fb + Froll) nv = 0;
       this.v = nv;
     }
+    // parcheggio (leva in P del cambio automatico, deciso fuori): il cambio è bloccato, le ruote motrici non girano e
+    // l'auto resta ferma. Di serie è spento: Supra e V40 vanno come prima
+    if (this.park && this.gear === 0) { this.wo = 0; this.ww = 0; this.phi = 0; this.v *= Math.max(0, 1 - h * 40); if (Math.abs(this.v) < 0.02) this.v = 0; }
     this.acc += ((this.v - v0) / h - this.acc) * Math.min(1, h / 0.05);
 
     // ---- accensione, avviamento, stallo ---------------------------------------------------------------

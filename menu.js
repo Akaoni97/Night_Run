@@ -156,10 +156,11 @@
       let r = 0; for (const el of dash.children) if (el !== st && el.offsetParent) r = Math.max(r, el.offsetLeft + el.offsetWidth);
       const x = (r || dash.offsetWidth) + (innerHeight <= 520 ? 10 : 14) + 'px'; if (st.style.left !== x) st.style.left = x;
     }
-    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear, t = g === -1 ? 'R' : g === 0 ? 'N' : String(g);
+    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear, lv = n.levaNow, t = n.gearLabel ? n.gearLabel(true) : g === -1 ? 'R' : g === 0 ? 'N' : String(g);
     if (t !== lastG) { lastG = t; gearEl.textContent = t; gearEl.classList.remove('pop'); void gearEl.offsetWidth; gearEl.classList.add('pop'); }
     // spente a fine corsa (aria-disabled e non disabled: un pulsante disabilitato sotto il dito non riceve il rilascio)
-    bUp.setAttribute('aria-disabled', String(g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(g <= 0));
+    // col cambio automatico le palette spostano la leva (▲ verso D, ▼ verso P)
+    bUp.setAttribute('aria-disabled', String(lv ? lv === 'D' : g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(lv ? lv === 'P' : g <= 0));
   }, 120);
 
   // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito

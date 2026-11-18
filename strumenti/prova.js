@@ -17,6 +17,7 @@
 //   foto:nome           salva nome.png nella cartella --out (1280×720, o 390×844 con --mob)
 //   stato               stampa lo stato del gioco in breve (km, soldi, auto, locale, bisogni...)
 // Alla fine stampa lo stato e gli errori della console. Esce con codice 1 se ci sono errori.
+// Le domande iniziali scelgono il cambio automatico: la leva parte in P. Per guidare: js:nightRun.engineTap() e js:nightRun.leva('D').
 //
 // Esempio: node strumenti/prova.js --out /tmp/foto soldi:40000 tappa:junk foto:fuori entra foto:dentro stato
 'use strict';

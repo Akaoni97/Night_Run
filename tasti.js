@@ -8,7 +8,7 @@
 const TASTI = [
   // [id, tasto originale, cosa fa, gruppo]
   ['gas', 'w', 'Gas', 'Guida'], ['freno', 's', 'Freno', 'Guida'], ['sx', 'a', 'Sterza / corsia a sinistra', 'Guida'], ['dx', 'd', 'Sterza / corsia a destra', 'Guida'],
-  ['su', 'e', 'Marcia su', 'Guida'], ['giu', 'q', 'Marcia giù', 'Guida'], ['folle', 'n', 'Folle', 'Guida'], ['retro', 'r', 'Retromarcia', 'Guida'],
+  ['su', 'e', 'Marcia su (automatico: leva verso D)', 'Guida'], ['giu', 'q', 'Marcia giù (automatico: leva verso P)', 'Guida'], ['folle', 'n', 'Folle (N)', 'Guida'], ['retro', 'r', 'Retromarcia (R)', 'Guida'],
   ['avvio', 'Enter', 'Avviamento (tieni premuto)', 'Guida'], ['quadro', 'i', 'Quadro acceso / spento', 'Guida'], ['spegni', 'o', 'Spegni il motore', 'Guida'],
   ['launch', 'l', 'Launch control', 'Guida'], ['clacson', 'h', 'Clacson', 'Guida'], ['fari', 'f', 'Sfanala (chiedi strada)', 'Guida'],
   ['finestrini', '8', 'Finestrini su / giù', 'Auto'], ['scorta', '9', 'Monta la ruota di scorta', 'Auto'], ['bagagliaio', 'b', 'Bagagliaio', 'Auto'], ['entra', 'u', 'Entra / esci dal locale', 'Auto'],

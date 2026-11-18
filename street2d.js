@@ -1930,7 +1930,8 @@ class Street2D {
       const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
       for (const ax of GG.ax) {
         const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
-        if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
+        if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore();
+          if (this.tireFx) { const ri = this.tireRim(wi); this.tireFx(g, wx2, wy2, GG.wr * k + 0.5, Math.round(ang / (Math.PI / 12)) * (Math.PI / 12), e.v || 0, { rim: ri && ri.frac, rgb: ri && ri.rgb }); } }   // gomme (gomme2d.js)
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
       // luci dei freni accese quando frena (e.acc, game.js); fari che lampeggiano quando sfanala (e.flashT, strada.js)

@@ -1230,6 +1230,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="luci2d.js"></script>
 <script src="effetti2d.js"></script>
 <script src="dettagli2d.js"></script>
+<script src="gomme2d.js"></script>
 <script src="paesaggi2d.js"></script>
 <script src="vita2d.js"></script>
 <script src="viaggio2d.js"></script>
@@ -1471,8 +1472,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // cambio: 'auto' cambia marcia da solo (con la frizione automatica), 'man' le marce le metti tu con E/Q
   function setGearbox(m) {
     S.gearbox = m; if (m === 'auto') S.autoClutch = true;
-    applySettings();
-    flash(m === 'auto' ? 'Cambio automatico: gas e freno, le marce le cambia lui (E/Q per comandare tu)' : 'Cambio manuale: E sale di marcia, Q scala', 2.6);
+    if (m === 'auto') leva = sim.gear === -1 ? 'R' : sim.gear > 0 ? 'D' : sim.running || Math.abs(sim.v) > 0.5 ? 'N' : 'P';
+    applySettings(); levaApply();
+    flash(m === 'auto' ? 'Cambio automatico: leva P R N D, E la sposta verso D e Q verso P' : 'Cambio manuale: E sale di marcia, Q scala; in folle (N) il gas fa solo salire i giri', 2.8);
   }
   $('tTc').addEventListener('change', (e) => { S.tc = e.target.checked; applySettings(); flash(S.tc ? 'Controllo di trazione inserito: toglie gas quando le ruote slittano' : 'Controllo di trazione spento: la sgommata la gestisci tu col gas', 2.4); });
   $('tRev').addEventListener('change', (e) => { S.revMatch = e.target.checked; applySettings(); });
@@ -1496,7 +1498,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const GEAR_NAMES = { '-1': 'retromarcia', 0: 'folle', 1: 'prima', 2: 'seconda', 3: 'terza', 4: 'quarta', 5: 'quinta', 6: 'sesta' };
 
   function shiftTo(g) {
-    ensureAudio(); boxT = 2.5;                 // col cambio automatico: per un po' comandi tu
+    ensureAudio();
     const before = sim.gear;
     const free = freeShiftGrade(before, g);
     if (free === 'perfetta') sim.fastShift = true;
@@ -1509,13 +1511,18 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       else if (!S.autoClutch) flash('Grattata! Premi la frizione (Spazio) per cambiare');
     }
   }
-  const shiftUp = () => { const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g < 6) shiftTo(g === -1 ? 0 : g + 1); };
-  const shiftDown = () => { const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g > 0) shiftTo(g - 1); };
+  // col cambio automatico E e Q spostano la leva (E verso D, Q verso P); in manuale salgono e scalano
+  const shiftUp = () => { if (S.gearbox === 'auto') { levaStep(1); return; } const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g < 6) shiftTo(g === -1 ? 0 : g + 1); };
+  const shiftDown = () => { if (S.gearbox === 'auto') { levaStep(-1); return; } const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g > 0) shiftTo(g - 1); };
 
   function ignToggle() { ensureAudio(); sim.setIgnition(!sim.ign); }
-  function startOn() { ensureAudio(); if (sim.running) return; sim.setStarter(true); $('btnStart').classList.add('on'); }
+  function startOn() {
+    ensureAudio(); if (sim.running) return;
+    if (S.gearbox === 'auto' && leva !== 'P' && leva !== 'N') { flash('Per avviare metti la leva in P o in N (Q)', 1.8); return; }
+    sim.setStarter(true); $('btnStart').classList.add('on');
+  }
   function startOff() { sim.setStarter(false); $('btnStart').classList.remove('on'); }
-  function engineOff() { sim.setIgnition(false); startOff(); }
+  function engineOff() { sim.setIgnition(false); startOff(); if (S.gearbox === 'auto' && Math.abs(sim.v) < 1) setLeva('P', true); }
   // accensione con un tocco (pulsante AVVIA sulla strada e sul telefono): quadro e avviamento finché il motore non gira; da fermo lo stesso tasto spegne
   function engineTap() {
     ensureAudio();
@@ -1566,9 +1573,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     keys.add(k);
     if (k === 'e') shiftUp();
     else if (k === 'q') shiftDown();
-    else if (k >= '1' && k <= '6') { if (game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1); else shiftTo(+k); }
-    else if (k === 'n') shiftTo(0);
-    else if (k === 'r') shiftTo(-1);
+    else if (k >= '1' && k <= '6') { if (game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1); else if (S.gearbox !== 'auto') shiftTo(+k); }
+    else if (k === 'n') { if (S.gearbox === 'auto') setLeva('N'); else shiftTo(0); }
+    else if (k === 'r') { if (S.gearbox === 'auto') setLeva('R'); else shiftTo(-1); }
     else if (k === 'i') ignToggle();
     else if (k === 'o') engineOff();
     else if (k === 'v') { S.view = (+S.view + 1) % 4; applySettings(); flash('Ascolto: ' + ['abitacolo', 'esterno', 'vano motore', 'automatico (segue la telecamera)'][S.view], 1.2); }
@@ -1644,23 +1651,53 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     inp.clutch = ramp(inp.clutch, tgt('clutch', k(' ')), 9, 2.3);
     if (game.s.vg && game.s.vg.weak) inp.thr *= 0.55 + 0.45 * Math.abs(Math.sin(performance.now() / 170));   // fame e sete: le mani non rispondono
     sim.in.thr = inp.thr; sim.in.brake = inp.brake; sim.in.clutch = S.autoClutch ? 0 : inp.clutch;
-    // partenza: gas in folle da fermo, senza freno (anche per un attimo) = vuoi partire. Col cambio automatico entra la
-    // prima, col manuale lo dice (sgasare in folle si può ancora tenendo il freno)
-    const wantGo = sim.running && sim.gear === 0 && !sim.shiftSeq && Math.abs(sim.v) < 1 && inp.thr > 0.5 && inp.brake < 0.1 && !game.ap && !game.inside;
-    neutralT = wantGo ? neutralT + dt : 0;
-    if (neutralT > 0.15) {
-      neutralT = -3;                                                     // non ripete subito l'avviso
-      if (S.autoClutch) { shiftTo(1); if ((sim.shiftSeq ? sim.shiftSeq.target : sim.gear) === 1 && goHints++ < 3) flash('Prima inserita: E e Q cambiano marcia', 2); }
-      else flash('Sei in folle: frizione (Spazio) ed E per mettere la prima', 2.4);
-    }
+    // in folle il gas fa solo salire i giri (si sgasa). Col cambio automatico, gas a lungo con la leva in P o in N:
+    // un avviso dice come partire (poche volte)
+    const parked = S.gearbox === 'auto' && sim.running && (leva === 'P' || leva === 'N') && Math.abs(sim.v) < 0.5 && inp.thr > 0.6 && !game.ap && !game.inside;
+    levaHintT = parked ? levaHintT + dt : Math.min(levaHintT, 0);
+    if (levaHintT > 1.2 && levaHints < 4) { levaHintT = -8; levaHints++; flash(`Leva in ${leva}: premi E fino a D per partire`, 2.4); }
   }
-  let neutralT = 0, goHints = 0, boxT = 0;
+  let boxT = 0, levaHintT = 0, levaHints = 0;
+  // ---------------------------------------------------------------- leva del cambio automatico: P R N D
+  // P parcheggio (cambio bloccato: sim.park), R retromarcia, N folle, D marcia avanti (le marce le sceglie autoBox).
+  // E sposta la leva verso D, Q verso P; N e R vanno dritti. P e R solo da fermi, D non mentre si va indietro.
+  const LEVA = ['P', 'R', 'N', 'D'];
+  let leva = 'P';
+  function levaGear() {                                        // in D a velocità già alta: la marcia giusta, non la prima
+    const P = sim.P, top = P.gears.length - 1, rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
+    for (let n = 1; n <= top; n++) if (rpmAt(n) < P.limiter * 0.72) return n;
+    return top;
+  }
+  function levaApply() {                                       // la marcia vera segue la leva
+    sim.park = S.gearbox === 'auto' && leva === 'P';
+    if (S.gearbox !== 'auto' || sim.shiftSeq) return;
+    if ((leva === 'P' || leva === 'N') && sim.gear !== 0) sim.shift(0);
+    else if (leva === 'R' && sim.gear !== -1 && Math.abs(sim.v) < 1.2) sim.shift(-1);
+    else if (leva === 'D' && sim.gear < 1 && sim.running) sim.shift(Math.abs(sim.v) > 3 ? levaGear() : 1);
+  }
+  function setLeva(L, quiet) {
+    if (S.gearbox !== 'auto' || !LEVA.includes(L)) return false;
+    if (L === leva) return true;
+    if ((L === 'P' || L === 'R') && Math.abs(sim.v) > 1.2) { flash(`Fermati prima di mettere ${L}`, 1.4); return false; }
+    if (L === 'D' && sim.v < -1.2) { flash('Fermati prima di mettere D', 1.4); return false; }
+    ensureAudio(); leva = L; boxT = 0.5; levaApply();
+    if (audio.ready) audio.send({ ev: [{ type: 'click' }] });
+    if (!quiet) flash('Leva   ' + LEVA.map((x) => (x === L ? `[ ${x} ]` : x)).join('   '), 1.1);
+    return true;
+  }
+  const levaStep = (d) => setLeva(LEVA[Math.max(0, Math.min(LEVA.length - 1, LEVA.indexOf(leva) + d))]);
+  // quello che si legge sul quadro: P R N D col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
+  function gearLabel(short) {
+    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear;
+    if (S.gearbox === 'auto') return leva === 'D' ? (short || g < 1 ? 'D' : 'D' + g) : leva;
+    return g === -1 ? 'R' : g === 0 ? 'N' : String(g);
+  }
   // cambio automatico: sale di marcia prima a gas leggero e più tardi a gas pieno, scala quando i giri calano o col
   // gas a fondo (kickdown), mai in una marcia che andrebbe sotto il minimo o oltre il limitatore. Dopo un cambio
   // aspetta un attimo; se cambi tu con E/Q aspetta di più (comandi tu)
   function autoBox(dt) {
-    boxT -= dt;
-    if (S.gearbox !== 'auto' || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || game.inside) return;
+    boxT -= dt; levaApply();
+    if (S.gearbox !== 'auto' || leva !== 'D' || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || game.inside) return;
     const P = sim.P, top = P.gears.length - 1, lim = P.limiter, idle = P.idle, thr = sim.in.thr, g = sim.gear;
     const rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
     const up = idle + (lim - idle) * (0.36 + 0.55 * thr), down = idle + (lim - idle) * (0.12 + 0.3 * thr);
@@ -1877,12 +1914,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const R = g.R;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       if (g.id === 'tach') {
-        const gearTxt = sim.gear === -1 ? 'R' : sim.gear === 0 ? 'N' : String(sim.gear);
+        const gearTxt = gearLabel();
         lcd(g.x, g.y + R * 0.58, R * 0.42, R * 0.36, R);
         ctx.fillStyle = lit ? (sim.gear === -1 ? COL.crit : TH.g.lcdInk || COL.amber) : '#2b2f35';
         ctx.font = `700 ${Math.round(R * 0.32)}px ${FD}`;
         ctx.save(); if (lit && TH.g.gearGlow) { ctx.shadowColor = COL.amber; ctx.shadowBlur = R * 0.08; }
-        ctx.fillText(sim.shiftSeq ? '–' : gearTxt, g.x, g.y + R * 0.6); ctx.restore();
+        ctx.fillText(sim.shiftSeq && S.gearbox !== 'auto' ? '–' : gearTxt, g.x, g.y + R * 0.6); ctx.restore();
         ctx.fillStyle = lit ? COL.dial : '#2b2f35';
         ctx.font = `600 ${Math.round(R * 0.085)}px ${FM}`;
         ctx.fillText(lit ? fmt(Math.round(disp.rpm / 10) * 10) + ' r/min' : '', g.x, g.y + R * 0.33);
@@ -2763,7 +2800,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       for (let r = r1; r <= r2; r += 1) { const x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + Math.sin(a) * r); g.fillRect(x, y, 2, 2); }
     }
     // marcia gigante al centro
-    const gear = sim.gear === 0 ? 'N' : sim.gear === -1 ? 'R' : String(sim.gear);
+    const gear = gearLabel(true);
     g.fillStyle = HG.ink; g.fillRect(cx - 9, cy - 11, 19, 22);
     pxText(g, gear, cx - 5, cy - 9, over && blink ? HG.red : inZone && blink ? HG.lime : lit ? HG.white : HG.dim, 4, lit ? HG.pink : null);
     pxText(g, String(Math.round(rpm / 100) / 10).replace('.', ','), cx - 8, cy + 14, lit ? HG.cyan : HG.dim, 1);
@@ -2813,7 +2850,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!auto.on) { game.blocked = false; return; }
     game.manualT = 0;
     sim.in.thr = clamp(0.22 + (auto.v - sim.v) * 0.3, 0, 1); sim.in.brake = 0;
-    if (!sim.shiftSeq) {
+    if (!sim.shiftSeq && S.gearbox !== 'auto') {
       const z = shiftZone();
       if (sim.rpm > z.lo && sim.gear < sim.topGear()) shiftUp();
       else if (sim.rpm < Math.max(1800, sim.P.idle * 2.2) && sim.gear > 1) shiftDown();
@@ -2876,7 +2913,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const trip = game.s.vg ? game.s.dist / 1000 : sim.trip;
     const red = cl.varRed ? (sim.oilT < 50 ? 4.5 : sim.oilT < 65 ? 5.5 : sim.oilT < 78 ? 6.5 : cl.red) : cl.red;
     const L = sim.fuel * sim.P.tank;
-    return { lit, kmh: Math.abs(sim.v) * 3.6, rpm, red, gear: sim.gear === 0 ? 'N' : sim.gear === -1 ? 'R' : String(sim.gear), over, shiftNow: inZone && blink, lights,
+    return { lit, kmh: Math.abs(sim.v) * 3.6, rpm, red, gear: gearLabel(true), over, shiftNow: inZone && blink, lights,
       odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
       range: c.range !== null ? fmt(c.range, 0) + ' km' : '—', cons: c.per100 !== null ? fmt(c.per100, 1) + ' L/100' : '—',
       fuel: sim.fuel, liters: fmt(L, 1) + ' L', tyres: T.p.map((p) => p * heat), waterT: sim.waterT, pods,
@@ -3171,7 +3208,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
-  window.nightRun = { get radioOn() { return !!(radio && radio.on && !S.muted); }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+  window.nightRun = { leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
@@ -3251,7 +3288,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
       const pick = (m) => () => { game.s.vg.cambio = m; setGearbox(m); saveGame(); };
       game.ask({ kind: 'story', title: 'Il cambio', time: 900,
-        text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: gas e freno, le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',
+        text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: leva P R N D (E la sposta verso D, Q verso P), poi gas e freno: le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare; in folle il gas fa solo salire i giri.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',
         options: [{ label: 'Automatico', act: pick('auto') }, { label: 'Manuale', act: pick('man') }] });
     }
     draw(); updateDom(dt);
