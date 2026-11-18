@@ -101,6 +101,8 @@ const V40_PRESETS = [
   { id: 'sleeper', name: 'Sleeper T4', sel: { exhaust: 'oem', intake: 'oem', ecu: 'remap', turbo: 'td04', intercooler: 'oem', tires: 'sport', suspension: 'oem', final: 'quaife', clutch: 'sport', weight: 'oem' } },
   { id: 'full', name: 'Familiare cattiva', sel: { exhaust: 'turboback', intake: 'pf', ecu: 'standalone', turbo: 'td04_19t', intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'quaife', clutch: 'sport', weight: 's2' } },
 ];
+// scoppi delle Volvo: boato basso (boom), poco schiocco e poco passaggio dal silenziatore, così non sembrano petardi
+const VOLVO_POP = { f: 0.8, crack: 0.45, len: 1.3, thump: 1.2, boom: 0.85, bf: 1, mid: 0.6 };
 const V40_EX = {
   stock: { L: 3.6, r: -0.4, m: [['lp', 900, 0.6], ['lp', 1600, 0.5], ['peak', 130, 1.0, 3], ['peak', 480, 2, -4]], g: 1.5, jet: 0.1, rasp: 0.05, tips: 1 },
   sport: { L: 3.4, r: -0.6, m: [['lp', 2600, 0.6], ['peak', 170, 1.0, 4], ['peak', 1100, 1.4, 5], ['peak', 3200, 2, 1]], g: 2.2, jet: 0.6, rasp: 0.5, tips: 1 },
@@ -127,6 +129,7 @@ function v40ParamsBase(sel) {
       valve: hasT ? 'bov' : 'recirc', boostK: 0.42,     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
     },
     dsp: {
+      voice: { pop: VOLVO_POP },
       cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ex.dsp === 'stock' ? 2400 : 3800, g: 0.9, pop: pops ? 1.4 : hasT ? 0.7 : 0.25 },
       tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
       bov: hasT ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
@@ -352,6 +355,7 @@ for (const q of GEN_NEW) {
   // scoppi dello scarico: le piccole acute e secche, le grosse più cupe e lunghe, i diesel quasi niente schiocco
   voice.pop = diesel ? { f: 0.7, crack: 0.5, len: 0.8 } : cyl === 6 ? { f: 0.9, crack: 1.0, len: 1.15, thump: 1.15 }
     : hp < 80 ? { f: 1.4, crack: 1.3, len: 0.75 } : hp < 120 ? { f: 1.2, crack: 1.15, len: 0.9 } : { f: 1.08, crack: 1.1, len: 1.0 };
+  if (make === 'Volvo') voice.pop = Object.assign({}, VOLVO_POP, { f: 0.72, bf: 0.92, len: 1.5, boom: 0.65 });   // 850 R: ancora più cupa
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
     shiftK: heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: diesel ? 0.15 : 0.3, voice, buy: { price, km },

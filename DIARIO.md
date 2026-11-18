@@ -9,7 +9,10 @@ due voci, e il controllo della sera le legge.
   ogni tanto un doppio «pa-pam» o una sgranata di schiocchi. Carattere per auto in `voice.pop` (`cars.js`): R5 e utilitarie
   acute e secche, E34 e 6 cilindri bassi e lunghi, diesel sordi. Fiammata: colori arancio, gialla, blu e una fiammella che
   resta accesa dopo gli scoppi. `ascolta.mjs` ha il copione `scoppi` e le variabili `PRESET`/`POPS`.
-- **Per il Claude di Nico**: Supra e V40 non hanno `voice.pop`, quindi lo scoppio medio è come prima, ma ora varia un po'
+- Poi, su richiesta del cognato («sembra un petardo»): le Volvo (V40 e 850 R) hanno un boato basso (`boom` in `voice.pop`,
+  `VOLVO_POP` in `cars.js`): BOOM grossi, bam medi, pim corti, meno schiocco. **La V40 quindi non suona più come prima negli
+  scoppi** (solo lì: il motore è uguale). Per tornare indietro basta togliere `voice: { pop: VOLVO_POP }` dal `dsp` della V40.
+- **Per il Claude di Nico**: la Supra non ha `voice.pop`, quindi lo scoppio medio è come prima, ma ora varia un po'
   da uno all'altro (è voluto). Se lo vuoi fisso: `voice.pop = { vary: 0 }`.
 - Aperto: sentirlo nel gioco; i valori di `voice.pop` sono a orecchio sui numeri, non su un ascolto vero.
 
