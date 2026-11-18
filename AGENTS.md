@@ -84,13 +84,14 @@ Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola
 | `night-run-pixel` | prima di disegnare nel 2D: coordinate, stile, luci, facciate, interni |
 | `night-run-audio` | suono del motore: `strumenti/ascolta.mjs` lo registra in WAV fuori dal browser e lo misura |
 | `night-run-auto` | un veicolo nuovo dai disegni del proprietario |
-| `night-run-pubblica` | pull request del cognato, commit, push, artifact, documentazione |
+| `night-run-pubblica` | commit, push diretto su `main`, artifact, documentazione |
+| `night-run-sera` | controllo della sera: cosa è cambiato su `main` dall'ultima volta, test, prova (`strumenti/controllo_sera.sh`) |
 | `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
 | `night-run-controllo` | controllo del gioco con voti per area e proposte |
 
 Skill nuove o modificate si fanno sul ramo **`skill`** (partito da `main`): una cartella
 `.claude/skills/<nome>/SKILL.md` con `name` uguale al nome della cartella e una `description` che dice quando usarla,
-una riga nella tabella qui sopra, poi pull request verso `main`. Prima di cominciare porta `skill` in pari con `main`.
+una riga nella tabella qui sopra, poi uniscile su `main` (direttamente, come il resto). Prima di cominciare porta `skill` in pari con `main`.
 
 Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
@@ -103,9 +104,13 @@ copiate qui apposta. Se una skill o un agente di ECC dice altro (commit in ingle
 TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
 
 ## Regole
-1. `main` è il ramo pubblicato su GitHub Pages: non ci si lavora sopra direttamente. Lavora su un ramo tuo
-   (es. `kimi/lavoro`, o quello che ti assegna la sessione) e porta le modifiche su `main` con una pull request,
-   che il proprietario approva. Prima di cominciare aggiorna il tuo ramo da `main`.
+1. `main` è il ramo pubblicato su GitHub Pages. Il progetto è del proprietario e del cognato insieme: **tutti e due
+   caricano direttamente su `main`, senza pull request e senza approvazione**, e il cognato può aggiungere, cambiare
+   ed eliminare quello che vuole. Prima di caricare: `git fetch origin main` e unisci (`git merge`), tenendo il
+   lavoro dell'altro; mai `push --force`, mai riscrivere la storia di `main`. I test devono passare e, se tocchi il
+   gioco, provalo nel browser (`night-run-prova`). Un ramo a parte serve solo se vuoi (lavori lunghi, prove): lo
+   unisci tu quando è pronto. Se la sessione ti assegna un ramo di lavoro, lavora lì e poi unisci su `main`.
+   Ogni sera, prima di un lavoro nuovo, si fa il **controllo della sera** insieme (skill `night-run-sera`).
 2. Commenti, testi del gioco e messaggi di commit in italiano, nello stile del codice esistente.
 3. Nel repository niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini): l'utente li carica
    in locale nel browser (IndexedDB). Niente copie di grafica, nomi o personaggi di giochi esistenti.

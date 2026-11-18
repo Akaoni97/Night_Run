@@ -47,7 +47,8 @@ vale `AGENTS.md`.
 ## 4. Cosa non si fa mai
 - Niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini) e niente grafica, nomi o
   personaggi copiati da giochi esistenti. I file personali dell'utente si caricano solo in locale nel browser.
-- Niente lavoro diretto su `main`: ramo tuo e pull request, che il proprietario approva.
+- Su `main` si carica direttamente (proprietario e cognato, senza approvazione), ma sempre dopo `git fetch` e unione:
+  mai `push --force`, mai riscrivere la storia di `main`. La sera si controlla insieme cosa è cambiato.
 - Niente chiamate di rete a servizi esterni (analytics, API, font, immagini da altri siti). Il gioco deve
   funzionare offline, a parte three.js dal CDN.
 - Niente dati personali nel repository o nelle richieste a servizi esterni.

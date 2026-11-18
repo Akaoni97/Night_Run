@@ -18,8 +18,9 @@ gioco fa, sezione per sezione).
 2. **Veicoli solo dai disegni del giocatore.** Niente auto inventate, né per il traffico né da guidare. Se manca un
    veicolo (per esempio un camion), chiedilo: il giocatore manda uno zip con i disegni.
 3. Niente file presi da mod o senza licenza nel repository (suoni, modelli): il giocatore li carica in locale.
-4. Si lavora sul ramo indicato dalla sessione (o un ramo proprio) e si porta su `main` come chiede il proprietario;
-   il cognato apre pull request verso `main`. Righe finali dei commit come da istruzioni della sessione
+4. Il proprietario e il cognato caricano direttamente su `main`, senza pull request né approvazione: il cognato ha
+   piena libertà di aggiungere ed eliminare. Prima di caricare `git fetch origin main` e unione, mai `push --force`.
+   Ogni sera, prima di un lavoro nuovo, controllo insieme (`strumenti/controllo_sera.sh`, skill `night-run-sera`). Righe finali dei commit come da istruzioni della sessione
    (Co-Authored-By e Claude-Session).
 5. Prima di dire che una cosa è fatta, provala (test e browser) e dillo in modo chiaro, anche quando qualcosa non va.
 
