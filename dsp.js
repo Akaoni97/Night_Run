@@ -1,5 +1,5 @@
 // ============================================================================
-//  EngineDSP · sintesi fisica del suono di un 6 cilindri in linea (2JZ-GTE)
+//  EngineDSP · sintesi fisica del suono di motori a 4, 5 e 6 cilindri in linea (nato sul 2JZ-GTE)
 //  Gira dentro un AudioWorklet (o in uno ScriptProcessor come ripiego).
 //  Nessun campione registrato: ogni scoppio è calcolato sull'angolo di manovella.
 // ============================================================================
@@ -61,6 +61,11 @@ class EngineDSP {
     this.radPrev = 0; this.dc1x = 0; this.dc1y = 0;
     this.viewLP = new BQ(); this.viewLP2 = new BQ(); this.barkPK = new BQ().set('peak', 1100, 0.9, sr, 0); this.opHP = new BQ().set('hp', 650, 0.7, sr); this.opHP2 = new BQ().set('hp', 650, 0.7, sr); this.opLP = new BQ().set('lp', 6000, 0.6, sr); this.open = 0; this.openG = 1;
     this.boomBP = new BQ().set('bp', 78, 1.6, sr);
+    // Modifica Codex (adattata da Claude): carattere «deciso» opzionale, solo sulla sintesi dello scarico.
+    // Con «Originale» (di serie) questo percorso resta escluso e il suono è identico a prima.
+    this.codexBody = new BQ().set('peak', 180, 0.8, sr, 2.5);
+    this.codexEdge = new BQ().set('peak', 1150, 0.85, sr, 3.5);
+    this.codexLoad = 0;
     this.howlBP = new BQ(); this.howlBP2 = new BQ(); this.metBP = new BQ(); this.metBP2 = new BQ(); this.metK = 0; this.howlK = 0;
     this.crackHP = new BQ().set('hp', 700, 0.7, sr);
     this.turbHP = new BQ().set('hp', 2500, 0.7, sr);
@@ -161,7 +166,9 @@ class EngineDSP {
     // collettori: ghisa originale 3+3 (biturbo) oppure tubolare 6-1 a lunghezze quasi uguali (single)
     const twin = t.tb.mani === 0;
     // quattro cilindri (Volvo B4204S): ordine 1-3-4-2, uno scoppio ogni 180°; sei cilindri: 1-5-3-6-2-4 ogni 120°
+    // cinque cilindri (Volvo 850 R, modifica Codex): 1-2-4-5-3, uno scoppio ogni 144°
     if ((t.cyl || 6) === 4) { this.nCyl = 4; [0, 2, 3, 1].forEach((c, k) => { this.cyl[c].off = k * 180; }); }
+    else if (t.cyl === 5) { this.nCyl = 5; [0, 1, 3, 4, 2].forEach((c, k) => { this.cyl[c].off = k * 144; }); }
     else { this.nCyl = 6; [0, 4, 2, 5, 1, 3].forEach((c, k) => { this.cyl[c].off = k * 120; }); }
     // carattere del singolo motore (auto da disegno): collettori, durata degli impulsi, farfalle singole, urlo metallico
     const v = t.voice || {};
@@ -171,7 +178,7 @@ class EngineDSP {
     // mid: quanto dello scoppio passa dal tubo e dal silenziatore (la parte che suona da petardo)
     this.popB = Object.assign({ f: 1, crack: 1, len: 1, thump: 1, vary: 1, boom: 0, bf: 1, mid: 1 }, v.pop || {});
     this.vc = { diesel: v.diesel || 0, pulse: v.pulse || 1, rough: v.rough || 0, howl: v.howl || 0, metal: v.metal || 0, boomRpm: v.boomRpm || 3300, hiRpm: v.hiRpm || 6800 };
-    const L = v.mani || (this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
+    const L = v.mani || (this.nCyl === 5 ? [0.56, 0.50, 0.46, 0.50, 0.56] : this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
     const split = v.split != null ? v.split : twin ? 0.22 : 0;
     this.cyl.forEach((cy, i) => {
       cy.D = Math.max(2, Math.round(((L[i] != null ? L[i] : 0.6) + (i >= 3 ? split : 0)) / 610 * sr));
@@ -204,6 +211,7 @@ class EngineDSP {
       { exh: 0.35, lp: 2600, boom: 0.0, intake: 1.0, mech: 0.8, turbo: 1.0, bov: 1.0, road: 0.15, wind: 0.1, tire: 0.3, gear: 0.45, starter: 1.0, pump: 0.25, rev: 0.08, width: 0.35, g: 1.15, er: 0.45, belt: 1.0 },
     ];
     this.mixT = Object.assign({}, V[c.view]);
+    this.mixT.character = c.character === 'codex' ? 1 : 0;   // modifica Codex: passa piano da un profilo all'altro
   }
 
   // ambiente intorno all'auto: 0 strada aperta (solo l'asfalto riflette), 1 città (i palazzi rimandano lo scarico),
@@ -433,6 +441,7 @@ class EngineDSP {
     // scalino quando entra il secondo turbo (biturbo sequenziale) — non una rampa lineare
     const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
     const ld = Math.min(1, S.charge * 1.2) * Math.min(1, S.thr * 1.6);
+    this.codexLoad = ld;
     const vc = this.vc, hi = vc.hiRpm;
     // urlo metallico in alto (sei in linea BMW, collettori in acciaio) e ululato delle farfalle singole
     this.metK = vc.metal * ss(hi - 3200, hi - 200, S.rpm) * (0.25 + 0.75 * ld);
@@ -472,7 +481,7 @@ class EngineDSP {
       const th = this.th;
       const nz = this.r(), nz2 = this.r(), nz3 = this.r();
 
-      // ---- 6 cilindri: impulsi di scarico (blowdown) e aspirazione ------------
+      // ---- impulsi di scarico (blowdown) e aspirazione, cilindro per cilindro ---
       let col = 0, inn = 0;
       for (let j = 0; j < this.nCyl; j++) {
         const c = cyl[j];
@@ -571,6 +580,12 @@ class EngineDSP {
       if (this.open > 0.02) {
         const o = this.open, hv = this.opHP2.p(this.opHP.p(ex));
         exh += this.opLP.p(Math.tanh(hv * (6 + 10 * o)) * 0.13) * o * o * this.openG * (M.lp < 4000 ? 1.5 : 1);   // in abitacolo arriva attraverso la scocca: più forte per compensare il filtro
+      }
+      if (M.character > 1e-5) {
+        // modifica Codex: più corpo nei medio-bassi e attacco quando acceleri, saturazione morbida (niente picchi)
+        const load = this.codexLoad, drive = 1 + 0.6 * load;
+        const tone = this.codexEdge.p(this.codexBody.p(exh)), shaped = Math.tanh(tone * drive) / drive;
+        exh += (shaped - exh) * M.character * (0.35 + 0.65 * load);
       }
       exh += thump;
       if (popB !== 0) exh += Math.tanh(popB * 1.1) * 0.25;      // boato: saturato come un colpo nel tubo, niente picchi

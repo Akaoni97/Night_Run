@@ -31,7 +31,7 @@ const sim = new SupraSim();
 sim.setCar(id === 'supra' ? null : Object.assign({}, c.P));
 sim.setTune(tp.sim); sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW;
 const dsp = new EngineDSP(SR);
-dsp.msg({ cfg: { tune: tp.dsp, view: +vista, vol: 1, pops: process.env.POPS ? 1 : 0, fx: {} } }); sim.cfg.pops = !!process.env.POPS; dsp.msg({ env: +amb });
+dsp.msg({ cfg: { tune: tp.dsp, view: +vista, vol: 1, pops: process.env.POPS ? 1 : 0, fx: {}, character: process.env.CARATTERE || 'originale' } }); sim.cfg.pops = !!process.env.POPS; dsp.msg({ env: +amb });
 
 const lim = tp.sim.limiter || 7000, cyl = (tp.dsp && tp.dsp.cyl) || 6;
 // copioni: (t, sim) → gas, e intanto cambiano marcia; durata in secondi
