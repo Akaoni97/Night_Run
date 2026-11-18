@@ -1512,7 +1512,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
   }
   // col cambio automatico E e Q spostano la leva (E verso D, Q verso P); in manuale salgono e scalano
-  const shiftUp = () => { if (S.gearbox === 'auto') { levaStep(1); return; } const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g < 6) shiftTo(g === -1 ? 0 : g + 1); };
+  const shiftUp = () => {
+    if (S.gearbox === 'auto') { levaStep(1); return; }
+    const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear;
+    if (g === -1) { if (sim.v > -1.2) shiftTo(1); else { shiftTo(0); flash('Vai ancora indietro: frena, poi E per la prima', 1.8); } return; }   // da R dritti in prima (come la leva vera)
+    if (g < 6) shiftTo(g + 1);
+  };
   const shiftDown = () => { if (S.gearbox === 'auto') { levaStep(-1); return; } const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g > 0) shiftTo(g - 1); };
 
   function ignToggle() { ensureAudio(); sim.setIgnition(!sim.ign); }
@@ -1669,6 +1674,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     return top;
   }
   function levaApply() {                                       // la marcia vera segue la leva
+    // il gioco ti accosta a un locale (U): si va avanti, quindi la leva va in D (prima la retro portava l'auto indietro)
+    if (S.gearbox === 'auto' && game.ap && (game.ap.fwd || game.ap.stopped) && leva !== 'D' && Math.abs(sim.v) < 1.2) leva = 'D';
     sim.park = S.gearbox === 'auto' && leva === 'P';
     if (S.gearbox !== 'auto' || sim.shiftSeq) return;
     if ((leva === 'P' || leva === 'N') && sim.gear !== 0) sim.shift(0);
@@ -1685,7 +1692,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!quiet) flash('Leva   ' + LEVA.map((x) => (x === L ? `[ ${x} ]` : x)).join('   '), 1.1);
     return true;
   }
-  const levaStep = (d) => setLeva(LEVA[Math.max(0, Math.min(LEVA.length - 1, LEVA.indexOf(leva) + d))]);
+  const levaStep = (d) => {
+    if (d > 0 && leva === 'R') {                               // da R, E va dritta in D (la leva vera passa da N in un colpo solo)
+      if (sim.v > -1.2) return setLeva('D');
+      setLeva('N', true); flash('Vai ancora indietro: frena, poi E per la D', 1.8); return false;
+    }
+    return setLeva(LEVA[Math.max(0, Math.min(LEVA.length - 1, LEVA.indexOf(leva) + d))]);
+  };
   // quello che si legge sul quadro: P R N D col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
   function gearLabel(short) {
     const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear;

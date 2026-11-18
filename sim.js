@@ -239,6 +239,8 @@ class SupraSim {
 
     // limitatore di velocità (camion, autobus): oltre la soglia il gas non c'è più
     if (P.vmax && Math.abs(this.v) * 3.6 > P.vmax - 1) thrCmd *= SIM_CLAMP((P.vmax + 1 - Math.abs(this.v) * 3.6) / 2, 0, 1);
+    // limitatore della retromarcia (m/s): lo decide il gioco (manovre lente; 0 = niente gas in retro). Di serie spento
+    if (this.revMax != null && this.gear === -1) thrCmd *= this.revMax <= 0.05 ? 0 : SIM_CLAMP((this.revMax + 0.15 + this.v) / 0.5, 0, 1);
     // ---- farfalla e aria ------------------------------------------------------------
     // esitazione: gas spalancato di colpo ai bassi giri, la miscela si smagrisce per un attimo e il motore "si siede"
     const dThr = thrCmd - this.thr;

@@ -29,6 +29,9 @@ due voci, e il controllo della sera le legge.
   niente di tuo; se serve, sistemala tu.
 
 ## 18/11/2026 sera · proprietario
+- Fatto: **retro sistemata**. Premendo U dopo la retro il pilota automatico dava gas in retromarcia e portava l'auto
+  indietro fino al limite, bloccata (era il "mi porta indietro" e il "non riparte"): ora frena, mette la marcia avanti ed
+  entra. Al limite dei 60 m l'auto si ferma davvero; retro al massimo 18 km/h; dopo R una E porta in D (o in prima).
 - Fatto: **leva P R N D** del cambio automatico (E verso D, Q verso P, P blocca le ruote, avvio solo in P/N); in **folle** il
   gas fa solo salire i giri (niente più prima inserita da sola); **gomme** più vere (`gomme2d.js`): la V40 usa la ruota del
   disegno (prima i copricerchi a codice brillavano col bagliore), ombra del passaruota, fianco con le scritte, tasselli,

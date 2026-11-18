@@ -71,6 +71,7 @@ const MOUNTAIN = {
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
 const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
+const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/s (18 km/h: una manovra, non una corsa)
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
   { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
@@ -623,18 +624,27 @@ class StreetGame {
   control(inp, dt) {
     const out = { thr: inp.thr, brake: inp.brake, auto: false };
     const ap = this.ap;
+    // mai bloccati per sempre: se per 8 secondi l'auto non si avvicina al punto dove fermarsi, il controllo torna a te
+    if (ap && !ap.stopped && ap.atX !== null) {
+      const rel = ap.atX - this.s.dist;
+      if (ap.best === undefined || rel < ap.best - 0.5) { ap.best = rel; ap.stuck = 0; } else ap.stuck = (ap.stuck || 0) + dt;
+      if (ap.stuck > 8) { this.ap = null; this.say('Non riesco ad accostare: guida tu', 'info'); return out; }
+    }
     if (ap) {
       out.auto = true; out.thr = 0;
       const v = Math.max(0, this.sim.v);
       if (!ap.stopped) {
         const rel = ap.atX === null ? 0 : ap.atX - this.s.dist;
-        if (ap.atX === null) out.brake = Math.min(1, 6 / 10.3 * 1.5 + 0.05);
+        ap.fwd = ap.atX !== null && rel > 4;                              // il locale è davanti: si va avanti (col cambio automatico la leva va in D)
+        if (this.sim.v < -0.3) out.brake = 1;                             // si arrivava in retro: prima fermi
+        else if (ap.atX === null) out.brake = Math.min(1, 6 / 10.3 * 1.5 + 0.05);
         else {
+          if (ap.fwd && this.sim.gear < 1 && !this.sim.shiftSeq && this.sim.cfg.autoClutch) this.sim.shift(1);   // mai gas in retro o in folle
           // velocità obiettivo: avvicinamento a ~50 km/h, poi frenata a 3 m/s² fino alla pompa
           const vt = Math.min(Math.max(v, 14), Math.sqrt(2 * 3 * Math.max(rel, 0)));
           const need = v * v / (2 * Math.max(rel, 0.8));
           out.brake = v > vt + 0.4 ? Math.min(1, need / 10.3 * 1.4 + (v - vt) * 0.05) : 0;
-          if (v < vt - 1 && rel > 4) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
+          if (v < vt - 1 && rel > 4 && this.sim.gear >= 1) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
         }
         if (v < 0.25 && Math.abs(this.sim.v) < 0.25 && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
           ap.stopped = true;
@@ -651,10 +661,16 @@ class StreetGame {
     if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
     if (sim.v > 0) this.s.dist += sim.v * dt;
     else if (sim.v < 0) {                  // retromarcia: si torna indietro di poco, l'autostrada resta a senso unico
-      const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = far - GAME_BACK_MAX;
+      const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = Math.min(d0, Math.max(0, far - GAME_BACK_MAX));
       this.s.dist = Math.max(lim, d0 + sim.v * dt);
-      if (this.s.dist <= lim && d0 > lim) this.say('Più indietro di così non si torna: l\'autostrada va solo avanti', 'info');
+      if (this.s.dist <= lim + 1e-6) {     // in fondo: l'auto si ferma davvero (prima la strada si fermava ma la fisica continuava ad andare indietro)
+        sim.v = 0; sim.ww = 0; sim.wo = 0; sim.phi = 0;
+        if (!this.backWall) this.say('Più indietro di così non si torna: l\'autostrada va solo avanti', 'info');
+        this.backWall = true;
+      }
     }
+    if (this.backWall && (sim.gear !== -1 || sim.v > 0.05)) this.backWall = false;
+    sim.revMax = this.backWall ? 0 : GAME_REV_MAX;                       // retro lenta; contro il muro niente gas in retro
     if (!(this.s.far >= this.s.dist) || this.s.far - this.s.dist > GAME_BACK_MAX + 1) this.s.far = this.s.dist;   // più lontano raggiunto (si azzera se la strada salta: partita nuova, tutorial)
     const d = this.s.dist;
     // contachilometri e traguardi
