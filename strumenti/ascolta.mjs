@@ -24,12 +24,14 @@ const c = CARS[id];
 if (!c) { console.error('auto sconosciuta: ' + id + '\nauto: ' + Object.keys(CARS).join(', ')); process.exit(1); }
 
 const SR = 48000, B = 128, dt = B / SR;
-const tp = c.params(c.presets[0].sel);
+// PRESET=<id> sceglie la preparazione (es. single per la Supra), POPS=1 accende la mappa pop & bang
+const pr = (process.env.PRESET && c.presets.find((q) => q.id === process.env.PRESET)) || c.presets[0];
+const tp = c.params(pr.sel);
 const sim = new SupraSim();
 sim.setCar(id === 'supra' ? null : Object.assign({}, c.P));
 sim.setTune(tp.sim); sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW;
 const dsp = new EngineDSP(SR);
-dsp.msg({ cfg: { tune: tp.dsp, view: +vista, vol: 1, pops: 0, fx: {} } }); dsp.msg({ env: +amb });
+dsp.msg({ cfg: { tune: tp.dsp, view: +vista, vol: 1, pops: process.env.POPS ? 1 : 0, fx: {} } }); sim.cfg.pops = !!process.env.POPS; dsp.msg({ env: +amb });
 
 const lim = tp.sim.limiter || 7000, cyl = (tp.dsp && tp.dsp.cyl) || 6;
 // copioni: (t, sim) → gas, e intanto cambiano marcia; durata in secondi
@@ -37,6 +39,7 @@ const COP = {
   minimo: { T: 8, f: () => 0 },
   sgasate: { T: 10, f: (t) => (t % 2.5 > 1 && t % 2.5 < 1.45 ? 1 : 0) },
   limitatore: { T: 6, f: (t) => (t > 1 ? 1 : 0) },
+  scoppi: { T: 12, f: (t) => (t % 3 > 0.6 && t % 3 < 1.5 ? 1 : 0) },        // in folle: sgasata fino in alto e rilascio, quattro volte (scoppi in rilascio)
   allungo: { T: 16, f: (t, s) => {
     if (t < 1) return 0;
     if (s.gear === 0) { s.shift(1); }

@@ -169,7 +169,15 @@
     g.restore();
   };
 
-  S.fxFlame = function (g, rx, exY, k, fl, y0) {
+  // tavolozze della fiamma: arancione (miscela grassa), gialla, blu alla radice con la punta arancione (magra, la classica
+  // fiammata da auto preparata). Ogni banda: [radice, punta], dall'esterno al cuore; o = contorno scuro, l = colore della luce
+  const FLAME_PAL = {
+    arancio: { b: [['#e8380c', '#e8380c'], ['#ff7a14', '#ff7a14'], ['#ffc832', '#ffc832'], ['#fff4cc', '#fff4cc']], o: 'rgba(110,18,8,.7)', l: '#ff7a20' },
+    gialla: { b: [['#ff8a1a', '#f0601a'], ['#ffc832', '#ffb020'], ['#ffe97a', '#ffe060'], ['#fffbe8', '#fff6d0']], o: 'rgba(120,60,8,.6)', l: '#ffb040' },
+    blu: { b: [['#2f5bff', '#ff5a14'], ['#4fb2ff', '#ff9a2a'], ['#bfe9ff', '#ffd65a'], ['#ffffff', '#fff4cc']], o: 'rgba(16,22,90,.6)', l: '#7aa8ff', cut: 0.42 },
+  };
+  S.fxFlame = function (g, rx, exY, k, fl, y0, pal) {
+    const P = FLAME_PAL[pal] || FLAME_PAL.arancio;
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
     const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)))), H0 = (3.4 + f * 4.2) * k, fr = Math.floor(t * 30);
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;                   // densità doppia: colonne e altezze a mezze unità
@@ -180,27 +188,28 @@
       cols.push([rx - 1 - i, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
         half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u]);
     }
-    g.fillStyle = 'rgba(110,18,8,.7)';                                           // contorno scuro: stacca la fiamma dallo sfondo
+    g.fillStyle = P.o;                                                           // contorno scuro: stacca la fiamma dallo sfondo
     for (const c of cols) { const y1 = rq(c[1] - c[2]), y2 = rq(c[1] + c[3]); if (y2 - y1 >= 2) g.fillRect(c[0], y1 - u1, u1, y2 - y1 + 2 * u1); }
-    const band = (col, sz, taper) => {
-      g.fillStyle = col;
+    const cut = P.cut || 0;                                                      // dove la radice blu diventa punta arancione
+    const band = (bc, sz, taper) => {
       for (const c of cols) {
         const m = sz * Math.max(0, 1 - c[4] * taper), y1 = rq(c[1] - c[2] * m), y2 = rq(c[1] + c[3] * m);
+        g.fillStyle = cut && (c[4] > cut + 0.06 * Math.sin(c[0] * 0.7 + fr) ? 1 : 0) ? bc[1] : bc[0];
         if (y2 - y1 >= u1) g.fillRect(c[0], y1, u1, y2 - y1);
         else if (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) g.fillRect(c[0], y1, u1, u1);    // punta sfrangiata
       }
     };
-    band('#e8380c', 1, 0); band('#ff7a14', 0.74, 0.25); band('#ffc832', 0.5, 0.6); band('#fff4cc', 0.27, 1.1);
+    band(P.b[0], 1, 0); band(P.b[1], 0.74, 0.25); band(P.b[2], 0.5, 0.6); band(P.b[3], 0.27, 1.1);
     if (big) {
       // scoppi grossi: radice azzurra alla bocca e nodi bianchi lungo il getto
       g.fillStyle = '#a8e4ff'; for (const c of cols) if (c[4] < 0.16) g.fillRect(c[0], rq(c[1]), u1, 1);
       g.fillStyle = '#ffffff'; for (let n = 1; n <= 3; n++) { const c = cols[Math.round(n * 6.5 * k * SS)]; if (c && c[4] < 0.6) g.fillRect(c[0], rq(c[1]) - 1, 2, 2); }
     }
     for (const c of cols) if (c[4] > 0.35 && rnd(c[0] * 1.7 + fr * 3) < 0.13) {      // lingue che si staccano sopra
-      g.fillStyle = c[4] > 0.7 ? '#e8380c' : '#ff7a14'; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
+      g.fillStyle = c[4] > 0.7 ? P.b[0][1] : P.b[1][1]; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
     }
     const a = Math.min(1, f);
-    this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, '#ff7a20', 0.13 * a, 3);        // alone
+    this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, P.l, 0.13 * a, 3);              // alone
     this.light(g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, '#ff8a20', 0.24 * a, 4);                  // luce sull'asfalto
     return L;
   };
@@ -385,15 +394,27 @@
     // scoppiettii: ogni scoppio accende la fiammata e lancia scintille e uno sbuffo di fuliggine
     st.flame = Math.max(0, st.flame - dt * 8);
     st.popFlash = Math.max(0, (st.popFlash || 0) - dt * 6);
+    // fiammella che resta accesa mentre c'è benzina che brucia nello scarico (rilascio, limitatore) e si spegne piano dopo:
+    // tremola e cambia colore da sola, tra arancione, gialla e blu
+    const susT = s.flame ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
+    st.sus = susT > (st.sus || 0) ? (st.sus || 0) + (susT - (st.sus || 0)) * Math.min(1, dt * 10) : Math.max(0, (st.sus || 0) - dt * 1.6);
+    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); return q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
+    if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
     if (s.flame && R() < s.flame * dt * 22) {
       const big = R() < 0.35 + s.flame * 0.3;
       st.flame = big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
+      st.flamePal = big && R() < 0.5 && !this.flamePal ? 'blu' : pickPal();          // ogni scoppio col suo colore
       for (let q = 0; q < (big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
     }
     if (st.flame > 0.05) {
-      const L = this.fxFlame(g, rx, exY, k, st.flame, y0), fl = Math.min(1.5, st.flame);
+      const L = this.fxFlame(g, rx, exY, k, st.flame, y0, st.flamePal), fl = Math.min(1.5, st.flame);
       if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1 });
+    }
+    else if (st.sus > 0.03) {
+      // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
+      const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * vn(st.t * 7.3)) * (vn(st.t * 2.1 + 9) < 0.18 ? 0.5 : 1);
+      this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal);
     }
     // anello d'urto alla bocca negli scoppi grossi; la punta cromata si arroventa
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);

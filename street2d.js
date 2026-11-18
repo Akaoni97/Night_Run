@@ -2102,7 +2102,7 @@ class Street2D {
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));
     // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
     this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
-    if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02)) this.lightAdd(rx - 20, exY, 90, 40, '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0)) * 0.9);
+    if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02 || (st.sus || 0) > 0.03)) this.lightAdd(rx - 20, exY, 90, 40, st.flame > 0.05 && st.flamePal === 'blu' ? '150,170,255' : '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0, (st.sus || 0) * 0.45)) * 0.9);
     if (s.v > 16) {
       // linee di velocità affusolate (più fitte e lunghe con la velocità)
       const n = Math.min(30, (s.v - 16) * 1.2), fr = Math.floor(st.t * 24);

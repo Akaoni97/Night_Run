@@ -91,7 +91,9 @@ class EngineDSP {
     this.beltPh = 0;
 
     // scoppiettii (afterfire)
-    this.pops = []; this.popEnv = 0; this.popDec = Math.exp(-1 / (sr * 0.014)); this.thPh = 0;
+    // ogni scoppio è una voce sua (nota del colpo, durata, schiocco, colore del rumore, colpo sordo): fino a 6 insieme
+    this.pops = []; this.popV = []; this.popEnv = 0; this.popB = { f: 1, crack: 1, len: 1, thump: 1, vary: 1 };
+    for (let q = 0; q < 6; q++) this.popV.push({ e: 0, dec: 0, f: 68, tf: 88, ph: 0, th: 0, n: 0, nc: 1, nk: 1, br: 1, tk: 1 });
 
     // motorino d'avviamento, pompa benzina
     this.stPh = 0; this.stLP = new BQ().set('lp', 900, 0.7, sr); this.pumpPh = 0; this.pumpLP = new BQ().set('lp', 600, 0.7, sr);
@@ -163,6 +165,9 @@ class EngineDSP {
     else { this.nCyl = 6; [0, 4, 2, 5, 1, 3].forEach((c, k) => { this.cyl[c].off = k * 120; }); }
     // carattere del singolo motore (auto da disegno): collettori, durata degli impulsi, farfalle singole, urlo metallico
     const v = t.voice || {};
+    // scoppi dello scarico: nota (f, moltiplica i 68 Hz del colpo), schiocco (crack), durata (len), colpo sordo (thump),
+    // quanto cambiano da uno all'altro (vary). Di serie tutto a 1: Supra e V40 hanno la stessa media di prima
+    this.popB = Object.assign({ f: 1, crack: 1, len: 1, thump: 1, vary: 1 }, v.pop || {});
     this.vc = { diesel: v.diesel || 0, pulse: v.pulse || 1, rough: v.rough || 0, howl: v.howl || 0, metal: v.metal || 0, boomRpm: v.boomRpm || 3300, hiRpm: v.hiRpm || 6800 };
     const L = v.mani || (this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
     const split = v.split != null ? v.split : twin ? 0.22 : 0;
@@ -325,13 +330,22 @@ class EngineDSP {
   }
 
   addPop(big) {
-    if (this.pops.length > 8) return;
+    if (this.pops.length > 12) return;
     const d = Math.round((0.002 + this.r() * 0.5 * 0.03 + 0.015) * this.sr);
     let a = big ? 1.3 + 0.9 * Math.abs(this.r()) : 0.45 + 0.55 * Math.abs(this.r());
     if (this.cfg.fx && this.cfg.fx.pop) a *= 0.3;
     if (this.bov.env > 0 && this.tn.bov.v === 2) a *= 0.35;   // lascia sentire lo stu-tu-tu
     if (this.T.cut === 1) a *= 0.7;        // scoppi registrati caricati: qui resta solo il crepitio
-    this.pops.push({ d: Math.max(1, d), a });
+    // ognuno un po' diverso: nota ±17 %, durata, schiocco, rumore più o meno cupo, colpo sordo; le grosse più lunghe e basse
+    const B = this.popB, k = B.vary, rr = () => this.r() * k;
+    const f = 68 * B.f * Math.exp(0.16 * rr()) * (big ? 0.92 : 1), len = B.len * Math.max(0.45, 1 + 0.35 * rr()) * (big ? 1.3 : 1);
+    const P = { d: Math.max(1, d), a, f, tf: 88 * B.f * Math.exp(0.09 * rr()), len, br: B.crack * Math.max(0.3, 1 + 0.38 * rr()), nc: Math.max(0.3, 1 - 0.5 * Math.abs(rr())), tk: B.thump * (big ? 1.15 : 0.9 + 0.2 * Math.abs(rr())) };
+    this.pops.push(P);
+    if (Math.abs(this.r()) < 0.22 * k) this.pops.push(Object.assign({}, P, { d: P.d + Math.round((0.006 + 0.008 * Math.abs(this.r())) * this.sr), a: a * (0.35 + 0.25 * Math.abs(this.r())), f: f * 1.06, len: len * 0.7 }));   // doppio colpo: pa-pam
+    else if (!big && Math.abs(this.r()) < 0.12 * k) {     // crepitio: tre-cinque schiocchi piccoli in fila
+      let dd = P.d; const n = 3 + Math.floor(Math.abs(this.r()) * 3);
+      for (let q = 0; q < n; q++) { dd += Math.round((0.004 + 0.006 * Math.abs(this.r())) * this.sr); this.pops.push(Object.assign({}, P, { d: dd, a: a * (0.14 + 0.12 * Math.abs(this.r())), f: f * (1.2 + 0.3 * Math.abs(this.r())), len: 0.35, br: P.br * 1.4 })); }
+    }
   }
 
   cycle(c) {
@@ -487,14 +501,23 @@ class EngineDSP {
       // ---- afterfire -------------------------------------------------------------
       for (let q = this.pops.length - 1; q >= 0; q--) {
         const pp = this.pops[q];
-        if (--pp.d <= 0) { this.popEnv = Math.min(2.5, this.popEnv + pp.a); this.thPh = 0; this.pops.splice(q, 1); }
+        if (--pp.d <= 0) {
+          // la voce più quieta lascia il posto al nuovo scoppio
+          let w = this.popV[0]; for (const vv of this.popV) if (vv.e < w.e) w = vv;
+          w.e = Math.min(2.5, pp.a); w.dec = Math.exp(-1 / (sr * 0.014 * pp.len)); w.f = pp.f; w.tf = pp.tf; w.ph = 0; w.th = 0;
+          w.nc = pp.nc; w.nk = Math.sqrt((2 - pp.nc) / pp.nc); w.n = 0; w.br = pp.br; w.tk = pp.tk;
+          this.pops.splice(q, 1);
+        }
       }
-      let pop = 0;
-      if (this.popEnv > 1e-4) {
-        this.thPh += 68 / sr;
-        pop = this.popEnv * (nz3 * 0.85 + 0.7 * Math.sin(TAU * this.thPh));
-        this.popEnv *= this.popDec;
+      let pop = 0, popC = 0, popT = 0, popE = 0;
+      for (let q = 0; q < 6; q++) {
+        const vv = this.popV[q]; if (vv.e < 1e-4) continue;
+        vv.ph += vv.f / sr; vv.th += vv.tf / sr; vv.n += vv.nc * (nz3 - vv.n);
+        const sp = vv.e * (vv.n * vv.nk * 0.85 + 0.7 * Math.sin(TAU * vv.ph));
+        pop += sp; popC += sp * vv.br; popT += Math.sin(TAU * vv.th) * Math.min(1.6, vv.e) * 0.24 * vv.tk; popE += vv.e;
+        vv.e *= vv.dec;
       }
+      this.popEnv = popE;
       x += pop * 0.9;
 
       // ---- tubo principale (risonanze a quarto d'onda) --------------------------
@@ -513,9 +536,8 @@ class EngineDSP {
       const rad = y - 0.9 * this.radPrev; this.radPrev = y;
       const ex = rad - this.dc1x + 0.995 * this.dc1y; this.dc1x = rad; this.dc1y = ex;
       // scoppio all'uscita del terminale: schiocco secco (crack) più un colpo sordo (thump) che non passa dal silenziatore
-      const crack = this.crackHP.p(pop) * 0.55;
-      this.thumpPh = ((this.thumpPh || 0) + 88 / sr) % 1;
-      const thump = Math.sin(TAU * this.thumpPh) * Math.min(1.6, this.popEnv) * 0.24;
+      const crack = this.crackHP.p(popC) * 0.55;
+      const thump = Math.max(-0.4, Math.min(0.4, popT));
       let met = 0;
       if (this.metK > 1e-3) { const q = this.metBP.p(ex) * 30; met = (Math.tanh(q) * 0.7 + this.metBP2.p(Math.tanh(q * 2)) * 0.25) * 0.13 * this.metK * this.openG; }
       let exh = this.barkPK.p(this.viewLP2.p(this.viewLP.p(ex + crack + met)));

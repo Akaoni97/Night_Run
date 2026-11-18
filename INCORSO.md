@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Claude) | Scoppi dello scarico (suono più vario, carattere per auto) e fiammata prolungata a colori | `dsp.js`, `effetti2d.js`, `cars.js` (voice), `index.html` (eventi) | 18/11 21:50 |
