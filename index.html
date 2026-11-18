@@ -3182,7 +3182,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
     }
-    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); }
+    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); }
     game.fx.length = 0;
     if (msgT > 0) { msgT -= dt; if (msgT <= 0) $('msg').classList.remove('show'); }
     draw(); updateDom(dt);
@@ -3248,6 +3248,25 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     n.connect(bp); bp.connect(g); o.connect(og); og.connect(g);
     if (pan) { pan.pan.setValueAtTime(dv > 0 ? 0.6 : -0.6, t); pan.pan.linearRampToValueAtTime(dv > 0 ? -0.6 : 0.6, t + dur); g.connect(pan); pan.connect(ctx.destination); } else g.connect(ctx.destination);
     n.start(t); o.start(t); n.stop(t + dur); o.stop(t + dur);
+  }
+  // gomme che stridono (un'altra auto che inchioda): fruscio in una banda stretta che scende, più un fischio che vibra
+  // (la gomma che salta sull'asfalto); più forte quanto è vicina, a sinistra se arriva da dietro
+  function skidSound(I, rel) {
+    if (!audio.ctx || S.muted) return;
+    const ctx = audio.ctx, t = ctx.currentTime, I1 = Math.min(1, I || 0.6), near = Math.max(0.12, 1 - Math.abs(rel || 0) / 110), dur = 0.55 + 0.75 * I1;
+    const len = Math.ceil(ctx.sampleRate * dur), buf = ctx.createBuffer(1, len, ctx.sampleRate), dd = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) dd[i] = Math.random() * 2 - 1;
+    const n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), o = ctx.createOscillator(), ob = ctx.createBiquadFilter(), og = ctx.createGain();
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(), g = ctx.createGain(), pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    n.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 8; bp.frequency.setValueAtTime(2400, t); bp.frequency.linearRampToValueAtTime(1500, t + dur);
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(1180, t); o.frequency.linearRampToValueAtTime(780, t + dur);
+    lfo.frequency.value = 19 + Math.random() * 8; lg.gain.value = 45; lfo.connect(lg); lg.connect(o.frequency);
+    ob.type = 'bandpass'; ob.frequency.value = 1050; ob.Q.value = 3; og.gain.value = 0.32;
+    const peak = 0.17 * near * (0.6 + 0.4 * I1) * S.vol / 100;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.04); g.gain.setValueAtTime(peak * 0.85, t + dur * 0.7); g.gain.exponentialRampToValueAtTime(0.0005, t + dur);
+    n.connect(bp); bp.connect(g); o.connect(ob); ob.connect(og); og.connect(g);
+    if (pan) { pan.pan.value = Math.max(-0.7, Math.min(0.7, (rel || 0) / 60)); g.connect(pan); pan.connect(ctx.destination); } else g.connect(ctx.destination);
+    n.start(t); o.start(t); lfo.start(t); n.stop(t + dur); o.stop(t + dur); lfo.stop(t + dur);
   }
   // clacson di un'altra auto: due toni più bassi e corti del nostro
   function carHorn() {
