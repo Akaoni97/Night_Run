@@ -176,7 +176,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     const fx = IMG.drive ? IMG.drive.width - 4 : 196;
     beam(g, vx + fx, 288, 240, 0.4); if (IMG.drive) g.drawImage(IMG.drive, Math.round(vx), Math.round(vy + IMG.driveDy)); else g.drawImage(IMG.v40, Math.round(vx), Math.round(vy)); R(g, vx + 2, 258, 4, 3, '#ff3a2a');
     glow(g, vx + fx + 2, 289, 50, 'rgba(255,240,190,A)', 0.4);
-    const fade = clamp((t - 9.5) / 1.5, 0, 1); if (fade > 0) { R(g, 0, 0, W, H, `rgba(0,0,0,${fade})`); if (t > 10.5) { g.globalAlpha = clamp((t - 10.5) / 1, 0, 1); g.font = '44px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#f0e6d2'; g.textAlign = 'center'; g.fillText('NIGHT RUN', W / 2, 190); g.font = '12px "Share Tech Mono", monospace'; g.fillStyle = '#ffb347'; g.fillText('km 0', W / 2, 216); g.textAlign = 'left'; g.globalAlpha = 1; } }
+    const fade = clamp((t - 9.5) / 1.5, 0, 1); if (fade > 0) { R(g, 0, 0, W, H, `rgba(0,0,0,${fade})`); if (t > 10.5) { g.globalAlpha = clamp((t - 10.5) / 1, 0, 1); g.font = '44px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#f0e6d2'; g.textAlign = 'center'; g.fillText('NIGHT RUN', W / 2, 184); g.font = '16px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#ffb347'; g.fillText('THE LAST HIGHWAY', W / 2, 208); g.font = '12px "Share Tech Mono", monospace'; g.fillStyle = '#a8936a'; g.fillText('km 0', W / 2, 234); g.textAlign = 'left'; g.globalAlpha = 1; } }
   } };
   const ORDER = ['lettera', 'arrivo', 'studio', 'garage', 'strada'];
 

@@ -8,7 +8,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 
 | Cosa | Stato | Da fare |
 | --- | --- | --- |
-| Nome "Night Run" | **Deciso, da controllare** | Il 18/11 il proprietario ha scelto **Night Run: The Last Highway** (il sottotitolo lo distingue dal "Night Run" di Thousand Ant). Da controllare nelle banche dati dei marchi e su Steam/itch.io; da mettere nel gioco. |
+| Nome "Night Run" | **Deciso, da controllare** | Il 18/11 il proprietario ha scelto **Night Run: The Last Highway** (il sottotitolo lo distingue dal "Night Run" di Thousand Ant). Già nel gioco; da controllare nelle banche dati dei marchi e su Steam/itch.io. |
 | Nomi e marchi reali delle auto (27 mezzi) | **Rischio** | Marche e modelli veri nel gioco e sul quadro strumenti (TOYOTA, VOLVO, BMW); strisce M sulle BMW. |
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
 | Musica (8 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
@@ -27,9 +27,9 @@ trova il loro). C'è anche *Nightrunner* (Planetary Gears, Steam, 2024).
 **Consiglio**: scegliere un nome diverso o con un sottotitolo forte prima dei video, e controllare il nome scelto
 nelle banche dati dei marchi (EUIPO, UIBM) e su Steam/itch.io. Il video si rifà in pochi minuti con un altro nome
 (`strumenti/teaser_monta.sh`, scritte in `cartelli`).
-**Deciso il 18/11/2026**: *Night Run: The Last Highway*. Restano da fare il controllo del nome completo (EUIPO, UIBM,
-Steam, itch.io) e il cambio nel gioco (`<title>` di `index.html`, cartello finale del prologo in `prologo.js`,
-scritte del teaser).
+**Deciso il 18/11/2026**: *Night Run: The Last Highway*. Nel gioco c'è già (titolo della pagina, scritta in alto, schermata
+iniziale, cartello finale del prologo). Restano il controllo del nome completo (EUIPO, UIBM, Steam, itch.io) e le
+scritte del teaser.
 
 ## 2. Auto e marchi reali
 Nel gioco ci sono marche e modelli veri: Toyota Supra RZ, Volvo V40 SW 2.0, Volvo 850 R, BMW 2002 Turbo, BMW M3 E30,
