@@ -5,6 +5,8 @@ dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook 
 due voci, e il controllo della sera le legge.
 
 ## 19/11/2026 · cognato
+- Fatto: polizia da autostrada: non ferma più chi è in sesta, ma chi le passa accanto oltre i 136 km/h (limite 130, tolleranza
+  5 %). Multa a scaglioni come il codice della strada, moltiplicata dal livello di ricercato. Provato nel browser (149 km/h: € 170).
 - Fatto: `strumenti/prova.js` dà per fatto il primo lavoro (dal tutorial obbligatorio `tappa:` e `km:` non saltavano più,
   il gioco riportava al Bar Sport); `--tutorial` per provarlo. Controllo della sera fatto.
 - Da sapere: col borbottio nuovo gli scoppi della V40 sono tornati forti (copione `scoppi`: da −14,8 a −10,5 dB). Da sentire

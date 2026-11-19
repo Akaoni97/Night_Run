@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Claude) | Polizia: limite 130 (multa da 137 km/h) | game.js, index.html (aiuto), test/motori.test.js | 19/11 13:05 |

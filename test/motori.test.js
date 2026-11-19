@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS } =
-  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS };')();
+const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS, speedFine } =
+  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS, speedFine };')();
 
 function drive(sim, seconds, each) {
   for (let t = 0; t < seconds; t += 1 / 60) { each?.(sim, t); sim.update(1 / 60); sim.events.length = 0; }
@@ -145,11 +145,12 @@ const flatOut = (sim) => {
   return { thr: 1, brake: 0 };
 };
 
-test('polizia: passarle accanto in sesta costa una multa e alza il livello di ricercato', () => {
+test('polizia: passarle accanto oltre i 136 km/h costa una multa e alza il livello di ricercato', () => {
   const { sim, game } = career();
   sim.shift(1);
   for (let k = 0; k < 60 && sim.gear < 6; k++) play(sim, game, 1, flatOut);   // fino alla sesta (la massa conta pilota e benzina)
   assert.equal(sim.gear, 6);
+  assert.ok(game.kmh > 140, 'abbastanza forte: ' + game.kmh);
   game.ents.push({ id: 99, kind: 'police', lane: 0, x: game.s.dist + 60, v: 0 });
   const money = game.s.money;
   play(sim, game, 14, flatOut);
@@ -159,14 +160,24 @@ test('polizia: passarle accanto in sesta costa una multa e alza il livello di ri
   assert.ok(game.s.money < money && game.s.heat >= 1);
 });
 
-test('polizia: in quinta si passa senza problemi', () => {
+test('polizia: sotto i 136 km/h si passa senza problemi, anche in sesta', () => {
   const { sim, game } = career();
   sim.shift(1);
   play(sim, game, 10, (s) => { if (s.rpm > 6000 && s.gear < 5 && !s.shiftSeq) s.shift(s.gear + 1); return { thr: 0.8, brake: 0 }; });
   game.ents.push({ id: 99, kind: 'police', lane: 0, x: game.s.dist + 40, v: 0 });
   play(sim, game, 4, () => ({ thr: 0.5, brake: 0 }));
+  assert.ok(game.kmh < 136, 'velocità della prova: ' + game.kmh);
   assert.equal(game.prompt, null);
   assert.equal(game.s.heat, 0);
+});
+
+test('polizia: tolleranza e scaglioni delle multe', () => {
+  assert.equal(speedFine(136), null);
+  assert.equal(speedFine(130), null);
+  assert.deepEqual(speedFine(137), { over: 1, fine: 42 });
+  assert.equal(speedFine(160).fine, 173);
+  assert.equal(speedFine(200).fine, 543);
+  assert.equal(speedFine(230).fine, 845);
 });
 
 test('traffico lento in prima corsia: sorpasso automatico e rientro', () => {
