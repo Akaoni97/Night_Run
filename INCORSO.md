@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| Claude (per il cognato) | Usato sotto il traffico; inseguimenti: dopo la fuga niente fermi, si semina solo in un locale | `street2d.js`, `polizia.js`, `test/polizia.test.js` | 19/11 16:45 |
