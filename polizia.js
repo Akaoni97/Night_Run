@@ -4,9 +4,11 @@
 //  - FERMO (polStop): velocità, posto di controllo, etilometro, pattuglia in coda. L'agente controlla anche i documenti
 //    (documenti.js): con l'assicurazione scaduta la paghi lì, oltre alla multa. Tre risposte: Paga, Contesta, Scappa.
 //  - CONTESTA: scegli una scusa tra tre (POL_SCUSE); ognuna ha le sue probabilità: annullata, ridotta, confermata, peggio.
-//  - SCAPPA: inseguimento (this.pol.ch): la volante parte dopo qualche secondo e prova a raggiungerti. Se la distanzi
-//    di 450 m, o ti infili in un locale con un po' di vantaggio, o resisti 75 s, l'hai seminata (ricercato +2, e a volte
-//    un posto di blocco più avanti). Se ti affianca, fermo con multa grossa.
+//  - SCAPPA: sei RICERCATO (s.pol.fuga) finché non entri in un locale o in un negozio a bordo strada. Da ricercato
+//    nessuna pattuglia ti fa più accostare in automatico (niente fermi, posti di controllo, etilometro, coda): le passi
+//    e quella che hai bruciato accende la sirena e ti insegue (this.pol.ch, polJoin). Se la distanzi di 450 m (o dopo
+//    75 s con un po' di vantaggio) sparisce dagli specchietti, ma resti ricercato e a volte trovi un posto di blocco.
+//    Le volanti vanno sempre avanti: se ti fermi in un locale tirano dritto e si dimenticano di te, ricercato a zero.
 //  - AUTOVELOX e TUTOR (s.pol.ctl): pochi, a volte niente per 7-12 km. Cartello 500 m prima, segnati sulla mappa in
 //    basso. Il verbale arriva sul telefono qualche km dopo (s.pol.verb).
 //  - PATTUGLIA IN CODA: ogni tanto una volante ti si mette dietro per un paio di km; se passi i 136 ti ferma.
@@ -110,6 +112,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   // e: la volante che ferma (o null: se ne crea una dietro), why: 'speed' | 'docs' | 'alcol' | 'fuga', data: { kmh, sf, gl }
   P.polStop = function (e, why, data = {}) {
     if (this.pol && this.pol.stop) return false;
+    if (st(this).fuga && why !== 'fuga') return false;   // da ricercato non ti fanno più accostare: ti inseguono
     this.pol = this.pol || {};
     const heat = this.s.heat || 0, voci = [];
     let tot = 0, ass = 0;
@@ -177,54 +180,62 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
 
   // ------------------------------------------------------------ fuga e inseguimento
   P.polFlee = function (S) {
+    this.pol.stop = null; this.ap = null;
+    S.e.chase = false; S.e.checked = true; S.e.v = 0;
+    st(this).fuga = true;
+    this.s.heat = Math.min(5, Math.max(3, (this.s.heat || 0) + 1));
+    this.polJoin(S.e, 12, S.tot, true);
+    this.say('Sgommi via. Sei ricercato: le volanti non ti fermano più, ti inseguono. Per farti dimenticare entra in un locale o in un negozio a bordo strada.', 'police');
+    if (this.vgThink && this.s.vg) this.vgThink('Adesso tutte le volanti mi cercano. Devo infilarmi da qualche parte e sparire finché passano oltre.');
+  };
+  // una volante si mette a inseguirti (quella da cui scappi, o una che hai bruciato da ricercato)
+  P.polJoin = function (e, gap, base = 0, first = false) {
     const F = POL.fuga;
-    this.pol.stop = null; this.ap = null; this.siren = 1;
-    S.e.chase = false; S.e.pursuit = true; S.e.checked = true; S.e.v = 0;
-    this.pol.ch = { e: S.e, gap: 12, t: 0, vP: 0, close: 0, vmax: F.vmax + (this.s.heat || 0) * 1.5 + R(this) * 3, base: S.tot, said: 0 };
-    this.s.heat = Math.min(5, (this.s.heat || 0) + 1);
-    this.say('Sgommi via. Dietro, la sirena si accende.', 'police');
+    e.pursuit = true; e.checked = true; e.chase = false; e.busy = false; e.still = false; e.hazard = false; e.block = false; e.blockDone = false; e.alcol = false;
+    this.pol.ch = { e, gap: Math.max(12, gap || 12), t: first ? 0 : F.ritardo - 1, vP: first ? 0 : Math.max(0, e.v || 0), close: 0, vmax: F.vmax + (this.s.heat || 0) * 1.5 + R(this) * 3, base, said: 0 };
+    this.siren = 1;
+    if (!first) this.say('Hai bruciato una volante: sirena accesa, ti sta dietro.', 'police');
   };
   P.polChase = function (dt) {
     const C = this.pol.ch, F = POL.fuga, sim = this.sim, d = this.s.dist;
     C.t += dt;
     if (C.t > F.ritardo) {
-      const want = C.gap > 30 ? C.vmax : Math.min(C.vmax, sim.v + 2 + (C.gap - 8) * 0.25);   // vicino: si accosta senza tamponarti
+      const want = C.gap > 30 ? C.vmax : Math.min(C.vmax, sim.v + 2 + (C.gap - 8) * 0.25);   // vicino: ti sta dietro senza tamponarti
       C.vP += Math.max(-6, Math.min(F.acc, (want - C.vP) * 2)) * dt;
     }
     C.gap = Math.max(7, C.gap + (sim.v - C.vP) * dt);
-    C.close = C.gap < 9 && sim.v < C.vP + 1 ? C.close + dt : Math.max(0, C.close - dt);
     const e = C.e;
     if (C.gap < 200) { if (!this.ents.includes(e)) this.ents.push(e); e.x = d - C.gap; e.v = C.vP; e.lane = this.lane; e._z = undefined; }
     else if (this.ents.includes(e)) this.ents.splice(this.ents.indexOf(e), 1);
     const step = C.gap > 300 ? 3 : C.gap > 150 ? 2 : 1;
     if (step > C.said) { C.said = step; this.say(step === 1 ? 'La volante ti sta addosso' : step === 2 ? 'La volante resta indietro: 150 m' : 'Ancora un po\': la sirena si sente appena', 'police'); }
-    if (C.close > 2.2) { this.pol.ch = null; this.polStop(e, 'fuga', { base: C.base }); return; }
-    if (C.gap > F.perso || C.t > F.tempo) this.polLost(C.t > F.tempo && C.gap <= F.perso ? 'Hanno smesso di inseguirti. Forse.' : 'Li hai seminati.');
+    // niente più fermo se ti raggiunge: si semina solo entrando in un locale; distanziata, sparisce dagli specchietti
+    if (C.gap > F.perso || (C.t > F.tempo && C.gap > 120)) this.polDrop();
   };
-  P.polLost = function (msg) {
+  P.polDrop = function () {
     const C = this.pol.ch; this.pol.ch = null; this.siren = 0;
     if (C && C.e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
-    this.s.heat = Math.min(5, (this.s.heat || 0) + 1);
-    this.say(msg + ' Livello di ricercato alle stelle.', 'police');
+    this.say('La volante è sparita dagli specchietti, ma la radio passa la tua targa: sei ancora ricercato. Entra in un locale o in un negozio per farti dimenticare.', 'police');
     if (R(this) < 0.6) {                         // un posto di blocco più avanti: due volanti in prima e seconda, la terza libera
       const x = this.s.dist + 1800 + R(this) * 2200;
       for (const lane of [1, 2]) this.ents.push({ id: this.id++, kind: 'police', lane, x: x + lane * 3, v: 0, busy: true, still: true, hazard: true, block: true, checked: true });
       this.pol.block = { x, base: C ? C.base : 0 };
-      this.say('Alla radio: posto di blocco più avanti. Corsia di sorpasso libera, ma ti guardano in faccia.', 'info');
+      this.say('Alla radio: posto di blocco più avanti. Corsia di sorpasso libera: se lo bruci, ti inseguono di nuovo.', 'info');
     }
+  };
+  // ricercato azzerato: sei entrato in un locale e le volanti hanno tirato dritto
+  P.polClear = function (msg) {
+    const C = this.pol.ch; this.pol.ch = null; this.pol.block = null; this.siren = 0;
+    if (C && C.e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+    st(this).fuga = false; this.s.heat = 0;
+    this.say(msg, 'police');
   };
   P.polBlock = function () {
     const B = this.pol.block, d = this.s.dist; if (!B || d < B.x - 4) return;
     this.pol.block = null;
     this.ents.forEach((o) => { if (o.block) o.blockDone = true; });
-    const kmh = this.kmh;
-    if (this.lane === 3 && kmh < 60 && R(this) < 0.5) { this.say('Ti fanno cenno di passare: non ti hanno riconosciuto.', 'info'); return; }
-    if (kmh >= 60) {                            // tirato dritto al posto di blocco: si riparte, e più arrabbiati
-      const e = { id: this.id++, kind: 'police', lane: this.lane, x: d - 15, v: 0, pursuit: true, checked: true }; this.ents.push(e);
-      this.pol.ch = { e, gap: 15, t: POL.fuga.ritardo - 0.8, vP: sim0(this), close: 0, vmax: POL.fuga.vmax + 6 + (this.s.heat || 0) * 1.5, base: B.base, said: 0 };
-      this.siren = 1; this.say('Hai tirato dritto al posto di blocco. Si riparte.', 'police'); return;
-    }
-    this.polStop(null, 'fuga', { base: B.base });
+    if (!st(this).fuga) return;                  // (la fuga è finita prima del posto di blocco)
+    this.say('Hai bruciato il posto di blocco.', 'police');   // una delle due volanti ti insegue (update, polJoin)
   };
   const sim0 = (g) => Math.max(0, g.sim.v * 0.6);
 
@@ -293,6 +304,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     const T = this.pol.tail;
     if (!T) {
       if (km < S.codaKm) return;
+      if (S.fuga) { S.codaKm = km + 0.5; return; }      // da ricercato la coda non serve: ti inseguono
       if (this.prompt || this.ap || this.pol.ch || this.sim.v < 15) { S.codaKm = km + 0.5; return; }   // non è il momento: riprova tra poco
       S.codaKm = km + between(this, POL.codaKm);
       if (R(this) >= POL.codaP) return;
@@ -337,11 +349,12 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     if (I && I.id === 'bar' && this.s.vg && typeof VG !== 'undefined' && this.polBarCheck(VG.stopIndex(I.x)))
       this.ents.push({ id: this.id++, kind: 'police', lane: 0, x: this.s.dist + 150, v: 0, alcol: true, checked: true, docChk: true });
   };
-  // in un locale con la volante a ridosso: ti prendono; con un po' di vantaggio: seminata
+  // da ricercato, entrare in un locale o in un negozio è l'unico modo per seminarle: loro vanno avanti e si dimenticano di te
   const enter = P.enterPlace;
   P.enterPlace = function (p) {
-    if (this.pol && this.pol.ch) { if (this.pol.ch.gap > 60) this.polLost('Ti infili nel parcheggio e spegni i fari. Passano oltre.'); else { const C = this.pol.ch; this.pol.ch = null; this.polStop(C.e, 'fuga', { base: C.base }); return; } }
-    return enter.call(this, p);
+    const r = enter.call(this, p);
+    if (r && st(this).fuga) this.polClear('Ti infili nel parcheggio e spegni i fari. Le volanti tirano dritto e si dimenticano di te: ricercato azzerato.');
+    return r;
   };
 
   // ------------------------------------------------------------ posto di controllo (strada.js): ora ti fanno accostare
@@ -359,8 +372,14 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     if (this.inside || !on(this)) return;
     if (this.s.vg) this.polAlc(dt);
     this.polPlan(); this.polCams(dt, d0);
+    const S = st(this);
+    if (S.fuga) {                                // ricercato: le stelle non scendono finché non entri in un locale
+      this.s.heat = Math.max(3, this.s.heat || 0);
+    }
     if (this.pol.ch) this.polChase(dt);
     else if (this.pol.block) this.polBlock();
+    // ricercato e nessuno dietro: la prima volante che passi accende la sirena e ti insegue
+    if (S.fuga && !this.pol.ch) for (const e of this.ents) if (e.kind === 'police' && !e.pursuit && e.x < this.s.dist && e.x > this.s.dist - 25) { this.polJoin(e, this.s.dist - e.x, this.pol.block ? this.pol.block.base : 0); break; }
     if (!this.pol.ch && !this.pol.stop) this.polTail(dt);
     // la volante fuori dal bar: passandole accanto ti fa soffiare
     for (const e of this.ents) if (e.alcol && !e.alcDone && Math.abs(e.x - this.s.dist) < 12 && !this.prompt && !this.ap) { e.alcDone = true; this.polStop(e, 'alcol', { gl: (this.s.vg && this.s.vg.alc) || 0 }); }
