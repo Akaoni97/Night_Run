@@ -1693,7 +1693,12 @@ class Street2D {
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
     // in accelerazione resta un attimo indietro, in frenata va avanti
-    const camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
+    let camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
+    // fermi (o quasi) davanti a un locale del viaggio: l'inquadratura scivola avanti e mette la facciata al centro, l'auto a sinistra
+    if (game && game.placesOn && !game.inside && Math.abs(s.v) < 6 && !this.camHold) {
+      const p = game.placesBetween(dist - 12, dist + 40)[0];
+      if (p) camT = Math.max(0.3, Math.min(0.5, 0.64 - (p.x - dist) * 30 / W));   // non sotto 0,3: l'auto resta fuori dal quadro strumenti
+    }
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
     if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)
     const PPM = 30, carX = Math.round(W * st.cam), K0 = 0.78;

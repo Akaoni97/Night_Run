@@ -127,7 +127,7 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
   const posizione = (stage) => {
     const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap'));
     let fine = r.right - 12;                                             // il testo finisce prima dei comandi della metà destra (bottone corsia, pedali al tocco)
-    for (const sel of ['.lanebtn.r', '.touchpedals']) { const b = visibile(document.querySelector(sel)); if (b && b.left > r.left + r.width / 2) fine = Math.min(fine, b.left - 12); }
+    for (const sel of ['.lanebtn.r', '.touchpedals']) { const b = visibile(document.querySelector(sel)); if (b && b.left > r.left + r.width / 2) fine = Math.min(fine, b.left - 28); }
     if (mm) {
       const libero = fine - (mm.right + 16);
       if (libero >= 200) return { accanto: true, left: Math.round(mm.right + 16 - r.left), bottom: Math.round(r.bottom - mm.bottom), maxW: Math.min(libero, 420) };

@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 pomeriggio · cognato (ritocchi)
+- Fatto: "Come si gioca" riscritto per il gioco di oggi (viaggio, tappe, bisogni, documenti, polizia, leva) e tasti U, 0,
+  Tab, P. Fermi davanti a un locale: l'inquadratura scivola avanti e la facciata si vede (street2d.js, `camT` tra 0,3 e
+  0,5), gli avvisi a destra vanno a sinistra (`body.nearplace`, solo PC). Pensieri un po' più staccati dalla freccia D.
+- Aperto: col motel (facciata larga) l'inquadratura è un compromesso: più a sinistra l'auto finirebbe sotto il quadro.
+
 ## 19/11/2026 pomeriggio · cognato (polizia)
 - Fatto: `polizia.js`. Pattuglie in giro a 80-100 km/h (si superano). Al fermo l'agente guarda anche i documenti
   (assicurazione scaduta = la fai lì) e si può pagare, **contestare** (tre scuse a caso, risposte dell'agente, quattro esiti)
