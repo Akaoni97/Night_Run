@@ -5,9 +5,11 @@
 //  acceleratore graduato (cursore 0-100 % con le tacche, tasti 0-9 e ↑ ↓), freno (S o tasto tenuto premuto, fa da carico),
 //  marce (E su, Q giù), AVVIA/SPEGNI (Invio). Le curve si registrano a gas oltre il 90 % in marcia, frizione chiusa:
 //  ogni nuovo strappo diventa la curva nuova, la precedente resta in grigio per il confronto.
-//  Il banco usa una copia della fisica (SupraSim) con gli stessi pezzi montati e la stessa auto: la macchina vera resta
-//  ferma nel negozio. Niente aria sui rulli (cd 0). Senza suono: il motore audio segue solo l'auto vera.
-//  window.NightBanco.panel(body) aggiunge la sezione al pannello; .open() / .close(); .sim è la copia mentre è aperto.
+//  Sui rulli c'è l'auto vera: stessa fisica, stesso cambio (anche l'automatico con la leva), stesso suono, stessa benzina.
+//  game.rulli = true: le ruote girano ma la strada non scorre (game.js); NightBanco.on: gas e freno li dà il banco
+//  (index.html, ciclo principale). Sui rulli niente aria (cd e portanza a zero, rimessi scendendo). Scendendo si frena
+//  finché le ruote non sono ferme, poi si torna al negozio.
+//  window.NightBanco.panel(body) aggiunge la sezione al pannello; .open() / .close(); .on, .thr, .brake mentre si è sopra.
 // ============================================================================
 const BANCO = {
   registra: 0.9,        // gas minimo per registrare la curva
@@ -34,7 +36,7 @@ function bancoPicco(curva) {
   for (const p of curva) { if (p.cv > cv.v) cv = { v: p.cv, rpm: p.rpm }; if (p.nm > nm.v) nm = { v: p.nm, rpm: p.rpm }; }
   return { cv, nm };
 }
-// la copia della fisica per i rulli: stessa auto, stessi pezzi, stesse condizioni del motore
+// una copia della fisica con gli stessi pezzi (per le prove automatiche: nel gioco sui rulli c'è l'auto vera)
 function bancoSim(sim, carId) {
   if (typeof SupraSim === 'undefined') return null;
   const d = new SupraSim();
@@ -95,37 +97,45 @@ function bancoSim(sim, carId) {
   </div>`;
   document.body.appendChild(box);
 
-  let regT = 0, runOk = 0, d = null, raf = 0, last = 0, gasCmd = 0, brk = false, curva = [], prima = null, regOn = false, ang = 0, back = null, starting = 0;
-  const NR = () => window.nightRun;
+  let regT = 0, offT = 99, d = null, raf = 0, last = 0, gasCmd = 0, brk = false, curva = [], prima = null, regOn = false, ang = 0, back = null, aria = null, scendi = false;
+  const NR = () => window.nightRun, B = () => window.NightBanco;
   const setGas = (v) => { gasCmd = Math.max(0, Math.min(100, Math.round(v / 5) * 5)); $('bcGas').value = gasCmd; $('bcGasV').textContent = gasCmd + ' %'; };
   function open() {
-    const n = NR(); if (!n || !n.sim) return;
-    d = bancoSim(n.sim, n.game ? n.game.car : 'supra'); if (!d) return;
+    const n = NR(); if (!n || !n.sim || !n.game) return;
+    if (scendi) finish();
+    d = n.sim; n.game.rulli = true; aria = { cd: d.P.cd, cl: d.P.cl }; d.P.cd = 0; d.P.cl = 0;
+    const b = B(); b.on = true; b.thr = 0; b.brake = 0;
     back = document.activeElement; box.hidden = false; curva = []; prima = null; regOn = false; setGas(0); brk = false;
-    last = performance.now(); raf = requestAnimationFrame(loop); window.NightBanco.sim = d; $('bcClose').focus();
+    last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); $('bcClose').focus();
   }
+  // scendendo: gas a zero e freno finché le ruote non si fermano, poi la strada torna a scorrere
   function close() {
-    box.hidden = true; cancelAnimationFrame(raf); raf = 0; d = null; window.NightBanco.sim = null;
+    box.hidden = true; if (!d) return;
+    scendi = true; setGas(0); const b = B(); b.thr = 0; b.brake = 1;
     if (back && back.focus) back.focus();
   }
-  function engine() {
-    if (!d) return;
-    if (d.running || d.starter) { d.setIgnition(false); starting = 0; return; }
-    d.setIgnition(true); d.setStarter(true); starting = 6; runOk = 0;
+  function finish() {
+    const n = NR(), b = B(); cancelAnimationFrame(raf); raf = 0; scendi = false;
+    if (d) { d.v = 0; d.ww = 0; d.wo = 0; if (aria) { d.P.cd = aria.cd; d.P.cl = aria.cl; } }
+    if (n && n.game) n.game.rulli = false;
+    b.on = false; b.thr = 0; b.brake = 0; d = null;
   }
-  const shift = (k) => { if (!d) return; d.shift(d.gear + k); };
+  // accensione e marce come in strada (anche la leva dell'automatico)
+  function engine() {
+    const n = NR(); if (!n || !n.engineTap) return;
+    if (!n.sim.running && n.levaNow && n.levaNow !== 'P' && n.levaNow !== 'N' && n.leva) n.leva('N');   // l'automatico si avvia solo in P o N
+    n.engineTap();
+  }
+  const shift = (k) => { const n = NR(); if (!n) return; if (k > 0 && n.shiftUp) n.shiftUp(); else if (k < 0 && n.shiftDown) n.shiftDown(); };
   function step(dt) {
-    // avviamento tenuto finché il motore non gira da mezzo secondo di fila (come engineTap): un primo colpo può spegnersi
-    if (starting > 0) { starting -= dt; runOk = d.running ? runOk + dt : 0; if (runOk > 0.5 || starting <= 0) { d.setStarter(false); starting = 0; } }
-    const want = gasCmd / 100;
-    d.in.thr += Math.max(-BANCO.gasVel * dt, Math.min(BANCO.gasVel * dt, want - d.in.thr));
-    d.in.brake = brk ? 1 : 0;
-    d.update(dt);
-    if (d.v < 0) d.v = 0;
+    const b = B(), want = gasCmd / 100;
+    b.thr += Math.max(-BANCO.gasVel * dt, Math.min(BANCO.gasVel * dt, want - b.thr));
+    b.brake = brk ? 1 : 0;
     const rpm = d.rpm, nm = Math.max(0, d.Tnet || 0), cv = nm * rpm / 7023;
-    const reg = d.running && d.in.thr >= BANCO.registra && d.gear > 0 && d.lock && !d.shiftSeq && rpm > 1200;
-    if (reg && !regOn) { if (curva.length > 5) prima = curva; curva = []; regT = 0; }   // nuovo strappo: la curva di prima va in grigio
-    regOn = reg; if (reg) regT += dt;
+    const reg = d.running && d.in.thr >= BANCO.registra && b.thr >= BANCO.registra && d.gear > 0 && d.lock && !d.shiftSeq && rpm > 1200;
+    // nuovo strappo (gas mollato per più di un secondo e mezzo): la curva di prima va in grigio; una cambiata no
+    if (reg && !regOn) { if (offT > 1.5) { if (curva.length > 5) prima = curva; curva = []; } regT = 0; }
+    regOn = reg; if (reg) { regT += dt; offT = 0; } else offT += dt;
     // si registra dopo mezzo secondo di gas pieno (il motore si assesta) e senza i buchi di un attimo (cambiata, frizione)
     const prec = curva.length ? curva[curva.length - 1] : null;
     if (reg && regT > 0.5 && !(prec && rpm > prec.rpm && cv < prec.cv * 0.85)) bancoRegistra(curva, rpm, cv, nm);
@@ -135,6 +145,7 @@ function bancoSim(sim, carId) {
   function loop(t) {
     if (!d) return;
     const dt = Math.min(0.05, (t - last) / 1000); last = t;
+    if (scendi) { if (Math.abs(d.v) < 0.3) { finish(); return; } raf = requestAnimationFrame(loop); return; }
     const L = step(dt);
     drawScene(); drawChart();
     $('bcRpm').textContent = fmt(L.rpm); $('bcKmh').textContent = fmt(d.v * 3.6);
@@ -142,7 +153,7 @@ function bancoSim(sim, carId) {
     $('bcBoost').textContent = d.tune.turbo && d.tune.turbo.max > 0 ? fmt(Math.max(0, d.pipeP), 2) : '—';
     const pk = bancoPicco(bancoPulita(curva.length ? curva : prima || []));
     $('bcPeak').textContent = pk.cv.v ? `${fmt(pk.cv.v)} CV` : '—';
-    $('bcGear').textContent = d.gear === 0 ? 'N' : d.gear < 0 ? 'R' : String(d.gear);
+    const n = NR(); $('bcGear').textContent = n && n.gearLabel ? n.gearLabel(true) : d.gear === 0 ? 'N' : d.gear < 0 ? 'R' : String(d.gear);
     $('bcEng').textContent = d.running ? 'SPEGNI' : d.starter ? '…' : 'AVVIA';
     raf = requestAnimationFrame(loop);
   }
@@ -229,7 +240,7 @@ function bancoSim(sim, carId) {
     if (k === 'ArrowUp' || k === 'w' || k === 'W') { e.preventDefault(); setGas(gasCmd + 5); return; }
     if (k === 'ArrowDown') { e.preventDefault(); setGas(gasCmd - 5); return; }
     if (k === 's' || k === 'S') { e.preventDefault(); brk = true; bb.classList.add('on'); return; }
-    if (k === 'e' || k === 'E') { e.preventDefault(); if (!e.repeat) shift(1); return; }
+    if (k === 'e' || k === 'E') { e.preventDefault(); if (!e.repeat) shift(1); return; }   // con l'automatico spostano la leva verso D / verso P
     if (k === 'q' || k === 'Q') { e.preventDefault(); if (!e.repeat) shift(-1); return; }
     if (k === 'Enter') { e.preventDefault(); if (!e.repeat) engine(); }
   }, true);
@@ -242,6 +253,6 @@ function bancoSim(sim, carId) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Sali sui rulli'; b.addEventListener('click', open);
     sec.appendChild(b); body.appendChild(sec); return sec;
   }
-  window.NightBanco = { open, close, panel, sim: null, get curva() { return curva; }, get prima() { return prima; }, setGas, engine, shift };
+  window.NightBanco = { open, close, panel, on: false, thr: 0, brake: 0, get sim() { return d; }, get curva() { return curva; }, get prima() { return prima; }, setGas, engine, shift };
 })();
 if (typeof window !== 'undefined') Object.assign(window, { BANCO, bancoRegistra, bancoPicco, bancoPulita, bancoSim });

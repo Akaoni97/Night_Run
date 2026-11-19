@@ -671,7 +671,8 @@ class StreetGame {
   update(dt) {
     const sim = this.sim, d0 = this.s.dist;
     if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
-    if (sim.v > 0) this.s.dist += sim.v * dt;
+    if (this.rulli) { /* sui rulli del banco prova (banco.js): le ruote girano ma l'auto resta ferma nel negozio */ }
+    else if (sim.v > 0) this.s.dist += sim.v * dt;
     else if (sim.v < 0) {                  // retromarcia: si torna indietro di poco, l'autostrada resta a senso unico
       const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = Math.min(d0, Math.max(0, far - GAME_BACK_MAX));
       this.s.dist = Math.max(lim, d0 + sim.v * dt);
