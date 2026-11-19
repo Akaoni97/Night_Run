@@ -4,6 +4,16 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 sera · proprietario (storia: le proposte sono nel gioco)
+- Fatto: le tre scene di prova di `docs/storia/REVISIONE_DIALOGHI.md` sono nelle chat. Elena, la prima sera (`ELE_ritiro_*`: temperino, trapano,
+  bugia «domani la vendo», rinfaccio) e il litigio (`ELE_litigio_*`: ventisei ore di silenzio, niente scuse di manuale, riparazione più avanti col flag
+  `elena_litigio`). Rosa e Livia in vivavoce (`ROS_vivavoce_*`, dopo il passato di Rosa). Dario (nuovo, [P]): il vero rinfaccia il trasloco saltato,
+  la presenza lo imita più avanti (`ev_imitazione_dario`, Lisbona) e gli dà ragione subito: è il segno. Tutto da `materiale_chat/materiale4_01_*.txt`
+  con l'importatore (`chat_dati.js` rigenerato, 1004 nodi); 180 test, uno nuovo per ogni regola (scelte finte, litigio, Dario, vivavoce).
+- Ritirate: `V2_ELE_n3_01` (la foto promessa non esiste più nella nuova scena). Il flag `e08c` ora lo dà il «non mi va di spiegarlo» del litigio.
+- Aperto: riscrivere il resto di Elena (altri 30 nodi di cortesie), Rosa, Livia e la presenza con le stesse regole; le tre soste di Codex nei file
+  dedicati; le scene nel mondo (furgone di Rosa, banco pacchi, motel, piazzola). Serve dal cognato: approvare i fatti [P] (Dario, trapano, trasloco).
+
 ## 19/11/2026 pomeriggio · cognato (pubblicazione)
 - Fatto: `docs/pubblicazione/PERCORSO.md`, il percorso per farne un gioco da installare (Electron, niente riscritture),
   costi (zero fino a Steam: 100 dollari recuperabili) ed esempi su cosa diventa più stabile. Collegato da `LICENZE.md` (punto 9).

@@ -128,7 +128,7 @@
       "node": "ELE_riparazione_01",
       "km": 270,
       "req": [
-        "flag:elena_scuse"
+        "flag:elena_litigio"
       ]
     },
     {
@@ -422,6 +422,25 @@
       "req": [
         "flag:ev_presenza_scoperta"
       ]
+    },
+    {
+      "id": "st_DAR_traslochi_01",
+      "th": "Dario",
+      "node": "DAR_traslochi_01",
+      "km": 256,
+      "req": [
+        "fatto:ELE_ritiro_08"
+      ]
+    },
+    {
+      "id": "st_ROS_vivavoce_01",
+      "th": "Rosa",
+      "node": "ROS_vivavoce_01",
+      "km": 300,
+      "req": [
+        "fatto:ROS_passato_01",
+        "conf:Livia>=15"
+      ]
     }
   ],
   "confidenza_solo_unlock": [
@@ -668,21 +687,6 @@
       "fase": "II"
     },
     {
-      "entry": "V2_ELE_n3_01",
-      "nodes": [
-        "V2_ELE_n3_01",
-        "V2_ELE_n3_02",
-        "V2_ELE_n3_03",
-        "V2_ELE_n3_04",
-        "V2_ELE_n3_05",
-        "V2_ELE_n3_06"
-      ],
-      "kind": "dialogo",
-      "who": "Elena",
-      "req": "flag:e01b",
-      "fase": "II"
-    },
-    {
       "entry": "V2_ELE_n4_01",
       "nodes": [
         "V2_ELE_n4_01",
@@ -906,6 +910,21 @@
       "who": "Livia",
       "req": "flag:l100",
       "fase": "V"
+    },
+    {
+      "entry": "DAR_imit_01",
+      "nodes": [
+        "DAR_imit_01",
+        "DAR_imit_02",
+        "DAR_imit_03",
+        "DAR_imit_04",
+        "DAR_imit_05",
+        "DAR_imit_06"
+      ],
+      "kind": "dialogo",
+      "who": "Sconosciuto",
+      "req": "flag:ev_imitazione_dario",
+      "fase": "IV"
     }
   ],
   "luoghi": [

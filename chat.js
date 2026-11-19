@@ -27,6 +27,7 @@ const CHAT_CNT = ['conoscenza', 'legami', 'patti', 'varchi'];
 // (k: piace, indifferente, non piace). presenza = barra rossa e «fiducia». nobar = nome che compare senza barra (la presenza lo imita).
 const CHAT_NPC = {
   Elena: { ruolo: 'Sorella', col: '#e879a6', k: [2, 1, -1], gusti: { ironico: 1, gentile: 1, sincero: 1, freddo: -1, evasivo: -1 } },
+  Dario: { ruolo: 'Amico', col: '#34d399', k: [2, 1, -1], gusti: { sincero: 1, ironico: 1, gentile: 1, freddo: -1, evasivo: -1 } },
   Rosa: { ruolo: 'Meccanica', col: '#f59e0b', k: [3, 1, -1], gusti: { sboccato: 1, sincero: 1, ironico: 1, evasivo: -1, freddo: -1 } },
   Livia: { ruolo: 'Archivista', col: '#38bdf8', k: [3, 1, -2], gusti: { pacato: 1, sincero: 1, gentile: 1, sboccato: -1, evasivo: -1 } },
   Sconosciuto: { ruolo: 'Numero nascosto', col: '#ef4444', presenza: true, k: [4, 1, -1], gusti: { gentile: 1, sincero: 1, ironico: 1, freddo: -1, sboccato: -1 } },

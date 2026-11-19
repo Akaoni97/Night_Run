@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const src = ['chat_dati.js', 'chat.js'].map((f) => readFileSync(new URL('../' + f, import.meta.url), 'utf8')).join('\n');
-const E = new Function(src + ';return { CHAT_NPC, CHAT_LIST, CHAT_NODES, CHAT_START, CHAT_UNLOCK, CHAT_TONI, CHAT_SOGLIE, chatState, chatConf, chatCond, chatEnter, chatOptions, chatReply, chatTick, chatUnread, chatSetConf, chatThreads };')();
+const E = new Function(src + ';return { CHAT_NPC, CHAT_LIST, CHAT_NODES, CHAT_START, CHAT_UNLOCK, CHAT_TONI, CHAT_SOGLIE, chatState, chatConf, chatCond, chatEnter, chatOptions, chatReply, chatTick, chatUnread, chatLines, chatSetConf, chatThreads };')();
 const tel = readFileSync(new URL('../telefono.js', import.meta.url), 'utf8');
 const { TEL_APP_OFFERS, TEL_SMS } = new Function(tel + ';return { TEL_APP_OFFERS, TEL_SMS };')();
 const fresh = () => ({});
@@ -25,11 +25,11 @@ test('chat: ogni conversazione parte al suo km, e una chat ignorata resta lì ad
   assert.ok(st.km >= 18, 'la prima chat non arriva subito');
   assert.equal(E.chatTick(s, st.km - 1).length, 0);
   assert.ok(E.chatTick(s, st.km).some((e) => e.who === 'Elena' && e.node === 'ELE_ritiro_01'));
-  assert.equal(E.chatUnread(s), 1);
+  assert.equal(E.chatUnread(s), E.chatLines(s, st.km, E.CHAT_NODES.ELE_ritiro_01).length, 'ogni riga è un messaggio da leggere');
   E.chatTick(s, 9999);                                           // chilometri senza rispondere
   const th = s.chat.th.Elena;
   assert.equal(th.at, 'ELE_ritiro_01', 'la domanda aspetta');
-  assert.equal(th.msgs.length, 1, 'e le altre chat con lei non la scavalcano');
+  assert.equal(th.msgs.length, E.chatLines(s, st.km, E.CHAT_NODES.ELE_ritiro_01).length, 'e le altre chat con lei non la scavalcano');
 });
 
 test('chat: le risposte che piacciono alzano la barra e svelano il gusto; quelle che non piacciono la abbassano', () => {
@@ -191,4 +191,51 @@ test('capitali: 36 cartelli (≤ 22 caratteri) e 48 eventi, ognuno con una capit
   for (const t of Object.values(CAP_SIGNS).flat()) assert.ok(t.length <= 22 && /^[A-Z0-9 .\-']+$/.test(t), t);
   assert.equal(CAP_EVT.length, 48);
   for (const e of CAP_EVT) { assert.ok(CAP_ORDER.includes(e.cap) && CAP_FASE_KM[e.fase] !== undefined, e.id); assert.ok(e.testo.length <= 140, e.id); }
+});
+
+// ---- revisione dei dialoghi (docs/storia/REVISIONE_DIALOGHI.md): scontri veri, risposte che cambiano qualcosa, Dario come prima imitazione
+const REV = /^(ELE_ritiro_0[1-7]|ELE_litigio_0[1-6]|ROS_vivavoce_01|DAR_traslochi_0[1-5]|DAR_imit_0[1-3])/;
+test('revisione: due risposte dello stesso nodo non portano mai allo stesso punto con gli stessi effetti', () => {
+  for (const n of E.CHAT_LIST.filter((x) => REV.test(x.id))) {
+    const keys = (n.opts || []).map((o) => o.to + '|' + (o.fx || []).slice().sort().join(','));
+    assert.equal(new Set(keys).size, keys.length, `${n.id}: scelta finta (due risposte uguali nel risultato)`);
+  }
+});
+
+test('revisione: la prima sera con Elena, ogni strada arriva alla fine e lascia i suoi segni', () => {
+  const run = (picks) => { const s = fresh(); E.chatEnter(s, 20, 'Elena', 'ELE_ritiro_01'); let i = 0; while ((s.chat.th.Elena || {}).at && i < 12) { E.chatReply(s, 20, 'Elena', picks[i++] || 0); } return s; };
+  const bugia = run([1, 0, 0, 0, 0]), dura = run([0, 1, 1, 2, 0]), ferita = run([0, 0, 0, 0, 0]);
+  for (const s of [bugia, dura, ferita]) assert.ok(E.chatCond(s, 20, 'fatto:ELE_ritiro_08'), 'ogni strada finisce in ELE_ritiro_08');
+  assert.ok(bugia.chat.flags.bugia_vendita, 'la bugia «domani la vendo» resta segnata');
+  assert.ok(dura.chat.flags.elena_dura, 'rispondere male si ricorda');
+  assert.ok(ferita.chat.flags.elena_ferita && ferita.chat.flags.elena_sosta_promessa, 'la promessa del messaggio si ricorda');
+});
+
+test('revisione: il litigio non finisce per forza in pace, ma apre sempre la riparazione più avanti', () => {
+  const rip = E.CHAT_START.find((x) => x.node === 'ELE_riparazione_01');
+  assert.deepEqual(rip.req, ['flag:elena_litigio']);
+  for (const picks of [[0, 0, 1], [0, 0, 0], [1, 1, 0], [2, 0, 1], [1, 0, 1]]) {
+    const s = fresh(); E.chatEnter(s, 172, 'Elena', 'ELE_litigio_01'); let i = 0;
+    while ((s.chat.th.Elena || {}).at && i < 8) E.chatReply(s, 172, 'Elena', picks[i++] || 0);
+    assert.ok(s.chat.flags.elena_litigio, `strada ${picks}: manca elena_litigio`);
+  }
+});
+
+test('revisione: Dario è un amico vero con un conto aperto; chi perdona subito è la presenza', () => {
+  const st = E.CHAT_START.find((x) => x.node === 'DAR_traslochi_01');
+  assert.equal(st.th, 'Dario'); assert.ok(E.CHAT_NPC.Dario);
+  const s = fresh(); E.chatEnter(s, 260, 'Dario', 'DAR_traslochi_01'); E.chatReply(s, 260, 'Dario', 0); E.chatReply(s, 260, 'Dario', 0);
+  assert.ok(s.chat.flags.dario_bugia, 'dire «avevo da fare» è una bugia che resta');
+  const imit = E.CHAT_START.find((x) => x.node === 'DAR_imit_01');
+  assert.equal(imit.th, 'Dario'); assert.ok(imit.req.includes('flag:ev_imitazione_dario'));
+  const n = E.CHAT_NODES.DAR_imit_02; assert.equal(n.who, 'Sconosciuto'); assert.equal(n.as, 'Dario');
+  assert.ok(E.chatLines(s, 300, n)[0].includes('Avevi da fare'), 'l\'imitazione dà ragione sulla bugia che il vero Dario non ha mai accettato');
+});
+
+test('revisione: Rosa e Livia litigano in vivavoce, e nessuno ti dà ragione gratis', () => {
+  const st = E.CHAT_START.find((x) => x.node === 'ROS_vivavoce_01');
+  assert.ok(st.req.includes('fatto:ROS_passato_01'));
+  const n = E.CHAT_NODES.ROS_vivavoce_01, tt = n.opts.map((o) => o.tono);
+  assert.equal(n.opts.length, 3); assert.ok(tt.includes('evasivo'), 'non schierarsi non piace a nessuna delle due');
+  for (const o of n.opts) assert.ok((E.CHAT_NODES[o.to].text + '').length > 0);
 });

@@ -3,6 +3,11 @@
 Lavoro del 18/11/2026 su richiesta del proprietario. Non cambia ancora niente nel gioco: è l'analisi, le regole di scrittura,
 tre scene di prova da approvare e il piano. I nomi e i fatti nuovi sono **[P]** (proposta, da approvare), come in `STORIA_BOZZA_02.md`.
 
+> **Stato (19/11/2026):** le scene A, B e C del §4 sono nel gioco (chat, non ancora scene nel mondo): `materiale_chat/materiale4_01_revisione_dialoghi.txt`,
+> toni in `materiale4_00_toni.txt`, vedi `materiale_chat/RIGENERA.md`. Le decisioni del §7 le ho prese io con i valori proposti (Dario resta a parte,
+> parolacce solo contro qualcuno e per una ragione, litigio al livello delle scene); si cambiano riscrivendo quel file e rigenerando.
+> Restano i punti 3 (resto del nucleo), 4 (tre soste), 5 (scene nel mondo) e 6 (rilettura) del §6.
+
 Cosa ho letto: lo zip di Codex (`Night_Run_Le_tre_soste_CODEX.zip`: progetto, copione completo, motore, demo, rapporto),
 `STORIA.md`, `STORIA_BOZZA_02.md` (la storia di Claudio, Irene, Elena, Rosa, Livia), `LIMITI.md`, il materiale delle chat
 (`materiale_chat/`) e i 982 nodi di `chat_dati.js`.
