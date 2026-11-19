@@ -135,6 +135,12 @@ def main():
     a = ap.parse_args()
     nodes, order = {}, []
     for src in a.src: parse(src, nodes, order)
+    if a.attivazione:
+        # materiale5: nodi ritirati e soglie sostituite (il parser da solo non cancella e somma gli UNLOCK)
+        iv = json.load(open(a.attivazione, encoding='utf-8')).get('intervento_materiale5_blocco01') or {}
+        for nid in iv.get('rimuovi_nodi', []):
+            if nid in nodes: del nodes[nid]; order.remove(nid)
+        for who, tiers in iv.get('sostituisci_unlock', {}).items(): UNLOCK[who] = {int(k): list(v) for k, v in tiers.items()}
     toni_tab = {}
     if a.toni:
         for l in open(a.toni, encoding='utf-8'):

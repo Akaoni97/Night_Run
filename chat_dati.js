@@ -192,28 +192,27 @@ const CHAT_LIST = [
 "id":"ELE_pasta_01",
 "who":"Elena",
 "fase":"I",
-"text":"Pasta ha deciso che la casa è sua.",
+"text":[
+"Pasta sulla sedia. Io in piedi col piatto.",
+"Poi sono io quella che comanda tutti."
+],
 "opts":[
 {
-"t":"Ha dei diritti.",
-"to":"ELE_pasta_02",
+"t":"Spostalo. La sedia è tua.",
+"to":"ELE_pasta_02"
+},
+{
+"t":"Prima lui. Ha occupato il posto.",
+"to":"ELE_pasta_03",
 "fx":[
 "flag:elena_difende_pasta"
 ]
 },
 {
-"t":"Ti serve aiuto o soltanto un testimone contro il gatto?",
-"to":"V2_E02_01",
+"t":"Anche il gatto mi devi raccontare?",
+"to":"ELE_pasta_04",
 "fx":[
-"flag:e02b"
-]
-},
-{
-"t":"Non ho testa per il gatto, oggi.",
-"to":"V2_E02_03",
-"fx":[
-"flag:e02c",
-"sblocca:ELE_pasta_08"
+"flag:e5_gatto_taglio"
 ]
 }
 ]
@@ -222,14 +221,10 @@ const CHAT_LIST = [
 "id":"ELE_pasta_02",
 "who":"Elena",
 "fase":"I",
-"text":"Non serve che lo difendi ogni volta.",
+"text":"Sai fare il capo benissimo, quando tocca al culo degli altri.",
 "opts":[
 {
-"t":"Uno solo: stare comodo.",
-"to":"ELE_pasta_04"
-},
-{
-"t":"Non sto difendendo nessuno.",
+"t":"È un gatto. Ti sei alzata tu.",
 "to":"ELE_pasta_05"
 }
 ]
@@ -238,15 +233,24 @@ const CHAT_LIST = [
 "id":"ELE_pasta_03",
 "who":"Elena",
 "fase":"I",
-"text":"Sì, il gatto. Non la cena.",
+"text":[
+"Certo. Il suo avvocato è partito e la parcella la pago io.",
+"L’auto. Una foto intera."
+],
 "opts":[
 {
-"t":"Hai scelto tu il nome.",
-"to":"ELE_pasta_04"
+"t":"Te la mando dal parcheggio.",
+"to":"ELE_pasta_06",
+"fx":[
+"flag:e5_foto"
+]
 },
 {
-"t":"Allora niente, pensavo avessi mangiato.",
-"to":"ELE_pasta_05"
+"t":"Per sentirti dire di venderla? No.",
+"to":"ELE_pasta_07",
+"fx":[
+"flag:e5_foto_no"
+]
 }
 ]
 },
@@ -254,21 +258,24 @@ const CHAT_LIST = [
 "id":"ELE_pasta_04",
 "who":"Elena",
 "fase":"I",
-"text":"Vorrei soltanto sedermi senza trattare.",
-"alt":[
-{
-"req":"conf:Elena>=25",
-"text":"Vorrei sedermi senza dover chiedere udienza a Pasta."
-}
+"text":[
+"Il gatto te lo risparmio.",
+"La macchina però me la fai vedere."
 ],
 "opts":[
 {
-"t":"Digli che arrivo a mediare.",
-"to":"ELE_pasta_06"
+"t":"Da fermo. Eccola.",
+"to":"ELE_pasta_06",
+"fx":[
+"flag:e5_foto"
+]
 },
 {
-"t":"Puoi anche spostarlo.",
-"to":"ELE_pasta_07"
+"t":"Hai già deciso senza vederla.",
+"to":"ELE_pasta_07",
+"fx":[
+"flag:e5_foto_no"
+]
 }
 ]
 },
@@ -276,15 +283,24 @@ const CHAT_LIST = [
 "id":"ELE_pasta_05",
 "who":"Elena",
 "fase":"I",
-"text":"Stai ridendo. Lo capisco da come scrivi, stronzo.",
+"text":[
+"Ah. Quando mi dici tu cosa fare è diverso.",
+"Mandami l’auto. Voglio vedere se almeno le ruote sono quattro."
+],
 "opts":[
 {
-"t":"Siamo almeno in due a ridere.",
-"to":"ELE_pasta_06"
+"t":"Ti mando la foto. Guarda pure.",
+"to":"ELE_pasta_06",
+"fx":[
+"flag:e5_foto"
+]
 },
 {
-"t":"Tu avresti riso uguale.",
-"to":"ELE_pasta_07"
+"t":"No. Tieniti il gatto, io la macchina.",
+"to":"ELE_pasta_07",
+"fx":[
+"flag:e5_foto_no"
+]
 }
 ]
 },
@@ -292,14 +308,13 @@ const CHAT_LIST = [
 "id":"ELE_pasta_06",
 "who":"Elena",
 "fase":"I",
-"text":"Sei dalla sua parte, ho capito.",
+"text":[
+"L’ho vista.",
+"Tu ci vedi un’eredità. Io ci vedo del lavoro da pagare."
+],
 "opts":[
 {
-"t":"Lo ammetto.",
-"to":"ELE_pasta_08"
-},
-{
-"t":"Solo finché non prende il mio posto.",
+"t":"Paga chi ci sale. E ci salgo io.",
 "to":"ELE_pasta_08"
 }
 ]
@@ -308,20 +323,14 @@ const CHAT_LIST = [
 "id":"ELE_pasta_07",
 "who":"Elena",
 "fase":"I",
-"text":"Almeno tu chiedi prima di prendermi il posto.",
+"text":[
+"La foto no, il parere no.",
+"Mi chiami quando ti serve il numero del carroattrezzi?"
+],
 "opts":[
 {
-"t":"Io mando un messaggio.",
+"t":"Adesso sei tu che fai la stronza.",
 "to":"ELE_pasta_08"
-},
-{
-"t":"Non dargli altre idee.",
-"to":"ELE_pasta_08"
-},
-{
-"t":"Oggi posso ascoltare il resto del processo.",
-"to":"V2_E02_03",
-"req":"flag:e02b"
 }
 ]
 },
@@ -329,11 +338,14 @@ const CHAT_LIST = [
 "id":"ELE_pasta_08",
 "who":"Elena",
 "fase":"I",
-"text":"Guida. Qui con Pasta ci parlo io.",
+"text":[
+"Pasta si è rimesso comodo. Io ho mangiato in piedi.",
+"Almeno uno, qui, sa come ottenere quello che vuole."
+],
 "alt":[
 {
-"req":"flag:e02c",
-"text":"Oggi niente gatto, come hai chiesto. Ti scrivo solo se serve."
+"req":"flag:e5_gatto_taglio",
+"text":"Il gatto è sistemato. Il resto del tuo viaggio te lo tieni tu."
 }
 ]
 },
@@ -341,26 +353,28 @@ const CHAT_LIST = [
 "id":"ELE_turno_01",
 "who":"Elena",
 "fase":"I",
-"text":"Hai presente un turno con un orario sensato?",
+"text":[
+"Ho dieci minuti. La macchina stavolta la lasciamo fuori.",
+"Il turno di notte me lo sto facendo io."
+],
+"alt":[
+{
+"req":"flag:e5_gatto_taglio",
+"text":"Il gatto te l’ho risparmiato. La pausa però stavolta è mia."
+}
+],
 "opts":[
 {
-"t":"Solo nei contratti. Quei figli di puttana.",
+"t":"Due minuti. Poi mi togli dai piedi.",
 "to":"ELE_turno_02"
 },
 {
-"t":"Decidiamo come sentirci senza rincorrerci.",
-"to":"V2_E03_01",
-"fx":[
-"flag:e03b"
-]
+"t":"Allora mangia. Ripasso dopo.",
+"to":"ELE_turno_03"
 },
 {
-"t":"Niente turni, oggi.",
-"to":"V2_E03_03",
-"fx":[
-"flag:e03c",
-"sblocca:ELE_turno_08"
-]
+"t":"Quando servi tu, hai sempre il turno.",
+"to":"ELE_turno_04"
 }
 ]
 },
@@ -368,15 +382,21 @@ const CHAT_LIST = [
 "id":"ELE_turno_02",
 "who":"Elena",
 "fase":"I",
-"text":"Ecco. Io oggi preferisco non pensarci.",
+"text":[
+"Due minuti per dirmi cosa?",
+"Che parte ancora? L’abbiamo già festeggiato."
+],
 "opts":[
 {
-"t":"Che turno hai?",
-"to":"ELE_turno_03"
+"t":"Che non ho ancora deciso di tornare.",
+"to":"ELE_turno_05"
 },
 {
-"t":"Vuoi che ti lasci tranquilla?",
-"to":"ELE_turno_04"
+"t":"Lascia perdere. Tanto hai da fare.",
+"to":"ELE_turno_06",
+"fx":[
+"flag:e5_turno_rinfaccio"
+]
 }
 ]
 },
@@ -384,14 +404,20 @@ const CHAT_LIST = [
 "id":"ELE_turno_03",
 "who":"Elena",
 "fase":"I",
-"text":"Lavoro. Senza la parte in cui ti organizzi la giornata.",
+"text":[
+"Dopo quando?",
+"Tu dopo me lo scrivi e poi per me comincia un’altra notte."
+],
 "opts":[
 {
-"t":"Non ti fisso un orario, allora.",
-"to":"ELE_turno_05"
+"t":"Finisci tu. Poi scrivi tu.",
+"to":"ELE_turno_07",
+"fx":[
+"flag:e5_aspetto_turno"
+]
 },
 {
-"t":"Aspetto che chiami tu.",
+"t":"Scrivo io alla prossima sosta.",
 "to":"ELE_turno_05"
 }
 ]
@@ -400,14 +426,20 @@ const CHAT_LIST = [
 "id":"ELE_turno_04",
 "who":"Elena",
 "fase":"I",
-"text":"Non devi sistemarmi il calendario da una macchina.",
+"text":[
+"Quando servivi tu, avevi sei auto tra cui scegliere.",
+"Io tre tavoli. Potevi chiamare prima delle due."
+],
 "opts":[
 {
-"t":"Era un’offerta, non un ordine.",
-"to":"ELE_turno_05"
+"t":"Tu almeno potevi richiamare.",
+"to":"ELE_turno_06",
+"fx":[
+"flag:e5_turno_rinfaccio"
+]
 },
 {
-"t":"Va bene, niente calendario.",
+"t":"La scelta l’ho fatta senza di te. Sì.",
 "to":"ELE_turno_05"
 }
 ]
@@ -416,21 +448,24 @@ const CHAT_LIST = [
 "id":"ELE_turno_05",
 "who":"Elena",
 "fase":"I",
-"text":"Quando ti fermi scrivimi. Se lavoro rispondo dopo.",
-"alt":[
-{
-"req":"conf:Elena>=50",
-"text":"Scrivi quando puoi. Se lavoro rispondo dopo."
-}
+"text":[
+"Quindi io mangio e tu continui.",
+"Era questa la notizia da farmi ingoiare?"
 ],
 "opts":[
 {
-"t":"Ti mando un messaggio.",
-"to":"ELE_turno_06"
+"t":"Sì. Non torno stasera.",
+"to":"ELE_turno_08",
+"fx":[
+"flag:e5_turno_detto"
+]
 },
 {
-"t":"Se serve ti chiamo una volta.",
-"to":"ELE_turno_07"
+"t":"Appena so qualcosa ti scrivo.",
+"to":"ELE_turno_08",
+"fx":[
+"flag:e5_turno_rimando"
+]
 }
 ]
 },
@@ -438,15 +473,17 @@ const CHAT_LIST = [
 "id":"ELE_turno_06",
 "who":"Elena",
 "fase":"I",
-"text":"Bravo. Il telefono non è un citofono.",
+"text":[
+"Tu puoi lasciarmi sei messaggi. Io ti rovino due minuti.",
+"Mi hanno richiamata. Tanto per cambiare, devo andare io."
+],
 "opts":[
 {
-"t":"Poi aspetto.",
-"to":"ELE_turno_08"
-},
-{
-"t":"Promesso, niente raffica.",
-"to":"ELE_turno_08"
+"t":"Vai. Quella frase però resta.",
+"to":"ELE_turno_08",
+"fx":[
+"flag:e5_turno_rinfaccio"
+]
 }
 ]
 },
@@ -454,20 +491,17 @@ const CHAT_LIST = [
 "id":"ELE_turno_07",
 "who":"Elena",
 "fase":"I",
-"text":"Una chiamata basta, Nonno.",
+"text":[
+"Scrivo io, allora.",
+"E se dormi, dormi. Senza il processo perché ho risposto tardi."
+],
 "opts":[
 {
-"t":"Una. Ho capito.",
-"to":"ELE_turno_08"
-},
-{
-"t":"E non ti prenoto la serata.",
-"to":"ELE_turno_08"
-},
-{
-"t":"Come d’accordo: un messaggio, senza prenotarti.",
-"to":"V2_E03_03",
-"req":"flag:e03b"
+"t":"Il messaggio lo aspetto.",
+"to":"ELE_turno_08",
+"fx":[
+"flag:e5_aspetto_turno"
+]
 }
 ]
 },
@@ -475,11 +509,15 @@ const CHAT_LIST = [
 "id":"ELE_turno_08",
 "who":"Elena",
 "fase":"I",
-"text":"Adesso vai. Io cerco di capire quando mangiare.",
+"text":"La pausa è finita. Il piatto no.",
 "alt":[
 {
-"req":"flag:e03c",
-"text":"Il turno lo gestisco io. Prima mi hai chiesto di non coinvolgerti."
+"req":"flag:e5_turno_rinfaccio",
+"text":"Il piatto è via. Le due di notte me le ricordo."
+},
+{
+"req":"flag:e5_aspetto_turno",
+"text":"Torno ai tavoli. Il messaggio lo mando io, come hai detto."
 }
 ]
 },
@@ -487,26 +525,28 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_01",
 "who":"Elena",
 "fase":"I",
-"text":"Il mio coinquilino parla. Io avrei un turno da superare.",
+"text":[
+"È mezzanotte. Ha ripreso col trapano.",
+"Scrivimi cosa gli diresti tu, già che sai sempre cosa dire a me."
+],
 "opts":[
 {
-"t":"Quanto parla?",
-"to":"ELE_coinquilino_02"
-},
-{
-"t":"Fagli scrivere due righe. Voglio verificare.",
-"to":"V2_E04_01",
+"t":"Smettila, si dorme. Giraglielo.",
+"to":"ELE_coinquilino_02",
 "fx":[
-"flag:e04b"
+"flag:e5_trapano_messaggio"
 ]
 },
 {
-"t":"Non reggo altri sfoghi.",
-"to":"V2_E04_03",
+"t":"Diglielo tu. Sei lì.",
+"to":"ELE_coinquilino_03",
 "fx":[
-"flag:e04c",
-"sblocca:ELE_coinquilino_08"
+"flag:e5_trapano_solo"
 ]
+},
+{
+"t":"Almeno lui sa dove sta andando. Nel muro.",
+"to":"ELE_coinquilino_04"
 }
 ]
 },
@@ -514,15 +554,21 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_02",
 "who":"Elena",
 "fase":"I",
-"text":"No, non è cattivo. È una riunione che abita qui.",
+"text":[
+"«La gente dorme.»",
+"Tu no, ovviamente. Tu stai facendo una cosa importantissima."
+],
 "opts":[
 {
-"t":"Ti ascolto e basta.",
-"to":"ELE_coinquilino_04"
+"t":"Glielo giri o volevi litigare con me?",
+"to":"ELE_coinquilino_05"
 },
 {
-"t":"Posso suggerire una fuga?",
-"to":"ELE_coinquilino_05"
+"t":"Stanotte mi fermo. È scritto.",
+"to":"ELE_coinquilino_06",
+"fx":[
+"flag:elena_sosta_promessa"
+]
 }
 ]
 },
@@ -530,14 +576,17 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_03",
 "who":"Elena",
 "fase":"I",
-"text":"Non gli giro la chat. Voglio bene anche a te, purtroppo.",
+"text":[
+"Sono qui, infatti. Lo sento da qui.",
+"Tu puoi decidere per me perfino quando mi dici di arrangiarmi."
+],
 "opts":[
 {
-"t":"Allora racconta tu.",
-"to":"ELE_coinquilino_04"
+"t":"Non vengo a litigare col tuo coinquilino.",
+"to":"ELE_coinquilino_07"
 },
 {
-"t":"Mi hai tolto una curiosità.",
+"t":"Scrivigli che domani lavori. Basta quello.",
 "to":"ELE_coinquilino_05"
 }
 ]
@@ -546,15 +595,18 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_04",
 "who":"Elena",
 "fase":"I",
-"text":"Sto solo sfogandomi. Tra poco mi passa.",
+"text":[
+"Sì. Avanti finché trova qualcosa di duro.",
+"Ti somiglia. Solo che lui ogni tanto si ferma."
+],
 "opts":[
 {
-"t":"Va bene. Sfogati.",
-"to":"ELE_coinquilino_06"
+"t":"Smetti di parlare della macchina per un minuto.",
+"to":"ELE_coinquilino_07"
 },
 {
-"t":"Poi passiamo a qualcosa di meglio.",
-"to":"ELE_coinquilino_07"
+"t":"Digli di smettere. Con quelle parole.",
+"to":"ELE_coinquilino_05"
 }
 ]
 },
@@ -562,15 +614,14 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_05",
 "who":"Elena",
 "fase":"I",
-"text":"Tu intanto sei scappato in autostrada.",
+"text":[
+"Gli ho scritto.",
+"Ha letto. Aspetto la risposta."
+],
 "opts":[
 {
-"t":"Non esattamente una fuga riuscita.",
-"to":"ELE_coinquilino_06"
-},
-{
-"t":"Ti tengo compagnia ancora un po’.",
-"to":"ELE_coinquilino_07"
+"t":"Guarda se smette, non se risponde.",
+"to":"ELE_coinquilino_08"
 }
 ]
 },
@@ -578,20 +629,13 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_06",
 "who":"Elena",
 "fase":"I",
-"text":"Grazie. Due minuti senza consigli fanno miracoli.",
-"alt":[
-{
-"req":"conf:Elena>=50",
-"text":"Con te posso lamentarmi senza una riunione."
-}
+"text":[
+"Lo salvo.",
+"Così domani litighiamo su quello che hai scritto, non sul campo."
 ],
 "opts":[
 {
-"t":"Non devo riparare anche questo.",
-"to":"ELE_coinquilino_08"
-},
-{
-"t":"Ti lascio lo spazio.",
+"t":"Salvalo pure.",
 "to":"ELE_coinquilino_08"
 }
 ]
@@ -600,20 +644,14 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_07",
 "who":"Elena",
 "fase":"I",
-"text":"Nonno, non serve un piano per ogni conversazione.",
+"text":[
+"Io volevo smettere di sentire un trapano.",
+"Tu sei riuscito a farmi venire voglia di riattaccare."
+],
 "opts":[
 {
-"t":"Tolgo il piano.",
+"t":"Allora fallo.",
 "to":"ELE_coinquilino_08"
-},
-{
-"t":"Almeno su questo hai ragione.",
-"to":"ELE_coinquilino_08"
-},
-{
-"t":"Stavolta niente consigli: finisci il discorso.",
-"to":"V2_E04_03",
-"req":"flag:e04b"
 }
 ]
 },
@@ -621,11 +659,15 @@ const CHAT_LIST = [
 "id":"ELE_coinquilino_08",
 "who":"Elena",
 "fase":"I",
-"text":"Vado. Ti riscrivo quando ho qualcosa di meno noioso.",
+"text":"Ha smesso. Aspetto a festeggiare.",
 "alt":[
 {
-"req":"flag:e04c",
-"text":"Lo sfogo lo tengo per dopo. Prima mi hai detto che eri pieno."
+"req":"flag:e5_trapano_solo",
+"text":"Ha smesso. Da solo. Almeno lui."
+},
+{
+"req":"flag:e5_trapano_messaggio",
+"text":"Ha letto. Ha smesso. Bastava quello."
 }
 ]
 },
@@ -633,25 +675,36 @@ const CHAT_LIST = [
 "id":"ELE_cena_01",
 "who":"Elena",
 "fase":"I",
-"text":"Riesci a dirmi se torni per cena?",
+"text":[
+"Il piatto lo metto via?",
+"Una risposta. Non il bollettino della macchina."
+],
+"alt":[
+{
+"req":"flag:e5_aspetto_turno",
+"text":"Dovevo scrivere io. Ho finito: il piatto lo metto via?"
+}
+],
 "opts":[
 {
-"t":"Non lo so ancora.",
-"to":"ELE_cena_02"
-},
-{
-"t":"Mangia senza aspettarmi. Niente orario finto.",
-"to":"V2_E05_01",
+"t":"Sì. Mangia senza aspettarmi.",
+"to":"ELE_cena_02",
 "fx":[
-"flag:e05b"
+"flag:elena_non_aspettare"
 ]
 },
 {
-"t":"Non chiedermelo più stasera.",
-"to":"V2_E05_03",
+"t":"Tienilo ancora un po’.",
+"to":"ELE_cena_03",
 "fx":[
-"flag:e05c",
-"sblocca:ELE_cena_08"
+"flag:e5_piatto_attesa"
+]
+},
+{
+"t":"Non mi serve che mi tieni il piatto.",
+"to":"ELE_cena_04",
+"fx":[
+"flag:e5_piatto_respinto"
 ]
 }
 ]
@@ -660,15 +713,38 @@ const CHAT_LIST = [
 "id":"ELE_cena_02",
 "who":"Elena",
 "fase":"I",
-"text":"Puoi anche dirmi che non lo sai.",
+"text":[
+"Metto via.",
+"La vendi o la tieni?"
+],
+"alt":[
+{
+"req":"flag:bugia_vendita",
+"text":"Domani la vendi, hai detto. Ti tengo il piatto?"
+}
+],
 "opts":[
 {
-"t":"Ti avviso dalla sosta.",
-"to":"ELE_cena_03"
+"t":"Volevo farti smettere.",
+"to":"ELE_cena_05",
+"fx":[
+"flag:e5_vendita_ammessa"
+],
+"req":"flag:bugia_vendita"
 },
 {
-"t":"Mangia senza aspettarmi.",
-"to":"ELE_cena_04"
+"t":"Non la vendo.",
+"to":"ELE_cena_06",
+"fx":[
+"flag:e5_auto_tenuta"
+]
+},
+{
+"t":"Mangia. Della macchina parliamo dopo.",
+"to":"ELE_cena_07",
+"fx":[
+"flag:e5_vendita_rinvio"
+]
 }
 ]
 },
@@ -676,15 +752,21 @@ const CHAT_LIST = [
 "id":"ELE_cena_03",
 "who":"Elena",
 "fase":"I",
-"text":"Va bene. Preferisco quello a un orario inventato.",
+"text":"Ancora quanto? Il piatto è qui. Tu no.",
 "opts":[
 {
-"t":"Meglio così.",
-"to":"ELE_cena_05"
+"t":"Lo so. Mettilo via.",
+"to":"ELE_cena_02",
+"fx":[
+"flag:elena_non_aspettare"
+]
 },
 {
-"t":"Appena posso ti scrivo.",
-"to":"ELE_cena_05"
+"t":"Ho detto un po’. Non mi cronometrare.",
+"to":"ELE_cena_04",
+"fx":[
+"flag:e5_piatto_respinto"
+]
 }
 ]
 },
@@ -692,31 +774,14 @@ const CHAT_LIST = [
 "id":"ELE_cena_04",
 "who":"Elena",
 "fase":"I",
-"text":"Lo sapevo. Prima cena e poi magari arrivi domani.",
+"text":[
+"Mi serviva sapere se mangiavo da sola.",
+"Adesso lo so."
+],
 "opts":[
 {
-"t":"Non avevo promesso domani.",
-"to":"ELE_cena_05"
-},
-{
-"t":"Quindi hai capito il problema.",
-"to":"ELE_cena_05"
-}
-]
-},
-{
-"id":"ELE_cena_05",
-"who":"Elena",
-"fase":"I",
-"text":"Quando sei fermo mi aggiorni. Non mentre guidi.",
-"opts":[
-{
-"t":"Aspetta il mio messaggio, non me.",
-"to":"ELE_cena_06"
-},
-{
-"t":"Mangia. Non fare tardi per me.",
-"to":"ELE_cena_07",
+"t":"Sì. Stasera da sola.",
+"to":"ELE_cena_08",
 "fx":[
 "flag:elena_non_aspettare"
 ]
@@ -724,23 +789,31 @@ const CHAT_LIST = [
 ]
 },
 {
-"id":"ELE_cena_06",
+"id":"ELE_cena_05",
 "who":"Elena",
 "fase":"I",
-"text":"Perfetto. Così non ti aspetto con il piatto in mano.",
-"alt":[
-{
-"req":"conf:Elena>=25",
-"text":"Perfetto. Mi tolgo l’attesa dal tavolo, non te."
-}
+"text":[
+"Per farmi smettere.",
+"Ho messo un piatto per uno che mi aveva già liquidata."
 ],
 "opts":[
 {
-"t":"Ci siamo capiti.",
+"t":"Quel domani era una bugia. Il resto te lo dico.",
 "to":"ELE_cena_08"
+}
+]
 },
 {
-"t":"Ti scrivo comunque.",
+"id":"ELE_cena_06",
+"who":"Elena",
+"fase":"I",
+"text":[
+"Ecco. Potevi cominciare da lì.",
+"Io avrei mangiato caldo e tu avresti avuto lo stesso la tua macchina."
+],
+"opts":[
+{
+"t":"Stasera la tengo. Anche se sei contraria.",
 "to":"ELE_cena_08"
 }
 ]
@@ -749,20 +822,14 @@ const CHAT_LIST = [
 "id":"ELE_cena_07",
 "who":"Elena",
 "fase":"I",
-"text":"Nonno, non mangio per tenerti compagnia a distanza.",
+"text":[
+"Dopo.",
+"Rimetto via anche quello."
+],
 "opts":[
 {
-"t":"Meno male.",
+"t":"Per stasera basta.",
 "to":"ELE_cena_08"
-},
-{
-"t":"Era l’ultima cosa che volevo.",
-"to":"ELE_cena_08"
-},
-{
-"t":"Senza aspettarmi, come avevamo deciso.",
-"to":"V2_E05_03",
-"req":"flag:e05b"
 }
 ]
 },
@@ -770,11 +837,11 @@ const CHAT_LIST = [
 "id":"ELE_cena_08",
 "who":"Elena",
 "fase":"I",
-"text":"Ci sentiamo alla sosta. Io intanto mangio.",
+"text":"Ho mangiato. La macchina la digerisci tu.",
 "alt":[
 {
-"req":"flag:e05c",
-"text":"Non ti chiedo più della cena. Aspetto che sia tu ad aggiornarmi."
+"req":"flag:e5_vendita_ammessa",
+"text":"Ho mangiato. Il tuo «per farmi smettere» mi è rimasto qui."
 }
 ]
 },
@@ -782,26 +849,38 @@ const CHAT_LIST = [
 "id":"ELE_bollette_01",
 "who":"Elena",
 "fase":"I",
-"text":"Un’auto ereditata è gratis finché non la accendi.",
+"text":[
+"Ho aperto una bolletta.",
+"Tu almeno il conto della macchina l’hai fatto?"
+],
+"alt":[
+{
+"req":"flag:e5_foto_no",
+"text":"La foto me l’hai negata. Almeno il conto l’hai guardato?"
+},
+{
+"req":"flag:e5_auto_tenuta",
+"text":"La tieni. Il conto per tenerla l’hai fatto?"
+}
+],
 "opts":[
 {
-"t":"Anche tu hai aperto una bolletta?",
-"to":"ELE_bollette_02"
-},
-{
-"t":"Aspetta, ho risposto come se mi stessi chiedendo soldi.",
-"to":"V2_E06_01",
+"t":"Te lo mando. Dimmi tu.",
+"to":"ELE_bollette_02",
 "fx":[
-"flag:e06b"
+"flag:e5_conto_mostrato"
 ]
 },
 {
-"t":"Oggi non voglio parlare di soldi.",
-"to":"V2_E06_03",
+"t":"La pago io.",
+"to":"ELE_bollette_03",
 "fx":[
-"flag:e06c",
-"sblocca:ELE_bollette_08"
+"flag:e5_soldi_muro"
 ]
+},
+{
+"t":"Non ancora. Mi serviva portarla via.",
+"to":"ELE_bollette_04"
 }
 ]
 },
@@ -809,15 +888,18 @@ const CHAT_LIST = [
 "id":"ELE_bollette_02",
 "who":"Elena",
 "fase":"I",
-"text":"No, la bolletta non diventa più simpatica se non la apro.",
+"text":[
+"Il numero lo vedo.",
+"Tu lo hai guardato prima di partire o quando te l’ho chiesto io?"
+],
 "opts":[
 {
-"t":"Hai ragione. Lamentati pure.",
-"to":"ELE_bollette_04"
+"t":"Dopo. Ho fatto il conto dopo.",
+"to":"ELE_bollette_05"
 },
 {
-"t":"Non apriamo anche il mio conto.",
-"to":"ELE_bollette_05"
+"t":"Cambia il prezzo se te lo dico?",
+"to":"ELE_bollette_06"
 }
 ]
 },
@@ -825,15 +907,21 @@ const CHAT_LIST = [
 "id":"ELE_bollette_03",
 "who":"Elena",
 "fase":"I",
-"text":"Non era una richiesta di soldi. Era una lamentela.",
+"text":[
+"Sì. E io sono qui col mio.",
+"Quando mi dici che hai scelto bene, vuoi il parere o l’applauso?"
+],
 "opts":[
 {
-"t":"Ricevuto. Ti ascolto.",
-"to":"ELE_bollette_04"
+"t":"L’applauso no. Il parere l’ho già sentito.",
+"to":"ELE_bollette_06"
 },
 {
-"t":"Era una battuta riuscita male.",
-"to":"ELE_bollette_05"
+"t":"Ti mando il conto. Guardalo.",
+"to":"ELE_bollette_02",
+"fx":[
+"flag:e5_conto_mostrato"
+]
 }
 ]
 },
@@ -841,15 +929,21 @@ const CHAT_LIST = [
 "id":"ELE_bollette_04",
 "who":"Elena",
 "fase":"I",
-"text":"Tu hai già fatto il conto di quello che va sistemato?",
+"text":[
+"Portarla via da chi?",
+"Il notaio ti teneva per il giubbotto?"
+],
 "opts":[
 {
-"t":"Solo il necessario.",
-"to":"ELE_bollette_06"
+"t":"Da lì. Ho scelto, volevo andarmene.",
+"to":"ELE_bollette_05"
 },
 {
-"t":"Sto ancora cercando di capirlo.",
-"to":"ELE_bollette_07"
+"t":"Anche da questa conversazione.",
+"to":"ELE_bollette_07",
+"fx":[
+"flag:e5_soldi_muro"
+]
 }
 ]
 },
@@ -857,15 +951,14 @@ const CHAT_LIST = [
 "id":"ELE_bollette_05",
 "who":"Elena",
 "fase":"I",
-"text":"Mi basta che non compri tutto nella prima officina.",
+"text":[
+"Tre volte l’hai visto.",
+"Adesso sembra che devi recuperare tutti gli altri anni al benzinaio."
+],
 "opts":[
 {
-"t":"Controllo prima di spendere.",
-"to":"ELE_bollette_06"
-},
-{
-"t":"Posso rimandare il superfluo.",
-"to":"ELE_bollette_07"
+"t":"Tre volte. Il regalo però era mio.",
+"to":"ELE_bollette_08"
 }
 ]
 },
@@ -873,14 +966,13 @@ const CHAT_LIST = [
 "id":"ELE_bollette_06",
 "who":"Elena",
 "fase":"I",
-"text":"Ecco. Una cosa alla volta, senza fare il fenomeno.",
+"text":[
+"Il prezzo no.",
+"L’idea che mi sto facendo di te, parecchio."
+],
 "opts":[
 {
-"t":"Per una volta sì.",
-"to":"ELE_bollette_08"
-},
-{
-"t":"Mi faccio dire cosa serve.",
+"t":"Tienitela. La bolletta chiudila tu.",
 "to":"ELE_bollette_08"
 }
 ]
@@ -889,20 +981,14 @@ const CHAT_LIST = [
 "id":"ELE_bollette_07",
 "who":"Elena",
 "fase":"I",
-"text":"Il conto poi lo guardi da seduto. Consiglio gratuito.",
+"text":[
+"Allora vai.",
+"La prossima volta scrivimi direttamente quando vuoi gli applausi."
+],
 "opts":[
 {
-"t":"Lo tengo. È l’unico gratuito.",
+"t":"Chiudo io.",
 "to":"ELE_bollette_08"
-},
-{
-"t":"Ti aggiorno senza mandarti la fattura.",
-"to":"ELE_bollette_08"
-},
-{
-"t":"Come prima: ascolto, senza aprire il portafoglio.",
-"to":"V2_E06_03",
-"req":"flag:e06b"
 }
 ]
 },
@@ -910,15 +996,11 @@ const CHAT_LIST = [
 "id":"ELE_bollette_08",
 "who":"Elena",
 "fase":"I",
-"text":"Adesso ti lascio ai tuoi rumori. Io ho le mie carte.",
+"text":"Rimetto tutto nella busta. Per stasera l’ho guardato abbastanza.",
 "alt":[
 {
-"req":"flag:e06c",
-"text":"Niente conti, come hai chiesto. Niente fatture per la compagnia."
-},
-{
-"req":"conf:Elena>=50",
-"text":"Vai. Le carte le odio io; ai rumori pensaci tu, con calma."
+"req":"flag:e5_conto_mostrato",
+"text":"Il tuo conto è nella chat. Il mio torna nella busta."
 }
 ]
 },
@@ -926,26 +1008,42 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_01",
 "who":"Elena",
 "fase":"II",
-"text":"Sei fermo adesso?",
+"text":[
+"«Ti scrivo quando mi fermo.»",
+"È arrivato prima il tuo silenzio. Dove sei?"
+],
+"alt":[
+{
+"req":"flag:e5_turno_rinfaccio",
+"text":"Avevo il turno, dicevi. Adesso il turno è finito. Dove sei?"
+},
+{
+"req":"flag:e5_turno_rimando",
+"text":"Alla prossima sosta, hai scritto. Io sto ancora aspettando."
+},
+{
+"req":"flag:e5_turno_detto",
+"text":"Stasera non torni. Me l’hai scritto. Dove ti sei fermato?"
+}
+],
 "opts":[
 {
-"t":"Sì. E ti dovevo un messaggio.",
-"to":"ELE_richiamo_02"
-},
-{
-"t":"Non ti ho scritto perché non sapevo cosa dirti.",
-"to":"V2_E07_01",
+"t":"In un autogrill. Ti mando l’insegna.",
+"to":"ELE_richiamo_02",
 "fx":[
-"flag:e07b"
+"flag:e5_sosta_foto"
 ]
 },
 {
-"t":"Non chiedermi altro stasera.",
-"to":"V2_E07_03",
+"t":"Sono fermo. Il nome lo tengo.",
+"to":"ELE_richiamo_03",
 "fx":[
-"flag:e07c",
-"sblocca:ELE_richiamo_08"
+"flag:e5_sosta_nascosta"
 ]
+},
+{
+"t":"Aspettavo di avere una notizia buona.",
+"to":"ELE_richiamo_04"
 }
 ]
 },
@@ -953,21 +1051,18 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_02",
 "who":"Elena",
 "fase":"II",
-"text":"Mi avevi detto che avresti scritto dalla sosta.",
-"alt":[
-{
-"req":"flag:elena_sosta_promessa",
-"text":"La sosta l’avevi promessa tu."
-}
+"text":[
+"Quella la vedo.",
+"E prima? Il messaggio non lo potevi mandare prima?"
 ],
 "opts":[
 {
-"t":"Hai ragione. Ho rimandato troppo.",
-"to":"ELE_richiamo_04"
+"t":"L’ho rimandato. Stavo evitando te.",
+"to":"ELE_richiamo_05"
 },
 {
-"t":"Non volevo chiamare guidando.",
-"to":"ELE_richiamo_04"
+"t":"Era la prima cosa a cui stavo pensando, certo.",
+"to":"ELE_richiamo_06"
 }
 ]
 },
@@ -975,15 +1070,21 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_03",
 "who":"Elena",
 "fase":"II",
-"text":"Almeno stavolta mi scrivi da fermo.",
+"text":[
+"Allora tenevi il telefono acceso per cosa?",
+"Per vedere se smettevo prima io?"
+],
 "opts":[
 {
-"t":"Sto bene. Sono solo in ritardo.",
-"to":"ELE_richiamo_05"
+"t":"Per essere lasciato stare.",
+"to":"ELE_richiamo_06"
 },
 {
-"t":"Ho bisogno di fermarmi un po’.",
-"to":"ELE_richiamo_05"
+"t":"Ti mando l’insegna. Il resto resta uguale.",
+"to":"ELE_richiamo_02",
+"fx":[
+"flag:e5_sosta_foto"
+]
 }
 ]
 },
@@ -991,15 +1092,21 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_04",
 "who":"Elena",
 "fase":"II",
-"text":"Non mi serve una cronaca. Mi basta sapere che stai bene.",
+"text":[
+"Per una buona notizia hai il notaio.",
+"A me avevi promesso un messaggio."
+],
 "opts":[
 {
-"t":"Sto bene. Te lo dico sul serio.",
-"to":"ELE_richiamo_06"
+"t":"Autogrill. Questa è l’insegna.",
+"to":"ELE_richiamo_02",
+"fx":[
+"flag:e5_sosta_foto"
+]
 },
 {
-"t":"Sono teso. Non con te.",
-"to":"ELE_richiamo_06"
+"t":"Se ogni volta finisce così, smetto di scrivere.",
+"to":"ELE_richiamo_07"
 }
 ]
 },
@@ -1007,15 +1114,14 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_05",
 "who":"Elena",
 "fase":"II",
-"text":"Se sei stanco, dillo. Non ti faccio un processo.",
+"text":[
+"Lo so.",
+"Volevo fartelo scrivere."
+],
 "opts":[
 {
-"t":"Sono stanco.",
-"to":"ELE_richiamo_07"
-},
-{
-"t":"Non ho ancora capito la strada.",
-"to":"ELE_richiamo_07"
+"t":"Adesso l’hai scritto anche tu.",
+"to":"ELE_richiamo_08"
 }
 ]
 },
@@ -1023,20 +1129,13 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_06",
 "who":"Elena",
 "fase":"II",
-"text":"Grazie. Era tutto qui.",
-"alt":[
-{
-"req":"conf:Elena>=75",
-"text":"Grazie. Non mi serviva una versione migliore di come stai."
-}
+"text":[
+"Bravo stronzo.",
+"Tu trovi il tempo di rispondere solo quando puoi farmela pagare."
 ],
 "opts":[
 {
-"t":"Ti aggiorno senza sparire.",
-"to":"ELE_richiamo_08"
-},
-{
-"t":"Non prometto un orario.",
+"t":"Oggi la conversazione finisce qui.",
 "to":"ELE_richiamo_08"
 }
 ]
@@ -1045,20 +1144,14 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_07",
 "who":"Elena",
 "fase":"II",
-"text":"Nonno, puoi anche non avere già la soluzione.",
+"text":[
+"Smetti.",
+"Ma la prossima promessa te la fai da solo."
+],
 "opts":[
 {
-"t":"È quello che sto imparando.",
+"t":"Questa l’ho fatta io. Lo so.",
 "to":"ELE_richiamo_08"
-},
-{
-"t":"Ci provo.",
-"to":"ELE_richiamo_08"
-},
-{
-"t":"Ti scrivo non so, come avevamo detto.",
-"to":"V2_E07_03",
-"req":"flag:e07b"
 }
 ]
 },
@@ -1066,11 +1159,11 @@ const CHAT_LIST = [
 "id":"ELE_richiamo_08",
 "who":"Elena",
 "fase":"II",
-"text":"Mangia qualcosa. Mi scrivi quando riparti, se puoi.",
+"text":"Il turno mi aspetta. Tu avevi promesso che scrivevi.",
 "alt":[
 {
-"req":"flag:e07c",
-"text":"Ti lascio spazio, come hai chiesto. Non confonderlo con non esserci."
+"req":"flag:e5_sosta_foto",
+"text":"Ho salvato l’insegna. Il resto lo riprendiamo. Non è finito."
 }
 ]
 },
@@ -1245,26 +1338,22 @@ const CHAT_LIST = [
 "id":"ELE_distanza_01",
 "who":"Elena",
 "fase":"II",
-"text":"Questa foto da dove l’hai presa?",
+"text":[
+"La foto di Parigi.",
+"Adesso mi scrivi da dove l’hai presa."
+],
 "opts":[
 {
-"t":"L’ho scattata io.",
+"t":"Dal telefono. L’ho appena fatta.",
 "to":"ELE_distanza_02"
 },
 {
-"t":"Ti mando il dettaglio del posto, non solo il nome.",
-"to":"V2_E09_01",
-"fx":[
-"flag:e09b"
-]
+"t":"Aprila. Guarda anche l’orario.",
+"to":"ELE_distanza_03"
 },
 {
-"t":"Basta controlli. Voglio arrivare.",
-"to":"V2_E09_03",
-"fx":[
-"flag:e09c",
-"sblocca:ELE_distanza_08"
-]
+"t":"Sei libera di non crederci.",
+"to":"ELE_distanza_04"
 }
 ]
 },
@@ -1272,15 +1361,24 @@ const CHAT_LIST = [
 "id":"ELE_distanza_02",
 "who":"Elena",
 "fase":"II",
-"text":"Non dirmi solo sono qui. Fammi capire.",
+"text":[
+"Prima eri vicino a Roma.",
+"Quale delle due cose mi hai raccontato male?"
+],
+"alt":[
+{
+"req":"flag:bugia_vendita",
+"text":"«Domani la vendo.» Adesso ti credo sull’ora della foto?"
+}
+],
 "opts":[
 {
-"t":"Sono fermo. Controlla con calma.",
-"to":"ELE_distanza_03"
+"t":"Nessuna delle due.",
+"to":"ELE_distanza_05"
 },
 {
-"t":"Confronta il riferimento nella foto.",
-"to":"ELE_distanza_04"
+"t":"Ho imboccato una galleria. Poi c’era questo.",
+"to":"ELE_distanza_06"
 }
 ]
 },
@@ -1288,15 +1386,27 @@ const CHAT_LIST = [
 "id":"ELE_distanza_03",
 "who":"Elena",
 "fase":"II",
-"text":"Aspetta. Controllo il posto, non la tua memoria.",
+"text":[
+"Aperta. L’ora è quella.",
+"Una foto salvata da un’altra parte resta una foto sul telefono."
+],
+"alt":[
+{
+"req":"flag:e5_foto",
+"text":"La macchina me l’hai fatta vedere. Ora mi chiedi di guardare Parigi."
+}
+],
 "opts":[
 {
-"t":"Dimmi quello che trovi.",
-"to":"ELE_distanza_05"
+"t":"Te ne mando un’altra, più larga.",
+"to":"ELE_distanza_05",
+"fx":[
+"flag:e5_seconda_foto"
+]
 },
 {
-"t":"Non voglio che mi credi per forza.",
-"to":"ELE_distanza_05"
+"t":"Ti lascio pensare che sia una presa in giro.",
+"to":"ELE_distanza_07"
 }
 ]
 },
@@ -1304,15 +1414,27 @@ const CHAT_LIST = [
 "id":"ELE_distanza_04",
 "who":"Elena",
 "fase":"II",
-"text":"Va bene. Quindi la foto l’hai scattata adesso.",
+"text":[
+"Decidi tu anche quando ho finito di chiederti le cose.",
+"Mandami il bordo della foto."
+],
+"alt":[
+{
+"req":"flag:e5_vendita_ammessa",
+"text":"Prima una bugia. Ora ti serve che ti creda."
+}
+],
 "opts":[
 {
-"t":"Sì, adesso.",
-"to":"ELE_distanza_05"
+"t":"Ti mando tutto il fotogramma.",
+"to":"ELE_distanza_05",
+"fx":[
+"flag:e5_seconda_foto"
+]
 },
 {
-"t":"Non è una foto vecchia.",
-"to":"ELE_distanza_05"
+"t":"Arrangiati, allora.",
+"to":"ELE_distanza_07"
 }
 ]
 },
@@ -1320,22 +1442,31 @@ const CHAT_LIST = [
 "id":"ELE_distanza_05",
 "who":"Elena",
 "fase":"II",
-"text":"Il riferimento del luogo corrisponde. Non so spiegarti la distanza.",
+"text":[
+"La scritta è quella. Il posto è quello.",
+"L’orario che mi hai dato prima, invece, non ci sta."
+],
+"alt":[
+{
+"req":"flag:e5_seconda_foto",
+"text":"Stesso posto anche nella seconda foto. L’orario di prima?"
+}
+],
 "opts":[
 {
-"t":"Non cambiamo le date.",
-"to":"ELE_distanza_06",
+"t":"Coincide. Tienile.",
+"to":"ELE_distanza_08",
 "fx":[
-"cnt:conoscenza+1",
-"flag:distanza_confermata"
+"flag:distanza_confermata",
+"cnt:conoscenza+1"
 ]
 },
 {
-"t":"Il luogo coincide.",
-"to":"ELE_distanza_07",
+"t":"Tienile. Chiudo.",
+"to":"ELE_distanza_08",
 "fx":[
-"cnt:conoscenza+1",
-"flag:distanza_confermata"
+"flag:distanza_confermata",
+"flag:e5_foto_rottura"
 ]
 }
 ]
@@ -1344,15 +1475,18 @@ const CHAT_LIST = [
 "id":"ELE_distanza_06",
 "who":"Elena",
 "fase":"II",
-"text":"Non facciamo altre prove mentre guidi.",
+"text":[
+"Una galleria.",
+"Senti come suona, almeno, prima di scrivermelo?"
+],
 "opts":[
 {
-"t":"Resto fermo.",
-"to":"ELE_distanza_08"
+"t":"Lo sento. Il posto non cambia.",
+"to":"ELE_distanza_05"
 },
 {
-"t":"Chiudo appena devo ripartire.",
-"to":"ELE_distanza_08"
+"t":"Ti riscrivo quando ho una spiegazione.",
+"to":"ELE_distanza_07"
 }
 ]
 },
@@ -1360,20 +1494,17 @@ const CHAT_LIST = [
 "id":"ELE_distanza_07",
 "who":"Elena",
 "fase":"II",
-"text":"Preferisco un messaggio corto da fermo a un ti spiego mentre guidi.",
+"text":[
+"Allora adesso ho pure una foto da guardare.",
+"Prima bastava il telefono."
+],
 "opts":[
 {
-"t":"Va bene. Leggo quello che trovi.",
-"to":"ELE_distanza_08"
-},
-{
-"t":"Almeno su questo siamo d’accordo.",
-"to":"ELE_distanza_08"
-},
-{
-"t":"Riprendiamo il particolare che ti avevo mandato.",
-"to":"V2_E09_03",
-"req":"flag:e09b"
+"t":"La foto resta lì.",
+"to":"ELE_distanza_08",
+"fx":[
+"flag:e5_foto_rottura"
+]
 }
 ]
 },
@@ -1381,19 +1512,14 @@ const CHAT_LIST = [
 "id":"ELE_distanza_08",
 "who":"Elena",
 "fase":"II",
-"text":"Ok. Resta lì un momento. Non fare cose.",
+"text":[
+"Quella foto resta aperta.",
+"La prossima ora che mi scrivi la controllo."
+],
 "alt":[
 {
-"req":"flag:e09c",
-"text":"Avevi fermato il confronto. Per riprenderlo, mandami il dettaglio."
-},
-{
-"req":"conf:Elena>=75",
-"text":"Ti credo. Fermati: capiamo senza metterti fretta."
-},
-{
 "req":"flag:distanza_confermata",
-"text":"Il luogo coincide. Non aggiustiamo la distanza."
+"text":"Il posto coincide. Mi resta quando sei partito."
 }
 ]
 },
@@ -1401,25 +1527,42 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_01",
 "who":"Elena",
 "fase":"III",
-"text":"Ci siamo calmati?",
-"opts":[
+"text":[
+"Ho finito il turno.",
+"La macchina è in vendita, sì o no?"
+],
+"alt":[
 {
-"t":"Io sì. Ti dovevo un messaggio decente.",
-"to":"ELE_riparazione_02"
+"req":"flag:e5_foto_rottura",
+"text":"La foto è ancora aperta. La vendita invece come va?"
 },
 {
-"t":"Ho chiesto scusa. Non cancella tutto.",
-"to":"V2_E10_01",
+"req":"flag:e5_soldi_muro",
+"text":"La paghi tu. Ho finito il turno: la tieni ancora?"
+}
+],
+"req":"flag:elena_litigio",
+"opts":[
+{
+"t":"No. La tengo.",
+"to":"ELE_riparazione_02",
 "fx":[
-"flag:e10b"
+"flag:e5_ripresa",
+"flag:e5_auto_tenuta"
 ]
 },
 {
-"t":"Ne ho abbastanza. Basta.",
-"to":"V2_E10_03",
+"t":"Sono ancora fermo. Ho dormito.",
+"to":"ELE_riparazione_03",
 "fx":[
-"flag:e10c",
-"sblocca:ELE_riparazione_08"
+"flag:e5_ripresa"
+]
+},
+{
+"t":"È l’unica cosa che sai chiedermi?",
+"to":"ELE_riparazione_04",
+"fx":[
+"flag:e5_ripresa"
 ]
 }
 ]
@@ -1428,21 +1571,25 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_02",
 "who":"Elena",
 "fase":"III",
-"text":"Prima mi hai chiesto scusa.",
+"text":"Quindi era un viaggio, non il tragitto fino a casa.",
 "alt":[
 {
-"req":"flag:elena_scuse",
-"text":"Mi hai chiesto scusa. Riparto senza cancellare il prima."
+"req":"flag:bugia_vendita",
+"text":"Il «domani» della prima sera è finito. L’auto è ancora lì."
 }
 ],
 "opts":[
 {
-"t":"Era vero. Ti ho risposto male.",
-"to":"ELE_riparazione_04"
+"t":"Sì. È questo che ho scelto.",
+"to":"ELE_riparazione_05"
 },
 {
-"t":"Lo penso ancora. Non era colpa tua.",
-"to":"ELE_riparazione_04"
+"t":"Era una bugia.",
+"to":"ELE_riparazione_06",
+"fx":[
+"flag:e5_vendita_ammessa"
+],
+"req":"flag:bugia_vendita"
 }
 ]
 },
@@ -1450,15 +1597,21 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_03",
 "who":"Elena",
 "fase":"III",
-"text":"Ripartiamo da adesso. Senza rifare tutta la discussione.",
+"text":[
+"Dormito quanto?",
+"Stavo per chiederti della vendita. Ti è uscita una dormita."
+],
 "opts":[
 {
-"t":"Va bene. Ti dico come sto.",
-"to":"ELE_riparazione_05"
+"t":"Poco. Sono ancora stanco.",
+"to":"ELE_riparazione_05",
+"fx":[
+"flag:e5_sonno_detto"
+]
 },
 {
-"t":"Non ricominciamo il litigio.",
-"to":"ELE_riparazione_05"
+"t":"È la risposta che ti do adesso.",
+"to":"ELE_riparazione_07"
 }
 ]
 },
@@ -1466,14 +1619,20 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_04",
 "who":"Elena",
 "fase":"III",
-"text":"Allora dimmelo quando sei stanco. Posso capirlo.",
+"text":[
+"È quella a cui cambi risposta ogni volta.",
+"Mi fai finire un turno a indovinare e poi quella pesante sono io."
+],
 "opts":[
 {
-"t":"Te lo dico prima di sbottare.",
-"to":"ELE_riparazione_06"
+"t":"Non la vendo. Adesso hai la risposta.",
+"to":"ELE_riparazione_05",
+"fx":[
+"flag:e5_auto_tenuta"
+]
 },
 {
-"t":"Ci provo, senza promettere miracoli.",
+"t":"Sono stato uno stronzo. Ma la tengo.",
 "to":"ELE_riparazione_06"
 }
 ]
@@ -1482,15 +1641,21 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_05",
 "who":"Elena",
 "fase":"III",
-"text":"Questa volta niente orario preciso, va bene?",
+"text":[
+"Quando hai deciso?",
+"Prima di chiamarmi, vero?"
+],
 "opts":[
 {
-"t":"Nessun orario inventato.",
-"to":"ELE_riparazione_07"
+"t":"Prima.",
+"to":"ELE_riparazione_08"
 },
 {
-"t":"Ti aggiorno dalla prossima sosta.",
-"to":"ELE_riparazione_07"
+"t":"Dopo che mi hai detto di venderla.",
+"to":"ELE_riparazione_08",
+"fx":[
+"flag:e5_scelta_ripicca"
+]
 }
 ]
 },
@@ -1498,14 +1663,13 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_06",
 "who":"Elena",
 "fase":"III",
-"text":"Leggo. Non devi scrivermi tutto insieme.",
+"text":[
+"Mi hai lasciato fare tutti quei discorsi.",
+"E tu sapevi già come finivano."
+],
 "opts":[
 {
-"t":"Sono stanco, ma sono fermo.",
-"to":"ELE_riparazione_08"
-},
-{
-"t":"Ho trovato qualcuno che mi aiuta con l’auto.",
+"t":"Sì. Ti ho lasciata parlare.",
 "to":"ELE_riparazione_08"
 }
 ]
@@ -1514,20 +1678,14 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_07",
 "who":"Elena",
 "fase":"III",
-"text":"Va bene anche poco. Purché non sia tutto va tutto bene.",
+"text":[
+"Allora per oggi mi tengo quella.",
+"L’altra resta qui."
+],
 "opts":[
 {
-"t":"Ti dico almeno una cosa vera.",
+"t":"Per oggi quella.",
 "to":"ELE_riparazione_08"
-},
-{
-"t":"Non lo uso più come risposta automatica.",
-"to":"ELE_riparazione_08"
-},
-{
-"t":"Non mi aspetto il ripristino. Come avevamo detto.",
-"to":"V2_E10_03",
-"req":"flag:e10b"
 }
 ]
 },
@@ -1535,108 +1693,118 @@ const CHAT_LIST = [
 "id":"ELE_riparazione_08",
 "who":"Elena",
 "fase":"III",
-"text":"Ci sentiamo. E mangia: non è un’opinione.",
+"text":[
+"Vado a dormire.",
+"Quando riparti scrivi. Le altre cose restano."
+],
 "alt":[
 {
-"req":"flag:e10c",
-"text":"Prima mi hai chiesto di non tornarci. Sto cercando di rispettarlo."
-},
-{
-"req":"conf:Elena>=100",
-"text":"Mangia. Poi scrivi sono qui. Mi basta per ripartire."
+"req":"flag:e5_scelta_ripicca",
+"text":"Hai scelto per darmi torto. Quindi sono in auto anch’io?"
 }
 ]
 },
 {
 "id":"ELE_nonno_01",
 "who":"Elena",
-"fase":"IV",
-"text":"Nonno, hai finito di discutere anche con il navigatore?",
+"fase":"III",
+"text":[
+"Nonno, quel navigatore ti ha già denunciato?",
+"Che hai da controllare ancora?"
+],
+"alt":[
+{
+"req":"flag:e5_sonno_detto",
+"text":"Dormito poco. Nonno, litighi ancora col navigatore?"
+}
+],
+"req":"flag:e5_ripresa",
 "opts":[
 {
-"t":"Mi prende in giro lui per primo.",
+"t":"Quanti anni avevo quando ha cominciato a chiamarmi così?",
 "to":"ELE_nonno_02"
 },
 {
-"t":"Per oggi puoi non chiamarmi così? Non ce l’ho con te.",
-"to":"V2_E11_01",
+"t":"Non chiamarmi così.",
+"to":"ELE_nonno_03",
 "fx":[
-"flag:e11b"
+"flag:e5_nonno_stop"
 ]
 },
 {
-"t":"Quel soprannome non lo voglio più.",
-"to":"V2_E11_03",
-"fx":[
-"flag:e11c",
-"sblocca:ELE_nonno_08"
-]
+"t":"Quello ormai parla meno di te.",
+"to":"ELE_nonno_04"
 }
 ]
 },
 {
 "id":"ELE_nonno_02",
 "who":"Elena",
-"fase":"IV",
-"text":"Lo uso perché brontoli. Non è un titolo onorifico.",
+"fase":"III",
+"text":[
+"Otto. Claudio. Perché brontolavi.",
+"Adesso posso chiederti perché mi stai interrogando?"
+],
 "opts":[
 {
-"t":"Me lo ricordo.",
-"to":"ELE_nonno_03"
+"t":"Volevo vedere se ti ricordavi.",
+"to":"ELE_nonno_05",
+"fx":[
+"flag:nonno_uso_fissato"
+]
 },
 {
-"t":"Era chiaro dal trattamento.",
-"to":"ELE_nonno_04"
+"t":"L’ho sentito dire in un altro modo.",
+"to":"ELE_nonno_06",
+"fx":[
+"flag:nonno_uso_fissato"
+]
 }
 ]
 },
 {
 "id":"ELE_nonno_03",
 "who":"Elena",
-"fase":"IV",
-"text":"Non mi offendo se non ti fa ridere oggi.",
+"fase":"III",
+"text":[
+"Da quando?",
+"Quando ti do ragione o quando comincio a rompere?"
+],
 "opts":[
 {
-"t":"Non sei tu il problema.",
-"to":"ELE_nonno_05"
+"t":"Oggi mi dà fastidio. Basta.",
+"to":"ELE_nonno_07",
+"fx":[
+"flag:nonno_uso_fissato"
+]
 },
 {
-"t":"Ti chiedo solo una pausa.",
-"to":"ELE_nonno_05"
+"t":"Dimmelo come lo diceva Claudio.",
+"to":"ELE_nonno_06",
+"fx":[
+"flag:nonno_uso_fissato"
+]
 }
 ]
 },
 {
 "id":"ELE_nonno_04",
 "who":"Elena",
-"fase":"IV",
-"text":"Claudio ti chiamava così da quando avevi otto anni.",
+"fase":"III",
+"text":[
+"Lui ti dice dove andare.",
+"Io ti ho detto dove tornare. Ecco perché gli vuoi bene."
+],
 "opts":[
 {
-"t":"Sì. Non era nato da te.",
-"to":"ELE_nonno_05"
-},
-{
-"t":"E tu non te lo sei lasciato scappare.",
-"to":"ELE_nonno_05"
-}
-]
-},
-{
-"id":"ELE_nonno_05",
-"who":"Elena",
-"fase":"IV",
-"text":"Io ci scherzo. Non mi hai mai sentito dirlo tutta dolce.",
-"opts":[
-{
-"t":"Appunto. Volevo sentirlo da te.",
+"t":"Tu lo dici per prendermi in giro. Lui no.",
 "to":"ELE_nonno_06",
 "fx":[
 "flag:nonno_uso_fissato"
 ]
 },
 {
-"t":"Mi ricordavo la differenza.",
+"t":"Tieniti anche il soprannome.",
 "to":"ELE_nonno_07",
 "fx":[
 "flag:nonno_uso_fissato"
@@ -1645,17 +1813,31 @@ const CHAT_LIST = [
 ]
 },
 {
-"id":"ELE_nonno_06",
+"id":"ELE_nonno_05",
 "who":"Elena",
-"fase":"IV",
-"text":"Perché ti interessa tanto il tono?",
+"fase":"III",
+"text":[
+"Me lo ricordo.",
+"Ho ancora la tua prima risposta. Il resto me lo dici quando ti pare."
+],
 "opts":[
 {
-"t":"Sono stanco. Sto facendo confusione.",
+"t":"La domanda era per il nome.",
 "to":"ELE_nonno_08"
+}
+]
 },
 {
-"t":"Mi aiuta mettere in ordine le cose.",
+"id":"ELE_nonno_06",
+"who":"Elena",
+"fase":"III",
+"text":[
+"Claudio lo diceva tutto tenero.",
+"Io ti prendo per il culo, cretino. Te ne accorgi almeno adesso?"
+],
+"opts":[
+{
+"t":"Adesso sì.",
 "to":"ELE_nonno_08"
 }
 ]
@@ -1663,33 +1845,30 @@ const CHAT_LIST = [
 {
 "id":"ELE_nonno_07",
 "who":"Elena",
-"fase":"IV",
-"text":"Va bene. Per oggi ti lascio il nome che non diciamo.",
+"fase":"III",
+"text":[
+"Per oggi lo lascio stare.",
+"Quello tutto dolce era Claudio. Io te lo dico perché rompi."
+],
 "opts":[
 {
-"t":"Grazie. Domani puoi ricominciare.",
+"t":"Lui tenero, tu per prendermi in giro.",
 "to":"ELE_nonno_08"
-},
-{
-"t":"Va bene. Quello non lo usi nessuno.",
-"to":"ELE_nonno_08"
-},
-{
-"t":"Solo per oggi, come ti avevo chiesto.",
-"to":"V2_E11_03",
-"req":"flag:e11b"
 }
 ]
 },
 {
 "id":"ELE_nonno_08",
 "who":"Elena",
-"fase":"IV",
-"text":"Adesso riposa. Litighi meglio quando hai dormito.",
+"fase":"III",
+"text":[
+"Otto anni. Claudio. La tua faccia offesa era la stessa.",
+"Adesso smettila con le domande a cui sai già rispondere."
+],
 "alt":[
 {
-"req":"flag:e11c",
-"text":"Non uso il soprannome. Me l’hai chiesto e non era una battuta."
+"req":"flag:e5_nonno_stop",
+"text":"Per oggi niente soprannome. La domanda resta."
 }
 ]
 },
@@ -1697,26 +1876,43 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_01",
 "who":"Elena",
 "fase":"V",
-"text":"Prima che ricominci: ho mangiato.",
+"text":[
+"Ho mangiato. Il piatto tuo l’ho messo via.",
+"Vuoi che lo riprenda o anche stavolta è un modo per salutarmi?"
+],
+"alt":[
+{
+"req":"flag:e5_piatto_respinto",
+"text":"Il piatto lo volevi via. Perché oggi dovrei riprenderlo?"
+},
+{
+"req":"flag:e5_piatto_attesa",
+"text":"Ho aspettato quel tuo «un po’». Stasera ho mangiato prima."
+},
+{
+"req":"flag:e5_vendita_rinvio",
+"text":"La macchina veniva dopo. Adesso vuoi tornare?"
+}
+],
+"req":"flag:ev_fase_v",
 "opts":[
 {
-"t":"Bene. Era quello che ti avevo chiesto.",
-"to":"ELE_cena_ritorno_02"
-},
-{
-"t":"Non so quando torno. Mi manca la normalità.",
-"to":"V2_E12_01",
+"t":"Lascialo. Non so quando torno.",
+"to":"ELE_cena_ritorno_02",
 "fx":[
-"flag:e12b"
+"flag:elena_non_aspettare"
 ]
 },
 {
-"t":"Oggi non racconto altro.",
-"to":"V2_E12_03",
+"t":"Riprendilo. Voglio sedermi lì.",
+"to":"ELE_cena_ritorno_03",
 "fx":[
-"flag:e12c",
-"sblocca:ELE_cena_ritorno_08"
+"flag:e5_tavola"
 ]
+},
+{
+"t":"Stavolta volevo soltanto sentirti.",
+"to":"ELE_cena_ritorno_04"
 }
 ]
 },
@@ -1724,21 +1920,28 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_02",
 "who":"Elena",
 "fase":"V",
-"text":"Mi avevi detto di non aspettarti.",
+"text":[
+"Quel «non so quando» lo conosco.",
+"Che cosa cambierebbe, se ti credessi adesso?"
+],
 "alt":[
 {
-"req":"flag:elena_non_aspettare",
-"text":"Mi avevi detto di non aspettarti. Ho mangiato."
+"req":"flag:e5_vendita_ammessa",
+"text":"Un domani per farmi smettere l’avevi trovato. Oggi?"
+},
+{
+"req":"flag:e5_conto_mostrato",
+"text":"Il conto è arrivato. L’ora del ritorno manca."
 }
 ],
 "opts":[
 {
-"t":"E lo penso ancora.",
-"to":"ELE_cena_ritorno_04"
+"t":"Quando arrivo chiamo. Prima non prometto niente.",
+"to":"ELE_cena_ritorno_05"
 },
 {
-"t":"Non volevo tenerti in sospeso.",
-"to":"ELE_cena_ritorno_04"
+"t":"Niente. Ma la voglia di tornare è vera.",
+"to":"ELE_cena_ritorno_06"
 }
 ]
 },
@@ -1746,15 +1949,21 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_03",
 "who":"Elena",
 "fase":"V",
-"text":"Non serve che fai una promessa per ogni telefonata.",
+"text":[
+"Lo riprendo.",
+"Quello che abbiamo da dirci lo mettiamo a tavola con noi."
+],
 "opts":[
 {
-"t":"Niente promesse nuove.",
+"t":"Anche la macchina. Ne parliamo lì.",
 "to":"ELE_cena_ritorno_05"
 },
 {
-"t":"Ti dico solo quello che so.",
-"to":"ELE_cena_ritorno_05"
+"t":"Se ricominci, resto fuori.",
+"to":"ELE_cena_ritorno_07",
+"fx":[
+"flag:e5_soglia_ricatto"
+]
 }
 ]
 },
@@ -1762,15 +1971,24 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_04",
 "who":"Elena",
 "fase":"V",
-"text":"Una cosa la puoi fare: dirmi se ti fermi.",
+"text":[
+"Mi hai sentita. Sono ancora contraria.",
+"La voce è la stessa anche quando non ti serve."
+],
+"alt":[
+{
+"req":"flag:e5_sosta_nascosta",
+"text":"Mi avevi nascosto perfino l’insegna. Oggi la voce basta?"
+}
+],
 "opts":[
 {
-"t":"Mi fermo prima di chiamarti.",
+"t":"Lo so. Per questo ho chiamato te.",
 "to":"ELE_cena_ritorno_06"
 },
 {
-"t":"Se riparto te lo scrivo.",
-"to":"ELE_cena_ritorno_06"
+"t":"Allora chiudiamo.",
+"to":"ELE_cena_ritorno_07"
 }
 ]
 },
@@ -1778,15 +1996,20 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_05",
 "who":"Elena",
 "fase":"V",
-"text":"Non è una gara a chi resiste più sveglio.",
+"text":[
+"Chiama da sotto.",
+"Scendo io. La macchina resta fuori."
+],
+"alt":[
+{
+"req":"flag:e5_tavola",
+"text":"Il piatto è sul tavolo. Chiama da sotto. La macchina resta fuori."
+}
+],
 "opts":[
 {
-"t":"Ho smesso di trattarla come una gara.",
-"to":"ELE_cena_ritorno_07"
-},
-{
-"t":"Lo so. Mi manca sentirlo dire.",
-"to":"ELE_cena_ritorno_07"
+"t":"Da sotto. E senza far finta di averla venduta.",
+"to":"ELE_cena_ritorno_08"
 }
 ]
 },
@@ -1794,14 +2017,13 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_06",
 "who":"Elena",
 "fase":"V",
-"text":"Ecco. Questo è un aggiornamento che capisco.",
+"text":[
+"Puoi volere di tornare e continuare a non farlo.",
+"Fin qui ti è riuscito."
+],
 "opts":[
 {
-"t":"Sono fermo adesso.",
-"to":"ELE_cena_ritorno_08"
-},
-{
-"t":"Per oggi basta guidare senza pensare.",
+"t":"Mi tengo anche questa.",
 "to":"ELE_cena_ritorno_08"
 }
 ]
@@ -1810,20 +2032,14 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_07",
 "who":"Elena",
 "fase":"V",
-"text":"Nonno, puoi tornare anche senza una storia da raccontare.",
+"text":[
+"Il piatto lo rimetto via.",
+"Quella frase la tieni tu."
+],
 "opts":[
 {
-"t":"Mi basta tornare.",
+"t":"Quella frase resta mia.",
 "to":"ELE_cena_ritorno_08"
-},
-{
-"t":"Una cosa da raccontarti ce l’ho.",
-"to":"ELE_cena_ritorno_08"
-},
-{
-"t":"Una cosa piccola, come avevamo deciso.",
-"to":"V2_E12_03",
-"req":"flag:e12b"
 }
 ]
 },
@@ -1831,15 +2047,14 @@ const CHAT_LIST = [
 "id":"ELE_cena_ritorno_08",
 "who":"Elena",
 "fase":"V",
-"text":"Scrivimi quando puoi. Io sono qui.",
+"text":[
+"Il telefono resta acceso.",
+"Quando arrivi, svegliami."
+],
 "alt":[
 {
-"req":"flag:e12c",
-"text":"Oggi niente domande, come hai scelto. Il posto nella chat resta."
-},
-{
-"req":"conf:Elena>=100",
-"text":"Sono qui. Non serve una bella storia per tornare a scrivermi."
+"req":"flag:e5_soglia_ricatto",
+"text":"Telefono acceso. Il «resto fuori» lo riprendiamo se torni."
 }
 ]
 },
@@ -4986,534 +5201,6 @@ const CHAT_LIST = [
 ]
 },
 {
-"id":"V2_E01_01",
-"who":"Elena",
-"fase":"I",
-"text":"Mandami il dettaglio. Se fotografi solo il muso sembra sempre una buona idea.",
-"opts":[
-{
-"t":"Ti mostro l’interno, senza sistemarlo prima.",
-"to":"V2_E01_02"
-},
-{
-"t":"Prima voglio guardarlo io.",
-"to":"V2_E01_03"
-}
-]
-},
-{
-"id":"V2_E01_02",
-"who":"Elena",
-"fase":"I",
-"text":"Così posso prenderti in giro su qualcosa di preciso. Servizio serio.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_ritiro_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E01_03"
-}
-]
-},
-{
-"id":"V2_E01_03",
-"who":"Elena",
-"fase":"I",
-"text":"Guardala pure. La foto può aspettare.",
-"alt":[
-{
-"req":"flag:e01c",
-"text":"Va bene. Non mi trasformo in una perizia con le gambe."
-}
-]
-},
-{
-"id":"V2_E02_01",
-"who":"Elena",
-"fase":"I",
-"text":"Un testimone. Non mandarmi istruzioni per sedermi sul mio divano.",
-"opts":[
-{
-"t":"Va bene. Raccontami il processo.",
-"to":"V2_E02_02"
-},
-{
-"t":"Allora lascio vincere Pasta.",
-"to":"V2_E02_03"
-}
-]
-},
-{
-"id":"V2_E02_02",
-"who":"Elena",
-"fase":"I",
-"text":"L’imputato non si è presentato. Era già sul cuscino del giudice.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_pasta_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E02_03"
-}
-]
-},
-{
-"id":"V2_E02_03",
-"who":"Elena",
-"fase":"I",
-"text":"Pasta è assolto. Io resto in piedi, evidentemente.",
-"alt":[
-{
-"req":"flag:e02c",
-"text":"Ricevuto. Ti risparmio il resto. Non era un esame da superare."
-}
-]
-},
-{
-"id":"V2_E03_01",
-"who":"Elena",
-"fase":"I",
-"text":"Un messaggio quando puoi. Non un appuntamento che saltiamo entrambi.",
-"opts":[
-{
-"t":"Scrivo una volta, poi aspetto.",
-"to":"V2_E03_02"
-},
-{
-"t":"Meglio sentirci dopo il turno.",
-"to":"V2_E03_03"
-}
-]
-},
-{
-"id":"V2_E03_02",
-"who":"Elena",
-"fase":"I",
-"text":"Esatto. Se non rispondo, sto lavorando. Non sto punendo nessuno.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_turno_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E03_03"
-}
-]
-},
-{
-"id":"V2_E03_03",
-"who":"Elena",
-"fase":"I",
-"text":"Allora niente ora precisa. Ci togliamo almeno quel problema.",
-"alt":[
-{
-"req":"flag:e03c",
-"text":"Non te l’avevo chiesto. Mi arrangio, ma potevi dirlo meglio."
-}
-]
-},
-{
-"id":"V2_E04_01",
-"who":"Elena",
-"fase":"I",
-"text":"Sì. Vorrei lamentarmi senza aprire un cantiere sul coinquilino.",
-"opts":[
-{
-"t":"Vai. Non cerco una soluzione.",
-"to":"V2_E04_02"
-},
-{
-"t":"Ti lascio finire quando puoi.",
-"to":"V2_E04_03"
-}
-]
-},
-{
-"id":"V2_E04_02",
-"who":"Elena",
-"fase":"I",
-"text":"Grazie. Ho già uno che parla troppo. Due diventava una condanna.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_coinquilino_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E04_03"
-}
-]
-},
-{
-"id":"V2_E04_03",
-"who":"Elena",
-"fase":"I",
-"text":"Va bene. Lo sfogo lo rimandiamo; non mi serve vincere una discussione.",
-"alt":[
-{
-"req":"flag:e04c",
-"text":"Va bene. Mi fermo. Non ti chiedi compagnia con un modulo, però."
-}
-]
-},
-{
-"id":"V2_E05_01",
-"who":"Elena",
-"fase":"I",
-"text":"Va bene. Lo dici perché lo vuoi o perché ti senti in colpa?",
-"opts":[
-{
-"t":"Perché non voglio bloccarti la serata.",
-"to":"V2_E05_02"
-},
-{
-"t":"Perché non so quanto manca.",
-"to":"V2_E05_03"
-}
-]
-},
-{
-"id":"V2_E05_02",
-"who":"Elena",
-"fase":"I",
-"text":"Allora mangio. Non ti tengo un posto che sembri un rimprovero.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_cena_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E05_03"
-}
-]
-},
-{
-"id":"V2_E05_03",
-"who":"Elena",
-"fase":"I",
-"text":"È una risposta sufficiente. Se cambia qualcosa mi avvisi.",
-"alt":[
-{
-"req":"flag:e05c",
-"text":"D’accordo. Ma se poi cambi idea, il primo messaggio lo mandi tu."
-}
-]
-},
-{
-"id":"V2_E06_01",
-"who":"Elena",
-"fase":"I",
-"text":"Sì. Io stavo solo odiando un foglio. Adesso siamo già a una discussione.",
-"opts":[
-{
-"t":"Ho capito male. Ripartiamo dal foglio.",
-"to":"V2_E06_02"
-},
-{
-"t":"Lascio perdere i conti per un momento.",
-"to":"V2_E06_03"
-}
-]
-},
-{
-"id":"V2_E06_02",
-"who":"Elena",
-"fase":"I",
-"text":"Il foglio almeno non risponde. Tu hai ancora margine di miglioramento.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_bollette_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E06_03"
-}
-]
-},
-{
-"id":"V2_E06_03",
-"who":"Elena",
-"fase":"I",
-"text":"Va bene. Nessuno deve pagare per sentirsi ascoltato.",
-"alt":[
-{
-"req":"flag:e06c",
-"text":"Va bene. Non te li chiedo e non te li racconto."
-}
-]
-},
-{
-"id":"V2_E07_01",
-"who":"Elena",
-"fase":"II",
-"text":"Questo lo capisco. Non confonderlo con non avevo un momento.",
-"opts":[
-{
-"t":"Hai ragione. Ho rimandato io.",
-"to":"V2_E07_02"
-},
-{
-"t":"Mi serviva fermarmi prima di parlarti.",
-"to":"V2_E07_03"
-}
-]
-},
-{
-"id":"V2_E07_02",
-"who":"Elena",
-"fase":"II",
-"text":"Allora la prossima volta scrivi non so. È già qualcosa che posso capire.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_richiamo_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E07_03"
-}
-]
-},
-{
-"id":"V2_E07_03",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Ci sentiamo quando sei fermo, senza completare i vuoti da soli.",
-"alt":[
-{
-"req":"flag:e07c",
-"text":"Mi fermo. Se hai bisogno, devi però essere tu a scrivere."
-}
-]
-},
-{
-"id":"V2_E08_01",
-"who":"Elena",
-"fase":"II",
-"text":"Questa è una scusa. Se arriva un però la mando indietro.",
-"opts":[
-{
-"t":"Niente però. Ti ho risposto male.",
-"to":"V2_E08_02"
-},
-{
-"t":"Ti chiedo tempo prima di ricominciare.",
-"to":"V2_E08_03"
-}
-]
-},
-{
-"id":"V2_E08_02",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Posso essere arrabbiata e volerti ancora parlare.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_litigio_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E08_03"
-}
-]
-},
-{
-"id":"V2_E08_03",
-"who":"Elena",
-"fase":"II",
-"text":"Prenditelo. Non usare il silenzio per farmela pagare.",
-"alt":[
-{
-"req":"flag:e08c",
-"text":"Va bene. Il messaggio di domani lo inizi tu."
-}
-]
-},
-{
-"id":"V2_E09_01",
-"who":"Elena",
-"fase":"II",
-"text":"Bene. Prima pensavo a una foto vecchia. Fammi confrontare il particolare.",
-"opts":[
-{
-"t":"Aspetto qui mentre controlli.",
-"to":"V2_E09_02"
-},
-{
-"t":"Non voglio darti la risposta io.",
-"to":"V2_E09_03"
-}
-]
-},
-{
-"id":"V2_E09_02",
-"who":"Elena",
-"fase":"II",
-"text":"Corrisponde. Adesso abbiamo un fatto scomodo, non una spiegazione.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_distanza_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E09_03"
-}
-]
-},
-{
-"id":"V2_E09_03",
-"who":"Elena",
-"fase":"II",
-"text":"Lo guardo senza chiederti di spostarti. Una cosa alla volta.",
-"alt":[
-{
-"req":"flag:e09c",
-"text":"Rimane senza confronto. Non lo chiamo certo per consolarti."
-}
-]
-},
-{
-"id":"V2_E10_01",
-"who":"Elena",
-"fase":"III",
-"text":"Basta a ricominciare. Non a far finta che non mi abbia dato fastidio.",
-"opts":[
-{
-"t":"Puoi essere ancora arrabbiata.",
-"to":"V2_E10_02"
-},
-{
-"t":"Dimmi cosa ti ha ferito, poi mi fermo.",
-"to":"V2_E10_03"
-}
-]
-},
-{
-"id":"V2_E10_02",
-"who":"Elena",
-"fase":"III",
-"text":"Che mi rispondevi come se fossi un altro problema della macchina.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_riparazione_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E10_03"
-}
-]
-},
-{
-"id":"V2_E10_03",
-"who":"Elena",
-"fase":"III",
-"text":"Mi basta che la prossima volta lo dici prima di sbottare.",
-"alt":[
-{
-"req":"flag:e10c",
-"text":"Va bene. Io però non ho il pulsante ripristina."
-}
-]
-},
-{
-"id":"V2_E11_01",
-"who":"Elena",
-"fase":"IV",
-"text":"Posso. Non devo vincere neanche sul soprannome.",
-"opts":[
-{
-"t":"Grazie. Oggi mi serve una cosa semplice.",
-"to":"V2_E11_02"
-},
-{
-"t":"Domani puoi ricominciare a rompere.",
-"to":"V2_E11_03"
-}
-]
-},
-{
-"id":"V2_E11_02",
-"who":"Elena",
-"fase":"IV",
-"text":"Domani valuto quanto brontoli. Ho un mestiere da difendere.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_nonno_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E11_03"
-}
-]
-},
-{
-"id":"V2_E11_03",
-"who":"Elena",
-"fase":"IV",
-"text":"Per oggi basta. Il nome non è un test che devi sopportare.",
-"alt":[
-{
-"req":"flag:e11c",
-"text":"D’accordo. Lo smetto. Non ti prometto di capire subito perché."
-}
-]
-},
-{
-"id":"V2_E12_01",
-"who":"Elena",
-"fase":"V",
-"text":"Allora dimmine una piccola. Non devi sistemare la giornata intera.",
-"opts":[
-{
-"t":"Mi sono fermato. Sto mangiando.",
-"to":"V2_E12_02"
-},
-{
-"t":"Ho bisogno di compagnia per un momento.",
-"to":"V2_E12_03"
-}
-]
-},
-{
-"id":"V2_E12_02",
-"who":"Elena",
-"fase":"V",
-"text":"Va bene. Per adesso bastano un tavolo e un messaggio che capisco.",
-"opts":[
-{
-"t":"Proseguiamo da qui.",
-"to":"ELE_cena_ritorno_06"
-},
-{
-"t":"Mi fermo su questo, per ora.",
-"to":"V2_E12_03"
-}
-]
-},
-{
-"id":"V2_E12_03",
-"who":"Elena",
-"fase":"V",
-"text":"Resto nella chat. Tu non devi diventare interessante per tenermi qui.",
-"alt":[
-{
-"req":"flag:e12c",
-"text":"Va bene. Non ti faccio domande. Se cambi idea, ricominci tu."
-}
-]
-},
-{
 "id":"V2_R01_01",
 "who":"Rosa",
 "fase":"II",
@@ -6224,322 +5911,6 @@ const CHAT_LIST = [
 "text":"Conservo gli originali. Nella ricerca, per ora, sei da solo."
 }
 ]
-},
-{
-"id":"V2_ELE_s25_01",
-"who":"Elena",
-"fase":"I",
-"text":"Quando dici cinque minuti, io intanto mi siedo.",
-"opts":[
-{
-"t":"Ti aggiorno senza inventare i minuti.",
-"to":"V2_ELE_s25_02",
-"fx":[
-"flag:e25"
-]
-},
-{
-"t":"Oggi la porta può andare in ferie.",
-"to":"V2_ELE_s25_03",
-"fx":[
-"flag:e25"
-]
-}
-]
-},
-{
-"id":"V2_ELE_s25_02",
-"who":"Elena",
-"fase":"I",
-"text":"È un’abitudine. Le attese in piedi mi fanno sentire già fregata.",
-"opts":[
-{
-"t":"Scrivo quello che so.",
-"to":"V2_ELE_s25_04"
-},
-{
-"t":"Ti lascio seduta tranquilla.",
-"to":"V2_ELE_s25_05"
-}
-]
-},
-{
-"id":"V2_ELE_s25_03",
-"who":"Elena",
-"fase":"I",
-"text":"Non ti sto cronometrando. Sto cercando di non passare la sera sulla porta.",
-"opts":[
-{
-"t":"Non voglio tenerti in attesa.",
-"to":"V2_ELE_s25_04"
-},
-{
-"t":"Niente conto alla rovescia, allora.",
-"to":"V2_ELE_s25_06"
-}
-]
-},
-{
-"id":"V2_ELE_s25_04",
-"who":"Elena",
-"fase":"I",
-"text":"Puoi scrivere non lo so. Non è una risposta che ti toglie dei punti.",
-"opts":[
-{
-"t":"Non lo so ancora. Ma ti tengo aggiornata.",
-"to":"V2_ELE_s25_05"
-},
-{
-"t":"Ti scrivo quando cambia davvero qualcosa.",
-"to":"V2_ELE_s25_06"
-}
-]
-},
-{
-"id":"V2_ELE_s25_05",
-"who":"Elena",
-"fase":"I",
-"text":"Va bene. Io mi siedo e tu smetti di fare il bollettino."
-},
-{
-"id":"V2_ELE_s25_06",
-"who":"Elena",
-"fase":"I",
-"text":"Allora niente orario. La conversazione non scade."
-},
-{
-"id":"V2_ELE_s50_01",
-"who":"Elena",
-"fase":"II",
-"text":"Ti mando mai un messaggio e poi lo riscrivo tre volte nella testa?",
-"opts":[
-{
-"t":"Sempre. Quello brillante arriva dopo la figuraccia.",
-"to":"V2_ELE_s50_02",
-"fx":[
-"flag:e50"
-]
-},
-{
-"t":"Sì. Poi finisco per non scrivere.",
-"to":"V2_ELE_s50_03",
-"fx":[
-"flag:e50"
-]
-}
-]
-},
-{
-"id":"V2_ELE_s50_02",
-"who":"Elena",
-"fase":"II",
-"text":"Lo faccio anch’io. La seconda versione è brillante. Nessuno la leggerà mai.",
-"opts":[
-{
-"t":"Allora ti mando quella imperfetta.",
-"to":"V2_ELE_s50_04"
-},
-{
-"t":"Quella brillante me la tengo per il notaio.",
-"to":"V2_ELE_s50_05"
-}
-]
-},
-{
-"id":"V2_ELE_s50_03",
-"who":"Elena",
-"fase":"II",
-"text":"Quella arrivata conta più della risposta perfetta che non mandi.",
-"opts":[
-{
-"t":"Ti dico se una frase non era giusta.",
-"to":"V2_ELE_s50_04"
-},
-{
-"t":"Non ti lascio indovinare il resto.",
-"to":"V2_ELE_s50_06"
-}
-]
-},
-{
-"id":"V2_ELE_s50_04",
-"who":"Elena",
-"fase":"II",
-"text":"Se hai scritto male una cosa, puoi correggerla senza ricominciare da zero.",
-"opts":[
-{
-"t":"Posso dire ho scritto male, senza sparire.",
-"to":"V2_ELE_s50_05"
-},
-{
-"t":"Ti scrivo poco, ma non ti taglio fuori.",
-"to":"V2_ELE_s50_06"
-}
-]
-},
-{
-"id":"V2_ELE_s50_05",
-"who":"Elena",
-"fase":"II",
-"text":"Accetto le correzioni. Le tre versioni segrete tienile per Pasta."
-},
-{
-"id":"V2_ELE_s50_06",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Un messaggio normale, anche storto."
-},
-{
-"id":"V2_ELE_s75_01",
-"who":"Elena",
-"fase":"II",
-"text":"Non voglio essere quella a cui scrivi soltanto va tutto bene.",
-"opts":[
-{
-"t":"A volte è la frase con cui provo a chiudere tutto.",
-"to":"V2_ELE_s75_02"
-},
-{
-"t":"Pensavo di risparmiarti una preoccupazione.",
-"to":"V2_ELE_s75_03"
-}
-]
-},
-{
-"id":"V2_ELE_s75_02",
-"who":"Elena",
-"fase":"II",
-"text":"Non mi serve il bollettino. Mi serve non essere tenuta fuori per farmi un favore.",
-"opts":[
-{
-"t":"Ti scrivo come sto, senza sistemarlo prima.",
-"to":"V2_ELE_s75_04"
-},
-{
-"t":"Oggi non riesco a raccontare tutto.",
-"to":"V2_ELE_s75_05"
-}
-]
-},
-{
-"id":"V2_ELE_s75_03",
-"who":"Elena",
-"fase":"II",
-"text":"Puoi non sapere cosa dire. Non devi lucidarlo per mandarmelo.",
-"opts":[
-{
-"t":"Posso iniziare da sono stanco.",
-"to":"V2_ELE_s75_04"
-},
-{
-"t":"Non ti tengo fuori chiamandola protezione.",
-"to":"V2_ELE_s75_06"
-}
-]
-},
-{
-"id":"V2_ELE_s75_04",
-"who":"Elena",
-"fase":"II",
-"text":"Se oggi puoi darmi solo una frase, dammi quella vera.",
-"opts":[
-{
-"t":"Una frase vera, allora.",
-"to":"V2_ELE_s75_05"
-},
-{
-"t":"Mi fermo prima di risponderti di fretta.",
-"to":"V2_ELE_s75_06"
-}
-]
-},
-{
-"id":"V2_ELE_s75_05",
-"who":"Elena",
-"fase":"II",
-"text":"La leggo. Anche senza una battuta sotto."
-},
-{
-"id":"V2_ELE_s75_06",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Non ti metto fretta per farmi sentire utile."
-},
-{
-"id":"V2_ELE_s100_01",
-"who":"Elena",
-"fase":"II",
-"text":"Non devi tornare con una bella storia. Mi basta che torni tu.",
-"opts":[
-{
-"t":"Me la ricorderò quando mi verrà da fingere.",
-"to":"V2_ELE_s100_02"
-},
-{
-"t":"Adesso mi bastava proprio questo.",
-"to":"V2_ELE_s100_03"
-}
-]
-},
-{
-"id":"V2_ELE_s100_02",
-"who":"Elena",
-"fase":"II",
-"text":"Non è una frase per farti correre. È per quando hai voglia di sembrare a posto.",
-"opts":[
-{
-"t":"Non te lo prometto per farmi perdonare.",
-"to":"V2_ELE_s100_04"
-},
-{
-"t":"Ti scrivo quando posso esserci davvero.",
-"to":"V2_ELE_s100_05"
-}
-]
-},
-{
-"id":"V2_ELE_s100_03",
-"who":"Elena",
-"fase":"II",
-"text":"Se oggi ti manca il coraggio di raccontare, puoi scrivere sono qui.",
-"opts":[
-{
-"t":"Sono qui. Non ho una frase migliore.",
-"to":"V2_ELE_s100_04"
-},
-{
-"t":"La prossima volta comincio da quello.",
-"to":"V2_ELE_s100_06"
-}
-]
-},
-{
-"id":"V2_ELE_s100_04",
-"who":"Elena",
-"fase":"II",
-"text":"Nonno lo tengo per quando ricominci a brontolare. Questo lo dico senza.",
-"opts":[
-{
-"t":"Tieni pure la battuta per dopo.",
-"to":"V2_ELE_s100_05"
-},
-{
-"t":"Non serve il soprannome adesso. Ho capito.",
-"to":"V2_ELE_s100_06"
-}
-]
-},
-{
-"id":"V2_ELE_s100_05",
-"who":"Elena",
-"fase":"II",
-"text":"Sono qui. Ti tengo la conversazione aperta, non la cena in ostaggio."
-},
-{
-"id":"V2_ELE_s100_06",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Nessuna versione migliore di te richiesta all’ingresso."
 },
 {
 "id":"V2_ROS_s25_01",
@@ -10157,7 +9528,7 @@ const CHAT_LIST = [
 "text":"Che cosa volevi chiedermi?",
 "opts":[
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_Q2_M2",
 "fx":[
 "flag:q32"
@@ -10173,17 +9544,10 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q2_M2",
 "who":"Elena",
 "fase":"IV",
-"text":"Per risparmiarti una conversazione infinita.",
+"text":"Usava il trapano. A mezzanotte.",
 "opts":[
 {
-"t":"Lo tengo.",
-"to":"V2_CASA_03_fine",
-"fx":[
-"chiude:V2_CASA_03_Q2_M2"
-]
-},
-{
-"t":"Un’altra.",
+"t":"Torno ai messaggi.",
 "to":"V2_CASA_03_fine",
 "fx":[
 "chiude:V2_CASA_03_Q2_M2"
@@ -10205,7 +9569,7 @@ const CHAT_LIST = [
 ]
 },
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_Q2_M3",
 "fx":[
 "flag:q32"
@@ -10243,7 +9607,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q2_M3",
 "who":"Elena",
 "fase":"IV",
-"text":"Per risparmiarti una conversazione infinita.",
+"text":"Usava il trapano. A mezzanotte.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10284,17 +9648,10 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q3_M4",
 "who":"Elena",
 "fase":"IV",
-"text":"No. Mi stava annoiando. È diverso.",
+"text":"No. Mi teneva sveglia.",
 "opts":[
 {
-"t":"Lo tengo.",
-"to":"V2_CASA_03_fine",
-"fx":[
-"chiude:V2_CASA_03_Q3_M4"
-]
-},
-{
-"t":"Un’altra.",
+"t":"Torno ai messaggi.",
 "to":"V2_CASA_03_fine",
 "fx":[
 "chiude:V2_CASA_03_Q3_M4"
@@ -10354,7 +9711,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q3_M5",
 "who":"Elena",
 "fase":"IV",
-"text":"No. Mi stava annoiando. È diverso.",
+"text":"No. Mi teneva sveglia.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10379,7 +9736,7 @@ const CHAT_LIST = [
 "text":"Che cosa volevi chiedermi?",
 "opts":[
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_Q2_M6",
 "fx":[
 "flag:q32"
@@ -10402,7 +9759,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q2_M6",
 "who":"Elena",
 "fase":"IV",
-"text":"Per risparmiarti una conversazione infinita.",
+"text":"Usava il trapano. A mezzanotte.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10424,7 +9781,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q3_M6",
 "who":"Elena",
 "fase":"IV",
-"text":"No. Mi stava annoiando. È diverso.",
+"text":"No. Mi teneva sveglia.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10456,7 +9813,7 @@ const CHAT_LIST = [
 ]
 },
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_Q2_M7",
 "fx":[
 "flag:q32"
@@ -10497,7 +9854,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q2_M7",
 "who":"Elena",
 "fase":"IV",
-"text":"Per risparmiarti una conversazione infinita.",
+"text":"Usava il trapano. A mezzanotte.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10519,7 +9876,7 @@ const CHAT_LIST = [
 "id":"V2_CASA_03_Q3_M7",
 "who":"Elena",
 "fase":"IV",
-"text":"No. Mi stava annoiando. È diverso.",
+"text":"No. Mi teneva sveglia.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10610,7 +9967,7 @@ const CHAT_LIST = [
 "req":"flag:ev_voce_imitata",
 "opts":[
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_P_Q2_M2",
 "fx":[
 "flag:q32"
@@ -10627,17 +9984,10 @@ const CHAT_LIST = [
 "who":"Sconosciuto",
 "fase":"IV",
 "as":"Elena",
-"text":"Perché non vivo con nessuno.",
+"text":"Cucinava. Aspettavo che liberasse il tavolo.",
 "opts":[
 {
-"t":"Lo tengo.",
-"to":"V2_CASA_03_P_fine",
-"fx":[
-"chiude:V2_CASA_03_P_Q2_M2"
-]
-},
-{
-"t":"Un’altra.",
+"t":"Torno ai messaggi.",
 "to":"V2_CASA_03_P_fine",
 "fx":[
 "chiude:V2_CASA_03_P_Q2_M2"
@@ -10661,7 +10011,7 @@ const CHAT_LIST = [
 ]
 },
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_P_Q2_M3",
 "fx":[
 "flag:q32"
@@ -10701,7 +10051,7 @@ const CHAT_LIST = [
 "who":"Sconosciuto",
 "fase":"IV",
 "as":"Elena",
-"text":"Perché non vivo con nessuno.",
+"text":"Cucinava. Aspettavo che liberasse il tavolo.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10846,7 +10196,7 @@ const CHAT_LIST = [
 "req":"flag:ev_voce_imitata",
 "opts":[
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_P_Q2_M6",
 "fx":[
 "flag:q32"
@@ -10870,7 +10220,7 @@ const CHAT_LIST = [
 "who":"Sconosciuto",
 "fase":"IV",
 "as":"Elena",
-"text":"Perché non vivo con nessuno.",
+"text":"Cucinava. Aspettavo che liberasse il tavolo.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -10926,7 +10276,7 @@ const CHAT_LIST = [
 ]
 },
 {
-"t":"Perché non mi hai passato il coinquilino?",
+"t":"Che faceva il coinquilino?",
 "to":"V2_CASA_03_P_Q2_M7",
 "fx":[
 "flag:q32"
@@ -10969,7 +10319,7 @@ const CHAT_LIST = [
 "who":"Sconosciuto",
 "fase":"IV",
 "as":"Elena",
-"text":"Perché non vivo con nessuno.",
+"text":"Cucinava. Aspettavo che liberasse il tavolo.",
 "opts":[
 {
 "t":"Lo tengo.",
@@ -16381,492 +15731,6 @@ const CHAT_LIST = [
 ]
 },
 {
-"id":"V2_ELE_n1_01",
-"who":"Elena",
-"fase":"I",
-"text":"Pasta ha camminato sulla tastiera. Aveva un aggiornamento più lungo del tuo.",
-"opts":[
-{
-"t":"Licenzialo. Quel figlio di puttana scrive meglio di me.",
-"to":"V2_ELE_n1_02"
-},
-{
-"t":"Una riga inutile mi farebbe bene.",
-"to":"V2_ELE_n1_03"
-}
-]
-},
-{
-"id":"V2_ELE_n1_02",
-"who":"Elena",
-"fase":"I",
-"text":"Non si capiva un cazzo, ma almeno non finiva con tutto bene.",
-"opts":[
-{
-"t":"Due parentesi e una zampa: la mia autobiografia.",
-"to":"V2_ELE_n1_04"
-},
-{
-"t":"Mandami la versione corretta da te.",
-"to":"V2_ELE_n1_05"
-}
-]
-},
-{
-"id":"V2_ELE_n1_03",
-"who":"Elena",
-"fase":"I",
-"text":"Lo cancello. Non voglio abituarti a conversazioni migliori delle mie.",
-"opts":[
-{
-"t":"Non devo rendere utile ogni messaggio.",
-"to":"V2_ELE_n1_04"
-},
-{
-"t":"Oggi posso parlare anche di niente.",
-"to":"V2_ELE_n1_06"
-}
-]
-},
-{
-"id":"V2_ELE_n1_04",
-"who":"Elena",
-"fase":"I",
-"text":"Puoi mandare anche una riga inutile. Non mi pagano per smistarti le emergenze.",
-"opts":[
-{
-"t":"Ti mando un saluto senza una richiesta sotto.",
-"to":"V2_ELE_n1_05"
-},
-{
-"t":"Ti lascio scegliere l’argomento per una volta.",
-"to":"V2_ELE_n1_06"
-}
-]
-},
-{
-"id":"V2_ELE_n1_05",
-"who":"Elena",
-"fase":"I",
-"text":"Va bene. Pasta è stato promosso a collega e io resto tua sorella.",
-"alt":[
-{
-"req":"flag:elena_difende_pasta",
-"text":"Il gatto ha l’avvocato. Non devi essere utile anche a me."
-}
-]
-},
-{
-"id":"V2_ELE_n1_06",
-"who":"Elena",
-"fase":"I",
-"text":"Allora oggi niente aggiornamenti obbligatori. Solo una chat normale."
-},
-{
-"id":"V2_ELE_n2_01",
-"who":"Elena",
-"fase":"II",
-"text":"Quando scriviamo dopo, intendi dopo davvero o sparisco con una parola educata?",
-"opts":[
-{
-"t":"Dopo è il cassetto dove infilo le cose che mi pesano.",
-"to":"V2_ELE_n2_02"
-},
-{
-"t":"Adesso mi serve spazio, non un orario.",
-"to":"V2_ELE_n2_03"
-}
-]
-},
-{
-"id":"V2_ELE_n2_02",
-"who":"Elena",
-"fase":"II",
-"text":"Chiedo per entrambi. Non ho voglia di fare la polizia dei tuoi orari.",
-"opts":[
-{
-"t":"Ti dico che non so quando.",
-"to":"V2_ELE_n2_04"
-},
-{
-"t":"Non ti metto in attesa mentre fingo di organizzarmi.",
-"to":"V2_ELE_n2_05"
-}
-]
-},
-{
-"id":"V2_ELE_n2_03",
-"who":"Elena",
-"fase":"II",
-"text":"Se ti serve spazio, scrivi spazio. Capisco anche quello.",
-"opts":[
-{
-"t":"Spazio. Ecco, l’ho scritto. Fa un po’ schifo.",
-"to":"V2_ELE_n2_04"
-},
-{
-"t":"Non è per mandarti via.",
-"to":"V2_ELE_n2_06"
-}
-]
-},
-{
-"id":"V2_ELE_n2_04",
-"who":"Elena",
-"fase":"II",
-"text":"Possiamo smettere di usare un orario come una promessa che non sentiamo.",
-"opts":[
-{
-"t":"Ti scrivo quando ho qualcosa da condividere.",
-"to":"V2_ELE_n2_05"
-},
-{
-"t":"Per oggi mi fermo qui.",
-"to":"V2_ELE_n2_06"
-}
-]
-},
-{
-"id":"V2_ELE_n2_05",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. Il dopo rimane aperto, non diventa una sala d’attesa."
-},
-{
-"id":"V2_ELE_n2_06",
-"who":"Elena",
-"fase":"II",
-"text":"Allora ti lascio spazio. Il primo messaggio lo mandi tu quando puoi esserci."
-},
-{
-"id":"V2_ELE_n3_01",
-"who":"Elena",
-"fase":"II",
-"text":"La foto che volevi farmi vedere è diventata un servizio fotografico?",
-"opts":[
-{
-"t":"Te la mando com’è, senza prepararla.",
-"to":"V2_ELE_n3_02",
-"fx":[
-"flag:en3"
-]
-},
-{
-"t":"Oggi mi pesa perfino fare una foto.",
-"to":"V2_ELE_n3_03"
-}
-]
-},
-{
-"id":"V2_ELE_n3_02",
-"who":"Elena",
-"fase":"II",
-"text":"Non sistemare tutto prima. Non devo decidere se comprare la tua macchina.",
-"opts":[
-{
-"t":"Tolgo solo la scritta affare imperdibile.",
-"to":"V2_ELE_n3_04"
-},
-{
-"t":"Ti faccio vedere anche quello che non mi convince.",
-"to":"V2_ELE_n3_05"
-}
-]
-},
-{
-"id":"V2_ELE_n3_03",
-"who":"Elena",
-"fase":"II",
-"text":"Se oggi non vuoi mandarla, dimmelo. Non la trasformiamo in un altro compito.",
-"opts":[
-{
-"t":"Non te la mando oggi. Senza scuse strane.",
-"to":"V2_ELE_n3_04"
-},
-{
-"t":"Mi dai tempo senza dovermi ricordare la promessa?",
-"to":"V2_ELE_n3_06"
-}
-]
-},
-{
-"id":"V2_ELE_n3_04",
-"who":"Elena",
-"fase":"II",
-"text":"Una cosa vera va bene anche se non ti fa fare bella figura.",
-"opts":[
-{
-"t":"Non devo venderti una scelta perfetta.",
-"to":"V2_ELE_n3_05"
-},
-{
-"t":"Non ti faccio fare anche da perito.",
-"to":"V2_ELE_n3_06"
-}
-]
-},
-{
-"id":"V2_ELE_n3_05",
-"who":"Elena",
-"fase":"II",
-"text":"Ecco. Almeno posso prenderla in giro per il motivo giusto.",
-"alt":[
-{
-"req":"flag:en3",
-"text":"Mi hai mandato la foto com’è. Meglio di un annuncio."
-}
-]
-},
-{
-"id":"V2_ELE_n3_06",
-"who":"Elena",
-"fase":"II",
-"text":"Va bene. La foto resta una possibilità, non un debito."
-},
-{
-"id":"V2_ELE_n4_01",
-"who":"Elena",
-"fase":"III",
-"text":"La scusa di prima vale ancora anche se oggi sono io quella nervosa?",
-"opts":[
-{
-"t":"Vale. La scusa non era un buono per fare lo stronzo.",
-"to":"V2_ELE_n4_02"
-},
-{
-"t":"Se vuoi fermarti, non lo prendo come una vendetta.",
-"to":"V2_ELE_n4_03"
-}
-]
-},
-{
-"id":"V2_ELE_n4_02",
-"who":"Elena",
-"fase":"III",
-"text":"Non ti restituisco la frase cattiva per fare pari. Però mi serviva chiedertelo.",
-"opts":[
-{
-"t":"Ti leggo. Oggi niente tribunale dei coglioni.",
-"to":"V2_ELE_n4_04"
-},
-{
-"t":"Posso anche chiederti una pausa.",
-"to":"V2_ELE_n4_05"
-}
-]
-},
-{
-"id":"V2_ELE_n4_03",
-"who":"Elena",
-"fase":"III",
-"text":"Puoi dirmi di fermarmi prima che ricominciamo a risponderci male.",
-"opts":[
-{
-"t":"Te lo dico prima di sbottare.",
-"to":"V2_ELE_n4_04"
-},
-{
-"t":"Oggi mi fermo qui, senza sparire per dispetto.",
-"to":"V2_ELE_n4_06"
-}
-]
-},
-{
-"id":"V2_ELE_n4_04",
-"who":"Elena",
-"fase":"III",
-"text":"Non dobbiamo vincere la serata per volerci ancora parlare.",
-"opts":[
-{
-"t":"Non devo avere ragione per restare nella chat.",
-"to":"V2_ELE_n4_05"
-},
-{
-"t":"Riprendiamo dopo senza un conto da saldare.",
-"to":"V2_ELE_n4_06"
-}
-]
-},
-{
-"id":"V2_ELE_n4_05",
-"who":"Elena",
-"fase":"III",
-"text":"Va bene. Oggi comincio io con sono stanca.",
-"alt":[
-{
-"req":"flag:elena_scuse",
-"text":"Prima hai chiesto scusa. Oggi posso farlo io, senza pareggi."
-}
-]
-},
-{
-"id":"V2_ELE_n4_06",
-"who":"Elena",
-"fase":"III",
-"text":"Allora fermiamoci senza lasciare una punizione nascosta nel silenzio."
-},
-{
-"id":"V2_ELE_n5_01",
-"who":"Elena",
-"fase":"III",
-"text":"Tre incontri con Claudio. Non devi ricostruire una vita per avere diritto al temperino.",
-"opts":[
-{
-"t":"Ricordo il regalo. Il resto non voglio inventarlo.",
-"to":"V2_ELE_n5_02"
-},
-{
-"t":"Mi sento strano ad avere così poco da raccontare.",
-"to":"V2_ELE_n5_03"
-}
-]
-},
-{
-"id":"V2_ELE_n5_02",
-"who":"Elena",
-"fase":"III",
-"text":"Puoi ricordare poco. Non significa che quel poco sia finto.",
-"opts":[
-{
-"t":"Lo tengo senza aggiungere una storia.",
-"to":"V2_ELE_n5_04"
-},
-{
-"t":"Il vuoto lo lascio. Mi fa venire voglia di barare.",
-"to":"V2_ELE_n5_05"
-}
-]
-},
-{
-"id":"V2_ELE_n5_03",
-"who":"Elena",
-"fase":"III",
-"text":"Se una cosa non la sai, non devi prenderla in prestito da un racconto bello.",
-"opts":[
-{
-"t":"Posso fermarmi a quello che c’è.",
-"to":"V2_ELE_n5_04"
-},
-{
-"t":"Mi aiuta che tu lo dica così.",
-"to":"V2_ELE_n5_06"
-}
-]
-},
-{
-"id":"V2_ELE_n5_04",
-"who":"Elena",
-"fase":"III",
-"text":"A me basta che mi dici quale pezzo ricordi davvero.",
-"opts":[
-{
-"t":"È un pezzo piccolo, ma è mio.",
-"to":"V2_ELE_n5_05"
-},
-{
-"t":"Non completo il resto per farmi perdonare.",
-"to":"V2_ELE_n5_06"
-}
-]
-},
-{
-"id":"V2_ELE_n5_05",
-"who":"Elena",
-"fase":"III",
-"text":"Va bene. Restiamo a quello. Non ti chiedo di diventare suo figlio per capirlo."
-},
-{
-"id":"V2_ELE_n5_06",
-"who":"Elena",
-"fase":"III",
-"text":"Allora il temperino resta un regalo, non un esame su quanto gli volevi bene."
-},
-{
-"id":"V2_ELE_n6_01",
-"who":"Elena",
-"fase":"IV",
-"text":"Prima mi hai chiesto di non domandarti altro. Vale ancora?",
-"opts":[
-{
-"t":"Non vale più. Voglio parlarti.",
-"to":"V2_ELE_n6_02",
-"fx":[
-"flag:en6"
-]
-},
-{
-"t":"Vale ancora. Te lo chiedo senza arrabbiarmi.",
-"to":"V2_ELE_n6_03"
-}
-]
-},
-{
-"id":"V2_ELE_n6_02",
-"who":"Elena",
-"fase":"IV",
-"text":"Se sì, smetto. Non voglio farti guadagnare il silenzio rispondendo bene.",
-"opts":[
-{
-"t":"Grazie per avermelo chiesto una volta sola.",
-"to":"V2_ELE_n6_04"
-},
-{
-"t":"Non devi guadagnarti una risposta.",
-"to":"V2_ELE_n6_05"
-}
-]
-},
-{
-"id":"V2_ELE_n6_03",
-"who":"Elena",
-"fase":"IV",
-"text":"Se no, possiamo ricominciare da una cosa piccola.",
-"opts":[
-{
-"t":"Comincio da come sto adesso.",
-"to":"V2_ELE_n6_04"
-},
-{
-"t":"Una cosa normale mi aiuta.",
-"to":"V2_ELE_n6_06"
-}
-]
-},
-{
-"id":"V2_ELE_n6_04",
-"who":"Elena",
-"fase":"IV",
-"text":"Dimmi tu se vuoi compagnia o spazio. Non lo indovino facendo la sorella brava.",
-"opts":[
-{
-"t":"Compagnia. Anche se mi racconti una giornata di merda.",
-"to":"V2_ELE_n6_05"
-},
-{
-"t":"Spazio, per oggi.",
-"to":"V2_ELE_n6_06"
-}
-]
-},
-{
-"id":"V2_ELE_n6_05",
-"who":"Elena",
-"fase":"IV",
-"text":"Va bene. Resto nella chat senza riempirla.",
-"alt":[
-{
-"req":"flag:en6",
-"text":"Prima avevi chiuso le domande. Adesso hai scelto di riaprire: lo rispetto."
-}
-]
-},
-{
-"id":"V2_ELE_n6_06",
-"who":"Elena",
-"fase":"IV",
-"text":"Allora oggi spazio. Scrivimi tu quando vuoi riaprire."
-},
-{
 "id":"V2_ROS_n1_01",
 "who":"Rosa",
 "fase":"II",
@@ -18238,6 +17102,6 @@ const CHAT_LIST = [
 "text":"Bene. Spegni i fari quando arrivi, così non ci vedono."
 }
 ];
-const CHAT_START = [{"id":"st_ELE_ritiro_01","th":"Elena","node":"ELE_ritiro_01","km":18},{"id":"st_ELE_pasta_01","th":"Elena","node":"ELE_pasta_01","km":32},{"id":"st_ELE_turno_01","th":"Elena","node":"ELE_turno_01","km":46},{"id":"st_ELE_coinquilino_01","th":"Elena","node":"ELE_coinquilino_01","km":60},{"id":"st_ELE_cena_01","th":"Elena","node":"ELE_cena_01","km":74},{"id":"st_ELE_bollette_01","th":"Elena","node":"ELE_bollette_01","km":88},{"id":"st_ELE_temperino_fissato","th":"Elena","node":"ELE_temperino_fissato","km":102,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ELE_claudio_fissato","th":"Elena","node":"ELE_claudio_fissato","km":116,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ELE_richiamo_01","th":"Elena","node":"ELE_richiamo_01","km":130,"req":["flag:elena_sosta_promessa"]},{"id":"st_ROS_attrezzi_01","th":"Rosa","node":"ROS_attrezzi_01","km":144},{"id":"st_PRE_1_01","th":"Sconosciuto","node":"PRE_1_01","km":158},{"id":"st_ELE_litigio_01","th":"Elena","node":"ELE_litigio_01","km":172},{"id":"st_ROS_prudenza_01","th":"Rosa","node":"ROS_prudenza_01","km":186},{"id":"st_PRE_1_02","th":"Sconosciuto","node":"PRE_1_02","km":200},{"id":"st_ELE_distanza_01","th":"Elena","node":"ELE_distanza_01","km":200,"req":["flag:ev_distanza_impossibile"]},{"id":"st_PRE_1_03","th":"Sconosciuto","node":"PRE_1_03","km":214},{"id":"st_PRE_1_06","th":"Sconosciuto","node":"PRE_1_06","km":228},{"id":"st_PRE_1_07","th":"Sconosciuto","node":"PRE_1_07","km":242},{"id":"st_ELE_riparazione_01","th":"Elena","node":"ELE_riparazione_01","km":270,"req":["flag:elena_litigio"]},{"id":"st_ROS_ricontrollo_01","th":"Rosa","node":"ROS_ricontrollo_01","km":284,"req":["flag:rosa_sosta_accettata"]},{"id":"st_LIV_primo_01","th":"Livia","node":"LIV_primo_01","km":298},{"id":"st_ROS_passato_01","th":"Rosa","node":"ROS_passato_01","km":312},{"id":"st_LIV_affido_01","th":"Livia","node":"LIV_affido_01","km":326},{"id":"st_ROS_promessa_01","th":"Rosa","node":"ROS_promessa_01","km":340,"req":["flag:promessa_rosa"]},{"id":"st_LIV_ottavio_01","th":"Livia","node":"LIV_ottavio_01","km":354},{"id":"st_ROS_dopo_passaggio_01","th":"Rosa","node":"ROS_dopo_passaggio_01","km":354,"req":["flag:ev_incursione_1_conclusa"]},{"id":"st_ELE_nonno_01","th":"Elena","node":"ELE_nonno_01","km":430},{"id":"st_ROS_segni_01","th":"Rosa","node":"ROS_segni_01","km":430,"req":["flag:ev_indizio_sangue"]},{"id":"st_LIV_fiducia_01","th":"Livia","node":"LIV_fiducia_01","km":444,"req":["flag:prova_trattenuta"]},{"id":"st_SPORCO_01","th":"Elena","node":"SPORCO_01","km":458,"req":["flag:nonno_uso_fissato"]},{"id":"st_LIV_irene_01","th":"Livia","node":"LIV_irene_01","km":458,"req":["flag:ev_foto_originale"]},{"id":"st_SPORCO_02","th":"Elena","node":"SPORCO_02","km":472,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_03","th":"Elena","node":"SPORCO_03","km":486,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_04","th":"Elena","node":"SPORCO_04","km":500,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_05","th":"Elena","node":"SPORCO_05","km":514,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_06","th":"Elena","node":"SPORCO_06","km":528,"req":["flag:nonno_uso_fissato"]},{"id":"st_PRE_2_01","th":"Elena","node":"PRE_2_01","km":542},{"id":"st_PRE_2_02","th":"Elena","node":"PRE_2_02","km":556},{"id":"st_PRE_2_03","th":"Elena","node":"PRE_2_03","km":570},{"id":"st_PRE_2_06","th":"Elena","node":"PRE_2_06","km":584},{"id":"st_PRE_2_07","th":"Elena","node":"PRE_2_07","km":598},{"id":"st_PRE_3_01","th":"Zio Claudio","node":"PRE_3_01","km":612},{"id":"st_PRE_3_02","th":"Zio Claudio","node":"PRE_3_02","km":626},{"id":"st_PRE_3_03","th":"Zio Claudio","node":"PRE_3_03","km":640},{"id":"st_PRE_3_06","th":"Zio Claudio","node":"PRE_3_06","km":654},{"id":"st_PRE_3_07","th":"Zio Claudio","node":"PRE_3_07","km":668},{"id":"st_ELE_cena_ritorno_01","th":"Elena","node":"ELE_cena_ritorno_01","km":668,"req":["flag:elena_non_aspettare","flag:ev_fase_v"]},{"id":"st_ROS_recupero_01","th":"Rosa","node":"ROS_recupero_01","km":668,"req":["flag:promessa_rosa_chiarita","flag:ev_fase_v"]},{"id":"st_LIV_promessa_01","th":"Livia","node":"LIV_promessa_01","km":668,"req":["flag:promessa_rosa_chiarita","flag:ev_fase_v"]},{"id":"st_PRE_4_01","th":"Sconosciuto","node":"PRE_4_01","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_ROS_guardia_01","th":"Rosa","node":"ROS_guardia_01","km":668,"req":["flag:ev_fase_v"]},{"id":"st_PRE_4_02","th":"Sconosciuto","node":"PRE_4_02","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_ROS_prima_porta_01","th":"Rosa","node":"ROS_prima_porta_01","km":668,"req":["flag:promessa_rosa","flag:ev_fase_v"]},{"id":"st_PRE_4_03","th":"Sconosciuto","node":"PRE_4_03","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_PRE_4_06","th":"Sconosciuto","node":"PRE_4_06","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_PRE_4_07","th":"Sconosciuto","node":"PRE_4_07","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_DAR_traslochi_01","th":"Dario","node":"DAR_traslochi_01","km":256,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ROS_vivavoce_01","th":"Rosa","node":"ROS_vivavoce_01","km":300,"req":["fatto:ROS_passato_01","conf:Livia>=15"]},{"id":"st_V2_ELE_n1_01","th":"Elena","node":"V2_ELE_n1_01","km":18,"req":["flag:e25"]},{"id":"st_V2_ELE_n2_01","th":"Elena","node":"V2_ELE_n2_01","km":130,"req":["flag:e50"]},{"id":"st_V2_ELE_n4_01","th":"Elena","node":"V2_ELE_n4_01","km":270,"req":["flag:elena_scuse"]},{"id":"st_V2_ELE_n5_01","th":"Elena","node":"V2_ELE_n5_01","km":278,"req":["flag:temperino_detto_elena"]},{"id":"st_V2_ELE_n6_01","th":"Elena","node":"V2_ELE_n6_01","km":430,"req":["flag:e08c"]},{"id":"st_V2_ROS_n1_01","th":"Rosa","node":"V2_ROS_n1_01","km":130,"req":["flag:r25"]},{"id":"st_V2_ROS_n2_01","th":"Rosa","node":"V2_ROS_n2_01","km":138,"req":["flag:r50"]},{"id":"st_V2_ROS_n3_01","th":"Rosa","node":"V2_ROS_n3_01","km":270,"req":["flag:r75"]},{"id":"st_V2_ROS_n4_01","th":"Rosa","node":"V2_ROS_n4_01","km":278,"req":["flag:r01b"]},{"id":"st_V2_ROS_n5_01","th":"Rosa","node":"V2_ROS_n5_01","km":600,"req":["flag:r05c","flag:ev_fase_v"]},{"id":"st_V2_ROS_n6_01","th":"Rosa","node":"V2_ROS_n6_01","km":608,"req":["flag:r100","flag:ev_fase_v"]},{"id":"st_V2_LIV_n1_01","th":"Livia","node":"V2_LIV_n1_01","km":270,"req":["flag:l25"]},{"id":"st_V2_LIV_n2_01","th":"Livia","node":"V2_LIV_n2_01","km":278,"req":["flag:l50"]},{"id":"st_V2_LIV_n3_01","th":"Livia","node":"V2_LIV_n3_01","km":286,"req":["flag:l75"]},{"id":"st_V2_LIV_n4_01","th":"Livia","node":"V2_LIV_n4_01","km":430,"req":["flag:l02c"]},{"id":"st_V2_LIV_n5_01","th":"Livia","node":"V2_LIV_n5_01","km":438,"req":["flag:foto"]},{"id":"st_V2_LIV_n6_01","th":"Livia","node":"V2_LIV_n6_01","km":600,"req":["flag:l100","flag:ev_fase_v"]},{"id":"st_DAR_imit_01","th":"Dario","node":"DAR_imit_01","km":430,"req":["flag:ev_imitazione_dario"]},{"id":"st_V2_LUOGO_tokyo_01","th":"Elena","node":"V2_LUOGO_tokyo_01","km":26,"req":["flag:luogo_tokyo"]},{"id":"st_V2_LUOGO_roma_01","th":"Elena","node":"V2_LUOGO_roma_01","km":34,"req":["flag:luogo_roma"]},{"id":"st_V2_LUOGO_parigi_01","th":"Elena","node":"V2_LUOGO_parigi_01","km":138,"req":["flag:luogo_parigi"]},{"id":"st_V2_LUOGO_londra_01","th":"Rosa","node":"V2_LUOGO_londra_01","km":286,"req":["flag:luogo_londra"]},{"id":"st_V2_LUOGO_stoccolma_01","th":"Livia","node":"V2_LUOGO_stoccolma_01","km":294,"req":["flag:luogo_stoccolma"]},{"id":"st_V2_LUOGO_berlino_01","th":"Rosa","node":"V2_LUOGO_berlino_01","km":294,"req":["flag:luogo_berlino"]},{"id":"st_V2_LUOGO_praga_01","th":"Rosa","node":"V2_LUOGO_praga_01","km":302,"req":["flag:luogo_praga"]},{"id":"st_V2_LUOGO_vienna_01","th":"Elena","node":"V2_LUOGO_vienna_01","km":286,"req":["flag:luogo_vienna"]},{"id":"st_V2_LUOGO_madrid_01","th":"Elena","node":"V2_LUOGO_madrid_01","km":438,"req":["flag:luogo_madrid"]},{"id":"st_V2_LUOGO_lisbona_01","th":"Livia","node":"V2_LUOGO_lisbona_01","km":446,"req":["flag:luogo_lisbona"]},{"id":"st_V2_LUOGO_atene_01","th":"Rosa","node":"V2_LUOGO_atene_01","km":616,"req":["flag:luogo_atene","flag:ev_fase_v"]},{"id":"st_V2_LUOGO_washington_01","th":"Livia","node":"V2_LUOGO_washington_01","km":608,"req":["flag:luogo_washington","flag:ev_fase_v"]}];
-const CHAT_TONI_MAP = {"ELE_ritiro_01":["sincero","evasivo","freddo"],"ELE_ritiro_02":["sincero","freddo"],"ELE_ritiro_03":["gentile","ironico"],"ELE_ritiro_04":["pacato"],"ELE_ritiro_05":["sincero","freddo"],"ELE_ritiro_06":["sincero","freddo","freddo"],"ELE_ritiro_07":["gentile","evasivo"],"ELE_pasta_01":["ironico","pacato","sincero"],"ELE_pasta_02":["ironico","pacato"],"ELE_pasta_03":["ironico","sincero"],"ELE_pasta_04":["ironico","pacato"],"ELE_pasta_05":["ironico","ironico"],"ELE_pasta_06":["sincero","ironico"],"ELE_pasta_07":["ironico","ironico","sincero"],"ELE_turno_01":["sboccato","pacato","sincero"],"ELE_turno_02":["pacato","gentile"],"ELE_turno_03":["gentile","pacato"],"ELE_turno_04":["sincero","pacato"],"ELE_turno_05":["gentile","pacato"],"ELE_turno_06":["pacato","gentile"],"ELE_turno_07":["pacato","ironico","sincero"],"ELE_coinquilino_01":["pacato","pacato","sincero"],"ELE_coinquilino_02":["gentile","ironico"],"ELE_coinquilino_03":["gentile","ironico"],"ELE_coinquilino_04":["gentile","freddo"],"ELE_coinquilino_05":["sincero","gentile"],"ELE_coinquilino_06":["sincero","gentile"],"ELE_coinquilino_07":["pacato","sincero","sincero"],"ELE_cena_01":["sincero","pacato","sincero"],"ELE_cena_02":["gentile","gentile"],"ELE_cena_03":["pacato","gentile"],"ELE_cena_04":["ironico","pacato"],"ELE_cena_05":["pacato","gentile"],"ELE_cena_06":["pacato","gentile"],"ELE_cena_07":["ironico","sincero","sincero"],"ELE_bollette_01":["ironico","pacato","sincero"],"ELE_bollette_02":["gentile","evasivo"],"ELE_bollette_03":["gentile","sincero"],"ELE_bollette_04":["pacato","sincero"],"ELE_bollette_05":["pacato","pacato"],"ELE_bollette_06":["ironico","pacato"],"ELE_bollette_07":["ironico","ironico","sincero"],"ELE_richiamo_01":["sincero","pacato","sincero"],"ELE_richiamo_02":["sincero","sincero"],"ELE_richiamo_03":["sincero","sincero"],"ELE_richiamo_04":["sincero","sincero"],"ELE_richiamo_05":["sincero","sincero"],"ELE_richiamo_06":["gentile","evasivo"],"ELE_richiamo_07":["sincero","pacato","sincero"],"ELE_litigio_01":["freddo","sincero","sincero"],"ELE_litigio_02":["freddo","gentile"],"ELE_litigio_03":["ironico","sincero"],"ELE_litigio_04":["freddo","sincero"],"ELE_litigio_05":["gentile","freddo"],"ELE_litigio_06":["evasivo","sincero"],"ELE_distanza_01":["sincero","pacato","sincero"],"ELE_distanza_02":["pacato","pacato"],"ELE_distanza_03":["pacato","sincero"],"ELE_distanza_04":["sincero","pacato"],"ELE_distanza_05":["pacato","pacato"],"ELE_distanza_06":["pacato","pacato"],"ELE_distanza_07":["gentile","pacato","sincero"],"ELE_riparazione_01":["sincero","pacato","sincero"],"ELE_riparazione_02":["sincero","sincero"],"ELE_riparazione_03":["sincero","pacato"],"ELE_riparazione_04":["sincero","pacato"],"ELE_riparazione_05":["pacato","gentile"],"ELE_riparazione_06":["sincero","sincero"],"ELE_riparazione_07":["sincero","pacato","sincero"],"ELE_nonno_01":["ironico","pacato","sincero"],"ELE_nonno_02":["pacato","ironico"],"ELE_nonno_03":["sincero","gentile"],"ELE_nonno_04":["pacato","ironico"],"ELE_nonno_05":["sincero","sincero"],"ELE_nonno_06":["sincero","pacato"],"ELE_nonno_07":["gentile","ironico","sincero"],"ELE_cena_ritorno_01":["gentile","pacato","sincero"],"ELE_cena_ritorno_02":["sincero","sincero"],"ELE_cena_ritorno_03":["pacato","sincero"],"ELE_cena_ritorno_04":["gentile","gentile"],"ELE_cena_ritorno_05":["sincero","sincero"],"ELE_cena_ritorno_06":["pacato","sincero"],"ELE_cena_ritorno_07":["sincero","sincero","sincero"],"ELE_temperino_fissato":["sincero","sincero"],"ELE_claudio_fissato":["sincero","sincero"],"ROS_attrezzi_01":["sboccato","pacato","sincero"],"ROS_attrezzi_02":["pacato","pacato","sboccato"],"ROS_attrezzi_03":["pacato","gentile"],"ROS_attrezzi_04":["pacato","pacato"],"ROS_attrezzi_05":["gentile","pacato","sboccato"],"ROS_attrezzi_06":["pacato","ironico"],"ROS_attrezzi_07":["pacato","ironico","sincero"],"ROS_prudenza_01":["sincero","pacato","sincero"],"ROS_prudenza_02":["pacato","evasivo"],"ROS_prudenza_03":["sincero","gentile"],"ROS_prudenza_04":["pacato","pacato"],"ROS_prudenza_05":["pacato","ironico","sboccato"],"ROS_prudenza_06":["pacato","gentile"],"ROS_prudenza_07":["sincero","pacato","sincero"],"ROS_ricontrollo_01":["sincero","pacato","sincero"],"ROS_ricontrollo_02":["sincero","sincero"],"ROS_ricontrollo_03":["ironico","sincero","sincero"],"ROS_ricontrollo_04":["sincero","pacato"],"ROS_ricontrollo_05":["sincero","pacato"],"ROS_ricontrollo_06":["gentile","evasivo"],"ROS_ricontrollo_07":["pacato","ironico","sincero"],"ROS_passato_01":["pacato","pacato","sincero"],"ROS_passato_02":["pacato","pacato"],"ROS_passato_03":["sincero","gentile"],"ROS_passato_04":["pacato","pacato","sboccato"],"ROS_passato_05":["gentile","pacato"],"ROS_passato_06":["gentile","sincero"],"ROS_passato_07":["sincero","pacato","sincero"],"ROS_promessa_01":["sincero","pacato","sincero"],"ROS_promessa_02":["pacato","pacato","sboccato"],"ROS_promessa_03":["sincero","pacato"],"ROS_promessa_04":["sincero","pacato"],"ROS_promessa_05":["pacato","pacato"],"ROS_promessa_06":["pacato","sincero","sincero"],"ROS_promessa_07":["sincero","sincero","sincero"],"ROS_dopo_passaggio_01":["sincero","pacato","sincero"],"ROS_dopo_passaggio_02":["sincero","pacato"],"ROS_dopo_passaggio_03":["pacato","pacato"],"ROS_dopo_passaggio_04":["sincero","sincero"],"ROS_dopo_passaggio_05":["sincero","pacato"],"ROS_dopo_passaggio_06":["pacato","sincero"],"ROS_dopo_passaggio_07":["pacato","pacato","sincero"],"ROS_segni_01":["pacato","pacato","sincero"],"ROS_segni_02":["pacato","pacato"],"ROS_segni_03":["gentile","pacato"],"ROS_segni_04":["pacato","pacato"],"ROS_segni_05":["pacato","gentile"],"ROS_segni_06":["pacato","pacato"],"ROS_segni_07":["sincero","gentile","sincero"],"ROS_recupero_01":["sincero","pacato","sincero"],"ROS_recupero_02":["sincero","pacato"],"ROS_recupero_03":["sincero","pacato"],"ROS_recupero_04":["pacato","pacato"],"ROS_recupero_05":["sincero","pacato"],"ROS_recupero_06":["pacato","pacato"],"ROS_recupero_07":["sincero","sincero","sincero"],"ROS_guardia_01":["pacato","pacato","sincero"],"ROS_guardia_02":["sincero","sincero"],"ROS_guardia_03":["pacato","pacato"],"ROS_guardia_04":["pacato","sincero"],"ROS_guardia_05":["pacato","pacato"],"ROS_guardia_06":["pacato","sincero"],"ROS_guardia_07":["sincero","pacato","sincero"],"ROS_prima_porta_01":["pacato","pacato","sincero"],"ROS_prima_porta_02":["pacato","sincero"],"ROS_prima_porta_03":["sincero","gentile"],"ROS_prima_porta_04":["pacato","pacato"],"ROS_prima_porta_05":["sincero","pacato"],"ROS_prima_porta_06":["sincero","pacato"],"ROS_prima_porta_07":["sincero","sincero","sincero"],"LIV_primo_01":["sincero","pacato","sincero"],"LIV_primo_02":["pacato","pacato"],"LIV_primo_03":["pacato","sincero"],"LIV_primo_04":["pacato","pacato"],"LIV_primo_05":["pacato","pacato"],"LIV_primo_06":["sincero","pacato"],"LIV_primo_07":["pacato","sincero","sincero"],"LIV_affido_01":["sincero","pacato","sincero"],"LIV_affido_02":["sincero","pacato"],"LIV_affido_03":["sincero","pacato"],"LIV_affido_04":["sincero","pacato"],"LIV_affido_05":["sincero","pacato"],"LIV_affido_06":["sincero","pacato"],"LIV_affido_07":["sincero","pacato","sincero"],"LIV_ottavio_01":["pacato","pacato","sincero"],"LIV_ottavio_02":["pacato","pacato"],"LIV_ottavio_03":["pacato","pacato"],"LIV_ottavio_04":["gentile","pacato"],"LIV_ottavio_05":["pacato","pacato"],"LIV_ottavio_06":["pacato","pacato"],"LIV_ottavio_07":["sincero","sincero","sincero"],"LIV_fiducia_01":["sincero","sincero","sincero"],"LIV_fiducia_02":["sincero","sincero"],"LIV_fiducia_03":["sincero","sincero"],"LIV_fiducia_04":["pacato","pacato"],"LIV_fiducia_05":["sincero","pacato"],"LIV_fiducia_06":["sincero","sincero"],"LIV_fiducia_07":["sincero","pacato","sincero"],"LIV_irene_01":["pacato","pacato","sincero"],"LIV_irene_02":["pacato","pacato"],"LIV_irene_03":["pacato","pacato"],"LIV_irene_04":["sincero","pacato"],"LIV_irene_05":["pacato","pacato"],"LIV_irene_06":["pacato","pacato"],"LIV_irene_07":["pacato","pacato","sincero"],"LIV_promessa_01":["sincero","pacato","sincero"],"LIV_promessa_02":["sincero","pacato"],"LIV_promessa_03":["sincero","gentile"],"LIV_promessa_04":["pacato","sincero"],"LIV_promessa_05":["sincero","sincero"],"LIV_promessa_06":["sincero","sincero"],"LIV_promessa_07":["sincero","sincero","sincero"],"PRE_1_03":["pacato","freddo"],"PRE_1_07":["pacato","pacato","freddo"],"PRE_2_03":["pacato","pacato"],"PRE_2_07":["pacato","pacato","freddo"],"PRE_3_03":["pacato","pacato"],"PRE_3_07":["pacato","pacato","freddo"],"PRE_4_03":["freddo","pacato"],"PRE_4_07":["gentile","pacato","freddo"],"V2_E01_01":["sincero","pacato"],"V2_E01_02":["pacato","pacato"],"V2_E02_01":["sincero","pacato"],"V2_E02_02":["pacato","pacato"],"V2_E03_01":["sincero","pacato"],"V2_E03_02":["pacato","pacato"],"V2_E04_01":["sincero","pacato"],"V2_E04_02":["pacato","pacato"],"V2_E05_01":["sincero","pacato"],"V2_E05_02":["pacato","pacato"],"V2_E06_01":["sincero","pacato"],"V2_E06_02":["pacato","pacato"],"V2_E07_01":["sincero","pacato"],"V2_E07_02":["pacato","pacato"],"V2_E08_01":["sincero","pacato"],"V2_E08_02":["pacato","pacato"],"V2_E09_01":["sincero","pacato"],"V2_E09_02":["pacato","pacato"],"V2_E10_01":["sincero","pacato"],"V2_E10_02":["pacato","pacato"],"V2_E11_01":["sincero","pacato"],"V2_E11_02":["pacato","pacato"],"V2_E12_01":["sincero","pacato"],"V2_E12_02":["pacato","pacato"],"V2_R01_01":["sincero","pacato"],"V2_R01_02":["pacato","pacato"],"V2_R02_01":["sincero","pacato"],"V2_R02_02":["pacato","pacato"],"V2_R03_01":["sincero","pacato"],"V2_R03_02":["pacato","pacato"],"V2_R04_01":["sincero","pacato"],"V2_R04_02":["pacato","pacato"],"V2_R05_01":["sincero","pacato"],"V2_R05_02":["pacato","pacato"],"V2_R06_01":["sincero","pacato"],"V2_R06_02":["pacato","pacato"],"V2_R07_01":["sincero","pacato"],"V2_R07_02":["pacato","pacato"],"V2_R08_01":["sincero","pacato"],"V2_R08_02":["pacato","pacato"],"V2_R09_01":["sincero","pacato"],"V2_R09_02":["pacato","pacato"],"V2_R10_01":["sincero","pacato"],"V2_R10_02":["pacato","pacato"],"V2_L01_01":["sincero","pacato"],"V2_L01_02":["pacato","pacato"],"V2_L02_01":["sincero","pacato"],"V2_L02_02":["sincero","pacato"],"V2_L03_01":["sincero","pacato"],"V2_L03_02":["pacato","pacato"],"V2_L04_01":["sincero","pacato"],"V2_L04_02":["sincero","pacato"],"V2_L05_01":["sincero","pacato"],"V2_L05_02":["pacato","pacato"],"V2_L06_01":["sincero","pacato"],"V2_L06_02":["pacato","pacato"],"V2_ELE_s25_01":["sincero","ironico"],"V2_ELE_s25_02":["sincero","gentile"],"V2_ELE_s25_03":["sincero","pacato"],"V2_ELE_s25_04":["sincero","pacato"],"V2_ELE_s50_01":["ironico","sincero"],"V2_ELE_s50_02":["sincero","ironico"],"V2_ELE_s50_03":["sincero","gentile"],"V2_ELE_s50_04":["sincero","gentile"],"V2_ELE_s75_01":["sincero","sincero"],"V2_ELE_s75_02":["sincero","pacato"],"V2_ELE_s75_03":["sincero","sincero"],"V2_ELE_s75_04":["sincero","pacato"],"V2_ELE_s100_01":["sincero","sincero"],"V2_ELE_s100_02":["sincero","gentile"],"V2_ELE_s100_03":["sincero","pacato"],"V2_ELE_s100_04":["gentile","sincero"],"V2_ROS_s25_01":["pacato","ironico"],"V2_ROS_s25_02":["pacato","pacato"],"V2_ROS_s25_03":["pacato","ironico"],"V2_ROS_s25_04":["sincero","pacato"],"V2_ROS_s50_01":["gentile","ironico"],"V2_ROS_s50_02":["ironico","gentile"],"V2_ROS_s50_03":["pacato","sincero"],"V2_ROS_s50_04":["gentile","sincero"],"V2_ROS_s75_01":["pacato","sincero"],"V2_ROS_s75_02":["pacato","ironico"],"V2_ROS_s75_03":["sincero","pacato"],"V2_ROS_s75_04":["sincero","sincero"],"V2_ROS_s100_01":["sincero","sincero"],"V2_ROS_s100_02":["sincero","pacato"],"V2_ROS_s100_03":["sincero","sincero"],"V2_ROS_s100_04":["sincero","pacato"],"V2_LIV_s25_01":["ironico","sincero"],"V2_LIV_s25_02":["gentile","pacato"],"V2_LIV_s25_03":["ironico","gentile"],"V2_LIV_s25_04":["pacato","gentile"],"V2_LIV_s50_01":["ironico","gentile"],"V2_LIV_s50_02":["gentile","ironico"],"V2_LIV_s50_03":["gentile","sincero"],"V2_LIV_s50_04":["gentile","pacato"],"V2_LIV_s75_01":["gentile","sincero"],"V2_LIV_s75_02":["pacato","gentile"],"V2_LIV_s75_03":["sincero","sincero"],"V2_LIV_s75_04":["sincero","sincero"],"V2_LIV_s100_01":["sincero","sincero"],"V2_LIV_s100_02":["sincero","pacato"],"V2_LIV_s100_03":["sincero","pacato"],"V2_LIV_s100_04":["sincero","gentile"],"V2_PRE_s25_01":["freddo","gentile"],"V2_PRE_s25_02":["pacato","freddo"],"V2_PRE_s25_03":["pacato","pacato"],"V2_PRE_s25_04":["freddo","pacato"],"V2_PRE_s50_01":["pacato","sincero"],"V2_PRE_s50_02":["gentile","freddo"],"V2_PRE_s50_03":["pacato","freddo"],"V2_PRE_s50_04":["pacato","freddo"],"V2_PRE_s75_01":["gentile","freddo"],"V2_PRE_s75_02":["pacato","freddo"],"V2_PRE_s75_03":["pacato","pacato"],"V2_PRE_s75_04":["freddo","pacato"],"V2_LUOGO_tokyo_01":["sincero","pacato"],"V2_LUOGO_tokyo_02":["pacato","gentile"],"V2_LUOGO_tokyo_03":["pacato","ironico"],"V2_LUOGO_tokyo_04":["gentile","ironico"],"V2_LUOGO_roma_01":["ironico","sincero"],"V2_LUOGO_roma_02":["ironico","pacato"],"V2_LUOGO_roma_03":["sincero","ironico"],"V2_LUOGO_roma_04":["ironico","pacato"],"V2_LUOGO_parigi_01":["sincero","sincero"],"V2_LUOGO_parigi_02":["pacato","sincero"],"V2_LUOGO_parigi_03":["sincero","sincero"],"V2_LUOGO_parigi_04":["sincero","pacato"],"V2_LUOGO_londra_01":["pacato","pacato"],"V2_LUOGO_londra_02":["pacato","sincero"],"V2_LUOGO_londra_03":["pacato","sincero"],"V2_LUOGO_londra_04":["ironico","pacato"],"V2_LUOGO_stoccolma_01":["sincero","pacato"],"V2_LUOGO_stoccolma_02":["gentile","sincero"],"V2_LUOGO_stoccolma_03":["pacato","pacato"],"V2_LUOGO_stoccolma_04":["sincero","gentile"],"V2_LUOGO_berlino_01":["sincero","pacato"],"V2_LUOGO_berlino_02":["pacato","sincero"],"V2_LUOGO_berlino_03":["pacato","sincero"],"V2_LUOGO_berlino_04":["pacato","sboccato"],"V2_LUOGO_praga_01":["pacato","sincero"],"V2_LUOGO_praga_02":["pacato","sincero"],"V2_LUOGO_praga_03":["pacato","pacato"],"V2_LUOGO_praga_04":["sincero","pacato"],"V2_LUOGO_vienna_01":["sincero","pacato"],"V2_LUOGO_vienna_02":["sincero","pacato"],"V2_LUOGO_vienna_03":["pacato","sincero"],"V2_LUOGO_vienna_04":["sincero","pacato"],"V2_LUOGO_madrid_01":["pacato","pacato"],"V2_LUOGO_madrid_02":["pacato","sincero"],"V2_LUOGO_madrid_03":["sincero","pacato"],"V2_LUOGO_madrid_04":["pacato","sincero"],"V2_LUOGO_lisbona_01":["pacato","sincero"],"V2_LUOGO_lisbona_02":["pacato","sincero"],"V2_LUOGO_lisbona_03":["sincero","pacato"],"V2_LUOGO_lisbona_04":["pacato","sincero"],"V2_LUOGO_atene_01":["sincero","pacato"],"V2_LUOGO_atene_02":["pacato","sincero"],"V2_LUOGO_atene_03":["pacato","sincero"],"V2_LUOGO_atene_04":["sincero","pacato"],"V2_LUOGO_washington_01":["pacato","sincero"],"V2_LUOGO_washington_02":["pacato","pacato"],"V2_LUOGO_washington_03":["pacato","sincero"],"V2_LUOGO_washington_04":["sincero","sincero"],"V2_CASA_01_M1":["pacato","pacato"],"V2_CASA_01_Q1_M1":["pacato","pacato"],"V2_CASA_01_M2":["pacato","pacato"],"V2_CASA_01_Q2_M2":["pacato","pacato"],"V2_CASA_01_M3":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M3":["pacato","pacato"],"V2_CASA_01_Q2_M3":["pacato","pacato"],"V2_CASA_01_M4":["pacato","pacato"],"V2_CASA_01_Q3_M4":["pacato","pacato"],"V2_CASA_01_M5":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M5":["pacato","pacato"],"V2_CASA_01_Q3_M5":["pacato","pacato"],"V2_CASA_01_M6":["pacato","pacato","pacato"],"V2_CASA_01_Q2_M6":["pacato","pacato"],"V2_CASA_01_Q3_M6":["pacato","pacato"],"V2_CASA_01":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M7":["pacato","pacato"],"V2_CASA_01_Q2_M7":["pacato","pacato"],"V2_CASA_01_Q3_M7":["pacato","pacato"],"V2_CASA_01_P_M1":["pacato","pacato"],"V2_CASA_01_P_Q1_M1":["pacato","pacato"],"V2_CASA_01_P_M2":["pacato","pacato"],"V2_CASA_01_P_Q2_M2":["pacato","pacato"],"V2_CASA_01_P_M3":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M3":["pacato","pacato"],"V2_CASA_01_P_Q2_M3":["pacato","pacato"],"V2_CASA_01_P_M4":["pacato","pacato"],"V2_CASA_01_P_Q3_M4":["pacato","pacato"],"V2_CASA_01_P_M5":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M5":["pacato","pacato"],"V2_CASA_01_P_Q3_M5":["pacato","pacato"],"V2_CASA_01_P_M6":["pacato","pacato","pacato"],"V2_CASA_01_P_Q2_M6":["pacato","pacato"],"V2_CASA_01_P_Q3_M6":["pacato","pacato"],"V2_CASA_01_P":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M7":["pacato","pacato"],"V2_CASA_01_P_Q2_M7":["pacato","pacato"],"V2_CASA_01_P_Q3_M7":["pacato","pacato"],"V2_CASA_02_M1":["pacato","pacato"],"V2_CASA_02_Q1_M1":["pacato","pacato"],"V2_CASA_02_M2":["pacato","pacato"],"V2_CASA_02_Q2_M2":["pacato","pacato"],"V2_CASA_02_M3":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M3":["pacato","pacato"],"V2_CASA_02_Q2_M3":["pacato","pacato"],"V2_CASA_02_M4":["pacato","pacato"],"V2_CASA_02_Q3_M4":["pacato","pacato"],"V2_CASA_02_M5":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M5":["pacato","pacato"],"V2_CASA_02_Q3_M5":["pacato","pacato"],"V2_CASA_02_M6":["pacato","pacato","pacato"],"V2_CASA_02_Q2_M6":["pacato","pacato"],"V2_CASA_02_Q3_M6":["pacato","pacato"],"V2_CASA_02":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M7":["pacato","pacato"],"V2_CASA_02_Q2_M7":["pacato","pacato"],"V2_CASA_02_Q3_M7":["pacato","pacato"],"V2_CASA_02_P_M1":["pacato","pacato"],"V2_CASA_02_P_Q1_M1":["pacato","pacato"],"V2_CASA_02_P_M2":["pacato","pacato"],"V2_CASA_02_P_Q2_M2":["pacato","pacato"],"V2_CASA_02_P_M3":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M3":["pacato","pacato"],"V2_CASA_02_P_Q2_M3":["pacato","pacato"],"V2_CASA_02_P_M4":["pacato","pacato"],"V2_CASA_02_P_Q3_M4":["pacato","pacato"],"V2_CASA_02_P_M5":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M5":["pacato","pacato"],"V2_CASA_02_P_Q3_M5":["pacato","pacato"],"V2_CASA_02_P_M6":["pacato","pacato","pacato"],"V2_CASA_02_P_Q2_M6":["pacato","pacato"],"V2_CASA_02_P_Q3_M6":["pacato","pacato"],"V2_CASA_02_P":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M7":["pacato","pacato"],"V2_CASA_02_P_Q2_M7":["pacato","pacato"],"V2_CASA_02_P_Q3_M7":["pacato","pacato"],"V2_CASA_03_M1":["pacato","pacato"],"V2_CASA_03_Q1_M1":["pacato","pacato"],"V2_CASA_03_M2":["pacato","pacato"],"V2_CASA_03_Q2_M2":["pacato","pacato"],"V2_CASA_03_M3":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M3":["pacato","pacato"],"V2_CASA_03_Q2_M3":["pacato","pacato"],"V2_CASA_03_M4":["pacato","pacato"],"V2_CASA_03_Q3_M4":["pacato","pacato"],"V2_CASA_03_M5":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M5":["pacato","pacato"],"V2_CASA_03_Q3_M5":["pacato","pacato"],"V2_CASA_03_M6":["pacato","pacato","pacato"],"V2_CASA_03_Q2_M6":["pacato","pacato"],"V2_CASA_03_Q3_M6":["pacato","pacato"],"V2_CASA_03":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M7":["pacato","pacato"],"V2_CASA_03_Q2_M7":["pacato","pacato"],"V2_CASA_03_Q3_M7":["pacato","pacato"],"V2_CASA_03_P_M1":["pacato","pacato"],"V2_CASA_03_P_Q1_M1":["pacato","pacato"],"V2_CASA_03_P_M2":["pacato","pacato"],"V2_CASA_03_P_Q2_M2":["pacato","pacato"],"V2_CASA_03_P_M3":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M3":["pacato","pacato"],"V2_CASA_03_P_Q2_M3":["pacato","pacato"],"V2_CASA_03_P_M4":["pacato","pacato"],"V2_CASA_03_P_Q3_M4":["pacato","pacato"],"V2_CASA_03_P_M5":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M5":["pacato","pacato"],"V2_CASA_03_P_Q3_M5":["pacato","pacato"],"V2_CASA_03_P_M6":["pacato","pacato","pacato"],"V2_CASA_03_P_Q2_M6":["pacato","pacato"],"V2_CASA_03_P_Q3_M6":["pacato","pacato"],"V2_CASA_03_P":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M7":["pacato","pacato"],"V2_CASA_03_P_Q2_M7":["pacato","pacato"],"V2_CASA_03_P_Q3_M7":["pacato","pacato"],"V2_CASA_04_M1":["pacato","pacato"],"V2_CASA_04_Q1_M1":["pacato","pacato"],"V2_CASA_04_M2":["pacato","pacato"],"V2_CASA_04_Q2_M2":["pacato","pacato"],"V2_CASA_04_M3":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M3":["pacato","pacato"],"V2_CASA_04_Q2_M3":["pacato","pacato"],"V2_CASA_04_M4":["pacato","pacato"],"V2_CASA_04_Q3_M4":["pacato","pacato"],"V2_CASA_04_M5":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M5":["pacato","pacato"],"V2_CASA_04_Q3_M5":["pacato","pacato"],"V2_CASA_04_M6":["pacato","pacato","pacato"],"V2_CASA_04_Q2_M6":["pacato","pacato"],"V2_CASA_04_Q3_M6":["pacato","pacato"],"V2_CASA_04":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M7":["pacato","pacato"],"V2_CASA_04_Q2_M7":["pacato","pacato"],"V2_CASA_04_Q3_M7":["pacato","pacato"],"V2_CASA_04_P_M1":["pacato","pacato"],"V2_CASA_04_P_Q1_M1":["pacato","pacato"],"V2_CASA_04_P_M2":["pacato","pacato"],"V2_CASA_04_P_Q2_M2":["pacato","pacato"],"V2_CASA_04_P_M3":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M3":["pacato","pacato"],"V2_CASA_04_P_Q2_M3":["pacato","pacato"],"V2_CASA_04_P_M4":["pacato","pacato"],"V2_CASA_04_P_Q3_M4":["pacato","pacato"],"V2_CASA_04_P_M5":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M5":["pacato","pacato"],"V2_CASA_04_P_Q3_M5":["pacato","pacato"],"V2_CASA_04_P_M6":["pacato","pacato","pacato"],"V2_CASA_04_P_Q2_M6":["pacato","pacato"],"V2_CASA_04_P_Q3_M6":["pacato","pacato"],"V2_CASA_04_P":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M7":["pacato","pacato"],"V2_CASA_04_P_Q2_M7":["pacato","pacato"],"V2_CASA_04_P_Q3_M7":["pacato","pacato"],"V2_CASA_05_M1":["pacato","pacato"],"V2_CASA_05_Q1_M1":["pacato","pacato"],"V2_CASA_05_M2":["pacato","pacato"],"V2_CASA_05_Q2_M2":["pacato","pacato"],"V2_CASA_05_M3":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M3":["pacato","pacato"],"V2_CASA_05_Q2_M3":["pacato","pacato"],"V2_CASA_05_M4":["pacato","pacato"],"V2_CASA_05_Q3_M4":["pacato","pacato"],"V2_CASA_05_M5":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M5":["pacato","pacato"],"V2_CASA_05_Q3_M5":["pacato","pacato"],"V2_CASA_05_M6":["pacato","pacato","pacato"],"V2_CASA_05_Q2_M6":["pacato","pacato"],"V2_CASA_05_Q3_M6":["pacato","pacato"],"V2_CASA_05":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M7":["pacato","pacato"],"V2_CASA_05_Q2_M7":["pacato","pacato"],"V2_CASA_05_Q3_M7":["pacato","pacato"],"V2_CASA_05_P_M1":["pacato","pacato"],"V2_CASA_05_P_Q1_M1":["pacato","pacato"],"V2_CASA_05_P_M2":["pacato","pacato"],"V2_CASA_05_P_Q2_M2":["pacato","pacato"],"V2_CASA_05_P_M3":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M3":["pacato","pacato"],"V2_CASA_05_P_Q2_M3":["pacato","pacato"],"V2_CASA_05_P_M4":["pacato","pacato"],"V2_CASA_05_P_Q3_M4":["pacato","pacato"],"V2_CASA_05_P_M5":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M5":["pacato","pacato"],"V2_CASA_05_P_Q3_M5":["pacato","pacato"],"V2_CASA_05_P_M6":["pacato","pacato","pacato"],"V2_CASA_05_P_Q2_M6":["pacato","pacato"],"V2_CASA_05_P_Q3_M6":["pacato","pacato"],"V2_CASA_05_P":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M7":["pacato","pacato"],"V2_CASA_05_P_Q2_M7":["pacato","pacato"],"V2_CASA_05_P_Q3_M7":["pacato","pacato"],"V2_CASA_06_M1":["pacato","pacato"],"V2_CASA_06_Q1_M1":["pacato","pacato"],"V2_CASA_06_M2":["pacato","pacato"],"V2_CASA_06_Q2_M2":["pacato","pacato"],"V2_CASA_06_M3":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M3":["pacato","pacato"],"V2_CASA_06_Q2_M3":["pacato","pacato"],"V2_CASA_06_M4":["pacato","pacato"],"V2_CASA_06_Q3_M4":["pacato","pacato"],"V2_CASA_06_M5":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M5":["pacato","pacato"],"V2_CASA_06_Q3_M5":["pacato","pacato"],"V2_CASA_06_M6":["pacato","pacato","pacato"],"V2_CASA_06_Q2_M6":["pacato","pacato"],"V2_CASA_06_Q3_M6":["pacato","pacato"],"V2_CASA_06":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M7":["pacato","pacato"],"V2_CASA_06_Q2_M7":["pacato","pacato"],"V2_CASA_06_Q3_M7":["pacato","pacato"],"V2_CASA_06_P_M1":["pacato","pacato"],"V2_CASA_06_P_Q1_M1":["pacato","pacato"],"V2_CASA_06_P_M2":["pacato","pacato"],"V2_CASA_06_P_Q2_M2":["pacato","pacato"],"V2_CASA_06_P_M3":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M3":["pacato","pacato"],"V2_CASA_06_P_Q2_M3":["pacato","pacato"],"V2_CASA_06_P_M4":["pacato","pacato"],"V2_CASA_06_P_Q3_M4":["pacato","pacato"],"V2_CASA_06_P_M5":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M5":["pacato","pacato"],"V2_CASA_06_P_Q3_M5":["pacato","pacato"],"V2_CASA_06_P_M6":["pacato","pacato","pacato"],"V2_CASA_06_P_Q2_M6":["pacato","pacato"],"V2_CASA_06_P_Q3_M6":["pacato","pacato"],"V2_CASA_06_P":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M7":["pacato","pacato"],"V2_CASA_06_P_Q2_M7":["pacato","pacato"],"V2_CASA_06_P_Q3_M7":["pacato","pacato"],"V2_CASA_07_M1":["pacato","pacato"],"V2_CASA_07_Q1_M1":["pacato","pacato"],"V2_CASA_07_M2":["pacato","pacato"],"V2_CASA_07_Q2_M2":["pacato","pacato"],"V2_CASA_07_M3":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M3":["pacato","pacato"],"V2_CASA_07_Q2_M3":["pacato","pacato"],"V2_CASA_07_M4":["pacato","pacato"],"V2_CASA_07_Q3_M4":["pacato","pacato"],"V2_CASA_07_M5":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M5":["pacato","pacato"],"V2_CASA_07_Q3_M5":["pacato","pacato"],"V2_CASA_07_M6":["pacato","pacato","pacato"],"V2_CASA_07_Q2_M6":["pacato","pacato"],"V2_CASA_07_Q3_M6":["pacato","pacato"],"V2_CASA_07":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M7":["pacato","pacato"],"V2_CASA_07_Q2_M7":["pacato","pacato"],"V2_CASA_07_Q3_M7":["pacato","pacato"],"V2_CASA_07_P_M1":["pacato","pacato"],"V2_CASA_07_P_Q1_M1":["pacato","pacato"],"V2_CASA_07_P_M2":["pacato","pacato"],"V2_CASA_07_P_Q2_M2":["pacato","pacato"],"V2_CASA_07_P_M3":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M3":["pacato","pacato"],"V2_CASA_07_P_Q2_M3":["pacato","pacato"],"V2_CASA_07_P_M4":["pacato","pacato"],"V2_CASA_07_P_Q3_M4":["pacato","pacato"],"V2_CASA_07_P_M5":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M5":["pacato","pacato"],"V2_CASA_07_P_Q3_M5":["pacato","pacato"],"V2_CASA_07_P_M6":["pacato","pacato","pacato"],"V2_CASA_07_P_Q2_M6":["pacato","pacato"],"V2_CASA_07_P_Q3_M6":["pacato","pacato"],"V2_CASA_07_P":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M7":["pacato","pacato"],"V2_CASA_07_P_Q2_M7":["pacato","pacato"],"V2_CASA_07_P_Q3_M7":["pacato","pacato"],"V2_CASA_08_M1":["pacato","pacato"],"V2_CASA_08_Q1_M1":["pacato","pacato"],"V2_CASA_08_M2":["pacato","pacato"],"V2_CASA_08_Q2_M2":["pacato","pacato"],"V2_CASA_08_M3":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M3":["pacato","pacato"],"V2_CASA_08_Q2_M3":["pacato","pacato"],"V2_CASA_08_M4":["pacato","pacato"],"V2_CASA_08_Q3_M4":["pacato","pacato"],"V2_CASA_08_M5":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M5":["pacato","pacato"],"V2_CASA_08_Q3_M5":["pacato","pacato"],"V2_CASA_08_M6":["pacato","pacato","pacato"],"V2_CASA_08_Q2_M6":["pacato","pacato"],"V2_CASA_08_Q3_M6":["pacato","pacato"],"V2_CASA_08":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M7":["pacato","pacato"],"V2_CASA_08_Q2_M7":["pacato","pacato"],"V2_CASA_08_Q3_M7":["pacato","pacato"],"V2_CASA_08_P_M1":["pacato","pacato"],"V2_CASA_08_P_Q1_M1":["pacato","pacato"],"V2_CASA_08_P_M2":["pacato","pacato"],"V2_CASA_08_P_Q2_M2":["pacato","pacato"],"V2_CASA_08_P_M3":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M3":["pacato","pacato"],"V2_CASA_08_P_Q2_M3":["pacato","pacato"],"V2_CASA_08_P_M4":["pacato","pacato"],"V2_CASA_08_P_Q3_M4":["pacato","pacato"],"V2_CASA_08_P_M5":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M5":["pacato","pacato"],"V2_CASA_08_P_Q3_M5":["pacato","pacato"],"V2_CASA_08_P_M6":["pacato","pacato","pacato"],"V2_CASA_08_P_Q2_M6":["pacato","pacato"],"V2_CASA_08_P_Q3_M6":["pacato","pacato"],"V2_CASA_08_P":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M7":["pacato","pacato"],"V2_CASA_08_P_Q2_M7":["pacato","pacato"],"V2_CASA_08_P_Q3_M7":["pacato","pacato"],"V2_VICINO_01":["pacato","pacato"],"V2_VICINO_02":["pacato","pacato"],"V2_VICINO_03":["pacato","pacato"],"V2_VICINO_04":["pacato","pacato"],"V2_VICINO_05":["pacato","pacato"],"V2_MARCO_costo_01":["pacato","sincero"],"V2_MARCO_costo_02":["pacato","pacato"],"V2_MARCO_costo_03":["pacato","pacato"],"V2_MARCO_costo_04":["pacato","pacato"],"V2_MARCO_costo_05":["sincero","sincero","sincero"],"V2_FAL_1_01":["pacato","sincero"],"V2_FAL_1_02":["sincero","sincero"],"V2_FAL_1_03":["pacato","sincero"],"V2_FAL_2_01":["sincero","sincero"],"V2_FAL_2_02":["sincero","sincero"],"V2_FAL_2_03":["pacato","sincero"],"V2_FAL_3_01":["sincero","sincero"],"V2_FAL_3_02":["sincero","sincero"],"V2_FAL_3_03":["sincero","pacato"],"V2_FAL_4_01":["sincero","pacato"],"V2_FAL_4_02":["sincero","pacato"],"V2_FAL_4_03":["pacato","sincero"],"V2_USCITA_01":["pacato","pacato"],"V2_USCITA_02":["pacato","sincero"],"V2_USCITA_03":["pacato","sincero"],"V2_USCITA_04":["sincero","sincero"],"V2_USCITA_05":["sincero","sincero"],"V2_GUARDIA_01":["pacato","pacato"],"V2_GUARDIA_02":["pacato","pacato"],"V2_GUARDIA_03":["pacato","sincero"],"V2_GUARDIA_04":["sincero","sincero"],"V2_GUARDIA_05":["pacato","sincero"],"V2_VARCO_01":["pacato","sincero"],"V2_VARCO_02":["pacato","sincero"],"V2_VARCO_03":["pacato","sincero"],"V2_VARCO_04":["pacato","sincero"],"V2_VARCO_05":["sincero","sincero","sincero"],"V2_ELE_n1_01":["sboccato","sincero"],"V2_ELE_n1_02":["ironico","gentile"],"V2_ELE_n1_03":["sincero","pacato"],"V2_ELE_n1_04":["gentile","gentile"],"V2_ELE_n2_01":["sincero","sincero"],"V2_ELE_n2_02":["sincero","sincero"],"V2_ELE_n2_03":["sincero","sincero"],"V2_ELE_n2_04":["gentile","pacato"],"V2_ELE_n3_01":["sincero","sincero"],"V2_ELE_n3_02":["ironico","sincero"],"V2_ELE_n3_03":["sincero","gentile"],"V2_ELE_n3_04":["sincero","ironico"],"V2_ELE_n4_01":["sincero","gentile"],"V2_ELE_n4_02":["sboccato","pacato"],"V2_ELE_n4_03":["sincero","sincero"],"V2_ELE_n4_04":["sincero","gentile"],"V2_ELE_n5_01":["sincero","sincero"],"V2_ELE_n5_02":["sincero","sincero"],"V2_ELE_n5_03":["sincero","sincero"],"V2_ELE_n5_04":["sincero","sincero"],"V2_ELE_n6_01":["sincero","sincero"],"V2_ELE_n6_02":["gentile","sincero"],"V2_ELE_n6_03":["sincero","sincero"],"V2_ELE_n6_04":["sboccato","pacato"],"V2_ROS_n1_01":["sboccato","sincero"],"V2_ROS_n1_02":["gentile","ironico"],"V2_ROS_n1_03":["pacato","gentile"],"V2_ROS_n1_04":["sincero","pacato"],"V2_ROS_n2_01":["sboccato","sincero"],"V2_ROS_n2_02":["sincero","pacato"],"V2_ROS_n2_03":["pacato","sboccato"],"V2_ROS_n2_04":["sincero","pacato"],"V2_ROS_n3_01":["sincero","pacato"],"V2_ROS_n3_02":["ironico","pacato"],"V2_ROS_n3_03":["ironico","pacato"],"V2_ROS_n3_04":["pacato","sboccato"],"V2_ROS_n4_01":["sincero","pacato"],"V2_ROS_n4_02":["ironico","sincero"],"V2_ROS_n4_03":["pacato","pacato"],"V2_ROS_n4_04":["sincero","pacato"],"V2_ROS_n5_01":["sincero","sincero"],"V2_ROS_n5_02":["sboccato","pacato"],"V2_ROS_n5_03":["sincero","gentile"],"V2_ROS_n5_04":["sincero","pacato"],"V2_ROS_n6_01":["sincero","sincero"],"V2_ROS_n6_02":["sincero","gentile"],"V2_ROS_n6_03":["sincero","pacato"],"V2_ROS_n6_04":["sincero","sincero"],"V2_LIV_n1_01":["ironico","pacato"],"V2_LIV_n1_02":["gentile","ironico"],"V2_LIV_n1_03":["pacato","gentile"],"V2_LIV_n1_04":["gentile","pacato"],"V2_LIV_n2_01":["pacato","gentile"],"V2_LIV_n2_02":["sincero","pacato"],"V2_LIV_n2_03":["sincero","gentile"],"V2_LIV_n2_04":["pacato","sincero"],"V2_LIV_n3_01":["ironico","gentile"],"V2_LIV_n3_02":["ironico","pacato"],"V2_LIV_n3_03":["gentile","sincero"],"V2_LIV_n3_04":["sincero","gentile"],"V2_LIV_n4_01":["sincero","sincero"],"V2_LIV_n4_02":["sincero","pacato"],"V2_LIV_n4_03":["sincero","sincero"],"V2_LIV_n4_04":["sincero","pacato"],"V2_LIV_n5_01":["sincero","pacato"],"V2_LIV_n5_02":["sincero","sincero"],"V2_LIV_n5_03":["pacato","pacato"],"V2_LIV_n5_04":["sincero","gentile"],"V2_LIV_n6_01":["sincero","sincero"],"V2_LIV_n6_02":["sincero","sincero"],"V2_LIV_n6_03":["sincero","pacato"],"V2_LIV_n6_04":["sincero","sincero"],"ELE_ritiro_07b":["gentile","evasivo"],"ELE_ritiro_07c":["gentile","evasivo"],"ROS_vivavoce_01":["sincero","pacato","evasivo"],"DAR_traslochi_01":["gentile","evasivo"],"DAR_traslochi_02":["evasivo","sincero","freddo"],"DAR_traslochi_03":["freddo","sincero"],"DAR_traslochi_04":["sincero","freddo"],"DAR_traslochi_05":["freddo","sincero"],"DAR_imit_01":["pacato","pacato","freddo"],"DAR_imit_02":["sincero","gentile"],"DAR_imit_03":["sincero","gentile"]};
-const CHAT_UNLOCK = {"Elena":{"25":["V2_ELE_s25_01"],"50":["V2_ELE_s50_01"],"75":["V2_ELE_s75_01"],"100":["V2_ELE_s100_01"]},"Rosa":{"25":["V2_ROS_s25_01"],"50":["V2_ROS_s50_01"],"75":["V2_ROS_s75_01"],"100":["V2_ROS_s100_01"]},"Livia":{"25":["V2_LIV_s25_01"],"50":["V2_LIV_s50_01"],"75":["V2_LIV_s75_01"],"100":["V2_LIV_s100_01"]},"Sconosciuto":{"25":["V2_PRE_s25_01"],"50":["V2_PRE_s50_01"],"75":["V2_PRE_s75_01"]}};
+const CHAT_START = [{"id":"st_ELE_ritiro_01","th":"Elena","node":"ELE_ritiro_01","km":18},{"id":"st_ELE_pasta_01","th":"Elena","node":"ELE_pasta_01","km":32},{"id":"st_ELE_coinquilino_01","th":"Elena","node":"ELE_coinquilino_01","km":60},{"id":"st_ELE_cena_01","th":"Elena","node":"ELE_cena_01","km":74},{"id":"st_ELE_bollette_01","th":"Elena","node":"ELE_bollette_01","km":88},{"id":"st_ELE_temperino_fissato","th":"Elena","node":"ELE_temperino_fissato","km":102,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ELE_claudio_fissato","th":"Elena","node":"ELE_claudio_fissato","km":116,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ELE_richiamo_01","th":"Elena","node":"ELE_richiamo_01","km":130,"req":["flag:elena_sosta_promessa"]},{"id":"st_ROS_attrezzi_01","th":"Rosa","node":"ROS_attrezzi_01","km":144},{"id":"st_PRE_1_01","th":"Sconosciuto","node":"PRE_1_01","km":158},{"id":"st_ELE_litigio_01","th":"Elena","node":"ELE_litigio_01","km":172},{"id":"st_ROS_prudenza_01","th":"Rosa","node":"ROS_prudenza_01","km":186},{"id":"st_PRE_1_02","th":"Sconosciuto","node":"PRE_1_02","km":200},{"id":"st_ELE_distanza_01","th":"Elena","node":"ELE_distanza_01","km":200,"req":["flag:ev_distanza_impossibile"]},{"id":"st_PRE_1_03","th":"Sconosciuto","node":"PRE_1_03","km":214},{"id":"st_PRE_1_06","th":"Sconosciuto","node":"PRE_1_06","km":228},{"id":"st_PRE_1_07","th":"Sconosciuto","node":"PRE_1_07","km":242},{"id":"st_ROS_ricontrollo_01","th":"Rosa","node":"ROS_ricontrollo_01","km":284,"req":["flag:rosa_sosta_accettata"]},{"id":"st_LIV_primo_01","th":"Livia","node":"LIV_primo_01","km":298},{"id":"st_ROS_passato_01","th":"Rosa","node":"ROS_passato_01","km":312},{"id":"st_LIV_affido_01","th":"Livia","node":"LIV_affido_01","km":326},{"id":"st_ROS_promessa_01","th":"Rosa","node":"ROS_promessa_01","km":340,"req":["flag:promessa_rosa"]},{"id":"st_LIV_ottavio_01","th":"Livia","node":"LIV_ottavio_01","km":354},{"id":"st_ROS_dopo_passaggio_01","th":"Rosa","node":"ROS_dopo_passaggio_01","km":354,"req":["flag:ev_incursione_1_conclusa"]},{"id":"st_ROS_segni_01","th":"Rosa","node":"ROS_segni_01","km":430,"req":["flag:ev_indizio_sangue"]},{"id":"st_LIV_fiducia_01","th":"Livia","node":"LIV_fiducia_01","km":444,"req":["flag:prova_trattenuta"]},{"id":"st_SPORCO_01","th":"Elena","node":"SPORCO_01","km":458,"req":["flag:nonno_uso_fissato"]},{"id":"st_LIV_irene_01","th":"Livia","node":"LIV_irene_01","km":458,"req":["flag:ev_foto_originale"]},{"id":"st_SPORCO_02","th":"Elena","node":"SPORCO_02","km":472,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_03","th":"Elena","node":"SPORCO_03","km":486,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_04","th":"Elena","node":"SPORCO_04","km":500,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_05","th":"Elena","node":"SPORCO_05","km":514,"req":["flag:nonno_uso_fissato"]},{"id":"st_SPORCO_06","th":"Elena","node":"SPORCO_06","km":528,"req":["flag:nonno_uso_fissato"]},{"id":"st_PRE_2_01","th":"Elena","node":"PRE_2_01","km":542},{"id":"st_PRE_2_02","th":"Elena","node":"PRE_2_02","km":556},{"id":"st_PRE_2_03","th":"Elena","node":"PRE_2_03","km":570},{"id":"st_PRE_2_06","th":"Elena","node":"PRE_2_06","km":584},{"id":"st_PRE_2_07","th":"Elena","node":"PRE_2_07","km":598},{"id":"st_PRE_3_01","th":"Zio Claudio","node":"PRE_3_01","km":612},{"id":"st_PRE_3_02","th":"Zio Claudio","node":"PRE_3_02","km":626},{"id":"st_PRE_3_03","th":"Zio Claudio","node":"PRE_3_03","km":640},{"id":"st_PRE_3_06","th":"Zio Claudio","node":"PRE_3_06","km":654},{"id":"st_PRE_3_07","th":"Zio Claudio","node":"PRE_3_07","km":668},{"id":"st_ROS_recupero_01","th":"Rosa","node":"ROS_recupero_01","km":668,"req":["flag:promessa_rosa_chiarita","flag:ev_fase_v"]},{"id":"st_LIV_promessa_01","th":"Livia","node":"LIV_promessa_01","km":668,"req":["flag:promessa_rosa_chiarita","flag:ev_fase_v"]},{"id":"st_PRE_4_01","th":"Sconosciuto","node":"PRE_4_01","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_ROS_guardia_01","th":"Rosa","node":"ROS_guardia_01","km":668,"req":["flag:ev_fase_v"]},{"id":"st_PRE_4_02","th":"Sconosciuto","node":"PRE_4_02","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_ROS_prima_porta_01","th":"Rosa","node":"ROS_prima_porta_01","km":668,"req":["flag:promessa_rosa","flag:ev_fase_v"]},{"id":"st_PRE_4_03","th":"Sconosciuto","node":"PRE_4_03","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_PRE_4_06","th":"Sconosciuto","node":"PRE_4_06","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_PRE_4_07","th":"Sconosciuto","node":"PRE_4_07","km":668,"req":["flag:ev_presenza_scoperta"]},{"id":"st_DAR_traslochi_01","th":"Dario","node":"DAR_traslochi_01","km":256,"req":["fatto:ELE_ritiro_08"]},{"id":"st_ROS_vivavoce_01","th":"Rosa","node":"ROS_vivavoce_01","km":300,"req":["fatto:ROS_passato_01","conf:Livia>=15"]},{"id":"st_V2_ROS_n1_01","th":"Rosa","node":"V2_ROS_n1_01","km":130,"req":["flag:r25"]},{"id":"st_V2_ROS_n2_01","th":"Rosa","node":"V2_ROS_n2_01","km":138,"req":["flag:r50"]},{"id":"st_V2_ROS_n3_01","th":"Rosa","node":"V2_ROS_n3_01","km":270,"req":["flag:r75"]},{"id":"st_V2_ROS_n4_01","th":"Rosa","node":"V2_ROS_n4_01","km":278,"req":["flag:r01b"]},{"id":"st_V2_ROS_n5_01","th":"Rosa","node":"V2_ROS_n5_01","km":600,"req":["flag:r05c","flag:ev_fase_v"]},{"id":"st_V2_ROS_n6_01","th":"Rosa","node":"V2_ROS_n6_01","km":608,"req":["flag:r100","flag:ev_fase_v"]},{"id":"st_V2_LIV_n1_01","th":"Livia","node":"V2_LIV_n1_01","km":270,"req":["flag:l25"]},{"id":"st_V2_LIV_n2_01","th":"Livia","node":"V2_LIV_n2_01","km":278,"req":["flag:l50"]},{"id":"st_V2_LIV_n3_01","th":"Livia","node":"V2_LIV_n3_01","km":286,"req":["flag:l75"]},{"id":"st_V2_LIV_n4_01","th":"Livia","node":"V2_LIV_n4_01","km":430,"req":["flag:l02c"]},{"id":"st_V2_LIV_n5_01","th":"Livia","node":"V2_LIV_n5_01","km":438,"req":["flag:foto"]},{"id":"st_V2_LIV_n6_01","th":"Livia","node":"V2_LIV_n6_01","km":600,"req":["flag:l100","flag:ev_fase_v"]},{"id":"st_DAR_imit_01","th":"Dario","node":"DAR_imit_01","km":430,"req":["flag:ev_imitazione_dario"]},{"id":"st_V2_LUOGO_tokyo_01","th":"Elena","node":"V2_LUOGO_tokyo_01","km":26,"req":["flag:luogo_tokyo"]},{"id":"st_V2_LUOGO_roma_01","th":"Elena","node":"V2_LUOGO_roma_01","km":34,"req":["flag:luogo_roma"]},{"id":"st_V2_LUOGO_parigi_01","th":"Elena","node":"V2_LUOGO_parigi_01","km":138,"req":["flag:luogo_parigi"]},{"id":"st_V2_LUOGO_londra_01","th":"Rosa","node":"V2_LUOGO_londra_01","km":286,"req":["flag:luogo_londra"]},{"id":"st_V2_LUOGO_stoccolma_01","th":"Livia","node":"V2_LUOGO_stoccolma_01","km":294,"req":["flag:luogo_stoccolma"]},{"id":"st_V2_LUOGO_berlino_01","th":"Rosa","node":"V2_LUOGO_berlino_01","km":294,"req":["flag:luogo_berlino"]},{"id":"st_V2_LUOGO_praga_01","th":"Rosa","node":"V2_LUOGO_praga_01","km":302,"req":["flag:luogo_praga"]},{"id":"st_V2_LUOGO_vienna_01","th":"Elena","node":"V2_LUOGO_vienna_01","km":286,"req":["flag:luogo_vienna"]},{"id":"st_V2_LUOGO_madrid_01","th":"Elena","node":"V2_LUOGO_madrid_01","km":438,"req":["flag:luogo_madrid"]},{"id":"st_V2_LUOGO_lisbona_01","th":"Livia","node":"V2_LUOGO_lisbona_01","km":446,"req":["flag:luogo_lisbona"]},{"id":"st_V2_LUOGO_atene_01","th":"Rosa","node":"V2_LUOGO_atene_01","km":616,"req":["flag:luogo_atene","flag:ev_fase_v"]},{"id":"st_V2_LUOGO_washington_01","th":"Livia","node":"V2_LUOGO_washington_01","km":608,"req":["flag:luogo_washington","flag:ev_fase_v"]}];
+const CHAT_TONI_MAP = {"ELE_ritiro_01":["sincero","evasivo","freddo"],"ELE_ritiro_02":["sincero","freddo"],"ELE_ritiro_03":["gentile","ironico"],"ELE_ritiro_04":["pacato"],"ELE_ritiro_05":["sincero","freddo"],"ELE_ritiro_06":["sincero","freddo","freddo"],"ELE_ritiro_07":["gentile","evasivo"],"ELE_pasta_01":["pacato","ironico","freddo"],"ELE_pasta_02":["freddo"],"ELE_pasta_03":["pacato","sincero"],"ELE_pasta_04":["pacato","freddo"],"ELE_pasta_05":["sincero","freddo"],"ELE_pasta_06":["freddo"],"ELE_pasta_07":["sboccato"],"ELE_turno_01":["evasivo","gentile","freddo"],"ELE_turno_02":["sincero","freddo"],"ELE_turno_03":["pacato","sincero"],"ELE_turno_04":["freddo","sincero"],"ELE_turno_05":["sincero","evasivo"],"ELE_turno_06":["freddo"],"ELE_turno_07":["gentile"],"ELE_coinquilino_01":["pacato","freddo","ironico"],"ELE_coinquilino_02":["sincero","sincero"],"ELE_coinquilino_03":["freddo","pacato"],"ELE_coinquilino_04":["freddo","pacato"],"ELE_coinquilino_05":["pacato"],"ELE_coinquilino_06":["sincero"],"ELE_coinquilino_07":["freddo"],"ELE_cena_01":["sincero","evasivo","freddo"],"ELE_cena_02":["sincero","sincero","evasivo"],"ELE_cena_03":["sincero","freddo"],"ELE_cena_04":["sincero"],"ELE_cena_05":["sincero"],"ELE_cena_06":["sincero"],"ELE_cena_07":["freddo"],"ELE_bollette_01":["sincero","freddo","sincero"],"ELE_bollette_02":["sincero","ironico"],"ELE_bollette_03":["freddo","pacato"],"ELE_bollette_04":["sincero","freddo"],"ELE_bollette_05":["sincero"],"ELE_bollette_06":["freddo"],"ELE_bollette_07":["freddo"],"ELE_richiamo_01":["sincero","freddo","sincero"],"ELE_richiamo_02":["sincero","ironico"],"ELE_richiamo_03":["freddo","pacato"],"ELE_richiamo_04":["sincero","freddo"],"ELE_richiamo_05":["sincero"],"ELE_richiamo_06":["freddo"],"ELE_richiamo_07":["sincero"],"ELE_litigio_01":["freddo","sincero","sincero"],"ELE_litigio_02":["freddo","gentile"],"ELE_litigio_03":["ironico","sincero"],"ELE_litigio_04":["freddo","sincero"],"ELE_litigio_05":["gentile","freddo"],"ELE_litigio_06":["evasivo","sincero"],"ELE_distanza_01":["sincero","pacato","freddo"],"ELE_distanza_02":["sincero","sincero"],"ELE_distanza_03":["pacato","freddo"],"ELE_distanza_04":["pacato","freddo"],"ELE_distanza_05":["sincero","freddo"],"ELE_distanza_06":["sincero","evasivo"],"ELE_distanza_07":["sincero"],"ELE_riparazione_01":["sincero","evasivo","freddo"],"ELE_riparazione_02":["sincero","sincero"],"ELE_riparazione_03":["sincero","freddo"],"ELE_riparazione_04":["sincero","sincero"],"ELE_riparazione_05":["sincero","freddo"],"ELE_riparazione_06":["sincero"],"ELE_riparazione_07":["evasivo"],"ELE_nonno_01":["pacato","freddo","ironico"],"ELE_nonno_02":["evasivo","sincero"],"ELE_nonno_03":["sincero","pacato"],"ELE_nonno_04":["sincero","freddo"],"ELE_nonno_05":["evasivo"],"ELE_nonno_06":["sincero"],"ELE_nonno_07":["sincero"],"ELE_cena_ritorno_01":["sincero","sincero","evasivo"],"ELE_cena_ritorno_02":["sincero","sincero"],"ELE_cena_ritorno_03":["sincero","freddo"],"ELE_cena_ritorno_04":["sincero","freddo"],"ELE_cena_ritorno_05":["sincero"],"ELE_cena_ritorno_06":["sincero"],"ELE_cena_ritorno_07":["sincero"],"ELE_temperino_fissato":["sincero","sincero"],"ELE_claudio_fissato":["sincero","sincero"],"ROS_attrezzi_01":["sboccato","pacato","sincero"],"ROS_attrezzi_02":["pacato","pacato","sboccato"],"ROS_attrezzi_03":["pacato","gentile"],"ROS_attrezzi_04":["pacato","pacato"],"ROS_attrezzi_05":["gentile","pacato","sboccato"],"ROS_attrezzi_06":["pacato","ironico"],"ROS_attrezzi_07":["pacato","ironico","sincero"],"ROS_prudenza_01":["sincero","pacato","sincero"],"ROS_prudenza_02":["pacato","evasivo"],"ROS_prudenza_03":["sincero","gentile"],"ROS_prudenza_04":["pacato","pacato"],"ROS_prudenza_05":["pacato","ironico","sboccato"],"ROS_prudenza_06":["pacato","gentile"],"ROS_prudenza_07":["sincero","pacato","sincero"],"ROS_ricontrollo_01":["sincero","pacato","sincero"],"ROS_ricontrollo_02":["sincero","sincero"],"ROS_ricontrollo_03":["ironico","sincero","sincero"],"ROS_ricontrollo_04":["sincero","pacato"],"ROS_ricontrollo_05":["sincero","pacato"],"ROS_ricontrollo_06":["gentile","evasivo"],"ROS_ricontrollo_07":["pacato","ironico","sincero"],"ROS_passato_01":["pacato","pacato","sincero"],"ROS_passato_02":["pacato","pacato"],"ROS_passato_03":["sincero","gentile"],"ROS_passato_04":["pacato","pacato","sboccato"],"ROS_passato_05":["gentile","pacato"],"ROS_passato_06":["gentile","sincero"],"ROS_passato_07":["sincero","pacato","sincero"],"ROS_promessa_01":["sincero","pacato","sincero"],"ROS_promessa_02":["pacato","pacato","sboccato"],"ROS_promessa_03":["sincero","pacato"],"ROS_promessa_04":["sincero","pacato"],"ROS_promessa_05":["pacato","pacato"],"ROS_promessa_06":["pacato","sincero","sincero"],"ROS_promessa_07":["sincero","sincero","sincero"],"ROS_dopo_passaggio_01":["sincero","pacato","sincero"],"ROS_dopo_passaggio_02":["sincero","pacato"],"ROS_dopo_passaggio_03":["pacato","pacato"],"ROS_dopo_passaggio_04":["sincero","sincero"],"ROS_dopo_passaggio_05":["sincero","pacato"],"ROS_dopo_passaggio_06":["pacato","sincero"],"ROS_dopo_passaggio_07":["pacato","pacato","sincero"],"ROS_segni_01":["pacato","pacato","sincero"],"ROS_segni_02":["pacato","pacato"],"ROS_segni_03":["gentile","pacato"],"ROS_segni_04":["pacato","pacato"],"ROS_segni_05":["pacato","gentile"],"ROS_segni_06":["pacato","pacato"],"ROS_segni_07":["sincero","gentile","sincero"],"ROS_recupero_01":["sincero","pacato","sincero"],"ROS_recupero_02":["sincero","pacato"],"ROS_recupero_03":["sincero","pacato"],"ROS_recupero_04":["pacato","pacato"],"ROS_recupero_05":["sincero","pacato"],"ROS_recupero_06":["pacato","pacato"],"ROS_recupero_07":["sincero","sincero","sincero"],"ROS_guardia_01":["pacato","pacato","sincero"],"ROS_guardia_02":["sincero","sincero"],"ROS_guardia_03":["pacato","pacato"],"ROS_guardia_04":["pacato","sincero"],"ROS_guardia_05":["pacato","pacato"],"ROS_guardia_06":["pacato","sincero"],"ROS_guardia_07":["sincero","pacato","sincero"],"ROS_prima_porta_01":["pacato","pacato","sincero"],"ROS_prima_porta_02":["pacato","sincero"],"ROS_prima_porta_03":["sincero","gentile"],"ROS_prima_porta_04":["pacato","pacato"],"ROS_prima_porta_05":["sincero","pacato"],"ROS_prima_porta_06":["sincero","pacato"],"ROS_prima_porta_07":["sincero","sincero","sincero"],"LIV_primo_01":["sincero","pacato","sincero"],"LIV_primo_02":["pacato","pacato"],"LIV_primo_03":["pacato","sincero"],"LIV_primo_04":["pacato","pacato"],"LIV_primo_05":["pacato","pacato"],"LIV_primo_06":["sincero","pacato"],"LIV_primo_07":["pacato","sincero","sincero"],"LIV_affido_01":["sincero","pacato","sincero"],"LIV_affido_02":["sincero","pacato"],"LIV_affido_03":["sincero","pacato"],"LIV_affido_04":["sincero","pacato"],"LIV_affido_05":["sincero","pacato"],"LIV_affido_06":["sincero","pacato"],"LIV_affido_07":["sincero","pacato","sincero"],"LIV_ottavio_01":["pacato","pacato","sincero"],"LIV_ottavio_02":["pacato","pacato"],"LIV_ottavio_03":["pacato","pacato"],"LIV_ottavio_04":["gentile","pacato"],"LIV_ottavio_05":["pacato","pacato"],"LIV_ottavio_06":["pacato","pacato"],"LIV_ottavio_07":["sincero","sincero","sincero"],"LIV_fiducia_01":["sincero","sincero","sincero"],"LIV_fiducia_02":["sincero","sincero"],"LIV_fiducia_03":["sincero","sincero"],"LIV_fiducia_04":["pacato","pacato"],"LIV_fiducia_05":["sincero","pacato"],"LIV_fiducia_06":["sincero","sincero"],"LIV_fiducia_07":["sincero","pacato","sincero"],"LIV_irene_01":["pacato","pacato","sincero"],"LIV_irene_02":["pacato","pacato"],"LIV_irene_03":["pacato","pacato"],"LIV_irene_04":["sincero","pacato"],"LIV_irene_05":["pacato","pacato"],"LIV_irene_06":["pacato","pacato"],"LIV_irene_07":["pacato","pacato","sincero"],"LIV_promessa_01":["sincero","pacato","sincero"],"LIV_promessa_02":["sincero","pacato"],"LIV_promessa_03":["sincero","gentile"],"LIV_promessa_04":["pacato","sincero"],"LIV_promessa_05":["sincero","sincero"],"LIV_promessa_06":["sincero","sincero"],"LIV_promessa_07":["sincero","sincero","sincero"],"PRE_1_03":["pacato","freddo"],"PRE_1_07":["pacato","pacato","freddo"],"PRE_2_03":["pacato","pacato"],"PRE_2_07":["pacato","pacato","freddo"],"PRE_3_03":["pacato","pacato"],"PRE_3_07":["pacato","pacato","freddo"],"PRE_4_03":["freddo","pacato"],"PRE_4_07":["gentile","pacato","freddo"],"V2_R01_01":["sincero","pacato"],"V2_R01_02":["pacato","pacato"],"V2_R02_01":["sincero","pacato"],"V2_R02_02":["pacato","pacato"],"V2_R03_01":["sincero","pacato"],"V2_R03_02":["pacato","pacato"],"V2_R04_01":["sincero","pacato"],"V2_R04_02":["pacato","pacato"],"V2_R05_01":["sincero","pacato"],"V2_R05_02":["pacato","pacato"],"V2_R06_01":["sincero","pacato"],"V2_R06_02":["pacato","pacato"],"V2_R07_01":["sincero","pacato"],"V2_R07_02":["pacato","pacato"],"V2_R08_01":["sincero","pacato"],"V2_R08_02":["pacato","pacato"],"V2_R09_01":["sincero","pacato"],"V2_R09_02":["pacato","pacato"],"V2_R10_01":["sincero","pacato"],"V2_R10_02":["pacato","pacato"],"V2_L01_01":["sincero","pacato"],"V2_L01_02":["pacato","pacato"],"V2_L02_01":["sincero","pacato"],"V2_L02_02":["sincero","pacato"],"V2_L03_01":["sincero","pacato"],"V2_L03_02":["pacato","pacato"],"V2_L04_01":["sincero","pacato"],"V2_L04_02":["sincero","pacato"],"V2_L05_01":["sincero","pacato"],"V2_L05_02":["pacato","pacato"],"V2_L06_01":["sincero","pacato"],"V2_L06_02":["pacato","pacato"],"V2_ROS_s25_01":["pacato","ironico"],"V2_ROS_s25_02":["pacato","pacato"],"V2_ROS_s25_03":["pacato","ironico"],"V2_ROS_s25_04":["sincero","pacato"],"V2_ROS_s50_01":["gentile","ironico"],"V2_ROS_s50_02":["ironico","gentile"],"V2_ROS_s50_03":["pacato","sincero"],"V2_ROS_s50_04":["gentile","sincero"],"V2_ROS_s75_01":["pacato","sincero"],"V2_ROS_s75_02":["pacato","ironico"],"V2_ROS_s75_03":["sincero","pacato"],"V2_ROS_s75_04":["sincero","sincero"],"V2_ROS_s100_01":["sincero","sincero"],"V2_ROS_s100_02":["sincero","pacato"],"V2_ROS_s100_03":["sincero","sincero"],"V2_ROS_s100_04":["sincero","pacato"],"V2_LIV_s25_01":["ironico","sincero"],"V2_LIV_s25_02":["gentile","pacato"],"V2_LIV_s25_03":["ironico","gentile"],"V2_LIV_s25_04":["pacato","gentile"],"V2_LIV_s50_01":["ironico","gentile"],"V2_LIV_s50_02":["gentile","ironico"],"V2_LIV_s50_03":["gentile","sincero"],"V2_LIV_s50_04":["gentile","pacato"],"V2_LIV_s75_01":["gentile","sincero"],"V2_LIV_s75_02":["pacato","gentile"],"V2_LIV_s75_03":["sincero","sincero"],"V2_LIV_s75_04":["sincero","sincero"],"V2_LIV_s100_01":["sincero","sincero"],"V2_LIV_s100_02":["sincero","pacato"],"V2_LIV_s100_03":["sincero","pacato"],"V2_LIV_s100_04":["sincero","gentile"],"V2_PRE_s25_01":["freddo","gentile"],"V2_PRE_s25_02":["pacato","freddo"],"V2_PRE_s25_03":["pacato","pacato"],"V2_PRE_s25_04":["freddo","pacato"],"V2_PRE_s50_01":["pacato","sincero"],"V2_PRE_s50_02":["gentile","freddo"],"V2_PRE_s50_03":["pacato","freddo"],"V2_PRE_s50_04":["pacato","freddo"],"V2_PRE_s75_01":["gentile","freddo"],"V2_PRE_s75_02":["pacato","freddo"],"V2_PRE_s75_03":["pacato","pacato"],"V2_PRE_s75_04":["freddo","pacato"],"V2_LUOGO_tokyo_01":["sincero","pacato"],"V2_LUOGO_tokyo_02":["pacato","gentile"],"V2_LUOGO_tokyo_03":["pacato","ironico"],"V2_LUOGO_tokyo_04":["gentile","ironico"],"V2_LUOGO_roma_01":["ironico","sincero"],"V2_LUOGO_roma_02":["ironico","pacato"],"V2_LUOGO_roma_03":["sincero","ironico"],"V2_LUOGO_roma_04":["ironico","pacato"],"V2_LUOGO_parigi_01":["sincero","sincero"],"V2_LUOGO_parigi_02":["pacato","sincero"],"V2_LUOGO_parigi_03":["sincero","sincero"],"V2_LUOGO_parigi_04":["sincero","pacato"],"V2_LUOGO_londra_01":["pacato","pacato"],"V2_LUOGO_londra_02":["pacato","sincero"],"V2_LUOGO_londra_03":["pacato","sincero"],"V2_LUOGO_londra_04":["ironico","pacato"],"V2_LUOGO_stoccolma_01":["sincero","pacato"],"V2_LUOGO_stoccolma_02":["gentile","sincero"],"V2_LUOGO_stoccolma_03":["pacato","pacato"],"V2_LUOGO_stoccolma_04":["sincero","gentile"],"V2_LUOGO_berlino_01":["sincero","pacato"],"V2_LUOGO_berlino_02":["pacato","sincero"],"V2_LUOGO_berlino_03":["pacato","sincero"],"V2_LUOGO_berlino_04":["pacato","sboccato"],"V2_LUOGO_praga_01":["pacato","sincero"],"V2_LUOGO_praga_02":["pacato","sincero"],"V2_LUOGO_praga_03":["pacato","pacato"],"V2_LUOGO_praga_04":["sincero","pacato"],"V2_LUOGO_vienna_01":["sincero","pacato"],"V2_LUOGO_vienna_02":["sincero","pacato"],"V2_LUOGO_vienna_03":["pacato","sincero"],"V2_LUOGO_vienna_04":["sincero","pacato"],"V2_LUOGO_madrid_01":["pacato","pacato"],"V2_LUOGO_madrid_02":["pacato","sincero"],"V2_LUOGO_madrid_03":["sincero","pacato"],"V2_LUOGO_madrid_04":["pacato","sincero"],"V2_LUOGO_lisbona_01":["pacato","sincero"],"V2_LUOGO_lisbona_02":["pacato","sincero"],"V2_LUOGO_lisbona_03":["sincero","pacato"],"V2_LUOGO_lisbona_04":["pacato","sincero"],"V2_LUOGO_atene_01":["sincero","pacato"],"V2_LUOGO_atene_02":["pacato","sincero"],"V2_LUOGO_atene_03":["pacato","sincero"],"V2_LUOGO_atene_04":["sincero","pacato"],"V2_LUOGO_washington_01":["pacato","sincero"],"V2_LUOGO_washington_02":["pacato","pacato"],"V2_LUOGO_washington_03":["pacato","sincero"],"V2_LUOGO_washington_04":["sincero","sincero"],"V2_CASA_01_M1":["pacato","pacato"],"V2_CASA_01_Q1_M1":["pacato","pacato"],"V2_CASA_01_M2":["pacato","pacato"],"V2_CASA_01_Q2_M2":["pacato","pacato"],"V2_CASA_01_M3":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M3":["pacato","pacato"],"V2_CASA_01_Q2_M3":["pacato","pacato"],"V2_CASA_01_M4":["pacato","pacato"],"V2_CASA_01_Q3_M4":["pacato","pacato"],"V2_CASA_01_M5":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M5":["pacato","pacato"],"V2_CASA_01_Q3_M5":["pacato","pacato"],"V2_CASA_01_M6":["pacato","pacato","pacato"],"V2_CASA_01_Q2_M6":["pacato","pacato"],"V2_CASA_01_Q3_M6":["pacato","pacato"],"V2_CASA_01":["pacato","pacato","pacato"],"V2_CASA_01_Q1_M7":["pacato","pacato"],"V2_CASA_01_Q2_M7":["pacato","pacato"],"V2_CASA_01_Q3_M7":["pacato","pacato"],"V2_CASA_01_P_M1":["pacato","pacato"],"V2_CASA_01_P_Q1_M1":["pacato","pacato"],"V2_CASA_01_P_M2":["pacato","pacato"],"V2_CASA_01_P_Q2_M2":["pacato","pacato"],"V2_CASA_01_P_M3":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M3":["pacato","pacato"],"V2_CASA_01_P_Q2_M3":["pacato","pacato"],"V2_CASA_01_P_M4":["pacato","pacato"],"V2_CASA_01_P_Q3_M4":["pacato","pacato"],"V2_CASA_01_P_M5":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M5":["pacato","pacato"],"V2_CASA_01_P_Q3_M5":["pacato","pacato"],"V2_CASA_01_P_M6":["pacato","pacato","pacato"],"V2_CASA_01_P_Q2_M6":["pacato","pacato"],"V2_CASA_01_P_Q3_M6":["pacato","pacato"],"V2_CASA_01_P":["pacato","pacato","pacato"],"V2_CASA_01_P_Q1_M7":["pacato","pacato"],"V2_CASA_01_P_Q2_M7":["pacato","pacato"],"V2_CASA_01_P_Q3_M7":["pacato","pacato"],"V2_CASA_02_M1":["pacato","pacato"],"V2_CASA_02_Q1_M1":["pacato","pacato"],"V2_CASA_02_M2":["pacato","pacato"],"V2_CASA_02_Q2_M2":["pacato","pacato"],"V2_CASA_02_M3":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M3":["pacato","pacato"],"V2_CASA_02_Q2_M3":["pacato","pacato"],"V2_CASA_02_M4":["pacato","pacato"],"V2_CASA_02_Q3_M4":["pacato","pacato"],"V2_CASA_02_M5":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M5":["pacato","pacato"],"V2_CASA_02_Q3_M5":["pacato","pacato"],"V2_CASA_02_M6":["pacato","pacato","pacato"],"V2_CASA_02_Q2_M6":["pacato","pacato"],"V2_CASA_02_Q3_M6":["pacato","pacato"],"V2_CASA_02":["pacato","pacato","pacato"],"V2_CASA_02_Q1_M7":["pacato","pacato"],"V2_CASA_02_Q2_M7":["pacato","pacato"],"V2_CASA_02_Q3_M7":["pacato","pacato"],"V2_CASA_02_P_M1":["pacato","pacato"],"V2_CASA_02_P_Q1_M1":["pacato","pacato"],"V2_CASA_02_P_M2":["pacato","pacato"],"V2_CASA_02_P_Q2_M2":["pacato","pacato"],"V2_CASA_02_P_M3":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M3":["pacato","pacato"],"V2_CASA_02_P_Q2_M3":["pacato","pacato"],"V2_CASA_02_P_M4":["pacato","pacato"],"V2_CASA_02_P_Q3_M4":["pacato","pacato"],"V2_CASA_02_P_M5":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M5":["pacato","pacato"],"V2_CASA_02_P_Q3_M5":["pacato","pacato"],"V2_CASA_02_P_M6":["pacato","pacato","pacato"],"V2_CASA_02_P_Q2_M6":["pacato","pacato"],"V2_CASA_02_P_Q3_M6":["pacato","pacato"],"V2_CASA_02_P":["pacato","pacato","pacato"],"V2_CASA_02_P_Q1_M7":["pacato","pacato"],"V2_CASA_02_P_Q2_M7":["pacato","pacato"],"V2_CASA_02_P_Q3_M7":["pacato","pacato"],"V2_CASA_03_M1":["pacato","pacato"],"V2_CASA_03_Q1_M1":["pacato","pacato"],"V2_CASA_03_M2":["pacato","pacato"],"V2_CASA_03_Q2_M2":["pacato"],"V2_CASA_03_M3":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M3":["pacato","pacato"],"V2_CASA_03_Q2_M3":["pacato","pacato"],"V2_CASA_03_M4":["pacato","pacato"],"V2_CASA_03_Q3_M4":["pacato"],"V2_CASA_03_M5":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M5":["pacato","pacato"],"V2_CASA_03_Q3_M5":["pacato","pacato"],"V2_CASA_03_M6":["pacato","pacato","pacato"],"V2_CASA_03_Q2_M6":["pacato","pacato"],"V2_CASA_03_Q3_M6":["pacato","pacato"],"V2_CASA_03":["pacato","pacato","pacato"],"V2_CASA_03_Q1_M7":["pacato","pacato"],"V2_CASA_03_Q2_M7":["pacato","pacato"],"V2_CASA_03_Q3_M7":["pacato","pacato"],"V2_CASA_03_P_M1":["pacato","pacato"],"V2_CASA_03_P_Q1_M1":["pacato","pacato"],"V2_CASA_03_P_M2":["pacato","pacato"],"V2_CASA_03_P_Q2_M2":["pacato"],"V2_CASA_03_P_M3":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M3":["pacato","pacato"],"V2_CASA_03_P_Q2_M3":["pacato","pacato"],"V2_CASA_03_P_M4":["pacato","pacato"],"V2_CASA_03_P_Q3_M4":["pacato","pacato"],"V2_CASA_03_P_M5":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M5":["pacato","pacato"],"V2_CASA_03_P_Q3_M5":["pacato","pacato"],"V2_CASA_03_P_M6":["pacato","pacato","pacato"],"V2_CASA_03_P_Q2_M6":["pacato","pacato"],"V2_CASA_03_P_Q3_M6":["pacato","pacato"],"V2_CASA_03_P":["pacato","pacato","pacato"],"V2_CASA_03_P_Q1_M7":["pacato","pacato"],"V2_CASA_03_P_Q2_M7":["pacato","pacato"],"V2_CASA_03_P_Q3_M7":["pacato","pacato"],"V2_CASA_04_M1":["pacato","pacato"],"V2_CASA_04_Q1_M1":["pacato","pacato"],"V2_CASA_04_M2":["pacato","pacato"],"V2_CASA_04_Q2_M2":["pacato","pacato"],"V2_CASA_04_M3":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M3":["pacato","pacato"],"V2_CASA_04_Q2_M3":["pacato","pacato"],"V2_CASA_04_M4":["pacato","pacato"],"V2_CASA_04_Q3_M4":["pacato","pacato"],"V2_CASA_04_M5":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M5":["pacato","pacato"],"V2_CASA_04_Q3_M5":["pacato","pacato"],"V2_CASA_04_M6":["pacato","pacato","pacato"],"V2_CASA_04_Q2_M6":["pacato","pacato"],"V2_CASA_04_Q3_M6":["pacato","pacato"],"V2_CASA_04":["pacato","pacato","pacato"],"V2_CASA_04_Q1_M7":["pacato","pacato"],"V2_CASA_04_Q2_M7":["pacato","pacato"],"V2_CASA_04_Q3_M7":["pacato","pacato"],"V2_CASA_04_P_M1":["pacato","pacato"],"V2_CASA_04_P_Q1_M1":["pacato","pacato"],"V2_CASA_04_P_M2":["pacato","pacato"],"V2_CASA_04_P_Q2_M2":["pacato","pacato"],"V2_CASA_04_P_M3":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M3":["pacato","pacato"],"V2_CASA_04_P_Q2_M3":["pacato","pacato"],"V2_CASA_04_P_M4":["pacato","pacato"],"V2_CASA_04_P_Q3_M4":["pacato","pacato"],"V2_CASA_04_P_M5":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M5":["pacato","pacato"],"V2_CASA_04_P_Q3_M5":["pacato","pacato"],"V2_CASA_04_P_M6":["pacato","pacato","pacato"],"V2_CASA_04_P_Q2_M6":["pacato","pacato"],"V2_CASA_04_P_Q3_M6":["pacato","pacato"],"V2_CASA_04_P":["pacato","pacato","pacato"],"V2_CASA_04_P_Q1_M7":["pacato","pacato"],"V2_CASA_04_P_Q2_M7":["pacato","pacato"],"V2_CASA_04_P_Q3_M7":["pacato","pacato"],"V2_CASA_05_M1":["pacato","pacato"],"V2_CASA_05_Q1_M1":["pacato","pacato"],"V2_CASA_05_M2":["pacato","pacato"],"V2_CASA_05_Q2_M2":["pacato","pacato"],"V2_CASA_05_M3":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M3":["pacato","pacato"],"V2_CASA_05_Q2_M3":["pacato","pacato"],"V2_CASA_05_M4":["pacato","pacato"],"V2_CASA_05_Q3_M4":["pacato","pacato"],"V2_CASA_05_M5":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M5":["pacato","pacato"],"V2_CASA_05_Q3_M5":["pacato","pacato"],"V2_CASA_05_M6":["pacato","pacato","pacato"],"V2_CASA_05_Q2_M6":["pacato","pacato"],"V2_CASA_05_Q3_M6":["pacato","pacato"],"V2_CASA_05":["pacato","pacato","pacato"],"V2_CASA_05_Q1_M7":["pacato","pacato"],"V2_CASA_05_Q2_M7":["pacato","pacato"],"V2_CASA_05_Q3_M7":["pacato","pacato"],"V2_CASA_05_P_M1":["pacato","pacato"],"V2_CASA_05_P_Q1_M1":["pacato","pacato"],"V2_CASA_05_P_M2":["pacato","pacato"],"V2_CASA_05_P_Q2_M2":["pacato","pacato"],"V2_CASA_05_P_M3":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M3":["pacato","pacato"],"V2_CASA_05_P_Q2_M3":["pacato","pacato"],"V2_CASA_05_P_M4":["pacato","pacato"],"V2_CASA_05_P_Q3_M4":["pacato","pacato"],"V2_CASA_05_P_M5":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M5":["pacato","pacato"],"V2_CASA_05_P_Q3_M5":["pacato","pacato"],"V2_CASA_05_P_M6":["pacato","pacato","pacato"],"V2_CASA_05_P_Q2_M6":["pacato","pacato"],"V2_CASA_05_P_Q3_M6":["pacato","pacato"],"V2_CASA_05_P":["pacato","pacato","pacato"],"V2_CASA_05_P_Q1_M7":["pacato","pacato"],"V2_CASA_05_P_Q2_M7":["pacato","pacato"],"V2_CASA_05_P_Q3_M7":["pacato","pacato"],"V2_CASA_06_M1":["pacato","pacato"],"V2_CASA_06_Q1_M1":["pacato","pacato"],"V2_CASA_06_M2":["pacato","pacato"],"V2_CASA_06_Q2_M2":["pacato","pacato"],"V2_CASA_06_M3":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M3":["pacato","pacato"],"V2_CASA_06_Q2_M3":["pacato","pacato"],"V2_CASA_06_M4":["pacato","pacato"],"V2_CASA_06_Q3_M4":["pacato","pacato"],"V2_CASA_06_M5":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M5":["pacato","pacato"],"V2_CASA_06_Q3_M5":["pacato","pacato"],"V2_CASA_06_M6":["pacato","pacato","pacato"],"V2_CASA_06_Q2_M6":["pacato","pacato"],"V2_CASA_06_Q3_M6":["pacato","pacato"],"V2_CASA_06":["pacato","pacato","pacato"],"V2_CASA_06_Q1_M7":["pacato","pacato"],"V2_CASA_06_Q2_M7":["pacato","pacato"],"V2_CASA_06_Q3_M7":["pacato","pacato"],"V2_CASA_06_P_M1":["pacato","pacato"],"V2_CASA_06_P_Q1_M1":["pacato","pacato"],"V2_CASA_06_P_M2":["pacato","pacato"],"V2_CASA_06_P_Q2_M2":["pacato","pacato"],"V2_CASA_06_P_M3":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M3":["pacato","pacato"],"V2_CASA_06_P_Q2_M3":["pacato","pacato"],"V2_CASA_06_P_M4":["pacato","pacato"],"V2_CASA_06_P_Q3_M4":["pacato","pacato"],"V2_CASA_06_P_M5":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M5":["pacato","pacato"],"V2_CASA_06_P_Q3_M5":["pacato","pacato"],"V2_CASA_06_P_M6":["pacato","pacato","pacato"],"V2_CASA_06_P_Q2_M6":["pacato","pacato"],"V2_CASA_06_P_Q3_M6":["pacato","pacato"],"V2_CASA_06_P":["pacato","pacato","pacato"],"V2_CASA_06_P_Q1_M7":["pacato","pacato"],"V2_CASA_06_P_Q2_M7":["pacato","pacato"],"V2_CASA_06_P_Q3_M7":["pacato","pacato"],"V2_CASA_07_M1":["pacato","pacato"],"V2_CASA_07_Q1_M1":["pacato","pacato"],"V2_CASA_07_M2":["pacato","pacato"],"V2_CASA_07_Q2_M2":["pacato","pacato"],"V2_CASA_07_M3":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M3":["pacato","pacato"],"V2_CASA_07_Q2_M3":["pacato","pacato"],"V2_CASA_07_M4":["pacato","pacato"],"V2_CASA_07_Q3_M4":["pacato","pacato"],"V2_CASA_07_M5":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M5":["pacato","pacato"],"V2_CASA_07_Q3_M5":["pacato","pacato"],"V2_CASA_07_M6":["pacato","pacato","pacato"],"V2_CASA_07_Q2_M6":["pacato","pacato"],"V2_CASA_07_Q3_M6":["pacato","pacato"],"V2_CASA_07":["pacato","pacato","pacato"],"V2_CASA_07_Q1_M7":["pacato","pacato"],"V2_CASA_07_Q2_M7":["pacato","pacato"],"V2_CASA_07_Q3_M7":["pacato","pacato"],"V2_CASA_07_P_M1":["pacato","pacato"],"V2_CASA_07_P_Q1_M1":["pacato","pacato"],"V2_CASA_07_P_M2":["pacato","pacato"],"V2_CASA_07_P_Q2_M2":["pacato","pacato"],"V2_CASA_07_P_M3":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M3":["pacato","pacato"],"V2_CASA_07_P_Q2_M3":["pacato","pacato"],"V2_CASA_07_P_M4":["pacato","pacato"],"V2_CASA_07_P_Q3_M4":["pacato","pacato"],"V2_CASA_07_P_M5":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M5":["pacato","pacato"],"V2_CASA_07_P_Q3_M5":["pacato","pacato"],"V2_CASA_07_P_M6":["pacato","pacato","pacato"],"V2_CASA_07_P_Q2_M6":["pacato","pacato"],"V2_CASA_07_P_Q3_M6":["pacato","pacato"],"V2_CASA_07_P":["pacato","pacato","pacato"],"V2_CASA_07_P_Q1_M7":["pacato","pacato"],"V2_CASA_07_P_Q2_M7":["pacato","pacato"],"V2_CASA_07_P_Q3_M7":["pacato","pacato"],"V2_CASA_08_M1":["pacato","pacato"],"V2_CASA_08_Q1_M1":["pacato","pacato"],"V2_CASA_08_M2":["pacato","pacato"],"V2_CASA_08_Q2_M2":["pacato","pacato"],"V2_CASA_08_M3":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M3":["pacato","pacato"],"V2_CASA_08_Q2_M3":["pacato","pacato"],"V2_CASA_08_M4":["pacato","pacato"],"V2_CASA_08_Q3_M4":["pacato","pacato"],"V2_CASA_08_M5":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M5":["pacato","pacato"],"V2_CASA_08_Q3_M5":["pacato","pacato"],"V2_CASA_08_M6":["pacato","pacato","pacato"],"V2_CASA_08_Q2_M6":["pacato","pacato"],"V2_CASA_08_Q3_M6":["pacato","pacato"],"V2_CASA_08":["pacato","pacato","pacato"],"V2_CASA_08_Q1_M7":["pacato","pacato"],"V2_CASA_08_Q2_M7":["pacato","pacato"],"V2_CASA_08_Q3_M7":["pacato","pacato"],"V2_CASA_08_P_M1":["pacato","pacato"],"V2_CASA_08_P_Q1_M1":["pacato","pacato"],"V2_CASA_08_P_M2":["pacato","pacato"],"V2_CASA_08_P_Q2_M2":["pacato","pacato"],"V2_CASA_08_P_M3":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M3":["pacato","pacato"],"V2_CASA_08_P_Q2_M3":["pacato","pacato"],"V2_CASA_08_P_M4":["pacato","pacato"],"V2_CASA_08_P_Q3_M4":["pacato","pacato"],"V2_CASA_08_P_M5":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M5":["pacato","pacato"],"V2_CASA_08_P_Q3_M5":["pacato","pacato"],"V2_CASA_08_P_M6":["pacato","pacato","pacato"],"V2_CASA_08_P_Q2_M6":["pacato","pacato"],"V2_CASA_08_P_Q3_M6":["pacato","pacato"],"V2_CASA_08_P":["pacato","pacato","pacato"],"V2_CASA_08_P_Q1_M7":["pacato","pacato"],"V2_CASA_08_P_Q2_M7":["pacato","pacato"],"V2_CASA_08_P_Q3_M7":["pacato","pacato"],"V2_VICINO_01":["pacato","pacato"],"V2_VICINO_02":["pacato","pacato"],"V2_VICINO_03":["pacato","pacato"],"V2_VICINO_04":["pacato","pacato"],"V2_VICINO_05":["pacato","pacato"],"V2_MARCO_costo_01":["pacato","sincero"],"V2_MARCO_costo_02":["pacato","pacato"],"V2_MARCO_costo_03":["pacato","pacato"],"V2_MARCO_costo_04":["pacato","pacato"],"V2_MARCO_costo_05":["sincero","sincero","sincero"],"V2_FAL_1_01":["pacato","sincero"],"V2_FAL_1_02":["sincero","sincero"],"V2_FAL_1_03":["pacato","sincero"],"V2_FAL_2_01":["sincero","sincero"],"V2_FAL_2_02":["sincero","sincero"],"V2_FAL_2_03":["pacato","sincero"],"V2_FAL_3_01":["sincero","sincero"],"V2_FAL_3_02":["sincero","sincero"],"V2_FAL_3_03":["sincero","pacato"],"V2_FAL_4_01":["sincero","pacato"],"V2_FAL_4_02":["sincero","pacato"],"V2_FAL_4_03":["pacato","sincero"],"V2_USCITA_01":["pacato","pacato"],"V2_USCITA_02":["pacato","sincero"],"V2_USCITA_03":["pacato","sincero"],"V2_USCITA_04":["sincero","sincero"],"V2_USCITA_05":["sincero","sincero"],"V2_GUARDIA_01":["pacato","pacato"],"V2_GUARDIA_02":["pacato","pacato"],"V2_GUARDIA_03":["pacato","sincero"],"V2_GUARDIA_04":["sincero","sincero"],"V2_GUARDIA_05":["pacato","sincero"],"V2_VARCO_01":["pacato","sincero"],"V2_VARCO_02":["pacato","sincero"],"V2_VARCO_03":["pacato","sincero"],"V2_VARCO_04":["pacato","sincero"],"V2_VARCO_05":["sincero","sincero","sincero"],"V2_ROS_n1_01":["sboccato","sincero"],"V2_ROS_n1_02":["gentile","ironico"],"V2_ROS_n1_03":["pacato","gentile"],"V2_ROS_n1_04":["sincero","pacato"],"V2_ROS_n2_01":["sboccato","sincero"],"V2_ROS_n2_02":["sincero","pacato"],"V2_ROS_n2_03":["pacato","sboccato"],"V2_ROS_n2_04":["sincero","pacato"],"V2_ROS_n3_01":["sincero","pacato"],"V2_ROS_n3_02":["ironico","pacato"],"V2_ROS_n3_03":["ironico","pacato"],"V2_ROS_n3_04":["pacato","sboccato"],"V2_ROS_n4_01":["sincero","pacato"],"V2_ROS_n4_02":["ironico","sincero"],"V2_ROS_n4_03":["pacato","pacato"],"V2_ROS_n4_04":["sincero","pacato"],"V2_ROS_n5_01":["sincero","sincero"],"V2_ROS_n5_02":["sboccato","pacato"],"V2_ROS_n5_03":["sincero","gentile"],"V2_ROS_n5_04":["sincero","pacato"],"V2_ROS_n6_01":["sincero","sincero"],"V2_ROS_n6_02":["sincero","gentile"],"V2_ROS_n6_03":["sincero","pacato"],"V2_ROS_n6_04":["sincero","sincero"],"V2_LIV_n1_01":["ironico","pacato"],"V2_LIV_n1_02":["gentile","ironico"],"V2_LIV_n1_03":["pacato","gentile"],"V2_LIV_n1_04":["gentile","pacato"],"V2_LIV_n2_01":["pacato","gentile"],"V2_LIV_n2_02":["sincero","pacato"],"V2_LIV_n2_03":["sincero","gentile"],"V2_LIV_n2_04":["pacato","sincero"],"V2_LIV_n3_01":["ironico","gentile"],"V2_LIV_n3_02":["ironico","pacato"],"V2_LIV_n3_03":["gentile","sincero"],"V2_LIV_n3_04":["sincero","gentile"],"V2_LIV_n4_01":["sincero","sincero"],"V2_LIV_n4_02":["sincero","pacato"],"V2_LIV_n4_03":["sincero","sincero"],"V2_LIV_n4_04":["sincero","pacato"],"V2_LIV_n5_01":["sincero","pacato"],"V2_LIV_n5_02":["sincero","sincero"],"V2_LIV_n5_03":["pacato","pacato"],"V2_LIV_n5_04":["sincero","gentile"],"V2_LIV_n6_01":["sincero","sincero"],"V2_LIV_n6_02":["sincero","sincero"],"V2_LIV_n6_03":["sincero","pacato"],"V2_LIV_n6_04":["sincero","sincero"],"ELE_ritiro_07b":["gentile","evasivo"],"ELE_ritiro_07c":["gentile","evasivo"],"ROS_vivavoce_01":["sincero","pacato","evasivo"],"DAR_traslochi_01":["gentile","evasivo"],"DAR_traslochi_02":["evasivo","sincero","freddo"],"DAR_traslochi_03":["freddo","sincero"],"DAR_traslochi_04":["sincero","freddo"],"DAR_traslochi_05":["freddo","sincero"],"DAR_imit_01":["pacato","pacato","freddo"],"DAR_imit_02":["sincero","gentile"],"DAR_imit_03":["sincero","gentile"]};
+const CHAT_UNLOCK = {"Elena":{"25":["ELE_turno_01"],"50":["ELE_riparazione_01"],"75":["ELE_nonno_01"],"100":["ELE_cena_ritorno_01"]},"Rosa":{"25":["V2_ROS_s25_01"],"50":["V2_ROS_s50_01"],"75":["V2_ROS_s75_01"],"100":["V2_ROS_s100_01"]},"Livia":{"25":["V2_LIV_s25_01"],"50":["V2_LIV_s50_01"],"75":["V2_LIV_s75_01"],"100":["V2_LIV_s100_01"]},"Sconosciuto":{"25":["V2_PRE_s25_01"],"50":["V2_PRE_s50_01"],"75":["V2_PRE_s75_01"]}};

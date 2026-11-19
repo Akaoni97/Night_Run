@@ -12,12 +12,15 @@ const first = (id) => E.CHAT_START.find((s) => s.node === id);
 // risponde sempre con la risposta n finché la chat aspetta
 const walk = (s, km, tk, pick = () => 0) => { let g = 0; while ((s.chat.th[tk] || {}).at && g++ < 40) { const o = E.chatOptions(s, km, tk); assert.ok(o.length, 'una chat che aspetta deve avere risposte'); E.chatReply(s, km, tk, o[Math.min(pick(g), o.length - 1)].i); } };
 
-test('chat: le 28 conversazioni di Elena, Rosa e Livia ci sono tutte', () => {
-  const ing = ['ELE_ritiro_01', 'ELE_pasta_01', 'ELE_turno_01', 'ELE_coinquilino_01', 'ELE_cena_01', 'ELE_bollette_01', 'ELE_richiamo_01', 'ELE_litigio_01', 'ELE_distanza_01', 'ELE_riparazione_01', 'ELE_nonno_01', 'ELE_cena_ritorno_01',
+test('chat: le conversazioni di Elena, Rosa e Livia ci sono tutte (quelle di soglia di Elena si aprono con la confidenza)', () => {
+  const ing = ['ELE_ritiro_01', 'ELE_pasta_01', 'ELE_coinquilino_01', 'ELE_cena_01', 'ELE_bollette_01', 'ELE_richiamo_01', 'ELE_litigio_01', 'ELE_distanza_01',
     'ROS_attrezzi_01', 'ROS_prudenza_01', 'ROS_ricontrollo_01', 'ROS_passato_01', 'ROS_promessa_01', 'ROS_dopo_passaggio_01', 'ROS_segni_01', 'ROS_recupero_01', 'ROS_guardia_01', 'ROS_prima_porta_01',
     'LIV_primo_01', 'LIV_affido_01', 'LIV_ottavio_01', 'LIV_fiducia_01', 'LIV_irene_01', 'LIV_promessa_01'];
-  assert.equal(ing.length, 28);
+  assert.equal(ing.length, 24);
   for (const id of ing) assert.ok(first(id), `manca la partenza di ${id}`);
+  // le altre quattro di Elena non partono dai chilometri: si aprono alle soglie di confidenza (25, 50, 75, 100)
+  assert.deepEqual(E.CHAT_UNLOCK.Elena, { 25: ['ELE_turno_01'], 50: ['ELE_riparazione_01'], 75: ['ELE_nonno_01'], 100: ['ELE_cena_ritorno_01'] });
+  for (const id of E.CHAT_UNLOCK.Elena[25].concat(E.CHAT_UNLOCK.Elena[50], E.CHAT_UNLOCK.Elena[75], E.CHAT_UNLOCK.Elena[100])) { assert.ok(E.CHAT_NODES[id], id); assert.ok(!first(id), `${id} non deve partire anche dai chilometri`); }
 });
 
 test('chat: ogni conversazione parte al suo km, e una chat ignorata resta lì ad aspettare', () => {
@@ -146,26 +149,26 @@ test('ritmo: le chat non partono tutte insieme, e tra cartelloni e messaggi pass
 test('chat: una soglia si consuma una volta sola (scendere sotto e risalire non riapre la conversazione)', () => {
   const s = fresh(); E.chatState(s).conf.Elena = 24;
   E.chatSetConf(s, 10, 'Elena', 2); E.chatSetConf(s, 10, 'Elena', -3); E.chatSetConf(s, 10, 'Elena', 2);
-  assert.equal(s.chat.q.filter((q) => q.node === 'V2_ELE_s25_01').length, 1);
+  assert.equal(s.chat.q.filter((q) => q.node === 'ELE_turno_01').length, 1);
 });
 
 test('chat: una conversazione sbloccata con prerequisiti falsi resta in coda invece di perdersi', () => {
   const s = fresh(); const c = E.chatState(s);
   for (const st of E.CHAT_START) c.started[st.id] = 1;          // solo la coda, senza le conversazioni a chilometri
-  c.q.push({ node: 'V2_ELE_n1_01', km: 0 });
-  const n = E.CHAT_NODES.V2_ELE_n1_01;
+  c.q.push({ node: 'V2_ROS_n1_01', km: 0 });
+  const n = E.CHAT_NODES.V2_ROS_n1_01;
   const salvato = n.req; n.req = 'flag:aspetto_questo';
   try {
     E.chatTick(s, 50);
-    assert.equal(c.q.length, 1, 'ancora in coda'); assert.ok(!(c.th.Elena && c.th.Elena.done.V2_ELE_n1_01));
+    assert.equal(c.q.length, 1, 'ancora in coda'); assert.ok(!(c.th.Rosa && c.th.Rosa.done.V2_ROS_n1_01));
     c.flags.aspetto_questo = 1; E.chatTick(s, 51);
-    assert.equal(c.q.length, 0); assert.ok(c.th.Elena.done.V2_ELE_n1_01);
+    assert.equal(c.q.length, 0); assert.ok(c.th.Rosa.done.V2_ROS_n1_01);
   } finally { if (salvato === undefined) delete n.req; else n.req = salvato; }
 });
 
 test('chat: le 18 conversazioni nuove, le 15 di soglia e le 12 città ci sono, e le città aspettano il loro flag', () => {
-  for (const w of ['ELE', 'ROS', 'LIV']) for (let i = 1; i <= 6; i++) assert.ok(E.CHAT_NODES[`V2_${w}_n${i}_01`], `V2_${w}_n${i}_01`);
-  for (const w of ['ELE', 'ROS', 'LIV', 'PRE']) for (const t of [25, 50, 75, 100]) if (!(w === 'PRE' && t === 100)) assert.ok(E.CHAT_NODES[`V2_${w}_s${t}_01`], `soglia ${w} ${t}`);
+  for (const w of ['ROS', 'LIV']) for (let i = 1; i <= 6; i++) assert.ok(E.CHAT_NODES[`V2_${w}_n${i}_01`], `V2_${w}_n${i}_01`);   // quelle di Elena sono state fuse nelle dieci scene
+  for (const w of ['ROS', 'LIV', 'PRE']) for (const t of [25, 50, 75, 100]) if (!(w === 'PRE' && t === 100)) assert.ok(E.CHAT_NODES[`V2_${w}_s${t}_01`], `soglia ${w} ${t}`);
   const citta = E.CHAT_START.filter((x) => /^V2_LUOGO_/.test(x.node)); assert.equal(citta.length, 12);
   const s = fresh(); E.chatTick(s, 99999);
   assert.ok(!E.CHAT_START.some((x) => /^V2_LUOGO_/.test(x.node) && s.chat.started[x.id]), 'nessuna città parte prima di essere raggiunta');
@@ -212,8 +215,8 @@ test('revisione: la prima sera con Elena, ogni strada arriva alla fine e lascia 
 });
 
 test('revisione: il litigio non finisce per forza in pace, ma apre sempre la riparazione più avanti', () => {
-  const rip = E.CHAT_START.find((x) => x.node === 'ELE_riparazione_01');
-  assert.deepEqual(rip.req, ['flag:elena_litigio']);
+  assert.equal(E.CHAT_NODES.ELE_riparazione_01.req, 'flag:elena_litigio');      // si apre alla soglia 50, ma solo dopo il litigio
+  assert.deepEqual(E.CHAT_UNLOCK.Elena[50], ['ELE_riparazione_01']);
   for (const picks of [[0, 0, 1], [0, 0, 0], [1, 1, 0], [2, 0, 1], [1, 0, 1]]) {
     const s = fresh(); E.chatEnter(s, 172, 'Elena', 'ELE_litigio_01'); let i = 0;
     while ((s.chat.th.Elena || {}).at && i < 8) E.chatReply(s, 172, 'Elena', picks[i++] || 0);

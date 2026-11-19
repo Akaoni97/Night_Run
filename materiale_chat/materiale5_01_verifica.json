@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "scene_riscritte": 10,
+  "nodi_narrativi": 80,
+  "risposte_narrative": 124,
+  "override_CASA": 20,
+  "nodi_consegnati": 100,
+  "risposte_consegnate": 167,
+  "nodi_ritirati": 96,
+  "nodi_composito": 908,
+  "ingressi_rimasti": 79,
+  "ingressi_rimossi": 9,
+  "soglie_Elena": {
+    "25": [
+      "ELE_turno_01"
+    ],
+    "50": [
+      "ELE_riparazione_01"
+    ],
+    "75": [
+      "ELE_nonno_01"
+    ],
+    "100": [
+      "ELE_cena_ritorno_01"
+    ]
+  },
+  "scelte_finte_nel_consegnato": [],
+  "nuovi_flag_con_lettore": 26,
+  "righe_oltre_90": 0,
+  "toni": {
+    "pacato": 58,
+    "ironico": 5,
+    "freddo": 36,
+    "sincero": 55,
+    "sboccato": 1,
+    "evasivo": 10,
+    "gentile": 2
+  },
+  "scene_protette_identiche": true,
+  "importatore_originale": "PASS",
+  "grafo_completo_aciclico": true,
+  "lunghezza_massima_grafo": 7,
+  "gap_partenze_libere_minimo": 14,
+  "motore": {
+    "ok": true,
+    "profili_flag": 2,
+    "ingressi_narrativi": 20,
+    "percorsi_terminati": 149,
+    "risposte_eseguite": 348,
+    "scelte_condizionate_eseguite": 3,
+    "soglie_provate": 4,
+    "salvataggio_intermedio": true,
+    "bugia_rinfacciata_in_due_scene": true,
+    "ammissione_nascosta": true,
+    "soprannome_usato_dalla_presenza": true,
+    "ambito": "Motore puro originale, senza DOM, regia o partita nel browser."
+  },
+  "ambito": "Solo dati e motore puro su copie. Non UI, partita o suite completa del gioco.",
+  "hash_file": {
+    "materiale5_01_elena.txt": "11d219e9ad1fbee9b2bb575c6ace4164234a30f9698fe33d6499512622c17b0e",
+    "materiale5_01_toni.txt": "d73049829a71304b38f55adefb4b29a37b980b8662bc1c2993f49f9412b8d376",
+    "materiale5_01_ingressi.json": "eb616b12b25b6a8a25eb61f56d523ee59193a60d3eaa0e757f82c653497a69ef"
+  }
+}
+

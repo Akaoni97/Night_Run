@@ -1,0 +1,618 @@
+Nota · MATERIALE 5 · BLOCCO 01 · ELENA · 19/11/2026
+
+Nota · Dieci scene. ELE_ritiro e ELE_litigio del materiale4 restano intatti.
+
+Nota · Gli ingressi e le rimozioni sono nel JSON; i toni nel file a parte.
+
+Nota · Il posto sulla sedia.
+
+[ELE_pasta_01] ELENA · I · sempre
+Pasta sulla sedia. Io in piedi col piatto.
+Poi sono io quella che comanda tutti.
+  A) «Spostalo. La sedia è tua.» → ELE_pasta_02
+  B) «Prima lui. Ha occupato il posto.» → ELE_pasta_03 [flag:elena_difende_pasta]
+  C) «Anche il gatto mi devi raccontare?» → ELE_pasta_04 [flag:e5_gatto_taglio]
+
+[ELE_pasta_02] ELENA · I · sempre
+Sai fare il capo benissimo, quando tocca al culo degli altri.
+  A) «È un gatto. Ti sei alzata tu.» → ELE_pasta_05
+
+[ELE_pasta_03] ELENA · I · sempre
+Certo. Il suo avvocato è partito e la parcella la pago io.
+L’auto. Una foto intera.
+  A) «Te la mando dal parcheggio.» → ELE_pasta_06 [flag:e5_foto]
+  B) «Per sentirti dire di venderla? No.» → ELE_pasta_07 [flag:e5_foto_no]
+
+[ELE_pasta_04] ELENA · I · sempre
+Il gatto te lo risparmio.
+La macchina però me la fai vedere.
+  A) «Da fermo. Eccola.» → ELE_pasta_06 [flag:e5_foto]
+  B) «Hai già deciso senza vederla.» → ELE_pasta_07 [flag:e5_foto_no]
+
+[ELE_pasta_05] ELENA · I · sempre
+Ah. Quando mi dici tu cosa fare è diverso.
+Mandami l’auto. Voglio vedere se almeno le ruote sono quattro.
+  A) «Ti mando la foto. Guarda pure.» → ELE_pasta_06 [flag:e5_foto]
+  B) «No. Tieniti il gatto, io la macchina.» → ELE_pasta_07 [flag:e5_foto_no]
+
+[ELE_pasta_06] ELENA · I · sempre
+L’ho vista.
+Tu ci vedi un’eredità. Io ci vedo del lavoro da pagare.
+  A) «Paga chi ci sale. E ci salgo io.» → ELE_pasta_08
+
+[ELE_pasta_07] ELENA · I · sempre
+La foto no, il parere no.
+Mi chiami quando ti serve il numero del carroattrezzi?
+  A) «Adesso sei tu che fai la stronza.» → ELE_pasta_08
+
+[ELE_pasta_08] ELENA · I · sempre
+Pasta si è rimesso comodo. Io ho mangiato in piedi.
+Almeno uno, qui, sa come ottenere quello che vuole.
+  ALT se: e5_gatto_taglio → Il gatto è sistemato. Il resto del tuo viaggio te lo tieni tu.
+[FINE]
+
+Nota · Dieci minuti di pausa.
+
+[ELE_turno_01] ELENA · I · sempre
+Ho dieci minuti. La macchina stavolta la lasciamo fuori.
+Il turno di notte me lo sto facendo io.
+  ALT se: e5_gatto_taglio → Il gatto te l’ho risparmiato. La pausa però stavolta è mia.
+  A) «Due minuti. Poi mi togli dai piedi.» → ELE_turno_02
+  B) «Allora mangia. Ripasso dopo.» → ELE_turno_03
+  C) «Quando servi tu, hai sempre il turno.» → ELE_turno_04
+
+[ELE_turno_02] ELENA · I · sempre
+Due minuti per dirmi cosa?
+Che parte ancora? L’abbiamo già festeggiato.
+  A) «Che non ho ancora deciso di tornare.» → ELE_turno_05
+  B) «Lascia perdere. Tanto hai da fare.» → ELE_turno_06 [flag:e5_turno_rinfaccio]
+
+[ELE_turno_03] ELENA · I · sempre
+Dopo quando?
+Tu dopo me lo scrivi e poi per me comincia un’altra notte.
+  A) «Finisci tu. Poi scrivi tu.» → ELE_turno_07 [flag:e5_aspetto_turno]
+  B) «Scrivo io alla prossima sosta.» → ELE_turno_05
+
+[ELE_turno_04] ELENA · I · sempre
+Quando servivi tu, avevi sei auto tra cui scegliere.
+Io tre tavoli. Potevi chiamare prima delle due.
+  A) «Tu almeno potevi richiamare.» → ELE_turno_06 [flag:e5_turno_rinfaccio]
+  B) «La scelta l’ho fatta senza di te. Sì.» → ELE_turno_05
+
+[ELE_turno_05] ELENA · I · sempre
+Quindi io mangio e tu continui.
+Era questa la notizia da farmi ingoiare?
+  A) «Sì. Non torno stasera.» → ELE_turno_08 [flag:e5_turno_detto]
+  B) «Appena so qualcosa ti scrivo.» → ELE_turno_08 [flag:e5_turno_rimando]
+
+[ELE_turno_06] ELENA · I · sempre
+Tu puoi lasciarmi sei messaggi. Io ti rovino due minuti.
+Mi hanno richiamata. Tanto per cambiare, devo andare io.
+  A) «Vai. Quella frase però resta.» → ELE_turno_08 [flag:e5_turno_rinfaccio]
+
+[ELE_turno_07] ELENA · I · sempre
+Scrivo io, allora.
+E se dormi, dormi. Senza il processo perché ho risposto tardi.
+  A) «Il messaggio lo aspetto.» → ELE_turno_08 [flag:e5_aspetto_turno]
+
+[ELE_turno_08] ELENA · I · sempre
+La pausa è finita. Il piatto no.
+  ALT se: e5_turno_rinfaccio → Il piatto è via. Le due di notte me le ricordo.
+  ALT se: e5_aspetto_turno → Torno ai tavoli. Il messaggio lo mando io, come hai detto.
+[FINE]
+
+Nota · Il trapano.
+
+[ELE_coinquilino_01] ELENA · I · sempre
+È mezzanotte. Ha ripreso col trapano.
+Scrivimi cosa gli diresti tu, già che sai sempre cosa dire a me.
+  A) «Smettila, si dorme. Giraglielo.» → ELE_coinquilino_02 [flag:e5_trapano_messaggio]
+  B) «Diglielo tu. Sei lì.» → ELE_coinquilino_03 [flag:e5_trapano_solo]
+  C) «Almeno lui sa dove sta andando. Nel muro.» → ELE_coinquilino_04
+
+[ELE_coinquilino_02] ELENA · I · sempre
+«La gente dorme.»
+Tu no, ovviamente. Tu stai facendo una cosa importantissima.
+  A) «Glielo giri o volevi litigare con me?» → ELE_coinquilino_05
+  B) «Stanotte mi fermo. È scritto.» → ELE_coinquilino_06 [flag:elena_sosta_promessa]
+
+[ELE_coinquilino_03] ELENA · I · sempre
+Sono qui, infatti. Lo sento da qui.
+Tu puoi decidere per me perfino quando mi dici di arrangiarmi.
+  A) «Non vengo a litigare col tuo coinquilino.» → ELE_coinquilino_07
+  B) «Scrivigli che domani lavori. Basta quello.» → ELE_coinquilino_05
+
+[ELE_coinquilino_04] ELENA · I · sempre
+Sì. Avanti finché trova qualcosa di duro.
+Ti somiglia. Solo che lui ogni tanto si ferma.
+  A) «Smetti di parlare della macchina per un minuto.» → ELE_coinquilino_07
+  B) «Digli di smettere. Con quelle parole.» → ELE_coinquilino_05
+
+[ELE_coinquilino_05] ELENA · I · sempre
+Gli ho scritto.
+Ha letto. Aspetto la risposta.
+  A) «Guarda se smette, non se risponde.» → ELE_coinquilino_08
+
+[ELE_coinquilino_06] ELENA · I · sempre
+Lo salvo.
+Così domani litighiamo su quello che hai scritto, non sul campo.
+  A) «Salvalo pure.» → ELE_coinquilino_08
+
+[ELE_coinquilino_07] ELENA · I · sempre
+Io volevo smettere di sentire un trapano.
+Tu sei riuscito a farmi venire voglia di riattaccare.
+  A) «Allora fallo.» → ELE_coinquilino_08
+
+[ELE_coinquilino_08] ELENA · I · sempre
+Ha smesso. Aspetto a festeggiare.
+  ALT se: e5_trapano_solo → Ha smesso. Da solo. Almeno lui.
+  ALT se: e5_trapano_messaggio → Ha letto. Ha smesso. Bastava quello.
+[FINE]
+
+Nota · Il piatto.
+
+[ELE_cena_01] ELENA · I · sempre
+Il piatto lo metto via?
+Una risposta. Non il bollettino della macchina.
+  ALT se: e5_aspetto_turno → Dovevo scrivere io. Ho finito: il piatto lo metto via?
+  A) «Sì. Mangia senza aspettarmi.» → ELE_cena_02 [flag:elena_non_aspettare]
+  B) «Tienilo ancora un po’.» → ELE_cena_03 [flag:e5_piatto_attesa]
+  C) «Non mi serve che mi tieni il piatto.» → ELE_cena_04 [flag:e5_piatto_respinto]
+
+[ELE_cena_02] ELENA · I · sempre
+Metto via.
+La vendi o la tieni?
+  ALT se: bugia_vendita → Domani la vendi, hai detto. Ti tengo il piatto?
+  A) «Volevo farti smettere.» → ELE_cena_05 [se:bugia_vendita;flag:e5_vendita_ammessa]
+  B) «Non la vendo.» → ELE_cena_06 [flag:e5_auto_tenuta]
+  C) «Mangia. Della macchina parliamo dopo.» → ELE_cena_07 [flag:e5_vendita_rinvio]
+
+[ELE_cena_03] ELENA · I · sempre
+Ancora quanto? Il piatto è qui. Tu no.
+  A) «Lo so. Mettilo via.» → ELE_cena_02 [flag:elena_non_aspettare]
+  B) «Ho detto un po’. Non mi cronometrare.» → ELE_cena_04 [flag:e5_piatto_respinto]
+
+[ELE_cena_04] ELENA · I · sempre
+Mi serviva sapere se mangiavo da sola.
+Adesso lo so.
+  A) «Sì. Stasera da sola.» → ELE_cena_08 [flag:elena_non_aspettare]
+
+[ELE_cena_05] ELENA · I · sempre
+Per farmi smettere.
+Ho messo un piatto per uno che mi aveva già liquidata.
+  A) «Quel domani era una bugia. Il resto te lo dico.» → ELE_cena_08
+
+[ELE_cena_06] ELENA · I · sempre
+Ecco. Potevi cominciare da lì.
+Io avrei mangiato caldo e tu avresti avuto lo stesso la tua macchina.
+  A) «Stasera la tengo. Anche se sei contraria.» → ELE_cena_08
+
+[ELE_cena_07] ELENA · I · sempre
+Dopo.
+Rimetto via anche quello.
+  A) «Per stasera basta.» → ELE_cena_08
+
+[ELE_cena_08] ELENA · I · sempre
+Ho mangiato. La macchina la digerisci tu.
+  ALT se: e5_vendita_ammessa → Ho mangiato. Il tuo «per farmi smettere» mi è rimasto qui.
+[FINE]
+
+Nota · La busta.
+
+[ELE_bollette_01] ELENA · I · sempre
+Ho aperto una bolletta.
+Tu almeno il conto della macchina l’hai fatto?
+  ALT se: e5_foto_no → La foto me l’hai negata. Almeno il conto l’hai guardato?
+  ALT se: e5_auto_tenuta → La tieni. Il conto per tenerla l’hai fatto?
+  A) «Te lo mando. Dimmi tu.» → ELE_bollette_02 [flag:e5_conto_mostrato]
+  B) «La pago io.» → ELE_bollette_03 [flag:e5_soldi_muro]
+  C) «Non ancora. Mi serviva portarla via.» → ELE_bollette_04
+
+[ELE_bollette_02] ELENA · I · sempre
+Il numero lo vedo.
+Tu lo hai guardato prima di partire o quando te l’ho chiesto io?
+  A) «Dopo. Ho fatto il conto dopo.» → ELE_bollette_05
+  B) «Cambia il prezzo se te lo dico?» → ELE_bollette_06
+
+[ELE_bollette_03] ELENA · I · sempre
+Sì. E io sono qui col mio.
+Quando mi dici che hai scelto bene, vuoi il parere o l’applauso?
+  A) «L’applauso no. Il parere l’ho già sentito.» → ELE_bollette_06
+  B) «Ti mando il conto. Guardalo.» → ELE_bollette_02 [flag:e5_conto_mostrato]
+
+[ELE_bollette_04] ELENA · I · sempre
+Portarla via da chi?
+Il notaio ti teneva per il giubbotto?
+  A) «Da lì. Ho scelto, volevo andarmene.» → ELE_bollette_05
+  B) «Anche da questa conversazione.» → ELE_bollette_07 [flag:e5_soldi_muro]
+
+[ELE_bollette_05] ELENA · I · sempre
+Tre volte l’hai visto.
+Adesso sembra che devi recuperare tutti gli altri anni al benzinaio.
+  A) «Tre volte. Il regalo però era mio.» → ELE_bollette_08
+
+[ELE_bollette_06] ELENA · I · sempre
+Il prezzo no.
+L’idea che mi sto facendo di te, parecchio.
+  A) «Tienitela. La bolletta chiudila tu.» → ELE_bollette_08
+
+[ELE_bollette_07] ELENA · I · sempre
+Allora vai.
+La prossima volta scrivimi direttamente quando vuoi gli applausi.
+  A) «Chiudo io.» → ELE_bollette_08
+
+[ELE_bollette_08] ELENA · I · sempre
+Rimetto tutto nella busta. Per stasera l’ho guardato abbastanza.
+  ALT se: e5_conto_mostrato → Il tuo conto è nella chat. Il mio torna nella busta.
+[FINE]
+
+Nota · La sosta promessa.
+
+[ELE_richiamo_01] ELENA · II · richiede: elena_sosta_promessa
+«Ti scrivo quando mi fermo.»
+È arrivato prima il tuo silenzio. Dove sei?
+  ALT se: e5_turno_rinfaccio → Avevo il turno, dicevi. Adesso il turno è finito. Dove sei?
+  ALT se: e5_turno_rimando → Alla prossima sosta, hai scritto. Io sto ancora aspettando.
+  ALT se: e5_turno_detto → Stasera non torni. Me l’hai scritto. Dove ti sei fermato?
+  A) «In un autogrill. Ti mando l’insegna.» → ELE_richiamo_02 [flag:e5_sosta_foto]
+  B) «Sono fermo. Il nome lo tengo.» → ELE_richiamo_03 [flag:e5_sosta_nascosta]
+  C) «Aspettavo di avere una notizia buona.» → ELE_richiamo_04
+
+[ELE_richiamo_02] ELENA · II · sempre
+Quella la vedo.
+E prima? Il messaggio non lo potevi mandare prima?
+  A) «L’ho rimandato. Stavo evitando te.» → ELE_richiamo_05
+  B) «Era la prima cosa a cui stavo pensando, certo.» → ELE_richiamo_06
+
+[ELE_richiamo_03] ELENA · II · sempre
+Allora tenevi il telefono acceso per cosa?
+Per vedere se smettevo prima io?
+  A) «Per essere lasciato stare.» → ELE_richiamo_06
+  B) «Ti mando l’insegna. Il resto resta uguale.» → ELE_richiamo_02 [flag:e5_sosta_foto]
+
+[ELE_richiamo_04] ELENA · II · sempre
+Per una buona notizia hai il notaio.
+A me avevi promesso un messaggio.
+  A) «Autogrill. Questa è l’insegna.» → ELE_richiamo_02 [flag:e5_sosta_foto]
+  B) «Se ogni volta finisce così, smetto di scrivere.» → ELE_richiamo_07
+
+[ELE_richiamo_05] ELENA · II · sempre
+Lo so.
+Volevo fartelo scrivere.
+  A) «Adesso l’hai scritto anche tu.» → ELE_richiamo_08
+
+[ELE_richiamo_06] ELENA · II · sempre
+Bravo stronzo.
+Tu trovi il tempo di rispondere solo quando puoi farmela pagare.
+  A) «Oggi la conversazione finisce qui.» → ELE_richiamo_08
+
+[ELE_richiamo_07] ELENA · II · sempre
+Smetti.
+Ma la prossima promessa te la fai da solo.
+  A) «Questa l’ho fatta io. Lo so.» → ELE_richiamo_08
+
+[ELE_richiamo_08] ELENA · II · sempre
+Il turno mi aspetta. Tu avevi promesso che scrivevi.
+  ALT se: e5_sosta_foto → Ho salvato l’insegna. Il resto lo riprendiamo. Non è finito.
+[FINE]
+
+Nota · La foto e l’ora.
+
+[ELE_distanza_01] ELENA · II · richiede: ev_distanza_impossibile
+La foto di Parigi.
+Adesso mi scrivi da dove l’hai presa.
+  A) «Dal telefono. L’ho appena fatta.» → ELE_distanza_02
+  B) «Aprila. Guarda anche l’orario.» → ELE_distanza_03
+  C) «Sei libera di non crederci.» → ELE_distanza_04
+
+[ELE_distanza_02] ELENA · II · sempre
+Prima eri vicino a Roma.
+Quale delle due cose mi hai raccontato male?
+  ALT se: bugia_vendita → «Domani la vendo.» Adesso ti credo sull’ora della foto?
+  A) «Nessuna delle due.» → ELE_distanza_05
+  B) «Ho imboccato una galleria. Poi c’era questo.» → ELE_distanza_06
+
+[ELE_distanza_03] ELENA · II · sempre
+Aperta. L’ora è quella.
+Una foto salvata da un’altra parte resta una foto sul telefono.
+  ALT se: e5_foto → La macchina me l’hai fatta vedere. Ora mi chiedi di guardare Parigi.
+  A) «Te ne mando un’altra, più larga.» → ELE_distanza_05 [flag:e5_seconda_foto]
+  B) «Ti lascio pensare che sia una presa in giro.» → ELE_distanza_07
+
+[ELE_distanza_04] ELENA · II · sempre
+Decidi tu anche quando ho finito di chiederti le cose.
+Mandami il bordo della foto.
+  ALT se: e5_vendita_ammessa → Prima una bugia. Ora ti serve che ti creda.
+  A) «Ti mando tutto il fotogramma.» → ELE_distanza_05 [flag:e5_seconda_foto]
+  B) «Arrangiati, allora.» → ELE_distanza_07
+
+[ELE_distanza_05] ELENA · II · sempre
+La scritta è quella. Il posto è quello.
+L’orario che mi hai dato prima, invece, non ci sta.
+  ALT se: e5_seconda_foto → Stesso posto anche nella seconda foto. L’orario di prima?
+  A) «Coincide. Tienile.» → ELE_distanza_08 [flag:distanza_confermata;+conoscenza]
+  B) «Tienile. Chiudo.» → ELE_distanza_08 [flag:distanza_confermata;flag:e5_foto_rottura]
+
+[ELE_distanza_06] ELENA · II · sempre
+Una galleria.
+Senti come suona, almeno, prima di scrivermelo?
+  A) «Lo sento. Il posto non cambia.» → ELE_distanza_05
+  B) «Ti riscrivo quando ho una spiegazione.» → ELE_distanza_07
+
+[ELE_distanza_07] ELENA · II · sempre
+Allora adesso ho pure una foto da guardare.
+Prima bastava il telefono.
+  A) «La foto resta lì.» → ELE_distanza_08 [flag:e5_foto_rottura]
+
+[ELE_distanza_08] ELENA · II · sempre
+Quella foto resta aperta.
+La prossima ora che mi scrivi la controllo.
+  ALT se: distanza_confermata → Il posto coincide. Mi resta quando sei partito.
+[FINE]
+
+Nota · Dopo il turno.
+
+[ELE_riparazione_01] ELENA · III · richiede: elena_litigio
+Ho finito il turno.
+La macchina è in vendita, sì o no?
+  ALT se: e5_foto_rottura → La foto è ancora aperta. La vendita invece come va?
+  ALT se: e5_soldi_muro → La paghi tu. Ho finito il turno: la tieni ancora?
+  A) «No. La tengo.» → ELE_riparazione_02 [flag:e5_ripresa;flag:e5_auto_tenuta]
+  B) «Sono ancora fermo. Ho dormito.» → ELE_riparazione_03 [flag:e5_ripresa]
+  C) «È l’unica cosa che sai chiedermi?» → ELE_riparazione_04 [flag:e5_ripresa]
+
+[ELE_riparazione_02] ELENA · III · sempre
+Quindi era un viaggio, non il tragitto fino a casa.
+  ALT se: bugia_vendita → Il «domani» della prima sera è finito. L’auto è ancora lì.
+  A) «Sì. È questo che ho scelto.» → ELE_riparazione_05
+  B) «Era una bugia.» → ELE_riparazione_06 [se:bugia_vendita;flag:e5_vendita_ammessa]
+
+[ELE_riparazione_03] ELENA · III · sempre
+Dormito quanto?
+Stavo per chiederti della vendita. Ti è uscita una dormita.
+  A) «Poco. Sono ancora stanco.» → ELE_riparazione_05 [flag:e5_sonno_detto]
+  B) «È la risposta che ti do adesso.» → ELE_riparazione_07
+
+[ELE_riparazione_04] ELENA · III · sempre
+È quella a cui cambi risposta ogni volta.
+Mi fai finire un turno a indovinare e poi quella pesante sono io.
+  A) «Non la vendo. Adesso hai la risposta.» → ELE_riparazione_05 [flag:e5_auto_tenuta]
+  B) «Sono stato uno stronzo. Ma la tengo.» → ELE_riparazione_06
+
+[ELE_riparazione_05] ELENA · III · sempre
+Quando hai deciso?
+Prima di chiamarmi, vero?
+  A) «Prima.» → ELE_riparazione_08
+  B) «Dopo che mi hai detto di venderla.» → ELE_riparazione_08 [flag:e5_scelta_ripicca]
+
+[ELE_riparazione_06] ELENA · III · sempre
+Mi hai lasciato fare tutti quei discorsi.
+E tu sapevi già come finivano.
+  A) «Sì. Ti ho lasciata parlare.» → ELE_riparazione_08
+
+[ELE_riparazione_07] ELENA · III · sempre
+Allora per oggi mi tengo quella.
+L’altra resta qui.
+  A) «Per oggi quella.» → ELE_riparazione_08
+
+[ELE_riparazione_08] ELENA · III · sempre
+Vado a dormire.
+Quando riparti scrivi. Le altre cose restano.
+  ALT se: e5_scelta_ripicca → Hai scelto per darmi torto. Quindi sono in auto anch’io?
+[FINE]
+
+Nota · Nonno.
+
+[ELE_nonno_01] ELENA · III · richiede: e5_ripresa
+Nonno, quel navigatore ti ha già denunciato?
+Che hai da controllare ancora?
+  ALT se: e5_sonno_detto → Dormito poco. Nonno, litighi ancora col navigatore?
+  A) «Quanti anni avevo quando ha cominciato a chiamarmi così?» → ELE_nonno_02
+  B) «Non chiamarmi così.» → ELE_nonno_03 [flag:e5_nonno_stop]
+  C) «Quello ormai parla meno di te.» → ELE_nonno_04
+
+[ELE_nonno_02] ELENA · III · sempre
+Otto. Claudio. Perché brontolavi.
+Adesso posso chiederti perché mi stai interrogando?
+  A) «Volevo vedere se ti ricordavi.» → ELE_nonno_05 [flag:nonno_uso_fissato]
+  B) «L’ho sentito dire in un altro modo.» → ELE_nonno_06 [flag:nonno_uso_fissato]
+
+[ELE_nonno_03] ELENA · III · sempre
+Da quando?
+Quando ti do ragione o quando comincio a rompere?
+  A) «Oggi mi dà fastidio. Basta.» → ELE_nonno_07 [flag:nonno_uso_fissato]
+  B) «Dimmelo come lo diceva Claudio.» → ELE_nonno_06 [flag:nonno_uso_fissato]
+
+[ELE_nonno_04] ELENA · III · sempre
+Lui ti dice dove andare.
+Io ti ho detto dove tornare. Ecco perché gli vuoi bene.
+  A) «Tu lo dici per prendermi in giro. Lui no.» → ELE_nonno_06 [flag:nonno_uso_fissato]
+  B) «Tieniti anche il soprannome.» → ELE_nonno_07 [flag:nonno_uso_fissato]
+
+[ELE_nonno_05] ELENA · III · sempre
+Me lo ricordo.
+Ho ancora la tua prima risposta. Il resto me lo dici quando ti pare.
+  A) «La domanda era per il nome.» → ELE_nonno_08
+
+[ELE_nonno_06] ELENA · III · sempre
+Claudio lo diceva tutto tenero.
+Io ti prendo per il culo, cretino. Te ne accorgi almeno adesso?
+  A) «Adesso sì.» → ELE_nonno_08
+
+[ELE_nonno_07] ELENA · III · sempre
+Per oggi lo lascio stare.
+Quello tutto dolce era Claudio. Io te lo dico perché rompi.
+  A) «Lui tenero, tu per prendermi in giro.» → ELE_nonno_08
+
+[ELE_nonno_08] ELENA · III · sempre
+Otto anni. Claudio. La tua faccia offesa era la stessa.
+Adesso smettila con le domande a cui sai già rispondere.
+  ALT se: e5_nonno_stop → Per oggi niente soprannome. La domanda resta.
+[FINE]
+
+Nota · Il posto rimasto.
+
+[ELE_cena_ritorno_01] ELENA · V · richiede: ev_fase_v
+Ho mangiato. Il piatto tuo l’ho messo via.
+Vuoi che lo riprenda o anche stavolta è un modo per salutarmi?
+  ALT se: e5_piatto_respinto → Il piatto lo volevi via. Perché oggi dovrei riprenderlo?
+  ALT se: e5_piatto_attesa → Ho aspettato quel tuo «un po’». Stasera ho mangiato prima.
+  ALT se: e5_vendita_rinvio → La macchina veniva dopo. Adesso vuoi tornare?
+  A) «Lascialo. Non so quando torno.» → ELE_cena_ritorno_02 [flag:elena_non_aspettare]
+  B) «Riprendilo. Voglio sedermi lì.» → ELE_cena_ritorno_03 [flag:e5_tavola]
+  C) «Stavolta volevo soltanto sentirti.» → ELE_cena_ritorno_04
+
+[ELE_cena_ritorno_02] ELENA · V · sempre
+Quel «non so quando» lo conosco.
+Che cosa cambierebbe, se ti credessi adesso?
+  ALT se: e5_vendita_ammessa → Un domani per farmi smettere l’avevi trovato. Oggi?
+  ALT se: e5_conto_mostrato → Il conto è arrivato. L’ora del ritorno manca.
+  A) «Quando arrivo chiamo. Prima non prometto niente.» → ELE_cena_ritorno_05
+  B) «Niente. Ma la voglia di tornare è vera.» → ELE_cena_ritorno_06
+
+[ELE_cena_ritorno_03] ELENA · V · sempre
+Lo riprendo.
+Quello che abbiamo da dirci lo mettiamo a tavola con noi.
+  A) «Anche la macchina. Ne parliamo lì.» → ELE_cena_ritorno_05
+  B) «Se ricominci, resto fuori.» → ELE_cena_ritorno_07 [flag:e5_soglia_ricatto]
+
+[ELE_cena_ritorno_04] ELENA · V · sempre
+Mi hai sentita. Sono ancora contraria.
+La voce è la stessa anche quando non ti serve.
+  ALT se: e5_sosta_nascosta → Mi avevi nascosto perfino l’insegna. Oggi la voce basta?
+  A) «Lo so. Per questo ho chiamato te.» → ELE_cena_ritorno_06
+  B) «Allora chiudiamo.» → ELE_cena_ritorno_07
+
+[ELE_cena_ritorno_05] ELENA · V · sempre
+Chiama da sotto.
+Scendo io. La macchina resta fuori.
+  ALT se: e5_tavola → Il piatto è sul tavolo. Chiama da sotto. La macchina resta fuori.
+  A) «Da sotto. E senza far finta di averla venduta.» → ELE_cena_ritorno_08
+
+[ELE_cena_ritorno_06] ELENA · V · sempre
+Puoi volere di tornare e continuare a non farlo.
+Fin qui ti è riuscito.
+  A) «Mi tengo anche questa.» → ELE_cena_ritorno_08
+
+[ELE_cena_ritorno_07] ELENA · V · sempre
+Il piatto lo rimetto via.
+Quella frase la tieni tu.
+  A) «Quella frase resta mia.» → ELE_cena_ritorno_08
+
+[ELE_cena_ritorno_08] ELENA · V · sempre
+Il telefono resta acceso.
+Quando arrivi, svegliami.
+  ALT se: e5_soglia_ricatto → Telefono acceso. Il «resto fuori» lo riprendiamo se torni.
+[FINE]
+
+[V2_CASA_03_M2] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che faceva il coinquilino?» → V2_CASA_03_Q2_M2 [flag:q32]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+[V2_CASA_03_Q2_M2] ELENA · IV · sempre
+Usava il trapano. A mezzanotte.
+  A) «Torno ai messaggi.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M2]
+
+[V2_CASA_03_M3] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M3 [flag:q31]
+  B) «Che faceva il coinquilino?» → V2_CASA_03_Q2_M3 [flag:q32]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+[V2_CASA_03_Q2_M3] ELENA · IV · sempre
+Usava il trapano. A mezzanotte.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M3]
+  B) «Un’altra.» → V2_CASA_03_M1 [chiude:V2_CASA_03_Q2_M3]
+
+[V2_CASA_03_Q3_M4] ELENA · IV · sempre
+No. Mi teneva sveglia.
+  A) «Torno ai messaggi.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M4]
+
+[V2_CASA_03_Q3_M5] ELENA · IV · sempre
+No. Mi teneva sveglia.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M5]
+  B) «Un’altra.» → V2_CASA_03_M1 [chiude:V2_CASA_03_Q3_M5]
+
+[V2_CASA_03_M6] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Che faceva il coinquilino?» → V2_CASA_03_Q2_M6 [flag:q32]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M6 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_fine
+
+[V2_CASA_03_Q2_M6] ELENA · IV · sempre
+Usava il trapano. A mezzanotte.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M6]
+  B) «Un’altra.» → V2_CASA_03_M4 [chiude:V2_CASA_03_Q2_M6]
+
+[V2_CASA_03_Q3_M6] ELENA · IV · sempre
+No. Mi teneva sveglia.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M6]
+  B) «Un’altra.» → V2_CASA_03_M2 [chiude:V2_CASA_03_Q3_M6]
+
+[V2_CASA_03] ELENA · IV · sempre
+Che cosa volevi chiedermi?
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_Q1_M7 [flag:q31]
+  B) «Che faceva il coinquilino?» → V2_CASA_03_Q2_M7 [flag:q32]
+  C) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_Q3_M7 [flag:q33]
+
+[V2_CASA_03_Q2_M7] ELENA · IV · sempre
+Usava il trapano. A mezzanotte.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q2_M7]
+  B) «Un’altra.» → V2_CASA_03_M5 [chiude:V2_CASA_03_Q2_M7]
+
+[V2_CASA_03_Q3_M7] ELENA · IV · sempre
+No. Mi teneva sveglia.
+  A) «Lo tengo.» → V2_CASA_03_fine [chiude:V2_CASA_03_Q3_M7]
+  B) «Un’altra.» → V2_CASA_03_M3 [chiude:V2_CASA_03_Q3_M7]
+
+[V2_CASA_03_P_M2] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che faceva il coinquilino?» → V2_CASA_03_P_Q2_M2 [flag:q32]
+  B) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+[V2_CASA_03_P_Q2_M2] IMITAZIONE DI ELENA · IV · sempre
+Cucinava. Aspettavo che liberasse il tavolo.
+  A) «Torno ai messaggi.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M2]
+
+[V2_CASA_03_P_M3] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M3 [flag:q31]
+  B) «Che faceva il coinquilino?» → V2_CASA_03_P_Q2_M3 [flag:q32]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+[V2_CASA_03_P_Q2_M3] IMITAZIONE DI ELENA · IV · sempre
+Cucinava. Aspettavo che liberasse il tavolo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M3]
+  B) «Un’altra.» → V2_CASA_03_P_M1 [chiude:V2_CASA_03_P_Q2_M3]
+
+[V2_CASA_03_P_M6] IMITAZIONE DI ELENA · IV · richiede: ev_voce_imitata
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Che faceva il coinquilino?» → V2_CASA_03_P_Q2_M6 [flag:q32]
+  B) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M6 [flag:q33]
+  C) «Per ora torno ai messaggi.» → V2_CASA_03_P_fine
+
+[V2_CASA_03_P_Q2_M6] IMITAZIONE DI ELENA · IV · sempre
+Cucinava. Aspettavo che liberasse il tavolo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M6]
+  B) «Un’altra.» → V2_CASA_03_P_M4 [chiude:V2_CASA_03_P_Q2_M6]
+
+[V2_CASA_03_P] IMITAZIONE DI ELENA · IV · sempre
+Chiedimi quello che vuoi. Poi vieni a prendermi.
+  A) «Di chi ti lamentavi prima?» → V2_CASA_03_P_Q1_M7 [flag:q31]
+  B) «Che faceva il coinquilino?» → V2_CASA_03_P_Q2_M7 [flag:q32]
+  C) «Il tuo coinquilino ti faceva paura?» → V2_CASA_03_P_Q3_M7 [flag:q33]
+
+[V2_CASA_03_P_Q2_M7] IMITAZIONE DI ELENA · IV · sempre
+Cucinava. Aspettavo che liberasse il tavolo.
+  A) «Lo tengo.» → V2_CASA_03_P_fine [chiude:V2_CASA_03_P_Q2_M7]
+  B) «Un’altra.» → V2_CASA_03_P_M5 [chiude:V2_CASA_03_P_Q2_M7]
+
+Nota · Soglie sostitutive: usare il filtro indicato nel rapporto.
+UNLOCK: Elena 25 → ELE_turno_01
+UNLOCK: Elena 50 → ELE_riparazione_01
+UNLOCK: Elena 75 → ELE_nonno_01
+UNLOCK: Elena 100 → ELE_cena_ritorno_01
+
+Nota · Fine blocco Elena.
+
