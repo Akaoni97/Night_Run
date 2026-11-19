@@ -40,6 +40,13 @@ due voci, e il controllo della sera le legge.
 - Aperto: Autosalone e Sfascio sono rimasti come prima; ogni facciata costa 1-2,5 ms a fotogramma (prima 0,5-1,5).
 - Serve dal cognato: niente; `drawTripPlace` ha un anello in più nella catena (vedi AGENTS).
 
+## 18/11/2026 notte · proprietario (storia: revisione dei dialoghi)
+- Fatto: letto lo zip «Le tre soste» di Codex e tutta la storia scritta (`STORIA_BOZZA_02.md`, `materiale_chat/`, `chat_dati.js`). Analisi misurata dei dialoghi di oggi
+  (172 scelte su 783 sono finte, solo 28 righe su 758 con vero dissenso, litigi scritti come mediazioni), regole di scrittura, tre scene di prova
+  (Elena, Rosa e Livia, Dario come prima imitazione) e piano: `docs/storia/REVISIONE_DIALOGHI.md`. Nel gioco non è cambiato niente.
+- Idea guida: chi ti dà sempre ragione è la presenza; le persone vere ti contraddicono.
+- Aperto: approvare il tono (proprietario, poi il cognato che scrive la storia), poi riscrivere Elena, Rosa, Livia e integrare le tre soste.
+
 ## 18/11/2026 notte · proprietario (ruote e borbottio)
 - Fatto: **borbottio rifatto più forte**: il primo giro era inudibile (in abitacolo +0,5 dB: a gas mollato lo scarico normale è quasi muto e i pop restavano a -25 dB).
   Ora il borbottio ha voci e livello suoi in `dsp.js` (colpo basso che scende di nota + rumore cupo, raffiche "brrrap"), in abitacolo da -19 a circa -13 dB di RMS al
