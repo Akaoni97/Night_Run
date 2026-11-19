@@ -4,6 +4,35 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 pomeriggio · cognato (pubblicazione)
+- Fatto: `docs/pubblicazione/PERCORSO.md`, il percorso per farne un gioco da installare (Electron, niente riscritture),
+  costi (zero fino a Steam: 100 dollari recuperabili) ed esempi su cosa diventa più stabile. Collegato da `LICENZE.md` (punto 9).
+- Serve dal proprietario: leggerlo e decidere insieme se e quando partire.
+
+## 19/11/2026 pomeriggio · cognato (ritocchi)
+- Fatto: "Come si gioca" riscritto per il gioco di oggi (viaggio, tappe, bisogni, documenti, polizia, leva) e tasti U, 0,
+  Tab, P. Fermi davanti a un locale: l'inquadratura scivola avanti e la facciata si vede (street2d.js, `camT` tra 0,3 e
+  0,5), gli avvisi a destra vanno a sinistra (`body.nearplace`, solo PC). Pensieri un po' più staccati dalla freccia D.
+- Aperto: col motel (facciata larga) l'inquadratura è un compromesso: più a sinistra l'auto finirebbe sotto il quadro.
+
+## 19/11/2026 pomeriggio · cognato (polizia)
+- Fatto: `polizia.js`. Pattuglie in giro a 80-100 km/h (si superano). Al fermo l'agente guarda anche i documenti
+  (assicurazione scaduta = la fai lì) e si può pagare, **contestare** (tre scuse a caso, risposte dell'agente, quattro esiti)
+  o **scappare** (inseguimento, a volte posto di blocco dopo). **Autovelox e Tutor** rari, a volte niente per 7-12 km, V e T
+  sulla mappa in basso, verbale sul telefono qualche km dopo. **Pattuglia in coda** ogni tanto. **Alcolici al bar** e
+  etilometro fuori da un bar su cinque (si vede dalla vetrina); da brilli solo la testa che ciondola e qualche battuta.
+- Da sapere per il proprietario: il posto di controllo in prima corsia ora ti fa accostare (prima era solo un avviso);
+  `P.busted` e `P.payFine` di `game.js` sono sostituiti da `polizia.js`.
+- Aperto: frequenze e multe sono a occhio; le battute sono segnaposto come gli altri pensieri.
+
+## 19/11/2026 · cognato
+- Fatto: polizia da autostrada: non ferma più chi è in sesta, ma chi le passa accanto oltre i 136 km/h (limite 130, tolleranza
+  5 %). Multa a scaglioni come il codice della strada, moltiplicata dal livello di ricercato. Provato nel browser (149 km/h: € 170).
+- Fatto: `strumenti/prova.js` dà per fatto il primo lavoro (dal tutorial obbligatorio `tappa:` e `km:` non saltavano più,
+  il gioco riportava al Bar Sport); `--tutorial` per provarlo. Controllo della sera fatto.
+- Da sapere: col borbottio nuovo gli scoppi della V40 sono tornati forti (copione `scoppi`: da −14,8 a −10,5 dB). Da sentire
+  nel gioco prima di toccare `VOLVO_POP` o `burG`. Le facciate a 9 m dall'ingresso sono mezze fuori schermo a destra.
+
 ## 18/11/2026 notte · proprietario (facciate)
 - Fatto: facciate dei locali rifatte in `locali2d.js`: bar, benzinaio, autogrill, motel, Niko, Luca e Neon Kustom con
   materiali, vetrine accese con la gente dentro, neon che sfarfallano, lampade, piante e luce sul marciapiede; di giorno

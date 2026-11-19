@@ -134,6 +134,15 @@ const INV = {
   pacco: { name: 'Pacco da consegnare', kg: 10, price: 0, note: 'Va portato a destinazione.' },
   zavorra: { name: 'Sacco di sabbia', kg: 25, price: 10, note: 'Peso sul posteriore: più trazione in partenza, ma più massa.' },
 };
+// limite dell'autostrada e multe per eccesso di velocità (tolleranza del 5 %, almeno 5 km/h: la multa scatta da 137 km/h).
+// Scaglioni come il codice della strada: fino a 10 km/h oltre, da 10 a 40, da 40 a 60, oltre 60. null = niente multa.
+const GAME_SPEED_LIMIT = 130;
+function speedFine(kmh) {
+  const over = Math.ceil(kmh - Math.max(5, kmh * 0.05) - GAME_SPEED_LIMIT);
+  if (over < 1) return null;
+  return { over, fine: over <= 10 ? 42 : over <= 40 ? 173 : over <= 60 ? 543 : 845 };
+}
+
 class StreetGame {
   constructor(sim, rnd = Math.random) {
     this.sim = sim;
@@ -538,7 +547,7 @@ class StreetGame {
       for (let i = 0; i < n; i++) this.spawnTraffic(d + 230 + r() * 160 + i * 45);
     } else if (kind === 'police') {
       const parked = r() < 0.6;
-      this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 2, x: d + (parked ? 380 : 260), v: parked ? 0 : 24 + r() * 4 });
+      this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 1 + (r() < 0.5 ? 1 : 0), x: d + (parked ? 380 : 260), v: parked ? 0 : (80 + r() * 20) / 3.6 });   // in giro: 80-100 km/h, si supera
     } else if (kind === 'station') {
       if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
     } else if (kind === 'job') this.offerJob();
@@ -597,15 +606,15 @@ class StreetGame {
   }
 
   busted(e) {
-    const kmh = this.kmh;
-    const fine = Math.round((160 + Math.max(0, kmh - 90) * 6) * (1 + this.s.heat * 0.3) / 10) * 10;
+    const kmh = this.kmh, sf = speedFine(kmh) || { over: 1, fine: 42 };
+    const fine = Math.round(sf.fine * (1 + this.s.heat * 0.3) / 10) * 10;
     e.chase = true; e.lane = this.lane; e.x = Math.min(e.x, this.s.dist - 40);
     this.siren = 1;
-    this.say(`Polizia! Fermato in sesta a ${Math.round(kmh)} km/h`, 'police');
+    this.say(`Polizia! Fermato a ${Math.round(kmh)} km/h, limite ${GAME_SPEED_LIMIT}`, 'police');
     this.stopAt(null, () => {
       this.ask({
         kind: 'police', title: 'Posto di blocco', time: 12,
-        text: `Patente e libretto. Sesta marcia a ${Math.round(kmh)} km/h in città: multa di € ${fine}.`,
+        text: `Patente e libretto. Il radar dice ${Math.round(kmh)} km/h, tolta la tolleranza ${GAME_SPEED_LIMIT + sf.over}: ${sf.over} km/h oltre il limite di ${GAME_SPEED_LIMIT}. Multa di € ${fine}.`,
         options: [{ label: `Paga € ${fine}`, act: () => this.payFine(e, fine) }],
         onTimeout: () => this.payFine(e, fine),
       });
@@ -790,7 +799,7 @@ class StreetGame {
       }
       if (e.kind === 'police' && !e.checked && !e.busy && rel < 3 && rel > -8 && this.mode === 'career') {
         e.checked = true;
-        if (sim.gear === sim.topGear() && sim.gear >= 5 && sim.v > 4 && !this.ap) this.busted(e);
+        if (!this.ap && speedFine(this.kmh)) this.busted(e);
       }
       if (e.kind === 'station' && !e.asked && rel < 620 && rel > 120) {
         e.asked = true;

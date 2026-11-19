@@ -18,6 +18,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Caratteri (Google Fonts) | Va bene | OFL / Apache; ma caricarli dai server di Google è un problema di privacy in UE: metterli nel repository. |
 | Disegni delle auto, grafica, codice, storia | Va bene | Fatti dal proprietario, dal cognato e con Claude per loro. |
 | Skill in `.claude/skills/` | Va bene | Apache 2.0 con NOTICE (strumenti di sviluppo, non vanno nel gioco). |
+| Come pubblicarlo (gioco da installare, Steam) | **Piano scritto** | Percorso con Electron, costi ed esempi sulla stabilità: [`docs/pubblicazione/PERCORSO.md`](docs/pubblicazione/PERCORSO.md) (punto 9). |
 
 ## 1. Il nome del gioco
 Su Steam c'è [*Night Run*](https://store.steampowered.com/app/2496340) di Thousand Ant (in arrivo, con playtest) e su
@@ -100,6 +101,12 @@ Non c'è un file LICENSE: tutto è "tutti i diritti riservati", ma se il reposit
 disegni, musica e **tutta la storia** (`docs/storia/`, `materiale_chat/`, `storia.js`, `chat_dati.js`): spoiler
 prima dell'uscita. Se il gioco andrà venduto, valutare di rendere privato il repository della storia o il
 repository intero.
+
+## 9. Come pubblicarlo (il percorso)
+Il piano per trasformare il gioco da pagina web a gioco da installare (Electron), con i costi (zero fino a Steam, poi
+100 dollari per gioco) e degli esempi su cosa diventa più stabile, sta in una pagina a parte:
+[`docs/pubblicazione/PERCORSO.md`](docs/pubblicazione/PERCORSO.md). Scritto il 19/11/2026 su richiesta del cognato,
+da decidere insieme. Le cose di questa pagina (nome, marchi, musica, crediti) vanno sistemate prima, qualunque sia il percorso.
 
 ## Crediti da mostrare nel gioco
 - Modello 3D Toyota Supra MK4 (LowPoly) di Mike Farrant, CC BY 4.0, modificato.

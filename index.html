@@ -329,6 +329,7 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .lanebtn.l { left: 12px; } .lanebtn.r { right: 12px; }
 .lanebtn:active { background: rgba(255,179,71,.25); }
 .toasts { position: absolute; right: 12px; top: 31%; display: grid; gap: 6px; justify-items: end; max-width: min(380px, 60%); }   /* sotto il radar delle corsie e la radio */
+@media (min-width: 601px) { body.nearplace .toasts { right: auto; left: 12px; top: 34%; justify-items: start; } }   /* davanti a un locale: a sinistra, così non coprono la facciata */
 .toast { font: 400 13.5px/1.3 var(--f-data); padding: 6px 10px; background: rgba(10,9,7,.82); border-right: 3px solid var(--amber); animation: tin .25s ease-out; }
 .toast.money { border-color: var(--lime); color: var(--lime); }
 .toast.police, .toast.lose { border-color: var(--crit); color: #ffb3bf; }
@@ -1152,11 +1153,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <div class="panel">
       <h2>Come si gioca</h2>
       <ul>
-        <li>Guidi tu: gas, freno, marce e corsie (<kbd>A</kbd> <kbd>D</kbd>). Con il sorpasso automatico la Supra si sposta da sola dietro al traffico lento; senza, se tamponi paghi il carrozziere.</li>
-        <li>Lungo la strada arrivano proposte: rispondi con i pulsanti o con <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Se non rispondi, vale l'ultima.</li>
-        <li>Polizia in vista: se le passi accanto in sesta ti ferma e ti multa. Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
-        <li>Sfide da 400 m: freno, gas su, parti al verde. Partire prima del via costa la posta.</li>
-        <li>La benzina si consuma davvero (70 litri). Le parti dell'officina si comprano e si montano da fermo.</li>
+        <li>Sei in viaggio sull'autostrada, di notte, con l'auto che hai ereditato. Lungo la strada ci sono le tappe: bar, benzinaio, autogrill, Motel Ovunque, officine, Autosalone, Sfascio. Rallenta, fermati davanti e premi <kbd>U</kbd> per entrare.</li>
+        <li>Al bar e all'autogrill c'è la bacheca: prendi un lavoro e porta il carico alla tappa giusta. Il primo è obbligatorio; dopo, se salti l'uscita, la consegna salta.</li>
+        <li>Fame, sete, sonno e igiene calano guidando: mangia, bevi e lavati nelle tappe. Si dorme al Motel Ovunque, ed è lì che il viaggio si salva.</li>
+        <li>Benzina, gomme e danni si consumano davvero. Assicurazione e bollo si pagano dal telefono (app Libretto), la revisione da Niko.</li>
+        <li>Polizia: il limite è 130 km/h; se passi accanto a una volante oltre i 136 ti ferma (paga, contesta o scappa). Autovelox (V) e Tutor (T) sono segnati sulla mappa in basso; un bar su cinque ha l'etilometro fuori. Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
+        <li>Cambio automatico: la leva parte in P, <kbd>E</kbd> la porta verso D, <kbd>Q</kbd> verso P. Superato un locale, in retro puoi tornare indietro di qualche decina di metri.</li>
+        <li>Lungo la strada arrivano domande: rispondi con i pulsanti o con <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Il telefono (<kbd>0</kbd>) ha messaggi, mappa e app; il menu (<kbd>Tab</kbd>) officina, bagagliaio e impostazioni.</li>
       </ul>
     </div>
     <div class="panel">
@@ -1166,6 +1169,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div><kbd>W</kbd><kbd>↑</kbd> <kbd>S</kbd><kbd>↓</kbd></div><div>Gas · freno (sulle auto senza ABS — 2002, Golf GTI, 205 GTI, A112, R5 Turbo, Williams — a freno pieno le ruote si bloccano: frena a colpetti)</div>
         <div><kbd>E</kbd><kbd>→</kbd> <kbd>Q</kbd><kbd>←</kbd></div><div>Sali · scala marcia</div>
         <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div><div>Rispondi alle proposte (altrimenti: marcia diretta)</div>
+        <div><kbd>U</kbd> <kbd>0</kbd> <kbd>Tab</kbd> <kbd>P</kbd></div><div>Entra nella tappa · telefono · menu · stazione radio</div>
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
         <div><kbd>9</kbd></div><div>Cambia la gomma forata con la ruota di scorta (da fermo, serve la scorta nel bagagliaio)</div>
         <div><kbd>8</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
@@ -2516,6 +2520,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       r.appendChild(row(IC('panino') + 'Panino <small>€ 4,50</small>', svc(4.5, 'Panino', { food: 0.5 })));
       r.appendChild(row(IC('acqua') + 'Acqua <small>€ 1</small>', svc(1, 'Acqua', { water: 0.5 })));
       r.appendChild(row(IC('sapone') + 'Lavarsi le mani <small>gratis</small>', svc(0, '', { wash: 0.1 })));
+      // alcolici (polizia.js): un bar su cinque ha la volante fuori con l'etilometro, e lo si vede dalla vetrina
+      if (typeof POL_ALCOLICI !== 'undefined' && game.polDrink) {
+        const ar = group('Alcolici');
+        for (const a of POL_ALCOLICI) ar.appendChild(row(`${a.name} <small>€ ${fmt(a.price)}</small>`, () => { const q = game.polDrink(a.id); if (q.ok && q.alc >= POL.alcLimite) flash('Sopra 0,5 g/l: se ti fermano, multa', 1.8); return q; }));
+        if (game.polBarCheck(n)) note('Dalla vetrina si vede una volante parcheggiata qui davanti. Ogni tanto un agente guarda dentro.');
+      }
     } else if (I.id === 'grill') {
       note('Sosta 24: pasti caldi, docce, un market. Le luci al neon non si spengono mai.');
       const r = group('Servizi');
@@ -2584,6 +2594,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (!mm.hidden) { mmT -= dt; if (mmT <= 0) { mmT = 0.1; renderMiniMap(); } }
     document.body.classList.toggle('inplace', !!I);
+    { const np = !I && game.placesOn && Math.abs(sim.v) < 6 && game.placesBetween(game.s.dist - 12, game.s.dist + 40).length > 0; document.body.classList.toggle('nearplace', np); }   // fermi davanti a un locale: gli avvisi vanno a sinistra
     if (I && I.phase === 'shop' && placeOpen !== I) openPlace(I);
     if ((!I || I.phase !== 'shop') && placeOpen) closePlace();
     if (placeOpen && placeOpen.id === 'fuel') renderFuel();
@@ -2611,6 +2622,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (e.kind === 'drop' && e.x - d > -back) add(Math.min(e.x, d + ahead - 30), 'C', '#b8ff3a', '', 'Consegna');
       if (e.kind === 'police' && !e.chase && e.x - d > -back && e.x - d < 450) add(e.x, '!', null, 'police', 'Polizia');
     }
+    // autovelox (V) e Tutor (T inizio e fine), da polizia.js: si vedono da lontano, così si sa dove si può tirare
+    if (game.polPins) for (const q of game.polPins(d - back, d + ahead)) add(q.x, q.t, q.end ? '#7f8aa8' : '#ff9a2e', q.x - d > 1500 ? 'far' : '', q.name);
     // il Viaggio: la meta del lavoro in corso (bandierina che pulsa; oltre la barra resta sul bordo con la distanza)
     // e le soste dove vanno consegnati scatole e bancali caricati
     if (game.s.vg && typeof VG !== 'undefined') {
@@ -3629,5 +3642,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="sfascio.js"></script>
 <script src="garage.js"></script>
 <script src="documenti.js"></script>
+<script src="polizia.js"></script>
 </body>
 </html>
