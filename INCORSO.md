@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| Claude (per il cognato) | Dieci migliorie: scuse, eventi 8-10 km, soldi negativi, nascondiglio, caccia (radar/sirena), statistiche, pioggia, danni e spie, testi | `polizia.js`, `viaggio.js`, `strada.js`, `index.html`, `street2d.js`, `sim.js`, `menu.js`, `pensieri.js`, `storia.js` | 19/11 17:45 |

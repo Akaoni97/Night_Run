@@ -4,6 +4,14 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 sera · cognato (migliorie)
+- Fatto: scuse assurde che a volte passano (anche il bagno); un evento ogni 8-10 km (incidente, controllo, foratura,
+  uno che ha fretta); credito in rosso fino a 500 € per benzina, cibo e motel; nascondiglio con rischio (1 su 3 ti
+  aspettano fuori); sirena e radio che seguono la distanza, volanti nel radar; statistiche nella scheda Partita;
+  aquaplaning e frenate più corte per tutti sul bagnato; spie sul quadro; pensieri sullo stato dell'auto.
+- Aperto: gli epiloghi A, C, D non li ho toccati (sono trama); il punto 4 (obiettivo vicino) da spiegare meglio.
+- Da provare sul PC: grandezza delle spie sul quadro, volume della sirena.
+
 ## 19/11/2026 sera · cognato (inseguimenti)
 - Fatto: da ricercato le volanti si sommano (quelle che bruci e i rinforzi da dietro) e ti fermano solo tagliandoti la
   strada: ti superano, ti si piazzano davanti, inchiodano fino a 50; sotto i 60 con una davanti ti prendono (multone,

@@ -1,8 +1,10 @@
 // ============================================================================
 //  Night Run · I pensieri del protagonista (dopo missioni.js)
 //  Ogni tanto il protagonista dice cosa pensa: un testo scritto sulla strada, 8-10 secondi, senza vignetta e senza riquadro.
-//  Tre sorgenti: PENS_KM (uno scritto, a un certo km: la radio, il navigatore...), PENS_BISOGNI (fame, sete, sonno, igiene:
-//  due livelli, prima presto e poi con urgenza) e PENS_ANIMO (pensieri a caso, ognuno una sola volta per partita).
+//  Quattro sorgenti: PENS_KM (uno scritto, a un certo km: la radio, il navigatore...), PENS_BISOGNI (fame, sete, sonno,
+//  igiene: due livelli, prima presto e poi con urgenza), PENS_STATO (com'è messa l'auto e la situazione: fari rotti, spia
+//  del motore, gomma, pioggia, soldi in rosso, ricercato; una volta quando comincia) e PENS_ANIMO (pensieri a caso, ognuno
+//  una sola volta per partita).
 //  Non si ripetono: ogni gruppo si pesca da un mazzo mescolato, che si ricarica solo quando è finito.
 //  I TESTI SONO SEGNAPOSTO (tranne la radio): si cambiano qui. La storia nuova ne aggiunge con game.vgThink(testo).
 //  Stato in game.s.vg.pens; l'ultimo pensiero in game.thought ({ text, left, id }), che il testo a schermo legge.
@@ -45,7 +47,20 @@ const PENS_ANIMO = [
   'Chissà se prima o poi arrivo a una fine.',
   'Ho lasciato la luce accesa a casa? Boh.',
   'Mi sa che ho esagerato col caffè.',
+  'A quest\'ora le canzoni alla radio sembrano scritte apposta per chi guida da solo.',
+  'Conto le strisce bianche. Poi perdo il conto. Poi ricomincio.',
+  'Chi guida di notte ha sempre qualcosa da cui scappare. O verso cui correre.',
+  'Le luci dei camion da lontano sembrano un paese che si muove.',
 ];
+// com'è messa l'auto e la situazione: `on` dice se vale adesso; parla quando comincia (e lo ripete dopo PENS_RIPETI)
+const PENS_STATO = {
+  luci: { on: (g) => (g.sim.damage || 0) > 0.35, frasi: ['I fari vanno e vengono. Qualche botta di troppo, e si vede.', 'Si è accesa la spia delle luci. Con questi fari a singhiozzo di notte è un terno al lotto.'] },
+  motore: { on: (g) => (g.sim.damage || 0) > 0.6 || !!(g.carState && g.carState().tired), frasi: ['La spia del motore è accesa. Finché tira, tiro avanti. Poi si vedrà.', 'Spia gialla sul quadro. Da Niko prima che diventi rossa.'] },
+  gomma: { on: (g) => g.tyres && Math.min(...g.tyres().p) < 1.9, frasi: ['Il volante tira da una parte. Una gomma è giù.', 'Spia delle gomme. Al prossimo benzinaio le gonfio, o da Niko se perde.'] },
+  pioggia: { on: (g) => (g.sim.wet || 0) > 0.5, frasi: ['Con quest\'acqua l\'auto galleggia. Piede leggero.', 'Pioggia. Le frenate si allungano, meglio tenere le distanze.'] },
+  rosso: { on: (g) => g.s.money < 0, frasi: ['Sono in rosso. Il prossimo lavoro lo prendo senza fare storie.', 'Conto in negativo. Per la benzina mi fanno ancora credito, ma non durerà.'] },
+  ricercato: { on: (g) => !!(g.s.pol && g.s.pol.fuga), frasi: ['Tutte le volanti hanno la mia targa. Devo sparire in un parcheggio.', 'Sirene in giro. Il primo locale che trovo, mi ci infilo.'] },
+};
 const PENS_PAUSA = 25;                    // secondi minimi tra un pensiero e il prossimo
 const PENS_ANIMO_OGNI = [150, 150];       // i pensieri a caso arrivano ogni 150-300 secondi di guida
 const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con un'altra frase) ogni 7 minuti
@@ -92,7 +107,15 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
       p.lvl[n] = lvl;
       if (lvl && (lvl > was || p.t - (p.nag[n] || 0) > PENS_RIPETI)) { p.nag[n] = p.t; this.vgThink(this.vgPensDraw(PENS_BISOGNI[n][lvl - 1], n + lvl)); return; }
     }
-    // 3. un pensiero a caso, ogni tanto
+    // 3. com'è messa l'auto o la situazione, quando comincia
+    p.st = p.st || {};
+    for (const [id, q] of Object.entries(PENS_STATO)) {
+      let on = false; try { on = !!q.on(this); } catch (e) { on = false; }
+      const was = p.st[id];
+      if (on && (!was || p.t - was > PENS_RIPETI)) { p.st[id] = p.t; this.vgThink(this.vgPensDraw(q.frasi, 'st' + id)); return; }
+      if (!on && was) p.st[id] = 0;
+    }
+    // 4. un pensiero a caso, ogni tanto
     if (p.t >= p.nextAmb) {
       const left = PENS_ANIMO.filter((_, i) => !p.seen['a' + i]);
       p.nextAmb = p.t + PENS_ANIMO_OGNI[0] + (this.rnd || Math.random)() * PENS_ANIMO_OGNI[1];
@@ -152,4 +175,4 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     el.classList.toggle('on', th.left > 0.8 && !nascosto);
   }, 150);
 })();
-if (typeof window !== 'undefined') Object.assign(window, { PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_SOGLIE });
+if (typeof window !== 'undefined') Object.assign(window, { PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_SOGLIE, PENS_STATO });
