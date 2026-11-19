@@ -29,7 +29,8 @@ const POL = {
   alcLimite: 0.5, alcCala: 0.00035,                   // g/l: limite e quanto cala al secondo
   fuga: { ritardo: 2.6, acc: 3.2, vmax: 50, perso: 450, tempo: 75, multa: 1000, aVolante: 400,
     sorpasso: 7, taglio: 9, frena: 5.5, vTaglio: 14, presa: 60 / 3.6, presaT: 1.2, fermoT: 2, reazione: 0.8,
-    rinforzi: [26, 42], max: 4 },   // m/s in più per superarti, m davanti per tagliare, decelerazione, 50 km/h, ti prendono sotto i 60
+    rinforzi: [26, 42], max: 4,   // m/s in più per superarti, m davanti per tagliare, decelerazione, 50 km/h, ti prendono sotto i 60
+    visto: 20, vistoP: 1 / 3 },   // entrando in un locale con una volante a meno di 20 m: una volta su tre ti aspetta fuori
 };
 // bevande del bar: prezzo e g/l che aggiungono
 const POL_ALCOLICI = [
@@ -59,12 +60,12 @@ const POL_SCUSE = [
     '«Ho un cugino anch\'io. Gli assomiglia. Metà multa, per la famiglia.»',
     '«Non ho cugini. Paghi.»',
     '«Mio cugino è in galera. Vuole fargli compagnia? No? Allora paghi di più.»'] },
-  { t: '«Mi scusi, ha ragione. Non succederà più.»', p: [0.1, 0.5, 0.38, 0.02], r: [
+  { t: '«Mi scusi, ha ragione. Non succederà più.»', p: [0.18, 0.45, 0.35, 0.02], r: [
     '«Uno sincero, a quest\'ora. Mi ha commosso. Vada.»',
     '«Almeno è onesto. Le tolgo un pezzo.»',
     '«Lo dicono tutti. Paghi lo stesso.»',
     '«Lo ha detto anche l\'altra volta. Me lo ricordo, sa?»'] },
-  { t: '«Avevo un\'urgenza. Fisiologica. Grave.»', p: [0.08, 0.42, 0.4, 0.1], r: [
+  { t: '«Avevo un\'urgenza. Fisiologica. Grave.»', p: [0.3, 0.32, 0.3, 0.08], r: [
     '«Per carità, vada. E non sul sedile.»',
     '«Capisco. Il prossimo bar è vicino. Metà multa e stringa i denti.»',
     '«Il bagno costa meno della multa. Paghi.»',
@@ -89,6 +90,27 @@ const POL_SCUSE = [
     '«Conosco Niko. Metà multa, e che non mi faccia più pagare il bullone a parte.»',
     '«Anche io vado da Niko. A cinquanta all\'ora.»',
     '«Niko mi ha venduto una frizione rotta. Lei paga per tutti e due.»'] },
+  // le assurde (raro): escono solo ogni tanto tra le tre proposte, ma sono talmente fuori di testa che spesso passano
+  { t: '«Ho appena visto un UFO e lo stavo seguendo.»', raro: true, p: [0.5, 0.1, 0.25, 0.15], r: [
+    '«Anche lei? Quello con le luci verdi? ...Vada. E non ne parli con nessuno, intesi?»',
+    '«Scrivo "avvistamento" nel verbale. Metà multa, per la scienza.»',
+    '«L\'UFO è il nostro elicottero. E l\'ha seminato.»',
+    '«Allora le faccio la multa anche per il disco volante.»'] },
+  { t: '«Guida la mia gatta. Io faccio solo i pedali.»', raro: true, p: [0.45, 0.15, 0.25, 0.15], r: [
+    '«...Sono le tre di notte e non sono pagato abbastanza per questo. Vada.»',
+    '«La gatta non ha la patente. Metà multa a lei, metà alla gatta.»',
+    '«Non vedo nessuna gatta. Vedo solo lei. E la multa.»',
+    '«Guida senza patente e maltratta gli animali. Bella serata.»'] },
+  { t: '«Sto scappando da mia suocera. È dietro di me.»', raro: true, p: [0.5, 0.15, 0.25, 0.1], r: [
+    '«Ho una suocera anch\'io. Vada, e che Dio la protegga.»',
+    '«La capisco. Metà multa, e saluti la signora da lontano.»',
+    '«Dietro di lei ci sono solo io. Paghi.»',
+    '«Sua suocera ci ha chiamati. Dice che le deve anche dei soldi.»'] },
+  { t: '«Non sono io. Sono il mio gemello cattivo.»', raro: true, p: [0.4, 0.15, 0.3, 0.15], r: [
+    '«Allora dica al suo gemello di andare piano. Vada.»',
+    '«Facciamo metà multa a testa.»',
+    '«Ottimo. Il gemello paga la multa, lei paga la mia pazienza.»',
+    '«Due persone in un\'auto e una sola cintura. Si aggiunge al verbale.»'] },
 ];
 // frasi del protagonista quando ha bevuto, e quando gli passa
 const POL_BRILLO = [
@@ -167,7 +189,9 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   // contestazione: tre scuse a caso tra quelle che valgono per questo fermo
   P.polContest = function (S) {
     S.contested = true;
-    const pool = POL_SCUSE.filter((q) => !q.solo || q.solo.includes(S.why)), pick = [];
+    const strana = R(this) < 0.35;                 // ogni tanto, tra le tre, ce n'è una assurda
+    const pool = POL_SCUSE.filter((q) => (!q.solo || q.solo.includes(S.why)) && !q.raro), pick = [];
+    if (strana) { const rari = POL_SCUSE.filter((q) => q.raro); pick.push(rari[Math.floor(R(this) * rari.length)]); }
     while (pick.length < 3 && pool.length) pick.push(pool.splice(Math.floor(R(this) * pool.length), 1)[0]);
     this.prompt = null;
     this.ask({ kind: 'police', title: 'Contesti', time: 14, text: 'L\'agente ti guarda da sopra gli occhiali. «Sentiamo.»',
@@ -425,14 +449,30 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   P.exitPlace = function () {
     const I = this.inside;
     exit.call(this);
+    const A = st(this).aspetta;
+    if (I && A) {               // ti avevano visto entrare: la volante era lì fuori ad aspettarti
+      st(this).aspetta = null;
+      const e = { id: this.id++, kind: 'police', lane: 0, x: this.s.dist - 14, v: 0 }; this.ents.push(e);
+      this.polJoin(e, 14, 0, false, 'Ti aspettavano fuori. La volante accende la sirena: si riparte.');
+      return;
+    }
     if (I && I.id === 'bar' && this.s.vg && typeof VG !== 'undefined' && this.polBarCheck(VG.stopIndex(I.x)))
       this.ents.push({ id: this.id++, kind: 'police', lane: 0, x: this.s.dist + 150, v: 0, alcol: true, checked: true, docChk: true });
   };
   // da ricercato, entrare in un locale o in un negozio è l'unico modo per seminarle: loro vanno avanti e si dimenticano di te
   const enter = P.enterPlace;
   P.enterPlace = function (p) {
+    const near = st(this).fuga && chs(this).some((C) => Math.abs(C.gap) < POL.fuga.visto && this.ents.includes(C.e));
     const r = enter.call(this, p);
-    if (r && st(this).fuga) this.polClear('Ti infili nel parcheggio e spegni i fari. Le volanti tirano dritto e si dimenticano di te: ricercato azzerato.');
+    if (r && st(this).fuga) {
+      if (near && R(this) < POL.fuga.vistoP) {     // con la volante a ridosso, a volte ti hanno visto entrare: ti aspettano fuori
+        const n = chs(this).length;
+        for (const C of chs(this)) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+        this.pol.cs = []; sync(this); this.siren = 0; st(this).aspetta = { n };
+        this.say('Ti infili nel parcheggio e spegni i fari. La sirena si spegne... speriamo che non ti abbiano visto entrare.', 'police');
+      } else this.polClear(near ? 'Ti infili nel parcheggio all\'ultimo e spegni i fari. Le volanti tirano dritto e si dimenticano di te: ricercato azzerato.'
+        : 'Ti infili nel parcheggio e spegni i fari. Le volanti tirano dritto e si dimenticano di te: ricercato azzerato.');
+    }
     return r;
   };
 

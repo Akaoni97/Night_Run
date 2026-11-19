@@ -521,7 +521,9 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
 
   // ------------------------------------------------------------ servizi dei locali
   P.vgPay = function (eur, what) {
-    if (this.s.money < eur) return { ok: false, why: `Costa € ${eur}` };
+    const fido = typeof GAME_FIDO === 'number' ? GAME_FIDO : 0;   // cibo, bevande e motel anche in rosso, fino al credito
+    if (this.s.money - eur < -fido) return { ok: false, why: this.s.money < 0 ? `Sei in rosso di € ${Math.round(-this.s.money)}: niente più credito` : `Costa € ${eur}` };
+    if (this.s.money - eur < 0) this.say('Pagato a credito: sei in rosso', 'buy');
     this.s.money -= eur; if (what) this.say(`${what}: − € ${eur}`, 'buy'); return { ok: true };
   };
   P.vgEat = function (food, water, eur, what) {

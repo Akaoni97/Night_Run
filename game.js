@@ -3,6 +3,8 @@
 //  Indipendente dalla grafica: la scena 3D legge `ents`, `laneZ`, `s.dist`.
 // ============================================================================
 const GAME_FUEL_PRICE = 1.95;            // € al litro
+// in rosso si può andare (multe, rate): per benzina, cibo e motel ti fanno credito fino a GAME_FIDO euro sotto zero
+const GAME_FIDO = 500;
 const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a, 0xb38b2d];
 // traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
 // velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
@@ -338,8 +340,9 @@ class StreetGame {
     liters = Math.max(0, Math.min(liters, miss));
     if (liters < 0.5) return { ok: false, why: 'Il serbatoio è già pieno' };
     const cost = liters * GAME_FUEL_PRICE;
-    if (this.mode === 'career' && cost > this.s.money + 0.5) liters = Math.max(0, this.s.money / GAME_FUEL_PRICE);
-    if (liters < 0.5) return { ok: false, why: 'Non hai abbastanza soldi' };
+    if (this.mode === 'career' && cost > this.s.money + GAME_FIDO + 0.5) liters = Math.max(0, (this.s.money + GAME_FIDO) / GAME_FUEL_PRICE);
+    if (liters < 0.5) return { ok: false, why: `Sei in rosso oltre i € ${GAME_FIDO}: niente più credito, servono soldi` };
+    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: il benzinaio ti fa credito, per stavolta', 'fuel');
     I.fill = { liters, got: 0, cost: 0 };
     return { ok: true };
   }

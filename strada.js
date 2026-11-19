@@ -42,9 +42,27 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     return 'yield';
   };
 
-  // ------------------------------------------------------------ eventi in prima corsia: incidente, controllo della polizia
-  P.spawnRoadEvent = function () {
-    const d = this.s.dist, x = d + 650 + Math.random() * 250, kind = Math.random() < 0.55 ? 'crash' : 'stop';
+  // ------------------------------------------------------------ eventi tra le tappe, uno ogni 8-10 km: incidente o controllo
+  // della polizia in prima corsia, una gomma che comincia a perdere, uno che ha fretta e ti sfanala da dietro
+  P.spawnRoadEvent = function (kind) {
+    const d = this.s.dist, x = d + 650 + Math.random() * 250, r = Math.random();
+    kind = kind || (r < 0.35 ? 'crash' : r < 0.6 ? 'stop' : r < 0.8 ? 'gomma' : 'fretta');
+    if (kind === 'gomma') {                       // foratura lenta: la pressione scende piano (viaggio.js), si vede sul quadro
+      if (!this.tyres) return;
+      const T = this.tyres(), i = Math.floor(Math.random() * 4); if (T.leak[i]) return;
+      T.leak[i] = 0.008 + Math.random() * 0.01;
+      this.say('Un colpo secco sotto la scocca: hai preso qualcosa. Tieni d\'occhio la pressione delle gomme', 'info');
+      if (this.vgThink && this.s.vg) this.vgThink('Cos\'era quel botto? Speriamo non una gomma. Al prossimo benzinaio do un\'occhiata.');
+      return;
+    }
+    if (kind === 'fretta') {                      // un aggressivo arriva forte da dietro nella tua corsia e sfanala (trafficAI)
+      const sim = this.sim; if (sim.v < 15) return;
+      const L = GAME_TRAFFIC.filter((t) => t.len < 6 && t.vt !== 'ambulanza'), a = L[Math.floor(Math.random() * L.length)], vb = sim.v + 9;
+      this.ents.push({ id: this.id++, kind: 'traffic', vt: a.vt, len: a.len || 4.4, lane: this.lane, x: d - 90, v: vb, vT: vb, vBase: vb, color: 'orig', fretta: true,
+        drv: { t: 'aggressivo', T: 0.6, a: 2.6, b: 4 } });
+      this.say('Fari negli specchietti: arriva uno che ha fretta', 'info');
+      return;
+    }
     if (this.ents.some((e) => e.hazard && Math.abs(e.x - x) < 300)) return;
     const pick = () => GAME_TRAFFIC[Math.floor(Math.random() * GAME_TRAFFIC.length)];
     if (kind === 'crash') {
@@ -155,8 +173,8 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     this.trafficAI(dt);
     // un evento ogni tanto (nel viaggio e in autostrada), sempre in prima corsia
     const km = this.s.dist / 1000;
-    if (this.nextRoadEvent === undefined) this.nextRoadEvent = km + 4 + Math.random() * 6;
-    if (km > this.nextRoadEvent) { this.nextRoadEvent = km + 7 + Math.random() * 12; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
+    if (this.nextRoadEvent === undefined) this.nextRoadEvent = km + 5 + Math.random() * 4;
+    if (km > this.nextRoadEvent) { this.nextRoadEvent = km + 8 + Math.random() * 2; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
   };
 })();
 if (typeof window !== 'undefined') Object.assign(window, { ST_CAT, ST_CAT_NAME, ST_CAT_ONE, stCat });
