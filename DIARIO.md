@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 sera · cognato (inseguimenti)
+- Fatto: da ricercato le volanti si sommano (quelle che bruci e i rinforzi da dietro) e ti fermano solo tagliandoti la
+  strada: ti superano, ti si piazzano davanti, inchiodano fino a 50; sotto i 60 con una davanti ti prendono (multone,
+  +400 € per ogni volante in più). Con tre fanno muro su tutte le corsie. `polizia.js`, 178 test.
+- Da provare sul PC: quanto è facile scansarle con un'auto forte; i numeri sono in `POL.fuga` (sorpasso, taglio,
+  frena, vTaglio, presa, reazione, rinforzi, max).
+
 ## 19/11/2026 pomeriggio · cognato (usato e polizia)
 - Fatto: l'auto dell'usato col cartello VENDESI (e le facciate) ora sta dietro le auto in prima corsia (`street2d.js`,
   ordine a pari profondità). Inseguimenti: dopo «Scappa» sei ricercato; nessuna volante ti fa più accostare, quella che

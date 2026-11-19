@@ -6,9 +6,13 @@
 //  - CONTESTA: scegli una scusa tra tre (POL_SCUSE); ognuna ha le sue probabilità: annullata, ridotta, confermata, peggio.
 //  - SCAPPA: sei RICERCATO (s.pol.fuga) finché non entri in un locale o in un negozio a bordo strada. Da ricercato
 //    nessuna pattuglia ti fa più accostare in automatico (niente fermi, posti di controllo, etilometro, coda): le passi
-//    e quella che hai bruciato accende la sirena e ti insegue (this.pol.ch, polJoin). Se la distanzi di 450 m (o dopo
-//    75 s con un po' di vantaggio) sparisce dagli specchietti, ma resti ricercato e a volte trovi un posto di blocco.
-//    Le volanti vanno sempre avanti: se ti fermi in un locale tirano dritto e si dimenticano di te, ricercato a zero.
+//    e quella che hai bruciato accende la sirena e ti insegue (this.pol.cs, polJoin); ogni tanto arrivano rinforzi da
+//    dietro, fino a POL.fuga.max volanti. L'unico modo che hanno di fermarti è il taglio di strada: ti raggiungono, ti
+//    superano nella corsia accanto, ti si piazzano davanti e inchiodano fino a 50 km/h. Se sotto i 60 km/h ne hai una
+//    davanti nella tua corsia, o ti fermi con una volante addosso, ti hanno preso: multone (più alto con più volanti).
+//    Una la scansi cambiando corsia e accelerando; con un'auto scassata ti riprende, e tre davanti fanno muro.
+//    Distanziata di 450 m una volante sparisce; resti ricercato, e quando le hai perse tutte a volte c'è un posto di
+//    blocco. Le volanti vanno sempre avanti: se ti fermi in un locale tirano dritto e si dimenticano di te.
 //  - AUTOVELOX e TUTOR (s.pol.ctl): pochi, a volte niente per 7-12 km. Cartello 500 m prima, segnati sulla mappa in
 //    basso. Il verbale arriva sul telefono qualche km dopo (s.pol.verb).
 //  - PATTUGLIA IN CODA: ogni tanto una volante ti si mette dietro per un paio di km; se passi i 136 ti ferma.
@@ -23,7 +27,9 @@ const POL = {
   codaKm: [6, 14], codaP: 0.25, codaLen: [1.5, 3],    // pattuglia in coda: ogni quanto ci si prova, probabilità, km
   barOgni: 5,                                         // un bar su cinque ha l'etilometro
   alcLimite: 0.5, alcCala: 0.00035,                   // g/l: limite e quanto cala al secondo
-  fuga: { ritardo: 2.6, acc: 3.2, vmax: 50, perso: 450, tempo: 75, multa: 1000 },
+  fuga: { ritardo: 2.6, acc: 3.2, vmax: 50, perso: 450, tempo: 75, multa: 1000, aVolante: 400,
+    sorpasso: 7, taglio: 9, frena: 5.5, vTaglio: 14, presa: 60 / 3.6, presaT: 1.2, fermoT: 2, reazione: 0.8,
+    rinforzi: [26, 42], max: 4 },   // m/s in più per superarti, m davanti per tagliare, decelerazione, 50 km/h, ti prendono sotto i 60
 };
 // bevande del bar: prezzo e g/l che aggiungono
 const POL_ALCOLICI = [
@@ -122,7 +128,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
       if (f) { tot += f; voci.push(`Etilometro: ${gl.toFixed(2).replace('.', ',')} g/l, il limite è 0,5. € ${fmt(f)}${gl >= 0.8 ? ' e la patente la rivede tra un po\'' : ''}.`); }
       else voci.push(`Etilometro: ${gl.toFixed(2).replace('.', ',')} g/l. «Sotto il limite, vada pure. Piano.»`);
     }
-    if (why === 'fuga') { const f = Math.round((POL.fuga.multa + (data.base || 0) * 1.5) / 10) * 10; tot += f; voci.push(`Fuga all'alt, guida pericolosa, resistenza: € ${fmt(f)}. «Le è andata bene che non l'abbiamo inseguita in elicottero.»`); }
+    if (why === 'fuga') { const f = Math.round((POL.fuga.multa + (data.base || 0) * 1.5 + Math.max(0, (data.n || 1) - 1) * POL.fuga.aVolante) / 10) * 10; tot += f; voci.push(`Fuga all'alt, guida pericolosa, resistenza: € ${fmt(f)}. «Le è andata bene che non l'abbiamo inseguita in elicottero.»`); }
     // i documenti li guardano sempre (documenti.js); l'assicurazione scaduta si paga lì
     const sc = typeof this.docScaduti === 'function' && typeof DOC !== 'undefined' ? this.docScaduti() : [];
     for (const x of sc) tot += DOC.multa[x];
@@ -133,7 +139,8 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     if (!tot && !ass) { this.say(voci.join(' '), 'police'); return false; }
     if (!e) { e = { id: this.id++, kind: 'police', lane: this.lane, x: this.s.dist - 40, v: 0 }; this.ents.push(e); }
     const S = this.pol.stop = { e, why, data, tot, ass, voci, sc, contested: false };
-    e.chase = true; e.lane = this.lane; e.x = Math.min(e.x, this.s.dist - 40); e.checked = true;
+    if (why === 'fuga' && e.x > this.s.dist + 5) { S.ahead = e.x - this.s.dist; e.chase = false; e.lane = this.lane; e.checked = true; }   // ti ha tagliato la strada: resta davanti
+    else { e.chase = true; e.lane = this.lane; e.x = Math.min(e.x, this.s.dist - 40); e.checked = true; }
     this.siren = 1;
     this.say(why === 'speed' ? `Polizia! Fermato a ${Math.round(data.kmh)} km/h, limite ${GAME_SPEED_LIMIT}` : why === 'alcol' ? 'Polizia: «Accosti, controllo con l\'etilometro.»' : why === 'fuga' ? 'Ti hanno preso.' : 'La paletta si alza: accosta, controllo documenti', 'police');
     this.stopAt(null, () => this.polAsk(S));
@@ -154,6 +161,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     if (S.ass) { const d = this.docs(), k = this.s.dist / 1000; d.ass = Math.max(d.ass, k) + DOC.durata.ass; }
     S.e.chase = false; S.e.v = 0; S.e.lane = 0; S.e.x = Math.min(S.e.x, this.s.dist - 30);
     this.siren = 0; this.ap = null; this.pol.stop = null;
+    if (S.why === 'fuga') st(this).fuga = false;   // presa e pagata: la fuga è finita
     this.say(`Pagato: − € ${fmt(pay)}${S.ass ? ' (assicurazione compresa)' : ''}`, 'police');
   };
   // contestazione: tre scuse a caso tra quelle che valgono per questo fermo
@@ -182,56 +190,127 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   P.polFlee = function (S) {
     this.pol.stop = null; this.ap = null;
     S.e.chase = false; S.e.checked = true; S.e.v = 0;
-    st(this).fuga = true;
+    st(this).fuga = true; this.pol.cs = []; this.pol.rinfT = between(this, POL.fuga.rinforzi);
     this.s.heat = Math.min(5, Math.max(3, (this.s.heat || 0) + 1));
     this.polJoin(S.e, 12, S.tot, true);
-    this.say('Sgommi via. Sei ricercato: le volanti non ti fermano più, ti inseguono. Per farti dimenticare entra in un locale o in un negozio a bordo strada.', 'police');
-    if (this.vgThink && this.s.vg) this.vgThink('Adesso tutte le volanti mi cercano. Devo infilarmi da qualche parte e sparire finché passano oltre.');
+    this.say('Sgommi via. Sei ricercato: le volanti non ti fermano più al passaggio, ti inseguono e provano a tagliarti la strada. Per farti dimenticare entra in un locale o in un negozio a bordo strada.', 'police');
+    if (this.vgThink && this.s.vg) this.vgThink('Adesso tutte le volanti mi cercano. Se mi si piazzano davanti è finita: devo infilarmi da qualche parte e sparire.');
   };
-  // una volante si mette a inseguirti (quella da cui scappi, o una che hai bruciato da ricercato)
-  P.polJoin = function (e, gap, base = 0, first = false) {
-    const F = POL.fuga;
+  const chs = (g) => (g.pol.cs = g.pol.cs || []);
+  const sync = (g) => { g.pol.ch = chs(g)[0] || null; };
+  // una volante si mette a inseguirti (quella da cui scappi, una che hai bruciato da ricercato, o i rinforzi)
+  P.polJoin = function (e, gap, base = 0, first = false, msg) {
+    const F = POL.fuga, cs = chs(this);
+    if (cs.some((C) => C.e === e)) return null;
+    if (cs.length >= F.max) { e.checked = true; return null; }
     e.pursuit = true; e.checked = true; e.chase = false; e.busy = false; e.still = false; e.hazard = false; e.block = false; e.blockDone = false; e.alcol = false;
-    this.pol.ch = { e, gap: Math.max(12, gap || 12), t: first ? 0 : F.ritardo - 1, vP: first ? 0 : Math.max(0, e.v || 0), close: 0, vmax: F.vmax + (this.s.heat || 0) * 1.5 + R(this) * 3, base, said: 0 };
-    this.siren = 1;
-    if (!first) this.say('Hai bruciato una volante: sirena accesa, ti sta dietro.', 'police');
+    const C = { e, gap: Math.max(12, gap || 12), t: first ? 0 : F.ritardo, vP: first ? 0 : Math.max(0, e.v || 0), fase: 'segue', reaz: 0,
+      vmax: F.vmax + (this.s.heat || 0) * 1.5 + R(this) * 3, base };
+    cs.push(C); sync(this); this.siren = 1;
+    if (!first) this.say(msg || (cs.length > 1 ? `Hai bruciato un'altra volante: adesso sono ${cs.length}.` : 'Hai bruciato una volante: sirena accesa, ti sta dietro.'), 'police');
+    return C;
+  };
+  // corsia libera per una volante: tra 1 e 3, non quella di un'altra volante vicina
+  const laneFor = (g, C, prefer) => {
+    const busy = new Set(chs(g).filter((o) => o !== C && Math.abs(o.gap - C.gap) < 14).map((o) => o.e.lane));
+    for (const L of prefer) if (L >= 1 && L <= 3 && !busy.has(L)) return L;
+    return null;
   };
   P.polChase = function (dt) {
-    const C = this.pol.ch, F = POL.fuga, sim = this.sim, d = this.s.dist;
-    C.t += dt;
-    if (C.t > F.ritardo) {
-      const want = C.gap > 30 ? C.vmax : Math.min(C.vmax, sim.v + 2 + (C.gap - 8) * 0.25);   // vicino: ti sta dietro senza tamponarti
-      C.vP += Math.max(-6, Math.min(F.acc, (want - C.vP) * 2)) * dt;
+    const F = POL.fuga, sim = this.sim, d = this.s.dist, cs = chs(this), me = this.lane;
+    // rinforzi: arrivano da dietro, finché non sono troppe (con nessuna dietro ci mettono di più)
+    this.pol.rinfT = (this.pol.rinfT ?? between(this, F.rinforzi)) - dt;
+    if (this.pol.rinfT <= 0) {
+      this.pol.rinfT = between(this, F.rinforzi) * (cs.length ? 1 : 1.6);
+      if (cs.length < Math.min(3, F.max)) {
+        const e = { id: this.id++, kind: 'police', lane: 1 + Math.floor(R(this) * 3), x: d - 230, v: Math.max(sim.v, 30) };
+        const C = this.polJoin(e, 230, this.pol.block ? this.pol.block.base : 0, false, 'Alla radio: rinforzi. Un\'altra volante arriva da dietro.');
+        if (C) { C.vP = e.v; C.t = F.ritardo; }
+      }
     }
-    C.gap = Math.max(7, C.gap + (sim.v - C.vP) * dt);
-    const e = C.e;
-    if (C.gap < 200) { if (!this.ents.includes(e)) this.ents.push(e); e.x = d - C.gap; e.v = C.vP; e.lane = this.lane; e._z = undefined; }
-    else if (this.ents.includes(e)) this.ents.splice(this.ents.indexOf(e), 1);
-    const step = C.gap > 300 ? 3 : C.gap > 150 ? 2 : 1;
-    if (step > C.said) { C.said = step; this.say(step === 1 ? 'La volante ti sta addosso' : step === 2 ? 'La volante resta indietro: 150 m' : 'Ancora un po\': la sirena si sente appena', 'police'); }
-    // niente più fermo se ti raggiunge: si semina solo entrando in un locale; distanziata, sparisce dagli specchietti
-    if (C.gap > F.perso || (C.t > F.tempo && C.gap > 120)) this.polDrop();
+    for (const C of cs.slice()) {
+      const e = C.e, inside = this.ents.includes(e);
+      C.t += dt;
+      if (inside) { C.gap = d - e.x; C.vP = e.v; }          // la strada muove l'auto (e i tamponamenti la spostano)
+      let want = C.vP;
+      if (C.t > F.ritardo) {
+        if (C.fase === 'segue') {
+          want = C.gap > 30 ? C.vmax : Math.min(C.vmax, sim.v + (C.gap - 10) * 0.6 + 1);
+          if (C.gap > 16) e.lane = me;
+          else {                                             // vicina: ti supera nella corsia accanto
+            const L = laneFor(this, C, [me + 1, me - 1, me + 2, me - 2]);
+            if (L) { e.lane = L; C.fase = 'sorpassa'; }
+          }
+        }
+        if (C.fase === 'sorpassa') {
+          want = Math.min(C.vmax, sim.v + F.sorpasso);
+          if (e.lane === me && C.gap > -F.taglio) { const L = laneFor(this, C, [me + 1, me - 1]); if (L) e.lane = L; }
+          if (C.gap < -F.taglio) {                          // davanti abbastanza: taglia e inchioda
+            C.fase = 'taglia'; C.reaz = 0;
+            const L = laneFor(this, C, [me, me + 1, me - 1, me + 2, me - 2]); if (L) e.lane = L;
+            if (!C.said) { C.said = 1; this.say(cs.filter((o) => o.fase === 'taglia').length >= 3 ? 'Tre volanti davanti: fanno muro.' : 'La volante ti supera, ti si piazza davanti e inchioda!', 'police'); }
+          }
+          if (C.gap > 40) C.fase = 'segue';                 // l'hai staccata: torna a inseguire
+        }
+        if (C.fase === 'taglia') {
+          const ahead = -C.gap;                              // metri davanti a te
+          // nella tua corsia inchioda (fino a 50 km/h); nelle altre ti resta davanti alla tua velocità: con tre è un muro
+          if (e.lane === me) want = ahead > 25 ? sim.v - 1 : Math.max(F.vTaglio, Math.min(C.vP, sim.v + 1) - 3);
+          else want = Math.min(C.vmax, ahead > 12 ? sim.v - 0.5 : sim.v + 2);
+          // ti segue di corsia, con un attimo di ritardo, se la tua è libera da altre volanti
+          if (e.lane !== me) {
+            C.reaz += dt;
+            if (C.reaz > Math.max(0.3, F.reazione - (this.s.heat || 0) * 0.06) && laneFor(this, C, [me]) === me) { e.lane = me; C.reaz = 0; }
+          } else C.reaz = 0;
+          if (C.gap > 6) C.fase = 'segue';                  // l'hai passata: torna dietro
+        }
+      }
+      const acc = Math.max(C.fase === 'taglia' ? -F.frena : C.gap < 25 ? -9 : -6, Math.min(F.acc * (C.fase === 'sorpassa' ? 1.4 : 1), (want - C.vP) * 2));
+      C.vP = Math.max(0, C.vP + acc * dt); e.v = C.vP; e.acc = acc; e._z = undefined;
+      if (!inside) C.gap += (sim.v - C.vP) * dt;
+      if (C.gap < 200 && !inside) { e.x = d - C.gap; this.ents.push(e); }
+      else if (C.gap >= 200 && inside) this.ents.splice(this.ents.indexOf(e), 1);
+      if (C.gap > F.perso || (C.t > F.tempo && C.gap > 120 && C.fase === 'segue')) this.polDrop(C);
+    }
+    if (!this.pol.cs || !this.pol.cs.length) return;
+    // presa: sotto i 60 con una volante davanti nella tua corsia, o fermo con una volante addosso
+    const block = cs.find((C) => C.fase === 'taglia' && C.e.lane === me && -C.gap > 0 && -C.gap < 20);
+    const near = cs.some((C) => Math.abs(C.gap) < 15 && C.t > F.ritardo + 1);
+    this.pol.presa = (block && sim.v < F.presa) ? (this.pol.presa || 0) + dt : Math.max(0, (this.pol.presa || 0) - dt);
+    this.pol.fermo = (near && sim.v < 2) ? (this.pol.fermo || 0) + dt : 0;
+    if (this.pol.presa > F.presaT || this.pol.fermo > F.fermoT) this.polPresa(block ? block.e : cs[0].e);
   };
-  P.polDrop = function () {
-    const C = this.pol.ch; this.pol.ch = null; this.siren = 0;
-    if (C && C.e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
-    this.say('La volante è sparita dagli specchietti, ma la radio passa la tua targa: sei ancora ricercato. Entra in un locale o in un negozio per farti dimenticare.', 'police');
+  // ti hanno preso: le altre volanti restano indietro, accosti e paghi il multone
+  P.polPresa = function (e) {
+    const cs = chs(this), n = cs.length, base = Math.max(0, ...cs.map((C) => C.base || 0));
+    for (const C of cs) if (C.e !== e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+    this.pol.cs = []; sync(this); this.pol.presa = 0; this.pol.fermo = 0; this.pol.block = null;
+    e.pursuit = false;
+    this.polStop(e, 'fuga', { base, n });
+  };
+  P.polDrop = function (C) {
+    const cs = chs(this); C = C || cs[0]; if (!C) return;
+    cs.splice(cs.indexOf(C), 1); sync(this);
+    { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+    if (cs.length) { this.say(`Una volante resta indietro. Ne restano ${cs.length}.`, 'police'); return; }
+    this.siren = 0;
+    this.say('Le volanti sono sparite dagli specchietti, ma la radio passa la tua targa: sei ancora ricercato. Entra in un locale o in un negozio per farti dimenticare.', 'police');
     if (R(this) < 0.6) {                         // un posto di blocco più avanti: due volanti in prima e seconda, la terza libera
       const x = this.s.dist + 1800 + R(this) * 2200;
       for (const lane of [1, 2]) this.ents.push({ id: this.id++, kind: 'police', lane, x: x + lane * 3, v: 0, busy: true, still: true, hazard: true, block: true, checked: true });
-      this.pol.block = { x, base: C ? C.base : 0 };
+      this.pol.block = { x, base: C.base || 0 };
       this.say('Alla radio: posto di blocco più avanti. Corsia di sorpasso libera: se lo bruci, ti inseguono di nuovo.', 'info');
     }
   };
   // ricercato azzerato: sei entrato in un locale e le volanti hanno tirato dritto
   P.polClear = function (msg) {
-    const C = this.pol.ch; this.pol.ch = null; this.pol.block = null; this.siren = 0;
-    if (C && C.e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+    for (const C of chs(this)) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
+    this.pol.cs = []; sync(this); this.pol.block = null; this.siren = 0; this.pol.presa = 0; this.pol.fermo = 0;
     st(this).fuga = false; this.s.heat = 0;
     this.say(msg, 'police');
   };
   P.polBlock = function () {
-    const B = this.pol.block, d = this.s.dist; if (!B || d < B.x - 4) return;
+    const B = this.pol.block, d = this.s.dist; if (!B || d < B.x + 2) return;   // appena passato: le volanti ti vedono
     this.pol.block = null;
     this.ents.forEach((o) => { if (o.block) o.blockDone = true; });
     if (!st(this).fuga) return;                  // (la fuga è finita prima del posto di blocco)
@@ -370,16 +449,18 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     this.pol = this.pol || {};
     this.ents = this.ents.filter((o) => !o.blockDone || o.x - this.s.dist > -60);
     if (this.inside || !on(this)) return;
+    { const T = this.pol.stop; if (T && T.ahead) { T.e.x = this.s.dist + T.ahead; T.e.v = this.sim.v; T.e.lane = this.lane; T.e._z = undefined; } }   // la volante che ti ha preso resta davanti finché accosti
     if (this.s.vg) this.polAlc(dt);
     this.polPlan(); this.polCams(dt, d0);
     const S = st(this);
     if (S.fuga) {                                // ricercato: le stelle non scendono finché non entri in un locale
       this.s.heat = Math.max(3, this.s.heat || 0);
     }
-    if (this.pol.ch) this.polChase(dt);
-    else if (this.pol.block) this.polBlock();
-    // ricercato e nessuno dietro: la prima volante che passi accende la sirena e ti insegue
-    if (S.fuga && !this.pol.ch) for (const e of this.ents) if (e.kind === 'police' && !e.pursuit && e.x < this.s.dist && e.x > this.s.dist - 25) { this.polJoin(e, this.s.dist - e.x, this.pol.block ? this.pol.block.base : 0); break; }
+    if (this.pol.block) this.polBlock();
+    // ricercato: ogni volante che passi accende la sirena e si aggiunge all'inseguimento
+    if (S.fuga) for (const e of this.ents.slice()) if (e.kind === 'police' && !e.pursuit && !e.checkedFuga && e.x < this.s.dist && e.x > this.s.dist - 25) { e.checkedFuga = true; this.polJoin(e, this.s.dist - e.x, this.pol.block ? this.pol.block.base : 0); }
+    if (S.fuga && !this.pol.stop) this.polChase(dt);
+    if (!S.fuga && this.pol.cs && this.pol.cs.length) { for (const C of this.pol.cs) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); } this.pol.cs = []; sync(this); }
     if (!this.pol.ch && !this.pol.stop) this.polTail(dt);
     // la volante fuori dal bar: passandole accanto ti fa soffiare
     for (const e of this.ents) if (e.alcol && !e.alcDone && Math.abs(e.x - this.s.dist) < 12 && !this.prompt && !this.ap) { e.alcDone = true; this.polStop(e, 'alcol', { gl: (this.s.vg && this.s.vg.alc) || 0 }); }
