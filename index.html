@@ -1224,24 +1224,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/Pass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/MaskPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<!-- three.js, car3d.js e street3d.js si caricano solo quando serve la vista 3D (carica3d() più sotto) -->
 <script src="dsp.js"></script>
 <script src="sim.js"></script>
 <script src="tuning.js"></script>
 <script src="cars.js"></script>
 <script src="samples.js"></script>
-<script src="car3d.js"></script>
-<script src="street3d.js"></script>
 <script src="street2d.js"></script>
 <script src="quartieri2d.js"></script>
 <script src="personaggio.js"></script>
@@ -1365,7 +1353,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.12;
     comp.connect(ctx.destination);
     player = new SamplePlayer(ctx, comp);
-    loadSupraSamples(); restoreUserSamples();
+    if (game.car === 'supra') loadSupraSamples();   // le registrazioni (1,9 MB) servono solo alla Supra: con le altre auto non si scaricano
+    restoreUserSamples();
     const fallback = () => {
       const dsp = new EngineDSP(ctx.sampleRate);
       const node = ctx.createScriptProcessor(1024, 1, 2);
@@ -1424,6 +1413,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     useCar(carId);
     TP = tuningParams(S.tune);
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
+    if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
     TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Niko)
@@ -2275,6 +2265,24 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   if (io) io.observe($('roadStage'));
   if (window.ResizeObserver) new ResizeObserver(() => garage && garage.resize()).observe($('roadStage'));
   const SUPRA_MODEL = { url: ['models/supra_mk4.glb', 'models/supra_mk4.gltf.json'], name: 'Toyota Supra MK4 · modello di Mike Farrant (CC BY 4.0)' };
+  // la grafica 3D (three.js dal CDN, car3d.js, street3d.js: circa 900 KB) si carica solo la prima volta che serve:
+  // vista 3D, montagna, vetrina. Chi gioca in 2D non la scarica mai.
+  const TRE_JS = ['https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/Pass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/MaskPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js'].concat(['car3d.js', 'street3d.js']);
+  let treP = null;
+  const tre = () => typeof Street3D !== 'undefined';
+  function carica3d() {
+    if (tre()) return Promise.resolve(true);
+    if (treP) return treP;
+    const m = $('g3dMsg'); if (m) { m.hidden = false; m.textContent = 'Carico la grafica 3D…'; } flash('Carico la grafica 3D…', 2);
+    treP = TRE_JS.reduce((p, src) => p.then(() => new Promise((ok, ko) => {
+      const el = document.createElement('script'); el.src = src; el.async = false; el.onload = ok; el.onerror = () => ko(new Error(src)); document.head.appendChild(el);
+    })), Promise.resolve()).then(() => { if (m) m.hidden = true; return tre(); }).catch((e) => {
+      console.warn('Grafica 3D non caricata:', e); treP = null;
+      if (m) { m.hidden = false; m.textContent = 'La vista 3D non è disponibile: three.js non si è caricato (serve la rete la prima volta).'; }
+      return false;
+    });
+    return treP;
+  }
   function make3D() {
     if (street3d) return street3d;
     try {
@@ -2310,7 +2318,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     $('g2d').hidden = !is2d; $('g3d').hidden = is2d;
     document.querySelectorAll('.only3d').forEach((el) => { el.hidden = is2d; });
     if (is2d) { $('g3dMsg').hidden = true; garage = street2d || (street2d = new Street2D($('g2d'))); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView()); }
-    else {
+    else if (!tre()) {                                         // prima volta in 3D: si scarica, intanto resta il 2D
+      $('g2d').hidden = false; $('g3d').hidden = true; garage = street2d || (street2d = new Street2D($('g2d')));
+      carica3d().then((ok) => { if (ok && S.look !== '2d') applyLook(); else if (!ok && game.track !== 'mountain') { S.look = '2d'; applyLook(); } });
+    } else {
       garage = make3D();
       if (garage) garage.setView(S.look === 'cockpit' ? 'cockpit' : (S.cam && S.cam !== 'cockpit' ? S.cam : 'chase'));
     }
@@ -3290,6 +3301,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     applySettings(); renderMode(); saveGame(); flash('Nuova carriera: € 3.000 e una Supra di serie', 2.4);
   });
   window.addEventListener('pagehide', saveGame);
+  // il gioco salvato nel browser (sw.js): immagini, suoni e three.js non si riscaricano, e si gioca anche senza rete.
+  // Solo da un sito vero (GitHub Pages) o da localhost; dentro l'artifact di claude.ai non si può e si salta.
+  try {
+    const okSito = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if ('serviceWorker' in navigator && okSito && window.top === window) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  } catch (e) { /* niente: il gioco va lo stesso */ }
   window.nightRun = { leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
     get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
@@ -3532,7 +3549,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   };
   function showSpecText() { const e = sim.estimatePeak(); return `${Math.round(e.cv)} CV · ${Math.round(e.nm || 0)} Nm · 400 m in ${fmt(game.etEstimate(), 1)} s · ${(sim.P.mass + game.trunkKg()).toFixed(0)} kg`; }
   function openShowroom() {
-    if (!window.THREE) { flash('La vetrina richiede la grafica 3D', 2); return; }
+    if (!window.THREE || !tre()) { flash('Carico la grafica 3D…', 1.5); carica3d().then((ok) => { if (ok) openShowroom(); else flash('La vetrina richiede la grafica 3D: serve la rete la prima volta', 2.6); }); return; }
     $('showroom').hidden = false; showOn = true;
     if (!show) {
       try {

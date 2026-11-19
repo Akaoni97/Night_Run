@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 sera · cognato (caricamento)
+- Fatto: la grafica 3D (three.js dal CDN, car3d.js, street3d.js, circa 900 KB) si scarica solo se apri la vista 3D,
+  la montagna o la vetrina; le registrazioni della Supra solo con la Supra; `sw.js` salva immagini, suoni e modelli
+  nel browser (seconda volta più veloce, si gioca anche senza rete; il codice arriva sempre fresco).
+- Banco prova: sui rulli c'è l'auto vera, col suo cambio (anche automatico) e il suo suono.
+- Da provare: la vista 3D su GitHub Pages (qui non c'è rete verso il CDN per provarla).
+
 ## 19/11/2026 sera · cognato (banco prova)
 - Fatto: banco prova a rulli da Da Luca Tuning (`banco.js`): auto sui rulli, acceleratore graduato, freno, marce,
   curva di CV e coppia con quella di prima in grigio per confrontare prima e dopo i pezzi. 187 test.

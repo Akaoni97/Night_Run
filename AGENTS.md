@@ -11,7 +11,12 @@ https://akaoni97.github.io/Night_Run/ (pubblicato dal ramo `main`). Fino al 16/1
 `Akaoni97/RandomEgg-s`, cartella `motori/`: lì non si lavora più.
 
 ## Com'è fatto
-HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.js 0.147 da CDN per la vista 3D.
+HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.js 0.147 da CDN per la vista 3D,
+caricato solo quando serve (`carica3d()` in `index.html`: vista 3D, montagna, vetrina; insieme a `car3d.js` e
+`street3d.js`, che quindi non sono tra gli script della pagina). `sw.js` (service worker) salva il gioco nel browser:
+codice sempre dalla rete se c'è, immagini dalla copia aggiornata in sottofondo, suoni, modelli e three.js dalla copia
+(si rinnovano cambiando `VERSIONE`); niente dentro l'artifact. Le registrazioni della Supra (`audio/supra/`) si
+scaricano solo guidando la Supra.
 `index.html` carica gli script in quest'ordine, e le costanti globali di un file si usano dagli altri
 (per esempio `CARS`, `CLUSTERS`, `GAME_LANE_Z`, `GAME_LOCS`):
 
@@ -22,7 +27,7 @@ HTML + JavaScript puro: niente build, niente npm, niente framework. Solo three.j
 | `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), `tuningParams()`. |
 | `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
 | `samples.js` | Lettore di campioni audio caricati dall'utente (solo Supra). |
-| `car3d.js`, `street3d.js` | Vista 3D. |
+| `car3d.js`, `street3d.js` | Vista 3D (caricati da `carica3d()` con three.js, non all'avvio). |
 | `street2d.js` | Tutta la grafica 2D in pixel art (classe `Street2D`), sfondi dei luoghi (`drawScenery`, `drawNearSide`), traffico, radar delle corsie. |
 | `quartieri2d.js` | Quartieri della città (dopo `street2d.js`): elenco `Street2D.DISTRICTS` (tipi di palazzo, colori, insegne, foschia, lampioni, tinta), `districtAt`/`districtMix`, palazzi nuovi (`kindExtra`), punti di riferimento lontani (`landmark`), degrado (`decayTile`), cartello col nome (`districtBanner`). |
 | `personaggio.js` | Il personaggio (prima di `pilota2d.js`): editor a tutto schermo prima del prologo e dal menu (scheda Partita, pulsante Personaggio), `NightPG.editor/get/set/now`; scelte in `PG_OPZ` (pelle, capelli e colore, in testa e colore, addosso e colore, barba, occhiali), `PG_DEF` è il protagonista di sempre; stato in `game.s.vg.pg` e `localStorage` `nr_pg`. Disegno comune: `pgDriver` (in auto, con testa che gira, occhi che sbattono, respiro, mano che segue lo sterzo, gomito fuori dal finestrino, spalle al cambio marcia), `pgStanding` (in piedi in pixel art vera: `pgSprite` disegna pixel per pixel su 44×86 con contorno calcolato, pose `idle`, `walk` a 8 fotogrammi, `wave`, `phone`, `pockets`, in cache), `pgBack` (di spalle). In auto anche sopracciglio, bocca, contorno, testa a tempo con la radio (`nightRun.radioOn`), canticchia, occhi pesanti, sbadigli e testa che ciondola col sonno (`vg.needs.sleep`). Test in `test/personaggio.test.js`. |
