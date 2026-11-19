@@ -809,6 +809,10 @@ html.tdash .tpan-dati .hud-tag { max-width: none; width: auto; }
 .gs-stat small { display: block; font: 500 10.5px/1 var(--f-data); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .gs-stat b { display: block; margin-top: 5px; font: 400 22px/1 var(--f-display); color: #fff; font-variant-numeric: tabular-nums; }
 .gs-stat.money b { color: var(--lime); text-shadow: 0 0 12px rgba(201,221,90,.35); }
+.gs-nums { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; position: relative; }
+.gs-nums h3 { grid-column: 1 / -1; margin: 6px 0 0; font: 500 11px/1 var(--f-data); letter-spacing: .2em; text-transform: uppercase; color: var(--acc); }
+.gs-nums .gs-stat { background: rgba(0,0,0,.55); }
+.gs-nums .gs-stat b { font-size: 17px; }
 .gs-goal { grid-column: 1 / -1; padding: 12px 14px; border-radius: 10px; position: relative; background: linear-gradient(90deg, rgba(184,255,58,.14), rgba(184,255,58,.03)); box-shadow: inset 3px 0 0 #b8ff3a, inset 0 0 0 1px rgba(184,255,58,.2); }
 .gs-goal small { font: 500 11px/1 var(--f-data); letter-spacing: .16em; text-transform: uppercase; color: #b8ff3a; }
 .gs-goal b { display: block; margin-top: 4px; font: 600 16px/1.25 var(--f-body); color: #fff; }
@@ -2957,6 +2961,21 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!r) flash('Lampeggi', 0.6);
   }
   // ---------------------------------------------------------------- cruscotto in alta definizione (hudpro.js)
+  // spie dello stato dell'auto (disegnate da hudpro.js): rosse = fermati, gialle = occhio. LUCI si accende quando i
+  // colpi hanno rovinato i fari (oltre il 35 % di danni le lampadine vanno a tratti, street2d.js)
+  function spie(lit, T) {
+    const st = game.carState ? game.carState() : {}, m = game.maint ? game.maint() : {}, dmg = sim.damage || 0;
+    return [
+      { id: 'motore', col: '#ffb000', on: lit && (!sim.running || !!st.tired || (m.plugs ?? 1) < 0.2 || dmg > 0.6), blink: lit && dmg > 0.85 },
+      { id: 'olio', col: '#ff3a24', on: lit && (!sim.running || (m.oil ?? 1) < 0.12) },
+      { id: 'temp', col: '#ff3a24', on: lit && sim.waterT > 108, blink: lit && sim.waterT > 115 },
+      { id: 'freni', col: '#ff3a24', on: lit && ((m.pads ?? 1) < 0.15 || sim.brakeT > 480 || !!sim.park), blink: lit && (m.pads ?? 1) < 0.06 },
+      { id: 'luci', col: '#ffb000', on: lit && dmg > 0.35 },
+      { id: 'batteria', col: '#ff3a24', on: lit && !sim.running },
+      { id: 'gomme', col: '#ffb000', on: lit && Math.min(...T.p) < 1.9, blink: lit && Math.min(...T.p) < 1.6 },
+      { id: 'benzina', col: '#ffb000', on: lit && sim.fuel < 0.12 },
+    ];
+  }
   function hudData() {
     const lit = sim.ign, cl = (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, z = shiftZone(), rpm = lit ? sim.rpm : 0;
     const over = lit && (sim.cut === 2 || rpm >= z.hi), inZone = lit && !over && rpm >= z.lo && sim.gear > 0 && sim.gear < sim.topGear();
@@ -2975,7 +2994,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
       range: c.range !== null ? fmt(c.range, 0) + ' km' : '—', cons: c.per100 !== null ? fmt(c.per100, 1) + ' L/100' : '—',
       fuel: sim.fuel, liters: fmt(L, 1) + ' L', tyres: T.p.map((p) => p * heat), waterT: sim.waterT, pods,
-      warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3], ['GOMME', '#ff3a24', Math.min(...T.p) < 1.6], ['RISERVA', '#ffb000', sim.fuel < 0.12], ['FRENI', '#ff3a24', sim.brakeT > 480]] };
+      warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3]],
+      spie: spie(lit, T) };
   }
   function drawHudPro() {
     const c = $('hudP'); c.hidden = false;
@@ -3205,8 +3225,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         siren.osc.connect(siren.g).connect(audio.ctx.destination); siren.osc.start();
       }
       sirenT += dt;
-      const on = game.siren && !S.muted;
-      siren.g.gain.setTargetAtTime(on ? 0.05 * S.vol / 100 : 0, audio.ctx.currentTime, 0.05);
+      const on = game.siren && !S.muted, sk = game.sirenK ?? 1;   // sirenK (polizia.js): più forte quanto più la volante è vicina
+      siren.g.gain.setTargetAtTime(on ? 0.05 * S.vol / 100 * sk : 0, audio.ctx.currentTime, 0.05);
+      if (radio && radio.setDuck) radio.setDuck(on ? 1 - 0.55 * sk : 1);   // la radio si abbassa quando la sirena è vicina
       if (on) siren.osc.frequency.setTargetAtTime(Math.floor(sirenT * 1.6) % 2 ? 660 : 494, audio.ctx.currentTime, 0.01);
     }
     saveT += dt; if (saveT > 3) { saveT = 0; saveGame(); }
@@ -3484,7 +3505,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       ATM.wT -= dt;
       if (ATM.wT <= 0) {
         if (S.rain) { setRainState(false, 'Smette di piovere'); ATM.wT = 100 + Math.random() * 140; }
-        else if (Math.random() < 0.55) { setRainState(true, 'Comincia a piovere: asfalto viscido'); ATM.wT = 60 + Math.random() * 80; }
+        else if (Math.random() < 0.55) { setRainState(true, 'Comincia a piovere: asfalto viscido, frenate più lunghe (anche per le volanti)'); ATM.wT = 60 + Math.random() * 80; }
         else ATM.wT = 60 + Math.random() * 60;
       }
     }
@@ -3643,5 +3664,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="garage.js"></script>
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
+<script src="statistiche.js"></script>
 </body>
 </html>

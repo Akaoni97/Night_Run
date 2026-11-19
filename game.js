@@ -255,7 +255,7 @@ class StreetGame {
       const sx = e.exitX - e.x, need = (v * v) / (2 * Math.max(0.5, sx - 1));
       if (need > 1.9 || sx < 3) acc = Math.min(acc, sx < 3 ? -3 : -Math.min(3.5, need));
     }
-    const maxB = D.t === 'distratto' && isMe ? 4.5 : 8.5;
+    const maxB = (D.t === 'distratto' && isMe ? 4.5 : 8.5) * (1 - 0.3 * (sim.wet || 0));   // sul bagnato si frena meno
     return { acc: Math.max(-maxB, Math.min(D.a, acc)), gap, vl, isMe };
   }
 

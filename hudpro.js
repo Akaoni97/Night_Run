@@ -82,6 +82,21 @@ const HudPro = {
     g.font = `500 ${Math.round(r * 0.26)}px "Barlow Semi Condensed", sans-serif`; g.fillStyle = cl.num; g.globalAlpha = 0.75; g.fillText(P.name.toUpperCase(), cx, cy + r * 0.48); g.fillText(P.unit, cx, cy - r * 0.42); g.globalAlpha = 1;
     g.restore();
   },
+  // una spia: icona semplice in un quadrato di lato 2r, centrata in (x, y)
+  spia(g, id, x, y, r, col, on) {
+    g.save(); g.translate(x, y); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1.3; g.lineCap = 'round'; g.lineJoin = 'round';
+    if (on) { g.shadowColor = col; g.shadowBlur = 7; }
+    const P = (pts) => { g.beginPath(); pts.forEach(([a, b], i) => (i ? g.lineTo(a * r, b * r) : g.moveTo(a * r, b * r))); };
+    if (id === 'motore') { P([[-0.9, -0.2], [-0.6, -0.2], [-0.6, -0.5], [0.4, -0.5], [0.6, -0.2], [0.9, -0.2], [0.9, 0.6], [-0.6, 0.6], [-0.6, 0.3], [-0.9, 0.3], [-0.9, -0.2]]); g.stroke(); P([[-0.2, -0.5], [-0.2, -0.8], [0.2, -0.8]]); g.stroke(); }
+    else if (id === 'olio') { P([[-0.9, 0.5], [0.5, 0.5], [0.9, -0.3], [-0.4, -0.3], [-0.9, -0.1], [-0.9, 0.5]]); g.stroke(); P([[0.9, -0.3], [1.0, 0]]); g.stroke(); g.beginPath(); g.arc(0.95 * r, 0.45 * r, 0.12 * r, 0, 7); g.fill(); }
+    else if (id === 'temp') { P([[0, -0.9], [0, 0.35]]); g.stroke(); g.beginPath(); g.arc(0, 0.55 * r, 0.25 * r, 0, 7); g.fill(); P([[0, -0.6], [0.35, -0.6]]); g.stroke(); P([[0, -0.25], [0.35, -0.25]]); g.stroke(); P([[-0.9, 0.85], [-0.45, 0.7], [0, 0.85], [0.45, 0.7], [0.9, 0.85]]); g.stroke(); }
+    else if (id === 'freni') { g.beginPath(); g.arc(0, 0, 0.6 * r, 0, 7); g.stroke(); g.beginPath(); g.arc(0, 0, 0.9 * r, 2.3, 4); g.stroke(); g.beginPath(); g.arc(0, 0, 0.9 * r, -0.85, 0.85); g.stroke(); P([[0, -0.35], [0, 0.1]]); g.stroke(); g.beginPath(); g.arc(0, 0.32 * r, 0.08 * r, 0, 7); g.fill(); }
+    else if (id === 'luci') { g.beginPath(); g.moveTo(-0.1 * r, -0.6 * r); g.quadraticCurveTo(-0.95 * r, 0, -0.1 * r, 0.6 * r); g.closePath(); g.stroke(); for (const k of [-0.45, 0, 0.45]) { P([[0.15, k], [0.9, k + 0.15]]); g.stroke(); } P([[-0.9, -0.9], [0.9, 0.9]]); g.stroke(); }
+    else if (id === 'batteria') { g.strokeRect(-0.9 * r, -0.45 * r, 1.8 * r, 1.2 * r); g.fillRect(-0.65 * r, -0.7 * r, 0.3 * r, 0.25 * r); g.fillRect(0.35 * r, -0.7 * r, 0.3 * r, 0.25 * r); P([[-0.6, 0.1], [-0.2, 0.1]]); g.stroke(); P([[0.2, 0.1], [0.6, 0.1]]); g.stroke(); P([[0.4, -0.1], [0.4, 0.3]]); g.stroke(); }
+    else if (id === 'gomme') { g.beginPath(); g.moveTo(-0.75 * r, -0.7 * r); g.quadraticCurveTo(-1 * r, 0.3 * r, -0.5 * r, 0.75 * r); g.lineTo(0.5 * r, 0.75 * r); g.quadraticCurveTo(1 * r, 0.3 * r, 0.75 * r, -0.7 * r); g.stroke(); P([[0, -0.45], [0, 0.15]]); g.stroke(); g.beginPath(); g.arc(0, 0.42 * r, 0.08 * r, 0, 7); g.fill(); }
+    else if (id === 'benzina') { g.strokeRect(-0.8 * r, -0.75 * r, 1 * r, 1.55 * r); g.fillRect(-0.65 * r, -0.6 * r, 0.7 * r, 0.4 * r); P([[0.2, -0.3], [0.65, -0.3], [0.65, 0.5], [0.9, 0.5], [0.9, -0.5], [0.6, -0.8]]); g.stroke(); }
+    g.restore();
+  },
   // disegna tutto il cruscotto su un canvas logico W×H (già scalato per il DPR)
   draw(g, W, H, d, cl, dpr) {
     g.clearRect(0, 0, W, H);
@@ -133,9 +148,16 @@ const HudPro = {
     // strumenti tuning
     const pods = d.pods, pr = 23, n = pods.length;
     pods.forEach((p, i) => { const P = HUD_PODS[p.id]; if (!P) return; this.pod(g, W / 2 + (i - (n - 1) / 2) * (pr * 2 + 10), H - pr - 10, pr, P, p.v, cl, lit && p.on !== false); });
-    // spie
-    g.font = `700 11px "Barlow Semi Condensed", sans-serif`; g.textAlign = 'left';
+    // spie dello stato dell'auto: una fila sotto il display centrale, spente al buio, accese nel loro colore
     const blink = Math.floor(performance.now() / 300) % 2;
+    if (d.spie) {
+      const n = d.spie.length, step = Math.min(19, cw / n), s0 = cx0 + (cw - step * n) / 2;
+      d.spie.forEach((sp, i) => {
+        const on = sp.on && (!sp.blink || blink), x = s0 + i * step + step / 2, y = cy0 + 106 + 16;
+        this.spia(g, sp.id, x, y, Math.min(8.5, step * 0.42), on ? sp.col : 'rgba(255,255,255,.07)', on);
+      });
+    }
+    g.font = `700 11px "Barlow Semi Condensed", sans-serif`; g.textAlign = 'left';
     let wx = 14; for (const [txt, c2, on] of d.warn) { if (!on) continue; if (c2 === '#ff3a24' && !blink) { wx += 44; continue; } g.fillStyle = c2; g.fillText(txt, wx, 30); wx += 44; }
   },
 };

@@ -206,6 +206,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     S.esito = esito;
     const dopo = esito === 0 ? 'Multa annullata.' : esito === 1 ? `Multa scesa da € ${fmt(prima)} a € ${fmt(S.tot)}.` : esito === 3 ? `Multa salita a € ${fmt(S.tot)}.` : 'Multa confermata.';
     S.voci = [`Tu: ${q.t}`, `L'agente: ${q.r[esito]}`, dopo + (S.ass ? ` L'assicurazione però la fai: € ${fmt(S.ass)}.` : '')];
+    if (esito === 0 && this.statAdd) this.statAdd('scuse');
     if (esito === 0 && !S.ass) { this.say(`${q.r[0]} Multa annullata.`, 'money'); S.e.chase = false; S.e.v = 0; S.e.lane = 0; this.siren = 0; this.ap = null; this.pol.stop = null; return; }
     this.polAsk(S);
   };
@@ -215,6 +216,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     this.pol.stop = null; this.ap = null;
     S.e.chase = false; S.e.checked = true; S.e.v = 0;
     st(this).fuga = true; this.pol.cs = []; this.pol.rinfT = between(this, POL.fuga.rinforzi);
+    if (this.statAdd) this.statAdd('fughe');
     this.s.heat = Math.min(5, Math.max(3, (this.s.heat || 0) + 1));
     this.polJoin(S.e, 12, S.tot, true);
     this.say('Sgommi via. Sei ricercato: le volanti non ti fermano più al passaggio, ti inseguono e provano a tagliarti la strada. Per farti dimenticare entra in un locale o in un negozio a bordo strada.', 'police');
@@ -289,14 +291,16 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
           if (C.gap > 6) C.fase = 'segue';                  // l'hai passata: torna dietro
         }
       }
-      const acc = Math.max(C.fase === 'taglia' ? -F.frena : C.gap < 25 ? -9 : -6, Math.min(F.acc * (C.fase === 'sorpassa' ? 1.4 : 1), (want - C.vP) * 2));
+      const wk = 1 - 0.3 * (sim.wet || 0);                  // sotto la pioggia anche le volanti frenano e scattano meno
+      const acc = Math.max((C.fase === 'taglia' ? -F.frena : C.gap < 25 ? -9 : -6) * wk, Math.min(F.acc * (C.fase === 'sorpassa' ? 1.4 : 1) * wk, (want - C.vP) * 2));
       C.vP = Math.max(0, C.vP + acc * dt); e.v = C.vP; e.acc = acc; e._z = undefined;
       if (!inside) C.gap += (sim.v - C.vP) * dt;
       if (C.gap < 200 && !inside) { e.x = d - C.gap; this.ents.push(e); }
       else if (C.gap >= 200 && inside) this.ents.splice(this.ents.indexOf(e), 1);
       if (C.gap > F.perso || (C.t > F.tempo && C.gap > 120 && C.fase === 'segue')) this.polDrop(C);
     }
-    if (!this.pol.cs || !this.pol.cs.length) return;
+    if (!this.pol.cs || !this.pol.cs.length) { this.sirenK = 0; return; }
+    { const g0 = Math.min(...cs.map((C) => Math.abs(C.gap))); this.sirenK = 0.2 + 0.8 * Math.max(0, Math.min(1, 1 - (g0 - 10) / 300)); }   // sirena: forte vicino, appena udibile lontano
     // presa: sotto i 60 con una volante davanti nella tua corsia, o fermo con una volante addosso
     const block = cs.find((C) => C.fase === 'taglia' && C.e.lane === me && -C.gap > 0 && -C.gap < 20);
     const near = cs.some((C) => Math.abs(C.gap) < 15 && C.t > F.ritardo + 1);
@@ -310,6 +314,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     for (const C of cs) if (C.e !== e) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
     this.pol.cs = []; sync(this); this.pol.presa = 0; this.pol.fermo = 0; this.pol.block = null;
     e.pursuit = false;
+    if (this.statAdd) this.statAdd('prese');
     this.polStop(e, 'fuga', { base, n });
   };
   P.polDrop = function (C) {
@@ -328,9 +333,11 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   };
   // ricercato azzerato: sei entrato in un locale e le volanti hanno tirato dritto
   P.polClear = function (msg) {
+    this.sirenK = 0;
     for (const C of chs(this)) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); }
     this.pol.cs = []; sync(this); this.pol.block = null; this.siren = 0; this.pol.presa = 0; this.pol.fermo = 0;
     st(this).fuga = false; this.s.heat = 0;
+    if (this.statAdd) this.statAdd('seminate');
     this.say(msg, 'police');
   };
   P.polBlock = function () {
@@ -397,6 +404,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     S.verb = S.verb.filter((V) => !V.done);
   };
   P.polVerbale = function (sf, kmh, what) {
+    if (this.statAdd) this.statAdd('verbali');
     st(this).verb.push({ fine: sf.fine, kmh, what, due: this.s.dist + between(this, POL.verbale) * 1000 });
   };
 

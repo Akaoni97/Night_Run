@@ -126,3 +126,13 @@ test('soldi in rosso: benzina e cibo a credito fino a 500 €, oltre no', () => 
   assert.equal(game.startFill(20).ok, true, 'quel poco che resta del credito'); game.inside.fill = null;
   game.s.money = -600; assert.equal(game.startFill(20).ok, false);
 });
+
+test('pioggia: meno aderenza, di più sopra i 130 (aquaplaning); il traffico frena meno; asciutto come prima', () => {
+  const { sim, game } = setup(); sim.v = 20; const asc = sim.tireGrip();
+  sim.wet = 1; const lento = sim.tireGrip(); sim.v = 50; const forte = sim.tireGrip();
+  assert.ok(lento < asc * 0.75 && forte < lento * 0.9, `${asc} ${lento} ${forte}`);
+  sim.wet = 0; assert.equal(sim.tireGrip(), asc, 'asciutto: niente cambia anche veloce');
+  const e = car(game, 20, 30, 'normale'); game.ents.push({ id: 5, kind: 'traffic', vt: 'polo', len: 4, lane: e.lane, x: e.x + 6, v: 0, vT: 0, vBase: 0, still: true });
+  const dry = game.trafficAccel(e, game.s.dist).acc; sim.wet = 1; const wet = game.trafficAccel(e, game.s.dist).acc;
+  assert.ok(wet > dry && dry <= -8, `${dry} ${wet}`);
+});

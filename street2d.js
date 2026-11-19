@@ -1568,6 +1568,19 @@ class Street2D {
     g.fillStyle = this.paintHex || '#ff5a3a'; g.fillRect(px0 - 3, py0 - 2, 6, 5); g.fillStyle = '#b8ff3a'; g.fillRect(px0 + 3, py0 - 1, 2, 3);
     this.text(g, 'CORSIA ' + (game.lane || 1), x0 + 4, y0 + 37, '#b8ff3a');
     if (game.blocked) this.text(g, 'CODA', x0 + w - 24, y0 + 37, '#ffb000');
+    // inseguimento (polizia.js): le volanti oltre il radar come lampeggianti sul bordo, e quante sono
+    const cs = game.pol && game.pol.cs;
+    if (cs && cs.length) {
+      const ph = Math.floor(t * 6) % 2;
+      for (const C of cs) {
+        const rel = -C.gap; if (rel >= from && rel <= to) continue;
+        const ex = rel < from ? x0 + 2 : x0 + w - 4, z = GAME_LANE_Z[C.e.lane] ?? 0;
+        g.fillStyle = ph ? '#ff2e4d' : '#4f7bff'; g.fillRect(ex, ly(z) - 2, 2, 5);
+      }
+      const lbl = 'VOLANTI ' + cs.length;
+      g.fillStyle = 'rgba(8,9,16,.72)'; g.fillRect(x0, y0 + h, w, 10);
+      this.text(g, lbl, x0 + 4, y0 + h + 2, ph ? '#ff2e4d' : '#ffd23f');
+    }
   }
 
   person(g, x, gy, who, t) {

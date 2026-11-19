@@ -82,8 +82,10 @@ class SupraSim {
   tireGrip() {
     const ty = this.tune.tyre || {}, d = (this.tireT - (ty.opt || 90)) / (ty.win || 65);
     const cooked = this.tireT > 110 ? (this.tireT - 110) * 0.004 : 0;
-    // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1)
-    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * (this.wet || 0)) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
+    // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1), e sopra i 130 km/h un velo d'acqua
+    // (aquaplaning) ne toglie fino a un altro 12 % verso i 190
+    const wet = this.wet || 0, aqua = wet ? 0.12 * wet * SIM_CLAMP((Math.abs(this.v) - 36) / 17, 0, 1) : 0;
+    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * wet - aqua) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
   }
   get rpm() { return Math.max(0, this.we) * 9.5493; }
   get kmh() { return Math.abs(this.v) * 3.6; }
