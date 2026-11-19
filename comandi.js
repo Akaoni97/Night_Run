@@ -3,7 +3,7 @@
 //  Una seconda fila di pulsanti sotto quelli di guida (AUTO, TC, LAUNCH...), accanto al cambio e ai pedali. Compaiono solo quando servono:
 //    RIMORCHIO  aggancia / sgancia (se hai comprato il gancio; lo sgancio controlla slot e chili rimasti in auto)
 //    TURBO      pressione della turbina: ECO 70 % · NORMALE · FORTE 115 % (solo con un turbo montato)
-//    SCARICO    valvola di scarico: APERTO (tutto il rumore) o SILENZIO (volume dimezzato, niente scoppi) (dopo un po' di potenziamento)
+//    SCARICO    valvola di scarico: APERTO (scoppi e fiammate) o SILENZIO (niente fiamme, scoppi rarissimi e smorzati, motore pieno) (dopo un po' di potenziamento)
 //    NEON       accende e spegne il neon sotto l'auto (se l'hai montato da Neon Kustom)
 //  Lo stato sta in `game.s.cmd` e si salva con la partita. Funzioni pure provate in test/comandi.test.js.
 // ============================================================================
@@ -67,7 +67,7 @@ function cmdApply(game, sim, view2d) {
     on('Neon', a.neon, `NEON <b>${c.neon ? 'ON' : 'OFF'}</b>`, c.neon);
     row.hidden = !(a.rimorchio || a.turbo || a.scarico || a.neon);
     if (pan) pan.querySelector('#cmInfo').textContent = row.hidden ? 'nessuno disponibile' : '';
-    if (lastExh !== c.exh) { lastExh = c.exh; if (n.audioCfg) n.audioCfg(); }              // il volume dello scarico passa al motore audio
+    if (lastExh !== c.exh) { lastExh = c.exh; if (n.applySettings) n.applySettings(); if (n.audioCfg) n.audioCfg(); }              // scoppi e volume seguono la valvola              // il volume dello scarico passa al motore audio
   };
   setInterval(() => { try { refresh(); } catch (e) { /* il gioco non è ancora pronto */ } }, 400);
   window.comandi = { refresh, state: () => cmdState(window.nightRun.game.s) };
