@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 · cognato
+- Fatto: `strumenti/prova.js` dà per fatto il primo lavoro (dal tutorial obbligatorio `tappa:` e `km:` non saltavano più,
+  il gioco riportava al Bar Sport); `--tutorial` per provarlo. Controllo della sera fatto.
+- Da sapere: col borbottio nuovo gli scoppi della V40 sono tornati forti (copione `scoppi`: da −14,8 a −10,5 dB). Da sentire
+  nel gioco prima di toccare `VOLVO_POP` o `burG`. Le facciate a 9 m dall'ingresso sono mezze fuori schermo a destra.
+
 ## 18/11/2026 notte · proprietario (facciate)
 - Fatto: facciate dei locali rifatte in `locali2d.js`: bar, benzinaio, autogrill, motel, Niko, Luca e Neon Kustom con
   materiali, vetrine accese con la gente dentro, neon che sfarfallano, lampade, piante e luce sul marciapiede; di giorno

@@ -43,6 +43,8 @@ node strumenti/prova.js --mob --out <cartella-foto> tappa:dealer entra foto:deal
 Alla fine stampa lo stato e **gli errori della console e i file mancanti (404)**; esce con codice 1 se ce ne sono.
 
 Regole pratiche:
+- Il primo lavoro (tutorial) è dato per fatto, altrimenti il gioco riporta sempre al Bar Sport e `tappa:`/`km:` non
+  saltano. Per provare il tutorial: `--tutorial`.
 - Metti le foto nella cartella temporanea della sessione, non nel repository.
 - **Guarda sempre le foto** (strumento Read sull'immagine): un test verde non dice se un disegno è nel posto giusto.
 - Prova sia su computer (1280×720) che su telefono (`--mob`, 390×844): il pannello dei locali e il telefono cambiano

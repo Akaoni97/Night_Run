@@ -2,7 +2,8 @@
 // come la proverebbe un giocatore, senza riscrivere ogni volta l'avvio, il prologo e il viaggio fino a una tappa.
 //
 // Uso (dalla radice del repository, serve Playwright con Chromium):
-//   node strumenti/prova.js [--mob] [--out cartella] passo passo ...
+//   node strumenti/prova.js [--mob] [--tutorial] [--out cartella] passo passo ...
+//   (senza --tutorial il primo lavoro è dato per fatto, altrimenti il gioco riporta sempre al Bar Sport)
 // Passi:
 //   tappa:dealer        vai 9 m prima della prossima tappa di quel tipo (bar, fuel, grill, niko, luca, style,
 //                       motel, dealer, junk...), da fermo: si vede la facciata
@@ -69,6 +70,9 @@ const STATO = () => {
   await page.evaluate(() => { const b = document.querySelector('.pged .pg-go'); if (b) b.click(); }); await page.waitForTimeout(1500);   // l'editor del personaggio: va bene così
   await page.evaluate(() => { if (window.NightPrologo && NightPrologo.playing) NightPrologo.finish(); }); await page.waitForTimeout(800);
   for (let i = 0; i < 6; i++) { await page.evaluate(() => { const g = nightRun.game; if (g.prompt) try { g.answer(0); } catch (e) { /* niente */ } }); await page.waitForTimeout(150); }
+  // il primo lavoro (tutorial) ti riporta sempre al Bar Sport: lo diamo per fatto, così tappa: e km: saltano davvero.
+  // Con --tutorial resta da fare (per provare proprio il tutorial).
+  if (!args.includes('--tutorial')) await page.evaluate(() => { const v = nightRun.game.s.vg; if (v) v.firstDone = true; });
 
   const log = (...a) => console.log(...a);
   for (const st of steps) {
