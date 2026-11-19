@@ -1917,7 +1917,10 @@ class Street2D {
     // profondità = altezza sullo schermo: chi sta più in alto (più lontano) si disegna prima
     const yOf = (e) => this.laneY(zOf(e));
     for (const e of items) e._y = yOf(e);
-    items.sort((a, b) => a._y - b._y);
+    // a pari profondità (prima corsia e locali stanno tutti a z 9) prima i locali, poi le auto: l'usato col cartello
+    // VENDESI e le facciate restano dietro il traffico che passa in prima corsia
+    const back = (e) => (e.kind === 'place' || e.kind === 'station' ? 0 : 1);
+    items.sort((a, b) => a._y - b._y || back(a) - back(b));
     const front = [];
     const drawEnt = (e) => {
       const x = wx(e.x);

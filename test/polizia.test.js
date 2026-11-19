@@ -50,17 +50,79 @@ test('polizia: la contestazione ha quattro esiti con le probabilità della scusa
   assert.ok(game.prompt.options.every((o) => !/analcolica|assicurazione/i.test(o.label)), 'solo scuse buone per la velocità');
 });
 
-test('polizia: scappando, se la volante resta 450 m indietro l\'hai seminata; se ti affianca ti ferma', () => {
+test('polizia: scappando sei ricercato; con l\'auto veloce la volante sparisce ma resti ricercato', () => {
   const { game } = trip(() => 0.9);                              // 0.9: niente posto di blocco
   game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
-  assert.ok(game.pol.ch, 'inseguimento');
-  run(game, 40, 70);                                             // 252 km/h: più forte della volante
-  assert.equal(game.pol.ch, null); assert.ok(game.s.heat > 1.5, "ricercato: " + game.s.heat);   // +1 la fuga, +1 seminata, poi cala piano
-  const b = trip(() => 0.9).game;
-  b.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); b.ap.onStop(); b.answer(2);
-  run(b, 18, 8);                                                  // va piano: la volante lo raggiunge
-  assert.ok(b.pol.stop && b.pol.stop.why === 'fuga', 'fermato dopo la fuga');
-  b.ap.onStop(); assert.equal(b.prompt.options.length, 1, 'niente contesta né fuga');
+  assert.ok(game.pol.ch, 'inseguimento'); assert.equal(game.polState().fuga, true);
+  run(game, 20, 70);                                             // 252 km/h: più forte della volante
+  assert.equal(game.pol.stop, null);
+  assert.equal(game.pol.cs.filter((C) => C.gap < POL.fuga.perso).length, 0, 'sparite dagli specchietti'); assert.equal(game.polState().fuga, true, 'ancora ricercato');
+  assert.ok(game.s.heat >= 3, 'ricercato: ' + game.s.heat);
+});
+
+test('polizia: con l\'auto lenta la volante ti supera, ti taglia la strada, inchioda e ti prende: multone e fuga finita', () => {
+  const { game } = trip(() => 0.9);
+  game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
+  const e = game.pol.ch.e; let tagliato = false, dentro = 0;
+  for (let t = 0; t < 40 && !game.pol.stop; t += 1 / 30) {
+    if (!game.ap) game.sim.v = Math.min(game.sim.v + 3 / 30, 120 / 3.6);   // un'auto scassata: arriva a 120 e basta
+    if (game.pol.ch && game.pol.ch.fase === 'taglia') { tagliato = true; if (e.lane === game.lane) game.sim.v = Math.min(game.sim.v, e.v); }   // frena dietro di lei
+    if (game.ents.includes(e) && e.x > game.s.dist) dentro++;
+    game.update(1 / 30); if (game.prompt && game.prompt.kind !== 'police') game.answer(0);
+  }
+  assert.ok(tagliato, 'ti ha tagliato la strada'); assert.ok(dentro > 0, 'è passata davanti');
+  assert.ok(game.pol.stop && game.pol.stop.why === 'fuga', 'presa'); assert.ok(game.pol.stop.e.x > game.s.dist, 'resta davanti');
+  game.ap.onStop(); assert.deepEqual(game.prompt.options.length, 1, 'solo Paga');
+  const m = game.s.money; game.answer(0);
+  assert.ok(m - game.s.money >= POL.fuga.multa, 'multone'); assert.equal(game.polState().fuga, false, 'fuga finita');
+});
+
+test('polizia: tre volanti davanti fanno muro; ogni volante in più alza la multa', () => {
+  const { game } = trip(() => 0.9);
+  game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
+  game.pol.rinfT = 1e9;
+  for (let i = 0; i < 2; i++) { const e = { id: 900 + i, kind: 'police', lane: 1 + i, x: game.s.dist - 30, v: 30 }; game.ents.push(e); game.polJoin(e, 30, 0); }
+  assert.equal(game.pol.cs.length, 3);
+  let muro = false; game.autoLane = false;                       // vorrebbe andare a 120 e scansa le volanti cambiando corsia
+  for (let t = 0; t < 60 && !game.pol.stop; t += 1 / 30) {
+    if (!game.ap) {
+      game.sim.v = Math.min(game.sim.v + 3 / 30, 120 / 3.6);
+      const avanti = (L) => game.pol.cs.some((C) => C.e.lane === L && -C.gap > 0 && -C.gap < 30);
+      if (avanti(game.lane)) { const L = [1, 2, 3].find((q) => !avanti(q)); if (L) game.lane = L; }   // prova a scansarle
+      for (const C of game.pol.cs) if (C.e.lane === game.lane && -C.gap > 0 && -C.gap < 20) game.sim.v = Math.min(game.sim.v, C.e.v);   // frena dietro chi ha davanti
+    }
+    const davanti = game.pol.cs.filter((C) => C.fase === 'taglia').map((C) => C.e.lane);
+    if (new Set(davanti).size === 3) muro = true;
+    game.update(1 / 30); if (game.prompt && game.prompt.kind !== 'police') game.answer(0);
+  }
+  assert.ok(muro, 'tre volanti davanti, una per corsia');
+  assert.ok(game.pol.stop && game.pol.stop.why === 'fuga', 'preso');
+  assert.equal(game.pol.stop.data.n, 3);
+  game.ap.onStop(); assert.match(game.prompt.options[0].label, /Paga/);
+  const base = POL.fuga.multa + 173 * 1.5; assert.ok(game.pol.stop.tot >= base + 2 * POL.fuga.aVolante - 10, 'multa con tre volanti: ' + game.pol.stop.tot);
+});
+
+test('polizia: da ricercato le altre pattuglie non ti fanno accostare, ti inseguono; entrando in un locale si dimenticano di te', () => {
+  const { game } = trip(() => 0.9);
+  game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
+  run(game, 20, 70); game.pol.rinfT = 1e9;
+  // nessun fermo automatico: velocità, posto di controllo, etilometro
+  assert.equal(game.polStop(null, 'speed', { kmh: 200, sf: { over: 60, fine: 543 } }), false);
+  assert.equal(game.polStop(null, 'docs'), false); assert.equal(game.polStop(null, 'alcol', { gl: 1 }), false);
+  assert.equal(game.ap, null); assert.equal(game.prompt, null);
+  // una volante ferma più avanti: la bruci a 200 km/h e ti insegue lei
+  const e = { id: 999, kind: 'police', lane: 0, x: game.s.dist + 40, v: 0, busy: true, still: true, hazard: true };
+  game.ents.push(e); run(game, 1.5, 200 / 3.6);
+  assert.equal(game.pol.stop, null); assert.equal(game.ap, null, 'niente frenata');
+  assert.ok(game.pol.cs.some((C) => C.e === e), 'la volante bruciata ti insegue'); assert.ok(!e.hazard && !e.busy);
+  // ti infili in un locale: ricercato azzerato
+  const p = { ok: true, id: 'bar', x: game.s.dist + 30, name: 'Bar', rel: 30 };
+  assert.ok(game.enterPlace(p));
+  assert.equal(game.polState().fuga, false); assert.equal(game.s.heat, 0); assert.equal(game.pol.ch, null);
+  assert.ok(!game.ents.includes(e), 'la volante è andata avanti');
+  // e dopo si torna alla normalità: la prossima volante ti ferma di nuovo
+  game.ap = null; game.inside = null;
+  assert.equal(game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }), true);
 });
 
 test('polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 km, e il verbale arriva dopo', () => {
