@@ -566,6 +566,23 @@
     this.placeTag(g, X + 56, dT + 6, 'ESTETICA', '#ff2e88', near);
   };
 
+  // ---------------------------------------------------------------- carcasse (sfascio): il disegno vero dell'auto, ingiallito,
+  // scurito, con ruggine e un vetro rotto; in cache a grandezza piena (si scala al disegno: con la densità doppia resta nitido)
+  S.lcWreck = function (id) {
+    const key = 'lcwreck' + id; if (this.spr[key]) return this.spr[key];
+    if (typeof CARS === 'undefined' || !CARS[id] || !CARS[id].sprite) return null;
+    const spr = this.trafficSprite(id, 'orig', 1); if (!spr || !spr.hd) return null;
+    const b = spr.hd, w = b.width, h = b.height, G = spr.geo, c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+    try { x.filter = 'sepia(0.7) saturate(0.5) brightness(0.55) contrast(1.15)'; } catch (e) { /* senza filtri */ }
+    x.drawImage(b, 0, 0);
+    if (spr.wheelImg && spr.wheelImg.width) for (const ax of G.ax) x.drawImage(spr.wheelImg, Math.round(ax - spr.wheelImg.width / 2), Math.round(G.wy - spr.wheelImg.height / 2));
+    x.filter = 'none'; x.globalCompositeOperation = 'source-atop';
+    for (let q = 0; q < 26; q++) { const r = rnd(w * 3 + q * 7.7); x.fillStyle = q % 3 ? 'rgba(120,56,22,.5)' : 'rgba(18,12,8,.55)'; x.fillRect(Math.floor(rnd(q + w) * w), Math.floor(h * 0.25 + r * h * 0.6), 3 + Math.floor(rnd(q * 2 + h) * 12), 2 + Math.floor(r * 4)); }
+    x.fillStyle = 'rgba(8,6,6,.75)'; x.beginPath(); x.moveTo(w * 0.62, h * 0.18); x.lineTo(w * 0.74, h * 0.22); x.lineTo(w * 0.7, h * 0.42); x.lineTo(w * 0.6, h * 0.36); x.closePath(); x.fill();
+    c.geo = G; return (this.spr[key] = c);
+  };
+
   // ---------------------------------------------------------------- aggancio
   S.drawTripPlace = function (g, e, x, st, near, open) {
     if (!MINE[e.id]) return prev ? prev.call(this, g, e, x, st, near, open) : false;

@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 · proprietario (autosalone e sfascio)
+- Fatto: facciate rifatte anche per Autosalone Notte (`concessionario.js`: fascia scura con la scritta, portale col marchio,
+  faretti sulle auto, ufficio vendite, porta scorrevole, bandiere e totem più bassi) e Sfascio Ruggine (`sfascio.js`: gru a
+  traliccio col magnete, pile di carcasse fatte coi disegni veri ingialliti, lamiera col filo spinato, copricerchi,
+  cancello a rete che scorre, ufficio nel container, ATTENTI AL CANE). Nuovo `lcWreck` in `locali2d.js`.
+- PASSAGGIO: ora ci sono tutti e due gli artifact (proprietario e cognato), ognuno aggiorna il suo.
+
 ## 20/11/2026 notte · cognato (Jeshka e Luca)
 - Fatto: storia secondaria «Ti tengo compagnia» (`jeshka.js`) dalla proposta di Codex, riscritta: sei scene nei
   negozi Neon e tuning, il cavo, Jeshka in macchina col messaggio falso, i cinque lampi, incontro e finale. 191 test.

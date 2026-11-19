@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | Facciate di Autosalone Notte e Sfascio Ruggine | `concessionario.js`, `sfascio.js` | 19/11 |

@@ -9,8 +9,9 @@ gioco fa, sezione per sezione).
 - Repository **`Akaoni97/Night_Run`**, solo il gioco, alla radice. Il ramo **`main`** è quello pubblicato su Pages.
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
-- Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/XJDCR8GCQSYz95XXtXoyrs
-  (ultima versione pubblicata: 119, facciate dei locali).
+- Copie giocabili come artifact privati su claude.ai (ognuno aggiorna la sua):
+  - del proprietario: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (ultima versione pubblicata: 120, autosalone e sfascio);
+  - del cognato: https://claude.ai/artifact/XJDCR8GCQSYz95XXtXoyrs.
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
