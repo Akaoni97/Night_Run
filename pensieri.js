@@ -47,7 +47,7 @@ const PENS_ANIMO = [
   'Chissà se prima o poi arrivo a una fine.',
   'Ho lasciato la luce accesa a casa? Boh.',
   'Mi sa che ho esagerato col caffè.',
-  'A quest\'ora le canzoni alla radio sembrano scritte apposta per chi guida da solo.',
+  'A quest\'ora ogni canzone sembra scritta apposta per chi guida da solo.',
   'Conto le strisce bianche. Poi perdo il conto. Poi ricomincio.',
   'Chi guida di notte ha sempre qualcosa da cui scappare. O verso cui correre.',
   'Le luci dei camion da lontano sembrano un paese che si muove.',
