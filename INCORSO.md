@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Claude) | Aiuto aggiornato, riquadri che si sovrappongono, facciate in inquadratura | index.html, missioni.js (tutorial), pensieri (css), street2d.js (inquadratura) | 19/11 13:56 |
