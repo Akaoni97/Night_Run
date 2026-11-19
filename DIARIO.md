@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · cognato (Jeshka e Luca)
+- Fatto: storia secondaria «Ti tengo compagnia» (`jeshka.js`) dalla proposta di Codex, riscritta: sei scene nei
+  negozi Neon e tuning, il cavo, Jeshka in macchina col messaggio falso, i cinque lampi, incontro e finale. 191 test.
+- Aperto: Jeshka non è Rosa (la storia principale non cambia); entrate tramite Marco e incursione non fatte.
+- Da provare: tutta la catena giocando dal km 20 in poi.
+
 ## 19/11/2026 sera · cognato (caricamento)
 - Fatto: la grafica 3D (three.js dal CDN, car3d.js, street3d.js, circa 900 KB) si scarica solo se apri la vista 3D,
   la montagna o la vetrina; le registrazioni della Supra solo con la Supra; `sw.js` salva immagini, suoni e modelli

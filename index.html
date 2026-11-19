@@ -2706,6 +2706,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // l'annuncio di un privato a questa tappa, e da Niko la revisione del motore (usato.js)
     if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Niko: la revisione (documenti.js)
     if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
+    // «Ti tengo compagnia»: la storia secondaria di Jeshka (Neon) e Luca (tuning), in cima al pannello (jeshka.js)
+    if (window.NightJL && (I.id === 'style' || I.id === 'shop')) NightJL.panel(body, I, { flash, save: () => saveGame(), refresh: () => { if (placeOpen === I) openPlace(I); } });
     box.hidden = false;
     if (street2d) {
       const r = $('g2d').getBoundingClientRect(), pl = box.getBoundingClientRect();
@@ -3688,5 +3690,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="polizia.js"></script>
 <script src="statistiche.js"></script>
 <script src="banco.js"></script>
+<script src="jeshka.js"></script>
 </body>
 </html>
