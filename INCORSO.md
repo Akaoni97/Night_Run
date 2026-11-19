@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Claude) | Polizia: pattuglie, documenti, autovelox/tutor, contesta/scappa, etilometro | game.js, polizia.js (nuovo), index.html, documenti.js, interni.js (bar), pilota2d.js (testa), street2d.js (minimappa/autovelox) | 19/11 13:25 |

@@ -1149,7 +1149,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <ul>
         <li>Guidi tu: gas, freno, marce e corsie (<kbd>A</kbd> <kbd>D</kbd>). Con il sorpasso automatico la Supra si sposta da sola dietro al traffico lento; senza, se tamponi paghi il carrozziere.</li>
         <li>Lungo la strada arrivano proposte: rispondi con i pulsanti o con <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Se non rispondi, vale l'ultima.</li>
-        <li>Polizia in vista: il limite è 130 km/h; se le passi accanto oltre i 136 ti ferma e ti multa (più vai forte, più paghi). Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
+        <li>Polizia: il limite è 130 km/h; se passi accanto a una volante oltre i 136 ti ferma (paga, contesta o scappa). Autovelox (V) e Tutor (T) sono segnati sulla mappa in basso; un bar su cinque ha l'etilometro fuori. Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
         <li>Sfide da 400 m: freno, gas su, parti al verde. Partire prima del via costa la posta.</li>
         <li>La benzina si consuma davvero (70 litri). Le parti dell'officina si comprano e si montano da fermo.</li>
       </ul>
@@ -2511,6 +2511,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       r.appendChild(row(IC('panino') + 'Panino <small>€ 4,50</small>', svc(4.5, 'Panino', { food: 0.5 })));
       r.appendChild(row(IC('acqua') + 'Acqua <small>€ 1</small>', svc(1, 'Acqua', { water: 0.5 })));
       r.appendChild(row(IC('sapone') + 'Lavarsi le mani <small>gratis</small>', svc(0, '', { wash: 0.1 })));
+      // alcolici (polizia.js): un bar su cinque ha la volante fuori con l'etilometro, e lo si vede dalla vetrina
+      if (typeof POL_ALCOLICI !== 'undefined' && game.polDrink) {
+        const ar = group('Alcolici');
+        for (const a of POL_ALCOLICI) ar.appendChild(row(`${a.name} <small>€ ${fmt(a.price)}</small>`, () => { const q = game.polDrink(a.id); if (q.ok && q.alc >= POL.alcLimite) flash('Sopra 0,5 g/l: se ti fermano, multa', 1.8); return q; }));
+        if (game.polBarCheck(n)) note('Dalla vetrina si vede una volante parcheggiata qui davanti. Ogni tanto un agente guarda dentro.');
+      }
     } else if (I.id === 'grill') {
       note('Sosta 24: pasti caldi, docce, un market. Le luci al neon non si spengono mai.');
       const r = group('Servizi');
@@ -2606,6 +2612,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (e.kind === 'drop' && e.x - d > -back) add(Math.min(e.x, d + ahead - 30), 'C', '#b8ff3a', '', 'Consegna');
       if (e.kind === 'police' && !e.chase && e.x - d > -back && e.x - d < 450) add(e.x, '!', null, 'police', 'Polizia');
     }
+    // autovelox (V) e Tutor (T inizio e fine), da polizia.js: si vedono da lontano, così si sa dove si può tirare
+    if (game.polPins) for (const q of game.polPins(d - back, d + ahead)) add(q.x, q.t, q.end ? '#7f8aa8' : '#ff9a2e', q.x - d > 1500 ? 'far' : '', q.name);
     // il Viaggio: la meta del lavoro in corso (bandierina che pulsa; oltre la barra resta sul bordo con la distanza)
     // e le soste dove vanno consegnati scatole e bancali caricati
     if (game.s.vg && typeof VG !== 'undefined') {
@@ -3604,5 +3612,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="sfascio.js"></script>
 <script src="garage.js"></script>
 <script src="documenti.js"></script>
+<script src="polizia.js"></script>
 </body>
 </html>

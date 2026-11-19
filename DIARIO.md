@@ -4,6 +4,16 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 pomeriggio · cognato (polizia)
+- Fatto: `polizia.js`. Pattuglie in giro a 80-100 km/h (si superano). Al fermo l'agente guarda anche i documenti
+  (assicurazione scaduta = la fai lì) e si può pagare, **contestare** (tre scuse a caso, risposte dell'agente, quattro esiti)
+  o **scappare** (inseguimento, a volte posto di blocco dopo). **Autovelox e Tutor** rari, a volte niente per 7-12 km, V e T
+  sulla mappa in basso, verbale sul telefono qualche km dopo. **Pattuglia in coda** ogni tanto. **Alcolici al bar** e
+  etilometro fuori da un bar su cinque (si vede dalla vetrina); da brilli solo la testa che ciondola e qualche battuta.
+- Da sapere per il proprietario: il posto di controllo in prima corsia ora ti fa accostare (prima era solo un avviso);
+  `P.busted` e `P.payFine` di `game.js` sono sostituiti da `polizia.js`.
+- Aperto: frequenze e multe sono a occhio; le battute sono segnaposto come gli altri pensieri.
+
 ## 19/11/2026 · cognato
 - Fatto: polizia da autostrada: non ferma più chi è in sesta, ma chi le passa accanto oltre i 136 km/h (limite 130, tolleranza
   5 %). Multa a scaglioni come il codice della strada, moltiplicata dal livello di ricercato. Provato nel browser (149 km/h: € 170).

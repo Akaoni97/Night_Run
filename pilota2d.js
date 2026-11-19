@@ -151,11 +151,13 @@
     const sleepy = need ? Math.max(0, Math.min(1, (0.32 - need.sleep) / 0.25)) : 0;
     const yawnT = (t % 13) - 11.2, yawn = sleepy > 0.15 && yawnT > 0 ? Math.sin(Math.min(1, yawnT / 1.6) * Math.PI) : 0;
     const nod = sleepy > 0.5 ? Math.max(0, Math.sin(t * 0.7)) ** 6 * 1.4 * sleepy : 0;
+    // dopo qualche bicchiere (polizia.js, vg.alc in g/l): la testa ciondola piano, di lato e un po' in su e giù. Nient'altro
+    const alc = G2 && G2.s.vg ? Math.min(1, (G2.s.vg.alc || 0) / 1.1) : 0, swayX = alc * (Math.sin(t * 1.15) * 1.3 + Math.sin(t * 2.7) * 0.4), swayY = alc * Math.sin(t * 0.9 + 1) * 0.7;
     const beat = music && !sleepy ? Math.max(0, Math.sin(t * Math.PI * 2 * 1.9)) * 0.32 : 0, sing = music && !sleepy && (t % 11) > 8.5 && Math.floor(t * 4) % 2 === 0;
     const look = window.NightPG ? NightPG.now() : (typeof PG_DEF !== 'undefined' ? PG_DEF : null);
     const blink = (t % 3.9) < 0.11 || ((t + 1.7) % 7.3) < 0.1;
     if (typeof pgDriver === 'function') {
-      pgDriver(x, { cx, cy: cy + beat + nod, sx, wx, wy, C: pgColors(look, dk * 0.38), look, turn: nod > 0.3 ? 0 : M2.turn, blink: blink || (sleepy > 0.7 && (t % 2.4) < 0.5), breath: Math.sin(t * 1.6),
+      pgDriver(x, { cx: cx + swayX, cy: cy + beat + nod + swayY, sx, wx, wy, C: pgColors(look, dk * 0.38), look, turn: nod > 0.3 ? 0 : M2.turn, blink: blink || (sleepy > 0.7 && (t % 2.4) < 0.5), breath: Math.sin(t * 1.6),
         steer: M2.steer, elbow: M2.elbow, shiftK: M2.shiftK, lookUp: mirror && !sig ? 1 : 0, sleepy, yawn, sing });
     }
     // volante (corona vista di taglio)

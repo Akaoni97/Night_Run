@@ -547,7 +547,7 @@ class StreetGame {
       for (let i = 0; i < n; i++) this.spawnTraffic(d + 230 + r() * 160 + i * 45);
     } else if (kind === 'police') {
       const parked = r() < 0.6;
-      this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 2, x: d + (parked ? 380 : 260), v: parked ? 0 : 24 + r() * 4 });
+      this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 1 + (r() < 0.5 ? 1 : 0), x: d + (parked ? 380 : 260), v: parked ? 0 : (80 + r() * 20) / 3.6 });   // in giro: 80-100 km/h, si supera
     } else if (kind === 'station') {
       if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
     } else if (kind === 'job') this.offerJob();
