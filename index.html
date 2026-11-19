@@ -2668,6 +2668,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Scegli i pezzi dalle tendine: li monta subito. Alcuni si sbloccano solo dopo un po\' di chilometri.');
       move(document.querySelector('section.panel.tuning'));
       renderTuning(); renderServices();
+      if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
       const m = game.maint(), worst = Math.min(m.oil, m.plugs, m.pads);
       note(sim.damage > 0.2 ? 'Niko: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Niko: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Niko: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Niko: «Tutto in ordine. Controllo veloce e vai.»');
@@ -3665,5 +3666,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
 <script src="statistiche.js"></script>
+<script src="banco.js"></script>
 </body>
 </html>

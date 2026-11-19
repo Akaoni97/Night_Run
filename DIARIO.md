@@ -4,6 +4,11 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 19/11/2026 sera · cognato (banco prova)
+- Fatto: banco prova a rulli da Da Luca Tuning (`banco.js`): auto sui rulli, acceleratore graduato, freno, marce,
+  curva di CV e coppia con quella di prima in grigio per confrontare prima e dopo i pezzi. 187 test.
+- Aperto: il banco non ha suono (il motore audio segue solo l'auto vera); se serve si collega dopo.
+
 ## 19/11/2026 sera · cognato (migliorie)
 - Fatto: scuse assurde che a volte passano (anche il bagno); un evento ogni 8-10 km (incidente, controllo, foratura,
   uno che ha fretta); credito in rosso fino a 500 € per benzina, cibo e motel; nascondiglio con rischio (1 su 3 ti
