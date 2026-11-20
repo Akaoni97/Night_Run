@@ -17,6 +17,8 @@ const DOC = {
   multa: { ass: 650, bollo: 120, rev: 170 },                    // ai controlli
   controllo: 0.4,                                               // passando davanti a un posto di controllo: quanto spesso ti fermano
   avviso: 20,                                                   // km prima della scadenza: avviso sul telefono
+  franchigia: 150,                                              // con l'assicurazione in regola carrozzeria e soccorso costano al massimo questo
+  malus: 0.25, malusMax: 1, malusKm: 300,                       // ogni sinistro alza il premio del 25 % (al massimo il doppio); ne sparisce uno ogni 300 km senza danni
 };
 const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
 
@@ -35,8 +37,15 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     return st.docs;
   };
   P.docScaduti = function (id = this.car) { const d = this.docs(id), k = km(this); return Object.keys(DOC_NOMI).filter((x) => d[x] <= k); };
+  // assicurazione in regola? sinistri ancora attivi (ne cala uno ogni DOC.malusKm km senza danni)? un danno coperto dall'assicurazione
+  P.docAssOk = function (id = this.car) { return this.docs(id).ass > km(this); };
+  P.docSinistri = function (id = this.car) { const d = this.docs(id); return Math.max(0, (d.sin || 0) - Math.floor((km(this) - (d.sinKm || 0)) / DOC.malusKm)); };
+  P.docSinistro = function (coperto, id = this.car) {
+    const d = this.docs(id); d.sin = this.docSinistri(id) + 1; d.sinKm = km(this);
+    this.say(`Assicurazione: copre € ${fmt(coperto)} di danni. Sinistri attivi: ${d.sin}, il premio sale del ${Math.round(Math.min(DOC.malusMax, DOC.malus * d.sin) * 100)} %`, 'info');
+  };
   P.docCosto = function (tipo, id = this.car) {
-    if (tipo === 'ass') return DOC.ass[cat(id)] || 400;
+    if (tipo === 'ass') return Math.round((DOC.ass[cat(id)] || 400) * (1 + Math.min(DOC.malusMax, DOC.malus * this.docSinistri(id))) / 5) * 5;
     if (tipo === 'rev') return DOC.rev;
     const cv = this.dlSpec ? this.dlSpec(id).cv : 100, base = Math.min(DOC.bolloMax, Math.max(DOC.bolloMin, Math.round(cv * DOC.bolloCv / 5) * 5));
     return this.docs(id).bollo <= km(this) ? Math.round(base * (1 + DOC.mora) / 5) * 5 : base;
@@ -69,6 +78,18 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     st.docs = extra.damage ? { ass: 0, bollo: 0, rev: 0 } : { ass: 0, bollo: h < 4 ? 0 : k + 120 + h * 30, rev: h < 3 ? 0 : k + 200 + h * 60 };
     return st;
   };
+  // carrozziere (Mario) e soccorso: con l'assicurazione in regola si paga solo la franchigia; il resto lo copre lei e conta come sinistro
+  const rc = P.repairCost;
+  if (rc) {
+    P.repairCostFull = rc;
+    P.repairCost = function () { const full = rc.call(this); return this.docAssOk() ? Math.min(full, DOC.franchigia) : full; };
+    const rep = P.repair;
+    P.repair = function () {
+      const full = rc.call(this), pagato = this.repairCost(), r = rep.call(this);
+      if (r && r.ok && this.mode === 'career' && full > pagato) this.docSinistro(full - pagato);
+      return r;
+    };
+  }
   // passando accanto a un posto di controllo in prima corsia (strada.js), a volte ti fermano; avvisi sul telefono prima delle scadenze
   const up = P.update;
   P.update = function (dt) {
@@ -117,7 +138,7 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     const g = G(); if (!g || !g.s || !g.s.vg) return '';
     const ids = (g.s.vg.garage || []).slice().sort((a, b) => (b === g.car) - (a === g.car)), sc = g.docScaduti();
     return `<div class="view app"><div class="nav"><h3>Libretto</h3></div><div class="body">
-      <div class="lb-hd"><b>${sc.length ? 'Non sei in regola' : 'In regola'}</b>Assicurazione e bollo si pagano da qui; la revisione si fa da Mario. Ai posti di controllo in prima corsia la polizia a volte ti ferma.</div>
+      <div class="lb-hd"><b>${sc.length ? 'Non sei in regola' : 'In regola'}</b>Assicurazione e bollo si pagano da qui; la revisione si fa da Mario. Ai posti di controllo in prima corsia la polizia a volte ti ferma.<br>Con l'assicurazione in regola carrozzeria e soccorso costano al massimo € ${fmt(DOC.franchigia)} (franchigia); ogni danno coperto è un sinistro e alza il premio.${g.docSinistri() ? ` Sinistri attivi: <b>${g.docSinistri()}</b> (premio +${Math.round(Math.min(DOC.malusMax, DOC.malus * g.docSinistri()) * 100)} %).` : ''}</div>
       ${ids.map((id) => `<div class="lb-car"><b>${esc((CARS[id] || {}).name || id)}${id === g.car ? ' · la guidi ora' : ''}</b>${['ass', 'bollo', 'rev'].map((t) => riga(g, id, t)).join('')}</div>`).join('')}
     </div></div>`;
   }

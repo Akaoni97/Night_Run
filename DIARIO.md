@@ -1,3 +1,12 @@
+## 20/11/2026 notte · proprietario (**v0.55 · assicurazione, traino, diario**)
+- Fatto: (1) **assicurazione con franchigia** (`documenti.js`): in regola, carrozzeria e soccorso costano al massimo € 150; il resto lo copre lei ed è un sinistro
+  (premio +25 % l'uno, al massimo il doppio, ne sparisce uno ogni 300 km); scaduta si paga tutto. (2) **Guasti e traino** (`soccorso.js`): da fermo con motore
+  rotto o gomma a terra la domanda propone l'app; servizio **Traino** (motore rotto → da Luca, dove Nico lo rifà; auto distrutta → da Mario): catena, buio,
+  si arriva davanti all'officina (premi U), € 60 + € 12 al km; non si può con una consegna in corso prima dell'officina. (3) **Diario** (`diario.js`, app nel telefono):
+  capitali, incidenti, fughe, motore rotto, auto nuove, soccorso, ogni 100 km, con foto piccole fuori dal salvataggio.
+- Aperto: la prossima officina dello stesso tipo è lontana (Mario e Luca ogni ~38 km): il traino salta quella strada (eventi, bisogni sì, odometro no). Se è troppo,
+  si può far arrivare al locale più vicino anche indietro. Il diario scrive anche «Arrivo a Tokyo» al km 0.
+
 ## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
 - Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è
   ricostruito dalle voci del diario (approssimato), da v0.51 è esatto. Da qui in poi lo compila chi fa l'intervento, prima di chiuderlo.
