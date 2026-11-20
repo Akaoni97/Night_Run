@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 sera · proprietario (**interni più belli: prototipo del bar**)
+- Fatto: il bar rifatto in alta definizione (`interni_hd.js`): doppia densità come la strada, profondità su tre piani,
+  materiali e luci vere, barista disegnata come il protagonista che lavora tra caffè e brioche. `interni.js` ora sa
+  disegnare una scena a doppia densità (solo se la scena lo chiede: gli altri interni sono identici). Il bar vecchio
+  resta in `SCENE.bar_vecchio`.
+- Aperto: se lo stile piace, gli altri otto interni uno alla volta (quello di Luca col cognato, per Nico).
+
 ## 20/11/2026 sera · proprietario (**Impostazioni nel menu e meteo nuovo**)
 - Fatto: nel menu una scheda **Impostazioni** con quattro sottoschede (Grafica, Audio, Comandi, Guida): ci sono finite le
   regolazioni che stavano sparse in Vista, Guida ed Extra (stessi controlli, spostati). Le schede Vista ed Extra non ci

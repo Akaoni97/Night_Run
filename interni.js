@@ -735,6 +735,10 @@
   let cv = null, tag = null, cur = null, raf = 0, t0 = 0, alpha = 0, closing = false, hover = null;
   const off = document.createElement('canvas'); off.width = W; off.height = H; const og = off.getContext('2d');
   const bg = document.createElement('canvas'); bg.width = W; bg.height = H; const bgg = bg.getContext('2d');
+  // densità della scena: 1 = pixel da 640×360 come sempre, 2 = doppia (1280×720, come la strada in qualità alta).
+  // Le coordinate di disegno restano 640×360: con 2 si può disegnare a mezze unità. La sceglie la scena (ss).
+  let SSc = 1;
+  const setSS = (ss) => { if (SSc === ss) return; SSc = ss; off.width = bg.width = W * ss; off.height = bg.height = H * ss; };
   let fit = { s: 1, ox: 0, oy: 0 };
   function mount() {
     if (cv) return;
@@ -785,8 +789,8 @@
     const k = fitKey(); if (k !== lastKey) { lastKey = k; resize(); }
     alpha = closing ? Math.max(0, alpha - 0.06) : Math.min(1, alpha + 0.06);
     cv.style.opacity = String(alpha);
-    og.setTransform(1, 0, 0, 1, 0, 0); og.globalCompositeOperation = 'source-over'; og.globalAlpha = 1;
-    og.drawImage(bg, 0, 0);
+    og.setTransform(SSc, 0, 0, SSc, 0, 0); og.globalCompositeOperation = 'source-over'; og.globalAlpha = 1; og.imageSmoothingEnabled = false;
+    og.drawImage(bg, 0, 0, W, H);
     // la tua auto si ridisegna due volte al secondo: vernice, cerchi e pezzi provati o comprati si vedono subito
     if (cur.S.carK && t - (cur.S.carT || 0) > 0.5) { cur.S.carT = t; const c = carPic(cur.S.carK); if (c) cur.S.car = c; }
     S.dyn(og, t, cur.S);
@@ -804,11 +808,13 @@
 
   window.NightInterni = {
     SCENE,
+    // gli attrezzi di disegno, per le scene scritte in altri file (interni_hd.js)
+    kit: { W, H, rng, R, P, shade, shade2, glow, cone, text, textW, neon, carPic, traffic, rain, drops, frame, clock, bottles, wood, outside, person, BAYER },
     open(place) {
       const id = place && place.id; if (!SCENE[id]) return false;
       mount(); if (!cv) return false;
       if (cur && cur.id === id && !closing) return true;               // il pannello si ridisegna: la scena resta
-      const S = {}; bgg.setTransform(1, 0, 0, 1, 0, 0); bgg.clearRect(0, 0, W, H); SCENE[id].static(bgg, rng(id.length * 977 + 13), S);
+      const S = {}; setSS(SCENE[id].ss || 1); bgg.setTransform(SSc, 0, 0, SSc, 0, 0); bgg.clearRect(0, 0, W, H); bgg.imageSmoothingEnabled = false; SCENE[id].static(bgg, rng(id.length * 977 + 13), S);
       cur = { id, S }; closing = false; t0 = performance.now(); cv.style.pointerEvents = 'auto'; resize();
       if (!raf) raf = requestAnimationFrame(draw);
       AMB.start(SCENE[id].amb);
