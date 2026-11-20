@@ -12,9 +12,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Nomi e marchi reali delle auto (27 mezzi) | **Rischio** | Marche e modelli veri nel gioco e sul quadro strumenti (TOYOTA, VOLVO, BMW); strisce M sulle BMW. |
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
 | Musica (13 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
-| Modello 3D della Supra | Va bene con condizioni | CC BY 4.0: crediti obbligatori e visibili; il modello contiene i loghi Toyota. |
 | Suono registrato del motore | Va bene | CC0 (Freesound). |
-| three.js | Va bene | MIT. |
 | Caratteri (Google Fonts) | Va bene | OFL / Apache; ma caricarli dai server di Google è un problema di privacy in UE: metterli nel repository. |
 | Disegni delle auto, grafica, codice, storia | Va bene | Fatti dal proprietario, dal cognato e con Claude per loro. |
 | Skill in `.claude/skills/` | Va bene | Apache 2.0 con NOTICE (strumenti di sviluppo, non vanno nel gioco). |
@@ -73,12 +71,9 @@ prima metà di novembre 2026 (una o due settimane prima). Il piano a pagamento �
 e della ricevuta dell'abbonamento; per un gioco a pagamento, chiedere conferma (Google o un avvocato) prima di uscire.
 Le canzoni nuove fatte più avanti vanno segnate qui con piano e data.
 
-## 4. Modello 3D della Supra (`models/supra_mk4.glb`)
-*Toyota Supra MK4 (LowPoly)* di Mike Farrant (Sketchfab), licenza CC BY 4.0, modificato (scala, ruote separate,
-texture ridotte). La licenza permette anche l'uso commerciale, ma chiede il credito: oggi c'è nel README e
-nell'etichetta della vista 3D, ma solo quando la si apre. **Fatto (18/11/2026)**: schermata Crediti nel gioco (`crediti.js`). La licenza
-CC copre il modello ma non il marchio: la texture contiene i loghi Toyota. Se la vista 3D non serve all'uscita,
-la cosa più semplice è non pubblicarla.
+## 4. Modello 3D della Supra (tolto)
+Il 20/11/2026 il 3D è stato tolto dal gioco e con lui il modello *Toyota Supra MK4 (LowPoly)* di Mike Farrant
+(CC BY 4.0, con i loghi Toyota nella texture): niente più crediti da mostrare. Resta nella storia di git.
 
 ## 5. Suono registrato del motore (`audio/supra/`)
 Anelli ricavati da "Import car revs on chassis dyno with turbo" di editboy23 (Freesound 496171), CC0: si può usare
@@ -86,15 +81,14 @@ per tutto, senza obbligo di crediti (citarlo è gentile). Da qui la pagina di Fr
 controllare una volta la licenza sulla pagina.
 
 ## 6. Codice di altri
-- three.js 0.147.0 (MIT) da cdn.jsdelivr.net, solo per la vista 3D. Va bene; nei crediti: "three.js, licenza MIT".
-- Nient'altro: niente pacchetti npm nel gioco.
+- Nessuno: niente pacchetti npm nel gioco (three.js, usato dalla vista 3D, è andato via col 3D il 20/11/2026).
 
 ## 7. Caratteri
 Russo One, Barlow Semi Condensed, Share Tech Mono, Saira Stencil One, Bangers, Black Ops One (SIL Open Font License
 1.1) e Permanent Marker (Apache 2.0) da Google Fonts: si possono usare in giochi e video, anche venduti.
 **Privacy**: caricarli dai server di Google manda l'indirizzo IP del giocatore a Google senza consenso; in Germania un
 tribunale (LG München I, 20/01/2022) l'ha considerato una violazione del GDPR. Conviene mettere i file dei caratteri
-nel repository e caricarli da lì (lo stesso, meno grave, per three.js da jsdelivr).
+nel repository e caricarli da lì.
 
 ## 8. Il repository
 Non c'è un file LICENSE: tutto è "tutti i diritti riservati", ma se il repository è pubblico chiunque vede codice,
@@ -109,8 +103,6 @@ Il piano per trasformare il gioco da pagina web a gioco da installare (Electron)
 da decidere insieme. Le cose di questa pagina (nome, marchi, musica, crediti) vanno sistemate prima, qualunque sia il percorso.
 
 ## Crediti da mostrare nel gioco
-- Modello 3D Toyota Supra MK4 (LowPoly) di Mike Farrant, CC BY 4.0, modificato.
 - Suono del motore: editboy23 (Freesound), CC0.
-- three.js, licenza MIT.
 - Caratteri: Russo One, Barlow Semi Condensed, Share Tech Mono, Saira Stencil One, Bangers, Black Ops One (OFL);
   Permanent Marker (Apache 2.0).

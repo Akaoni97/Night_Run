@@ -1,7 +1,7 @@
 // ============================================================================
 //  Night Run · I crediti (dopo menu.js)
 //  Una schermata a tutto schermo con chi ha fatto il gioco e il materiale di altri che usa, come chiedono le licenze
-//  (il modello 3D della Supra è CC BY 4.0: il credito deve essere visibile). Si apre dalla schermata iniziale
+//  (per esempio il suono registrato del motore). Si apre dalla schermata iniziale
 //  ("Crediti" sotto Accendi e parti) e dal menu, scheda Partita. Esc o un clic fuori la chiudono.
 //  L'elenco è in CREDITI: tenerlo uguale a "Crediti da mostrare nel gioco" in LICENZE.md.
 // ============================================================================
@@ -10,12 +10,10 @@ const CREDITI = [
     ['Ideato, disegnato e scritto da', 'il proprietario e suo cognato'],
     ['Musica originale', 'del proprietario, fatta con Gemini (Google)'],
   ]],
-  ['Modelli e suoni', [
-    ['Modello 3D Toyota Supra MK4 (LowPoly)', 'di Mike Farrant, licenza CC BY 4.0, modificato (scala, ruote separate, texture ridotte)'],
+  ['Suoni', [
     ['Suono registrato del motore', '"Import car revs on chassis dyno with turbo" di editboy23 (Freesound), CC0'],
   ]],
   ['Programmi e caratteri', [
-    ['three.js', 'licenza MIT'],
     ['Caratteri', 'Russo One, Barlow Semi Condensed, Share Tech Mono, Saira Stencil One, Bangers, Black Ops One (SIL OFL); Permanent Marker (Apache 2.0)'],
   ]],
 ];

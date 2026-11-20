@@ -9,6 +9,15 @@ questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
 
+## 20/11/2026 sera · per il cognato · dal proprietario · **IL 3D NON C'È PIÙ**
+- Il proprietario ha deciso di **togliere il 3D**: farebbero tutti i modelli 3D delle auto, troppo lungo e costoso.
+  Il gioco ora è **solo 2D**. Spariti: vista 3D e Abitacolo, la modalità **Montagna** (era solo 3D), la Vetrina (G),
+  la telecamera (C), il caricamento di modelli .glb e three.js. Cancellati `car3d.js`, `street3d.js`, `viaggio3d.js`
+  e `models/`. Se un giorno servisse, sono nella storia di git.
+- Al posto del 3D: **la costruzione del motore** (scegli i pezzi, lo monti a mano sul cavalletto, lo monti su
+  qualsiasi auto), in un **locale nuovo** del Viaggio. Ci sta lavorando il proprietario.
+- Il weekend quindi è tutto 2D: segnate in `INCORSO.md` cosa toccate.
+
 ## 20/11/2026 · per il cognato · dal proprietario
 - **Il gioco ora si installa come app sul PC** (Edge o Chrome: menu → «App» → «Installa Night Run»; in Chrome l'icona col
   monitor in fondo alla barra degli indirizzi). Icona sul desktop e nel menu Start, finestra sua, salvataggi uguali al sito.

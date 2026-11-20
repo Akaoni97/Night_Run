@@ -8,6 +8,13 @@ due voci, e il controllo della sera le legge.
 - **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
   su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
 
+## 20/11/2026 sera · proprietario (**via il 3D**)
+- Deciso dal proprietario: il 3D si toglie (servirebbero tutti i modelli delle auto). Cancellati `car3d.js`,
+  `street3d.js`, `viaggio3d.js`, `models/supra_mk4.glb`; da `index.html` vista 3D/Abitacolo, Montagna, Vetrina,
+  telecamera, modelli .glb, three.js; da `game.js` la guida in montagna; tasti C e G; crediti e licenze del modello.
+  Tolto il test della Montagna (194). `sw.js` non toccato (la riga di three.js lì non fa più niente).
+- Al posto del 3D: costruzione del motore in un locale nuovo (in corso).
+
 ## 20/11/2026 · proprietario (entrata nei locali)
 - Fatto: entrando in un locale niente più teletrasporto. Ogni locale ha un **posto auto** accanto alla porta (strisce e P sul
   marciapiede; al benzinaio la pompa): l'auto ci entra con le ruote che girano (in retro se la porta l'hai passata), il

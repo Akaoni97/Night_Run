@@ -177,9 +177,8 @@ body.inplace.pb-sotto .trg-pop { top: 8px; bottom: auto; }   /* telefono: il pan
 /* ---- strada 3D ---- */
 .road { background: #04060b; box-shadow: inset 0 0 0 1px var(--line); }
 .stage { position: relative; }
-#g3d, #g2d { display: block; width: 100%; aspect-ratio: 16 / 7.4; max-width: 100%; touch-action: none; }
+#g2d { display: block; width: 100%; aspect-ratio: 16 / 7.4; max-width: 100%; touch-action: none; }
 #g2d { image-rendering: pixelated; }
-.g3d-msg { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: var(--muted); }
 .hud { position: absolute; inset: 0; pointer-events: none; padding: 12px; overflow: hidden; }
 .hud > * { pointer-events: auto; }
 .hud-l { position: absolute; left: 12px; top: 12px; display: grid; gap: 6px; }
@@ -351,7 +350,7 @@ body.inplace #hudG { display: none; }
 body.fs { overflow: hidden; }
 body.fs .road, body.fs #cluster { clip-path: none; }
 body.fs #roadStage { position: fixed; inset: 0; z-index: 30; background: #000; }
-body.fs #g2d, body.fs #g3d { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; }
+body.fs #g2d { width: 100vw; height: 100vh; height: 100dvh; aspect-ratio: auto; }
 body.fs .fsbtn svg path { d: path("M5 1v4H1M15 5h-4V1M11 15v-4h4M1 11h4v4"); }
 body.fs .msg { position: fixed; top: 14px; z-index: 45; }
 body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
@@ -373,7 +372,6 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .seg.look { flex: 0 0 auto; }
 .seg.look button { flex: 0 0 auto; padding: 6px 10px; font-size: 13px; }
 .swatches button { width: 24px; height: 24px; border: 2px solid #3a3329; padding: 0; transform: skewX(-12deg); }
-.swatches .sw-model { background: conic-gradient(#c81d11, #ffb347, #b8ff3a, #c81d11); color: #1a1206; font: 400 11px/1 var(--f-display); }
 .swatches button[aria-pressed="true"] { border-color: var(--fg); box-shadow: 0 0 0 2px var(--amber); }
 .file { position: relative; overflow: hidden; }
 .file input, .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -564,7 +562,6 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   .toggles { grid-template-columns: 1fr; }
   .cluster { padding: 10px 8px; }
   .msg { top: 22px; }
-  #g3d { aspect-ratio: 4 / 4.2; }
   #g2d { aspect-ratio: 4 / 3.4; }
   .hud-tag { font-size: 12px; padding: 4px 8px; }
   .radar { top: 84px; font-size: 13px; }
@@ -595,14 +592,6 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
 .ui-fumetto .panel h2 { font-style: normal; color: #fff; text-shadow: 0 0 10px rgba(255,46,136,.8); }
 
 /* ---- vetrina e foto ---- */
-.showroom { position: fixed; inset: 0; z-index: 30; background: radial-gradient(ellipse at 50% 70%, #26221c, #050403 70%); display: grid; grid-template-rows: auto 1fr auto; }
-.showroom canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.show-top, .show-bar { position: relative; z-index: 1; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-  padding: max(14px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px)); }
-.show-top { justify-content: space-between; }
-.show-top h2 { margin: 0; font: 400 clamp(22px, 4vw, 36px)/1 var(--f-display); text-transform: uppercase; letter-spacing: .06em; color: var(--fg); text-shadow: 0 2px 12px #000; }
-.show-top h2 em { display: block; margin-top: 6px; font: 400 13px/1.3 var(--f-data); font-style: normal; letter-spacing: .04em; color: var(--amber); text-transform: none; }
-.show-bar { grid-row: 3; background: linear-gradient(0deg, rgba(0,0,0,.7), transparent); padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
 .photo { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.88); display: grid; place-items: center; gap: 12px; padding: 20px max(16px, env(safe-area-inset-right, 0px)) 20px max(16px, env(safe-area-inset-left, 0px)); align-content: center; }
 .photo img { max-width: 100%; max-height: 78vh; box-shadow: 0 0 0 6px #f4f1e6, 0 20px 60px #000; }
 .photo p { margin: 0; color: var(--muted); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
@@ -625,7 +614,7 @@ html.game .chip span { font-size: 16px; }
 html.game .audio-state { padding: 6px 10px; }
 html.game .road { display: grid; min-height: 0; clip-path: none; border-radius: 6px; overflow: hidden; }
 html.game .road .stage { min-height: 0; height: 100%; }
-html.game #g2d, html.game #g3d { width: 100%; height: 100%; aspect-ratio: auto; }
+html.game #g2d { width: 100%; height: 100%; aspect-ratio: auto; }
 html.game #roadStage > .msg { position: absolute; top: 56px; z-index: 6; }
 .menubtn { border: 0; padding: 8px 14px 7px; font: 400 14px/1 var(--f-display); letter-spacing: .08em; color: #1a1206; background: var(--amber); clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%); white-space: nowrap; }
 .menubtn kbd { margin-left: 6px; background: transparent; border-color: rgba(0,0,0,.3); color: #1a1206; }
@@ -916,7 +905,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <button type="button" data-m="trip" class="mode-main">Il Viaggio</button>
         <span class="mode-sep">modalità libere</span>
         <button type="button" data-m="free">Città libera</button>
-        <button type="button" data-m="mountain">Montagna</button>
       </div>
       <button class="linkbtn" type="button" id="btnNew">Nuova carriera</button>
     </div>
@@ -952,8 +940,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   <section class="road cutbox" aria-label="Strada">
     <div class="stage" id="roadStage">
     <canvas id="g2d" aria-label="La Supra sulla strada di notte, in pixel art vista di lato"></canvas>
-    <canvas id="g3d" hidden aria-label="La Supra sulla strada di notte in 3D: trascina per cambiare inquadratura"></canvas>
-    <p class="g3d-msg" id="g3dMsg" hidden></p>
     <div class="hud">
       <button class="lanebtn l" type="button" id="laneL" aria-label="Sterza a sinistra (tieni premuto A)">◀<small>A</small></button>
       <button class="lanebtn r" type="button" id="laneR" aria-label="Sterza a destra (tieni premuto D)">▶<small>D</small></button>
@@ -1014,28 +1000,14 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <div class="place-body" id="placeBody"></div>
     </div>
     <div class="roadbar">
-      <div class="seg look" id="lookSeg" role="group" aria-label="Stile grafico">
-        <button type="button" data-l="2d">2D cartoon</button>
-        <button type="button" data-l="smooth">3D</button>
-        <button type="button" data-l="cockpit">Abitacolo</button>
-      </div>
       <div class="swatches" id="swatches" role="group" aria-label="Colore carrozzeria"></div>
-      <label class="kbtn file only3d">Carica modello .glb<input type="file" id="glbIn" accept=".glb,.gltf,model/gltf-binary"></label>
-      <button class="kbtn only3d" type="button" id="glbRot">Ruota 90°</button>
-      <button class="kbtn only3d" type="button" id="glbUp">Raddrizza</button>
-      <button class="kbtn only3d" type="button" id="glbSupra">Supra MK4</button>
-      <button class="kbtn only3d" type="button" id="glbReset">Modello di base</button>
-      <button class="kbtn only3d" type="button" id="camReset">Inquadratura</button>
-      <button class="kbtn only3d" type="button" id="camNext">Telecamera<small>C</small></button>
       <button class="kbtn" type="button" id="mapBtn">Mappa del mondo<small>T</small></button>
       <button class="kbtn" type="button" id="fsBtn2">Schermo intero<small>Z</small></button>
-      <button class="kbtn" type="button" id="showBtn">Vetrina<small>G</small></button>
       <button class="kbtn" type="button" id="photoBtn">Foto<small>X</small></button>
       <button class="kbtn" type="button" id="replayBtn">Replay<small>Y</small></button>
       <label class="kbtn qsel">Ora <select id="clockSel" aria-label="Ora del giorno"><option value="auto">dinamica</option><option value="giorno">giorno</option><option value="tramonto">tramonto</option><option value="notte">notte</option></select></label>
       <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option></select></label>
-      <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica 3D"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
-      <p class="hint"><span id="g3dName">modello di base</span> · trascina per girare la visuale</p>
+      <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
     </div>
   </section>
 
@@ -1208,7 +1180,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
         <div><kbd>9</kbd></div><div>Cambia la gomma forata con la ruota di scorta (da fermo, serve la scorta nel bagagliaio)</div>
         <div><kbd>8</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
-        <div><kbd>C</kbd> <kbd>F</kbd> <kbd>H</kbd> <kbd>B</kbd></div><div>Telecamera (anche abitacolo) · abbaglianti · clacson · bagagliaio</div>
+        <div><kbd>F</kbd> <kbd>H</kbd> <kbd>B</kbd></div><div>Abbaglianti · clacson · bagagliaio</div>
         <div><kbd>N</kbd> <kbd>R</kbd> <kbd>Spazio</kbd></div><div>Folle · retro · frizione (manuale)</div>
         <div><kbd>V</kbd> <kbd>L</kbd> <kbd>M</kbd></div><div>Ascolto · launch control · muto</div>
         <div><kbd>Pad</kbd></div><div>RT gas, LT freno, A/X marce, B frizione, Y avviamento</div>
@@ -1217,20 +1189,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   </section>
 </div>
 
-<div class="showroom" id="showroom" hidden role="dialog" aria-labelledby="showTitle">
-  <canvas id="showCv" aria-label="La Supra in vetrina, trascina per girarla"></canvas>
-  <div class="show-top">
-    <h2 id="showTitle">Vetrina <em id="showSpec">—</em></h2>
-    <button class="kbtn" type="button" id="showClose">Chiudi<small>Esc</small></button>
-  </div>
-  <div class="show-bar">
-    <div class="swatches" id="showSw" role="group" aria-label="Colore"></div>
-    <label class="kbtn qsel">Assetto <select id="showStance" aria-label="Assetto"><option value="0">di serie</option><option value="0.035">ribassato</option><option value="0.07">slammed</option></select></label>
-    <label class="kbtn qsel">Luci <select id="showLight" aria-label="Luci dello studio"><option value="studio">studio</option><option value="neon">neon</option><option value="tramonto">tramonto</option></select></label>
-    <button class="kbtn" type="button" id="showSpin" aria-pressed="true">Piattaforma</button>
-    <button class="kbtn" type="button" id="showPhoto">Foto<small>X</small></button>
-  </div>
-</div>
 <div class="photo" id="photoBox" hidden role="dialog" aria-label="Foto">
   <img id="photoImg" alt="Foto della Supra">
   <p>Tieni premuto (o tasto destro) sulla foto per salvarla · <button class="kbtn" type="button" id="photoClose">Chiudi</button></p>
@@ -1255,7 +1213,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   </div>
 </div>
 
-<!-- three.js, car3d.js e street3d.js si caricano solo quando serve la vista 3D (carica3d() più sotto) -->
 <script src="dsp.js"></script>
 <script src="sim.js"></script>
 <script src="tuning.js"></script>
@@ -1347,7 +1304,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const st = radio.station, on = st.id !== 'off';
     $('radioFreq').textContent = on ? st.freq : 'RADIO'; $('radioName').textContent = on ? st.name : 'spenta';
     $('radioBtn').classList.toggle('off', !on);
-    if (street3d && street3d.setRadio) street3d.setRadio(on ? st.freq : '', on ? st.name : '');
     S.radio = radio.i;
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
     if (announce && !window.radioUI) flash(on ? `Radio: ${st.freq} · ${st.name}` : 'Radio spenta', 1.6);   // col banner nuovo (radio_ui.js) basta lui
@@ -1358,7 +1314,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const audio = { ctx: null, send: () => {}, ready: false, starting: null };
   let player = null;
   // punto d'ascolto: 3 = automatico, segue la telecamera (interna → abitacolo, le altre → da fuori)
-  const viewNow = () => (+S.view === 3 ? (S.look === 'cockpit' ? 0 : 1) : +S.view);
+  const viewNow = () => (+S.view === 3 ? 1 : +S.view);
   // ambiente intorno all'auto per il suono: 0 strada aperta, 1 città tra i palazzi, 2 galleria
   function envNow() {
     const d = game.s.dist, v2 = S.look === '2d' ? street2d : null;
@@ -1612,7 +1568,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (rp.on && !e.repeat) { stopReplay(); return; }
     if (e.key === 'Escape' && placeOpen) { game.exitPlace(); return; }
     if (e.key === 'Escape' && document.body.classList.contains('fs') && !document.fullscreenElement) { setFs(false); return; }
-    if (e.key === 'Escape' && (showOn || !$('photoBox').hidden)) { if (!$('photoBox').hidden) $('photoBox').hidden = true; else closeShowroom(); return; }
+    if (e.key === 'Escape' && !$('photoBox').hidden) { $('photoBox').hidden = true; return; }
     let k = e.key.toLowerCase(); k = KEYMAP[k] || k;
     if ([' ', 'w', 's', 'e', 'q'].includes(k) || e.key.startsWith('Arrow')) e.preventDefault();
     if (e.key === 'Enter') { e.preventDefault(); if (!e.repeat) startOn(); return; }
@@ -1627,7 +1583,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'i') ignToggle();
     else if (k === 'o') engineOff();
     else if (k === 'v') { S.view = (+S.view + 1) % 4; applySettings(); flash('Ascolto: ' + ['abitacolo', 'esterno', 'vano motore', 'automatico (segue la telecamera)'][S.view], 1.2); }
-    else if (k === 'c') nextCam();
     else if (k === 'f') sfanala();
     else if (k === 'h') hornOn();
     else if (k === 'b') openTrunk();
@@ -1640,7 +1595,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') cycleHud();
     else if (k === 'k') cycleMeteo();
-    else if (k === 'g') openShowroom();
     else if (k === 'x') takePhoto();
     else if (k === 'y') startReplay();
     else if (k === 'l') { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); }
@@ -2290,119 +2244,32 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     flash('Preparazione montata: ' + p.name, 1.6);
   }
 
-  // ---------------------------------------------------------------- vista: 2D cartoon (predefinita) o 3D
-  let garage = null, garageOn = true, street2d = null, street3d = null;
+  // ---------------------------------------------------------------- vista: il gioco è solo in 2D (il 3D è stato tolto il 20/11/2026,
+  // si recupera dalla storia di git: car3d.js, street3d.js, viaggio3d.js, models/)
+  let garage = null, garageOn = true, street2d = null;
   const PAINTS = [['#c81d11', 'Rosso'], ['#f2f2ee', 'Bianco'], ['#0d0e10', 'Nero'], ['#9ea3aa', 'Argento'], ['#e2690f', 'Arancio'], ['#1d3f8f', 'Blu']];
   const io = window.IntersectionObserver ? new IntersectionObserver((es) => { es.forEach((e) => { garageOn = e.isIntersecting; if (garage) garage.visible = garageOn; }); }) : null;
   if (io) io.observe($('roadStage'));
   if (window.ResizeObserver) new ResizeObserver(() => garage && garage.resize()).observe($('roadStage'));
-  const SUPRA_MODEL = { url: ['models/supra_mk4.glb', 'models/supra_mk4.gltf.json'], name: 'Toyota Supra MK4 · modello di Mike Farrant (CC BY 4.0)' };
-  // la grafica 3D (three.js dal CDN, car3d.js, street3d.js: circa 900 KB) si carica solo la prima volta che serve:
-  // vista 3D, montagna, vetrina. Chi gioca in 2D non la scarica mai.
-  const TRE_JS = ['https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/Pass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/MaskPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js', 'https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js'].concat(['car3d.js', 'street3d.js', 'viaggio3d.js']);
-  let treP = null;
-  const tre = () => typeof Street3D !== 'undefined';
-  function carica3d() {
-    if (tre()) return Promise.resolve(true);
-    if (treP) return treP;
-    const m = $('g3dMsg'); if (m) { m.hidden = false; m.textContent = 'Carico la grafica 3D…'; } flash('Carico la grafica 3D…', 2);
-    treP = TRE_JS.reduce((p, src) => p.then(() => new Promise((ok, ko) => {
-      const el = document.createElement('script'); el.src = src; el.async = false; el.onload = ok; el.onerror = () => ko(new Error(src)); document.head.appendChild(el);
-    })), Promise.resolve()).then(() => { if (m) m.hidden = true; return tre(); }).catch((e) => {
-      console.warn('Grafica 3D non caricata:', e); treP = null;
-      if (m) { m.hidden = false; m.textContent = 'La vista 3D non è disponibile: three.js non si è caricato (serve la rete la prima volta).'; }
-      return false;
-    });
-    return treP;
-  }
-  function make3D() {
-    if (street3d) return street3d;
-    try {
-      street3d = new Street3D($('g3d'));
-      street3d.setQuality(S.q || 'alta');
-      street3d.setCluster($('gauges'));
-      street3d.setRain(!!S.rain);
-      // auto principale: la Supra MK4 di Mike Farrant (CC BY 4.0); se il file non si carica resta il modello di base
-      street3d.loadModelURL(SUPRA_MODEL.url, 'supra_mk4.glb').then(() => {
-        if (street3d.custom && !$('g3dName').dataset.model) { $('g3dName').dataset.model = SUPRA_MODEL.name; $('g3dName').textContent = SUPRA_MODEL.name; }
-        street3d.setPaint(S.paint);
-      }).catch((err) => { console.warn('Supra MK4 non caricata:', err); flash('Modello Supra MK4 non disponibile: uso il modello di base', 2.5); });
-      if (radio) { const st = radio.station; street3d.setRadio(st.id === 'off' ? '' : st.freq, st.name); }
-      $('camReset').addEventListener('click', () => street3d.resetCamera());
-    } catch (e) {
-      const m = $('g3dMsg'); m.hidden = false; m.textContent = 'La vista 3D non è disponibile: three.js non si è caricato o il browser non supporta WebGL.';
-    }
-    return street3d;
-  }
-  if (!['2d', 'smooth', 'cockpit'].includes(S.look)) S.look = '2d';
-  const CAMS = ['chase', 'side', 'hood', 'cockpit'], CAM_NAMES = { chase: 'inseguimento', side: 'di lato', hood: 'sul cofano', cockpit: 'abitacolo' };
-  function nextCam() {
-    const cur = S.look === '2d' ? null : S.look === 'cockpit' ? 'cockpit' : (S.cam || 'chase');
-    const nx = cur === null ? 'chase' : CAMS[(CAMS.indexOf(cur) + 1) % CAMS.length];
-    S.cam = nx; S.look = nx === 'cockpit' ? 'cockpit' : 'smooth';
-    applyLook(); flash('Telecamera: ' + CAM_NAMES[nx], 1.2);
-    try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ }
-  }
+  S.look = '2d';                                              // le partite salvate con la vista 3D tornano al 2D
+  if (S.paint === 'model') S.paint = PAINTS[0][0];            // "colore del modello" c'era solo coi modelli 3D
   function applyLook() {
-    if (game.track === 'mountain' && S.look === '2d') { S.look = 'smooth'; flash('In montagna c\'è solo la vista 3D', 1.8); }
-    document.querySelectorAll('#lookSeg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.l === S.look)));
-    const is2d = S.look === '2d';
-    $('g2d').hidden = !is2d; $('g3d').hidden = is2d;
-    document.querySelectorAll('.only3d').forEach((el) => { el.hidden = is2d; });
-    if (is2d) { $('g3dMsg').hidden = true; garage = street2d || (street2d = new Street2D($('g2d'))); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView()); }
-    else if (!tre()) {                                         // prima volta in 3D: si scarica, intanto resta il 2D
-      $('g2d').hidden = false; $('g3d').hidden = true; garage = street2d || (street2d = new Street2D($('g2d')));
-      carica3d().then((ok) => { if (ok && S.look !== '2d') applyLook(); else if (!ok && game.track !== 'mountain') { S.look = '2d'; applyLook(); } });
-    } else {
-      garage = make3D();
-      if (garage) garage.setView(S.look === 'cockpit' ? 'cockpit' : (S.cam && S.cam !== 'cockpit' ? S.cam : 'chase'));
-    }
-    if (garage) { garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint); garage.setTips(TP.dsp.ex.tips); }
-    $('g3dName').textContent = is2d ? '2D cartoon' : (street3d && street3d.custom ? $('g3dName').dataset.model || 'modello caricato' : 'modello di base');
+    garage = street2d || (street2d = new Street2D($('g2d'))); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
+    garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint); garage.setTips(TP.dsp.ex.tips);
   }
-  $('lookSeg').addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if (!b) return;
-    S.look = b.dataset.l; applyLook();
-    try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ }
-  });
   applyLook();
-  $('camNext').addEventListener('click', nextCam);
   $('q3d').value = S.q || 'alta';
-  $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street3d) street3d.setQuality(S.q); if (street2d) street2d.quality = S.q; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street2d) street2d.quality = S.q; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   // vernice: ogni auto ha la sua (la Supra usa S.paint come prima)
   function carPaint() { return game.car === 'supra' ? S.paint : ((S.paints || {})[game.car] || CARS[game.car].paint0 || '#2a4b57'); }
   function setCarPaint(hex) { if (game.car === 'supra') S.paint = hex; else { S.paints = S.paints || {}; S.paints[game.car] = hex; } }
   const sw = $('swatches');
-  PAINTS.push(['model', 'Colore del modello']);
   PAINTS.forEach(([hex, name]) => {
-    const b = document.createElement('button'); b.type = 'button'; b.title = name; b.setAttribute('aria-label', name === 'Colore del modello' ? name : 'Colore ' + name);
-    if (hex === 'model') { b.textContent = 'M'; b.className = 'sw-model'; b.hidden = true; } else b.style.background = hex;
-    b.addEventListener('click', () => { if (hex === 'model' && game.car !== 'supra') return; setCarPaint(hex); applySettings(); sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
+    const b = document.createElement('button'); b.type = 'button'; b.title = name; b.setAttribute('aria-label', 'Colore ' + name);
+    b.style.background = hex;
+    b.addEventListener('click', () => { setCarPaint(hex); applySettings(); sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); });
     b.setAttribute('aria-pressed', String(hex === S.paint));
     sw.appendChild(b);
-  });
-  $('glbSupra').addEventListener('click', () => {
-    const v = make3D(); if (!v) return;
-    v.loadModelURL(SUPRA_MODEL.url, 'supra_mk4.glb').then(() => { $('g3dName').dataset.model = SUPRA_MODEL.name; $('g3dName').textContent = SUPRA_MODEL.name; v.setPaint(S.paint); flash('Supra MK4 caricata', 1.4); }).catch(() => flash('Modello non disponibile: apri il gioco da un server o dall\'artifact', 3));
-  });
-  $('glbIn').addEventListener('change', async (e) => {
-    const f = e.target.files[0]; e.target.value = '';
-    if (!f || !street3d) return;
-    try {
-      const r = await street3d.loadModel(f); $('g3dName').textContent = f.name; $('g3dName').dataset.model = f.name;
-      sw.querySelector('.sw-model').hidden = false;
-      if (!r.paint) flash('Non trovo il materiale della carrozzeria in questo modello', 2.5);
-      flash(`${f.name}: ${r.upFixed ? 'raddrizzato (era esportato con Z in alto)' : 'caricato'}${r.wheels ? `, ${r.wheels} ruote animate` : ''}`, 3);
-    }
-    catch (err) { flash('Modello non leggibile: serve un file .glb (o .gltf con tutto incorporato)', 3); }
-  });
-  $('glbRot').addEventListener('click', () => street3d && street3d.rotateModel());
-  $('glbUp').addEventListener('click', () => street3d && street3d.uprightModel());
-  $('glbReset').addEventListener('click', () => {
-    if (!street3d) return;
-    street3d.resetModel(); delete $('g3dName').dataset.model; $('g3dName').textContent = 'modello di base';
-    sw.querySelector('.sw-model').hidden = true;
-    if (S.paint === 'model') { S.paint = PAINTS[0][0]; applySettings(); sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.title === PAINTS[0][1]))); }
   });
 
   // ---------------------------------------------------------------- luoghi in città (2D): mappa, ingresso, interni
@@ -2629,7 +2496,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const moved = [];
   const fmtDist = (m) => (m < 1000 ? Math.max(0, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km');
   function placesTick(dt) {
-    game.placesOn = (S.look === '2d' || !!game.s.vg) && game.track === 'city' && (!!(game.loc && game.loc.places) || !!game.s.vg);   // nel Viaggio i locali ci sono anche nel 3D (viaggio3d.js)
+    game.placesOn = game.track === 'city' && (!!(game.loc && game.loc.places) || !!game.s.vg);   // in città libera dove ci sono, nel Viaggio sempre
     const mm = $('miniMap'), eb = $('enterBtn'), I = game.inside;
     mm.hidden = !game.placesOn || !!I;
     const p = game.placesOn && !I ? game.nearPlace() : null;
@@ -2853,7 +2720,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // zona della cambiata perfetta (stessa regola delle gare): dai 420 giri sotto il limitatore fino a 30 sotto
   function shiftZone() { const lim = sim.P.limiter || 7000; return { lim, lo: lim - 420, hi: lim - 30 }; }
   function drawHudG(dt) {
-    const c = hudG.c, show = S.hudG !== false && S.look !== 'cockpit' && !game.inside && !rp.on;
+    const c = hudG.c, show = S.hudG !== false && !game.inside && !rp.on;
     c.hidden = !show; document.querySelector('.hud-l').classList.toggle('hasg', show); if (!show) { $('hudP').hidden = true; return; }
     hudG.t += dt;
     if (c.width !== hudG.W) { c.width = hudG.W; c.height = hudG.H; }
@@ -3284,7 +3151,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const sig = JSON.stringify(game.s.trunk) + game.mode + Math.floor(game.s.money); if (sig !== trunkSig) { trunkSig = sig; renderTrunk(); } }
   }
   function renderMode() {
-    const cur = S.trip ? 'trip' : game.track === 'mountain' ? 'mountain' : game.mode;
+    const cur = S.trip ? 'trip' : game.mode;
     $('btnNew').textContent = S.trip ? 'Nuovo viaggio' : 'Nuova carriera';
     document.querySelectorAll('#modeSw button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === cur)));
     $('career').classList.toggle('free', game.mode === 'free');
@@ -3304,21 +3171,17 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const r = game.switchCar(e.target.value);
     if (!r.ok) { e.target.value = game.car; if (r.why) flash(r.why, 2.2); return; }
     applySettings(); renderServices(); renderTrunk(); saveGame();
-    sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.title !== 'Colore del modello' && x.style.background && carPaint() === rgbHex(x.style.background))));
+    sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.style.background && carPaint() === rgbHex(x.style.background))));
     const C = CARS[game.car];
-    flash(game.car === 'supra' || S.look === '2d' ? `${C.name}: ${C.engine}. Potenziala da Luca!` : `La ${C.short} si vede nella vista 2D: nel 3D resta la Supra`, 2.6);
+    flash(`${C.name}: ${C.engine}. Potenziala da Luca!`, 2.6);
   });
   const rgbHex = (c) => '#' + (c.match(/\d+/g) || []).slice(0, 3).map((n) => (+n).toString(16).padStart(2, '0')).join('');
   $('modeSw').addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.m === 'trip') { switchTrip(true); flash(game.s.vg && vgKm(game) > 0.1 ? `Il viaggio riprende dal km ${fmt(vgKm(game), 1)}` : 'Il viaggio comincia: km 0, sotto casa', 2.4); return; }
     if (S.trip) switchTrip(false);
-    // "Montagna" è la modalità libera sulla strada di montagna (solo vista 3D: in 2D le curve non si vedono)
-    const mtn = b.dataset.m === 'mountain';
-    game.mode = mtn ? 'free' : b.dataset.m; game.track = mtn ? 'mountain' : 'city'; game.prompt = null; game.ap = null; game.ents = [];
-    game.laneZ = mtn ? 0 : GAME_LANE_Z[1]; game.lane = 1; game.free = false; game.relYaw = 0; game.steerAngle = 0; sim.grade = 0; game.mtnCars = null; if (mtn) game.laneZ = 2;
-    if (mtn && S.look === '2d') { S.look = 'smooth'; applyLook(); }
-    if (mtn) flash('Strada di montagna: tieni la Supra in strada con A/D, in curva ti spinge verso l\'esterno', 3.5);
+    game.mode = b.dataset.m; game.track = 'city'; game.prompt = null; game.ap = null; game.ents = [];
+    game.laneZ = GAME_LANE_Z[1]; game.lane = 1; game.free = false; game.relYaw = 0; game.steerAngle = 0; sim.grade = 0;
     if (game.mode === 'career') {   // in carriera si torna ai pezzi che si possiedono
       for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
     }
@@ -3481,7 +3344,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   function updateRainSound() {
     if (!rainSnd.g) return;
-    const inCab = S.look === 'cockpit', lvl = rainSnd.on && !S.muted ? (S.vol / 100) * (inCab ? 0.16 : 0.1) * (1 + Math.min(1, sim.v / 40) * 0.6) : 0;
+    const inCab = +S.view === 0, lvl = rainSnd.on && !S.muted ? (S.vol / 100) * (inCab ? 0.16 : 0.1) * (1 + Math.min(1, sim.v / 40) * 0.6) : 0;
     rainSnd.g.gain.setTargetAtTime(lvl, audio.ctx.currentTime, 0.4);
     rainSnd.lp.frequency.setTargetAtTime(inCab ? 2600 : 5200, audio.ctx.currentTime, 0.3);
   }
@@ -3537,7 +3400,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   function applyRain() {
     sim.wet = S.rain ? 1 : 0;
-    if (street3d) street3d.setRain(!!S.rain);
     if (street2d && street2d.setRain) street2d.setRain(!!S.rain);
     rainSound(!!S.rain);
   }
@@ -3568,7 +3430,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         else ATM.wT = 60 + Math.random() * 60;
       }
     }
-    if (street3d) street3d.setDaylight(d, ss, S.rain ? 1 : 0);
     if (street2d && street2d.setDaylight) street2d.setDaylight(d, ss);
     if ((ATM.txt -= dt) <= 0) {
       ATM.txt = 0.5; const hh = Math.floor(ATM.hour), mm = Math.floor((ATM.hour - hh) * 60);
@@ -3578,63 +3439,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   // ---------------------------------------------------------------- vetrina: la Supra in studio, girevole
-  let show = null, showOn = false, showLast = 0;
-  const SHOW_LIGHTS = {
-    studio: { bg: 0x0b0a08, hemi: 0.6, key: 1.9, rim: 1.1, rimC: 0xbfd4ff, warm: 0.6 },
-    neon: { bg: 0x07060f, hemi: 0.25, key: 0.7, rim: 2.2, rimC: 0xff2e88, warm: 1.8 },
-    tramonto: { bg: 0x1a0d08, hemi: 0.45, key: 2.2, rim: 0.8, rimC: 0xffa060, warm: 1.2 },
-  };
-  function showSpecText() { const e = sim.estimatePeak(); return `${Math.round(e.cv)} CV · ${Math.round(e.nm || 0)} Nm · 400 m in ${fmt(game.etEstimate(), 1)} s · ${(sim.P.mass + game.trunkKg()).toFixed(0)} kg`; }
-  function openShowroom() {
-    if (!window.THREE || !tre()) { flash('Carico la grafica 3D…', 1.5); carica3d().then((ok) => { if (ok) openShowroom(); else flash('La vetrina richiede la grafica 3D: serve la rete la prima volta', 2.6); }); return; }
-    $('showroom').hidden = false; showOn = true;
-    if (!show) {
-      try {
-        show = new Garage3D($('showCv'));
-        show.setQuality = () => {};
-        show.floor.material.color.set(0x08080a); show.floor.material.roughness = 0.22; show.floor.material.metalness = 0.6; show.grid.material.opacity = 0.12;
-        show.camera.position.set(5.6, 1.6, 5.4); show.controls.autoRotate = true; show.controls.autoRotateSpeed = 1.1;
-        show.loadModelURL(SUPRA_MODEL.url, 'supra_mk4.glb').then(() => show.setPaint(S.paint)).catch(() => {});
-        const sw = $('showSw');
-        for (const b of document.querySelectorAll('#swatches button')) {
-          const c = b.cloneNode(true); c.addEventListener('click', () => { b.click(); show.setPaint(S.paint); sw.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === c))); }); sw.appendChild(c);
-        }
-      } catch (e) { flash('La vetrina non è disponibile su questo browser', 2.5); closeShowroom(); return; }
-    }
-    show.setPaint(S.paint); show.setTips(TP.dsp.ex.tips); show.stance = +$('showStance').value; applyShowLight();
-    $('showSpec').textContent = showSpecText();
-    requestAnimationFrame(() => show.resize());
-    showLast = performance.now(); requestAnimationFrame(showLoop);
-  }
-  function applyShowLight() {
-    if (!show) return; const L = SHOW_LIGHTS[$('showLight').value] || SHOW_LIGHTS.studio, T3 = window.THREE;
-    show.scene.background = new T3.Color(L.bg); show.scene.fog.color.set(L.bg);
-    show.hemi.intensity = L.hemi; show.key.intensity = L.key; show.rim.intensity = L.rim; show.rim.color.set(L.rimC); show.warm.intensity = L.warm;
-  }
-  function showLoop(now) {
-    if (!showOn) return;
-    const dt = Math.min(0.05, (now - showLast) / 1000); showLast = now;
-    show.update(dt, { v: 0, ww: 0, acc: 0, rpm: sim.running ? sim.rpm : 0, running: sim.running, lope: 0, torque: 0, ign: true, brake: 0, flame: 0, spin: 0, thr: 0, events: [], damage: sim.damage, gear: 0 });
-    requestAnimationFrame(showLoop);
-  }
-  function closeShowroom() { $('showroom').hidden = true; showOn = false; }
-  $('showBtn').addEventListener('click', openShowroom);
-  $('showClose').addEventListener('click', closeShowroom);
-  $('showStance').addEventListener('change', (e) => { if (show) show.stance = +e.target.value; });
-  $('showLight').addEventListener('change', applyShowLight);
-  $('showSpin').addEventListener('click', (e) => { if (!show) return; show.controls.autoRotate = !show.controls.autoRotate; e.currentTarget.setAttribute('aria-pressed', String(show.controls.autoRotate)); });
-  // foto: l'immagine della vista attiva (vetrina, 3D o 2D) in un riquadro da salvare
+  // foto: l'immagine della strada in un riquadro da salvare
   function takePhoto() {
     let url = null;
     try {
-      if (showOn && show) { show.draw(); url = show.canvas.toDataURL('image/jpeg', 0.92); }
-      else if (S.look !== '2d' && street3d) { street3d.draw(); url = street3d.canvas.toDataURL('image/jpeg', 0.92); }
-      else if (street2d) url = street2d.canvas.toDataURL('image/png');
+      if (street2d) url = street2d.canvas.toDataURL('image/png');
     } catch (e) { url = null; }
     if (!url) { flash('Foto non disponibile', 1.5); return; }
     $('photoImg').src = url; $('photoBox').hidden = false; flash('Click!', 0.6);
   }
-  $('photoBtn').addEventListener('click', takePhoto); $('showPhoto').addEventListener('click', takePhoto);
+  $('photoBtn').addEventListener('click', takePhoto);
   $('photoClose').addEventListener('click', () => { $('photoBox').hidden = true; });
 
   // ---------------------------------------------------------------- replay: gli ultimi 20 secondi, al rallentatore, con il suono
@@ -3643,27 +3457,23 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (rp.on) return;
     rp.acc += dt; if (rp.acc < 1 / 30) return; rp.acc = 0;
     rp.buf.push({ vs: Object.assign({}, vs, { events: [] }), ap: sim.audioParams(), dist: game.s.dist, laneZ: game.laneZ, relYaw: game.relYaw, steerAngle: game.steerAngle,
-      track: game.track, ents: game.ents.map((e) => Object.assign({}, e)), mtn: game.mtnCars ? game.mtnCars.map((c) => Object.assign({}, c)) : null, signal: game.signal });
+      track: game.track, ents: game.ents.map((e) => Object.assign({}, e)), signal: game.signal });
     if (rp.buf.length > 600) rp.buf.shift();
   }
   function startReplay() {
     if (rp.on || rp.buf.length < 20) { if (!rp.on) flash('Guida ancora qualche secondo prima del replay', 1.8); return; }
-    rp.on = true; rp.i = 0; rp.t = 0; rp.shot = -1; rp.savedView = street3d ? street3d.view : null;
+    rp.on = true; rp.i = 0; rp.t = 0;
     $('replayTag').hidden = false; game.prompt = null;
   }
   function stopReplay() {
     if (!rp.on) return; rp.on = false; $('replayTag').hidden = true;
-    if (street3d && rp.savedView) street3d.setView(rp.savedView);
     rp.buf.length = 0;
   }
   function playReplay(dt) {
     rp.t += dt * 0.5;                                   // metà velocità
     const i = Math.min(rp.buf.length - 1, Math.floor(rp.t * 30)), f = rp.buf[i];
     if (i >= rp.buf.length - 1) { stopReplay(); return; }
-    // inquadrature che cambiano ogni ~3 secondi di replay (in 3D)
-    const shot = Math.floor(rp.t / 3) % 4;
-    if (street3d && garage === street3d && shot !== rp.shot) { rp.shot = shot; street3d.setView(['side', 'chase', 'hood', 'side'][shot]); }
-    const fake = { s: { dist: f.dist }, laneZ: f.laneZ, relYaw: f.relYaw, steerAngle: f.steerAngle, track: f.track, ents: f.ents, mtnCars: f.mtn, fx: [], signal: f.signal, free: true, steerIn: 0 };
+    const fake = { s: { dist: f.dist }, laneZ: f.laneZ, relYaw: f.relYaw, steerAngle: f.steerAngle, track: f.track, ents: f.ents, fx: [], signal: f.signal, free: true, steerIn: 0 };
     const vs = Object.assign({}, f.vs, { events: [] });
     if (Math.random() < 0.5 * dt * 60 && f.vs.flame) vs.flame = f.vs.flame;
     if (audio.ready) audio.send({ p: f.ap, ev: [] });

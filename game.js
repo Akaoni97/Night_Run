@@ -60,16 +60,6 @@ const GAME_LOCS = [
 ];
 const GAME_LANE_Z = { 0: 6.1, 1: 3.5, 2: 0, 3: -3.5 };
 
-// strada di montagna: la direzione cambia con la distanza percorsa (somma di sinusoidi), raggi fino a ~60 m.
-// theta > 0 = la strada gira a sinistra. Carreggiata di 8 m (due corsie), guardrail a 4,6 m dal centro.
-const MOUNTAIN = {
-  half: 4.6,
-  theta: (s) => 0.55 * Math.sin(s / 140) + 0.35 * Math.sin(s / 61 + 1.3) + 0.2 * Math.sin(s / 29 + 0.4),
-  // quota della strada (m) e pendenza: salite e discese
-  height: (s) => 9 * Math.sin(s / 170) + 4 * Math.sin(s / 53 + 0.7),
-  slope: (s) => 9 / 170 * Math.cos(s / 170) + 4 / 53 * Math.cos(s / 53 + 0.7),
-  kappa: (s) => 0.55 / 140 * Math.cos(s / 140) + 0.35 / 61 * Math.cos(s / 61 + 1.3) + 0.2 / 29 * Math.cos(s / 29 + 0.4),
-};
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
 const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
@@ -174,7 +164,7 @@ class StreetGame {
     this.nextSpawn = 250; this.id = 1;
     this.siren = 0;
     this.autoLane = true;      // sorpasso automatico (si può spegnere)
-    this.track = 'city';       // 'city' oppure 'mountain' (solo in modalità libera)
+    this.track = 'city';       // c'era anche 'mountain' (la montagna in 3D, tolta il 20/11/2026)
     this.loc = GAME_LOCS[0];   // luogo della mappa del mondo (sfondo 2D e traffico)
     this.manualT = 0;          // secondi in cui la corsia l'ha scelta il pilota
     this.steerIn = 0;          // sterzo libero tenuto dal pilota: +1 sinistra, -1 destra
@@ -905,64 +895,6 @@ class StreetGame {
     if (this.prevLane !== undefined && this.lane !== this.prevLane) this.signal = { dir: this.lane > this.prevLane ? 'L' : 'R', t: 2.6 };
     this.prevLane = this.lane;
     if (this.signal) { this.signal.t -= dt; if (this.signal.t <= 0) this.signal = null; }
-    // strada di montagna: niente corsie fisse, in curva la Supra viene spinta verso l'esterno (v²·κ):
-    // va tenuta in strada con lo sterzo; contro il guardrail rallenta, struscia e si ammacca
-    if (this.track === 'mountain') {
-      // guida libera: l'auto ha una sua direzione (relYaw rispetto alla strada). Lo sterzo dà un angolo alle ruote,
-      // l'angolo dà una rotazione (v·tanδ/passo) limitata dall'aderenza: se si esagera l'auto allarga (sottosterzo).
-      // Se la strada curva e non si sterza, si va dritti verso il bordo. Nessun aiuto automatico.
-      const v = Math.max(0, sim.v), grip = (sim.P.mu || 1.1) * sim.tireGrip() * 9.81;
-      const dMax = 0.55 / (1 + v * 0.06);                                   // sterzo pieno: meno angolo in velocità
-      this.steerAngle = (this.steerAngle || 0) + (this.steerIn * dMax - (this.steerAngle || 0)) * Math.min(1, dt * 9);
-      let yawRate = v * Math.tan(this.steerAngle) / 2.55;
-      const aMax = grip * 0.95; this.slide = 0;
-      if (v > 1 && Math.abs(yawRate * v) > aMax) { this.slide = Math.min(1, (Math.abs(yawRate * v) - aMax) / aMax); yawRate = Math.sign(yawRate) * aMax / v; }
-      // sovrasterzo di potenza: con le ruote che pattinano la coda gira di più
-      const wheelSlip = Math.max(0, sim.ww * sim.P.r - sim.v) / Math.max(4, sim.v);
-      if (wheelSlip > 0.12 && Math.abs(this.steerAngle) > 0.02) yawRate += Math.sign(this.steerAngle) * Math.min(0.9, wheelSlip * 1.6);
-      this.relYaw = (this.relYaw || 0) + (yawRate - MOUNTAIN.kappa(d) * v) * dt;
-      this.relYaw = Math.max(-1.2, Math.min(1.2, this.relYaw));
-      this.laneZ -= v * Math.sin(this.relYaw) * dt;
-      sim.grade = MOUNTAIN.slope(d);
-      // traffico: corsia di destra (o = +2) nel nostro senso, corsia di sinistra (o = -2) in senso opposto;
-      // rallentano nelle curve strette. Urtarli ammacca e frena di colpo (frontale molto peggio)
-      if (!this.mtnCars) {
-        const cols = [0x2b4c7e, 0xd8d8d0, 0x1c1c22, 0x8a1c1c, 0x3f6f4a, 0xb9a46a, 0x5a5f68];
-        this.mtnCars = [];
-        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 90 + k * 110, o: 2, dir: 1, v: 0, base: 13 + Math.random() * 6, color: cols[k % cols.length] });
-        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 140 + k * 150, o: -2, dir: -1, v: 0, base: 14 + Math.random() * 7, color: cols[(k + 3) % cols.length] });
-      }
-      for (const c of this.mtnCars) {
-        const tgt = Math.min(c.base, Math.sqrt(3.2 / Math.max(0.002, Math.abs(MOUNTAIN.kappa(c.s)))));
-        c.v += (tgt - c.v) * Math.min(1, dt * 0.8);
-        c.s += c.dir * c.v * dt;
-        const rel = c.s - d;
-        if (c.dir > 0 && (rel < -70 || rel > 520)) { c.s = d + 260 + Math.random() * 200; c.v = c.base * 0.8; }
-        if (c.dir < 0 && rel < -70) { c.s = d + 300 + Math.random() * 220; c.v = c.base; }
-        if (Math.abs(rel) < 4.3 && Math.abs(c.o - this.laneZ) < 1.75) {
-          if (!c.hit) {
-            c.hit = true; const head = c.dir < 0;
-            sim.v *= head ? 0.15 : 0.55; sim.damage = Math.min(1, sim.damage + (head ? 0.3 : 0.12));
-            this.laneZ -= Math.sign(c.o - this.laneZ || 1) * 0.6; this.relYaw = (this.relYaw || 0) * 0.3;
-            this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
-            sim.events.push({ type: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
-            this.say(head ? 'Frontale! Resta nella tua corsia' : 'Tamponamento', 'bad');
-          }
-        } else if (Math.abs(rel) > 7) c.hit = false;
-      }
-      const lim = MOUNTAIN.half - 1.0;
-      this.rail = 0;
-      if (Math.abs(this.laneZ) > lim) {
-        this.rail = Math.sign(this.laneZ); this.laneZ = this.rail * lim;
-        // il guardrail raddrizza l'auto lungo la strada e la rallenta
-        if (Math.sign(-this.relYaw) === this.rail) this.relYaw *= 0.3;
-        if (v > 3) { sim.v *= 1 - Math.min(0.5, dt * 1.2); sim.damage = Math.min(1, sim.damage + dt * 0.012 * v / 20); if (Math.random() < dt * 10) this.fx.push({ k: 'scrape', side: this.rail });
-          // guardrail: la strisciata si sente finché ci si resta attaccati
-          if ((this.railSndT = (this.railSndT || 0) - dt) <= 0) { this.railSndT = 0.4; sim.events.push({ type: 'crash', I: Math.min(1, 0.3 + v * 0.02), kind: 'side' }); } }
-      }
-      this.free = true; this.lane = 1; this.prevLane = 1; this.signal = null;
-      return;
-    }
     // sterzo libero: velocità laterale che cresce con la velocità, nessuno scatto tra le corsie
     const freeOK = !this.ap && sim.v > 0.3;
     if (freeOK && Math.abs(this.steerIn) > 0.05) {
