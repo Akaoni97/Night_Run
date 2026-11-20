@@ -218,10 +218,12 @@
     try {
       const spr = v.carSprite(1); if (!spr || !spr.width) return null;
       const G = v.geo(), hd = spr.hd || spr, w = spr.width, h = spr.height;
-      const c = document.createElement('canvas'); c.width = Math.ceil(w * k) + 2; c.height = Math.ceil(Math.max(h, (G.wy + G.wr)) * k) + 2;
+      // assetto: la scocca scende (o sale) rispetto alle ruote, come sulla strada (G.low è in unità del disegno)
+      const lowPx = Math.round((G.low || 0) * k), up = Math.max(0, -lowPx);
+      const c = document.createElement('canvas'); c.width = Math.ceil(w * k) + 2; c.height = Math.ceil(Math.max(h, G.wy + G.wr) * k + up) + 2;   // il terreno resta alla base delle ruote: da bassa la scocca affonda un po' (come sulla strada)
       const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
-      x.drawImage(hd, 0, 0, w * k, h * k);
-      const wf = v.wheelFn(); for (const [i, ax] of G.ax.entries()) wf(x, ax * k, G.wy * k, k, 0.4 + i, 0, i === 0);   // ruote sopra, come sulla strada (cerchi nuovi visibili)
+      x.drawImage(hd, 0, up + lowPx, w * k, h * k);
+      const wf = v.wheelFn(); for (const [i, ax] of G.ax.entries()) wf(x, ax * k, up + G.wy * k, k, 0.4 + i, 0, i === 0);   // ruote sopra, come sulla strada (cerchi nuovi visibili)
       return c;
     } catch (e) { return null; }
   };

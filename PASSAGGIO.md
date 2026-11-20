@@ -72,6 +72,17 @@ gioco fa, sezione per sezione).
   inquadrata nello spazio libero accanto al pannello (a destra su computer, sopra su telefono). Ogni locale ha chi ti
   serve con la sua posa animata, luci e neon, finestre sulla notte con traffico e pioggia, la tua auto fuori e un
   suono d'ambiente. I punti toccabili (es. la bacheca del bar) portano alla sezione giusta del pannello.
+- **Assetto a livelli** (20/11/2026, `tuning.js` + `sim.js` + pannello di Luca in `index.html`): in ogni auto l'Assetto ha 6 livelli
+  (0 originale, poi molle, molle e ammortizzatori, coilover, coilover da pista, competizione; id `oem, springs, dampers,
+  coilover|tein, race, pro`). Livello 0: niente da regolare. Dal livello 1 il pezzo parte più basso e rigido
+  (`SUSP_LV[n].h0/k0`) e due cursori sotto la tendina regolano altezza (mm rispetto all'originale, anche rialzata) e
+  rigidità (% delle molle di serie) entro i limiti del livello, sempre più larghi fino al 5 (−120/+90 mm, 50-420 %). La
+  regolazione è gratis ma da fermo e da Luca come i pezzi; cambiando pezzo si riparte dai valori di fabbrica. Stato:
+  `S.adj[auto] = { h, k }` (nel salvataggio di `banco2jz`, come `S.tunes`). La fisica: baricentro (`dcg`) e quindi trasferimento
+  di carico, aria (`cdK`), presa, beccheggio (rigidità), partenza (`launch`), saltellamento dopo i giunti (`sim.roadBump`,
+  `bumpU`) e, sotto −70 mm, il fondo che tocca sugli urti (`scrapeT`: frena un po', scintille e SCRAAAPE col `game.fx` `scrape`).
+  Il disegno segue (`look.low` in `street2d.js` e `carPic` in `interni.js`); nella vista 3D non si vede l'altezza. Il vecchio
+  assetto 'drag' della Supra è ora il livello 4 con regolazione morbida (migrazione in `fillTunes`). Test in `test/assetto.test.js`.
 - **Interni rifatti in parte (17/11/2026)**: personaggi ridisegnati (testa arrotondata con mascella, tre toni di luce,
   capelli con volume e frangia, occhi col riflesso, naso, labbra, braccia e mani a pixel netti con le dita); insegna BAR
   leggibile (prima era al rovescio), MOTEL/LIBERE dentro la finestra; dalle finestre passano le auto vere del traffico

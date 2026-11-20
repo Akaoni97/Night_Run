@@ -495,6 +495,12 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .part > span { font: 400 11px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .part select { width: 100%; background: #1c1a16; border: 1px solid #3a342a; padding: 7px 8px; font: 600 15px/1.2 var(--f-body); color: var(--fg); }
 .part p { margin: 0; font-size: 14px; line-height: 1.4; color: #c8bca4; }
+.part .susp { display: grid; gap: 6px; padding-top: 4px; }
+.part .susp.off { opacity: .45; }
+.part .srow { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; align-items: center; }
+.part .srow span { font: 400 11px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.part .srow b { font: 600 13px/1 var(--f-body); color: var(--amber); text-align: right; grid-column: 2; grid-row: 1; }
+.part .srow input { grid-column: 1 / -1; width: 100%; accent-color: var(--amber); }
 .part.mod { border-color: #544a3b; box-shadow: inset 0 0 0 1px rgba(255,179,71,.15); }
 .part.mod > span { color: var(--amber); }
 
@@ -1219,7 +1225,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ogni auto ha la sua selezione di pezzi (S.tunes) e la sua estetica (S.coss); S.tune e S.cos sono quelle dell'auto in uso
   const COS0 = { glow: 'none', rims: 'none', caliper: 'none', stripe: 'none', tint: 'none', decal: 'none', wheels: 'none', kit: 'none', spoiler: 'none', st_door: 'none', st_rear: 'none', st_glass: 'none' };
   // Il Viaggio è la modalità principale: la prima volta si parte da lì (la carriera resta, coi suoi salvataggi e pezzi)
-  if (S.trip === undefined) { S.trip = true; S.tunesOther = S.tunes; S.cossOther = S.coss; S.tunes = {}; S.coss = {}; }
+  if (S.trip === undefined) { S.trip = true; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.tunes = {}; S.coss = {}; S.adj = {}; }
   if (S.trip) {
     game.reset(); game.mode = 'career';
     const tg = localStorage.getItem('nightrun-viaggio');
@@ -1238,6 +1244,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       S.tunes[id] = Object.assign({}, CARS[id].presets[0].sel, S.tunes[id] || {});
       S.coss[id] = Object.assign({}, COS0, S.coss[id] || {});
     }
+    // regolazione dell'assetto (altezza e rigidità) di ogni auto; il vecchio assetto da drag della Supra è il livello 4
+    S.adj = S.adj || {};
+    if (S.tunes.supra.suspension === 'drag') { S.tunes.supra.suspension = 'race'; S.adj.supra = S.adj.supra || { h: -20, k: 0.8 }; }
+    if (game.s.owned && game.s.owned['suspension:drag']) game.s.owned['suspension:race'] = true;
     if (!S.v40mig && !game.s.vg) {                    // la vecchia scala della V40 diventa pezzi ed estetica posseduti
       S.v40mig = 1;
       for (const [k, id] of Object.entries(leg.sel)) if (id !== CARS.v40.presets[0].sel[k]) game.s.owned['v40|' + k + ':' + id] = true;
@@ -1248,7 +1258,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   fillTunes();
   function useCar(id) { setActiveCar(id); S.tune = S.tunes[ACTIVE_CAR]; S.cos = S.coss[ACTIVE_CAR]; }
   useCar(game.car);
-  let TP = tuningParams(S.tune);
+  const adjOf = () => S.adj && S.adj[ACTIVE_CAR];
+  let TP = tuningParams(S.tune, adjOf());
 
   // ---------------------------------------------------------------- autoradio (musica bassa mentre si guida)
   const radio = window.CarRadio ? new window.CarRadio({ src: 'audio/redline_at_midnight.mp3', onChange: () => renderRadio(true) }) : null;
@@ -1340,7 +1351,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function applySettings() {
     const carId = game.car;
     useCar(carId);
-    TP = tuningParams(S.tune);
+    TP = tuningParams(S.tune, adjOf());
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
@@ -1934,6 +1945,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     html += `<p class="hint">Velocità al limitatore (${fmt(lim)} giri). Cambiando al limitatore si riparte da ${drop(1)} giri in 2ª, ${n > 2 ? drop(2) : '—'} in 3ª. Gomme: aderenza ${fmt(P.mu, 2)}, presa massima con il ${peak} % di slittamento, ideali a ${ty.opt || 90} °C (ora ${Math.round(sim.tireT)} °C).</p>`;
     if ($('gearBox').innerHTML !== html) $('gearBox').innerHTML = html;
   }
+  // testi dei due cursori dell'assetto: altezza in mm rispetto all'originale, rigidità in % delle molle di serie
+  function suspLabels(h, k, st) {
+    st = st || suspState(tuningItem('suspension', S.tune.suspension), adjOf());
+    $('suspHv').textContent = !st.adjustable ? 'fissa' : h === 0 ? 'come di serie' : (h > 0 ? '+' : '−') + Math.abs(h) + ' mm';
+    $('suspKv').textContent = !st.adjustable ? 'di serie' : Math.round(k * 100) + ' %' + (k <= 0.75 ? ' · mollissima' : k >= 3 ? ' · durissima' : '');
+  }
   function renderTuning() {
     renderGears(); $('carUps').hidden = true;
     const grid = $('tgrid');
@@ -1943,6 +1960,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         const box = document.createElement('label'); box.className = 'part'; box.dataset.k = k;
         box.innerHTML = `<span>${cat.label}</span><select id="tu-${k}">${cat.items.map((it) => `<option value="${it.id}"></option>`).join('')}</select><p></p>`;
         box.querySelector('select').addEventListener('change', (e) => mountPart(k, e.target.value, e.target));
+        if (k === 'suspension') {
+          box.insertAdjacentHTML('beforeend', `<div class="susp">
+            <div class="srow"><span>Altezza</span><b id="suspHv"></b><input type="range" id="suspH" step="5" aria-label="Altezza da terra"></div>
+            <div class="srow"><span>Rigidità</span><b id="suspKv"></b><input type="range" id="suspK" step="0.1" aria-label="Rigidità delle molle"></div></div>`);
+          const hI = box.querySelector('#suspH'), kI = box.querySelector('#suspK');
+          const live = () => suspLabels(+hI.value, +kI.value);
+          hI.addEventListener('input', live); kI.addEventListener('input', live);
+          hI.addEventListener('change', () => setSuspAdj({ h: +hI.value }, () => renderTuning()));
+          kI.addEventListener('change', () => setSuspAdj({ k: +kI.value }, () => renderTuning()));
+        }
         grid.appendChild(box);
       }
       const pr = $('presets');
@@ -1956,7 +1983,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const k = box.dataset.k, it = tuningItem(k, S.tune[k]);
       const sel = box.querySelector('select');
       Array.from(sel.options).forEach((o) => {
-        const x = tuningItem(k, o.value), label = (['Su misura', '—', 'Integrata'].includes(x.brand) ? '' : x.brand + ' · ') + x.name;
+        const x = tuningItem(k, o.value), label = (k === 'suspension' ? `Liv. ${x.susp.lv} · ` : '') + (['Su misura', '—', 'Integrata'].includes(x.brand) ? '' : x.brand + ' · ') + x.name;
         const lk = game.partLocked(k, x.id);
         o.textContent = label + (game.owns(k, x.id) ? (x.id === it.id ? '' : ' · tuo') : lk ? ` · da ${game.partKm(k, x.id)} km` : ` · € ${fmt(game.price(k, x.id))}`);
         o.disabled = lk;
@@ -1964,6 +1991,14 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       sel.value = it.id;
       let note = it.note;
       if (k === 'wastegate' && it.id === 'tial' && TP.sim.turbo.twin) note += ' Con il biturbo di serie non ha effetto.';
+      if (k === 'suspension') {
+        const st = suspState(it, adjOf()), hI = box.querySelector('#suspH'), kI = box.querySelector('#suspK');
+        note += ` Livello ${st.lv} di ${SUSP_LV.length - 1}.`;
+        hI.min = st.hMin; hI.max = st.hMax; hI.value = st.h; kI.min = st.kMin; kI.max = st.kMax; kI.value = st.k;
+        hI.disabled = kI.disabled = !st.adjustable;
+        box.querySelector('.susp').classList.toggle('off', !st.adjustable);
+        suspLabels(st.h, st.k, st);
+      }
       box.querySelector('p').textContent = note;
       box.classList.toggle('mod', it.id !== TUNING[k].items[0].id);
     });
@@ -2095,7 +2130,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const r = game.buy(k, id);
       if (!r.ok) { revert(); flash(r.why, 2.4); return; }
     }
-    S.tune[k] = id; applySettings(); saveGame();
+    S.tune[k] = id; if (k === 'suspension') delete S.adj[ACTIVE_CAR];          // pezzo nuovo: si riparte dai valori di fabbrica del livello
+    applySettings(); saveGame();
+  }
+  // altezza e rigidità dell'assetto: gratis, ma da fermi e da Luca come i pezzi
+  function setSuspAdj(patch, revert) {
+    if (!game.canMount()) { revert(); flash(game.race ? 'Non durante una sfida' : 'L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
+    if (game.needsShop()) { revert(); flash('L\'assetto lo regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
+    const st = suspState(tuningItem('suspension', S.tune.suspension), adjOf());
+    S.adj[ACTIVE_CAR] = { h: st.h, k: st.k, ...patch };
+    applySettings(); saveGame();
   }
   function mountPreset(p) {
     if (!game.canMount()) { flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
@@ -2104,7 +2148,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (need > game.odo) { flash(`Questa preparazione si sblocca a ${fmt(need)} km: la Supra ne ha ${fmt(Math.floor(game.odo))}`, 2.8); return; }
     if (cost > game.s.money) { flash(`Mancano € ${fmt(cost - Math.floor(game.s.money))} per questa preparazione`, 2.6); return; }
     for (const [k, id] of Object.entries(p.sel)) if (!game.owns(k, id)) game.buy(k, id);
-    Object.assign(S.tune, p.sel); applySettings(); saveGame();
+    Object.assign(S.tune, p.sel); if (p.adj) S.adj[ACTIVE_CAR] = Object.assign({}, p.adj); else delete S.adj[ACTIVE_CAR];
+    applySettings(); saveGame();
     flash('Preparazione montata: ' + p.name, 1.6);
   }
 
@@ -2324,10 +2369,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!!S.trip === on && !fresh) return;
     if (game.inside) { flash('Prima esci dal locale', 1.6); return; }
     if (!fresh) saveGame();
-    if (!!S.trip !== on) { const ot = S.tunesOther, oc = S.cossOther; S.tunesOther = S.tunes; S.cossOther = S.coss; S.tunes = ot || {}; S.coss = oc || {}; }
+    if (!!S.trip !== on) { const ot = S.tunesOther, oc = S.cossOther, oa = S.adjOther; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.tunes = ot || {}; S.coss = oc || {}; S.adj = oa || {}; }
     S.trip = on; game.reset(); game.mode = 'career'; game.track = 'city';
     const g = fresh ? null : localStorage.getItem(on ? 'nightrun-viaggio' : 'nightrun');
-    if (g) { game.load(g); restoreSim(); } else if (on) { S.tunes = {}; S.coss = {}; game.startTrip(); }
+    if (g) { game.load(g); restoreSim(); } else if (on) { S.tunes = {}; S.coss = {}; S.adj = {}; game.startTrip(); }
     fillTunes(); useCar(game.car);
     for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
     if (on && S.look !== '2d') { S.look = '2d'; applyLook(); }
@@ -3139,7 +3184,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (Date.now() - newArm > 4000) { newArm = Date.now(); b.textContent = 'Sicuro? Clicca di nuovo per azzerare'; setTimeout(() => { b.textContent = S.trip ? 'Nuovo viaggio' : 'Nuova carriera'; }, 4000); return; }
     if (S.trip) { newArm = 0; switchTrip(true, true); flash('Nuovo viaggio: km 0, una V40 di serie e € 450', 2.6); return; }
     game.reset(); sim.fuel = 0.72;
-    S.tunes = {}; S.coss = {};
+    S.tunes = {}; S.coss = {}; S.adj = {};
     for (const id of CAR_IDS) { S.tunes[id] = Object.assign({}, CARS[id].presets[0].sel); S.coss[id] = Object.assign({}, COS0); }
     S.v40mig = 1; useCar('supra');
     b.textContent = 'Nuova carriera'; newArm = 0;
@@ -3187,7 +3232,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // giunti dell'asfalto ogni 47 m: prima l'asse anteriore, poi il posteriore ("ta-dum")
     for (const [k, off] of [['jf', 1.28], ['jr', -1.28]]) {
       const j = Math.floor((game.s.dist + off) / 47);
-      if (joints[k] !== undefined && j !== joints[k] && sim.v > 2) ev.push({ type: 'bump', I: Math.min(1, sim.v / 30) * (k === 'jf' ? 1 : 0.85) });
+      if (joints[k] !== undefined && j !== joints[k] && sim.v > 2) {
+        const bI = Math.min(1, sim.v / 30) * (k === 'jf' ? 1 : 0.85);
+        ev.push({ type: 'bump', I: bI });
+        if (sim.roadBump(bI)) game.fx.push({ k: 'scrape', I: 0.5 });          // assetto troppo basso: il fondo tocca, scintille
+      }
       joints[k] = j;
     }
     for (const e of ev) if (e.type === 'grind' && S.autoClutch && Math.abs(sim.v) > 1.2) flash('Retromarcia solo da fermo');

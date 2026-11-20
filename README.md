@@ -370,6 +370,12 @@ Apexi N1 Evolution, Tomei Expreme Ti, Blitz Nür-Spec, straight pipe), downpipe 
 (CT12B di serie, Garrett GTX3582R, Precision 6466, BorgWarner EFR 9180, HKS T51R SPL), valvole (HKS SSQV,
 Turbosmart Race Port, GReddy Type-RS, nessuna), wastegate TiAL con screamer pipe, aspirazione HKS Super
 Power Flow, camme HKS 264°/272°, centraline Haltech Elite 2500 e Link G4X, frizione bidisco OS Giken.
+
+**Assetto a livelli (tutte le auto).** Da Luca l'assetto ha sei livelli: lo 0 è l'originale e non si regola; salendo il pezzo
+parte più basso e più rigido e lascia regolare di più altezza e rigidità, fino al livello 5 che va dalla radente alla
+rialzata da rally e da mollissima a durissima. Si regola con due cursori sotto la tendina dell'Assetto (gratis, da fermi).
+Baricentro, aria, presa, beccheggio, partenza e urti rispondono: più bassa e più dura tiene meglio ma salta sulle buche, e
+sotto una certa altezza il fondo tocca e fa scintille. La scocca si abbassa o si alza anche nel disegno 2D.
 Il carattere sonoro è una nostra modellazione fisica, non una registrazione dei prodotti.
 
 ## Modello 3D e suoni di una mod
