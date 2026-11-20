@@ -5,11 +5,11 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['fiamme.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { flameTier, flameStyle, flameVariant, flamePalFor } = new Function(src + ';return { flameTier, flameStyle, flameVariant, flamePalFor };')();
+const { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_BIG_RPM } = new Function(src + ';return { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_BIG_RPM };')();
 
 const auto = (pw, max, spark, pops, extra = 1, ctl = 1) => ({ tune: { pw, turbo: { max }, sparkCut: spark, ecuPops: pops }, extraPw: extra, boostCtl: ctl });
 const quote = (tier, kind, rpm) => {                          // frazione di ogni stile su una griglia fitta di numeri a caso
-  const q = { torch: 0, free: 0, bang: 0 }, N = 2000;
+  const q = { torch: 0, free: 0, bang: 0, big: 0 }, N = 2000;
   for (let i = 0; i < N; i++) q[flameStyle(tier, kind, rpm, (i + 0.5) / N)]++;
   for (const k in q) q[k] /= N;
   return q;
@@ -39,12 +39,25 @@ test('fiamme: leggero = botti, medio = fiamme libere, spinto = ossidrica', () =>
   assert.ok(s.torch > 0.6 && s.torch > s.free, 'spinto: ossidrica');
 });
 
-test('fiamme: spinto a metà rilascio fa la fiamma libera, ai giri alti l\'ossidrica; nelle cambiate più botti', () => {
-  const mid = quote(2, 'lift', 0.5), high = quote(2, 'lift', 0.9), cambio = quote(2, 'shift', 0.6), lim = quote(2, 'limiter', 0.95);
-  assert.ok(mid.free > high.free && mid.free > 0.4, `fiamma libera a metà rilascio: ${mid.free.toFixed(2)} contro ${high.free.toFixed(2)} ai giri alti`);
-  assert.ok(high.torch > mid.torch);
-  assert.ok(cambio.bang > lim.bang, 'nelle cambiate più botti che al limitatore');
-  for (const q of [mid, high, cambio, lim]) assert.ok(Math.abs(q.torch + q.free + q.bang - 1) < 1e-9);
+test('fiamme: rilascio sotto i 5.000 giri = fiamme di livello medio, sopra = una bella fiammata grossa', () => {
+  assert.equal(FLAME_BIG_RPM, 5000);
+  for (const t of [1, 2]) {
+    const basso = quote(t, 'lift', 0.5), alto = quote(t, 'liftHigh', 0.9);
+    assert.ok(basso.free > 0.75 && basso.big === 0, `livello ${t}, sotto i 5.000: fiamma libera (${basso.free.toFixed(2)})`);
+    assert.ok(alto.big > 0.55 && alto.free < basso.free, `livello ${t}, sopra i 5.000: la grossa (${alto.big.toFixed(2)})`);
+  }
+  assert.ok(quote(2, 'liftHigh', 0.9).torch > 0.2, 'nello spinto la grossa ha anche l\'ossidrica');
+  assert.ok(quote(0, 'lift', 0.5).bang > 0.8 && quote(0, 'liftHigh', 0.9).bang > 0.55, 'leggero: botti');
+});
+
+test('fiamme: ogni famiglia di fiammata esiste e le quote fanno 1', () => {
+  const visti = new Set();
+  for (const t of [0, 1, 2]) for (const k of ['limiter', 'lift', 'liftHigh', 'shift']) {
+    const q = quote(t, k, 0.6); assert.ok(Math.abs(q.torch + q.free + q.bang + q.big - 1) < 1e-9, `${t} ${k}`);
+    for (const n of Object.keys(q)) if (q[n] > 0) visti.add(n);
+  }
+  assert.deepEqual([...visti].sort(), ['bang', 'big', 'free', 'torch']);
+  assert.ok(quote(2, 'shift', 0.6).bang > quote(2, 'limiter', 0.95).bang, 'nelle cambiate più botti che al limitatore');
 });
 
 test('fiamme: la fiamma libera ha quattro versioni e i colori seguono il livello', () => {
