@@ -13,6 +13,12 @@ gioco fa, sezione per sezione).
   - del proprietario: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (ultima versione pubblicata: 122, 3D del Viaggio);
   - del cognato: https://claude.ai/artifact/XJDCR8GCQSYz95XXtXoyrs.
 
+## Il gioco come app sul PC
+Da Edge o Chrome, sul sito https://akaoni97.github.io/Night_Run/: menu (i tre puntini) → «App» → «Installa Night Run»
+(in Chrome a volte è l'icona col monitor e la freccia in fondo alla barra degli indirizzi). Diventa un'icona sul desktop e
+nel menu Start, si apre in una finestra sua e si aggiorna da sola a ogni caricamento su `main`. I salvataggi sono gli
+stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per più avanti: `docs/pubblicazione/PERCORSO.md`.
+
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
    messaggi di commit in italiano.

@@ -1,0 +1,18 @@
+{
+  "name": "Night Run: The Last Highway",
+  "short_name": "Night Run",
+  "description": "Gioco di guida notturna: il viaggio sull'ultima autostrada.",
+  "lang": "it",
+  "start_url": "./index.html?app=1",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a081c",
+  "theme_color": "#0a081c",
+  "icons": [
+    { "src": "img/app/icona-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "img/app/icona-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "img/app/icona-maschera-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

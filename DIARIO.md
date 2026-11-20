@@ -4,6 +4,11 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 mattina · proprietario (app installabile)
+- Fatto: il gioco si installa come app da Edge o Chrome (`manifest.json`, icone in `img/app/`): icona sul desktop, finestra
+  sua, sempre aggiornato. Come si fa: `PASSAGGIO.md`, «Il gioco come app sul PC». Provato: Chromium la dà installabile.
+- Deciso: l'exe per Steam più avanti (piano di `docs/pubblicazione/PERCORSO.md`). Weekend: proprietario sul 3D, cognato sul 2D.
+
 ## 20/11/2026 · proprietario (3D: locali, paesaggi, luci)
 - Fatto: `viaggio3d.js` (file nuovo, `street3d.js` non toccato): nel 3D ci sono i locali del Viaggio con le stesse facciate
   del 2D (si entra anche dal 3D), i paesaggi (pianura, borgo, deserto, mare, montagna, autostrada) al posto della città
