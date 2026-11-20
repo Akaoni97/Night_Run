@@ -14,6 +14,7 @@ const STORIA_BEATS = [
   { id: 'distanza', cap: 'parigi', dopo: 1, flag: 'ev_distanza_impossibile' },
   { id: 'sangue', cap: 'stoccolma', dopo: 1, flag: 'ev_indizio_sangue' },
   { id: 'foto', cap: 'praga', dopo: 1, flag: 'ev_foto_originale' },
+  { id: 'imitazione_dario', cap: 'lisbona', dopo: 1, flag: 'ev_imitazione_dario' },
   { id: 'presenza', cap: 'madrid', dopo: 1, flag: 'ev_presenza_scoperta' },
   { id: 'faseV', cap: 'atene', dopo: 0, flag: 'ev_fase_v' },
 ];

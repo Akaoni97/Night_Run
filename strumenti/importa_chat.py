@@ -52,7 +52,7 @@ EXTRA = [
 ]
 BAND = {'I': 18, 'II': 130, 'III': 270, 'IV': 430, 'V': 600}     # km da cui comincia ogni fase (segnaposto)
 GAP = 14                                                       # km minimi tra l'inizio di due conversazioni
-LANES = ['Elena', 'Rosa', 'Livia', 'Sconosciuto']
+LANES = ['Elena', 'Dario', 'Rosa', 'Livia', 'Sconosciuto']
 
 def tono(t, who):
     s = t.lower()
@@ -89,7 +89,7 @@ def parse(path, nodes=None, order=None):
         if mu: UNLOCK.setdefault(mu.group(1), {}).setdefault(int(mu.group(2)), []).append(mu.group(3))
     for i, l in enumerate(L):
         m = node_re.match(l)
-        if m and re.match(r'^(ELE_|ROS_(?!INS_)|LIV_|PRE_|SPORCO_|V2_)', m.group(1)):
+        if m and re.match(r'^(ELE_|ROS_(?!INS_)|LIV_|DAR_|PRE_|SPORCO_|V2_)', m.group(1)):
             cur = {'id': m.group(1), 'head': m.group(2), 'text': [], 'opts': []}
             if cur['id'] not in nodes: order.append(cur['id'])        # un ID già visto viene sostituito (vale l'ultimo)
             nodes[cur['id']] = cur; continue
@@ -125,8 +125,8 @@ def head(h, nid):
     for p in parts[2:]:
         m = re.match(r'(?:richiede|se):\s*([a-z0-9_]+)', p)
         if m: cond = 'flag:' + m.group(1)
-    mp = {'ELENA': ('Elena', None), 'ROSA': ('Rosa', None), 'LIVIA': ('Livia', None), 'NUMERO SCONOSCIUTO': ('Sconosciuto', None), 'PRESENZA SCOPERTA': ('Sconosciuto', None),
-          'IMITAZIONE DI ELENA': ('Sconosciuto', 'Elena'), 'IMITAZIONE DI CLAUDIO': ('Sconosciuto', 'Zio Claudio')}
+    mp = {'ELENA': ('Elena', None), 'DARIO': ('Dario', None), 'ROSA': ('Rosa', None), 'LIVIA': ('Livia', None), 'NUMERO SCONOSCIUTO': ('Sconosciuto', None), 'PRESENZA SCOPERTA': ('Sconosciuto', None),
+          'IMITAZIONE DI ELENA': ('Sconosciuto', 'Elena'), 'IMITAZIONE DI DARIO': ('Sconosciuto', 'Dario'), 'IMITAZIONE DI CLAUDIO': ('Sconosciuto', 'Zio Claudio')}
     w, a = mp[who]
     return w, a, fase, cond
 
@@ -135,6 +135,12 @@ def main():
     a = ap.parse_args()
     nodes, order = {}, []
     for src in a.src: parse(src, nodes, order)
+    if a.attivazione:
+        # materiale5: nodi ritirati e soglie sostituite (il parser da solo non cancella e somma gli UNLOCK)
+        iv = json.load(open(a.attivazione, encoding='utf-8')).get('intervento_materiale5_blocco01') or {}
+        for nid in iv.get('rimuovi_nodi', []):
+            if nid in nodes: del nodes[nid]; order.remove(nid)
+        for who, tiers in iv.get('sostituisci_unlock', {}).items(): UNLOCK[who] = {int(k): list(v) for k, v in tiers.items()}
     toni_tab = {}
     if a.toni:
         for l in open(a.toni, encoding='utf-8'):
