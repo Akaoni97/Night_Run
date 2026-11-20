@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.54**
+**Versione attuale: v0.55**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -77,3 +77,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.52 | 20/11 | proprietario | Conteggio delle versioni (regola in `AGENTS.md`) |
 | v0.53 | 20/11 | proprietario | Questo elenco delle versioni (`VERSIONI.md`, al posto di `VERSIONE.md`) |
 | v0.54 | 20/11 | proprietario | Officina semplice (Modifiche e Swap, anteprima), Tutor ogni 10-15 km, prova di fumo su GitHub, pausa, suggerimenti, prossimo traguardo, qualità ricordata e FPS |
+| v0.55 | 20/11 | proprietario | Sviluppatori: «Disabilita polizia» (non ferma, non multa, non insegue; autovelox e Tutor spenti) |

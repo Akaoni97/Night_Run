@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.55 (**Sviluppatori: Disabilita polizia**)
+- Fatto: nella scheda Sviluppatori la spunta **Disabilita polizia** (`POL.off` in `polizia.js`, `game.polOffSet`): la polizia c'è e si vede, ma non può fermarti, multarti né inseguirti (fermi per velocità, posto di controllo, etilometro, coda, sfanalare una volante); autovelox e Tutor restano sulla strada ma non multano; accesa, il ricercato e i verbali in arrivo si azzerano. Si ricorda nel browser. 1 test nuovo (261).
+- Aperto: nessuno.
+
 ## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
 - Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è
   ricostruito dalle voci del diario (approssimato), da v0.51 è esatto. Da qui in poi lo compila chi fa l'intervento, prima di chiuderlo.

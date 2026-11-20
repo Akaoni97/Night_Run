@@ -33,6 +33,9 @@
     return n;
   }
 
+  // «Disabilita polizia»: la polizia si vede ma non può fermarti, multarti né inseguirti; autovelox e Tutor non multano (polizia.js, POL.off)
+  function polizia(v) { const g = G(); if (!g || !g.polOffSet) return false; const r = g.polOffSet(v === undefined ? !POL.off : v); save(); return r; }
+
   let box = null;
   function panel() {
     if (box) return box;
@@ -43,6 +46,8 @@
 .dev .dv button { padding: 8px 12px; border: 1px solid #4a4458; border-bottom-width: 3px; border-radius: 8px; background: #2a2636; color: #fff; font: 700 13px/1 var(--f-data, monospace); cursor: pointer; }
 .dev .dv button:hover { border-color: #ffb347; color: #ffd27a; }
 .dev .dv button.big { background: #ffb347; color: #1a1206; border-color: #ffb347; }
+.dev .dvck { display: flex; align-items: center; gap: 10px; margin: 8px 0 14px; font: 700 14px/1 var(--f-data, monospace); color: #fff; cursor: pointer; }
+.dev .dvck input { width: 20px; height: 20px; accent-color: #ffb347; }
 .dev .cash { font: 700 22px/1 var(--f-display, sans-serif); color: #b8ff3a; letter-spacing: .04em; margin: 6px 0 2px; }
 .dev .res { min-height: 1.3em; color: #8fe0a0; font-size: 13px; margin: 0 0 10px; }
 .dev h3 { margin: 16px 0 4px; font: 600 12px/1 var(--f-data, monospace); letter-spacing: .12em; text-transform: uppercase; color: #ffd27a; }
@@ -53,6 +58,9 @@
 <div class="cash" id="devCash">€ 0</div>
 <div class="dv"><input id="devMoney" type="number" min="0" step="100" inputmode="numeric" placeholder="importo"><button type="button" id="devSet" class="big">Imposta</button></div>
 <div class="dv" id="devAdd"><button type="button" data-n="1000">+ € 1.000</button><button type="button" data-n="10000">+ € 10.000</button><button type="button" data-n="100000">+ € 100.000</button><button type="button" data-n="1000000">+ € 1.000.000</button><button type="button" data-n="0">Azzera</button></div>
+<h3>Polizia</h3>
+<p class="hint">Con la spunta la polizia c'è e si vede, ma non può fermarti, farti multe né inseguirti. Autovelox e Tutor restano sulla strada e non fanno niente; il ricercato si azzera. Si ricorda in questo browser finché non la togli.</p>
+<label class="dvck"><input type="checkbox" id="devPol"><span>Disabilita polizia</span></label>
 <h3>Modifiche</h3>
 <p class="hint">Sblocca tutti i pezzi dell'officina (motore, turbo, scarico, centralina, limitatore...) e tutta l'estetica, senza pagarli e senza i chilometri richiesti. Poi si montano come sempre.</p>
 <div class="dv"><button type="button" id="devUnlock" class="big">Sblocca tutto per questa auto</button><button type="button" id="devUnlockAll">Sblocca per tutte le auto del garage</button></div>
@@ -63,6 +71,8 @@
     $('devSet').addEventListener('click', () => { const v = parseFloat($('devMoney').value); if (!isFinite(v) || v < 0) { say('Scrivi un importo.'); return; } setMoney(v); upd(); say('Contanti: € ' + fmt(v)); });
     $('devMoney').addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') $('devSet').click(); });   // i tasti del gioco non devono muovere l'auto mentre si scrive
     $('devAdd').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const n = +b.dataset.n; if (n) addMoney(n); else setMoney(0); upd(); say(n ? '+ € ' + fmt(n) : 'Contanti azzerati'); });
+    $('devPol').checked = typeof POL !== 'undefined' && !!POL.off;
+    $('devPol').addEventListener('change', (e) => { const r = polizia(e.target.checked); e.target.checked = r; say(r ? 'Polizia disabilitata: non ti ferma, non multa, non insegue.' : 'Polizia di nuovo in servizio.'); });
     $('devUnlock').addEventListener('click', () => { const g = G(), n = unlock(); say(`${n ? n + ' modifiche sbloccate' : 'Era già tutto sbloccato'} per ${g && g.car ? g.car : "quest'auto"}.`); });
     $('devUnlockAll').addEventListener('click', () => { const n = unlockAll(); say(n ? `${n} modifiche sbloccate in tutto il garage.` : 'Era già tutto sbloccato.'); });
     // [PISTONE] il progetto in prova dei motori costruiti (pistone/): acceso o spento, e i livelli di Nico
@@ -76,5 +86,5 @@
     setInterval(() => { if (box.offsetParent) upd(); }, 500); upd();
     return box;
   }
-  window.NightDev = { panel, setMoney, addMoney, unlock, unlockAll };
+  window.NightDev = { panel, setMoney, addMoney, unlock, unlockAll, polizia };
 })();

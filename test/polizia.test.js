@@ -239,3 +239,25 @@ test('polizia: entrando in un locale con la volante a ridosso, a volte ti aspett
   const c = ricercato(0.9, 12); c.enterPlace({ ok: true, id: 'bar', x: c.s.dist + 3, name: 'Bar', rel: 3 });
   assert.equal(c.polState().fuga, false, 'vicina ma non ti hanno visto');
 });
+
+test('polizia: «Disabilita polizia» (sviluppatori): niente fermo, multe, inseguimento, autovelox; si riaccende senza strascichi', () => {
+  const { game } = trip(); const kmh = 170, sf = { over: 33, fine: 173 };
+  game.sim.v = kmh / 3.6;
+  // ricercato e inseguito: si spegne tutto subito
+  game.polStop(null, 'speed', { kmh, sf }); game.ap.onStop(); game.answer(2);        // scappa
+  assert.ok(game.s.pol.fuga, 'prima era ricercato');
+  assert.equal(game.polOffSet(true), true);
+  assert.equal(game.s.pol.fuga, false); assert.equal(game.s.heat, 0); assert.deepEqual(game.pol.cs, []);
+  const m = game.s.money;
+  assert.equal(game.polStop(null, 'speed', { kmh, sf }), false, 'non ti ferma');
+  assert.equal(game.polCheck(null, true), false, 'non ti multa al posto di controllo');
+  // un autovelox sulla strada davanti: c'è, ma a 170 km/h non multa
+  const S = game.s.pol; S.ctl.push({ k: 'velox', x: game.s.dist + 40 });
+  const d0 = game.s.dist; game.sim.v = kmh / 3.6; for (let t = 0; t < 4; t += 1 / 30) game.update(1 / 30);
+  assert.ok(game.s.dist > d0 + 40, 'superato');
+  assert.equal(game.s.money, m, 'nessuna multa'); assert.equal(S.verb.length, 0);
+  assert.equal(S.ctl[S.ctl.length - 1].ents, true, 'cartello e autovelox sono stati messi sulla strada (la grafica resta)');
+  // di nuovo in servizio: l'autovelox successivo multa come prima
+  assert.equal(game.polOffSet(false), false);
+  assert.ok(game.polStop(null, 'speed', { kmh, sf }) !== false, 'ora ti ferma');
+});
