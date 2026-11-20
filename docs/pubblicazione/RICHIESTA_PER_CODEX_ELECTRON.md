@@ -10,14 +10,14 @@ Il gioco sul sito (GitHub Pages) deve continuare a funzionare identico: **non si
 
 ## Dove prendere il gioco
 
-Repository pubblico `https://github.com/Akaoni97/Night_Run`, ramo `main`. Si lavora su un ramo nuovo `desktop`, da `main`, e si carica solo quello.
+Repository pubblico `https://github.com/Akaoni97/Night_Run`, ramo `main` (riferimento: commit `a7375df` del 20/11/2026, che contiene `docs/pubblicazione/PERCORSO.md`, `AGENTS.md` e `LICENZE.md`). Questa richiesta sta sul ramo `claude/stoic-mendel-9mgpun`, non su `main`: vale il file che ti ha dato il proprietario. Si lavora su un ramo nuovo `desktop`, da `main`, e si carica solo quello.
 Se il PC ha già la cartella del repository: `git checkout main && git pull && git checkout -b desktop`.
 
 ## Regole (non negoziabili)
 
 1. **Niente npm, niente `package.json`, niente `node_modules` nella radice del repository.** Tutto quello che serve a Electron sta in `desktop/`.
 2. Si toccano solo questi file del gioco: `index.html` (solo per i punti 1 e 2: caratteri e three.js locali) e, se serve, `sw.js`. Tutto il resto del gioco **non si tocca**.
-3. Prima e dopo ogni modifica al gioco: `node --test test/*.test.js` (Node 22+) deve restare verde (oggi 232 test; un test della polizia è a volte instabile: se fallisce, rilanciarlo una volta).
+3. Prima e dopo ogni modifica al gioco: `node --test test/*.test.js` (Node 22+) deve restare verde (su `main` al commit `a7375df` sono 229; vedi «Decisioni», punto 5, per il test della polizia instabile).
 4. Il gioco sul sito deve partire come prima: dopo i punti 1 e 2 aprire `index.html` con `python -m http.server` e controllare che non ci siano errori in console.
 5. `node_modules/`, `desktop/dist/`, `desktop/app/` vanno in `.gitignore`. Mai committare programmi compilati.
 6. Non cambiare logica, fisica, audio, storia o grafica. Se qualcosa non funziona dentro Electron, **segnalarlo nel rapporto**, non "sistemarlo" nel gioco.
@@ -66,3 +66,13 @@ Niente Steamworks, niente Tauri, niente riscrittura in Godot o altri motori, nie
 - Ramo `desktop` con: `vendor/` (caratteri e three.js), `index.html` e `sw.js` ritoccati, cartella `desktop/` completa, `.gitignore` aggiornato.
 - `desktop/LEGGIMI.md` (come provare e come costruire, in italiano semplice) e `desktop/RAPPORTO.md` (§5).
 - Elenco di quello che non ha funzionato o è stato aggirato. Chi riceve il ramo (Claude) lo rivede, fa girare i test e lo unisce a `main` solo dopo l'ok del proprietario.
+
+## Decisioni (risposte alle domande di Codex del 20/11/2026)
+
+Le proposte di Codex sono accettate, con queste precisazioni. Le decisioni di prodotto restano quelle del proprietario: se qualcosa non ti torna, chiedi.
+
+1. **RIAVVIA.** Si rispetta esattamente quello che fa il gioco (`riavvia.js`): cancella la chiave `nightrun-viaggio` e **riscrive** `banco2jz` (pezzi montati azzerati), poi ricarica; volume, vista, tasti (`nr_tasti`) e personaggio (`nr_pg`) restano. Quindi il JSON si riscrive **senza le chiavi cancellate** e con quelle modificate com'erano. Il file non si elimina mai: se non resta niente si scrive `{}`. Anche la copia `.bak` va riallineata subito (stessa scrittura), così un recupero non fa ricomparire una partita azzerata.
+2. **Dati e precedenza.** Si conservano **tutte** le chiavi `localStorage` dell'origine dedicata al gioco. Con un JSON valido, il JSON è autorevole (anche per le chiavi assenti). JSON corrotto: si usa il `.bak` valido; se non c'è nemmeno quello, si parte da zero senza errori. **Se il JSON manca** ma esistono dati locali: si recuperano (prima migrazione) e si scrive subito il JSON; da lì in poi il file esiste sempre, quindi una cancellazione intenzionale (RIAVVIA) non può essere annullata da questa regola.
+3. **Installatore e portatile.** Stesso identificativo applicazione e stessa cartella `userData`: entrambe leggono la stessa partita sullo stesso account Windows. Nel LEGGIMI: «portatile» vuol dire «senza installazione», i salvataggi restano nel profilo Windows. Usare `app.requestSingleInstanceLock()` per non aprire due copie insieme e non avere scritture concorrenti.
+4. **«Cancellare la cache» nella prova.** Si eliminano solo i dati web di Electron (Local Storage, IndexedDB, Cache, Service Worker, ecc.) e si **preserva** `salvataggi/`. Documentare nel rapporto cosa è stato rimosso. Provare anche il caso opposto: cancellare `salvataggi/` e lasciare i dati web (deve valere il punto 2, recupero dei dati locali).
+5. **Riferimento dei test.** Partire da `main` aggiornato e riportare il commit usato. Oggi `main` (`a7375df`) ha **229 test**, tutti verdi. Il test intermittente è in `test/polizia.test.js`: *«polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 km, e il verbale arriva dopo»*, con errore noto `tratti liberi ogni tanto: 0.17…` (usa `Math.random`: capita raramente nella suite completa, mai da solo nelle prove). Se fallisce solo quello con quel messaggio, rilanciarlo una volta e riportare **sia il primo esito sia la ripetizione**; qualsiasi altro fallimento è un problema vero e va indagato.
