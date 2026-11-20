@@ -188,7 +188,7 @@
   P.v3Frame = function () {
     const game = this.v3Game; if (this.v3T === this.t) return; this.v3T = this.t;
     // dentro un locale la scena dell'interno (interni.js) è pensata sopra il 2D: la vista 3D sotto si mescolava, si nasconde
-    if (this.canvas) { const hide = !!(game && game.inside); if (this.v3Hid !== hide) { this.v3Hid = hide; this.canvas.style.visibility = hide ? 'hidden' : ''; } }
+    if (this.canvas) { const hide = !!(game && game.inside && game.inside.phase === 'shop');   // durante la manovra d'entrata e d'uscita la strada 3D resta if (this.v3Hid !== hide) { this.v3Hid = hide; this.canvas.style.visibility = hide ? 'hidden' : ''; } }
     if (!game || game.track === 'mountain') return;
     try { this.v3Scenery(game, this.dist); this.v3Places(game, this.dist); } catch (e) { if (!this.v3Err) { this.v3Err = true; console.warn('viaggio3d', e); } }
     if (this.v3ConeMat) this.v3ConeMat.opacity = 0.022 * (1 - (this.dayK || 0)) * (this.rainOn ? 1.8 : 1);

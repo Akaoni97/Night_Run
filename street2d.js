@@ -2018,11 +2018,12 @@ class Street2D {
 
     // ---- la Supra
     const IN = game && game.inside;
-    let entE = 0;
-    if (IN) { const ez = (t) => t * t * (3 - 2 * Math.min(1, Math.max(0, t))); entE = IN.phase === 'in' ? ez(Math.min(1, IN.t / 1.3)) : IN.phase === 'out' ? 1 - ez(Math.min(1, IN.t / 1.1)) : 1; }
-    const entLift = IN ? (IN.id === 'fuel' ? 12 : 30) * entE : 0;
-    const entA = IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
-    const entDX = IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
+    // entrata nel locale: la manovra nel piazzale la decide entrata2d.js (`entPose`); senza il file, quella di prima
+    let entE = 0, EP = IN && this.entPose ? this.entPose(IN, wx, carX, dist) : null;
+    if (IN && !EP) { const ez = (t) => t * t * (3 - 2 * Math.min(1, Math.max(0, t))); entE = IN.phase === 'in' ? ez(Math.min(1, IN.t / 1.3)) : IN.phase === 'out' ? 1 - ez(Math.min(1, IN.t / 1.1)) : 1; }
+    const entLift = EP ? EP.lift : IN ? (IN.id === 'fuel' ? 12 : 30) * entE : 0;
+    const entA = EP ? EP.a : IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
+    const entDX = EP ? EP.dx : IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
     const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
     const spr0 = this.carSprite(k), spr = (s.damage || 0) > 0.01 ? this.damaged(spr0, s.damage, this.geo()) : spr0, SW = spr.width, left = Math.round(carX + entDX - SW / 2);
     const hlK = (s.damage || 0) > 0.35 ? (Math.sin(st.t * 37) + Math.sin(st.t * 13.7) > 0.3 ? 0.45 : 0.12) : 1;   // faro rotto: debole e tremolante

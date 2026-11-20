@@ -8,6 +8,15 @@ due voci, e il controllo della sera le legge.
 - **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
   su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
 
+## 20/11/2026 · proprietario (entrata nei locali)
+- Fatto: entrando in un locale l'auto non si teletrasporta più. Si ferma ~5 m prima della porta, frenata decisa, poi svolta
+  nel piazzale con le ruote che girano (in retro se la porta l'hai appena passata, attraversando le corsie se eri a
+  sinistra), lo schermo si scurisce e si apre l'interno; uscendo scende dal piazzale in avanti. File nuovo `entrata2d.js`,
+  ritocchi in `game.js` (`enterPlace`, frenata dell'accosto, `exitPlace`), un aggancio in `street2d.js`; righe del cognato
+  non toccate. Test `test/entrata.test.js` (194 in tutto).
+- Per il cognato: se ieri l'entrata faceva cose strane in un caso preciso, dimmi quale: l'ho provata da fermo, arrivando a
+  40 km/h, dalla corsia di sinistra e appena oltre la porta.
+
 ## 20/11/2026 mattina · proprietario (app installabile)
 - Fatto: il gioco si installa come app da Edge o Chrome (`manifest.json`, icone in `img/app/`): icona sul desktop, finestra
   sua, sempre aggiornato. Come si fa: `PASSAGGIO.md`, «Il gioco come app sul PC». Provato: Chromium la dà installabile.

@@ -73,6 +73,8 @@ const MOUNTAIN = {
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
 const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
+// entrata in un locale (secondi): l'auto svolta nel piazzale e si ferma davanti, poi lo schermo si scurisce; uscendo il contrario
+const GAME_ENT_IN = 2.4, GAME_ENT_OUT = 1.8;
 const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/s (18 km/h: una manovra, non una corsa)
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
@@ -320,8 +322,13 @@ class StreetGame {
   enterPlace(p) {
     if (!p || !p.ok) return false;
     this.prompt = null; this.lane = 3; this.manualT = 0; this.free = false;
-    const go = () => { this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0 }; this.laneZ = GAME_LANE_Z[3]; };
-    if (p.rel < 4) { this.stopAt(null, go); } else this.stopAt(p.x, go);
+    const go = () => {
+      // dove parcheggia nel piazzale (metri dalla porta): chi è fermo prima della porta entra andando avanti,
+      // chi l'ha appena passata entra in retro; sempre dentro la facciata (da −5 a +7 m)
+      const c = this.s.dist - p.x, park = c <= -1.5 ? Math.max(-4, Math.min(2.5, c + 6)) : Math.max(-4, Math.min(6, c - 5));
+      this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0, from: c, park, z0: this.laneZ }; this.laneZ = GAME_LANE_Z[3];   // z0: la corsia da cui parte la manovra (entrata2d.js)
+    };
+    if (p.rel < 9) this.stopAt(null, go); else this.stopAt(p.x - 5, go);   // si ferma qualche metro prima e da lì svolta dentro
     this.say(`Accosto: ${p.name}`, p.id === 'fuel' ? 'fuel' : 'buy');
     return true;
   }
@@ -332,6 +339,8 @@ class StreetGame {
       this.say(`Rifornimento interrotto: ${I.fill.got.toFixed(1).replace('.', ',')} litri, − € ${c.toFixed(2).replace('.', ',')}`, 'fuel');
     }
     I.fill = null; I.phase = 'out'; I.t = 0;
+    // si riesce dal piazzale andando avanti: la strada riparte qualche metro più in là (mai indietro)
+    I.outFrom = I.x + (I.park ?? 0); this.s.dist = Math.max(this.s.dist, I.outFrom + 4.5); I.outTo = this.s.dist;
   }
   // rifornimento alla pompa: litri che entrano un po' alla volta
   startFill(liters) {
@@ -657,8 +666,9 @@ class StreetGame {
           const need = v * v / (2 * Math.max(rel, 0.8));
           out.brake = v > vt + 0.4 ? Math.min(1, need / 10.3 * 1.4 + (v - vt) * 0.05) : 0;
           if (v < vt - 1 && rel > 4 && this.sim.gear >= 1) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
+          if (rel < 1 && v < 2.5) out.brake = Math.max(out.brake, 0.7);   // arrivati: si frena deciso (prima gli ultimi centimetri si facevano a passo d'uomo)
         }
-        if (v < 0.25 && Math.abs(this.sim.v) < 0.25 && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
+        if (Math.abs(this.sim.v) < (ap.atX !== null && rel < 1 ? 0.6 : 0.25) && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
           ap.stopped = true;
           if ((this.sim.gear > 1 || this.sim.gear === -1) && this.sim.cfg.autoClutch) this.sim.shift(1);
           if (ap.onStop) ap.onStop();
@@ -705,8 +715,8 @@ class StreetGame {
     const I = this.inside;
     if (I) {
       I.t += dt;
-      if (I.phase === 'in' && I.t > 1.3) { I.phase = 'shop'; I.t = 0; }
-      if (I.phase === 'out' && I.t > 1.1) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
+      if (I.phase === 'in' && I.t > GAME_ENT_IN) { I.phase = 'shop'; I.t = 0; }
+      if (I.phase === 'out' && I.t > GAME_ENT_OUT) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
       if (I.fill) {
         const F = I.fill, step = Math.min(F.liters - F.got, dt * 8);
         F.got += step; sim.fuel = Math.min(1, sim.fuel + step / sim.P.tank); sim.dry = false;
