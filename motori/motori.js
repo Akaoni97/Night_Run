@@ -16,7 +16,7 @@
 // ============================================================================
 const MOT = {
   lavoro: 450,          // montare o smontare un motore su un'auto (manodopera)
-  revisione: 0.35,      // rifare un motore rotto: frazione del prezzo dei pezzi
+  revisione: 0.35,      // rifare un motore rotto al Pistone: frazione del prezzo dei pezzi (non è la revisione di Mario)
   maxMotori: 4,         // motori che si tengono in magazzino
   vendita: 0.55,        // rivendere un motore: frazione del prezzo dei pezzi (meno l'usura)
   // calore: quota della potenza all'albero che finisce nell'acqua (un motore a benzina butta circa un terzo

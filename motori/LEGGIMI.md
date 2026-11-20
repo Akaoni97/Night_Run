@@ -23,6 +23,21 @@ Fuori da questa cartella, ma legati ai motori:
   Destinato a diventare un personaggio quasi principale.
 - **Mario**: l'officina dei tagliandi, revisioni, gomme, carrozziere (nel codice l'id resta `niko` per i salvataggi).
 
+## Da non confondere
+Nel gioco ci sono cose con nomi simili che non sono i motori del Pistone:
+- **Da Luca Tuning** (`tuning.js`, `cars.js`): i pezzi per il motore *di serie* di ogni auto (turbo, intercooler,
+  centralina, camme, frizione, scarico, aspirazione, gomme, assetto...). Con un motore del Pistone montato, turbo,
+  intercooler, centralina, camme e frizione li decide il motore del Pistone (`motApply`): quelli di Luca tornano a
+  contare quando rimetti il motore di serie. Scarico, aspirazione (`pw`), gomme, assetto, differenziale, cambio e peso
+  restano quelli di Luca: per questo in strada i CV possono essere un po' diversi da quelli della scheda del Pistone.
+- **Banco prova a rulli** (`banco.js`, da Luca): misura i CV dell'auto vera sui rulli. Il **banco di montaggio** del
+  Pistone (`motori2d.js`) è dove monti il motore pezzo per pezzo.
+- **Revisioni**: la revisione dei documenti (`documenti.js`) e la revisione del motore stanco delle auto usate
+  (`usato.js`) le fa **Mario**. Al Pistone un motore rotto si **rifà** (`motRepair`).
+- **Test**: `test/motori.test.js` è il vecchio «Banco Suono 2JZ» (fisica e suono di tutte le auto), non il Pistone.
+  Le prove del Pistone sono in `test/motori-costruiti.test.js`.
+- **Nico**: è anche il nome del proprietario del repository; nel gioco è il motorista del Pistone.
+
 ## Come funziona
 - Un motore è un pezzo per reparto, montati dal basso in alto (l'ordine di `MOT_PARTI` è l'ordine del banco di montaggio).
 - Ogni pezzo ha un **livello** (`lv`, da 1 a 4). Si parte conoscendo il livello 1 di tutto. Nico insegna il livello dopo

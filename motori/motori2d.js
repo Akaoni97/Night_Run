@@ -194,7 +194,7 @@
     // a destra: vetrina coi blocchi motore sugli scaffali e le casse
     this.lcGlass(g, dL + dW + 16, 146, 64, 36, { col: '#ffd9a0', inside: (g2, x0, y0, w, h) => {
       for (let r = 0; r < 2; r++) { R(g2, x0 + 2, y0 + 15 + r * 16, w - 4, 2, '#3a2a20'); for (let q = 0; q < 3; q++) { const bx = x0 + 5 + q * 20, by2 = y0 + 6 + r * 16; R(g2, bx, by2, 14, 9, q % 2 ? '#a8aeb8' : '#5c6068'); for (let c = 0; c < 3; c++) R(g2, bx + 2 + c * 4, by2 + 2, 2, 3, '#1a1c22'); } } } });
-    this.text(g, 'REVISIONI', dL + dW + 20, 186, '#ff9a5a'); this.text(g, 'ELABORATI', dL + dW + 20, 194, '#e8e6df');
+    this.text(g, 'RICOSTRUZIONI', dL + dW + 18, 186, '#ff9a5a'); this.text(g, 'ELABORATI', dL + dW + 20, 194, '#e8e6df');
     for (let q = 0; q < 2; q++) { R(g, L + W - 30 + q * 4, GY - 16 - q * 12, 22, 14, ink); R(g, L + W - 29 + q * 4, GY - 15 - q * 12, 20, 12, '#7a5a34'); R(g, L + W - 29 + q * 4, GY - 10 - q * 12, 20, 1, '#5a3a20'); }   // casse
     // a sinistra: ufficio con la finestra e il fusto dell'olio
     this.lcGlass(g, L + 14, 150, 46, 28, { col: '#e8f0ff', noSpill: true, inside: (g2, x0, y0, w, h) => { for (let yy = y0 + 2; yy < y0 + h; yy += 3) { g2.fillStyle = 'rgba(60,64,80,.5)'; g2.fillRect(x0, yy, w, 1); } } });

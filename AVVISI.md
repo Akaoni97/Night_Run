@@ -16,7 +16,7 @@ Formato: `## data · per chi · da chi` e due o tre righe.
   e `models/`. Se un giorno servisse, sono nella storia di git.
 - Al posto del 3D: **la costruzione del motore**, già nel gioco: locale nuovo **Il Pistone** (al posto del secondo bar
   di ogni giro, primo al km 14,6). Scegli i pezzi, lo monti a mano sul cavalletto, lo metti su qualsiasi auto.
-  File `motori.js` e `motori2d.js`.
+  File `motori/motori.js` e `motori/motori2d.js` (guida in `motori/LEGGIMI.md`).
 - Il weekend quindi è tutto 2D: segnate in `INCORSO.md` cosa toccate.
 
 ## 20/11/2026 · per il cognato · dal proprietario

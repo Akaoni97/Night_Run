@@ -4,6 +4,14 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · cognato (**riordino dei motori**)
+- Controllato il lavoro di tutti e due sui motori: nessun ramo con lavoro non unito, niente file doppi. Tutto in
+  `motori/` con la guida `motori/LEGGIMI.md` (sezione «Da non confondere»: tuning di Luca, banco prova contro banco di
+  montaggio, revisioni di Mario contro motore rifatto al Pistone, `test/motori.test.js` che è il vecchio Banco Suono).
+- Da Luca, con un motore del Pistone montato, ora c'è scritto che turbo, intercooler, centralina, camme e frizione sono
+  quelli del motore di Nico (prima i pezzi di Luca sembravano montati ma non contavano). Vetrina del Pistone: RICOSTRUZIONI
+  al posto di REVISIONI (le revisioni sono di Mario).
+
 ## 20/11/2026 · cognato (**motori a livelli, Nico e Mario**)
 - Fatto: al Pistone **Nico** (era Ottone) insegna i pezzi a livelli 1-4, reparto per reparto, con requisiti (soldi, km,
   motori costruiti, livelli di altri reparti). Reparti nuovi: pompa dell'olio, intercooler, pompa della benzina,
