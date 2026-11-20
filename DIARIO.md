@@ -205,6 +205,13 @@ due voci, e il controllo della sera le legge.
 - Aperto: gli epiloghi A, C, D non li ho toccati (sono trama); il punto 4 (obiettivo vicino) da spiegare meglio.
 - Da provare sul PC: grandezza delle spie sul quadro, volume della sirena.
 
+## 20/11/2026 notte · proprietario (joystick, volante e pedali)
+- Fatto: `joystick.js`. Il gioco leggeva solo il PRIMO dispositivo collegato e presumeva la mappa «standard»: con cambio a H, scheda pedali e pad insieme prendeva il
+  cambio (niente assi) e il resto sembrava morto. Ora i comandi si assegnano premendo/muovendo il controllo giusto (Impostazioni → Comandi → Joystick e volante),
+  ognuno su un dispositivo diverso, pedali calibrati, cambio a H (una marcia per pulsante, folle a nessuno premuto). Di serie vale solo il pad standard.
+  `strumenti/prova_joystick.html` mostra cosa vede il browser. 7 test nuovi, 241 in tutto; provato nel browser con tre dispositivi finti (Hsifter, Maple, pad Xbox).
+- Aperto: provarlo con i dispositivi veri (pedali Maple: quale asse è quale; cambio a H nel manuale con la frizione); nell'automatico solo la R del cambio a H serve.
+
 ## 19/11/2026 notte · proprietario (storia: blocco Elena di Codex)
 - Fatto: integrato il pacchetto di Codex per Elena (`materiale5_01_*`, 8 file; rapporto in `docs/storia/RAPPORTO_CODEX_5_01_ELENA.md`). Dieci scene
   nuove (80 nodi, 124 risposte, ognuna con uno scontro: Pasta, Turno, Coinquilino, Cena, Bollette, Richiamo, Distanza, Riparazione, Nonno, Cena di ritorno)

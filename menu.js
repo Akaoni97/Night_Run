@@ -38,10 +38,13 @@
     const tasti = document.createElement('button'); tasti.type = 'button'; tasti.className = 'kbtn'; tasti.innerHTML = 'Cambia i tasti<small>scegli tu cosa fa ogni tasto</small>';
     tasti.addEventListener('click', () => { if (window.nightTasti) { close(); window.nightTasti.open(); } });
     const tastiP = document.createElement('p'); tastiP.className = 'hint'; tastiP.textContent = 'I tasti cambiati restano salvati in questo browser. Qui sotto i comandi di serie.';
+    const joy = document.createElement('button'); joy.type = 'button'; joy.className = 'kbtn'; joy.innerHTML = 'Joystick, volante e pedali<small>assegna i comandi, anche su dispositivi diversi</small>';
+    joy.addEventListener('click', () => { if (window.nightPad) { close(); window.nightPad.open(); } });
+    const joyP = document.createElement('p'); joyP.className = 'hint'; joyP.textContent = 'Un pad Xbox funziona da solo. Volante, pedali, cambio a H e joystick strani si assegnano qui.';
     const SUBS = [
       ['grafica', 'Grafica', [panel('Qualità, ora e meteo', [labelOf('q3d'), labelOf('clockSel'), labelOf('meteoSel')], 'gm-row'), q('section.uiprefs')]],
       ['audio', 'Audio', [panel('Volumi e ascolto', [fieldOf('vol'), fieldOf('radioVol'), q('.seg[data-k="view"]') && q('.seg[data-k="view"]').closest('.field'), q('.seg[data-k="character"]') && q('.seg[data-k="character"]').closest('.field')]), q('section.extras .samples')]],
-      ['comandi', 'Comandi', [panel('Tasti', [tasti, tastiP]), keysPanel]],
+      ['comandi', 'Comandi', [panel('Tasti', [tasti, tastiP]), panel('Joystick e volante', [joy, joyP]), keysPanel]],
       ['guida', 'Guida', [panel('Aiuti alla guida', [q('section.deck .setup .toggles')])]],
     ];
     const pagesI = {};

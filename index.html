@@ -1671,7 +1671,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     g.gain.setTargetAtTime(0, ctx.currentTime, 0.03); setTimeout(() => { os.forEach((o) => o.stop()); g.disconnect(); }, 200);
     horn.g = null; horn.o = [];
   }
+  let padGear;                                                 // marcia scelta dal cambio a H (joystick.js); undefined = nessun cambio a H assegnato
   function readPad() {
+    if (window.nightPad) {                // joystick.js: comandi assegnati su qualunque dispositivo, pad standard per il resto
+      const r = window.nightPad.poll();
+      inp.pad.thr = r.thr; inp.pad.brake = r.brake; inp.pad.clutch = r.clutch; inp.pad.steer = r.steer;
+      if (r.up) shiftUp(); if (r.down) shiftDown();
+      if (r.start && !padPrev[3]) startOn(); if (!r.start && padPrev[3]) startOff();
+      padPrev[3] = r.start;
+      if (r.gear === undefined) padGear = undefined;
+      else if (padGear === undefined) padGear = r.gear;          // la prima lettura non cambia marcia
+      else if (r.gear !== padGear) { padGear = r.gear; if (S.gearbox === 'man') shiftTo(r.gear); else if (S.gearbox === 'auto' && r.gear === -1) setLeva('R'); }
+      return;
+    }
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];
     const gp = Array.from(pads || []).find((p) => p && p.connected);
     if (!gp) { inp.pad.thr = inp.pad.brake = inp.pad.clutch = inp.pad.steer = 0; return; }
@@ -3642,6 +3654,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 })();
 </script>
 <script src="tasti.js"></script>
+<script src="joystick.js"></script>
 <script src="sviluppatori.js"></script>
 <script src="menu.js"></script>
 <script src="crediti.js"></script>
