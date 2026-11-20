@@ -108,7 +108,7 @@ Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola
 | `night-run-audio` | suono del motore: `strumenti/ascolta.mjs` lo registra in WAV fuori dal browser e lo misura |
 | `night-run-auto` | un veicolo nuovo dai disegni del proprietario |
 | `night-run-pubblica` | commit, push diretto su `main`, artifact, documentazione |
-| `night-run-sera` | controllo della sera: cosa è cambiato su `main` dall'ultima volta, test, prova (`strumenti/controllo_sera.sh`) |
+| `night-run-sera` | controllo della sera («check»): cosa è cambiato su `main` dall'ultima volta, test, prova (`strumenti/controllo_sera.sh`), cose in sospeso e da rivedere (`SOSPESI.md`) |
 | `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
 | `night-run-controllo` | controllo del gioco con voti per area e proposte |
 
