@@ -1,5 +1,9 @@
+## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
+- Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è
+  ricostruito dalle voci del diario (approssimato), da v0.51 è esatto. Da qui in poi lo compila chi fa l'intervento, prima di chiuderlo.
+
 ## 20/11/2026 notte · proprietario (**v0.52 · conteggio delle versioni**)
-- Fatto: `VERSIONE.md`. Ogni intervento (sessione o pacchetto di modifiche) alza la versione di un passo; si parte da v0.50 (le 50 voci del diario prima
+- Fatto: `VERSIONI.md`. Ogni intervento (sessione o pacchetto di modifiche) alza la versione di un passo; si parte da v0.50 (le 50 voci del diario prima
   di oggi), il soccorso è la v0.51. Regola aggiunta in `AGENTS.md` (regola 1).
 - Aperto: la versione non è ancora mostrata nel gioco (titolo o menu): se la vuoi vedere in Impostazioni, dimmelo.
 
