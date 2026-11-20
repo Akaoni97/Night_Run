@@ -7,6 +7,18 @@ Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
 Aggiornata il 20/11/2026 notte (briefing col proprietario e il cognato).
 
 ## Da decidere insieme
+- [economia] **Prova dei primi 200 km** (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco,
+  € 28.000 guadagnati (70 % dalle missioni, 29 consegne da ~€ 200), € 16.700 in tasca al km 200. Una Panda nuova
+  verso il km 180, la Supra (€ 65.000) non prima del km ~450. Benzina (€ 156), cibo (€ 80) e motel (€ 180) non pesano
+  quasi niente: i bisogni costano tempo, non soldi. Va bene così o li facciamo pesare? (tutti e due)
+- [missioni] **La cassa pesante blocca la catena**: la 4ª missione vuole il rimorchietto (€ 2.200, Motel). Chi non lo
+  compra non riceve più missioni (nella prova senza rimorchio: 3 missioni in 200 km, € 2.200 in tasca alla fine). Lo
+  dice solo un avviso quando provi a prenderla. Dirlo chiaro nell'obiettivo, o farla saltare e passare alla dopo?
+  (proprietario)
+- [missioni] **Il signore della valigetta va alla Sosta 24 dopo: 38 km** (la seconda Sosta 24 del giro è diventata lo
+  sfascio), a meno di 120 e senza frenate forti; in tutte e due le prove ha pagato il 30 %. Meta più vicina? (proprietario)
+- [guida] **Danni**: anche con l'AUTO 1 qualche tamponamento (4 in 94 km), e il carrozziere costa fino a € 2.600 a
+  volta: nella prova è stata la spesa più grossa (€ 8.400). Gomme bucate ogni ~30 km (7 in 200 km). Troppo? (tutti e due)
 - [interni] **Gli interni nuovi** (tutti e nove in `interni_hd.js`): da guardare sul PC. Le persone usano la pixel art
   del protagonista, più grossa del resto della scena: rifarle più fini è un lavoro a parte. Nico da Luca: lo disegna il
   cognato quando decide com'è. (proprietario, cognato per Nico)
