@@ -1,8 +1,82 @@
+## 21/11/2026 · proprietario · v0.61 (**assetto a livelli**)
+- Fatto: assetto a 6 livelli per ogni auto (`tuning.js`, `sim.js`): dal livello 1 due cursori regolano altezza (mm, anche rialzata) e rigidità (% delle molle di serie); la fisica
+  (baricentro, aria, presa, beccheggio, partenza, saltellamento e fondo che tocca) e il disegno seguono. I cursori ora stanno nella **nuova officina** di Luca (`officina.js`, gruppo
+  Ruote e telaio): il pannello a tendine su cui era scritto non c'è più. Il «ta-dum» dei giunti resta spento: dei giunti restano solo le scintille a assetto troppo basso.
+- Aperto: valori tarati a occhio, da provare in mano. Nel 3D (tolto) l'altezza non si vedeva comunque.
+
+## 21/11/2026 · proprietario · v0.60 (**la piazzetta**)
+- Fatto: `piazzetta.js`. Ogni 2 o 3 tappe (dalla quarta) la tappa è una piazzetta con due negozi affiancati: la tappa non cambia (bacheca, lavori e consegne come prima), le si aggiunge un secondo negozio a caso tra gli altri. **Luca e Neon Kustom (Jeshka) non stanno mai nella stessa piazzetta**, le altre coppie sono tutte uguali. U sulla piazzetta chiede dove entrare. La telecamera punta al centro dei due negozi (`street2d.js`), le strisce del posto auto sono di ognuno (`entrata2d.js`). 4 test nuovi (269), la prova di fumo ci passa dentro.
+- Aperto: nella piazzetta i due negozi hanno la stessa bacheca dei lavori della tappa; l'auto parcheggia nel posto del negozio scelto ma la camera resta sul gruppo. Da guardare col gioco vero: facciate larghe come il benzinaio con un garage possono stare strette.
+
+## 21/11/2026 · proprietario · v0.59 (**frasi di pipì e cacca**)
+- Fatto: nuovi pensieri (`pensieri.js`, `pee` e `poo`, sette frasi a livello, serie e comiche: «Oh merda, mi sto cagando addosso»), avvisi e tre frasi a testa per l'incidente quando arrivi a zero (`viaggio.js`). Testi miei, da rivedere.
+
+## 21/11/2026 · proprietario · v0.58 (**pipì e cacca**)
+- Fatto: due bisogni nuovi nel quadro (🚽 e 💩) e nei pensieri. Solo col tempo: la pipì si svuota in 12 «ore di viaggio», la cacca in 24, e un'ora di viaggio vale 3 minuti veri (`VG_BAGNO` in `viaggio.js`: l'orologio del gioco corre a 3 minuti per secondo e a ore di gioco vere sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca. Il bagno è gratis in bar, autogrill, benzinaio e motel. A zero fuori da un locale te la fai addosso e l'igiene crolla. 4 test nuovi (265).
+- Aperto: i tempi sono da provare (pipì ogni ~36 min veri, cacca ogni ~72): si cambiano in `VG_BAGNO`.
+
+## 21/11/2026 · proprietario · v0.57 (**Sviluppatori: cinque strumenti in più**)
+- Fatto: scheda Sviluppatori con **Vai a** (km o prossima tappa di ogni tipo), **Bisogni e benzina** (riempi, o infiniti), **Danni e usura** (ripara, o indistruttibile), **Meteo e ora** (pulsanti), **Storia e telefono** (flag di chat/storia, tutte le app, L'ultima porta). Le spunte si ricordano nel browser (`nr_dev`). Provati nel browser, senza errori in console.
+- Aperto: nessun test automatico per questi strumenti (usano la pagina); li copre la prova a mano.
+
+## 21/11/2026 · proprietario · v0.56 (**Sviluppatori: Disabilita polizia**)
+- Fatto: nella scheda Sviluppatori la spunta **Disabilita polizia** (`POL.off` in `polizia.js`, `game.polOffSet`): la polizia c'è e si vede, ma non può fermarti, multarti né inseguirti (fermi per velocità, posto di controllo, etilometro, coda, sfanalare una volante); autovelox e Tutor restano sulla strada ma non multano; accesa, il ricercato e i verbali in arrivo si azzerano. Si ricorda nel browser. 1 test nuovo (261).
+- Aperto: nessuno.
+
+## 20/11/2026 notte · proprietario (**v0.55 · assicurazione, traino, diario**)
+- Fatto: (1) **assicurazione con franchigia** (`documenti.js`): in regola, carrozzeria e soccorso costano al massimo € 150; il resto lo copre lei ed è un sinistro
+  (premio +25 % l'uno, al massimo il doppio, ne sparisce uno ogni 300 km); scaduta si paga tutto. (2) **Guasti e traino** (`soccorso.js`): da fermo con motore
+  rotto o gomma a terra la domanda propone l'app; servizio **Traino** (motore rotto → da Luca, dove Nico lo rifà; auto distrutta → da Mario): catena, buio,
+  si arriva davanti all'officina (premi U), € 60 + € 12 al km; non si può con una consegna in corso prima dell'officina. (3) **Diario** (`diario.js`, app nel telefono):
+  capitali, incidenti, fughe, motore rotto, auto nuove, soccorso, ogni 100 km, con foto piccole fuori dal salvataggio.
+- Aperto: la prossima officina dello stesso tipo è lontana (Mario e Luca ogni ~38 km): il traino salta quella strada (eventi, bisogni sì, odometro no). Se è troppo,
+  si può far arrivare al locale più vicino anche indietro. Il diario scrive anche «Arrivo a Tokyo» al km 0.
+
+## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
+- Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è
+  ricostruito dalle voci del diario (approssimato), da v0.51 è esatto. Da qui in poi lo compila chi fa l'intervento, prima di chiuderlo.
+
+## 20/11/2026 notte · proprietario (**v0.52 · conteggio delle versioni**)
+- Fatto: `VERSIONI.md`. Ogni intervento (sessione o pacchetto di modifiche) alza la versione di un passo; si parte da v0.50 (le 50 voci del diario prima
+  di oggi), il soccorso è la v0.51. Regola aggiunta in `AGENTS.md` (regola 1).
+- Aperto: la versione non è ancora mostrata nel gioco (titolo o menu): se la vuoi vedere in Impostazioni, dimmelo.
+
+## 20/11/2026 notte · proprietario (**v0.51 · soccorso stradale: chiami il furgone e ti sistema l'auto**)
+- Fatto: app **Soccorso** nel telefono (`soccorso.js`): scegli uno o più servizi (pieno, carrozzeria, gomme, gomme nuove, manutenzione) col prezzo vero di ciascuno
+  più l'uscita (€ 40). L'auto accosta nella corsia più a destra, il furgone ti supera e si ferma davanti con le quattro frecce, il meccanico scende e lavora
+  (martello, aria, olio, pompa) e l'auto migliora davvero poco per volta; si paga alla fine. Riquadro con le barre e «Accelera ×4». Dal «A secco» si arriva all'app.
+- Aperto: nel gioco non c'è una corsia d'emergenza vera, quindi si lavora nella corsia più a destra (il traffico rallenta per le quattro frecce); il furgone è il
+  `van` del traffico, un carro attrezzi vero verrà dopo. Non provato su telefono in orizzontale (solo il riquadro e l'app, che sono HTML come il resto).
+
 # Diario di Night Run
 
 Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, cosa resta aperto, cosa serve
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
+
+## 21/11/2026 · proprietario · v0.54 (**sei miglioramenti: prova di fumo, pausa, suggerimenti, prossimo traguardo, anteprima officina, qualità ricordata**)
+- Fatto: **prova di fumo nel browser** su GitHub (`strumenti/fumo.js`, job `fumo`: una tappa per tipo, errori di console = rosso); **pausa** quando la finestra perde il fuoco (alt-tab: il gioco si ferma e riprende con un tasto o un clic; non al tocco; Impostazioni → Grafica, «Pausa se esci»); **suggerimenti dei primi minuti** (`suggerimenti.js`, uno ogni 40 s al massimo, una volta sola, spegnibili in Impostazioni → Guida; con un joystick non standard si apre da sola la finestra di assegnazione); **prossimo traguardo** sempre nel quadro (`obiettivo.js`); **anteprima nell'officina** (passando sopra un livello le barre mostrano il prima/dopo); **qualità**: se il computer è andato a densità semplice resta così al prossimo avvio (si azzera scegliendo la qualità a mano), contatore FPS opzionale. 10 test nuovi (256).
+- Aperto: nell'anteprima con uno swap montato si guarda solo il motore (non peso né gomme); il tasto «Pausa se esci» è acceso di serie, se dà fastidio si spegne dalle Impostazioni.
+
+## 21/11/2026 · proprietario (**officina semplice: Modifiche e Swap motore; Tutor ogni 10-15 km**)
+- Fatto: `officina.js`. Da Luca una schermata sola a due schede (era un pannello di 3.600 px con Nico e sei schede): **Modifiche** (pezzi a livelli in riquadri, un clic compra e monta, la i spiega, livelli SERIE/1/2 sempre sbloccati e km solo dal 3 in su) e
+  **Swap motore** (il motore di un'altra auto del gioco: curva, giri, turbo, cilindri, voce e peso; i pezzi del motore dopo lo swap sono quelli del nuovo motore). Il vecchio Nico resta in `pistone/` ma spento di serie (interruttore in Sviluppatori); nel menu la scheda
+  Officina non ha più il negozio. 5 test nuovi (246 in tutto), provato nel browser: V40 140 CV → motore Supra 330 CV, turbo e pezzi del donatore comprabili. **Polizia**: un Tutor ogni 10-15 km lungo da 500 m a 1 km, niente autovelox a 700 m da lui; la prova del Tutor era instabile e ora è deterministica.
+- Aperto: **da dire a tuo cognato** (i motori sono suoi): Nico è spento di serie, da decidere cosa riportare nell'officina semplice (interni V40, banco, motori costruiti). Non fatto: anteprima prima/dopo sulle barre, interni del motore (albero, bielle...) come pezzi semplici.
+
+## 20/11/2026 notte · proprietario (**fluidità: palazzi preparati prima, meno lavoro a ogni fotogramma**)
+- Fatto: il palazzo che sta per entrare da destra si porta a densità doppia (`tileHD`) quando è ancora fuori schermo, uno per fotogramma
+  (`street2d.js`, `drawCity`): misurati 113 su 113 pronti prima di comparire, prima si facevano nel fotogramma in cui entravano (anche due o tre
+  insieme). Numeri con un formattatore preparato una volta (`fmt` in `index.html`, stesso risultato); pedali, quadro grande e telemetria non si
+  riscrivono col menu chiuso. Tre minuti di guida: memoria ferma a 14 MB, niente perdite.
+- Da sapere: nel browser di prova (senza scheda video) il gioco passa da solo a densità semplice dopo 3 s (`this.slow`); per provare l'alta va forzato.
+
+## 20/11/2026 notte · proprietario (**scatti: niente più letture di pixel dalla scheda video**)
+- Fatto: misurato un minuto di guida. Timer, salvataggi e stile premium non pesano; il sospetto è nelle tele preparate al volo e poi rilette
+  (~5 letture al secondo: palazzi, auto, sagome, Scale2x), che sul PC stanno nella scheda video e a ogni lettura la fermano. Ora nascono già
+  «nel processore» (`willReadFrequently` alla creazione: 13 righe in `street2d.js`, `quartieri2d.js`, `nitido2d.js`). Ridisegnate a ogni
+  fotogramma: invariate. Nel browser di prova (senza scheda video) lo scatto non si vede: va sentito giocando sul PC.
+- Aperto: i palazzi creano ~9 tele al secondo mentre si guida (la cache tiene 260 tessere): se gli scatti restano, il prossimo passo è lì.
 
 ## 20/11/2026 notte · proprietario (**polizia: posti di controllo che multano al passaggio, autovelox, Tutor e mappa**)
 - Fatto: il **posto di controllo** non ti ferma più e non fa partire nessuna volante: passi e ti multano (velocità sempre, documenti scaduti a caso),
@@ -205,6 +279,22 @@ due voci, e il controllo della sera le legge.
 - Aperto: gli epiloghi A, C, D non li ho toccati (sono trama); il punto 4 (obiettivo vicino) da spiegare meglio.
 - Da provare sul PC: grandezza delle spie sul quadro, volume della sirena.
 
+## 20/11/2026 notte · proprietario (joystick, volante e pedali)
+- Fatto: `joystick.js`. Il gioco leggeva solo il PRIMO dispositivo collegato e presumeva la mappa «standard»: con cambio a H, scheda pedali e pad insieme prendeva il
+  cambio (niente assi) e il resto sembrava morto. Ora i comandi si assegnano premendo/muovendo il controllo giusto (Impostazioni → Comandi → Joystick e volante),
+  ognuno su un dispositivo diverso, pedali calibrati, cambio a H (una marcia per pulsante, folle a nessuno premuto). Di serie vale solo il pad standard.
+  `strumenti/prova_joystick.html` mostra cosa vede il browser. 7 test nuovi, 241 in tutto; provato nel browser con tre dispositivi finti (Hsifter, Maple, pad Xbox).
+- Aperto: provarlo con i dispositivi veri (pedali Maple: quale asse è quale; cambio a H nel manuale con la frizione); nell'automatico solo la R del cambio a H serve.
+
+## 19/11/2026 notte · proprietario (storia: blocco Elena di Codex)
+- Fatto: integrato il pacchetto di Codex per Elena (`materiale5_01_*`, 8 file; rapporto in `docs/storia/RAPPORTO_CODEX_5_01_ELENA.md`). Dieci scene
+  nuove (80 nodi, 124 risposte, ognuna con uno scontro: Pasta, Turno, Coinquilino, Cena, Bollette, Richiamo, Distanza, Riparazione, Nonno, Cena di ritorno)
+  al posto di 96 vecchi nodi; prima sera e litigio restano come erano. Elena si apre alle soglie 25/50/75/100. `chat_dati.js`: 908 nodi, identico alla
+  prova di Codex. L'importatore ora applica `rimuovi_nodi` e `sostituisci_unlock` (nuova attivazione: `materiale5_01_ingressi.json`). 183 test, cinque
+  adattati a mano (Elena non parte più dai chilometri; ritirate le `V2_ELE_n*` e `s*`).
+- Aperto: provarla giocando (scene e battute), approvare i dettagli [P1-P4] del rapporto (sedia, trapano, conto, piatto); i vecchi salvataggi con una chat
+  aperta su un nodo ritirato non sono migrati (partita nuova). Blocchi B (Rosa e Livia), C (tre soste), D (presenza), E (contesti) ancora da fare a Codex.
+
 ## 19/11/2026 sera · cognato (inseguimenti)
 - Fatto: da ricercato le volanti si sommano (quelle che bruci e i rinforzi da dietro) e ti fermano solo tagliandoti la
   strada: ti superano, ti si piazzano davanti, inchiodano fino a 50; sotto i 60 con una davanti ti prendono (multone,
@@ -218,6 +308,16 @@ due voci, e il controllo della sera le legge.
   bruci ti insegue; si semina solo entrando in un locale o negozio, e lì il ricercato torna a zero (`polizia.js`).
 - Aperto: l'inseguimento non ti prende più mai, quindi la multa da fuga oggi non arriva; dirlo se la si vuole indietro.
 - Serve dal proprietario: provarlo sul PC (inseguimento con sirena, posto di blocco bruciato).
+
+## 19/11/2026 sera · proprietario (storia: le proposte sono nel gioco)
+- Fatto: le tre scene di prova di `docs/storia/REVISIONE_DIALOGHI.md` sono nelle chat. Elena, la prima sera (`ELE_ritiro_*`: temperino, trapano,
+  bugia «domani la vendo», rinfaccio) e il litigio (`ELE_litigio_*`: ventisei ore di silenzio, niente scuse di manuale, riparazione più avanti col flag
+  `elena_litigio`). Rosa e Livia in vivavoce (`ROS_vivavoce_*`, dopo il passato di Rosa). Dario (nuovo, [P]): il vero rinfaccia il trasloco saltato,
+  la presenza lo imita più avanti (`ev_imitazione_dario`, Lisbona) e gli dà ragione subito: è il segno. Tutto da `materiale_chat/materiale4_01_*.txt`
+  con l'importatore (`chat_dati.js` rigenerato, 1004 nodi); 180 test, uno nuovo per ogni regola (scelte finte, litigio, Dario, vivavoce).
+- Ritirate: `V2_ELE_n3_01` (la foto promessa non esiste più nella nuova scena). Il flag `e08c` ora lo dà il «non mi va di spiegarlo» del litigio.
+- Aperto: riscrivere il resto di Elena (altri 30 nodi di cortesie), Rosa, Livia e la presenza con le stesse regole; le tre soste di Codex nei file
+  dedicati; le scene nel mondo (furgone di Rosa, banco pacchi, motel, piazzola). Serve dal cognato: approvare i fatti [P] (Dario, trapano, trasloco).
 
 ## 19/11/2026 pomeriggio · cognato (pubblicazione)
 - Fatto: `docs/pubblicazione/PERCORSO.md`, il percorso per farne un gioco da installare (Electron, niente riscritture),

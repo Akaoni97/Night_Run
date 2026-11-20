@@ -102,7 +102,7 @@ function jlFatto(g, scena, k, I) {
   P.jlPiazzale = function () {
     if (!this.placesBetween) return null;
     const d = this.s.dist;
-    return this.placesBetween(d + JL.piazzale[0], d + JL.piazzale[1]).find((p) => p.id === 'shop') || null;
+    return this.placesBetween(d + JL.piazzale[0], d + JL.piazzale[1]).find((p) => p.id === 'shop' || (p.twin && p.twin.id === 'shop')) || null;
   };
   const up = P.update;
   P.update = function (dt) {

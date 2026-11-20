@@ -100,7 +100,7 @@ class Street2D {
 
   sprite(w, h, draw, outline = true) {
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + 2;
-    const x = c.getContext('2d'); x.translate(1, 1); draw(x);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.translate(1, 1); draw(x);
     const im = x.getImageData(0, 0, c.width, c.height), d = im.data, W = c.width, H = c.height;
     for (let i = 3; i < d.length; i += 4) d[i] = d[i] < 110 ? 0 : 255;
     if (outline) {
@@ -179,7 +179,7 @@ class Street2D {
     const key = 'gens' + k + this.carId + (this.carKey || '') + (this.cosKey || '') + ((this.genImgs().ready) ? 1 : 0);
     if (this.spr[key]) return this.spr[key];
     const D = this.genDef(), b = this.genBase(), c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
     c.geo = { w: D.w, ax: D.ax }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
@@ -261,7 +261,7 @@ class Street2D {
     const C0 = this.cos || {}, L = Object.assign({}, this.v40Look || {}, { clean: (C0.dirt ?? 0.8) < 0.35, kit: C0.kit === 'kit', spoiler: C0.spoiler === 'roof' });
     const hex = this.v40Paint || '#2a4b57', key = 'v40b' + JSON.stringify(L) + (this.cosKey || '') + hex + (this.v40Ready ? 'img' : '');
     if (this.spr[key]) return this.spr[key];
-    const W = 200, H = 71, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    const W = 200, H = 71, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true });
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), ww, hh); };
     const sh = (k) => Street2D.shade(hex, k), ink = this.C.ink;
     if (this.v40Ready) {
@@ -345,7 +345,7 @@ class Street2D {
     const key = 'v40s' + k + (this.carKey || '') + (this.cosKey || '') + (this.v40Ready ? 'i' : '');
     if (this.spr[key]) return this.spr[key];
     const b = this.v40Base(), c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(71 * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
     c.geo = { w: 200, ax: [41, 156] }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
@@ -356,7 +356,7 @@ class Street2D {
     g.fillStyle = '#0b0c10'; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.fill();
     g.fillStyle = '#1c1e24'; g.beginPath(); g.arc(0, 0, R * 0.9, 0, Math.PI * 2); g.fill();
     if (style && style !== 'none') {
-      this.brake(g, 0, 0, k * (L.low ? 1.02 : 0.98), ang, rear); g.translate(0, 0);
+      this.brake(g, 0, 0, k * (L.low > 0 ? 1.02 : 0.98), ang, rear); g.translate(0, 0);
       g.save(); const blur = speed > 9; g.rotate(blur ? ang : Math.round(ang / (Math.PI / 20)) * (Math.PI / 20));
       const rc = (this.cos && this.cos.rims && this.cos.rims !== 'none') ? this.cos.rims : '#c9ced6';
       g.strokeStyle = rc; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); g.arc(0, 0, R * 0.7, 0, Math.PI * 2); g.stroke();
@@ -376,7 +376,7 @@ class Street2D {
   // carrozzeria ricolorata: i pixel rosso vernice prendono il colore scelto mantenendo luci e ombre
   supraBase(hex) {
     if (this.paintBase[hex]) return this.paintBase[hex];
-    const c = document.createElement('canvas'); c.width = 200; c.height = 58; const x = c.getContext('2d');
+    const c = document.createElement('canvas'); c.width = 200; c.height = 58; const x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(this.sImg, 0, 0);
     const cos = this.cos || {}, stripe = cos.stripe && cos.stripe !== 'none' ? parseInt(cos.stripe.slice(1), 16) : null;
     {
@@ -413,7 +413,7 @@ class Street2D {
     const key = 'img' + hex + k;
     if (this.spr[key]) return this.spr[key];
     const c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(58 * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(this.supraBase(hex), 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(this.supraBase(hex), 0, 0, c.width, c.height);
     c.geo = Street2D.GEO.supra; c.img = true; c.hd = this.supraBase(hex);
     return (this.spr[key] = c);
   }
@@ -568,7 +568,7 @@ class Street2D {
       this.spr[bk] = base;
     }
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
-    const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
+    const cx = c.getContext('2d', { willReadFrequently: true }); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
     c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
     return (this.spr[key] = c);
   }
@@ -852,7 +852,7 @@ class Street2D {
     const h = haze ? Math.round((70 + Math.floor(r(2) * 80)) * (0.6 + 0.4 * D.farH)) : far ? Math.round((46 + Math.floor(r(2) * 70)) * D.farH) : 64 + Math.floor(r(2) * 92);
     if (far && !haze && D.land && this.landmark && r(41) < D.landP) { t = this.landmark(D.land, r, D); this.tiles.set(key, t); return t; }   // punto di riferimento del quartiere
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + 26;
-    const x = c.getContext('2d'), top = 25;
+    const x = c.getContext('2d', { willReadFrequently: true }), top = 25;
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(xx, yy, ww, hh); };
     const meta = { w: w + 2, h: h + 26, signs: [], beacons: [], shop: null };
     if (haze) {
@@ -961,7 +961,7 @@ class Street2D {
     const dims = { house: [62, 50], konbini: [70, 50], office: [60, 128], shrine: [72, 62], park: [66, 40], warehouse: [68, 54], ramen: [56, 48], parking: [70, 74] }[kind];
     const w = dims[0] + Math.floor(r(1) * 6), h = dims[1] + Math.floor(r(2) * (kind === 'office' ? 30 : 10)), top = 30;
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + top + 1;
-    const x = c.getContext('2d'), gy = top + h;                              // gy: livello del marciapiede
+    const x = c.getContext('2d', { willReadFrequently: true }), gy = top + h;                              // gy: livello del marciapiede
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), ww, hh); };
     const meta = { w: w + 2, h: h + top + 1, signs: [], beacons: [], shop: null, glows: [] };
     const win = (xx, yy, ww, hh, lit, col) => { px(ink, xx - 1, yy - 1, ww + 2, hh + 2); px(lit ? col : '#0d1426', xx, yy, ww, hh); if (lit) px(Street2D.shade(col, 0.35), xx, yy, ww, 1); };
@@ -1330,7 +1330,12 @@ class Street2D {
     const shops = [];
     for (let i = i0; i < i1; i++) {
       const b = this.building(layer, i, this.districtAt ? this.districtAt((i * tileW - 260) / (30 * speed)) : undefined), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
-      if (x > this.LW || x + b.w < 0) continue;
+      if (x > this.LW || x + b.w < 0) {
+        // il palazzo che sta per entrare da destra si porta a densità doppia adesso, uno per fotogramma: quando compare
+        // è già pronto, e il lavoro non si ammucchia nel fotogramma in cui ne entrano due o tre insieme
+        if (x > this.LW && this.SS > 1 && !b.hd && this.tileHD && this._hdT !== t) { this._hdT = t; this.tileHD(b, layer); }
+        continue;
+      }
       if (this.SS > 1 && !b.hd && this.tileHD) this.tileHD(b, layer);
       g.drawImage(b.c, x, y, b.w, b.h);
       for (const s of b.signs) {
@@ -1697,12 +1702,16 @@ class Street2D {
     g.fillStyle = 'rgba(8,8,14,.7)'; g.fillRect(cx - tw / 2 - 8, 330, tw + 16, 18); this.text(g, title, cx - tw / 2, 334, I.col, 2);
   }
 
+  slowReset() { this.slow = false; this.tBad = 0; this.tAvg = undefined; try { localStorage.removeItem('nr_slow'); } catch (e) { /* ignora */ } }
+
   update(dt, s, game) {
     const st = this.st, g = this.g, W = this.LW, C = this.C;
     this.fitLo(); const SS = this.SS;
     // dispositivo lento: se il disegno a densità doppia resta sopra i 30 ms per tre secondi, si torna a quella semplice
     const tStart = performance.now();
-    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) this.slow = true; }
+    // la scelta si ricorda: se questo computer è andato a densità semplice, al prossimo avvio parte già così (si azzera scegliendo la qualità a mano)
+    if (this.slow === undefined) { try { this.slow = localStorage.getItem('nr_slow') === '1'; } catch (e) { this.slow = false; } if (this.slow) { this.fitLo(); } }
+    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) { this.slow = true; try { localStorage.setItem('nr_slow', '1'); } catch (e) { /* ignora */ } } }
     st.t += dt;
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
@@ -1712,6 +1721,7 @@ class Street2D {
     if (game && game.placesOn && !game.inside && Math.abs(s.v) < 6 && !this.camHold) {
       const p = game.placesBetween(dist - 12, dist + 40)[0];
       if (p) camT = Math.max(0.3, Math.min(0.5, 0.64 - (p.x - dist) * 30 / W));   // non sotto 0,3: l'auto resta fuori dal quadro strumenti
+      if (p && p.twin) camT = Math.max(0.16, Math.min(0.5, (W * 0.5 - (p.x - dist) * 30) / W));   // piazzetta (piazzetta.js): si punta al centro dei due negozi, che stanno ai due lati di p.x
     }
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
     if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)
@@ -1975,6 +1985,7 @@ class Street2D {
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
+      e._scr = { left, sy, w, y, k, h: spr.height };                              // dove è finito sullo schermo (il furgone del soccorso, soccorso.js)
       // altezza di fanali e fari: dai dati del disegno (tail/head) se ci sono, altrimenti il riferimento vecchio
       const tY = GG.tail ? Math.round((GG.tail[1] + GG.tail[3] / 2) * k) : T0 + Math.round(35 * k), hY = GG.head ? Math.round(GG.head[1] * k) : T0 + Math.round(36 * k);
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);

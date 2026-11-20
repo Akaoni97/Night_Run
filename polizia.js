@@ -22,12 +22,16 @@
 //  - ETILOMETRO: al bar si bevono alcolici (s.vg.alc, grammi per litro). Un bar su cinque ha la volante fuori: all'uscita
 //    ti fa soffiare. Da ubriaco niente effetti grafici: la testa ciondola (pilota2d.js) e il protagonista ci scherza su.
 // ============================================================================
+// «Disabilita polizia» (scheda Sviluppatori): la polizia c'è e si vede, ma non può fermarti, multarti né inseguirti; gli autovelox e il Tutor restano sulla strada senza fare niente.
+// Si ricorda nel browser (localStorage nr_polizia_off), non nel salvataggio. Nei test parte spenta.
+const POL_OFF_INIT = (() => { try { return typeof localStorage !== 'undefined' && localStorage.getItem('nr_polizia_off') === '1'; } catch (e) { return false; } })();
 const POL = {
   liberoP: 0.35, libero: [7, 12], gap: [2.5, 6],   // km fra un controllo e l'altro: a volte un tratto libero
-  tutorP: 0.35, tutorLen: [4, 9],                     // km di tratto col Tutor
+  tutorGap: [10, 15], tutorLen: [0.5, 1],             // Tutor: uno ogni 10-15 km (inizio con inizio), tratto lungo da 500 m a 1 km
   cartello: 500,                                      // m: cartello prima dell'autovelox o del Tutor
   verbale: [0, 0],                                    // km dopo i quali arriva il verbale: 0 = la multa arriva subito (vecchi salvataggi con verbali in attesa li pagano come prima)
   codaKm: [6, 14], codaP: 0.25, codaLen: [1.5, 3],    // pattuglia in coda: ogni quanto ci si prova, probabilità, km
+  off: POL_OFF_INIT,                                  // true = «Disabilita polizia» (sviluppatori): niente fermi, multe, inseguimenti, autovelox e Tutor che multano
   barOgni: 5,                                         // un bar su cinque ha l'etilometro
   alcLimite: 0.5, alcCala: 0.00035,                   // g/l: limite e quanto cala al secondo
   fuga: { ritardo: 2.6, acc: 3.2, vmax: 50, perso: 450, tempo: 75, multa: 1000, aVolante: 400,
@@ -142,6 +146,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   // ------------------------------------------------------------ fermo: velocità, documenti, alcol
   // e: la volante che ferma (o null: se ne crea una dietro), why: 'speed' | 'docs' | 'alcol' | 'fuga', data: { kmh, sf, gl }
   P.polStop = function (e, why, data = {}) {
+    if (POL.off) return false;                          // polizia disabilitata: non ti ferma
     if (this.pol && this.pol.stop) return false;
     if (st(this).fuga && why !== 'fuga') return false;   // da ricercato non ti fanno più accostare: ti inseguono
     this.pol = this.pol || {};
@@ -352,14 +357,22 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   };
   const sim0 = (g) => Math.max(0, g.sim.v * 0.6);
 
-  // ------------------------------------------------------------ autovelox e Tutor: pochi, a volte niente per 7-12 km
+  // ------------------------------------------------------------ autovelox (pochi, a volte niente per 7-12 km) e Tutor (uno ogni 10-15 km, lungo 0,5-1 km)
   P.polPlan = function () {
     const S = st(this), km = this.s.dist / 1000;
+    if (S.nextKm >= 1e8) return;                 // pianificazione spenta (prove)
     if (S.nextKm === null || S.nextKm === undefined) S.nextKm = km + between(this, POL.gap);
+    if (S.nextTutor === null || S.nextTutor === undefined) S.nextTutor = km + between(this, POL.tutorGap);
+    const sopra = (x) => S.ctl.some((c) => c.k === 'tutor' && x > c.x - 700 && x < c.x2 + 700);        // niente autovelox dentro o accanto a un Tutor
+    while (S.nextTutor < km + 3.2) {
+      const x = S.nextTutor * 1000, x2 = x + between(this, POL.tutorLen) * 1000;
+      S.ctl = S.ctl.filter((c) => c.k === 'tutor' || c.ents || !(c.x > x - 700 && c.x < x2 + 700));    // l'autovelox già pianificato lì vicino salta (se non è già comparso)
+      S.ctl.push({ k: 'tutor', x, x2 });
+      S.nextTutor += between(this, POL.tutorGap);
+    }
     while (S.nextKm < km + 3.2) {
-      const x = S.nextKm * 1000, tutor = R(this) < POL.tutorP;
-      if (tutor) { const len = between(this, POL.tutorLen) * 1000; S.ctl.push({ k: 'tutor', x, x2: x + len }); S.nextKm += len / 1000; }
-      else S.ctl.push({ k: 'velox', x });
+      const x = S.nextKm * 1000;
+      if (!sopra(x)) S.ctl.push({ k: 'velox', x });
       S.nextKm += R(this) < POL.liberoP ? between(this, POL.libero) : between(this, POL.gap);
     }
     S.ctl = S.ctl.filter((c) => (c.x2 || c.x) > this.s.dist - 400);
@@ -407,19 +420,20 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
         this.ents.push({ id: this.id++, kind: c.k === 'tutor' ? 'tutor' : 'velox', lane: 0, x: c.x, v: 0, ctl: c, keep: true });
       }
       if (c.k === 'tutor' && c.ents && !c.ents2 && c.x2 - d < 1300) { c.ents2 = true; this.ents.push({ id: this.id++, kind: 'tutor', lane: 0, x: c.x2, v: 0, end: true, ctl: c, keep: true }); }
-      if (d0 < c.x && d >= c.x) {
+      if (d0 < c.x && d >= c.x && !POL.off) {
         if (c.k === 'velox') {
           const sf = speedFine(kmh), cam = this.ents.find((o) => o.ctl === c && o.kind === 'velox');
           if (sf) { if (cam) cam.flashT = 0.35; this.fx.push({ k: 'velox' }); this.polVerbale(sf, Math.round(kmh), 'autovelox'); }
         } else { c.t0 = this.polT; this.say(`Inizio Tutor: ${fmt((c.x2 - c.x) / 1000)} km di velocità media controllata`, 'info'); }
       }
-      if (c.k === 'tutor' && c.t0 !== undefined && d0 < c.x2 && d >= c.x2) {
+      if (c.k === 'tutor' && c.t0 !== undefined && d0 < c.x2 && d >= c.x2 && !POL.off) {
         const avg = (c.x2 - c.x) / Math.max(1, this.polT - c.t0) * 3.6, sf = speedFine(avg); c.t0 = undefined;
         this.say(`Fine Tutor: media ${Math.round(avg)} km/h`, sf ? 'police' : 'info');
         if (sf) { const cam = this.ents.find((o) => o.ctl === c && o.kind === 'tutor' && o.end); if (cam) cam.flashT = 0.35; this.polVerbale(sf, Math.round(avg), 'Tutor (media)'); }
       }
     }
-    // verbali: arrivano qualche km dopo, sul telefono
+    // verbali: arrivano qualche km dopo, sul telefono (con la polizia disabilitata quelli in arrivo si cancellano)
+    if (POL.off) S.verb = [];
     for (const V of S.verb) if (!V.done && d >= V.due) {
       V.done = true; this.s.money -= V.fine; this.s.fines = (this.s.fines || 0) + V.fine;
       const txt = `${V.what === 'autovelox' ? 'Flash! ' : ''}Verbale: ${V.what}, ${V.kmh} km/h (limite ${GAME_SPEED_LIMIT}). Addebitati € ${fmt(V.fine)}.`;
@@ -513,7 +527,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   // e = la volante del posto di controllo, docs = questa volta guardano anche i documenti (a caso, DOC.controllo). La velocità la
   // vedono sempre. Niente accostare, niente scuse, niente inseguimento: da ricercato nemmeno multano, ti inseguono (update).
   P.polCheck = function (e, docs) {
-    if (st(this).fuga || (e && e.block) || this.prompt) return false;
+    if (POL.off || st(this).fuga || (e && e.block) || this.prompt) return false;
     const kmh = this.kmh, sf = speedFine(kmh), heat = this.s.heat || 0, sc = docs && typeof this.docScaduti === 'function' && typeof DOC !== 'undefined' ? this.docScaduti() : [];
     let tot = 0; const voci = [];
     if (sf) { const f = Math.round(sf.fine * (1 + heat * 0.3) / 10) * 10; tot += f; voci.push(`velocità ${Math.round(kmh)} km/h, limite ${GAME_SPEED_LIMIT}: € ${fmt(f)}`); }
@@ -530,6 +544,19 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   P.busted = function (e) { const sf = speedFine(this.kmh) || { over: 1, fine: 42 }; this.polStop(e, 'speed', { kmh: this.kmh, sf }); };
   P.payFine = function () { if (this.pol && this.pol.stop) this.polPay(this.pol.stop); };
 
+  // «Disabilita polizia»: accende o spegne l'interruttore (si ricorda nel browser) e toglie subito ricercato, inseguimenti, fermo in corso e verbali
+  P.polOffSet = function (v) {
+    POL.off = !!v;
+    try { if (typeof localStorage !== 'undefined') { if (POL.off) localStorage.setItem('nr_polizia_off', '1'); else localStorage.removeItem('nr_polizia_off'); } } catch (e) { /* ignora */ }
+    if (POL.off) this.polSpegni();
+    return POL.off;
+  };
+  P.polSpegni = function () {
+    const S = st(this); this.pol = this.pol || {};
+    if (S.fuga || (this.pol.cs && this.pol.cs.length)) { this.sirenK = 0; for (const C of chs(this)) { const i = this.ents.indexOf(C.e); if (i >= 0) this.ents.splice(i, 1); } this.pol.cs = []; sync(this); S.fuga = false; this.siren = 0; this.pol.presa = 0; this.pol.fermo = 0; this.pol.ch = null; }
+    this.pol.block = null; this.pol.tail = null; S.verb = [];
+    if (this.s.heat) this.s.heat = 0;
+  };
   const up = P.update;
   P.update = function (dt) {
     const d0 = this.s.dist;
@@ -540,6 +567,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     { const T = this.pol.stop; if (T && T.ahead) { T.e.x = this.s.dist + T.ahead; T.e.v = this.sim.v; T.e.lane = this.lane; T.e._z = undefined; } }   // la volante che ti ha preso resta davanti finché accosti
     if (this.s.vg) this.polAlc(dt);
     this.polPlan(); this.polCams(dt, d0);
+    if (POL.off) { this.polSpegni(); return; }   // polizia disabilitata: niente ricercato, volanti che inseguono, coda, etilometro del bar
     const S = st(this);
     if (S.fuga) {                                // ricercato: le stelle non scendono finché non entri in un locale
       this.s.heat = Math.max(3, this.s.heat || 0);

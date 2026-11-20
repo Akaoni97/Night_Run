@@ -210,11 +210,12 @@ test('officina: si compra solo con i soldi sufficienti', () => {
   const { game } = career();
   assert.equal(game.owns('turbo', 't51r'), false);
   assert.equal(game.buy('turbo', 't51r').ok, false, 'costa 6000, ne hai 3000');
-  assert.equal(game.buy('bov', 'ssqv').ok, false, 'a 0 km il pezzo è ancora bloccato');
-  game.s.cars[game.car] = Object.assign(game.s.cars[game.car] || {}, { km: game.partKm('bov', 'ssqv') });
-  assert.equal(game.buy('bov', 'ssqv').ok, true);
-  assert.equal(game.s.money, 3000 - 380);
-  assert.ok(game.owns('bov', 'ssqv'));
+  assert.equal(game.partKm('bov', 'ssqv'), 0, 'i livelli 1 e 2 sono già sbloccati: niente chilometri');
+  assert.equal(game.buy('limiter', '2step').ok, false, 'dal livello 3 serve ancora la strada: a 0 km è bloccato');
+  game.s.cars[game.car] = Object.assign(game.s.cars[game.car] || {}, { km: game.partKm('limiter', '2step') });
+  assert.equal(game.buy('limiter', '2step').ok, true);
+  assert.equal(game.s.money, 3000 - 850);
+  assert.ok(game.owns('limiter', '2step'));
 });
 
 test('gomme da drag: più aderenza e tempo stimato migliore', () => {

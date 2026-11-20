@@ -517,7 +517,11 @@ class StreetGame {
   nextPerk() { return GAME_KM_PERKS.find((p) => !this.hasPerk(p.id)) || null; }
   // ogni pezzo chiede anche un po' di strada: più costa, più chilometri servono per sbloccarlo
   // ogni pezzo chiede anche un po' di strada (km del pezzo, oppure: più costa, più chilometri)
-  partKm(cat, id) { const it = tuningItem(cat, id); if (!it || !it.price) return 0; return it.km ?? Math.max(5, Math.round(it.price / 150 / 5) * 5); }
+  partKm(cat, id) {                                          // i livelli 1 e 2 sono sempre sbloccati: i chilometri servono solo dal 3 in su
+    const it = tuningItem(cat, id); if (!it || !it.price) return 0;
+    const c = TUNING[cat], lv = c ? c.items.findIndex((x) => x.id === id) : -1; if (lv >= 0 && lv <= 2) return 0;
+    return it.km ?? Math.max(5, Math.round(it.price / 150 / 5) * 5);
+  }
   partLocked(cat, id) { return this.mode === 'career' && !this.owns(cat, id) && this.odo < this.partKm(cat, id); }
   owns(cat, id) { return this.mode === 'free' || !TUNING[cat] || TUNING[cat].items[0].id === id || tuningItem(cat, id).price === 0 || !!this.s.owned[this.ownKey(cat + ':' + id)]; }
   price(cat, id) { return this.owns(cat, id) ? 0 : Math.round(tuningItem(cat, id).price * this.disc() / 10) * 10; }
@@ -756,11 +760,12 @@ class StreetGame {
     if (this.mode === 'career' && sim.running && !this.ap && d > this.nextSpawn) {
       this.spawn(); this.nextSpawn = d + 220 + this.rnd() * 380;
     }
-    if (this.mode === 'career' && sim.dry && Math.abs(sim.v) < 0.5 && !this.prompt && !this.ap) {
+    if (!sim.dry) this.dryDeclined = false;
+    if (this.mode === 'career' && sim.dry && Math.abs(sim.v) < 0.5 && !this.prompt && !this.ap && !this.dryDeclined) {
       this.ask({
         kind: 'fuel', title: 'A secco', time: 30,
         text: 'Il serbatoio è vuoto. Il carro attrezzi ti porta 10 litri per € 120.',
-        options: [{ label: 'Chiama il soccorso', act: () => { this.s.money -= 120; sim.fuel = Math.min(1, sim.fuel + 10 / sim.P.tank); sim.dry = false; this.say('10 litri nel serbatoio. Riavvia il motore.', 'fuel'); } }],
+        options: [{ label: 'Chiama il furgone (app Soccorso)', act: () => { this.dryDeclined = true; if (typeof window !== 'undefined' && window.telefono && window.telefono.show) window.telefono.show('soc'); } }, { label: 'Solo 10 litri (€ 120)', act: () => { this.dryDeclined = false; this.s.money -= 120; sim.fuel = Math.min(1, sim.fuel + 10 / sim.P.tank); sim.dry = false; this.say('10 litri nel serbatoio. Riavvia il motore.', 'fuel'); } }],
         onTimeout: () => {},
       });
     }
@@ -882,7 +887,7 @@ class StreetGame {
     if (this.shockT > 0) this.shockT -= dt;
     for (const e of this.ents) {
       if (e.hazT > 0) e.hazT -= dt;
-      if (!moving(e)) continue;
+      if (!moving(e) || e.soc) continue;                               // il furgone del soccorso (soccorso.js) non urta nessuno
       if ((e.hitT || 0) > 0) { e.hitT -= dt; continue; }
       const rel = e.x - d, half = ((e.len || 4.6) + 4.4) / 2, dz = Math.abs(this.laneZ - (e._gz ?? GAME_LANE_Z[e.lane]));
       if (Math.abs(rel) > half) continue;

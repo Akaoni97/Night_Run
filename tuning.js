@@ -5,6 +5,65 @@
 // ============================================================================
 // Ogni auto ha il suo catalogo con la stessa forma (categorie → tendine, pezzi con prezzo e chilometri).
 // TUNING e TUNING_PRESETS puntano sempre al catalogo dell'auto in uso (vedi setActiveCar in cars.js).
+// ---------------------------------------------------------------------------------------------------
+//  Assetto a livelli (uguale per tutte le auto). Livello 0 = originale, nessuna regolazione. Più sale il livello,
+//  più il pezzo parte basso e rigido, e più si può regolare: altezza (mm rispetto all'originale, negativo = più
+//  bassa) e rigidità delle molle (moltiplicatore, 1 = originale). La regolazione sta in S.adj[auto] = { h, k }
+//  ed è gratis; cambiando pezzo si riparte dai valori di fabbrica del livello.
+// ---------------------------------------------------------------------------------------------------
+const SUSP_LV = [
+  { lv: 0, h0: 0, h: [0, 0], k0: 1, k: [1, 1] },
+  { lv: 1, h0: -25, h: [-35, 10], k0: 1.2, k: [0.9, 1.4] },
+  { lv: 2, h0: -35, h: [-55, 20], k0: 1.5, k: [0.8, 1.8] },
+  { lv: 3, h0: -45, h: [-75, 35], k0: 1.9, k: [0.7, 2.4] },
+  { lv: 4, h0: -55, h: [-100, 50], k0: 2.4, k: [0.6, 3.2] },
+  { lv: 5, h0: -65, h: [-120, 90], k0: 3.0, k: [0.5, 4.2] },
+];
+const SUSP_NOTE = [
+  null,
+  'Molle più corte: un po\' più bassa e un po\' più ferma. Regolazione minima, qualche millimetro e un filo di rigidità.',
+  'Molle e ammortizzatori sportivi: più bassa e più ferma. Regoli altezza e rigidità di poco.',
+  'Coilover regolabili: scegli tu quanto abbassarla e quanto irrigidirla, senza esagerare.',
+  'Coilover da pista a doppia regolazione: parte bassa e dura, ma puoi anche rialzarla o ammorbidirla. Sugli urti inizia a toccare.',
+  'Assetto da competizione a tre vie: da radente a rally, da mollissima a durissima. Bassissima tocca per terra sugli urti.',
+];
+const SUSP_NAME = ['Originale', 'Molle sportive', 'Molle e ammortizzatori sportivi', 'Coilover regolabili', 'Coilover da pista', 'Assetto da competizione'];
+const SUSP_BRAND = [null, 'Eibach', 'Bilstein', 'KW', 'Öhlins', 'Su misura'];
+const SUSP_PRICE = [0, 600, 1000, 1600, 2800, 4500], SUSP_KM = [0, 5, 10, 18, 28, 42];
+const suspClamp = (v, a, b) => Math.max(a, Math.min(b, v));
+// costruisce la categoria "Assetto": o = { make, ids[6], note0, pitch, fwd, price(fn), km(fn), brand[], name[] }
+function suspCat(o) {
+  const pr = o.price || ((n) => n), km = o.km || ((n) => n);
+  return { label: 'Assetto', items: SUSP_LV.map((L) => {
+    const it = { id: o.ids[L.lv], price: pr(SUSP_PRICE[L.lv]), km: km(SUSP_KM[L.lv]), brand: L.lv ? ((o.brand || {})[L.lv] || SUSP_BRAND[L.lv]) : o.make,
+      name: L.lv ? ((o.name || {})[L.lv] || SUSP_NAME[L.lv]) : 'Originale', note: L.lv ? SUSP_NOTE[L.lv] : o.note0,
+      susp: { lv: L.lv, pitch: o.pitch || 1, fwd: !!o.fwd } };
+    const r = suspResolve(it, null); it.sim = { susp: r.susp }; it.look = { low: r.low };
+    return it;
+  }) };
+}
+// valori correnti (h, k) di un pezzo con la regolazione dell'auto, sempre dentro i limiti del livello
+function suspState(item, adj) {
+  const sp = item && item.susp, L = SUSP_LV[sp ? sp.lv : 0];
+  const h = suspClamp(adj && Number.isFinite(adj.h) ? adj.h : L.h0, L.h[0], L.h[1]);
+  const k = suspClamp(adj && Number.isFinite(adj.k) ? adj.k : L.k0, L.k[0], L.k[1]);
+  return { lv: L.lv, adjustable: L.h[0] !== L.h[1], h: Math.round(h / 5) * 5, k: Math.round(k * 10) / 10, hMin: L.h[0], hMax: L.h[1], kMin: L.k[0], kMax: L.k[1], h0: L.h0, k0: L.k0 };
+}
+// dalla regolazione alla fisica: beccheggio, presa, partenza, baricentro, aria, sensibilità alle buche e ai fondi bassi
+function suspResolve(item, adj) {
+  const sp = item && item.susp;
+  if (!sp) return { susp: (item && item.sim && item.sim.susp) || { pitch: 1, grip: 1, launch: 1 }, low: ((item && item.look) || {}).low || 0, st: null };
+  const st = suspState(item, adj), h = st.h, k = st.k;
+  const lowN = suspClamp(-h / 90, -1, 1);                                   // 1 = molto bassa, −1 = molto alta
+  const grip = Math.min(1.07, 1 + 0.05 * lowN + (k >= 1 ? 0.03 * Math.min(k - 1, 1.5) / 1.5 : -0.04 * (1 - k)));
+  const launch = sp.fwd ? suspClamp(1 + 0.04 * (k - 1), 0.96, 1.05) : suspClamp(1 + 0.06 * (1 - k), 0.95, 1.07);
+  const rough = suspClamp(Math.max(0, k - 1) * 0.22 + Math.max(0, -h - 40) / 120 * 0.5 - Math.max(0, h) / 200, 0, 1);
+  return {
+    susp: { pitch: sp.pitch * Math.pow(k, -0.85), grip, launch, dcg: 0.65 * h / 1000, cdK: 1 + (h < 0 ? 0.0006 : 0.0009) * h, rough, scrapeK: suspClamp((-h - 70) / 50, 0, 1), h, k },
+    low: suspClamp(-h / 13, -7, 9) || 0, st,
+  };
+}
+
 const TUNING_SUPRA = {
   exhaust: {
     label: 'Scarico (catback)',
@@ -118,14 +177,9 @@ const TUNING_SUPRA = {
       { id: 'hks', price: 1300, brand: 'HKS', name: 'R-type frontale maggiorato', note: 'Massa radiante tripla: l\'aria resta fresca anche a 2 bar, la potenza non cala più tirando le marce. Un filo di ritardo in più del turbo.', sim: { ic: { heat: 0.35, lag: 1.06 } } },
     ],
   },
-  suspension: {
-    label: 'Assetto',
-    items: [
-      { id: 'oem', price: 0, brand: 'Toyota', name: 'Originale', note: 'Comodo: in partenza la coda si siede e il muso si alza molto, in frenata si tuffa.', sim: { susp: { pitch: 1, grip: 1, launch: 1 } }, look: { low: 0 } },
-      { id: 'tein', price: 1600, brand: 'Tein', name: 'Flex Z regolabile', note: 'Coilover da strada, 30 mm più bassa: la cassa si muove la metà, più precisa in ingresso. Un filo meno di trazione in partenza (il posteriore non si "siede").', sim: { susp: { pitch: 0.55, grip: 1.03, launch: 0.98 } }, look: { low: 2 } },
-      { id: 'drag', price: 1400, brand: 'Su misura', name: 'Assetto da drag', note: 'Posteriore morbido ed estensione libera davanti: in partenza il peso va tutto sulle ruote dietro (+6 % di trazione al via). In curva è goffa.', sim: { susp: { pitch: 1.35, grip: 0.97, launch: 1.06 } }, look: { low: 0 } },
-    ],
-  },
+  suspension: suspCat({ make: 'Toyota', ids: ['oem', 'springs', 'dampers', 'tein', 'race', 'pro'], pitch: 1,
+    note0: 'Comodo: in partenza la coda si siede e il muso si alza molto, in frenata si tuffa. Nessuna regolazione.',
+    brand: { 3: 'Tein', 4: 'Öhlins' }, name: { 3: 'Flex Z regolabile', 4: 'Road & Track' } }),
   weight: {
     label: 'Alleggerimento',
     items: [
@@ -149,7 +203,7 @@ const SUPRA_PRESETS = [
   { id: 'stock', name: 'Originale', sel: { exhaust: 'oem', cat: 'oem', turbo: 'ct12b', bov: 'oem', wastegate: 'int', intake: 'oem', cams: 'oem', ecu: 'oem', clutch: 'oem', tires: 'oem', final: 'oem', gearbox: 'oem', intercooler: 'oem', suspension: 'oem', weight: 'oem' } },
   { id: 'street', name: 'Street biturbo', sel: { exhaust: 'hks', cat: 'sport', turbo: 'ct12b', bov: 'ssqv', wastegate: 'int', intake: 'pf', cams: 'oem', ecu: 'link', clutch: 'oem', tires: 'r888r', final: 'oem', gearbox: 'oem', intercooler: 'oem', suspension: 'tein', weight: 's1' } },
   { id: 'single', name: 'Big single', sel: { exhaust: 'tomei', cat: 'sport', turbo: 'pte6466', bov: 'raceport', wastegate: 'tial', intake: 'pf', cams: 'hks264', ecu: 'haltech', clutch: 'osgiken', tires: 'etstreet', final: 'f3769', gearbox: 'close', intercooler: 'hks', suspension: 'tein', weight: 's2' } },
-  { id: 'drag', name: 'Drag anni 90', sel: { exhaust: 'straight', cat: 'decat', turbo: 't51r', bov: 'none', wastegate: 'tial', intake: 'pf', cams: 'hks272', ecu: 'haltech', clutch: 'osgiken', tires: 'etstreet', final: 'osg4083', gearbox: 'close', intercooler: 'hks', suspension: 'drag', weight: 's3' } },
+  { id: 'drag', name: 'Drag anni 90', adj: { h: -20, k: 0.8 }, sel: { exhaust: 'straight', cat: 'decat', turbo: 't51r', bov: 'none', wastegate: 'tial', intake: 'pf', cams: 'hks272', ecu: 'haltech', clutch: 'osgiken', tires: 'etstreet', final: 'osg4083', gearbox: 'close', intercooler: 'hks', suspension: 'race', weight: 's3' } },
 ];
 let TUNING_PRESETS = SUPRA_PRESETS;
 
@@ -187,27 +241,27 @@ function applyLimiter(out, item, ecuSim) {
 }
 
 // parametri dell'auto in uso (le altre auto registrano la loro funzione in cars.js)
-function tuningParams(sel) {
+function tuningParams(sel, adj) {
   const car = typeof ACTIVE_CAR !== 'undefined' ? ACTIVE_CAR : 'supra';
   const fn = typeof CARS !== 'undefined' && CARS[car] && CARS[car].params;
-  return fn ? fn(sel) : supraParams(sel);
+  return fn ? fn(sel, adj) : supraParams(sel, adj);
 }
 // trasforma la selezione in parametri per la fisica e per il DSP (Supra)
-function supraParams(sel) {
+function supraParams(sel, adj) {
   const g = (k) => tuningItemOf(TUNING_SUPRA, k, sel[k]);
-  return applyLimiter(supraParamsBase(sel, g), g('limiter'), g('ecu').sim);
+  return applyLimiter(supraParamsBase(sel, g, adj), g('limiter'), g('ecu').sim);
 }
-function supraParamsBase(sel, g) {
+function supraParamsBase(sel, g, adj) {
   const tb = g('turbo'), ecu = g('ecu'), cams = g('cams'), cl = g('clutch');
   // con una centralina programmabile i turbo di serie reggono circa 1 bar
   const turbo = tb.sim.twin && ecu.id !== 'oem' ? Object.assign({}, tb.sim, { max: 1.0 }) : tb.sim;
-  const pw = g('exhaust').pw * g('cat').pw * g('intake').pw;
+  const pw = g('exhaust').pw * g('cat').pw * g('intake').pw, su = suspResolve(g('suspension'), adj);
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.launch, ecuPops: ecu.sim.pops,
       idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: cl.sim.Ie,
-      mu: g('tires').sim.mu * g('suspension').sim.susp.grip, tyre: g('tires').sim.tyre,
-      ic: g('intercooler').sim.ic, susp: g('suspension').sim.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: g('gearbox').sim.gears,
+      mu: g('tires').sim.mu * su.susp.grip, tyre: g('tires').sim.tyre,
+      ic: g('intercooler').sim.ic, susp: su.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: g('gearbox').sim.gears,
       valve: g('bov').dsp.v === 2 ? 'flutter' : g('bov').dsp.v === 1 ? 'bov' : 'recirc',
     },
     dsp: {
@@ -215,6 +269,6 @@ function supraParamsBase(sel, g) {
       scream: tb.sim.twin ? 0 : g('wastegate').dsp.scream, intake: g('intake').dsp, lope: cams.dsp.lope,
       rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: g('weight').sim.cabin,
     },
-    look: { low: (g('suspension').look || {}).low || 0, susp: g('suspension').sim.susp.pitch },
+    look: { low: su.low, susp: su.susp.pitch },
   };
 }

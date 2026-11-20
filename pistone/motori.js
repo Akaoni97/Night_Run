@@ -16,7 +16,7 @@
 // ============================================================================
 // [PISTONE] interruttore del progetto in prova: spento (scheda Sviluppatori, o localStorage nr_pistone = '0') il Pistone
 // non compare tra le tappe e i motori costruiti non si montano sulle auto (restano salvati: riaccendendolo tornano)
-const PISTONE = { on: (() => { try { return typeof localStorage === 'undefined' || localStorage.getItem('nr_pistone') !== '0'; } catch (e) { return true; } })() };
+const PISTONE = { on: (() => { try { return typeof localStorage === 'undefined' || localStorage.getItem('nr_pistone') === '1'; } catch (e) { return true; } })() };   // nel browser spento di serie (21/11: officina semplice, officina.js); acceso solo dalla scheda Sviluppatori
 const MOT = {
   lavoro: 450,          // montare o smontare un motore su un'auto (manodopera)
   revisione: 0.35,      // rifare un motore rotto al Pistone: frazione del prezzo dei pezzi (non è la revisione di Mario)

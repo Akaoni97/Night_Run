@@ -126,6 +126,10 @@
 :root:not(.classico) #hudGoal b { color: #c8ff6a; }
 :root:not(.classico) #hudGoal span { font-size: 13px; }
 :root:not(.classico) #hudGoal em { font: 500 11.5px/1.25 var(--p-f-data); color: #ffd36a; }
+:root:not(.classico) #hudNext { --pi: var(--pi-info); --tc: #7fd3ff; display: grid; gap: 2px; background: linear-gradient(90deg, rgba(127, 211, 255, .1), rgba(127, 211, 255, .02)); }
+:root:not(.classico) #hudNext b { color: #9fe0ff; }
+:root:not(.classico) #hudNext span { font-size: 12.5px; }
+:root:not(.classico) #hudNext em { font: 500 11.5px/1.25 var(--p-f-data); color: #ffd36a; }
 :root:not(.classico) #hudVg { display: grid; gap: 6px; padding: 8px 9px 7px; }
 :root:not(.classico) #hudVg::before { content: none; }
 /* i bisogni: icona disegnata (al posto delle emoji) e barra che va dal rosso al verde */
@@ -140,6 +144,8 @@
 :root:not(.classico) #vgWater { --pi: var(--pi-drop); }
 :root:not(.classico) #vgSleep { --pi: var(--pi-moon); }
 :root:not(.classico) #vgWash { --pi: var(--pi-bubbles); }
+:root:not(.classico) #vgPee { --pi: var(--pi-toilet); }
+:root:not(.classico) #vgPoo { --pi: var(--pi-poo); }
 :root:not(.classico) .vgbars i.low { --nc: #ff6b5e; background: rgba(255, 70, 60, .14); box-shadow: inset 0 0 0 1px rgba(255, 90, 80, .45); }
 :root:not(.classico) #vgInfo { display: block; font: 500 11.5px/1.25 var(--p-f-ui); letter-spacing: .04em; color: var(--p-muted); }
 :root:not(.classico) #vgInfo::before { content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -2px; background: currentColor; -webkit-mask: var(--pi-weight) center / contain no-repeat; mask: var(--pi-weight) center / contain no-repeat; }

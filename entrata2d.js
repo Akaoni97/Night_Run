@@ -80,7 +80,7 @@
   // le strisce del posto auto davanti a ogni locale (sopra la facciata, sotto l'auto)
   P.entStall = function (g, e, x) {
     const Pp = typeof GAME_POSTI !== 'undefined' && GAME_POSTI[e.id];
-    if (!Pp || e.id === 'fuel' || !this.laneY) return;
+    if (!Pp || e.id === 'fuel' || !this.laneY || e.twin) return;   // la piazzetta (piazzetta.js) disegna le strisce di ognuno dei suoi due negozi
     const yb = 231, yt = 214, n = 1 - (this.day || 0) * 0.4;                    // sul marciapiede lontano (y 216-232), sotto le ruote
     g.fillStyle = `rgba(226,228,236,${0.5 * n})`;
     for (const s of [-1, 1]) { const x0 = Math.round(x + ((Pp.park ?? 0) + s * 2.55) * 30); for (let yy = yt; yy <= yb; yy++) g.fillRect(x0 + Math.round((yb - yy) * 0.6), yy, 2, 1); }
