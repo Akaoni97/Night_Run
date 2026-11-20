@@ -36,7 +36,7 @@ if (typeof VG_PLACE !== 'undefined') {
   P.jkStock = function (n) {
     const T = CARS[this.car] && CARS[this.car].tuning; if (!T) return [];
     const pre = this.car === 'supra' ? '' : this.car + '|', cand = [];
-    for (const cat in T) for (const it of T[cat].items || []) if (it.price > 0 && !this.s.owned[pre + cat + ':' + it.id]) cand.push({ cat, it });
+    for (const cat in T) if (!(typeof tuningNascosto === 'function' && tuningNascosto(this.car, cat))) for (const it of T[cat].items || []) if (it.price > 0 && !this.s.owned[pre + cat + ':' + it.id]) cand.push({ cat, it });   // [PISTONE] i pezzi motore della V40 li fa Nico
     if (!cand.length) return [];
     const h = (k) => VG.hash(n * 17 + k * 3.7 + carHash(this.car) * 0.13), out = [];
     for (let k = 0; out.length < Math.min(4, cand.length) && k < 30; k++) { const c = cand[Math.floor(h(k) * cand.length)]; if (!out.includes(c)) out.push(c); }

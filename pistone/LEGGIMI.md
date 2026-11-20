@@ -46,6 +46,7 @@ si estende alle altre auto. L'interruttore resta (scheda Sviluppatori): spento, 
   - `sim.js`: bilancio di calore (`tune.cool`), protezione (`hotK`), pressione dell'olio (`tune.oilRpm`) — senza un
     motore del Pistone non fanno niente;
   - `sviluppatori.js`: il riquadro del Pistone;
+  - `valigette.js`, `sfascio.js`: niente pezzi motore di Luca della V40 tra i premi e i pezzi usati;
   - `test/motori-costruiti.test.js`.
 - **Toglierlo del tutto**: cancellare la cartella `pistone/` e il test, togliere le righe `[PISTONE]` (in `sim.js` i
   tre punti tornano come prima togliendo il blocco `cool` e i due fattori), le righe di `pistone/` in `AGENTS.md`
