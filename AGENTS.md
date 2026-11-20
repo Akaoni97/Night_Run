@@ -154,6 +154,8 @@ TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
    `Per: cognato` (chi ha chiesto il lavoro), prima delle righe Co-Authored-By: così il controllo della sera sa chi ha
    fatto cosa. Su GitHub i test girano da soli a ogni caricamento (`.github/workflows/test.yml`): se arriva l'email
    di test falliti, si sistema prima di tutto il resto.
+   **Versione**: ogni intervento (ogni sessione con Claude o altri, o pacchetto di modifiche) alza la versione di un passo in `VERSIONI.md`
+   (v0.53 → v0.54…): la riga nell'elenco, la versione nel titolo della voce di `DIARIO.md` e nel messaggio di commit. Prima di chiudere, non dopo.
 2. Commenti, testi del gioco e messaggi di commit in italiano, nello stile del codice esistente.
 3. Nel repository niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini): l'utente li carica
    in locale nel browser (IndexedDB). Niente copie di grafica, nomi o personaggi di giochi esistenti.
