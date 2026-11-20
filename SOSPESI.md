@@ -7,6 +7,11 @@ Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
 Aggiornata il 20/11/2026 notte (briefing col proprietario e il cognato).
 
 ## Da decidere insieme
+- [grafica] **Pedoni in alta definizione**: dopo marciapiede, lampioni e auto nitide (`nitido2d.js`), gli omini del marciapiede
+  (`districtPeople` in `quartieri2d.js`) sono la cosa più a blocchi della strada. Si possono disegnare come il protagonista
+  (`pgStanding`) con aspetti a caso per quartiere (cappucci, caschi, gilet, completi da rifare). Lo facciamo? (proprietario)
+- [grafica] **Dispositivi lenti**: se il disegno resta sopra i 30 ms per tre secondi il gioco torna alla densità semplice e tutta la
+  grafica nitida si spegne (`slow` in `street2d.js`). Se sul PC sembra «sgranato» come prima, è questo: si guarda insieme. (tutti e due)
 - [economia] **Prova dei primi 200 km** (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco,
   € 28.000 guadagnati (70 % dalle missioni, 29 consegne da ~€ 200), € 16.700 in tasca al km 200. Una Panda nuova
   verso il km 180, la Supra (€ 65.000) non prima del km ~450. Benzina (€ 156), cibo (€ 80) e motel (€ 180) non pesano

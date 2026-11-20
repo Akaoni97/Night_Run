@@ -4,6 +4,16 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**grafica più nitida e dettagliata; ruote della trazione anteriore**)
+- Fatto (`nitido2d.js` nuovo, agganci piccoli in `street2d.js`): ingrandimento sullo schermo a pixel tutti uguali (prima su un 1080p
+  erano larghi 1 o 2 pixel a caso), carrozzerie e ruote dai disegni passate per Scale2x (curve e diagonali senza scalini, ruote che girano
+  lisce), contorno e luci dell'auto alla densità vera, bagliore più netto, scia della velocità più leggera e nitida. Più dettagli:
+  marciapiede a lastre con fughe, crepe e cordolo di pietra, cordolo vicino, lampioni nuovi (palo tondo, braccio curvo, base coi
+  bulloni, vetro acceso), riflessi sull'asfalto più fini, cartacce riconoscibili (`vita2d.js`). Qualità bassa e leggera come prima.
+- Fatto: sulle auto a **trazione anteriore** (V40, Panda, Golf...) ora gira forte la ruota davanti e la dietro rotola (`street2d.js`);
+  al banco di Luca girano solo i rulli sotto le ruote motrici (`banco.js`). `strumenti/prova.js --vista 1920x1080` per le foto grandi.
+- Aperto: i pedoni del marciapiede sono ancora i vecchi omini a blocchi (il prossimo passo: disegnarli come il protagonista).
+
 ## 20/11/2026 notte · proprietario (**fiamme secondo il tuning**)
 - Fatto: l'auto ha un livello di preparazione (leggero, medio, spinto: `flameTier` in `fiamme.js`) e da quello dipende la fiammata: leggero fa
   soprattutto un piccolo **botto** circolare, medio la **fiamma libera** in quattro versioni (classica, doppia lingua, lunga, tozza; arancio e

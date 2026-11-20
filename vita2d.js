@@ -131,6 +131,21 @@
         const col = ['#a8622a', '#c98a32', '#7a8a2a', '#8a3a1a'][p.c], fl = Math.sin(p.sp) > 0;
         g.fillStyle = col; if (fl) { g.fillRect(X, Y, 4, 2); g.fillRect(X + 1, Y - 1, 2, 1); } else { g.fillRect(X, Y - 1, 2, 3); g.fillRect(X + 2, Y, 1, 2); }
         g.fillStyle = Street2D.shade(col, -0.35); g.fillRect(X + 1, Y + (fl ? 1 : 0), 2, 1);
+      } else if (p.k === 'paper' && (this.SS || 1) > 1) {
+        // a densità doppia si riconosce cos'è: giornale col testo, pallina di carta, bicchiere di carta, scontrino
+        const fl = Math.floor(p.sp) % 3, u = 0.5, lt = day > 0.5, pc = lt ? '#e8e4d8' : '#a8a6b8', sh = lt ? '#b8b4a8' : '#7c7a8e', ink = lt ? '#6a6a78' : '#55546a';
+        const f = (c, a, b, w, h) => { g.fillStyle = c; g.fillRect(a, b, w, h); };
+        if (p.c === 0) {                                                       // giornale che sventola
+          if (fl === 0) { f(sh, X, Y - 1, 7, 4); f(pc, X, Y - 1, 6.5, 3.5); for (let q = 0; q < 3; q++) f(ink, X + 1, Y - 0.5 + q, q === 0 ? 3 : 4.5, u); f(sh, X + 3.5, Y - 1, u, 3.5); }
+          else if (fl === 1) { f(pc, X, Y + 1, 7, 1.5); f(ink, X + 1, Y + 1.5, 4, u); f(sh, X, Y + 2, 7, u); }
+          else { f(sh, X + 1, Y - 2, 3.5, 6); f(pc, X + 1, Y - 2, 3, 5.5); f(ink, X + 1.5, Y - 1, 2, u); f(ink, X + 1.5, Y, 2, u); f(ink, X + 1.5, Y + 1, 1.5, u); }
+        } else if (p.c === 1) {                                                // pallina di carta che rotola
+          const r = Math.floor(p.sp * 2) % 4; f(sh, X, Y - 1, 4, 3.5); f(pc, X + 0.5, Y - 1.5, 3, 3); f(lt ? '#fffaf0' : '#c8c6d6', X + 0.5 + (r & 1) * 1.5, Y - 1.5 + (r >> 1) * 1, 1, u); f(sh, X + 1 + (r & 1), Y, 1.5, u);
+        } else if (p.c === 2) {                                                // bicchiere di carta schiacciato
+          f('#e8e4d8', X, Y - 0.5, 6, 2.5); f('#c4241c', X + 0.5, Y, 5, 1); f('#ffffff', X + 1, Y - 0.5, 2, u); f(sh, X, Y + 1.5, 6, u); f('#d8d0c0', X + 5.5, Y - 1, 1, 3.5);
+        } else {                                                                // scontrino lungo e sottile
+          if (fl === 2) { f(pc, X + 1, Y - 2.5, 1.5, 6); f(ink, X + 1.5, Y - 2, u, 4); } else { f(pc, X, Y, 8, 1); f(ink, X + 1, Y + 0.5, 1, u); f(ink, X + 3, Y + 0.5, 2, u); f(ink, X + 6, Y + 0.5, 1, u); f(sh, X, Y + 1, 8, u); }
+        }
       } else if (p.k === 'paper') {
         const fl = Math.floor(p.sp) % 3; g.fillStyle = day > 0.5 ? '#e8e4d8' : '#a8a6b8';
         if (fl === 0) g.fillRect(X, Y - 1, 6, 4); else if (fl === 1) g.fillRect(X, Y + 1, 6, 2); else g.fillRect(X + 1, Y - 2, 3, 6);
@@ -154,11 +169,13 @@
     if (night > 0.2) {
       // riflessi verticali sull'asfalto: lunghe strisce tremolanti sotto insegne e lampioni (di più col bagnato)
       const wet = (rain ? 1 : 0.6) * night;
+      // a densità doppia trattini di mezza unità, più fitti e più fini (sull'asciutto ondeggiano meno): un riflesso, non una scala
+      const u = 1 / (this.SS || 1), fine = u < 1, step = fine ? 1.5 : 3, hh = fine ? 1 : 2, q = (v) => Math.round(v / u) * u;
       const streak = (x, rgb, a, w) => {
         g.fillStyle = `rgb(${rgb})`;
-        for (let y = 240; y < 334; y += 3) {
-          const k = (y - 240) / 94, wob = Math.sin(y * 0.45 + t * (rain ? 9 : 4) + x * 0.1) * (1 + k * 2), ww = Math.max(1, Math.round(w * (1 - k * 0.5)));
-          g.globalAlpha = a * (1 - k) * (0.7 + 0.3 * Math.sin(y * 1.7 + t * 6)); g.fillRect(Math.round(x + wob - ww / 2), y, ww, 2);
+        for (let y = 240; y < 334; y += step) {
+          const k = (y - 240) / 94, wob = Math.sin(y * 0.45 + t * (rain ? 9 : 4) + x * 0.1) * (1 + k * 2) * (fine && !rain ? 0.7 : 1), ww = Math.max(u, q(w * (1 - k * 0.5)));
+          g.globalAlpha = a * (1 - k) * (0.7 + 0.3 * Math.sin(y * 1.7 + t * 6)) * (fine ? 0.9 : 1); g.fillRect(q(x + wob - ww / 2), y, ww, hh);
         }
         g.globalAlpha = 1;
       };
@@ -167,14 +184,14 @@
       // scintille sul bagnato: puntini che si accendono e spengono nelle pozze di luce dei lampioni
       if (!slow) for (const x of lamps) for (let i = 0; i < (rain ? 9 : 4); i++) {
         const sd = Math.floor(t * 5) + i * 17 + Math.round(x), px = x + 19 + (rnd(sd) - 0.5) * 110, py = 246 + rnd(sd + 1) * 80;
-        if (rnd(sd + 2) < 0.5) continue; g.fillStyle = `rgba(255,240,210,${0.5 * night})`; g.fillRect(Math.round(px), Math.round(py), 1, 1);
+        if (rnd(sd + 2) < 0.5) continue; g.fillStyle = `rgba(255,240,210,${0.5 * night})`; g.fillRect(q(px), q(py), 1, 1);
       }
       // falene intorno alla testa dei lampioni
       if (!rain) for (const x of lamps) {
         if (x < -40 || x > W + 20) continue;
         for (let i = 0; i < 4; i++) {
           const r = 5 + i * 3, px = x + 19 + Math.cos(t * (4 + i) + i * 2.1 + x) * r + Math.sin(t * 13 + i) * 1.5, py = 131 + Math.sin(t * (3.1 + i * 0.7) + i * 1.7) * (3 + i);
-          g.fillStyle = `rgba(255,240,200,${0.8 * night})`; g.fillRect(Math.round(px), Math.round(py), 1, 1);
+          g.fillStyle = `rgba(255,240,200,${0.8 * night})`; g.fillRect(q(px), q(py), fine ? u : 1, fine ? u : 1);
         }
       }
       // lucciole nei campi e nei paesi: si accendono a respiro, verde-giallo

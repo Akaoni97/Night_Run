@@ -173,18 +173,21 @@ function bancoSim(sim, carId) {
     const dw = 300, f = spr ? dw / spr.width : 1, x0 = 130, base = FL + 10;
     if (src && src.width && geo) {
       const dh = spr.height * f, y0 = base - (geo.wy + geo.wr) * f - 6;
-      // rulli sotto le ruote, in una buca
-      for (const ax of geo.ax) {
-        const wx = x0 + ax * f, ry = base + 4, rr = 14;
+      // rulli sotto le ruote, in una buca. Girano solo sotto le ruote motrici: davanti con la trazione anteriore (V40, Panda...),
+      // dietro con la posteriore; l'altro asse resta fermo (l'ultimo dell'elenco è quello davanti: le auto guardano a destra)
+      const fwd = !!(d && d.P && d.P.fwd), mot = (i) => (fwd ? i === geo.ax.length - 1 : i !== geo.ax.length - 1);
+      for (const [i, ax] of geo.ax.entries()) {
+        const wx = x0 + ax * f, ry = base + 4, rr = 14, aR = mot(i) ? ang : 0;
         g.fillStyle = '#08070b'; g.fillRect(wx - 34, base - 2, 68, 30);
         for (const dx of [-14, 14]) {
           g.fillStyle = '#5a5866'; g.beginPath(); g.arc(wx + dx, ry, rr, 0, 7); g.fill();
-          g.strokeStyle = '#8a8896'; g.lineWidth = 1.5; g.beginPath(); for (let k = 0; k < 4; k++) { const a = -ang * (geo.wr * f / rr) + k * Math.PI / 2; g.moveTo(wx + dx, ry); g.lineTo(wx + dx + Math.cos(a) * rr, ry + Math.sin(a) * rr); } g.stroke();
+          g.strokeStyle = '#8a8896'; g.lineWidth = 1.5; g.beginPath(); for (let k = 0; k < 4; k++) { const a = -aR * (geo.wr * f / rr) + k * Math.PI / 2; g.moveTo(wx + dx, ry); g.lineTo(wx + dx + Math.cos(a) * rr, ry + Math.sin(a) * rr); } g.stroke();
         }
       }
       g.drawImage(src, x0, y0, dw, dh);
-      // ruote che girano: raggi sopra il cerchio del disegno
-      for (const ax of geo.ax) {
+      // ruote che girano: raggi sopra il cerchio del disegno (solo le motrici)
+      for (const [i, ax] of geo.ax.entries()) {
+        if (!mot(i)) continue;
         const wx = x0 + ax * f, wy = y0 + geo.wy * f, r = geo.wr * f * 0.55;
         g.strokeStyle = 'rgba(30,30,36,.85)'; g.lineWidth = 2; g.beginPath();
         for (let k = 0; k < 5; k++) { const a = ang + k * 2 * Math.PI / 5; g.moveTo(wx, wy); g.lineTo(wx + Math.cos(a) * r, wy + Math.sin(a) * r); }
