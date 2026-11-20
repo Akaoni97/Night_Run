@@ -41,7 +41,7 @@ html.tdash #riavviaBtn { display: none; }
   function now() {
     window.__nrRiavvia = true;                                  // il gioco non risalva mentre la pagina si chiude
     try {
-      localStorage.removeItem('nightrun-viaggio');
+      localStorage.removeItem('nightrun-viaggio'); localStorage.removeItem('nr_diario_foto');
       const s = JSON.parse(localStorage.getItem('banco2jz') || '{}');
       if (s.trip === false) { s.tunesOther = s.tunes; s.cossOther = s.coss; }   // veniva da una modalità libera: i suoi pezzi restano da parte
       s.trip = true; s.tunes = {}; s.coss = {};
