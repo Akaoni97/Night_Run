@@ -77,7 +77,11 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     const d = this.s.dist;
     for (const e of this.ents) {
       if (e.kind !== 'police' || !e.busy || e.docChk) continue;
-      if (Math.abs(e.x - d) < 14) { e.docChk = true; if ((this.docRnd || Math.random)() < DOC.controllo) this.docControllo(); }
+      if (Math.abs(e.x - d) < 14) {
+        e.docChk = true; const chk = (this.docRnd || Math.random)() < DOC.controllo;
+        if (typeof this.polCheck === 'function') this.polCheck(e, chk);      // con la polizia (polizia.js): passi e ti multano, anche per la velocità
+        else if (chk) this.docControllo();
+      }
     }
     const k = km(this), dd = this.docs(), prossimo = Object.keys(DOC_NOMI).filter((x) => dd[x] > k && dd[x] - k < DOC.avviso)[0];
     const key = prossimo ? this.car + prossimo + Math.floor(dd[prossimo]) : null;
