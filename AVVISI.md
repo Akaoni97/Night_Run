@@ -9,6 +9,16 @@ questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
 
+## 20/11/2026 sera · per tutti e due · dal check completo · **COSA È CAMBIATO OGGI (da collaudare stasera)**
+- **Menu**: c'è la scheda **Impostazioni** (Grafica, Audio, Comandi, Guida) con tutte le regolazioni. Le schede Vista ed
+  Extra non ci sono più: colore, mappa, foto, replay e «Come si gioca» stanno in **Partita**.
+- **Meteo nuovo**: nebbia, neve e vento (menu Impostazioni → Grafica → Meteo, o tasto **K**, che ora ha 6 scelte). La
+  neve fa scivolare più della pioggia. In «dinamico» arrivano secondo il paesaggio, mai in città.
+- **Entrare nei locali**: ogni locale ha il suo posto auto con le strisce; l'auto parcheggia, il protagonista scende ed
+  entra a piedi (U salta la camminata). Accostando, il passaggio alla corsia di destra ora è deciso: niente più tamponi.
+- **Motori**: li gestisce il cognato. Da Luca c'è Nico coi pezzi a livelli; l'officina dei tagliandi è di **Mario**.
+- Check: nessun errore in tutte le tappe, 211 test passati. Le cose da decidere sono in `SOSPESI.md`.
+
 ## 20/11/2026 sera · per il cognato · dal proprietario · **IL 3D NON C'È PIÙ**
 - Il proprietario ha deciso di **togliere il 3D**: farebbero tutti i modelli 3D delle auto, troppo lungo e costoso.
   Il gioco ora è **solo 2D**. Spariti: vista 3D e Abitacolo, la modalità **Montagna** (era solo 3D), la Vetrina (G),

@@ -38,6 +38,7 @@
       else if (!info.rain) {
         // fuori dal suo paesaggio la neve smette (la nebbia e il vento possono seguirti un po')
         if (M.kind === 'neve' && info.bg !== 'mountain') stop();
+        if (M.kind && info.bg === 'city') stop();                         // in città, tra i palazzi, niente nebbia né vento: restano i neon
         if ((M.timer -= dt) <= 0) {
           if (M.kind) { stop(); M.timer = 90 + Math.random() * 120; }
           else {
@@ -134,8 +135,8 @@
       }
     } else if (kind === 'vento') {
       const desert = (this._bg || '') === 'desert', col = desert ? '224,176,112' : day > 0.5 ? '200,196,186' : '120,118,130';
-      g.fillStyle = `rgba(${col},${(desert ? 0.16 : 0.08) * k})`; g.fillRect(0, 0, W, 360);
-      { const dv = g.createLinearGradient(0, 150, 0, 360); dv.addColorStop(0, `rgba(${col},0)`); dv.addColorStop(0.45, `rgba(${col},${(desert ? 0.42 : 0.22) * k * (0.7 + 0.5 * Math.abs(M.gust))})`); dv.addColorStop(1, `rgba(${col},${(desert ? 0.18 : 0.1) * k})`); g.fillStyle = dv; g.fillRect(0, 150, W, 210); }   // polvere sollevata
+      if (desert) { g.fillStyle = `rgba(${col},${0.16 * k})`; g.fillRect(0, 0, W, 360); }   // il velo di sabbia solo nel deserto
+      if (desert) { const dv = g.createLinearGradient(0, 150, 0, 360); dv.addColorStop(0, `rgba(${col},0)`); dv.addColorStop(0.45, `rgba(${col},${(desert ? 0.42 : 0.22) * k * (0.7 + 0.5 * Math.abs(M.gust))})`); dv.addColorStop(1, `rgba(${col},${(desert ? 0.18 : 0.1) * k})`); g.fillStyle = dv; g.fillRect(0, 150, W, 210); }   // polvere sollevata
       // strisce di polvere o sabbia che corrono, più fitte sulle raffiche
       const n = lowQ ? 40 : 110, gust = 0.6 + Math.abs(M.gust);
       for (let i = 0; i < n; i++) {
