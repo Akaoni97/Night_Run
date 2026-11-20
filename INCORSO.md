@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | Estetica premium dell'interfaccia: layout, banner e icone (barra in alto, riquadri sulla strada, avvisi, pannelli dei locali, menu, telefono, schermata iniziale) | file nuovi premium.css e premium.js; in index.html solo due righe (collegamenti) | 20/11 notte |

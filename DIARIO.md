@@ -12,6 +12,12 @@ due voci, e il controllo della sera le legge.
 - Aperto: le pattuglie che fanno il radar (parcheggiate o in giro) ti fermano ancora e hai Paga / Contesta / Scappa, come prima: se vuoi lo stesso
   passaggio senza fermarti, dimmelo.
 
+## 20/11/2026 notte · proprietario (**estetica premium: layout, banner, icone**)
+- Fatto: `premium.css` e `premium.js`. Icone disegnate al posto di emoji e simboli (barra in alto, bisogni, cruscotto a tessere, frecce, avvisi,
+  pannelli dei locali, telefono); vetro scuro e pulsanti metallici; avvisi con icona e barra del tempo; traguardo dorato; titoli dei quartieri e
+  delle capitali. Interruttore Premium/Classico in Impostazioni → Grafica (Classico = come prima). Provato su PC e al tocco, console pulita.
+- Aperto: non guardati uno per uno i pannelli di autosalone, sfascio e Nico (prendono lo stile comune dei pulsanti).
+
 ## 20/11/2026 notte · proprietario (**grafica più nitida e dettagliata; ruote della trazione anteriore**)
 - Fatto (`nitido2d.js` nuovo, agganci piccoli in `street2d.js`): ingrandimento sullo schermo a pixel tutti uguali (prima su un 1080p
   erano larghi 1 o 2 pixel a caso), carrozzerie e ruote dai disegni passate per Scale2x (curve e diagonali senza scalini, ruote che girano
