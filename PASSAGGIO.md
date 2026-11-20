@@ -10,7 +10,7 @@ gioco fa, sezione per sezione).
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
 - Copie giocabili come artifact privati su claude.ai (ognuno aggiorna la sua):
-  - del proprietario: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (ultima versione pubblicata: 130, tutti gli interni in alta definizione);
+  - del proprietario: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (ultima versione pubblicata: 131, la cassa pesante non blocca più le missioni);
   - del cognato: https://claude.ai/artifact/XJDCR8GCQSYz95XXtXoyrs.
 
 ## Il gioco come app sul PC
