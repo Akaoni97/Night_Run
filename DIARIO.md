@@ -8,6 +8,15 @@ due voci, e il controllo della sera le legge.
 - **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
   su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
 
+## 20/11/2026 sera · proprietario (**costruzione del motore**, al posto del 3D)
+- Fatto: locale nuovo **Il Pistone** (al posto del secondo bar di ogni giro, primo al km 14,6). Progetti un motore pezzo
+  per pezzo (blocco 4/5/6 cilindri, albero, bielle, pistoni, testata, camme, turbo o volumetrico, iniettori, centralina)
+  con CV, coppia, giri, peso, affidabilità e curva che cambiano; lo monti a mano sul cavalletto (si parte dal basso,
+  Ottone ti corregge), lo accendi, e poi lo metti su **qualsiasi auto** (swap: cambiano guida, suono e peso). Motori
+  troppo spinti si rompono tirandoli al limitatore. File `motori.js`, `motori2d.js`; test (200 in tutto).
+- Anche: `strumenti/prova.js` (passo `entra`) aspetta la fine della camminata nei locali.
+- Da provare sul PC: il suono dei motori swappati in strada e quanto costano i pezzi rispetto ai guadagni.
+
 ## 20/11/2026 sera · proprietario (**via il 3D**)
 - Deciso dal proprietario: il 3D si toglie (servirebbero tutti i modelli delle auto). Cancellati `car3d.js`,
   `street3d.js`, `viaggio3d.js`, `models/supra_mk4.glb`; da `index.html` vista 3D/Abitacolo, Montagna, Vetrina,

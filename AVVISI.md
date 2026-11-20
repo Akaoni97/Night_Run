@@ -14,8 +14,9 @@ Formato: `## data · per chi · da chi` e due o tre righe.
   Il gioco ora è **solo 2D**. Spariti: vista 3D e Abitacolo, la modalità **Montagna** (era solo 3D), la Vetrina (G),
   la telecamera (C), il caricamento di modelli .glb e three.js. Cancellati `car3d.js`, `street3d.js`, `viaggio3d.js`
   e `models/`. Se un giorno servisse, sono nella storia di git.
-- Al posto del 3D: **la costruzione del motore** (scegli i pezzi, lo monti a mano sul cavalletto, lo monti su
-  qualsiasi auto), in un **locale nuovo** del Viaggio. Ci sta lavorando il proprietario.
+- Al posto del 3D: **la costruzione del motore**, già nel gioco: locale nuovo **Il Pistone** (al posto del secondo bar
+  di ogni giro, primo al km 14,6). Scegli i pezzi, lo monti a mano sul cavalletto, lo metti su qualsiasi auto.
+  File `motori.js` e `motori2d.js`.
 - Il weekend quindi è tutto 2D: segnate in `INCORSO.md` cosa toccate.
 
 ## 20/11/2026 · per il cognato · dal proprietario

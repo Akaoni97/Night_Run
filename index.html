@@ -1239,6 +1239,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="viaggio.js"></script>
 <script src="strada.js"></script>
 <script src="missioni.js"></script>
+<script src="motori.js"></script>
 <script src="pensieri.js"></script>
 <script>
 (() => {
@@ -1325,9 +1326,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   let sentView = -1, sentEnv = -1;
   function dspCfg() {
-    const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
+    const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
-    const has = (r) => (player && game.car === 'supra' && player.has(r) ? 1 : 0);
+    const has = (r) => (player && eng && player.has(r) ? 1 : 0);
     return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.8 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
@@ -1401,12 +1402,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     useCar(carId);
     TP = tuningParams(S.tune);
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
+    const MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // motore costruito al Pistone (motori.js)
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
     TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Niko)
     game.applyMass(TP.sim.dm || 0, TP.sim.rearOff);
-    $('carTag').textContent = CARS[carId].tag;
+    $('carTag').textContent = CARS[carId].tag + (MOTE ? ` · motore: ${MOTE.tipo} da ${MOTE.hp} CV (swap)` : '');
     if (!$('carSw').options.length) for (const id of CAR_IDS) { const o = document.createElement('option'); o.value = id; o.textContent = CARS[id].name; $('carSw').appendChild(o); }
     $('carSw').value = carId;
     TP.sim.pw = (TP.sim.pw || 1) * game.perkPow(); TP.sim.mu = (TP.sim.mu || sim.P.mu || 1.1) * game.perkGrip();   // traguardi di chilometri
@@ -2491,7 +2493,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
   function cosView(c) { return Object.assign({}, c || S.cos, { dirt: Math.round(game.maint().dirt * 10) / 10 }); }
-  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'N', style: 'E', dealer: 'A', junk: 'S' };
+  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'N', style: 'E', dealer: 'A', junk: 'S', motori: 'M' };
   let mmT = 0, placeOpen = null, cosPrev = null;
   const moved = [];
   const fmtDist = (m) => (m < 1000 ? Math.max(0, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km');
@@ -2555,7 +2557,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       }
     }
     const low = sim.fuel * sim.P.tank < 15;
-    const parts = ['fuel', 'shop', 'niko', 'style', 'dealer', 'junk'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
+    const parts = ['fuel', 'shop', 'niko', 'style', 'dealer', 'junk', 'motori'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
     const html = (low ? '<b style="color:var(--warn)">Riserva!</b> ' : '') + parts.join(' · ');
     if ($('mmNext').innerHTML !== html) $('mmNext').innerHTML = html;
   }
@@ -2572,6 +2574,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       vgPlace(I, body, note);
     } else if (I.id === 'dealer') {                                  // Autosalone Notte (concessionario.js)
       if (window.NightDealer) NightDealer.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
+    } else if (I.id === 'motori') {                                  // Il Pistone: motori costruiti a pezzi (motori.js, motori2d.js)
+      if (window.NightMotori) NightMotori.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
@@ -3530,6 +3534,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="concessionario.js"></script>
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
+<script src="motori2d.js"></script>
 <script src="garage.js"></script>
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>

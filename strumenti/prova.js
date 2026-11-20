@@ -88,7 +88,8 @@ const STATO = () => {
       await page.evaluate(() => { const g = nightRun.game, n = Math.round((g.s.dist - VG_STOP0) / VG_STEP); g.s.dist = VG.stopX(n) - 2; g.sim.v = 0; });
       await page.waitForTimeout(300);
       await page.evaluate(() => { const g = nightRun.game; if (g.inside) return true; const q = g.nearPlace(); if (q && q.ok !== false) g.enterPlace(q); return true; });
-      await page.waitForTimeout(4500);
+      await page.waitForFunction(() => { const I = nightRun.game.inside; return !I || I.phase === 'shop'; }, null, { timeout: 15000 }).catch(() => {});   // manovra, camminata e buio (entrata2d.js)
+      await page.waitForTimeout(900);
       const dentro = await page.evaluate(() => { const g = nightRun.game; return g.inside ? g.inside.id : null; });
       log(dentro ? 'entrato: ' + dentro : 'entra: nessun locale vicino');
     } else if (k === 'esci') { await page.evaluate(() => nightRun.game.exitPlace()); await page.waitForTimeout(2000);
