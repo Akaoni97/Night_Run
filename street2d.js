@@ -1458,7 +1458,7 @@ class Street2D {
     g.fillStyle = '#23263a'; g.fillRect(x - 56, 216, 112, 16); g.fillStyle = '#4a5070'; g.fillRect(x - 56, 216, 112, 1);
     for (let k = -50; k < 50; k += 10) { g.fillStyle = '#2f3450'; g.fillRect(x + k, 224, 6, 1); }
     if (e.id === 'shop' || e.id === 'niko') {
-      const niko = e.id === 'niko', sign = niko ? 'OFFICINA NIKO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
+      const niko = e.id === 'niko', sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
       g.fillStyle = C.ink; g.fillRect(L - 2, top - 2, R - L + 4, 216 - top + 2);
       g.fillStyle = niko ? '#33302a' : '#2b2f3e'; g.fillRect(L, top, R - L, 216 - top);
       for (let yy = top + 6; yy < 216; yy += 6) { g.fillStyle = '#252836'; g.fillRect(L, yy, R - L, 1); for (let xx = L + ((yy / 6) % 2 ? 0 : 6); xx < R; xx += 12) g.fillRect(xx, yy - 6, 1, 6); }   // mattoni
@@ -1514,7 +1514,7 @@ class Street2D {
       this.placeTag(g, x, top - 16, 'ESTETICA', '#ff2e88', near);
     }
   }
-  // personaggi: Niko (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
+  // personaggi: Mario (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
   // primo piano fuori città: sotto la carreggiata (y 339–360)
   drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, t) {
     const W = this.LW, rnd = Street2D.rnd;
@@ -1627,7 +1627,7 @@ class Street2D {
       for (let xx = 0; xx < W; xx += 48) { g.fillStyle = '#252937'; g.fillRect(xx, 40, 46, 200); g.fillStyle = '#181a24'; g.fillRect(xx + 46, 40, 2, 200); }
       // neon e tubi fluorescenti
       for (let xx = 30; xx < W; xx += 110) { g.fillStyle = C.ink; g.fillRect(xx, 18, 70, 6); g.fillStyle = '#eef6ff'; g.fillRect(xx + 2, 19, 66, 3); this.light(g, xx + 35, 24, 90, 40, '#dfeaff', 0.06, 3); }
-      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'NIKO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', W - 150, 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
+      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'MARIO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', Math.max(W - 150, W - 218 + this.textW(niko ? 'MARIO' : 'LUCA', 3) + 8), 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
       if (!niko) for (let q = 0; q < 3; q++) { g.fillStyle = ['#ff2e88', '#2ee6ff', '#b07bff'][q]; g.fillRect(0, 96 + q * 3, W, 1); this.light(g, W / 2, 97 + q * 3, W * 0.5, 6, ['#ff2e88', '#2ee6ff', '#b07bff'][q], 0.05, 2); }
       // pannello forato con attrezzi
       g.fillStyle = '#3b3326'; g.fillRect(24, 70, 150, 90);

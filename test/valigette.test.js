@@ -43,7 +43,7 @@ test('valigette: le frequenze seguono le probabilità dichiarate (argento)', () 
   CASE_TYPES.argento.odds.forEach((p, i) => { const f = cnt[i] / n * 100; assert.ok(Math.abs(f - p) < Math.max(2, p * 0.25), `${CASE_RAR[i].name}: ${f.toFixed(1)} % contro ${p} %`); });
 });
 
-test('valigette: ticket tagliando e modifica rendono gratis Niko e Luca, una volta', () => {
+test('valigette: ticket tagliando e modifica rendono gratis Mario e Luca, una volta', () => {
   const { game } = trip(), C = game.cases();
   game.s.money = 100000; game.maint().oil = 0.2; C.tickets.svc = 1;
   assert.equal(game.serviceCost('oil'), 0);

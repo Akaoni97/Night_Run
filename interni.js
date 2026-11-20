@@ -1,9 +1,9 @@
 // ============================================================================
 //  Night Run · Gli interni dei locali (dopo telefono.js)
-//  Quando entri in un locale (bar, autogrill, motel, benzinaio, Da Luca Tuning, Officina Niko, Neon Kustom) sopra la
+//  Quando entri in un locale (bar, autogrill, motel, benzinaio, Da Luca Tuning, Officina Mario, Neon Kustom) sopra la
 //  strada compare la scena dell'interno, in pixel art 640×360: chi ti serve dietro al bancone che si muove e sbatte gli
 //  occhi, le luci (neon che tremano, lampade calde, tubi fluorescenti), le finestre con la notte fuori e il traffico che
-//  passa, la tua auto vera (sul ponte da Luca, sopra la fossa da Niko, in cabina al Neon Kustom, alla pompa del
+//  passa, la tua auto vera (sul ponte da Luca, sopra la fossa da Mario, in cabina al Neon Kustom, alla pompa del
 //  benzinaio, fuori dalla vetrina del bar). Gli oggetti importanti si toccano: portano alla sezione giusta del pannello.
 //  Ogni locale ha anche il suo sottofondo (brusio, macchina del caffè, frigoriferi, compressore...), sintetizzato.
 //  Dal resto del gioco: NightInterni.open(place), .close(). Le scene sono in SCENE (una funzione per locale).
@@ -480,7 +480,7 @@
     hot: [{ x: 200, y: 60, w: 260, h: 100, label: 'La tua auto', go: 'top' }, { x: 470, y: 30, w: 150, h: 80, label: 'Banco prova', go: 'top' }, { x: 0, y: 260, w: 230, h: 100, label: 'Pezzi', go: 'top' }],
   };
 
-  // ---- OFFICINA NIKO: officina vecchia, la tua auto sulla fossa, compressore, radio, Niko in tuta con lo straccio
+  // ---- OFFICINA MARIO: officina vecchia, la tua auto sulla fossa, compressore, radio, Mario in tuta con lo straccio
   SCENE.niko = {
     focus: 250, amb: 'niko', grade: '120,200,255', gradeA: 0.05,
     static(g, r, S) {
@@ -506,7 +506,7 @@
       if (S.car) g.drawImage(S.car, 335 - S.car.width / 2, 252 - S.car.height + 4);
       // luce da lavoro accesa sotto l'auto (dalla fossa)
       glow(g, 335, 262, 90, '255,230,170', 0.35, 0.3);
-      // Niko: tuta blu, barba grigia, straccio rosso in tasca, si pulisce le mani
+      // Mario: tuta blu, barba grigia, straccio rosso in tasca, si pulisce le mani
       person(g, 110, 330, { skin: '#d8a888', hair: '#9a9a92', hairStyle: 'short', beard: '#a8a8a0', overalls: '#2a4a8a', rag: true, pose: 'wipe', s: 1.35, seed: 4.2, shirt: '#2a4a8a' }, t);
       // la radio suona: lucina che pulsa
       if (Math.sin(t * 6) > 0) R(g, 380, 82, 2, 2, '#7aff9a');
@@ -516,7 +516,7 @@
       cone(g, 95, 20, 120, 200, 200, '200,220,255', 0.05);
       for (let k = 0; k < 10; k++) P(g, 60 + ((k * 37 + t * 4) % 120), 60 + ((k * 53 + Math.sin(t + k) * 20) % 140), 'rgba(255,255,240,.4)');
     },
-    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Niko', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
+    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Mario', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
   };
 
   // ---- NEON KUSTOM: cabina di verniciatura con la tua auto sotto le luci viola, muro dei cerchi, rotoli di vinile, l'artista con l'aerografo

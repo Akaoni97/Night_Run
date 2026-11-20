@@ -2,11 +2,11 @@
 //  Night Run · Il Pistone, la grafica (dopo sfascio.js; la logica è in motori.js)
 //  - la facciata del locale sulla strada (avvolge Street2D.drawTripPlace): officina di mattoni col portone alzato,
 //    dentro un motore sul cavalletto sotto la lampada, insegna al neon col pistone, vetrina coi blocchi sugli scaffali;
-//  - l'interno (NightInterni.SCENE.motori): l'officina coi cavalletti, il paranco, il banco e Ottone il motorista;
+//  - l'interno (NightInterni.SCENE.motori): l'officina coi cavalletti, il paranco, il banco e Nico il motorista;
 //  - il pannello (NightMotori.panel): progetto del motore pezzo per pezzo con la scheda che si aggiorna (CV, Nm, giri,
 //    peso, affidabilità, curva), i tuoi motori (monta, smonta, vendi, rifai);
 //  - il banco di montaggio (NightMotori.banco): a tutto schermo, il motore sul cavalletto si costruisce dal basso
-//    in alto; scegli tu il pezzo giusto dalla cassetta (sbagli: Ottone ti dice cosa va prima), poi lo accendi.
+//    in alto; scegli tu il pezzo giusto dalla cassetta (sbagli: Nico ti dice cosa va prima), poi lo accendi.
 //  drawEngine disegna il motore (visto di lato, con lo spaccato dei cilindri) a qualunque punto del montaggio.
 // ============================================================================
 (() => {
@@ -19,9 +19,10 @@
 
   // ---------------------------------------------------------------- il motore disegnato (vista di lato, spaccato)
   // g: contesto; cx: centro; by: base del cavalletto (pavimento); sel: pezzi; upto: quanti reparti sono montati
-  // (0-9, anche frazionario per l'ultimo che sta entrando); run: 0 fermo, >0 acceso (giri al secondo del disegno)
+  // (0-ORDER.length, anche frazionario per l'ultimo che sta entrando); run: 0 fermo, >0 acceso (giri al secondo del disegno)
   const R = (g, x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
   function drawEngine(g, cx, by, sel, upto, t, run, only) {
+    if (ORDER.some((k) => !motPart(k, sel[k]))) { const s2 = Object.assign({}, sel); for (const k of ORDER) if (!motPart(k, s2[k])) s2[k] = MOT_BASE[k]; sel = s2; }   // progetti di prima dei reparti nuovi
     const has = (k) => ORDER.indexOf(k) < upto && (!only || only === k), it = (k) => motPart(k, sel[k]);
     const B = it('blocco') || MOT_PARTI[0].items[0], cyl = B.cyl, bw = 26 * cyl + 34, bh = 64, bx = Math.round(cx - bw / 2), byT = by - 112;
     const shake = run ? Math.round(Math.sin(t * 61) * 1) : 0, ox = shake, ph = run ? t * run * Math.PI * 2 : 0;
@@ -123,6 +124,39 @@
       if (E.id === 'prog') R(g, ex + 18, ey + 9, 3, 3, Math.floor(t * 3) % 2 ? '#b8ff3a' : '#3a6a1a');
       g.strokeStyle = '#141418'; g.lineWidth = 2; g.beginPath(); g.moveTo(ex + 24, ey + 6); g.quadraticCurveTo(X - 10, ey - 40, X + 6, byT - 28); g.stroke();
     }
+    const lvc = (k) => ['#7a7e88', '#7a7e88', '#c8ccd6', '#d43a2a', '#d9a82e'][motLvOf(k, sel[k])];   // colore del livello
+    // pompa dell'olio: sotto la puleggia, davanti alla coppa (col carter secco anche il serbatoio a parte)
+    if (has('olio')) {
+      const O = it('olio'), oy = crankY + 3;
+      R(g, X - 9, oy - 1, 12, 10, '#0a0a0e'); R(g, X - 8, oy, 10, 8, lvc('olio')); R(g, X - 6, oy + 2, 6, 1, '#2a2c32');
+      if (O.kw) { R(g, X + 14, byT + bh + 19, 26, 6, '#0a0a0e'); for (let q = 0; q < 6; q++) R(g, X + 15 + q * 4, byT + bh + 20, 2, 4, '#9aa0aa'); }   // radiatore dell'olio
+      if (O.id === 'secco') { R(g, X - 22, byT + bh - 20, 10, 26, '#0a0a0e'); R(g, X - 21, byT + bh - 19, 8, 24, '#c42a1a'); R(g, X - 14, byT + bh + 4, 6, 2, '#141418'); }
+    }
+    // intercooler: col turbo, il pacco alettato sopra il motore e il tubo che arriva dalla chiocciola
+    if (has('intercooler') && it('sovra') && it('sovra').max > 0 && it('intercooler').cap > 0) {
+      const Ic = it('intercooler'), w = Ic.id === 'fms' ? bw * 0.45 : bw * 0.62, iy = it('sovra').sc ? byT - 84 : byT - 62, ix = X + bw * 0.25;
+      R(g, ix - 1, iy - 1, w + 2, 14, '#0a0a0e'); R(g, ix, iy, w, 12, Ic.id === 'aa' ? '#3a4a5a' : '#9aa0aa');
+      for (let q = 2; q < w - 2; q += 3) R(g, ix + q, iy + 2, 1, 8, '#5a5e66');
+      R(g, ix + w, iy + 4, X + bw + 8 - ix - w, 4, '#0a0a0e'); R(g, ix + w, iy + 5, X + bw + 8 - ix - w, 2, '#c8ccd6');   // tubo verso il turbo
+      if (Ic.id === 'aa') { R(g, ix + 4, iy - 5, 6, 5, '#2e8adf'); R(g, ix + w - 10, iy - 5, 6, 5, '#2e8adf'); }      // raccordi dell'acqua
+    }
+    // pompa della benzina: il filtro e il regolatore all'inizio del flauto
+    if (has('benzina')) { const ry = byT - 30; R(g, X - 20, ry - 6, 8, 13, '#0a0a0e'); R(g, X - 19, ry - 5, 6, 11, lvc('benzina')); R(g, X - 18, ry - 2, 4, 1, '#1a1a1e'); }
+    // radiatore: davanti, oltre il turbo, coi manicotti dell'acqua (doppia ventola col livello da gara)
+    if (has('radiatore')) {
+      const Rd = it('radiatore'), rx = X + bw + 46, ry = byT - 40, rh = bh + 30, rw = 6 + motLvOf('radiatore', sel.radiatore) * 2;
+      R(g, rx - 1, ry - 1, rw + 2, rh + 2, '#0a0a0e'); R(g, rx, ry, rw, rh, Rd.id === 'serie' ? '#3a3c44' : '#b8bcc6');
+      for (let q = 2; q < rh - 2; q += 3) R(g, rx + 1, ry + q, rw - 2, 1, Rd.id === 'serie' ? '#2a2c32' : '#7a7e88');
+      g.strokeStyle = '#141418'; g.lineWidth = 3; g.beginPath(); g.moveTo(X + bw - 4, byT - 16); g.quadraticCurveTo(rx - 10, ry - 6, rx, ry + 6); g.moveTo(X + bw - 4, byT + bh - 10); g.quadraticCurveTo(rx - 14, byT + bh + 6, rx, ry + rh - 8); g.stroke();
+      const fans = Rd.id === 'gara' ? 2 : 1; for (let q = 0; q < fans; q++) { const fy = ry + rh * (fans === 2 ? 0.28 + q * 0.44 : 0.5); g.fillStyle = '#0a0a0e'; g.beginPath(); g.arc(rx - 4, fy, 8, 0, 7); g.fill(); g.strokeStyle = '#5a5e66'; g.lineWidth = 1; const fa = ph * 2 + q; for (let k = 0; k < 4; k++) { g.beginPath(); g.moveTo(rx - 4, fy); g.lineTo(rx - 4 + Math.cos(fa + k * 1.57) * 7, fy + Math.sin(fa + k * 1.57) * 7); g.stroke(); } }
+    }
+    // frizione: la campana dietro al blocco (lato del volano), col bordo del disco del suo colore
+    if (has('frizione')) {
+      const F = it('frizione'), fx = X - 14, fy = byT + 10;
+      R(g, fx - 1, fy - 1, 12, bh + 2, '#0a0a0e'); R(g, fx, fy, 10, bh, '#8a8e98'); R(g, fx, fy, 10, 2, '#b8bcc6');
+      R(g, fx + 3, fy + 6, 3, bh - 12, F.id === 'bid' ? '#d9a82e' : F.id === 'cer' ? '#c42a1a' : F.id === 'rinf' ? '#2e8adf' : '#3a3c44');
+      if (F.id === 'bid') R(g, fx + 7, fy + 6, 2, bh - 12, '#d9a82e');
+    }
     // acceso: fumo dallo scarico e un tremolio di calore
     if (run && !only) for (let k = 0; k < 5; k++) { const sx = X + bw + 24 + Math.sin(t * 3 + k) * 4, sy = byT + 20 - ((t * 30 + k * 12) % 50); g.fillStyle = `rgba(200,200,210,${0.12 * (1 - ((t * 30 + k * 12) % 50) / 50)})`; g.beginPath(); g.arc(sx, sy, 4 + k, 0, 7); g.fill(); }
   }
@@ -152,7 +186,7 @@
     R(g, dL + 6, dT + 4, dW - 12, 1, '#6a5a4a');
     g.fillStyle = 'rgba(30,26,30,.9)'; g.fillRect(dL + 4, dT + 10, 26, 30); for (let q = 0; q < 9; q++) R(g, dL + 7 + (q % 3) * 8, dT + 13 + Math.floor(q / 3) * 9, 2, 6, ['#c8ccd6', '#d42a2a', '#ffd23f'][q % 3]);   // pannello attrezzi
     R(g, dL + 70, dT + 2, 2, 26, '#1a1a1e'); R(g, dL + 66, dT + 28, 10, 3, '#c8a040');   // paranco con la catena
-    g.save(); g.translate(dL + dW / 2 + 6, 0); g.scale(0.32, 0.32); drawEngine(g, 0, GY / 0.32 - 2, Object.assign({}, MOT_BASE, { blocco: 'b6_30', camme: 'sport', sovra: 'tm' }), 9, t, 0); g.restore();
+    g.save(); g.translate(dL + dW / 2 + 6, 0); g.scale(0.32, 0.32); drawEngine(g, 0, GY / 0.32 - 2, Object.assign({}, MOT_BASE, { blocco: 'b6_30', camme: 'sport', sovra: 'tm', intercooler: 'fmg' }), ORDER.length, t, 0); g.restore();
     if (n > 0.1) { this.light(g, dL + dW / 2 + 6, dT + 8, 34, 30, '#ffd9a0', 0.12 * n, 3); R(g, dL + dW / 2, dT + 2, 12, 3, '#ffe2a8'); }
     g.fillStyle = '#5a6070'; g.fillRect(dL, dT, dW, dH - oh);
     for (let yy = dT + 5; yy < dT + dH - oh; yy += 6) { R(g, dL, yy, dW, 1, '#454b5a'); R(g, dL, yy + 1, dW, 1, '#6a7080'); }
@@ -196,11 +230,11 @@
       dyn(g, t) {
         // il motore sul cavalletto: quello che stai progettando
         const game = G(), sel = game && game.mot ? game.mot().bozza : MOT_BASE;
-        g.save(); g.translate(0, 0); drawEngine(g, 330, 290, sel, 9, t, 0); g.restore();
+        g.save(); g.translate(0, 0); drawEngine(g, 330, 290, sel, ORDER.length, t, 0); g.restore();
         // lampada che oscilla appena e la sua luce
         const lx = 330 + Math.sin(t * 0.7) * 3; R(g, lx - 14, 60, 28, 8, '#1a1a1e'); R(g, lx - 12, 67, 24, 2, '#ffe2a8');
         g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(lx, 70, 4, lx, 200, 200); gr.addColorStop(0, 'rgba(255,220,160,.22)'); gr.addColorStop(1, 'rgba(255,220,160,0)'); g.fillStyle = gr; g.fillRect(lx - 220, 60, 440, 300); g.restore();
-        // Ottone il motorista: tuta blu, straccio in tasca, si pulisce le mani
+        // Nico il motorista: tuta blu, straccio in tasca, si pulisce le mani
         const ox = 470, oy = 300, b = Math.sin(t * 1.3) * 1;
         R(g, ox - 8, oy - 40, 7, 40, '#1a2a4a'); R(g, ox + 1, oy - 40, 7, 40, '#22345a'); R(g, ox - 10, oy - 2, 10, 3, '#0a0a0e'); R(g, ox, oy - 2, 10, 3, '#0a0a0e');
         R(g, ox - 12, oy - 78 + b, 24, 40, '#22345a'); R(g, ox - 12, oy - 78 + b, 24, 3, '#2e4470'); R(g, ox + 6, oy - 60 + b, 6, 8, '#d42a2a');
@@ -209,7 +243,7 @@
         // scintille della mola ogni tanto, sul banco
         if ((t % 5) < 0.6) for (let k = 0; k < 8; k++) { const a = -0.5 - k * 0.12, d = ((t * 60 + k * 9) % 30); R(g, 160 + Math.cos(a) * d, 186 + Math.sin(a) * d, 2, 1, '#ffd23f'); }
       },
-      hot: [{ x: 230, y: 120, w: 200, h: 180, label: 'Il motore sul cavalletto', go: 'Progetto del motore' }, { x: 440, y: 190, w: 70, h: 120, label: 'Ottone', go: 'I tuoi motori' }, { x: 10, y: 60, w: 200, h: 150, label: 'La tua auto', go: 'La tua auto' }],
+      hot: [{ x: 230, y: 120, w: 200, h: 180, label: 'Il motore sul cavalletto', go: 'Progetto del motore' }, { x: 440, y: 190, w: 70, h: 120, label: 'Nico', go: 'I tuoi motori' }, { x: 10, y: 60, w: 200, h: 150, label: 'La tua auto', go: 'La tua auto' }],
     };
   }
   addScene();
@@ -222,6 +256,13 @@
   .mt-cat>b{font:600 11px/1 var(--f-data);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .mt-chips{display:flex;flex-wrap:wrap;gap:5px}.mt-chip{flex:1 1 140px;text-align:left;padding:6px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--fg);font:500 12px/1.2 var(--f-data);cursor:pointer}
   .mt-chip small{display:block;color:var(--muted);margin-top:2px}.mt-chip[aria-pressed=true]{border-color:#ff6a2a;background:rgba(255,106,42,.16);box-shadow:0 0 0 1px #ff6a2a inset}
+  .mt-tree{display:grid;gap:4px;padding:8px;border-radius:6px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08)}
+  .mt-tr{display:grid;grid-template-columns:minmax(110px,1fr) auto minmax(150px,1.4fr);gap:8px;align-items:center;font:12px/1.2 var(--f-data)}
+  .mt-pips{display:flex;gap:3px}.mt-pips i{width:16px;height:16px;border-radius:3px;display:grid;place-items:center;font:600 10px/1 var(--f-data);font-style:normal;background:#2a2a30;color:#6a6470}
+  .mt-pips i.on{background:#ff6a2a;color:#1a0a04}.mt-nx{display:grid;gap:2px;justify-items:end}.mt-nx small{color:var(--muted);text-align:right}
+  .mt-nx .ok{color:#b8ff3a}.mt-nx .no{color:#ff7a6a}.mt-nx .kbtn{padding:3px 8px;font-size:12px}
+  .mt-lv{display:inline-block;padding:0 4px;border-radius:3px;background:#2a2a30;color:#ff9a5a;font:600 10px/14px var(--f-data)}.mt-chip:disabled{opacity:.45;cursor:not-allowed}
+  @media (max-width:700px){.mt-tr{grid-template-columns:1fr auto}.mt-nx{grid-column:1/-1;justify-items:start}.mt-nx small{text-align:left}}
   .mt-note{margin:0;font:12px/1.3 var(--f-data);color:var(--muted)}
   .mt-sheet{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:10px;border-radius:6px;background:#0e0c10;border:1px solid #ff6a2a55;font:13px/1.25 var(--f-data)}
   .mt-sheet span{color:var(--muted)}.mt-sheet b{text-align:right;color:var(--fg)}.mt-sheet .big{font:400 22px/1 var(--f-display);color:#ff9a5a}
@@ -264,9 +305,16 @@
       + `<span>Coppia</span><b class="big" style="color:#2ee6ff">${c.nm} Nm</b><span>Limitatore</span><b>${fmt(c.lim)} giri</b>`
       + `<span>Peso</span><b>${c.kg} kg <small style="color:var(--muted)">(${kgD >= 0 ? '+' : ''}${kgD} sulla ${esc(car.short || car.name)})</small></b>`
       + `<span>Pezzi</span><b style="color:#ff9a5a">€ ${fmt(c.price)}</b>`
-      + `<span>Affidabilità</span><b style="color:${rc}">${rel} %</b><div class="mt-bar"><i style="width:${rel}%;background:${rc}"></i></div>`;
+      + `<span>Affidabilità</span><b style="color:${rc}">${rel} %</b><div class="mt-bar"><i style="width:${rel}%;background:${rc}"></i></div>`
+      + (() => { const k = Math.round(c.coolK * 100), cc = k >= 110 ? '#2ee6ff' : k >= 100 ? '#b8ff3a' : k >= 80 ? '#ffd23f' : '#ff4a3a';
+        return `<span>Raffreddamento</span><b style="color:${cc}">${k} % <small style="color:var(--muted)">(${c.qOut} kW su ${c.qIn})</small></b><div class="mt-bar"><i style="width:${Math.min(100, k / 1.5)}%;background:${cc}"></i></div>`; })()
+      + `<span>Frizione</span><b style="color:${c.slitta ? '#ff4a3a' : 'var(--fg)'}">tiene ${c.clutch} Nm</b>`;
     const w = [];
-    if (c.lean) w.push('Iniettori troppo piccoli: la benzina non basta, la potenza si ferma e il motore gira magro.');
+    if (c.lean) w.push(c.leanPompa ? 'La pompa della benzina non ce la fa: a gas pieno la pressione cala, il motore gira magro e la potenza si ferma lì.' : 'Iniettori troppo piccoli: la benzina non basta, la potenza si ferma e il motore gira magro.');
+    if (c.caldo > 0.15) w.push(c.parts.intercooler.cap ? `Intercooler piccolo per ${String(c.boost).replace('.', ',')} bar: l'aria entra calda, perde ossigeno, scalda il motore e fa battere.` : 'Turbo senza intercooler: l\'aria compressa entra calda, perdi potenza, l\'acqua scalda e il motore batte.');
+    if (c.coolK < 1) w.push(`Il radiatore porta via ${c.qOut} kW, a gas pieno il motore ne butta nell'acqua ${c.qIn}: tirandolo a lungo la temperatura sale, la centralina va in protezione e se insisti salta la guarnizione.`);
+    if (c.oilOver > 0) w.push(`La pompa dell'olio regge fino a ${fmt(c.parts.olio.rpmOk)} giri, il motore ne fa ${fmt(c.lim)}: in alto la pressione cala e le bronzine soffrono.`);
+    if (c.slitta) w.push(`La frizione tiene ${c.clutch} Nm, il motore ne fa ${c.nm}: a gas pieno slitta.`);
     if (c.knock) w.push('Compressione alta col turbo: batte in testa. Pistoni a compressione bassa!');
     if (c.deboli.length) w.push('Al limite: ' + c.deboli.join(', ').toLowerCase() + '.');
     if (c.parts.sovra.max > c.boost + 0.01) w.push(`La centralina di serie tiene il turbo a ${String(c.boost).replace('.', ',')} bar.`);
@@ -284,7 +332,7 @@
     const p = (t) => { const e = document.createElement('p'); e.className = 'hint'; e.style.margin = '0'; e.textContent = t; wrap.appendChild(e); };
     const btn = (t, f, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = t; b.disabled = !!dis; b.addEventListener('click', f); return b; };
     const done = (r) => { if (r && r.ok === false) { if (r.why) ctx.flash(r.why, 2.4); } else ctx.save(); ctx.refresh(); };
-    p('Ottone: «Un motore si costruisce dal basso: blocco, albero, bielle, pistoni, poi la testa. Scegli i pezzi, il resto lo facciamo insieme sul cavalletto.»');
+    p('Nico: «Un motore si costruisce dal basso: blocco, albero, bielle, pistoni, poi la testa. E non basta che ogni pezzo sia forte: devono andare d\'accordo. Un turbo grosso con un radiatore piccolo ti cuoce la testata. I pezzi buoni te li insegno io, un livello alla volta.»');
     // la tua auto
     h('La tua auto');
     { const car = CARS[game.car], e = game.motOf(), c = e && motCalc(e.sel), d = document.createElement('div'); d.className = 'mt-eng';
@@ -292,17 +340,36 @@
       const a = document.createElement('div'); a.className = 'acts';
       if (e) a.appendChild(btn(`Rimetti quello di serie · € ${MOT.lavoro}`, () => done(game.motUnmount()), game.s.money < MOT.lavoro));
       d.appendChild(a); wrap.appendChild(d); }
+    // l'albero dei pezzi: per ogni reparto il livello che conosci (1-4) e cosa serve per il prossimo
+    h('Quello che ti ha insegnato Nico');
+    { const tree = document.createElement('div'); tree.className = 'mt-tree';
+      for (const C of MOT_PARTI) {
+        const lv = game.motLiv(C.id), nx = game.motNext(C.id), row = document.createElement('div'); row.className = 'mt-tr';
+        row.innerHTML = `<b>${esc(C.label)}</b><span class="mt-pips">${[1, 2, 3, 4].map((l) => `<i class="${l <= lv ? 'on' : ''}">${l}</i>`).join('')}</span>`;
+        const a = document.createElement('div'); a.className = 'mt-nx';
+        if (!nx) a.innerHTML = '<small>tutto</small>';
+        else {
+          const reqs = nx.req.map((r) => `<span class="${r.ok ? 'ok' : 'no'}">${esc(r.t)}</span>`).join(' ');
+          const b = btn(`Livello ${nx.lv} · € ${fmt(nx.price)}`, () => { const r = game.motUnlock(C.id); if (r.ok) ctx.flash(`Nico ti ha insegnato ${C.label.toLowerCase()} di livello ${r.lv}: ${r.items.map((x) => x.name).join(', ')}`, 3.4); done(r); }, !nx.ok || game.s.money < nx.price);
+          b.title = nx.items.map((x) => `${x.name}: ${x.note}`).join('\n');
+          a.appendChild(b); if (reqs) { const q = document.createElement('small'); q.innerHTML = reqs; a.appendChild(q); }
+        }
+        row.appendChild(a); tree.appendChild(row);
+      }
+      wrap.appendChild(tree); }
     // progetto
     h('Progetto del motore');
     const B = M.bozza || (M.bozza = Object.assign({}, MOT_BASE));
-    for (const k of ORDER) if (!motPart(k, B[k])) B[k] = MOT_BASE[k];
+    for (const k of ORDER) if (!motPart(k, B[k]) || !game.motPuoi(k, B[k])) B[k] = MOT_BASE[k];
     for (const C of MOT_PARTI) {
       const box = document.createElement('div'); box.className = 'mt-cat';
-      box.innerHTML = `<b>${ORDER.indexOf(C.id) + 1}. ${esc(C.label)}</b>`;
+      box.innerHTML = `<b>${ORDER.indexOf(C.id) + 1}. ${esc(C.label)} <span style="color:#ff9a5a">· livello ${game.motLiv(C.id)}</span></b>`;
       const chips = document.createElement('div'); chips.className = 'mt-chips';
       for (const it of C.items) {
         const b = document.createElement('button'); b.type = 'button'; b.className = 'mt-chip'; b.setAttribute('aria-pressed', String(B[C.id] === it.id));
-        b.innerHTML = `${esc(it.name)}<small>${it.price ? '€ ' + fmt(it.price) : 'gratis'}</small>`;
+        const sai = game.motPuoi(C.id, it.id), lv = it.lv || 1;
+        b.innerHTML = `<span class="mt-lv">L${lv}</span> ${esc(it.name)}<small>${sai ? (it.price ? '€ ' + fmt(it.price) : 'gratis') : '🔒 livello ' + lv + ': te lo insegna Nico'}</small>`;
+        b.disabled = !sai; b.title = it.note;
         b.addEventListener('click', () => { B[C.id] = it.id; ctx.refresh(); });
         chips.appendChild(b);
       }
@@ -313,7 +380,7 @@
     const c = motCalc(B);
     wrap.appendChild(sheet(c, game));
     const full = M.list.length >= MOT.maxMotori;
-    const go = btn(`Al cavalletto: montalo tu · € ${fmt(c.price)}`, () => banco(B, ctx), game.s.money < c.price || full);
+    const go = btn(`Al cavalletto: montalo tu · € ${fmt(c.price)}`, () => banco(c.sel, ctx), game.s.money < c.price || full);
     go.style.cssText = 'font-size:15px;padding:10px'; wrap.appendChild(go);
     if (full) p(`In magazzino ci stanno ${MOT.maxMotori} motori: vendine uno per costruirne un altro.`);
     else if (game.s.money < c.price) p('Non hai abbastanza soldi per tutti questi pezzi.');
@@ -361,7 +428,7 @@
     return { stop() { const t = a.currentTime; gg.gain.cancelScheduledValues(t); gg.gain.setValueAtTime(gg.gain.value, t); gg.gain.linearRampToValueAtTime(0, t + 0.4); setTimeout(() => { try { o.stop(); o2.stop(); } catch (e) { /* */ } }, 600); } };
   }
 
-  const OTTONE = {
+  const NICO = {
     ok: ['Bravo, va lì.', 'Perfetto. Stringi in croce, mi raccomando.', 'Così. Senti come entra?', 'Bene. Coppia di serraggio giusta.', 'Ecco fatto.'],
     no: (want, got) => `No no, ferma: ${got.toLowerCase()} va dopo. Prima ${want.toLowerCase()}: si monta dal basso verso l'alto.`,
   };
@@ -374,7 +441,7 @@
     document.body.appendChild(box);
     const cv = box.querySelector('canvas'), tray = box.querySelector('.mt-tray'), say = box.querySelector('.mt-say'), g = cv.getContext('2d');
     const st = { upto: 0, anim: null, run: 0, done: false, t0: performance.now(), sel: 0, snd: null, built: null };
-    const talk = (t) => { say.innerHTML = `<b>Ottone:</b> ${esc(t)}`; };
+    const talk = (t) => { say.innerHTML = `<b>Nico:</b> ${esc(t)}`; };
     talk('Ecco la cassetta. Prendi il pezzo che va montato adesso: si parte dal basso. Clicca un pezzo (o frecce e Invio).');
     // i pezzi in cassetta, mescolati (sempre allo stesso modo per lo stesso progetto)
     const order = ORDER.slice().sort((a, b) => rnd(ORDER.indexOf(a) * 13.1 + c.price) - rnd(ORDER.indexOf(b) * 13.1 + c.price));
@@ -395,7 +462,7 @@
     const pick = (k, b) => {
       if (st.anim || st.run) return;
       const want = ORDER[st.upto];
-      if (k !== want) { if (b) { b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); } clank(1, 0.5); talk(OTTONE.no(MOT_CAT[want].label, MOT_CAT[k].label)); return; }
+      if (k !== want) { if (b) { b.classList.remove('no'); void b.offsetWidth; b.classList.add('no'); } clank(1, 0.5); talk(NICO.no(MOT_CAT[want].label, MOT_CAT[k].label)); return; }
       st.anim = { k, t: 0 }; st.sel = 0; renderTray();
     };
     const accendi = () => {
@@ -442,7 +509,7 @@
       if (st.anim) {
         st.anim.t += dt;
         if (st.anim.t > 0.55 && !st.anim.c) { st.anim.c = 1; clank(3 + (st.anim.k === 'blocco' ? 2 : 0)); }
-        if (st.anim.t > 1.0) { st.upto++; const k2 = st.anim.k; st.anim = null; talk(st.upto >= ORDER.length ? 'Ecco, è tutto montato. Adesso la prova del nove: gira la chiave.' : OTTONE.ok[Math.floor(rnd(st.upto * 3.3) * OTTONE.ok.length)] + ` (${MOT_CAT[k2].label.toLowerCase()} a posto: ora ${MOT_CAT[ORDER[st.upto]].label.toLowerCase()})`); renderTray(); }
+        if (st.anim.t > 1.0) { st.upto++; const k2 = st.anim.k; st.anim = null; talk(st.upto >= ORDER.length ? 'Ecco, è tutto montato. Adesso la prova del nove: gira la chiave.' : NICO.ok[Math.floor(rnd(st.upto * 3.3) * NICO.ok.length)] + ` (${MOT_CAT[k2].label.toLowerCase()} a posto: ora ${MOT_CAT[ORDER[st.upto]].label.toLowerCase()})`); renderTray(); }
       }
       const upto = st.upto + (st.anim ? Math.min(1, st.anim.t / 0.55) * 0.999 : 0);
       // il motore grande al centro (scala 1,6), il pezzo nuovo che scende dall'alto
@@ -454,7 +521,7 @@
       // numeri del progetto in basso a sinistra
       g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(12, 10, 200, 50); g.fillStyle = '#ff9a5a'; g.font = '400 18px "Saira Stencil One", "Russo One", sans-serif'; g.fillText(`${c.hp} CV · ${c.nm} Nm`, 20, 32);
       g.fillStyle = '#c8c4cc'; g.font = '12px "Share Tech Mono", monospace'; g.fillText(`${c.tipo} · ${fmt(c.lim)} giri · ${c.kg} kg`, 20, 50);
-      g.fillStyle = '#c8c4cc'; g.fillText(`pezzi montati ${st.upto}/${ORDER.length}`, 520, 50);
+      g.fillStyle = '#c8c4cc'; g.fillText(`pezzi montati ${st.upto}/${ORDER.length}`, 470, 50);
       st.raf = requestAnimationFrame(loop);
     };
     st.raf = requestAnimationFrame(loop);

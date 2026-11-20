@@ -6,13 +6,15 @@ import { readFileSync } from 'node:fs';
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'motori.js']
   .map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const X = new Function(src + ';return { SupraSim, StreetGame, VG, VG_PATTERN, MOT, MOT_PARTI, MOT_BASE, motCalc, motApply, motKgSerie, CARS, tuningParams, setActiveCar };')();
-const { SupraSim, StreetGame, VG, MOT, MOT_BASE, motCalc, motApply } = X;
+const X = new Function(src + ';return { SupraSim, StreetGame, VG, VG_PATTERN, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motFill, motApply, motKgSerie, CARS, tuningParams, setActiveCar };')();
+const { SupraSim, StreetGame, VG, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motApply } = X;
 
 const TURBO = { blocco: 'b4_20', albero: 'forg', bielle: 'h', pistoni: 'low', testata: 'v4', camme: 'sport', sovra: 'tm', iniettori: 'i750', centralina: 'prog' };
-const viaggio = (soldi = 100000) => {
+// tutto: Nico ti ha già insegnato tutti i livelli (per provare i pezzi di qualunque livello)
+const viaggio = (soldi = 100000, tutto = true) => {
   const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip();
   game.trafficOn = false; game.nextRoadEvent = 1e9; game.ents = []; game.s.money = soldi;
+  if (tutto) game.motUnlockAll();
   return { sim, game };
 };
 const alPistone = (game) => { let n = 0; while (VG.stop(n).id !== 'motori') n++; game.inside = { id: 'motori', x: VG.stopX(n), phase: 'shop' }; game.s.dist = VG.stopX(n); };
@@ -91,4 +93,95 @@ test('motori: magazzino limitato, vendita e soldi che non bastano', () => {
   assert.equal(game.motBuild(MOT_BASE).ok, false, 'magazzino pieno');
   const e = game.mot().list[0], m0 = game.s.money, v = game.motValue(e);
   assert.ok(game.motSell(e.id).ok); assert.equal(game.s.money, m0 + v); assert.ok(v > 0 && v < e.prezzo);
+});
+
+// ---------------------------------------------------------------- livelli di Nico, calore, frizione, olio
+const PIENO = { blocco: 'b4_20', albero: 'forg', bielle: 'h', pistoni: 'low', olio: 'hv', testata: 'v4', camme: 'sport', sovra: 'tm', intercooler: 'fmg', iniettori: 'i750', benzina: 'p255', centralina: 'prog', radiatore: 'all3', frizione: 'rinf' };
+
+test('motori: ogni reparto ha i livelli da 1 a 4, il motore base è tutto di livello 1', () => {
+  for (const C of MOT_PARTI) for (let l = 1; l <= 4; l++) assert.ok(C.items.some((it) => it.lv === l), `${C.label} livello ${l}`);
+  for (const C of MOT_PARTI) assert.equal(C.items.find((it) => it.id === MOT_BASE[C.id]).lv, 1, C.label);
+  assert.ok(motCalc(MOT_BASE).ok && motCalc(MOT_BASE).rel === 1, 'il motore base regge');
+});
+
+test('motori: i motori di prima (senza i reparti nuovi) vanno come prima', () => {
+  const vecchio = { blocco: 'b4_20', albero: 'forg', bielle: 'h', pistoni: 'low', testata: 'v4', camme: 'sport', sovra: 'tm', iniettori: 'i750', centralina: 'prog' };
+  const c = motCalc(vecchio); assert.ok(c.ok);
+  assert.ok(!c.lean && c.caldo === 0 && !c.slitta && c.oilOver === 0 && c.coolK >= 1, 'pompa, intercooler, frizione, olio e radiatore adeguati');
+});
+
+test('motori: Nico insegna un livello alla volta, coi requisiti (soldi, km, motori costruiti, altri reparti)', () => {
+  const { game } = viaggio(100000, false); alPistone(game);
+  assert.equal(game.motLiv('sovra'), 1);
+  assert.equal(game.motBuild(PIENO).ok, false, 'pezzi di livello alto: non li sai ancora montare');
+  assert.ok(game.motBuild(MOT_BASE).ok, 'il motore base sì');
+  // turbo medio (livello 2): prima pistoni e iniettori di livello 2
+  assert.equal(game.motUnlock('sovra').ok, false);
+  const m0 = game.s.money;
+  assert.ok(game.motUnlock('pistoni').ok && game.motUnlock('iniettori').ok);
+  assert.equal(game.s.money, m0 - 2 * MOT_LIV[2].price);
+  assert.ok(game.motUnlock('sovra').ok); assert.equal(game.motLiv('sovra'), 2);
+  // livello 3: servono km di viaggio
+  game.s.dist = 0; const n3 = game.motNext('pistoni'); assert.equal(n3.lv, 3); assert.equal(n3.ok, false);
+  game.s.dist = (MOT_LIV[3].km + 1) * 1000; assert.ok(game.motUnlock('bielle').ok || game.motUnlock('albero').ok);
+  // fuori dal Pistone no
+  game.inside = null; assert.equal(game.motUnlock('radiatore').ok, false);
+});
+
+test('motori: intercooler piccolo col turbo grande = aria calda, battito, meno affidabilità e più calore', () => {
+  const buono = motCalc(Object.assign({}, PIENO, { pistoni: 'ipe', sovra: 'tp', intercooler: 'fmg' })), caldo = motCalc(Object.assign({}, PIENO, { pistoni: 'ipe', sovra: 'tp', intercooler: 'no' }));
+  assert.ok(caldo.caldo > 0.6 && buono.caldo === 0);
+  assert.ok(caldo.knock && caldo.rel < buono.rel, 'aria calda su pistoni non da turbo: batte');
+  assert.ok(caldo.qIn > buono.qIn, 'più calore nell\'acqua');
+  // al contrario, intercooler grande e turbo piccolo va benissimo
+  const ok = motCalc(Object.assign({}, PIENO, { sovra: 'tp', intercooler: 'aa' })); assert.equal(ok.caldo, 0);
+});
+
+test('motori: pompa della benzina, pompa dell\'olio e frizione piccole si sentono', () => {
+  const magro = motCalc(Object.assign({}, PIENO, { benzina: 'serie' }));
+  assert.ok(magro.lean && magro.leanPompa && magro.hp <= 236, `pompa di serie: ${magro.hp} CV`);
+  const giri = motCalc(Object.assign({}, PIENO, { olio: 'serie' }));
+  assert.ok(giri.oilOver > 0 && giri.rel < motCalc(PIENO).rel, 'olio che non basta ai giri');
+  assert.ok(motCalc(Object.assign({}, PIENO, { frizione: 'org' })).slitta, 'frizione di serie con 390 Nm: slitta');
+  assert.equal(motCalc(PIENO).slitta, false);
+});
+
+test('motori: a gas pieno un radiatore piccolo fa salire l\'acqua fino alla protezione; da fermo al minimo si raffredda', () => {
+  const run = (rad) => {
+    const { sim, game } = viaggio(); alPistone(game);
+    const sel = Object.assign({}, PIENO, { radiatore: rad }), r = game.motBuild(sel); game.motMount(r.e.id); game.inside = null;
+    X.setActiveCar(game.car); const TP = X.tuningParams({}); sim.setCar(Object.assign({}, X.CARS[game.car].P));
+    motApply(game, game.car, TP, sim); sim.setTune(TP.sim);
+    // in quarta a 72 all'ora, gas a fondo per un minuto e mezzo (fino alla velocità massima)
+    sim.setIgnition(true); sim.running = true; sim.fuel = 1; sim.waterT = 90; sim.gear = 4; sim.lock = true; sim.in.thr = 1; sim.in.clutch = 0;
+    sim.v = 20; sim.ww = sim.v / sim.P.r; sim.wo = sim.ww; sim.we = sim.wo * sim.ratio(4);
+    let maxT = 0, minK = 1;
+    for (let i = 0; i < 60 * 90; i++) { sim.update(1 / 60); game.motTick(1 / 60, 0); maxT = Math.max(maxT, sim.waterT); minK = Math.min(minK, sim.hotK); if (r.e.rotto) break; }
+    return { sim, game, e: r.e, maxT, minK, prot: motCalc(sel).cool.prot };
+  };
+  const big = run('gara'), small = run('serie');
+  assert.ok(big.maxT < big.prot, `radiatore da gara: max ${big.maxT.toFixed(0)} °C`);
+  assert.ok(small.maxT >= small.prot, `radiatore di serie su ${motCalc(PIENO).hp} CV: arriva a ${small.maxT.toFixed(0)} °C`);
+  assert.ok(small.minK < 0.8, 'in protezione la potenza cala');
+  // al minimo da fermo la ventola lo raffredda (se non è già cotto)
+  if (!small.e.rotto) {
+    const s = small.sim; s.in.thr = 0; s.gear = 0; s.v = 0; const T0 = s.waterT;
+    for (let i = 0; i < 60 * 60; i++) { s.update(1 / 60); s.v = 0; }
+    assert.ok(s.waterT < T0 - 10, `al minimo scende: ${T0.toFixed(0)} → ${s.waterT.toFixed(0)} °C`);
+  }
+});
+
+test('motori: oltre la protezione a lungo salta la guarnizione della testata', () => {
+  const { sim, game } = viaggio(); alPistone(game);
+  const r = game.motBuild(PIENO); game.motMount(r.e.id); game.inside = null;
+  const prot = motCalc(PIENO).cool.prot;
+  for (let i = 0; i < 60 * 20 && !r.e.rotto; i++) { sim.running = true; sim.waterT = prot + 10; game.motTick(1 / 60, 0); }
+  assert.ok(r.e.rotto); assert.equal(r.e.guasto, 'guarnizione'); assert.equal(sim.running, false);
+});
+
+test('motori: auto col motore di serie, niente bilancio di calore (come prima)', () => {
+  const { sim, game } = viaggio();
+  X.setActiveCar(game.car); const TP = X.tuningParams({}); sim.setCar(Object.assign({}, X.CARS[game.car].P));
+  motApply(game, game.car, TP, sim); sim.setTune(TP.sim);
+  assert.equal(sim.tune.cool, null); sim.running = true; sim.update(0.1); assert.equal(sim.hotK, 1);
 });

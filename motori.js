@@ -8,6 +8,10 @@
 //  Il calcolo (motCalc) è puro: CV e Nm stimati, limitatore, peso, affidabilità. Se chiedi più di quanto reggono
 //  blocco, albero, bielle e pistoni (o un turbo grosso su pistoni ad alta compressione), l'affidabilità scende: tirando
 //  il motore al limitatore a gas pieno, a lungo andare si rompe (non riparte finché non lo ricostruisci al Pistone).
+//  I pezzi hanno un livello (1-4): i livelli li insegna Nico, reparto per reparto (MOT_LIV, dip). I pezzi devono andare
+//  d'accordo come in un'officina vera: benzina (iniettori e pompa), aria (intercooler contro i bar), olio (giri),
+//  frizione (Nm) e calore (radiatore contro i kW che il motore butta nell'acqua: in strada lo calcola sim.js, con la
+//  protezione della centralina e la guarnizione che salta se insisti).
 //  Prezzi e numeri in MOT, pezzi in MOT_PARTI. Test in test/motori-costruiti.test.js.
 // ============================================================================
 const MOT = {
@@ -15,54 +19,109 @@ const MOT = {
   revisione: 0.35,      // rifare un motore rotto: frazione del prezzo dei pezzi
   maxMotori: 4,         // motori che si tengono in magazzino
   vendita: 0.55,        // rivendere un motore: frazione del prezzo dei pezzi (meno l'usura)
+  // calore: quota della potenza all'albero che finisce nell'acqua (un motore a benzina butta circa un terzo
+  // dell'energia nello scarico, un terzo nel raffreddamento e un terzo lo dà alle ruote); capacità termica di
+  // acqua, blocco e testata (J/K): più è alta, più ci mette a scaldarsi e a raffreddarsi
+  quotaAcqua: 0.6, capTermica: 90000, aria: 25,
+  cottura: 6,           // secondi oltre la protezione + 8 °C prima che salti la guarnizione della testata
 };
 
-// i reparti nell'ordine di montaggio; ogni pezzo: id, nome, prezzo, nota, kg e i suoi effetti
+// i livelli che insegna Nico al Pistone: si sblocca un reparto alla volta, un livello dopo l'altro.
+// km: km del Viaggio fatti; motori: motori costruiti finora (si impara montandoli)
+const MOT_LIV = [null,
+  { price: 0, km: 0, motori: 0 },
+  { price: 1200, km: 0, motori: 0 },
+  { price: 3500, km: 40, motori: 1 },
+  { price: 8000, km: 90, motori: 2 },
+];
+
+// i reparti nell'ordine di montaggio (dal basso in alto, la frizione per ultima dietro al volano); ogni pezzo: id,
+// livello (lv 1-4, quando lo puoi comprare), nome, prezzo, nota, kg e i suoi effetti. reg = cavalli che regge per
+// cilindro. dip = per sbloccare il livello n di questo reparto devi conoscere già quei livelli di altri reparti.
 const MOT_PARTI = [
-  { id: 'blocco', label: 'Blocco', items: [
-    { id: 'b4_16', name: '4 cilindri 1.6 in alluminio', price: 900, kg: 95, cyl: 4, disp: 1.6, reg: 70, note: 'Leggero e piccolo: sale di giri volentieri, regge poco.' },
-    { id: 'b4_20', name: '4 cilindri 2.0 in ghisa', price: 1400, kg: 135, cyl: 4, disp: 2.0, reg: 110, note: 'Pesante ma indistruttibile: la base classica per il turbo.' },
-    { id: 'b5_23', name: '5 cilindri 2.3 in alluminio', price: 2600, kg: 150, cyl: 5, disp: 2.3, reg: 85, note: 'Cinque cilindri: uno scoppio ogni 144°, la voce rauca e storta.' },
-    { id: 'b6_25', name: '6 cilindri 2.5 in alluminio', price: 3200, kg: 165, cyl: 6, disp: 2.5, reg: 75, note: 'Sei in linea: liscio come la seta, urla in alto.' },
-    { id: 'b6_30', name: '6 cilindri 3.0 in ghisa', price: 4800, kg: 215, cyl: 6, disp: 3.0, reg: 120, note: 'Il blocco da 1000 cavalli: pesa, ma non si rompe mai.' } ] },
-  { id: 'albero', label: 'Albero motore', items: [
-    { id: 'fuso', name: 'In ghisa', price: 400, kg: 0, rpm: 7200, reg: 60, note: 'Di serie: va bene finché non esageri.' },
-    { id: 'forg', name: 'Forgiato', price: 1300, kg: -2, rpm: 8600, reg: 120, note: 'Acciaio forgiato: regge giri e potenza.' },
-    { id: 'stroker', name: 'Forgiato a corsa lunga', price: 1900, kg: 2, rpm: 7300, reg: 110, dispK: 1.1, lowK: 1.04, note: '+10 % di cilindrata: più coppia in basso, sale meno di giri.' } ] },
-  { id: 'bielle', label: 'Bielle', items: [
-    { id: 'fuse', name: 'Di serie, in ghisa', price: 300, kg: 0, rpm: 7000, reg: 45, note: 'Il punto debole di ogni motore spinto.' },
-    { id: 'h', name: 'Forgiate ad H', price: 900, kg: 0, rpm: 8200, reg: 90, note: 'Le prime da mettere se vuoi il turbo.' },
-    { id: 'ti', name: 'In titanio', price: 2200, kg: -2, rpm: 9200, reg: 125, note: 'Leggerissime: il motore prende giri come una moto.' } ] },
-  { id: 'pistoni', label: 'Pistoni', items: [
-    { id: 'std', name: 'Fusi, compressione 10:1', price: 350, kg: 0, comp: 'std', reg: 45, note: 'Di serie: un po\' di turbo lo reggono, non tanto.' },
-    { id: 'low', name: 'Forgiati, compressione bassa 8,5:1', price: 1000, kg: 0, comp: 'low', reg: 110, note: 'Fatti per il turbo: meno spinta da aspirato, reggono pressioni alte.' },
-    { id: 'high', name: 'Forgiati, compressione alta 11,5:1', price: 1100, kg: 0, comp: 'high', reg: 100, note: 'Per l\'aspirato: +6 % di coppia. Col turbo battono in testa.' } ] },
-  { id: 'testata', label: 'Testata', items: [
-    { id: 'v2', name: '2 valvole per cilindro, monoalbero', price: 600, kg: 20, tq: 88, rN: 3000, rH: 5200, rpm: 6300, fall: 0.82, note: 'Coppia in basso, tranquilla: in alto finisce presto.' },
-    { id: 'v4', name: '4 valvole per cilindro, bialbero', price: 1500, kg: 28, tq: 94, rN: 4200, rH: 6200, rpm: 7300, fall: 0.88, note: 'Il giusto mezzo: piena dappertutto.' },
-    { id: 'v4p', name: '4 valvole, condotti lucidati a mano', price: 2600, kg: 28, tq: 97, rN: 4600, rH: 6900, rpm: 7900, fall: 0.9, note: 'Respira meglio in alto: allunga e spinge fino in fondo.' } ] },
-  { id: 'camme', label: 'Alberi a camme', items: [
-    { id: 'serie', name: 'Di serie', price: 250, kg: 0, tqK: 1, dN: 0, dH: 0, dRpm: 0, lope: 0, idle: 0, note: 'Minimo regolare, guidabile.' },
-    { id: 'sport', name: 'Sportivi (264°)', price: 700, kg: 0, tqK: 0.98, dN: 500, dH: 400, dRpm: 300, lope: 0.25, idle: 100, note: 'Il minimo comincia a scalciare, in alto c\'è di più.' },
-    { id: 'gara', name: 'Da gara (280°)', price: 1300, kg: 0, tqK: 0.93, dN: 1000, dH: 900, dRpm: 700, lope: 0.6, idle: 250, note: 'Minimo che galoppa, in basso vuoto, in alto esplode.' } ] },
-  { id: 'sovra', label: 'Sovralimentazione', items: [
-    { id: 'na', name: 'Aspirato', price: 0, kg: 0, max: 0, note: 'Nessun turbo: risposta immediata.' },
-    { id: 'tp', name: 'Turbo piccolo (0,7 bar)', price: 2200, kg: 14, max: 0.7, a: 2200, b: 3200, note: 'Si sveglia presto, spinta dolce.' },
-    { id: 'tm', name: 'Turbo medio (1,1 bar)', price: 3600, kg: 18, max: 1.1, a: 2800, b: 3900, note: 'Un po\' di ritardo, poi una bella botta.' },
-    { id: 'tg', name: 'Turbo grande (1,6 bar)', price: 5200, kg: 22, max: 1.6, a: 3400, b: 4700, note: 'Sotto i 3500 giri dorme. Poi una catapulta.' },
-    { id: 'sc', name: 'Compressore volumetrico (0,6 bar)', price: 3000, kg: 16, max: 0.6, sc: true, note: 'Spinta subito e sempre, col fischio acuto.' } ] },
-  { id: 'iniettori', label: 'Iniettori', items: [
-    { id: 'i250', name: '250 cc', price: 200, kg: 0, cap: 42, note: 'Bastano per un aspirato tranquillo.' },
-    { id: 'i440', name: '440 cc', price: 600, kg: 0, cap: 75, note: 'Per un turbo normale.' },
-    { id: 'i750', name: '750 cc', price: 1100, kg: 0, cap: 135, note: 'Benzina per tutto quello che vuoi fare.' } ] },
-  { id: 'centralina', label: 'Centralina', items: [
-    { id: 'serie', name: 'Di serie', price: 300, kg: 0, maxBoost: 0.6, spark: false, pw: 1, rpm: 0, note: 'Non sopra 0,6 bar, niente launch e scoppi.' },
-    { id: 'prog', name: 'Programmabile', price: 1600, kg: 0, maxBoost: 2.2, spark: true, pw: 1.03, rpm: 300, note: 'Tutta la pressione del turbo, +300 giri, launch control, pop & bang.' } ] },
+  { id: 'blocco', label: 'Blocco', dip: {}, items: [
+    { id: 'b4_16', lv: 1, name: '4 cilindri 1.6 in alluminio', price: 900, kg: 95, cyl: 4, disp: 1.6, reg: 70, note: 'Leggero e piccolo: sale di giri volentieri, regge poco (sui 280 CV).' },
+    { id: 'b4_20', lv: 1, name: '4 cilindri 2.0 in ghisa', price: 1400, kg: 135, cyl: 4, disp: 2.0, reg: 110, note: 'Pesante ma duro: la base classica per il turbo, regge sui 440 CV.' },
+    { id: 'b5_23', lv: 2, name: '5 cilindri 2.3 in alluminio', price: 2600, kg: 150, cyl: 5, disp: 2.3, reg: 85, note: 'Cinque cilindri: uno scoppio ogni 144°, la voce rauca e storta.' },
+    { id: 'b6_25', lv: 2, name: '6 cilindri 2.5 in alluminio', price: 3200, kg: 165, cyl: 6, disp: 2.5, reg: 75, note: 'Sei in linea: liscio come la seta, urla in alto.' },
+    { id: 'b6_30', lv: 3, name: '6 cilindri 3.0 in ghisa', price: 4800, kg: 215, cyl: 6, disp: 3.0, reg: 120, note: 'Sei in linea di ghisa con sette supporti di banco: regge sui 700 CV.' },
+    { id: 'b4_20cd', lv: 4, name: '4 cilindri 2.0 closed deck', price: 4200, kg: 140, cyl: 4, disp: 2.0, reg: 170, note: 'Canne chiuse in testa e camicie in acciaio: le guarnizioni non si muovono più. Sui 680 CV.' },
+    { id: 'b6_30cd', lv: 4, name: '6 cilindri 3.0 closed deck', price: 7500, kg: 222, cyl: 6, disp: 3.0, reg: 175, note: 'Il blocco da mille cavalli: canne chiuse, camicie in acciaio, banco rinforzato.' } ] },
+  { id: 'albero', label: 'Albero motore', dip: { 3: [['blocco', 2]], 4: [['blocco', 3]] }, items: [
+    { id: 'fuso', lv: 1, name: 'In ghisa', price: 400, kg: 0, rpm: 7200, reg: 60, note: 'Di serie: va bene finché non esageri.' },
+    { id: 'forg', lv: 2, name: 'Forgiato', price: 1300, kg: -2, rpm: 8600, reg: 120, note: 'Acciaio forgiato e temprato: regge giri e potenza.' },
+    { id: 'stroker', lv: 3, name: 'Forgiato a corsa lunga', price: 1900, kg: 2, rpm: 7300, reg: 110, dispK: 1.1, lowK: 1.04, note: '+10 % di cilindrata: più coppia in basso, ma i pistoni corrono di più e sale meno di giri.' },
+    { id: 'billet', lv: 4, name: 'Ricavato dal pieno (billet), equilibrato', price: 2900, kg: -3, rpm: 9500, reg: 165, note: 'Fresato da un blocco di acciaio e bilanciato al grammo: niente vibrazioni fino a 9500 giri.' } ] },
+  { id: 'bielle', label: 'Bielle', dip: { 3: [['albero', 2]], 4: [['albero', 3]] }, items: [
+    { id: 'fuse', lv: 1, name: 'Di serie, in ghisa', price: 300, kg: 0, rpm: 7000, reg: 45, note: 'Il punto debole di ogni motore spinto: sopra i 45 CV a cilindro si piegano.' },
+    { id: 'h', lv: 2, name: 'Forgiate ad H', price: 900, kg: 0, rpm: 8200, reg: 90, note: 'Le prime da mettere se vuoi il turbo.' },
+    { id: 'harp', lv: 3, name: 'Forgiate ad H con viti ARP', price: 1400, kg: 0, rpm: 8800, reg: 115, note: 'Le viti delle bielle sono quelle che cedono per prime in alto: queste no.' },
+    { id: 'ti', lv: 4, name: 'In titanio', price: 2200, kg: -2, rpm: 9200, reg: 150, note: 'Leggerissime: meno massa che va su e giù, il motore prende giri come una moto.' } ] },
+  { id: 'pistoni', label: 'Pistoni', dip: { 3: [['bielle', 2]], 4: [['bielle', 3]] }, items: [
+    { id: 'std', lv: 1, name: 'Fusi, compressione 10:1', price: 350, kg: 0, comp: 'std', reg: 45, note: 'Di serie: un po\' di turbo lo reggono, non tanto.' },
+    { id: 'ipe', lv: 2, name: 'Ipereutettici, compressione 10:1', price: 600, kg: 0, comp: 'std', reg: 65, note: 'Lega con più silicio: dilatano meno e reggono più calore di quelli fusi.' },
+    { id: 'low', lv: 3, name: 'Forgiati, compressione bassa 8,5:1', price: 1000, kg: 0, comp: 'low', reg: 110, note: 'Fatti per il turbo: meno spinta da aspirato, reggono pressioni alte senza battere.' },
+    { id: 'high', lv: 3, name: 'Forgiati, compressione alta 11,5:1', price: 1100, kg: 0, comp: 'high', reg: 100, note: 'Per l\'aspirato: +6 % di coppia. Col turbo battono in testa.' },
+    { id: 'g2618', lv: 4, name: 'Forgiati 2618, 9,5:1, cielo rivestito', price: 2200, kg: 0, comp: 'mid', reg: 150, note: 'Lega 2618 e rivestimento ceramico sul cielo: buoni da aspirato, col turbo battono solo oltre i 2 bar.' } ] },
+  { id: 'olio', label: 'Pompa dell\'olio', dip: { 3: [['albero', 2]], 4: [['albero', 3]] }, items: [
+    { id: 'serie', lv: 1, name: 'Di serie', price: 120, kg: 0, rpmOk: 7000, kw: 0, note: 'Sopra i 7000 giri la pressione cala: le bronzine lavorano col film d\'olio sottile.' },
+    { id: 'hv', lv: 2, name: 'Maggiorata (alta portata)', price: 450, kg: 1, rpmOk: 8000, kw: 0, note: 'Più olio a ogni giro: pressione piena fino a 8000.' },
+    { id: 'hvr', lv: 3, name: 'Maggiorata con radiatore dell\'olio', price: 1100, kg: 4, rpmOk: 8800, kw: 12, note: 'Il radiatore dell\'olio porta via calore anche lui: l\'acqua respira.' },
+    { id: 'secco', lv: 4, name: 'Carter secco a tre stadi', price: 3800, kg: 7, rpmOk: 10000, kw: 20, note: 'Serbatoio a parte e pompa a stadi: l\'olio non sbatte in curva e non manca mai.' } ] },
+  { id: 'testata', label: 'Testata', dip: { 3: [['camme', 2]], 4: [['camme', 3]] }, items: [
+    { id: 'v2', lv: 1, name: '2 valvole per cilindro, monoalbero', price: 600, kg: 20, tq: 88, rN: 3000, rH: 5200, rpm: 6300, fall: 0.82, note: 'Coppia in basso, tranquilla: in alto finisce presto.' },
+    { id: 'v4', lv: 2, name: '4 valvole per cilindro, bialbero', price: 1500, kg: 28, tq: 94, rN: 4200, rH: 6200, rpm: 7300, fall: 0.88, note: 'Il giusto mezzo: piena dappertutto.' },
+    { id: 'v4p', lv: 3, name: '4 valvole, condotti lucidati a mano', price: 2600, kg: 28, tq: 97, rN: 4600, rH: 6900, rpm: 7900, fall: 0.9, note: 'Respira meglio in alto: allunga e spinge fino in fondo.' },
+    { id: 'v4r', lv: 4, name: '4 valvole al sodio, molle doppie', price: 4300, kg: 27, tq: 98, rN: 4800, rH: 7300, rpm: 8700, fall: 0.92, note: 'Valvole cave col sodio dentro che le raffredda, molle doppie: niente sfarfallio fino a 8700.' } ] },
+  { id: 'camme', label: 'Alberi a camme', dip: { 2: [['testata', 2]], 3: [['testata', 3]], 4: [['testata', 4]] }, items: [
+    { id: 'serie', lv: 1, name: 'Di serie', price: 250, kg: 0, tqK: 1, dN: 0, dH: 0, dRpm: 0, lope: 0, idle: 0, note: 'Minimo regolare, guidabile.' },
+    { id: 'sport', lv: 2, name: 'Sportivi (264°)', price: 700, kg: 0, tqK: 0.98, dN: 500, dH: 400, dRpm: 300, lope: 0.25, idle: 100, note: 'Il minimo comincia a scalciare, in alto c\'è di più.' },
+    { id: 'gara', lv: 3, name: 'Da gara (280°)', price: 1300, kg: 0, tqK: 0.93, dN: 1000, dH: 900, dRpm: 700, lope: 0.6, idle: 250, note: 'Minimo che galoppa, in basso vuoto, in alto esplode.' },
+    { id: 'vvt', lv: 4, name: 'Con variatore di fase continuo', price: 2600, kg: 1, tqK: 1, dN: 400, dH: 700, dRpm: 500, lope: 0.1, idle: 0, note: 'La centralina sposta le camme coi giri: piena in basso come le serie, in alto quasi come le gara.' } ] },
+  { id: 'sovra', label: 'Sovralimentazione', dip: { 2: [['pistoni', 2], ['iniettori', 2]], 3: [['centralina', 3], ['intercooler', 2]], 4: [['intercooler', 3], ['bielle', 3]] }, items: [
+    { id: 'na', lv: 1, name: 'Aspirato', price: 0, kg: 0, max: 0, note: 'Nessun turbo: risposta immediata.' },
+    { id: 'tp', lv: 1, name: 'Turbo piccolo (0,7 bar)', price: 2200, kg: 14, max: 0.7, a: 2200, b: 3200, note: 'Si sveglia presto, spinta dolce.' },
+    { id: 'sc', lv: 2, name: 'Compressore volumetrico (0,6 bar)', price: 3000, kg: 16, max: 0.6, sc: true, note: 'Spinta subito e sempre, col fischio acuto.' },
+    { id: 'tm', lv: 2, name: 'Turbo medio (1,1 bar)', price: 3600, kg: 18, max: 1.1, a: 2800, b: 3900, note: 'Un po\' di ritardo, poi una bella botta.' },
+    { id: 'tg', lv: 3, name: 'Turbo grande (1,6 bar)', price: 5200, kg: 22, max: 1.6, a: 3400, b: 4700, note: 'Sotto i 3500 giri dorme. Poi una catapulta.' },
+    { id: 'tgs', lv: 4, name: 'Turbo a cuscinetti a sfere (1,8 bar)', price: 7400, kg: 22, max: 1.8, a: 3000, b: 4200, up: 0.32, note: 'La girante gira sulle sfere invece che sull\'olio: grande ma pronto come un medio.' } ] },
+  { id: 'intercooler', label: 'Intercooler', dip: {}, items: [
+    { id: 'no', lv: 1, name: 'Nessuno', price: 0, kg: 0, heat: 1.6, cap: 0, lag: 1, note: 'L\'aria compressa entra calda: meno ossigeno, più battito, più calore nel motore.' },
+    { id: 'fms', lv: 2, name: 'Frontale piccolo', price: 700, kg: 7, heat: 0.95, cap: 0.8, lag: 1, note: 'Basta fino a 0,8 bar.' },
+    { id: 'fmg', lv: 3, name: 'Frontale grande', price: 1500, kg: 12, heat: 0.6, cap: 1.5, lag: 1.1, note: 'Fino a 1,5 bar l\'aria resta fresca. Tubi lunghi: un filo di ritardo in più.' },
+    { id: 'aa', lv: 4, name: 'Aria-acqua, con pompa e radiatorino', price: 3200, kg: 15, heat: 0.42, cap: 2.2, lag: 0.92, note: 'Vicino al collettore, tubi corti: aria fredda e risposta pronta.' } ] },
+  { id: 'iniettori', label: 'Iniettori', dip: { 3: [['benzina', 2]], 4: [['benzina', 3]] }, items: [
+    { id: 'i250', lv: 1, name: '250 cc', price: 200, kg: 0, cap: 42, note: 'Bastano per un aspirato tranquillo (42 CV a cilindro).' },
+    { id: 'i440', lv: 2, name: '440 cc', price: 600, kg: 0, cap: 75, note: 'Per un turbo normale (75 CV a cilindro).' },
+    { id: 'i750', lv: 3, name: '750 cc', price: 1100, kg: 0, cap: 135, note: 'Benzina per tutto quello che vuoi fare (135 CV a cilindro).' },
+    { id: 'i1000', lv: 4, name: '1000 cc', price: 1700, kg: 0, cap: 175, note: 'Da gara: 175 CV a cilindro. Al minimo vanno tarati bene.' } ] },
+  { id: 'benzina', label: 'Pompa della benzina', dip: {}, items: [
+    { id: 'serie', lv: 1, name: 'Di serie', price: 150, kg: 0, cap: 230, note: 'Porta benzina per circa 230 CV in tutto.' },
+    { id: 'p255', lv: 2, name: 'Maggiorata, 255 litri l\'ora', price: 450, kg: 0, cap: 420, note: 'La classica: fino a circa 420 CV.' },
+    { id: 'dop', lv: 3, name: 'Doppia pompa nel serbatoio', price: 1100, kg: 2, cap: 650, note: 'Due pompe insieme: fino a circa 650 CV.' },
+    { id: 'mecc', lv: 4, name: 'Meccanica, con regolatore e polmone', price: 2400, kg: 4, cap: 950, note: 'Trascinata dal motore: la portata sale coi giri, non resta mai a secco.' } ] },
+  { id: 'centralina', label: 'Centralina', dip: { 3: [['iniettori', 2]], 4: [['sovra', 3]] }, items: [
+    { id: 'serie', lv: 1, name: 'Di serie', price: 300, kg: 0, maxBoost: 0.6, spark: false, pw: 1, rpm: 0, note: 'Non sopra 0,6 bar, niente launch e scoppi.' },
+    { id: 'rimap', lv: 2, name: 'Di serie rimappata', price: 700, kg: 0, maxBoost: 1.2, spark: false, pw: 1.01, rpm: 150, note: 'Mappe riscritte: fino a 1,2 bar e +150 giri.' },
+    { id: 'prog', lv: 3, name: 'Programmabile', price: 1600, kg: 0, maxBoost: 2.2, spark: true, pw: 1.03, rpm: 300, note: 'Tutta la pressione del turbo, +300 giri, launch control, pop & bang.' },
+    { id: 'gara', lv: 4, name: 'Da gara, col sensore di battito', price: 3400, kg: 0, maxBoost: 2.5, spark: true, pw: 1.04, rpm: 400, knockCtl: true, note: 'Sente il battito cilindro per cilindro e ritarda l\'anticipo prima che il pistone si buchi.' } ] },
+  { id: 'radiatore', label: 'Radiatore', dip: {}, items: [
+    { id: 'serie', lv: 1, name: 'Di serie, plastica e alluminio', price: 150, kg: 6, kw: 70, fan: 0.3, prot: 112, note: 'Smaltisce circa 70 kW a 100 all\'ora: un motore sui 160 CV lo tiene a gas pieno.' },
+    { id: 'all2', lv: 2, name: 'Alluminio, due ranghi', price: 550, kg: 8, kw: 105, fan: 0.35, prot: 112, note: 'Circa 105 kW: per motori sui 240 CV tirati.' },
+    { id: 'all3', lv: 3, name: 'Alluminio, tre ranghi, ventola grande', price: 1200, kg: 10, kw: 150, fan: 0.45, prot: 113, note: 'Circa 150 kW e da fermo la ventola tira di più.' },
+    { id: 'gara', lv: 4, name: 'Da gara, doppia ventola, tappo a 1,5 bar', price: 2600, kg: 11, kw: 210, fan: 0.6, prot: 118, note: 'Circa 210 kW. Il tappo in pressione alza il punto di ebollizione: la protezione scatta più tardi.' } ] },
+  { id: 'frizione', label: 'Frizione', dip: {}, items: [
+    { id: 'org', lv: 1, name: 'Organica di serie', price: 250, kg: 0, cap: 330, ieK: 1, note: 'Morbida: oltre 330 Nm slitta.' },
+    { id: 'rinf', lv: 2, name: 'Rinforzata, spingidisco maggiorato', price: 600, kg: 1, cap: 480, ieK: 1, note: 'Pedale più duro: tiene 480 Nm.' },
+    { id: 'cer', lv: 3, name: 'Cerametallica a pastiglie', price: 1100, kg: 0, cap: 700, ieK: 0.9, note: 'Attacca di colpo, partire piano è un\'arte: tiene 700 Nm.' },
+    { id: 'bid', lv: 4, name: 'Bidisco da gara, volano alleggerito', price: 2600, kg: -3, cap: 1050, ieK: 0.75, note: 'Due dischi piccoli: tiene 1050 Nm e il motore sale di giri di scatto. In folle tintinna.' } ] },
 ];
 const MOT_CAT = Object.fromEntries(MOT_PARTI.map((c) => [c.id, c]));
 const motPart = (cat, id) => { const C = MOT_CAT[cat]; return C && (C.items.find((x) => x.id === id) || null); };
 // la scelta più economica di ogni reparto (il motore "base")
 const MOT_BASE = Object.fromEntries(MOT_PARTI.map((c) => [c.id, c.items[0].id]));
+// reparti aggiunti dopo i primi motori: nei salvataggi vecchi mancano, valgono quelli di serie
+const MOT_NUOVI = ['olio', 'intercooler', 'benzina', 'radiatore', 'frizione'];
 
 // curva di coppia indicata (come genTq di cars.js, ma fino a dove serve) dai numeri chiave
 function motTq(hp, rpmHp, nm, rpmNm, lim) {
@@ -81,48 +140,82 @@ function motTq(hp, rpmHp, nm, rpmNm, lim) {
 function motCalc(sel) {
   sel = sel || {};
   const P = {}, missing = [];
+  if (MOT_NUOVI.some((k) => !sel[k])) sel = motFill(sel);
   for (const C of MOT_PARTI) { const it = motPart(C.id, sel[C.id]); if (it) P[C.id] = it; else missing.push(C.id); }
   if (missing.length) return { ok: false, missing };
-  const B = P.blocco, A = P.albero, Bi = P.bielle, Pi = P.pistoni, T = P.testata, Cm = P.camme, S = P.sovra, In = P.iniettori, E = P.centralina;
+  const B = P.blocco, A = P.albero, Bi = P.bielle, Pi = P.pistoni, O = P.olio, T = P.testata, Cm = P.camme, S = P.sovra, Ic = P.intercooler, In = P.iniettori, Pb = P.benzina, E = P.centralina, Rd = P.radiatore, F = P.frizione;
   const cyl = B.cyl, disp = Math.round(B.disp * (A.dispK || 1) * 10) / 10;
-  const compK = { std: 1, low: 0.95, high: 1.06 }[Pi.comp];
+  const compK = { std: 1, mid: 0.99, low: 0.95, high: 1.06 }[Pi.comp];
   const nm = Math.round(disp * T.tq * compK * Cm.tqK * (A.lowK || 1));
   const lim = Math.min(A.rpm, Bi.rpm, T.rpm + Cm.dRpm + E.rpm);
   const rH = Math.min(T.rH + Cm.dH, lim - 300), rN = Math.min(T.rN + Cm.dN, rH - 800);
   const hpNA = nm * T.fall * rH / 7023;
   // sovralimentazione: la centralina di serie non va oltre i suoi bar; la compressione alta batte in testa
-  const boost = Math.min(S.max, E.maxBoost), boostK = { low: 1, std: 0.85, high: 0.6 }[Pi.comp] * 0.95;
+  const boost = Math.min(S.max, E.maxBoost), boostK = { low: 1, mid: 0.93, std: 0.85, high: 0.6 }[Pi.comp] * 0.95;
   const bf = (0.9 + 0.78 * boostK * boost) / 0.9;                       // la stessa spinta che calcola sim.js a turbo pieno
   // CV e Nm veri: come li calcola sim.js (estimatePeak) con il turbo a pressione piena, giro per giro
   const fr = (r) => 16 + 0.0035 * r + 0.9e-6 * r * r, base = motTq(hpNA, rH, nm, rN, lim);
   const at = (t, r) => { for (let i = 1; i < t.length; i++) if (r < t[i][0]) { const [a, ta] = t[i - 1], [b, tb] = t[i]; return ta + (tb - ta) * (r - a) / (b - a); } return t[t.length - 1][1]; };
   const peak = (k) => { let cv = 0, T0 = 0; for (let r = 1000; r <= lim; r += 50) { const T = at(base, r) * k * bf - fr(r); cv = Math.max(cv, T * r / 7023); T0 = Math.max(T0, T); } return { cv, nm: T0 }; };
   let k = E.pw, pk = peak(k);
-  const cap = In.cap * cyl, lean = pk.cv > cap * 1.02;                   // iniettori piccoli: la benzina non basta, la potenza si ferma lì
+  // benzina: la portano gli iniettori e la pompa; se una delle due non basta la miscela va magra e la potenza si ferma lì
+  const capIn = In.cap * cyl, cap = Math.min(capIn, Pb.cap), lean = pk.cv > cap * 1.02, leanPompa = lean && Pb.cap < capIn;
   if (lean) for (let q = 0; q < 6; q++) { k *= Math.pow(cap / pk.cv, 0.8); pk = peak(k); }
   const hp = pk.cv, fuelK = k / E.pw;
+  // aria calda: col turbo, se l'intercooler è piccolo per la pressione l'aria entra calda (battito, calore in più)
+  const caldo = S.max > 0 ? Math.max(0, boost - Ic.cap) : 0;
   let reg = cyl * Math.min(B.reg, A.reg, Bi.reg, Pi.reg);
-  const knock = Pi.comp === 'high' && boost > 0.45;                      // compressione alta + turbo: detonazione
-  if (knock) reg *= 0.6;
+  // battito in testa: compressione alta col turbo, la 2618 oltre i 2 bar, o aria troppo calda su pistoni non da turbo
+  const knock = (Pi.comp === 'high' && boost > 0.45) || (Pi.comp === 'mid' && boost > 2.0) || (caldo > 0.5 && Pi.comp !== 'low');
+  const knockK = E.knockCtl ? 0.8 : 0.6;                                 // la centralina da gara lo sente e ritarda l'anticipo
+  if (knock) reg *= knockK;
   const stress = hp / reg;
   let rel = Math.max(0, Math.min(1, 1 - (stress - 0.9) * 3));
   if (lean) rel = Math.min(rel, 0.55);                                   // magra: pistoni che scaldano
+  if (caldo > 0.15) rel *= 1 - Math.min(0.45, caldo * (E.knockCtl ? 0.25 : 0.45));
+  // olio: sopra i giri che la pompa regge la pressione cala e le bronzine si consumano
+  const oilOver = Math.max(0, lim - O.rpmOk);
+  if (oilOver > 0) rel *= 1 - Math.min(0.6, oilOver / 2500);
+  // calore nell'acqua a piena potenza (kW) e quanto ne porta via il radiatore (più quello dell'olio) a 100 all'ora
+  // con l'acqua a 105 °C: sotto il 100 % a gas pieno a lungo la temperatura sale fino alla protezione
+  const quota = MOT.quotaAcqua * (S.max > 0 ? 1 + 0.06 * boost : 1) * (lean ? 1.12 : 1) * (1 + 0.2 * caldo);
+  const qIn = hp * 0.7355 * quota, kwCool = Rd.kw + (O.kw || 0), qOut = kwCool * (105 - MOT.aria) / 70;
+  const coolK = qOut / Math.max(1, qIn);
+  // frizione: se la coppia del motore è più di quella che tiene, a gas pieno slitta
+  const slitta = pk.nm > F.cap * 0.97;
   const kg = MOT_PARTI.reduce((a, C) => a + (P[C.id].kg || 0), 0) + 40;   // più testata, collettori, accessori
   const price = MOT_PARTI.reduce((a, C) => a + P[C.id].price, 0);
-  const turboSim = S.max > 0 ? (S.sc ? { max: boost, a: 1800, b: 5500, up: 0.2, down: 0.5, twin: false } : { max: boost, a: S.a, b: S.b, up: 0.42, down: 0.85, twin: false }) : null;
+  const turboSim = S.max > 0 ? (S.sc ? { max: boost, a: 1800, b: 5500, up: 0.2, down: 0.5, twin: false } : { max: boost, a: S.a, b: S.b, up: S.up || 0.42, down: 0.85, twin: false }) : null;
   const turboDsp = S.max > 0 ? (S.sc ? { f0: 3200, f1: 9800, w: 0.06, wh: 0.06, damp: 2600, twin: 0, mani: 1 } : { f0: 2000, f1: 7400, w: 0.055, wh: 0.08, damp: 2300, twin: 0, mani: 1 }) : null;
   const voice = {
     pulse: hp > 160 ? 0.85 : 1.0, rough: 0.1 + Cm.lope * 0.3, metal: S.max > 0 ? 0.25 : 0.12, boomRpm: Math.round(lim * 0.45), hiRpm: lim, lope: Cm.lope,
     pop: cyl === 6 ? { f: 0.9, crack: 1.0, len: 1.15, thump: 1.15 } : cyl === 5 ? { f: 0.85, crack: 1.0, len: 1.3, thump: 1.1 } : { f: 1.15, crack: 1.15, len: 0.9 },
   };
   const tipo = `${cyl} cilindri ${disp.toFixed(1)}${S.max > 0 ? (S.sc ? ' volumetrico' : ' turbo') : ''}`;
+  const sel2 = Object.assign({}, sel); for (const C of MOT_PARTI) sel2[C.id] = P[C.id].id;
   return {
-    ok: true, sel: Object.assign({}, sel), parts: P, cyl, disp, nm: Math.round(pk.nm), nmNA: nm, hp: Math.round(hp), hpNA: Math.round(hpNA),
+    ok: true, sel: sel2, parts: P, cyl, disp, nm: Math.round(pk.nm), nmNA: nm, hp: Math.round(hp), hpNA: Math.round(hpNA),
     rpmHp: rH, rpmNm: rN, lim, idle: 800 + Cm.idle, lope: Cm.lope, boost, boostK, turboSim, turboDsp, spark: E.spark, fuelK,
-    kg: Math.round(kg), price, rel, stress, lean, knock, tq: base.map(([r, t]) => [r, Math.round(t * k)]), voice, tipo,
-    deboli: MOT_PARTI.filter((C) => C.id !== 'blocco' && P[C.id].reg !== undefined && P[C.id].reg * cyl * (knock ? 0.6 : 1) < hp * 1.1).map((C) => C.label),
+    kg: Math.round(kg), price, rel, stress, lean, leanPompa, knock, caldo, oilOver, slitta, qIn: Math.round(qIn), qOut: Math.round(qOut), coolK,
+    cool: { kw: kwCool, fan: Rd.fan, prot: Rd.prot, quota, C: MOT.capTermica },
+    ic: S.max > 0 ? { heat: Ic.heat, lag: Ic.lag } : null, clutch: F.cap, ieK: F.ieK || 1, oilRpm: O.rpmOk,
+    tq: base.map(([r, t]) => [r, Math.round(t * k)]), voice, tipo,
+    deboli: MOT_PARTI.filter((C) => C.id !== 'blocco' && P[C.id].reg !== undefined && P[C.id].reg * cyl * (knock ? knockK : 1) < hp * 1.1).map((C) => C.label),
   };
 }
+// i motori costruiti prima dei reparti nuovi (olio, intercooler, benzina, radiatore, frizione) non li hanno: si
+// montano i più economici che non lo limitano, così quei motori vanno come prima
+function motFill(sel) {
+  const out = Object.assign({}, sel), miss = MOT_NUOVI.filter((k) => !out[k]);
+  for (const k of miss) out[k] = MOT_CAT[k].items[MOT_CAT[k].items.length - 1].id;     // intanto il migliore, per misurarlo
+  const c = motCalc(out); if (!c.ok) return out;
+  const need = { olio: (it) => it.rpmOk >= c.lim, intercooler: (it) => !c.parts.sovra.max || it.cap >= c.boost, benzina: (it) => it.cap >= c.hp * 1.02,
+    radiatore: (it) => (it.kw + (c.parts.olio.kw || 0)) * 80 / 70 >= c.qIn, frizione: (it) => it.cap * 0.97 >= c.nm };
+  for (const k of miss) { const its = MOT_CAT[k].items.slice().sort((a, b) => a.price - b.price); out[k] = (its.find(need[k]) || its[its.length - 1]).id; }
+  return out;
+}
+// livello di un pezzo e reparti che ne dipendono (per l'albero di Nico)
+const motLvOf = (cat, id) => { const it = motPart(cat, id); return it ? it.lv || 1 : 1; };
 // peso del motore di serie di un'auto (per lo swap): dai cilindri e dal tipo
 function motKgSerie(carId) {
   const c = typeof CARS !== 'undefined' && CARS[carId]; if (!c) return 150;
@@ -142,11 +235,37 @@ if (typeof VG_PLACE !== 'undefined') {
   const P = StreetGame.prototype;
   const fmt = (n) => Number(n || 0).toLocaleString('it-IT', { maximumFractionDigits: 0 });
   P.mot = function () { const v = this.s.vg || (this.s.vgMot = this.s.vgMot || {}); return v.mot || (v.mot = { list: [], on: {}, n: 0, bozza: Object.assign({}, MOT_BASE) }); };
+  // ---- i livelli di Nico: M.liv[reparto] = livello più alto che conosci (di partenza 1)
+  P.motLiv = function (cat) { if (this.mode !== 'career') return 4; const L = this.mot().liv || {}; return Math.max(1, Math.min(4, L[cat] || 1)); };
+  P.motPuoi = function (cat, id) { const it = motPart(cat, id); return !!it && (it.lv || 1) <= this.motLiv(cat); };
+  // cosa serve per il livello dopo di un reparto: prezzo, km, motori costruiti, livelli di altri reparti
+  P.motNext = function (cat) {
+    const C = MOT_CAT[cat]; if (!C) return null;
+    const lv = this.motLiv(cat) + 1; if (lv > 4) return null;
+    const L = MOT_LIV[lv], M = this.mot(), km = (this.s.dist || 0) / 1000, req = [];
+    if (L.km) req.push({ t: `${L.km} km di viaggio`, ok: km >= L.km });
+    if (L.motori) req.push({ t: `${L.motori} ${L.motori > 1 ? 'motori costruiti' : 'motore costruito'}`, ok: (M.n || 0) >= L.motori });
+    for (const [k, l] of (C.dip && C.dip[lv]) || []) req.push({ t: `${MOT_CAT[k].label} livello ${l}`, ok: this.motLiv(k) >= l });
+    return { lv, price: L.price, req, ok: req.every((r) => r.ok), items: C.items.filter((it) => (it.lv || 1) === lv) };
+  };
+  P.motUnlock = function (cat) {
+    const n = this.motNext(cat); if (!n) return { ok: false, why: 'Lo conosci già tutto' };
+    if (!this.motAlPistone()) return { ok: false, why: 'Te lo insegna Nico, al Pistone' };
+    const no = n.req.find((r) => !r.ok); if (no) return { ok: false, why: 'Prima: ' + no.t.toLowerCase() };
+    if (this.mode === 'career' && this.s.money < n.price) return { ok: false, why: `Nico vuole € ${fmt(n.price)}` };
+    if (this.mode === 'career') this.s.money -= n.price;
+    const M = this.mot(); M.liv = M.liv || {}; M.liv[cat] = n.lv;
+    return { ok: true, lv: n.lv, items: n.items };
+  };
+  P.motUnlockAll = function () { const M = this.mot(); M.liv = Object.fromEntries(MOT_PARTI.map((C) => [C.id, 4])); };
   P.motAlPistone = function () { return !!(this.inside && this.inside.id === 'motori'); };
   P.motOf = function (carId) { const M = this.mot(), id = M.on[carId || this.car]; return id ? M.list.find((e) => e.id === id) || null : null; };
   // costruire: si paga e il motore entra in magazzino (lo chiama la scena del montaggio, quando l'ultimo pezzo è al suo posto)
   P.motBuild = function (sel, nome) {
     const c = motCalc(sel); if (!c.ok) return { ok: false, why: 'Manca un pezzo: ' + c.missing.map((k) => MOT_CAT[k].label.toLowerCase()).join(', ') };
+    sel = c.sel;
+    const nonSai = MOT_PARTI.find((C) => !this.motPuoi(C.id, sel[C.id]));
+    if (nonSai) return { ok: false, why: `${nonSai.label}: quel pezzo è di livello ${motLvOf(nonSai.id, sel[nonSai.id])}, Nico non te l'ha ancora insegnato` };
     const M = this.mot();
     if (M.list.length >= MOT.maxMotori) return { ok: false, why: `In magazzino ci stanno ${MOT.maxMotori} motori: vendine uno` };
     if (this.mode === 'career' && this.s.money < c.price) return { ok: false, why: `Servono € ${fmt(c.price)}` };
@@ -204,15 +323,40 @@ if (typeof VG_PLACE !== 'undefined') {
     e.km = (e.km || 0) + (dkm || 0);
     const sim = this.sim;
     if (e.rotto) { if (sim.running) sim.running = false; if (sim.starter) sim.catchAt = 1e9; return; }
-    const c = motCalc(e.sel); if (!c.ok || c.rel >= 0.999) return;
+    const c = motCalc(e.sel); if (!c.ok) return;
+    this.motCalore(e, c, dt);
+    if (e.rotto || c.rel >= 0.999) return;
     if (sim.running && sim.rpm > c.lim * 0.9 && (sim.in.thr || 0) > 0.8) {
       e.risk = (e.risk || 0) + dt * (1 - c.rel) * (1 - c.rel) * 0.35;          // tirato al limite: lo stress si accumula
       if (e.risk > 1 && Math.random() < dt * 0.6) {
         e.rotto = true; e.risk = 0; sim.running = false;
+        e.guasto = c.lean ? 'grippato' : 'biella';
         this.say(c.lean ? 'Il motore ha grippato: la benzina non bastava e i pistoni si sono fusi. Portalo al Pistone' : 'CRACK! Una biella ha ceduto: il motore è rotto. Portalo al Pistone (carro attrezzi o a spinta)', 'bad');
         if (sim.events) sim.events.push({ type: 'crash', I: 1.2, kind: 'front' });
       } else if (e.risk > 0.6 && !e.warn) { e.warn = true; this.say('Il motore batte in testa e fa un rumore che non ti piace', 'bad'); }
     }
+  };
+  // temperatura dell'acqua (la calcola sim.js col bilancio di calore del motore costruito): avvisi, protezione della
+  // centralina, e se insisti oltre la protezione la guarnizione della testata salta. E la frizione che slitta.
+  P.motCalore = function (e, c, dt) {
+    const sim = this.sim, prot = c.cool.prot, T = sim.waterT || 0;
+    if (!sim.running) { e.cuoce = 0; return; }
+    if (T > prot - 5 && T < prot && !e.wCaldo) { e.wCaldo = true; this.say('La lancetta dell\'acqua sale verso il rosso: molla un po\' il gas', 'bad'); }
+    if (T < prot - 12) { e.wCaldo = false; e.wProt = false; }
+    if (T >= prot && !e.wProt) { e.wProt = true; this.say('Motore in protezione: la centralina taglia la potenza. Accosta e lascialo al minimo, la ventola lo raffredda (non spegnerlo caldo)', 'bad'); }
+    if (T > prot + 8) {
+      e.cuoce = (e.cuoce || 0) + dt;
+      if (e.cuoce > MOT.cottura) {
+        e.rotto = true; e.guasto = 'guarnizione'; e.cuoce = 0; sim.running = false;
+        this.say('Fumo bianco dallo scarico e l\'acqua che bolle nella vaschetta: la guarnizione della testata è saltata. Portalo al Pistone', 'bad');
+        if (this.statAdd) this.statAdd('motori_cotti');
+      }
+    } else e.cuoce = Math.max(0, (e.cuoce || 0) - dt * 0.5);
+    // frizione: a pedale lasciato, in marcia e a gas pieno, il motore sale di giri più delle ruote
+    if (sim.gear > 0 && (sim.clutch || 0) < 0.1 && (sim.in.thr || 0) > 0.8 && sim.P && Math.abs(sim.Tc || 0) >= sim.P.clutchMax * 0.97) {
+      e.slitT = (e.slitT || 0) + dt;
+      if (e.slitT > 1.5 && !e.wFriz) { e.wFriz = true; this.say(`Puzza di frizione bruciata: slitta. Il motore fa ${c.nm} Nm, la frizione ne tiene ${c.clutch}`, 'bad'); }
+    } else e.slitT = Math.max(0, (e.slitT || 0) - dt);
   };
   const up = P.update;
   P.update = function (dt) { const d0 = this.s.dist; up.call(this, dt); if (this.s && this.s.vg) this.motTick(dt, Math.max(0, this.s.dist - d0) / 1000); };
@@ -221,6 +365,7 @@ if (typeof VG_PLACE !== 'undefined') {
 // applySettings (index.html) la chiama dopo aver letto i pezzi dell'auto: se l'auto ha un motore costruito,
 // coppia, giri, turbo, voce e peso vengono dal motore. Restituisce il motore applicato (o null).
 function motApply(game, carId, TP, sim) {
+  if (TP && TP.sim) { TP.sim.cool = null; TP.sim.oilRpm = 0; }       // auto col motore di serie: niente bilancio di calore (come prima)
   if (!game || !game.motOf) return null;
   const e = game.motOf(carId); if (!e) return null;
   const c = motCalc(e.sel); if (!c.ok) return null;
@@ -230,7 +375,8 @@ function motApply(game, carId, TP, sim) {
   Object.assign(TP.sim, {
     turbo: hasT ? Object.assign({}, c.turboSim) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false },
     boostK: c.boostK, limiter: c.lim, idle: c.idle, lope: c.lope * 0.6, camLow: 1, camHigh: 1,
-    sparkCut: c.spark, ecuLaunch: c.spark, ecuPops: c.spark && hasT, ic: hasT ? { heat: 0.8 } : null, valve: hasT && !c.parts.sovra.sc ? 'bov' : 'recirc',
+    sparkCut: c.spark, ecuLaunch: c.spark, ecuPops: c.spark && hasT, ic: c.ic, valve: hasT && !c.parts.sovra.sc ? 'bov' : 'recirc',
+    cool: Object.assign({}, c.cool), oilRpm: c.oilRpm, clutchMax: c.clutch, Ie: Math.round((TP.sim.Ie || sim.P.Ie) * c.ieK * 1000) / 1000,
   });
   if (!TP.dsp) TP.dsp = {};
   Object.assign(TP.dsp, {
@@ -242,4 +388,4 @@ function motApply(game, carId, TP, sim) {
   return c;
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { MOT, MOT_PARTI, MOT_BASE, motCalc, motApply, motKgSerie });
+if (typeof window !== 'undefined') Object.assign(window, { MOT, MOT_LIV, MOT_PARTI, MOT_BASE, MOT_NUOVI, motCalc, motFill, motApply, motKgSerie });

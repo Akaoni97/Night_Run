@@ -4,6 +4,17 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · cognato (**motori a livelli, Nico e Mario**)
+- Fatto: al Pistone **Nico** (era Ottone) insegna i pezzi a livelli 1-4, reparto per reparto, con requisiti (soldi, km,
+  motori costruiti, livelli di altri reparti). Reparti nuovi: pompa dell'olio, intercooler, pompa della benzina,
+  radiatore, frizione (14 in tutto). I pezzi devono andare d'accordo: intercooler piccolo col turbo grande = aria calda e
+  battito; radiatore piccolo = l'acqua sale in strada, protezione della centralina, guarnizione che salta se insisti;
+  frizione piccola slitta; pompa dell'olio o della benzina piccole si sentono. Bilancio di calore vero in `sim.js`, solo
+  per i motori costruiti. L'officina dei tagliandi ora è di **Mario** (id interno sempre `niko`). Test: 208.
+- Aperto: prezzi e requisiti dei livelli da provare giocando; sopra i ~480 CV nessun radiatore regge il gas pieno a lungo
+  (si va in protezione, voluto); Nico ha ancora l'aspetto di Ottone (vecchio coi baffi bianchi).
+- Per il proprietario: Niko → Mario e Ottone → Nico in tutti i testi, guarda se ti va bene.
+
 ## 20/11/2026 · proprietario → **AVVISO PER IL COGNATO**
 - **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
   su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.

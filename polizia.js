@@ -85,11 +85,11 @@ const POL_SCUSE = [
     '«Facciamo a metà: io mi fido metà, lei paga metà.»',
     '«Anche il computer è in posta? Perché dice scaduta.»',
     '«Ieri era domenica. Si aggiunge la fantasia al verbale.»'] },
-  { t: '«Sto andando da Niko, il meccanico: è per questo che corro.»', p: [0.1, 0.2, 0.5, 0.2], r: [
-    '«Niko? Gli dica che la mia la ritiro lunedì. Vada.»',
-    '«Conosco Niko. Metà multa, e che non mi faccia più pagare il bullone a parte.»',
-    '«Anche io vado da Niko. A cinquanta all\'ora.»',
-    '«Niko mi ha venduto una frizione rotta. Lei paga per tutti e due.»'] },
+  { t: '«Sto andando da Mario, il meccanico: è per questo che corro.»', p: [0.1, 0.2, 0.5, 0.2], r: [
+    '«Mario? Gli dica che la mia la ritiro lunedì. Vada.»',
+    '«Conosco Mario. Metà multa, e che non mi faccia più pagare il bullone a parte.»',
+    '«Anche io vado da Mario. A cinquanta all\'ora.»',
+    '«Mario mi ha venduto una frizione rotta. Lei paga per tutti e due.»'] },
   // le assurde (raro): escono solo ogni tanto tra le tre proposte, ma sono talmente fuori di testa che spesso passano
   { t: '«Ho appena visto un UFO e lo stavo seguendo.»', raro: true, p: [0.5, 0.1, 0.25, 0.15], r: [
     '«Anche lei? Quello con le luci verdi? ...Vada. E non ne parli con nessuno, intesi?»',

@@ -4,7 +4,7 @@
 //  - L'auto ereditata è ferma da anni: tutto scaduto. Dall'Autosalone esce in regola. Dai privati arriva senza la tua
 //    assicurazione e a volte col bollo o la revisione scaduti. La carcassa dello sfascio non ha niente.
 //  - Assicurazione e bollo si pagano dal telefono (app Libretto); il bollo arretrato costa il 30 % in più.
-//    La revisione si fa solo da Niko.
+//    La revisione si fa solo da Mario.
 //  - Ai posti di controllo della polizia in prima corsia, passando, a volte ti fermano: con qualcosa di scaduto, multa.
 //  Stato in game.s.cars[id].docs = { ass, bollo, rev } (km a cui scade ciascuno). Costanti in DOC.
 // ============================================================================
@@ -13,7 +13,7 @@ const DOC = {
   ass: { utilitaria: 320, familiare: 400, hot: 560, sportiva: 780, lavoro: 480 },   // premio per 300 km, secondo la categoria
   bolloCv: 1.9, bolloMin: 90, bolloMax: 650,                    // bollo: € per CV, con un minimo e un massimo
   mora: 0.3,                                                    // bollo arretrato: + 30 %
-  rev: 85,                                                      // revisione da Niko
+  rev: 85,                                                      // revisione da Mario
   multa: { ass: 650, bollo: 120, rev: 170 },                    // ai controlli
   controllo: 0.4,                                               // passando davanti a un posto di controllo: quanto spesso ti fermano
   avviso: 20,                                                   // km prima della scadenza: avviso sul telefono
@@ -41,10 +41,10 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     const cv = this.dlSpec ? this.dlSpec(id).cv : 100, base = Math.min(DOC.bolloMax, Math.max(DOC.bolloMin, Math.round(cv * DOC.bolloCv / 5) * 5));
     return this.docs(id).bollo <= km(this) ? Math.round(base * (1 + DOC.mora) / 5) * 5 : base;
   };
-  // paga: assicurazione e bollo ovunque (dal telefono), la revisione solo da Niko. Si rinnova da oggi, o dalla scadenza se non è ancora scaduto
+  // paga: assicurazione e bollo ovunque (dal telefono), la revisione solo da Mario. Si rinnova da oggi, o dalla scadenza se non è ancora scaduto
   P.docPaga = function (tipo, id = this.car) {
     if (!DOC_NOMI[tipo]) return { ok: false };
-    if (tipo === 'rev' && !(this.inside && this.inside.id === 'niko')) return { ok: false, why: 'La revisione si fa da Niko' };
+    if (tipo === 'rev' && !(this.inside && this.inside.id === 'niko')) return { ok: false, why: 'La revisione si fa da Mario' };
     const c = this.docCosto(tipo, id); if (this.s.money < c) return { ok: false, why: `Servono € ${fmt(c)}` };
     const d = this.docs(id), k = km(this);
     if (d[tipo] - k > DOC.durata[tipo] * 0.5) return { ok: false, why: `${DOC_NOMI[tipo]}: è già a posto per altri ${fmt(d[tipo] - k)} km` };
@@ -59,7 +59,7 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     this.s.docCtl = (this.s.docCtl || 0) + 1;
     if (!sc.length) { this.say('Posto di controllo: patente e libretto. «Tutto in regola, buona strada.»', 'police'); return { ok: true, multa: 0 }; }
     this.s.money -= tot; this.s.fines = (this.s.fines || 0) + tot;
-    this.say(`Posto di controllo: ${sc.map((x) => DOC_NOMI[x].toLowerCase()).join(', ')} ${sc.length > 1 ? 'scaduti' : 'scaduta'}. Multa: − € ${fmt(tot)}. Mettiti in regola dall'app Libretto${sc.includes('rev') ? ' e da Niko' : ''}`, 'police');
+    this.say(`Posto di controllo: ${sc.map((x) => DOC_NOMI[x].toLowerCase()).join(', ')} ${sc.length > 1 ? 'scaduti' : 'scaduta'}. Multa: − € ${fmt(tot)}. Mettiti in regola dall'app Libretto${sc.includes('rev') ? ' e da Mario' : ''}`, 'police');
     return { ok: true, multa: tot, scaduti: sc };
   };
   // auto comprate: dal privato senza la tua assicurazione (bollo e revisione a caso), dallo sfascio tutto scaduto
@@ -90,7 +90,7 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     check: (g) => g.s.vg && g.s.vg.inherited && g.docScaduti().length === 0 && g.s.vg.garage.length > 0 });
 })();
 
-// ---------------------------------------------------------------- app Libretto e revisione da Niko (solo nel browser)
+// ---------------------------------------------------------------- app Libretto e revisione da Mario (solo nel browser)
 (function documentiApp() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
   const G = () => window.nightRun && window.nightRun.game;
@@ -106,14 +106,14 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     const d = g.docs(id), k = (g.s.dist || 0) / 1000, left = d[tipo] - k, ko = left <= 0, warn = !ko && left < DOC.avviso * 2, c = g.docCosto(tipo, id);
     const stato = ko ? (d[tipo] <= 0 ? 'scaduto da anni' : `scaduto da ${fmt(-left)} km`) : `valido ancora ${fmt(left)} km`;
     const cur = id === g.car, rev = tipo === 'rev', presto = left > DOC.durata[tipo] * 0.5;
-    const btn = rev ? `<button disabled>da Niko · € ${fmt(c)}</button>` : `<button data-x="paga" data-v="${tipo}" data-id="${id}" ${presto ? 'disabled' : ''}>Paga € ${fmt(c)}</button>`;
+    const btn = rev ? `<button disabled>da Mario · € ${fmt(c)}</button>` : `<button data-x="paga" data-v="${tipo}" data-id="${id}" ${presto ? 'disabled' : ''}>Paga € ${fmt(c)}</button>`;
     return `<div class="lb-r ${ko ? 'ko' : warn ? 'warn' : 'ok'}"><div>${DOC_NOMI[tipo]}<small>${stato}${!ko && !presto ? '' : ''}${cur && ko ? ' · ai controlli: multa € ' + fmt(DOC.multa[tipo]) : ''}</small></div>${btn}</div>`;
   };
   function render() {
     const g = G(); if (!g || !g.s || !g.s.vg) return '';
     const ids = (g.s.vg.garage || []).slice().sort((a, b) => (b === g.car) - (a === g.car)), sc = g.docScaduti();
     return `<div class="view app"><div class="nav"><h3>Libretto</h3></div><div class="body">
-      <div class="lb-hd"><b>${sc.length ? 'Non sei in regola' : 'In regola'}</b>Assicurazione e bollo si pagano da qui; la revisione si fa da Niko. Ai posti di controllo in prima corsia la polizia a volte ti ferma.</div>
+      <div class="lb-hd"><b>${sc.length ? 'Non sei in regola' : 'In regola'}</b>Assicurazione e bollo si pagano da qui; la revisione si fa da Mario. Ai posti di controllo in prima corsia la polizia a volte ti ferma.</div>
       ${ids.map((id) => `<div class="lb-car"><b>${esc((CARS[id] || {}).name || id)}${id === g.car ? ' · la guidi ora' : ''}</b>${['ass', 'bollo', 'rev'].map((t) => riga(g, id, t)).join('')}</div>`).join('')}
     </div></div>`;
   }
@@ -127,14 +127,14 @@ const DOC_NOMI = { ass: 'Assicurazione', bollo: 'Bollo', rev: 'Revisione' };
     return true;
   };
   if (!add()) addEventListener('load', add);
-  // da Niko: la revisione nel pannello (dopo gli altri pezzi, ridisegnata da sola)
+  // da Mario: la revisione nel pannello (dopo gli altri pezzi, ridisegnata da sola)
   window.NightDocs = {
     panel(body, I, ctx) {
       if (!I || I.id !== 'niko') return;
       const box = document.createElement('div'); box.className = 'vg-group'; body.appendChild(box);
       const draw = () => {
         const g = G(); if (!g) return; const d = g.docs(), k = (g.s.dist || 0) / 1000, left = d.rev - k, c = g.docCosto('rev');
-        box.innerHTML = `<h4>Revisione</h4><p class="hint">${left > 0 ? `In regola ancora per ${fmt(left)} km.` : 'Scaduta: ai controlli sono € ' + fmt(DOC.multa.rev) + ' di multa.'} Niko te la fa al banco: freni, luci, emissioni.</p>`;
+        box.innerHTML = `<h4>Revisione</h4><p class="hint">${left > 0 ? `In regola ancora per ${fmt(left)} km.` : 'Scaduta: ai controlli sono € ' + fmt(DOC.multa.rev) + ' di multa.'} Mario te la fa al banco: freni, luci, emissioni.</p>`;
         const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = `Fai la revisione · € ${fmt(c)}`;
         if (left > DOC.durata.rev * 0.5) b.disabled = true;
         b.addEventListener('click', () => { const r = g.docPaga('rev'); if (!r.ok && r.why && ctx.flash) ctx.flash(r.why, 2); if (ctx.save) ctx.save(); draw(); });

@@ -33,7 +33,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 
 ## Com'è fatto il gioco oggi (in breve)
 - **Il Viaggio** (modalità principale, `viaggio.js` + `viaggio2d.js`): autostrada infinita dal km 0 sotto casa con
-  una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Niko, Da Luca Tuning, Neon
+  una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Mario, Da Luca Tuning, Neon
   Kustom, Motel Ovunque con la cassa che ti segue), paesaggi che cambiano coi km, bisogni del guidatore (fame,
   sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), il prologo di apertura (`prologo.js`)
   e il telefono (`telefono.js`). La storia dopo il km 0 è da scrivere: capitoli, eventi strani e passeggeri speciali
@@ -100,7 +100,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Fari** (`effetti2d.js`): due coni volumetrici (anabbagliante e abbagliante), alone, pozza sull'asfalto, pulviscolo.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
-  ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
+  ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Mario) e modifica gratuita fino a € 5.000
   (Luca); potenziamenti a tempo (+8 % per 50 km, +15 % per 100 km) e per sempre (+3 %, mitico); pezzo vero del
   catalogo (epico), kit turbo (mitico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
   primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
@@ -134,7 +134,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   passeggeri ~€ 30 + 9-13 al km, autobus € 12 a passeggero; tagliando 120, candele 140, pastiglie 180, gomme da 420,
   motel 60. Ritmo misurato (40 lavori di fila, strumento in scratchpad non salvato): ~€ 290 netti al km coi lavori più
   ~€ 30 da consegne e passeggeri; una Panda nuova dopo ~45 km di lavoro, la Supra dopo ~200 (si sblocca al km 260).
-- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
+- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Mario, controlli della polizia (vedi AGENTS.md).
   Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
 - **Gare tolte (17/11/2026, ramo del cognato)**: niente più sfide al semaforo, con gli abbaglianti, scala dei rivali e reputazione di strada; le categorie restano per Garage e documenti. La voce qui sotto sulle sfide per categoria è superata. **Le gare torneranno (18/11/2026, deciso dal cognato)**, ma come attività secondaria per guadagnare, accanto alle consegne: il gioco non è centrato su di loro.
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
@@ -155,7 +155,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   (stessi disegni della strada, con ruote e fari), dietro l'auto parcheggiata. La tua auto negli interni si ridisegna due
   volte al secondo: al Neon Kustom vernice, cerchi, kit e spoiler provati si vedono subito (prima un aggiornamento ogni
   mezzo secondo rimetteva quelli comprati, e i cerchi finivano sotto la carrozzeria). Pannello: valori dell'officina su
-  tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Niko e Neon Kustom.
+  tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Mario e Neon Kustom.
 - **Traguardi** (`traguardi.js`): 27 traguardi in `TRG_LIST` (lavori, catena, km, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
@@ -174,8 +174,8 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   nel viaggio non funzionava (l'accosto automatico restava acceso e lo bloccava).
 - **Usato dei privati** (`usato.js`, app Annunci): a circa 4 tappe su 10 un privato vende la sua auto (cartello VENDESI
   davanti al locale). Entrando in quel locale c'è l'annuncio: guardarla (scopre carrozzeria e gomme), farci un giro
-  (motore e freni), Niko a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
-  accetta), compra. I difetti restano sull'auto: si sistemano da Niko (servizi, carrozziere, gomme, revisione del motore).
+  (motore e freni), Mario a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
+  accetta), compra. I difetti restano sull'auto: si sistemano da Mario (servizi, carrozziere, gomme, revisione del motore).
   Un'auto sana comprata bene si rivende all'Autosalone con guadagno (traguardo Commerciante).
 - **Sfascio Ruggine** (`sfascio.js`): decima tappa di ogni giro (al posto del secondo autogrill), primo al km 30,6.
   Rovistare tra sei carcasse (€ 20, una volta: niente, soldi, oggetti, ticket, un pezzo, una valigetta, raramente
@@ -220,6 +220,16 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
+- **Il Pistone e Nico** (`motori.js`, `motori2d.js`): motori costruiti a pezzi, 14 reparti in ordine di montaggio
+  (blocco, albero, bielle, pistoni, pompa dell'olio, testata, camme, sovralimentazione, intercooler, iniettori, pompa
+  della benzina, centralina, radiatore, frizione), ognuno coi livelli 1-4 (`lv` sui pezzi). I livelli li insegna Nico
+  (`motNext`/`motUnlock`, prezzi e requisiti in `MOT_LIV`, legami tra reparti in `dip`): si parte tutti dal livello 1.
+  I pezzi devono andare d'accordo: robustezza (`reg`, CV per cilindro), benzina (iniettori e pompa), aria
+  (intercooler contro i bar del turbo), olio (giri della pompa), frizione (Nm), calore (radiatore contro i kW che il
+  motore butta nell'acqua). In strada `sim.js` fa il bilancio di calore vero solo per i motori costruiti
+  (`tune.cool`): l'acqua sale, oltre `prot` la centralina taglia la potenza (`sim.hotK`), oltre `prot + 8` per
+  `MOT.cottura` secondi salta la guarnizione (`motCalore`). L'officina dei tagliandi ora è di **Mario** (id interno
+  sempre `niko`, per i salvataggi); Ottone è diventato Nico.
 
 ## Lavori aperti e idee in sospeso
 

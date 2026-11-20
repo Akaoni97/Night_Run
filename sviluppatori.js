@@ -30,6 +30,7 @@
     const g = G(); if (!g) return 0;
     const ids = new Set(Object.keys(g.s.cars || {})); ids.add(g.car);
     let n = 0; for (const id of ids) n += unlock(id);
+    if (g.motUnlockAll && g.s.vg) { g.motUnlockAll(); n++; save(); }   // anche tutti i livelli dei motori di Nico (motori.js)
     return n;
   }
 

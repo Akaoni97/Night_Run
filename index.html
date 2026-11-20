@@ -1163,7 +1163,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <li>Sei in viaggio sull'autostrada, di notte, con l'auto che hai ereditato. Lungo la strada ci sono le tappe: bar, benzinaio, autogrill, Motel Ovunque, officine, Autosalone, Sfascio. Rallenta, fermati davanti e premi <kbd>U</kbd> per entrare.</li>
         <li>Al bar e all'autogrill c'è la bacheca: prendi un lavoro e porta il carico alla tappa giusta. Il primo è obbligatorio; dopo, se salti l'uscita, la consegna salta.</li>
         <li>Fame, sete, sonno e igiene calano guidando: mangia, bevi e lavati nelle tappe. Si dorme al Motel Ovunque, ed è lì che il viaggio si salva.</li>
-        <li>Benzina, gomme e danni si consumano davvero. Assicurazione e bollo si pagano dal telefono (app Libretto), la revisione da Niko.</li>
+        <li>Benzina, gomme e danni si consumano davvero. Assicurazione e bollo si pagano dal telefono (app Libretto), la revisione da Mario.</li>
         <li>Polizia: il limite è 130 km/h; se passi accanto a una volante oltre i 136 ti ferma (paga, contesta o scappa). Autovelox (V) e Tutor (T) sono segnati sulla mappa in basso; un bar su cinque ha l'etilometro fuori. Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
         <li>Cambio automatico: la leva parte in P, <kbd>E</kbd> la porta verso D, <kbd>Q</kbd> verso P. Superato un locale, in retro puoi tornare indietro di qualche decina di metri.</li>
         <li>Lungo la strada arrivano domande: rispondi con i pulsanti o con <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Il telefono (<kbd>0</kbd>) ha messaggi, mappa e app; il menu (<kbd>Tab</kbd>) officina, bagagliaio e impostazioni.</li>
@@ -1406,7 +1406,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
-    TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Niko)
+    TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Mario)
     game.applyMass(TP.sim.dm || 0, TP.sim.rearOff);
     $('carTag').textContent = CARS[carId].tag + (MOTE ? ` · motore: ${MOTE.tipo} da ${MOTE.hp} CV (swap)` : '');
     if (!$('carSw').options.length) for (const id of CAR_IDS) { const o = document.createElement('option'); o.value = id; o.textContent = CARS[id].name; $('carSw').appendChild(o); }
@@ -2150,8 +2150,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const d = document.createElement('div'); d.className = 'svc'; d.dataset.s = s.id;
       d.innerHTML = `<b>${s.name}</b><span></span><div class="bar"><i></i></div><button class="kbtn" type="button">${s.id === 'wash' ? 'Lava' : 'Fai'}</button>`;
       d.querySelector('button').addEventListener('click', () => {
-        if (!game.canMount()) { flash('Da Niko si va da fermi', 2); return; }
-        if (game.needsNiko()) { flash('Questo lo fa Niko: la sua officina è sulla mappa (N)', 2.6); return; }
+        if (!game.canMount()) { flash('Da Mario si va da fermi', 2); return; }
+        if (game.needsNiko()) { flash('Questo lo fa Mario: la sua officina è sulla mappa (N)', 2.6); return; }
         const r = game.service(s.id); if (!r.ok) flash(r.why, 2.2); applySettings(); renderServices(); saveGame();
       });
       box.appendChild(d);
@@ -2165,8 +2165,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (bt.innerHTML !== h) bt.innerHTML = h; bt.disabled = lv > 0.97;
     }
   }
-  $('btnRepair').addEventListener('click', () => { if (!game.canMount()) { flash('Dal carrozziere si va da fermi', 2); return; } if (game.needsNiko()) { flash('Il carrozziere è da Niko: la sua officina è sulla mappa (N)', 2.6); return; } const r = game.repair(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
-  $('btnTires').addEventListener('click', () => { if (!game.canMount()) { flash('Le gomme si cambiano da fermi', 2); return; } if (game.needsNiko()) { flash('Le gomme le cambia Niko: la sua officina è sulla mappa (N)', 2.6); return; } game.tireId = S.tune.tires; const r = game.newTires(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
+  $('btnRepair').addEventListener('click', () => { if (!game.canMount()) { flash('Dal carrozziere si va da fermi', 2); return; } if (game.needsNiko()) { flash('Il carrozziere è da Mario: la sua officina è sulla mappa (N)', 2.6); return; } const r = game.repair(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
+  $('btnTires').addEventListener('click', () => { if (!game.canMount()) { flash('Le gomme si cambiano da fermi', 2); return; } if (game.needsNiko()) { flash('Le gomme le cambia Mario: la sua officina è sulla mappa (N)', 2.6); return; } game.tireId = S.tune.tires; const r = game.newTires(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
   // ---------------------------------------------------------------- bagagliaio
   const ICON_CACHE = {};
   const IC = (k) => (window.NR_ICON_TAG ? window.NR_ICON_TAG(k) : '');   // icona per i pulsanti (icone.js)
@@ -2276,7 +2276,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 
   // ---------------------------------------------------------------- luoghi in città (2D): mappa, ingresso, interni
   // Benzinaio, officina e ricambi estetici sono edifici veri lungo la strada: ci si ferma davanti e si entra con la Supra.
-  // estetica mostrata: quella scelta più lo sporco (si accumula coi chilometri, si lava da Niko)
+  // estetica mostrata: quella scelta più lo sporco (si accumula coi chilometri, si lava da Mario)
 
   // ---------------------------------------------------------------- mappa del mondo: punti reali, ognuno con il suo sfondo
   const WM_TYPES = { city: ['Città', '#ff5fa8'], highway: ['Autostrada', '#ffb000'], mountain: ['Montagna', '#7dff9a'], sea: ['Mare', '#2ee6ff'], plain: ['Pianura', '#c9dd5a'], village: ['Paese', '#ff9a5a'], desert: ['Deserto', '#ff6a3a'] };
@@ -2377,7 +2377,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     document.body.classList.add('travel');
     setTimeout(() => {
       game.setLoc(id); toggleWorldMap(false); saveGame();
-      flash(`${L.name} (${L.country}) · ${WM_TYPES[L.bg][0].toLowerCase()}${L.places ? '' : ' · qui niente negozi: Luca e Niko sono a Tokyo'}`, 3);
+      flash(`${L.name} (${L.country}) · ${WM_TYPES[L.bg][0].toLowerCase()}${L.places ? '' : ' · qui niente negozi: Luca e Mario sono a Tokyo'}`, 3);
       setTimeout(() => document.body.classList.remove('travel'), 120);
     }, 380);
   }
@@ -2585,11 +2585,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
       const m = game.maint(), worst = Math.min(m.oil, m.plugs, m.pads);
-      note(sim.damage > 0.2 ? 'Niko: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Niko: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Niko: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Niko: «Tutto in ordine. Controllo veloce e vai.»');
+      note(sim.damage > 0.2 ? 'Mario: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Mario: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Mario: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Mario: «Tutto in ordine. Controllo veloce e vai.»');
       move(document.querySelector('section.panel.tuning .services'));
       renderServices();
       { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Ripara la gomma forata (€ 25)'; b.addEventListener('click', () => { const r = game.repairTyre(); if (!r.ok) flash(r.why, 2); renderTrunk(); renderPlaceCash(); }); body.appendChild(b);
-        const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Niko: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
+        const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Mario: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
     } else if (I.id === 'fuel') {
       const f = document.createElement('div'); f.className = 'fuelbox'; f.id = 'fuelBox';
       f.innerHTML = '<div><b id="fuelL">—</b> <span class="hint" id="fuelSt"></span></div><div class="fuelgauge"><i id="fuelBar"></i></div>'
@@ -2606,8 +2606,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       cosPrev = Object.assign({ paint: carPaint() }, S.cos);
       renderCos();
     }
-    // l'annuncio di un privato a questa tappa, e da Niko la revisione del motore (usato.js)
-    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Niko: la revisione (documenti.js)
+    // l'annuncio di un privato a questa tappa, e da Mario la revisione del motore (usato.js)
+    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Mario: la revisione (documenti.js)
     if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     // «Ti tengo compagnia»: la storia secondaria di Jeshka (Neon) e Luca (tuning), in cima al pannello (jeshka.js)
     if (window.NightJL && (I.id === 'style' || I.id === 'shop')) NightJL.panel(body, I, { flash, save: () => saveGame(), refresh: () => { if (placeOpen === I) openPlace(I); } });
@@ -3319,7 +3319,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         if (id && CARS[id] && id !== game.car) { game.s.vg.garage = [id]; window.nightRun.swapCar(id); }
         if (game.car === id || !id) game.s.vg.garage = [game.car];
         game.s.vg.eredita = game.car;
-        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Niko`, 7), 1500); }
+        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Mario`, 7), 1500); }
       };
       const prologo = () => NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
       // prima del prologo l'editor del personaggio: chi si sceglie qui scende dalla E36, parla col notaio e guida tutto il viaggio

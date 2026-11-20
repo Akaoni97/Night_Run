@@ -16,11 +16,11 @@ const TEL_SMS = [
   { from: 'Studio Ferri', km: 0, text: 'Buonasera, siamo lo studio Ferri. L\'eredità di suo zio Claudio è pronta.' },
   { from: 'Studio Ferri', km: 0, text: 'Domani alle 9, via dei Cantieri 12. Porti un documento.' },
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
-  { from: 'Officina Niko', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
+  { from: 'Officina Mario', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
   { from: 'Motel Ovunque', km: 14, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
 ];
 // rubrica: nome, ruolo, atto da cui compare
-const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Niko', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
+const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Mario', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
   ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
 // app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
 // (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
@@ -34,7 +34,7 @@ const TEL_APP_OFFERS = [
 const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps && apps[o.app]) continue; return km >= o.km ? o : null; } return null; };
 const telAtto = (km) => { let a = 0; for (let i = 0; i < TEL_ATTI.length; i++) if (km >= TEL_ATTI[i]) a = i; return a; };
 const telRecenti = (a) => {
-  const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Niko', 'Persa', 'lun', 1]];
+  const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Mario', 'Persa', 'lun', 1]];
   if (a >= 1) r.unshift(['Zio Claudio', 'Chiamata in arrivo · 0:00', '01:12', 2]);
   if (a >= 2) r.unshift(['Io', 'Chiamata in arrivo · 0:41', '03:07', 2], ['Sconosciuto', '14 chiamate perse', '03:07', 1]);
   return r;

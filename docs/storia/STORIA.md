@@ -37,7 +37,7 @@ psicologico. Il telefono è lo strumento principale: lì si sviluppano le cose s
 - Chi era Claudio, perché la strada, qual è il segreto.
 - Le altre 5 auto del garage: nomi e quando si sbloccano.
 - Gli atti, i chilometri dei momenti chiave, il finale.
-- Se Niko, Luca, il barista, il benzinaio hanno un ruolo nella storia o restano negozi.
+- Se Mario, Luca, il barista, il benzinaio hanno un ruolo nella storia o restano negozi.
 - Quali effetti e quando (sonno, specchietto, radio, cassa del motel...).
 
 ## Dove si attacca nel codice

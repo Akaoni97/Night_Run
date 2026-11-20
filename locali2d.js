@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · Le facciate dei locali del Viaggio (dopo viaggio2d.js)
-//  Bar, benzinaio, autogrill Sosta 24, Motel Ovunque, Officina Niko, Da Luca Tuning, Neon Kustom: edifici a due piani o
+//  Bar, benzinaio, autogrill Sosta 24, Motel Ovunque, Officina Mario, Da Luca Tuning, Neon Kustom: edifici a due piani o
 //  capannoni con materiali veri (intonaco, mattoni, lamiera, pannelli), vetrine con l'interno acceso e chi c'è dentro,
 //  insegne al neon che ogni tanto sfarfallano, tende, lampade a muro, piante, tavolini, pompe, e la luce che cade sul
 //  marciapiede. Di giorno le vetrine riflettono il cielo e i neon sono quasi spenti.
@@ -441,7 +441,7 @@
     this.placeTag(g, X, T + fl + 10, 'MOTEL', '#ff5fa8', near);
   };
 
-  // ---------------------------------------------------------------- Officina Niko e Da Luca Tuning: capannone col portone sezionale
+  // ---------------------------------------------------------------- Officina Mario e Da Luca Tuning: capannone col portone sezionale
   S.lcGarage = function (g, e, X, st, near, open) {
     const C = this.C, t = st.t, n = 1 - (this.day || 0), s = Math.round(e.x) % 971, ink = C.ink, niko = e.id === 'niko';
     const L = X - 130, W = 260, T = niko ? 112 : 110, dL = X - 52, dW = 104, dT = 140, dH = GY - dT, oh = Math.round(dH * open);
@@ -464,7 +464,7 @@
     }
     g.fillStyle = ink; g.fillRect(L - 1, T, 1, GY - T); g.fillRect(L + W, T, 1, GY - T);
     // insegna
-    const sign = niko ? 'OFFICINA NIKO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
+    const sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
     if (niko) {
       this.lcBox(g, sL, T + 8, sw + 16, 18, '#163a6c'); g.fillStyle = '#2a5a9a'; g.fillRect(sL, T + 8, sw + 16, 1);
       this.text(g, sign, sL + 8, T + 12, '#f4f1e6', 2);
@@ -499,7 +499,7 @@
     this.text(g, niko ? 'GOMME' : 'CERCHI', L + 14, 186, niko ? '#ffb000' : '#ff5fa8');
     this.text(g, niko ? 'REVISIONI' : 'ELABORAZIONI', L + 14, 194, '#e8e6df');
     this.lcLamp(g, L + 37, 145);
-    // a destra: gomme, fusto, compressore (Niko) / ruote in esposizione e bandiere (Luca)
+    // a destra: gomme, fusto, compressore (Mario) / ruote in esposizione e bandiere (Luca)
     if (niko) {
       for (let q = 0; q < 5; q++) { g.fillStyle = ink; g.fillRect(dL + dW + 12, GY - 7 - q * 7, 22, 7); g.fillStyle = '#1b1b20'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 5); g.fillStyle = '#34343c'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 1); }
       g.fillStyle = ink; g.fillRect(L + W - 22, GY - 22, 16, 22); g.fillStyle = '#c42a1a'; g.fillRect(L + W - 21, GY - 21, 14, 21); g.fillStyle = '#8a1a10'; g.fillRect(L + W - 21, GY - 16, 14, 1); g.fillRect(L + W - 21, GY - 8, 14, 1);
