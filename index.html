@@ -2654,7 +2654,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const p = game.placesOn && !I ? game.nearPlace() : null;
     eb.hidden = !p;
     if (p) {
-      const h = (p.ok ? 'Entra · ' : 'Rallenta per entrare · ') + p.name + '<small>U</small>';
+      const h = (p.ok ? 'Entra · ' : 'Rallenta per entrare · ') + (p.twin ? 'Piazzetta: ' + p.name + ' e ' + p.twin.name : p.name) + '<small>U</small>';   // piazzetta: due negozi
       if (eb.dataset.h !== h) { eb.innerHTML = h; eb.dataset.h = h; }
       eb.disabled = !p.ok;
     }
@@ -2670,6 +2670,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const p = game.placesOn ? game.nearPlace() : null;
     if (!p) { if (game.placesOn) flash('Nessun ingresso qui: guarda la mappa in basso', 1.6); return; }
     if (!p.ok) { flash('Troppo veloce: rallenta per entrare', 1.6); return; }
+    if (p.twin && window.NightPiazza) { NightPiazza.choose(game, p); return; }   // piazzetta (piazzetta.js): due negozi, si sceglie dove entrare
     game.enterPlace(p);
   }
   document.body.appendChild($('placeBox'));       // fuori dai riquadri ritagliati: il pannello copre davvero lo schermo
@@ -3749,6 +3750,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="concessionario.js"></script>
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
+<script src="piazzetta.js"></script>
 <script src="obiettivo.js"></script>
 <script src="officina.js"></script>
 <script src="pistone/motori2d.js"></script>   <!-- [PISTONE] -->

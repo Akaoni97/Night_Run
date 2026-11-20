@@ -9,7 +9,7 @@
 //   tappa:dealer        vai 9 m prima della prossima tappa di quel tipo (bar, fuel, grill, niko, luca, style,
 //                       motel, dealer, junk...), da fermo: si vede la facciata
 //   km:27.4             mettiti a quel km, da fermo
-//   entra / esci        entra nel locale vicino (aspetta la scena dell'interno) / esci
+//   entra / esci        (nelle piazzette entra:1 prende il secondo negozio) entra nel locale vicino (aspetta la scena dell'interno) / esci
 //   soldi:50000         soldi
 //   tel / tel:usa       apri o chiudi il telefono / apri un'app del telefono (id: usa, trg, rta, ...)
 //   tasto:KeyW / tieni:KeyW:3000   premi un tasto / tienilo premuto per 3 s
@@ -82,7 +82,8 @@ const STATO = () => {
     const i = st.indexOf(':'), k = i < 0 ? st : st.slice(0, i), a = i < 0 ? '' : st.slice(i + 1);
     if (k === 'tappa') {
       const x = await page.evaluate((id) => { const g = nightRun.game; let n = Math.max(0, Math.ceil((g.s.dist + 20 - VG_STOP0) / VG_STEP));
-        for (let j = 0; j < 400 && VG.stop(n + j).id !== id; j++) if (j === 399) return null; while (VG.stop(n).id !== id) n++;
+        const is = (s) => s.id === id || (id === 'piazza' ? !!s.twin : s.twin && s.twin.id === id);
+        for (let j = 0; j < 400 && !is(VG.stop(n + j)); j++) if (j === 399) return null; while (!is(VG.stop(n))) n++;
         const x = VG.stopX(n); g.s.dist = x - 9; g.sim.v = 0; return x; }, a);
       log(x == null ? `tappa ${a}: non trovata` : `tappa ${a}: km ${(x / 1000).toFixed(1)}`); await page.waitForTimeout(1500);
     } else if (k === 'km') { await page.evaluate((m) => { const g = nightRun.game; g.s.dist = m; g.sim.v = 0; }, parseFloat(a) * 1000); await page.waitForTimeout(1500);
@@ -90,7 +91,7 @@ const STATO = () => {
       // come il giocatore fermo davanti alla porta: 2 m prima della tappa più vicina, senza accosto automatico
       await page.evaluate(() => { const g = nightRun.game, n = Math.round((g.s.dist - VG_STOP0) / VG_STEP); g.s.dist = VG.stopX(n) - 2; g.sim.v = 0; });
       await page.waitForTimeout(300);
-      await page.evaluate(() => { const g = nightRun.game; if (g.inside) return true; const q = g.nearPlace(); if (q && q.ok !== false) g.enterPlace(q); return true; });
+      await page.evaluate((w) => { const g = nightRun.game; if (g.inside) return true; const q = g.nearPlace(); if (q && q.ok !== false) g.enterPlace(q.twin ? NightPiazza.sub(q, +w || 0) : q); return true; }, a);   // piazzetta: entra:1 il secondo negozio
       await page.waitForFunction(() => { const I = nightRun.game.inside; return !I || I.phase === 'shop'; }, null, { timeout: 15000 }).catch(() => {});   // manovra, camminata e buio (entrata2d.js)
       await page.waitForTimeout(900);
       const dentro = await page.evaluate(() => { const g = nightRun.game; return g.inside ? g.inside.id : null; });
