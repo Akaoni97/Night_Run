@@ -31,12 +31,18 @@ const MOT = {
 
 // i livelli che insegna Nico al Pistone: si sblocca un reparto alla volta, un livello dopo l'altro.
 // km: km del Viaggio fatti; motori: motori costruiti finora (si impara montandoli)
+// Prezzi tarati sull'economia del Viaggio (PASSAGGIO.md, «Economia»: ~€ 290 netti al km di lavoro): tutto il livello 2
+// costa quanto un paio di lavori, tutto il 4 quanto una sportiva usata. pezzi: pezzi montati finora (motore o banco)
 const MOT_LIV = [null,
-  { price: 0, km: 0, motori: 0 },
-  { price: 1200, km: 0, motori: 0 },
-  { price: 3500, km: 40, motori: 1 },
-  { price: 8000, km: 90, motori: 2 },
+  { price: 0, km: 0, pezzi: 0, motori: 0 },
+  { price: 300, km: 10, pezzi: 0, motori: 0 },
+  { price: 900, km: 45, pezzi: 4, motori: 0 },
+  { price: 2400, km: 110, pezzi: 10, motori: 1 },
 ];
+// manodopera di Nico per montare o togliere un pezzo sul motore di un'auto: per albero, bielle, pistoni, pompa
+// dell'olio, testata e camme il motore va aperto (guarnizioni, ore di lavoro), il resto si cambia da fuori
+const MOT_INTERNI = ['albero', 'bielle', 'pistoni', 'olio', 'testata', 'camme'];
+const MOT_LAVORO = { interno: 380, esterno: 90 };
 
 // i reparti nell'ordine di montaggio (dal basso in alto, la frizione per ultima dietro al volano); ogni pezzo: id,
 // livello (lv 1-4, quando lo puoi comprare), nome, prezzo, nota, kg e i suoi effetti. reg = cavalli che regge per
@@ -140,8 +146,8 @@ function motTq(hp, rpmHp, nm, rpmNm, lim) {
 }
 
 // dai pezzi al motore: tutto quello che serve a fisica, suono e negozio
-function motCalc(sel) {
-  sel = sel || {};
+function motCalc(sel, opt) {
+  sel = sel || {}; const hpK = (opt && opt.hpK) || 1;   // hpK: scala della potenza (motore di serie di un'auto, vedi motCalcSerie)
   const P = {}, missing = [];
   if (MOT_NUOVI.some((k) => !sel[k])) sel = motFill(sel);
   for (const C of MOT_PARTI) { const it = motPart(C.id, sel[C.id]); if (it) P[C.id] = it; else missing.push(C.id); }
@@ -159,7 +165,7 @@ function motCalc(sel) {
   // CV e Nm veri: come li calcola sim.js (estimatePeak) con il turbo a pressione piena, giro per giro
   const fr = (r) => 16 + 0.0035 * r + 0.9e-6 * r * r, base = motTq(hpNA, rH, nm, rN, lim);
   const at = (t, r) => { for (let i = 1; i < t.length; i++) if (r < t[i][0]) { const [a, ta] = t[i - 1], [b, tb] = t[i]; return ta + (tb - ta) * (r - a) / (b - a); } return t[t.length - 1][1]; };
-  const peak = (k) => { let cv = 0, T0 = 0; for (let r = 1000; r <= lim; r += 50) { const T = at(base, r) * k * bf - fr(r); cv = Math.max(cv, T * r / 7023); T0 = Math.max(T0, T); } return { cv, nm: T0 }; };
+  const peak = (k) => { let cv = 0, T0 = 0; for (let r = 1000; r <= lim; r += 50) { const T = (at(base, r) * k * bf - fr(r)) * hpK; cv = Math.max(cv, T * r / 7023); T0 = Math.max(T0, T); } return { cv, nm: T0 }; };
   let k = E.pw, pk = peak(k);
   // benzina: la portano gli iniettori e la pompa; se una delle due non basta la miscela va magra e la potenza si ferma lì
   const capIn = In.cap * cyl, cap = Math.min(capIn, Pb.cap), lean = pk.cv > cap * 1.02, leanPompa = lean && Pb.cap < capIn;
@@ -230,7 +236,7 @@ function motKgSerie(carId) {
 if (typeof GAME_POSTI !== 'undefined') GAME_POSTI.motori = { park: -3.3, door: 0 };
 if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
   VG_PLACE.motori = { name: () => 'Il Pistone', what: 'motori', col: '#ff6a2a' };
-  if (VG_PATTERN[4] === 'bar') VG_PATTERN[4] = 'motori';
+  // dal 20/11 sera Nico lavora da Luca (negozio unico): il Pistone non è più una tappa e il secondo bar torna al suo posto
 }
 
 (function motoriLogica() {
@@ -247,6 +253,7 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
     const lv = this.motLiv(cat) + 1; if (lv > 4) return null;
     const L = MOT_LIV[lv], M = this.mot(), km = (this.s.dist || 0) / 1000, req = [];
     if (L.km) req.push({ t: `${L.km} km di viaggio`, ok: km >= L.km });
+    if (L.pezzi) req.push({ t: `${L.pezzi} pezzi montati`, ok: (M.montati || 0) >= L.pezzi });
     if (L.motori) req.push({ t: `${L.motori} ${L.motori > 1 ? 'motori costruiti' : 'motore costruito'}`, ok: (M.n || 0) >= L.motori });
     for (const [k, l] of (C.dip && C.dip[lv]) || []) req.push({ t: `${MOT_CAT[k].label} livello ${l}`, ok: this.motLiv(k) >= l });
     return { lv, price: L.price, req, ok: req.every((r) => r.ok), items: C.items.filter((it) => (it.lv || 1) === lv) };
@@ -261,7 +268,7 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
     return { ok: true, lv: n.lv, items: n.items };
   };
   P.motUnlockAll = function () { const M = this.mot(); M.liv = Object.fromEntries(MOT_PARTI.map((C) => [C.id, 4])); };
-  P.motAlPistone = function () { return !!(this.inside && this.inside.id === 'motori'); };
+  P.motAlPistone = function () { return !!(this.inside && (this.inside.id === 'shop' || this.inside.id === 'motori')); };   // Nico lavora da Luca
   P.motOf = function (carId) { if (!PISTONE.on) return null; const M = this.mot(), id = M.on[carId || this.car]; return id ? M.list.find((e) => e.id === id) || null : null; };
   // costruire: si paga e il motore entra in magazzino (lo chiama la scena del montaggio, quando l'ultimo pezzo è al suo posto)
   P.motBuild = function (sel, nome) {
@@ -279,6 +286,72 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
     if (this.statAdd) this.statAdd('motori');
     return { ok: true, e, c };
   };
+  // ---- i pezzi: un pezzo, un posto. Si comprano da Luca (se Nico te li ha insegnati) e stanno in magazzino ('mag'),
+  // sul motore di serie di un'auto (dove = id dell'auto, oggi solo la V40) o sul banco di lavoro ('banco').
+  // M.pz = [{ u, cat, id, dove }]; costruendo il motore del banco i suoi pezzi diventano il motore (escono da M.pz).
+  P.motPz = function () { const M = this.mot(); return M.pz || (M.pz = []); };
+  P.motPezzo = function (u) { return this.motPz().find((p) => p.u === u) || null; };
+  P.motBuyPart = function (cat, id) {
+    const it = motPart(cat, id); if (!it || it.hidden) return { ok: false, why: 'Pezzo non trovato' };
+    if (!this.motAlPistone()) return { ok: false, why: 'I pezzi si comprano da Luca' };
+    if (!this.motPuoi(cat, id)) return { ok: false, why: `È di livello ${it.lv}: prima te lo deve insegnare Nico` };
+    if (this.mode === 'career' && this.s.money < it.price) return { ok: false, why: `Servono € ${fmt(it.price)}` };
+    if (this.mode === 'career') this.s.money -= it.price;
+    const M = this.mot(); M.nU = (M.nU || 0) + 1;
+    const p = { u: 'p' + M.nU, cat, id, dove: 'mag' }; this.motPz().push(p);
+    return { ok: true, p };
+  };
+  P.motValPezzo = function (p) { const it = motPart(p.cat, p.id); return it ? Math.round(it.price * MOT.vendita / 10) * 10 : 0; };
+  P.motSellPart = function (u) {
+    const p = this.motPezzo(u); if (!p) return { ok: false, why: 'Pezzo non trovato' };
+    if (p.dove !== 'mag') return { ok: false, why: 'Prima smontalo' };
+    if (!this.motAlPistone()) return { ok: false, why: 'I pezzi si vendono da Luca' };
+    const v = this.motValPezzo(p); this.mot().pz = this.motPz().filter((x) => x !== p); if (this.mode === 'career') this.s.money += v;
+    return { ok: true, v };
+  };
+  P.motLavoro = function (cat) { return this.mode === 'career' ? MOT_LAVORO[MOT_INTERNI.includes(cat) ? 'interno' : 'esterno'] : 0; };
+  // mettere un pezzo: dove = 'banco' o l'id di un'auto col motore di serie modificabile (MOT_SERIE). Quello che c'era
+  // nello stesso reparto torna in magazzino.
+  P.motPut = function (u, dove) {
+    const p = this.motPezzo(u); if (!p) return { ok: false, why: 'Pezzo non trovato' };
+    if (!this.motAlPistone()) return { ok: false, why: 'Si fa da Luca, sul banco di Nico' };
+    if (p.dove === dove) return { ok: false, why: 'È già lì' };
+    let costo = 0;
+    if (dove !== 'banco') {
+      if (!MOT_SERIE[dove]) return { ok: false, why: `Sul motore di serie di quest'auto Nico non ci lavora ancora: per ora solo sulla V40` };
+      if (p.cat === 'blocco') return { ok: false, why: 'Il blocco è il motore stesso: per cambiarlo si costruisce un motore al banco' };
+      if (this.mot().on[dove]) return { ok: false, why: 'Su quest\'auto c\'è un motore costruito: i pezzi vanno sul motore di serie, rimettilo prima' };
+      costo = this.motLavoro(p.cat);
+      if (this.s.money < costo) return { ok: false, why: `La manodopera costa € ${costo}` };
+    }
+    for (const q of this.motPz()) if (q !== p && q.dove === dove && q.cat === p.cat) q.dove = 'mag';
+    if (costo) this.s.money -= costo;
+    p.dove = dove; const M = this.mot(); M.montati = (M.montati || 0) + 1;
+    return { ok: true, costo };
+  };
+  P.motTake = function (u) {
+    const p = this.motPezzo(u); if (!p || p.dove === 'mag') return { ok: false, why: 'È già in magazzino' };
+    if (!this.motAlPistone()) return { ok: false, why: 'Si fa da Luca, sul banco di Nico' };
+    const costo = p.dove === 'banco' ? 0 : this.motLavoro(p.cat);
+    if (this.s.money < costo) return { ok: false, why: `La manodopera costa € ${costo}` };
+    this.s.money -= costo; p.dove = 'mag'; return { ok: true, costo };
+  };
+  P.motSel = function (dove) { const o = {}; for (const p of this.motPz()) if (p.dove === dove) o[p.cat] = p.id; return o; };
+  // il motore del banco: quando ha tutti i reparti si accende e diventa un motore tuo (i pezzi li hai già pagati)
+  P.motBuildBanco = function (nome) {
+    const sel = this.motSel('banco'), manca = MOT_PARTI.filter((C) => !sel[C.id]);
+    if (manca.length) return { ok: false, why: 'Sul banco manca: ' + manca.map((C) => C.label.toLowerCase()).join(', ') };
+    const M = this.mot(); if (M.list.length >= MOT.maxMotori) return { ok: false, why: `In magazzino ci stanno ${MOT.maxMotori} motori: vendine uno` };
+    const c = motCalc(sel); if (!c.ok) return { ok: false, why: 'Il motore non torna' };
+    M.pz = this.motPz().filter((p) => p.dove !== 'banco');
+    M.n = (M.n || 0) + 1;
+    const e = { id: 'm' + M.n, nome: nome || `${c.tipo} n. ${M.n}`, sel: Object.assign({}, sel), km: 0, rotto: false, prezzo: c.price };
+    M.list.push(e); if (this.statAdd) this.statAdd('motori');
+    return { ok: true, e, c };
+  };
+  // i pezzi montati sul motore di serie di un'auto (solo quelli dei reparti che si possono cambiare)
+  P.motSerie = function (carId) { carId = carId || this.car; return MOT_SERIE[carId] ? this.motSel(carId) : {}; };
+  P.motCalcSerie = function (carId) { carId = carId || this.car; return MOT_SERIE[carId] ? motCalcSerie(carId, this.motSerie(carId)) : null; };
   // montare su un'auto del garage (al Pistone, da fermi): il motore che c'era (se costruito) torna in magazzino
   P.motMount = function (eid, carId) {
     carId = carId || this.car;
@@ -322,7 +395,12 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
   // usura e rotture: solo il motore montato sull'auto che guidi; più è spinto oltre quello che regge, più rischia
   // quando lo tieni sul limitatore a gas pieno
   P.motTick = function (dt, dkm) {
-    const e = this.motOf(); if (!e) return;
+    const e = this.motOf();
+    if (!e) {                                  // motore di serie coi pezzi di Nico: calore e frizione come per i costruiti
+      const ps = PISTONE.on && MOT_SERIE[this.car] ? this.motSerie() : null;
+      if (ps && Object.keys(ps).length) { const st = this.mot(), k = 'serie_' + this.car, ee = st[k] || (st[k] = {}); const c = this.motCalcSerie(); if (c && c.ok) this.motCalore(ee, c, dt); }
+      return;
+    }
     e.km = (e.km || 0) + (dkm || 0);
     const sim = this.sim;
     if (e.rotto) { if (sim.running) sim.running = false; if (sim.starter) sim.catchAt = 1e9; return; }
@@ -370,7 +448,8 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
 function motApply(game, carId, TP, sim) {
   if (TP && TP.sim) { TP.sim.cool = null; TP.sim.oilRpm = 0; }       // auto col motore di serie: niente bilancio di calore (come prima)
   if (!game || !game.motOf) return null;
-  const e = game.motOf(carId); if (!e) return null;
+  const e = game.motOf(carId);
+  if (!e) { if (PISTONE.on && MOT_SERIE[carId] && game.motSerie) motApplySerie(game, carId, TP, sim); return null; }
   const c = motCalc(e.sel); if (!c.ok) return null;
   sim.P.tq = c.tq;
   TP.sim.dm = (TP.sim.dm || 0) + c.kg - motKgSerie(carId);          // il peso del motore in più (o in meno) rispetto a quello di serie: lo somma game.applyMass
@@ -391,4 +470,72 @@ function motApply(game, carId, TP, sim) {
   return c;
 }
 
+// ---------------------------------------------------------------- il motore di serie con i pezzi di Nico
+// Per ora solo la V40 (decisione del cognato, 20/11): il suo B4204S descritto coi pezzi di Nico. blocco: il blocco
+// virtuale dell'auto (non si vende); sel: i pezzi di serie che corrispondono a quelli veri; hp: CV veri di serie.
+// La curva vera dell'auto resta quella sua: i pezzi la cambiano in proporzione (motApplySerie).
+const MOT_SERIE = {
+  v40: { hp: 140, blocco: { id: 's_v40', lv: 1, hidden: true, name: 'B4204S 2.0 16V di serie (lo stesso blocco della T4)', price: 0, kg: 135, cyl: 4, disp: 2.0, reg: 110, note: 'Basamento solido: regge il turbo, i pezzi dentro no.' },
+    sel: { albero: 'fuso', bielle: 'fuse', pistoni: 'std', olio: 'serie', testata: 'v4', camme: 'serie', sovra: 'na', intercooler: 'no', iniettori: 'i250', benzina: 'serie', centralina: 'serie', radiatore: 'serie', frizione: 'org' } },
+};
+for (const k in MOT_SERIE) MOT_CAT.blocco.items.push(MOT_SERIE[k].blocco);
+// i reparti del catalogo di Luca che sulle auto di MOT_SERIE adesso fa Nico coi suoi pezzi (nascosti da Luca)
+const MOT_LUCA_VIA = ['turbo', 'intercooler', 'ecu', 'clutch'];
+function tuningNascosto(carId, cat) { return !!(PISTONE.on && MOT_SERIE[carId] && MOT_LUCA_VIA.includes(cat)); }
+const motSerieBase = (carId) => Object.assign({ blocco: MOT_SERIE[carId].blocco.id }, MOT_SERIE[carId].sel);
+function motCalcSerie(carId, parts) {
+  const S0 = MOT_SERIE[carId]; if (!S0) return null;
+  const st = motCalc(motSerieBase(carId)), hpK = S0.hp / st.hp;
+  const sel = Object.assign(motSerieBase(carId), parts || {}), c = motCalc(sel, { hpK });
+  if (!c.ok) return c;
+  const car = typeof CARS !== 'undefined' && CARS[carId];
+  if (!(parts || {}).frizione && car) { c.clutch = car.P.clutchMax; c.ieK = 1; c.slitta = c.nm > c.clutch * 0.97; }   // frizione dell'auto
+  c.stock = st; c.hpK = hpK; c.serie = true; c.parts0 = parts || {};
+  c.price = MOT_PARTI.reduce((a, C) => a + ((parts || {})[C.id] ? motPart(C.id, parts[C.id]).price : 0), 0);
+  return c;
+}
+function motApplySerie(game, carId, TP, sim) {
+  const parts = game.motSerie(carId); if (!Object.keys(parts).length) return null;
+  const c = motCalcSerie(carId, parts); if (!c || !c.ok) return null;
+  const at = (t, r) => { for (let i = 1; i < t.length; i++) if (r < t[i][0]) { const [a, ta] = t[i - 1], [b, tb] = t[i]; return ta + (tb - ta) * (r - a) / (b - a); } return t[t.length - 1][1]; };
+  const fr = (r) => 16 + 0.0035 * r + 0.9e-6 * r * r, car = CARS[carId];
+  // curva vera dell'auto, cambiata in proporzione alla coppia indicata del motore coi pezzi rispetto a quello di serie
+  sim.P.tq = car.P.tq.map(([r, t]) => [r, Math.round((t - fr(r)) * (at(c.tq, r) - fr(r)) / Math.max(1, at(c.stock.tq, r) - fr(r)) + fr(r))]);
+  const P = c.parts, hasT = !!parts.sovra && !!c.turboSim;
+  TP.sim.limiter = (TP.sim.limiter || car.P.limiter) + (c.lim - c.stock.lim);
+  if (parts.camme) Object.assign(TP.sim, { idle: c.idle, lope: c.lope * 0.6 });
+  if (hasT) {
+    Object.assign(TP.sim, { turbo: Object.assign({}, c.turboSim), boostK: c.boostK, ic: c.ic, valve: P.sovra.sc ? 'recirc' : 'bov' });
+    if (!TP.dsp) TP.dsp = {};
+    TP.dsp.tb = c.turboDsp; TP.dsp.bov = !P.sovra.sc ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 };
+    if (TP.look) { TP.look.turbo = true; TP.look.badge = TP.look.badge || 'T'; }
+  }
+  if (parts.centralina) { const sp = P.centralina.spark; Object.assign(TP.sim, { sparkCut: sp, ecuLaunch: sp, ecuPops: sp && hasT }); if (TP.dsp) TP.dsp.spark = sp ? 1 : 0; }
+  if (TP.dsp && TP.dsp.cat) TP.dsp.cat = Object.assign({}, TP.dsp.cat, { pop: TP.sim.ecuPops ? 1.4 : hasT ? 0.7 : TP.dsp.cat.pop });
+  if (parts.camme && TP.dsp) TP.dsp.lope = c.lope;
+  if (parts.frizione) { TP.sim.clutchMax = c.clutch; TP.sim.Ie = Math.round((TP.sim.Ie || car.P.Ie) * c.ieK * 1000) / 1000; if (TP.dsp) TP.dsp.rattle = c.ieK < 1 ? 1 : 0; }
+  TP.sim.cool = Object.assign({}, c.cool); TP.sim.oilRpm = c.oilRpm;
+  TP.sim.dm = (TP.sim.dm || 0) + MOT_PARTI.reduce((a, C) => a + (parts[C.id] ? (motPart(C.id, parts[C.id]).kg || 0) - (motPart(C.id, MOT_SERIE[carId].sel[C.id]) || {}).kg || 0 : 0), 0);
+  return c;
+}
+// salvataggi di prima: i pezzi motore di Luca della V40 (turbo, intercooler, centralina, frizione) adesso li fa Nico.
+// Quelli comprati tornano in soldi (prezzo pieno) e sull'auto si rimettono quelli di serie. Una volta sola per pezzo.
+function motLucaMigra(game, S) {
+  if (!PISTONE.on || !game || !S) return 0;
+  let rimborso = 0;
+  for (const carId in MOT_SERIE) {
+    const T = CARS[carId] && CARS[carId].tuning; if (!T) continue;
+    for (const cat of MOT_LUCA_VIA) {
+      if (!T[cat]) continue;
+      const base = T[cat].items[0].id;
+      if (S.tunes && S.tunes[carId]) S.tunes[carId][cat] = base;
+      if (S.tune && game.car === carId) S.tune[cat] = base;
+      for (const it of T[cat].items) { const key = carId + '|' + cat + ':' + it.id; if (game.s.owned && game.s.owned[key]) { delete game.s.owned[key]; if (game.mode === 'career') rimborso += it.price || 0; } }
+    }
+  }
+  if (rimborso) { game.s.money += rimborso; if (game.say) game.say(`Luca: «Turbo, centraline e frizioni della V40 adesso le fa Nico, coi suoi pezzi. Ti ridò quello che avevi speso: € ${rimborso.toLocaleString('it-IT')}»`, 'money'); }
+  return rimborso;
+}
+
+if (typeof window !== 'undefined') Object.assign(window, { MOT_SERIE, MOT_LUCA_VIA, MOT_INTERNI, MOT_LAVORO, tuningNascosto, motCalcSerie, motApplySerie, motLucaMigra });
 if (typeof window !== 'undefined') Object.assign(window, { PISTONE, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, MOT_NUOVI, motCalc, motFill, motApply, motKgSerie });

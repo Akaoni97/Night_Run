@@ -263,6 +263,9 @@
   .mt-nx .ok{color:#b8ff3a}.mt-nx .no{color:#ff7a6a}.mt-nx .kbtn{padding:3px 8px;font-size:12px}
   .mt-lv{display:inline-block;padding:0 4px;border-radius:3px;background:#2a2a30;color:#ff9a5a;font:600 10px/14px var(--f-data)}.mt-chip:disabled{opacity:.45;cursor:not-allowed}
   @media (max-width:700px){.mt-tr{grid-template-columns:1fr auto}.mt-nx{grid-column:1/-1;justify-items:start}.mt-nx small{text-align:left}}
+  .mt-bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:5px}
+  .mt-slot{display:grid;gap:3px;padding:6px 8px;border-radius:5px;border:1px dashed rgba(255,255,255,.18);font:12px/1.2 var(--f-data)}
+  .mt-slot.on{border-style:solid;border-color:#ff6a2a88;background:rgba(255,106,42,.08)}.mt-slot small{color:var(--muted)}.mt-slot .kbtn{padding:2px 6px;font-size:11px;justify-self:start}
   .mt-note{margin:0;font:12px/1.3 var(--f-data);color:var(--muted)}
   .mt-sheet{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:10px;border-radius:6px;background:#0e0c10;border:1px solid #ff6a2a55;font:13px/1.25 var(--f-data)}
   .mt-sheet span{color:var(--muted)}.mt-sheet b{text-align:right;color:var(--fg)}.mt-sheet .big{font:400 22px/1 var(--f-display);color:#ff9a5a}
@@ -303,8 +306,8 @@
     d.innerHTML = `<span>Motore</span><b>${esc(c.tipo)}</b>`
       + `<span>Potenza</span><b class="big">${c.hp} CV</b><span>a</span><b>${fmt(c.rpmHp)} giri</b>`
       + `<span>Coppia</span><b class="big" style="color:#2ee6ff">${c.nm} Nm</b><span>Limitatore</span><b>${fmt(c.lim)} giri</b>`
-      + `<span>Peso</span><b>${c.kg} kg <small style="color:var(--muted)">(${kgD >= 0 ? '+' : ''}${kgD} sulla ${esc(car.short || car.name)})</small></b>`
-      + `<span>Pezzi</span><b style="color:#ff9a5a">€ ${fmt(c.price)}</b>`
+      + (c.serie ? '' : `<span>Peso</span><b>${c.kg} kg <small style="color:var(--muted)">(${kgD >= 0 ? '+' : ''}${kgD} sulla ${esc(car.short || car.name)})</small></b>`)
+      + `<span>${c.serie ? 'Pezzi montati' : 'Pezzi'}</span><b style="color:#ff9a5a">€ ${fmt(c.price)}</b>`
       + `<span>Affidabilità</span><b style="color:${rc}">${rel} %</b><div class="mt-bar"><i style="width:${rel}%;background:${rc}"></i></div>`
       + (() => { const k = Math.round(c.coolK * 100), cc = k >= 110 ? '#2ee6ff' : k >= 100 ? '#b8ff3a' : k >= 80 ? '#ffd23f' : '#ff4a3a';
         return `<span>Raffreddamento</span><b style="color:${cc}">${k} % <small style="color:var(--muted)">(${c.qOut} kW su ${c.qIn})</small></b><div class="mt-bar"><i style="width:${Math.min(100, k / 1.5)}%;background:${cc}"></i></div>`; })()
@@ -315,7 +318,8 @@
     if (c.coolK < 1) w.push(`Il radiatore porta via ${c.qOut} kW, a gas pieno il motore ne butta nell'acqua ${c.qIn}: tirandolo a lungo la temperatura sale, la centralina va in protezione e se insisti salta la guarnizione.`);
     if (c.oilOver > 0) w.push(`La pompa dell'olio regge fino a ${fmt(c.parts.olio.rpmOk)} giri, il motore ne fa ${fmt(c.lim)}: in alto la pressione cala e le bronzine soffrono.`);
     if (c.slitta) w.push(`La frizione tiene ${c.clutch} Nm, il motore ne fa ${c.nm}: a gas pieno slitta.`);
-    if (c.knock) w.push('Compressione alta col turbo: batte in testa. Pistoni a compressione bassa!');
+    if (c.knock && c.parts.pistoni.comp === 'high') w.push('Compressione alta col turbo: batte in testa. Pistoni a compressione bassa!');
+    else if (c.knock && c.parts.pistoni.comp === 'mid') w.push('Oltre i 2 bar anche i 2618 battono in testa: pistoni a compressione bassa o meno pressione.');
     if (c.deboli.length) w.push('Al limite: ' + c.deboli.join(', ').toLowerCase() + '.');
     if (c.parts.sovra.max > c.boost + 0.01) w.push(`La centralina di serie tiene il turbo a ${String(c.boost).replace('.', ',')} bar.`);
     if (c.rel < 0.999) w.push('Sotto il 100 % il motore si può rompere se lo tieni al limitatore a gas pieno.');
@@ -325,76 +329,106 @@
   }
 
   let lastCtx = null;
+  // il pannello di Nico, dentro Da Luca Tuning: livelli, motore di serie dell'auto, pezzi in vendita, magazzino, banco
   function panel(body, I, ctx) {
     const game = G(); if (!game) return; lastCtx = ctx;
-    const M = game.mot(), wrap = document.createElement('div'); wrap.className = 'mt-wrap';
+    const M = game.mot(), car = CARS[game.car], carN = car.short || car.name, wrap = document.createElement('div'); wrap.className = 'mt-wrap';
     const h = (t) => { const e = document.createElement('h4'); e.className = 'mt-h'; e.textContent = t; wrap.appendChild(e); };
     const p = (t) => { const e = document.createElement('p'); e.className = 'hint'; e.style.margin = '0'; e.textContent = t; wrap.appendChild(e); };
     const btn = (t, f, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = t; b.disabled = !!dis; b.addEventListener('click', f); return b; };
-    const done = (r) => { if (r && r.ok === false) { if (r.why) ctx.flash(r.why, 2.4); } else ctx.save(); ctx.refresh(); };
-    p('Nico: «Un motore si costruisce dal basso: blocco, albero, bielle, pistoni, poi la testa. E non basta che ogni pezzo sia forte: devono andare d\'accordo. Un turbo grosso con un radiatore piccolo ti cuoce la testata. I pezzi buoni te li insegno io, un livello alla volta.»');
-    // la tua auto
-    h('La tua auto');
-    { const car = CARS[game.car], e = game.motOf(), c = e && motCalc(e.sel), d = document.createElement('div'); d.className = 'mt-eng';
-      d.innerHTML = `<div><b>${esc(car.name)}</b><small>${e ? `motore costruito: ${esc(e.nome)} · ${c.hp} CV${e.rotto ? ' · ROTTO' : ''}` : `motore di serie: ${esc(car.engine || '')}`}</small></div>`;
-      const a = document.createElement('div'); a.className = 'acts';
-      if (e) a.appendChild(btn(`Rimetti quello di serie · € ${MOT.lavoro}`, () => done(game.motUnmount()), game.s.money < MOT.lavoro));
-      d.appendChild(a); wrap.appendChild(d); }
-    // l'albero dei pezzi: per ogni reparto il livello che conosci (1-4) e cosa serve per il prossimo
+    const done = (r, msg) => { if (r && r.ok === false) { if (r.why) ctx.flash(r.why, 2.4); } else { if (msg) ctx.flash(msg, 2.2); ctx.save(); } ctx.refresh(); };
+    const row = (html, acts) => { const d = document.createElement('div'); d.className = 'mt-eng'; d.innerHTML = `<div>${html}</div>`; const a = document.createElement('div'); a.className = 'acts'; for (const b of acts) if (b) a.appendChild(b); d.appendChild(a); wrap.appendChild(d); return d; };
+    const nome = (cat, id) => { const it = motPart(cat, id); return it ? it.name : id; };
+    const serie = !!MOT_SERIE[game.car], built = game.motOf();
+    const h0 = document.createElement('h3'); h0.className = 'mt-h'; h0.style.cssText = 'font-size:22px;color:#ff9a5a;margin-top:14px'; h0.textContent = 'Nico · il motore'; wrap.appendChild(h0);
+    p('Nico: «Qui da Luca il motore lo faccio io. Un pezzo alla volta: lo compri, sta in magazzino, e lo mettiamo dove vuoi tu, sul motore della tua macchina o sul banco, dove c\'è il motore nuovo che mi aspetta. E non basta che ogni pezzo sia forte: devono andare d\'accordo. Un turbo grosso con un radiatore piccolo ti cuoce la testata.»');
+    // ---- quello che ti ha insegnato Nico
     h('Quello che ti ha insegnato Nico');
     { const tree = document.createElement('div'); tree.className = 'mt-tree';
       for (const C of MOT_PARTI) {
-        const lv = game.motLiv(C.id), nx = game.motNext(C.id), row = document.createElement('div'); row.className = 'mt-tr';
-        row.innerHTML = `<b>${esc(C.label)}</b><span class="mt-pips">${[1, 2, 3, 4].map((l) => `<i class="${l <= lv ? 'on' : ''}">${l}</i>`).join('')}</span>`;
+        const lv = game.motLiv(C.id), nx = game.motNext(C.id), r = document.createElement('div'); r.className = 'mt-tr';
+        r.innerHTML = `<b>${esc(C.label)}</b><span class="mt-pips">${[1, 2, 3, 4].map((l) => `<i class="${l <= lv ? 'on' : ''}">${l}</i>`).join('')}</span>`;
         const a = document.createElement('div'); a.className = 'mt-nx';
         if (!nx) a.innerHTML = '<small>tutto</small>';
         else {
-          const reqs = nx.req.map((r) => `<span class="${r.ok ? 'ok' : 'no'}">${esc(r.t)}</span>`).join(' ');
-          const b = btn(`Livello ${nx.lv} · € ${fmt(nx.price)}`, () => { const r = game.motUnlock(C.id); if (r.ok) ctx.flash(`Nico ti ha insegnato ${C.label.toLowerCase()} di livello ${r.lv}: ${r.items.map((x) => x.name).join(', ')}`, 3.4); done(r); }, !nx.ok || game.s.money < nx.price);
-          b.title = nx.items.map((x) => `${x.name}: ${x.note}`).join('\n');
+          const reqs = nx.req.map((q) => `<span class="${q.ok ? 'ok' : 'no'}">${esc(q.t)}</span>`).join(' ');
+          const b = btn(`Livello ${nx.lv} · € ${fmt(nx.price)}`, () => { const q = game.motUnlock(C.id); done(q, q.ok && `Nico ti ha insegnato ${C.label.toLowerCase()} di livello ${q.lv}: ${q.items.filter((x) => !x.hidden).map((x) => x.name).join(', ')}`); }, !nx.ok || game.s.money < nx.price);
+          b.title = nx.items.filter((x) => !x.hidden).map((x) => `${x.name}: ${x.note}`).join('\n');
           a.appendChild(b); if (reqs) { const q = document.createElement('small'); q.innerHTML = reqs; a.appendChild(q); }
         }
-        row.appendChild(a); tree.appendChild(row);
+        r.appendChild(a); tree.appendChild(r);
       }
       wrap.appendChild(tree); }
-    // progetto
-    h('Progetto del motore');
-    const B = M.bozza || (M.bozza = Object.assign({}, MOT_BASE));
-    for (const k of ORDER) if (!motPart(k, B[k]) || !game.motPuoi(k, B[k])) B[k] = MOT_BASE[k];
+    // ---- il motore dell'auto che guidi
+    h(`Il motore della ${carN}`);
+    if (built) {
+      const c = motCalc(built.sel);
+      row(`<b>${esc(built.nome)}</b><small>motore costruito al banco · ${c.hp} CV · ${c.nm} Nm${built.rotto ? ' · <b style="color:#ff4a3a">ROTTO</b>' : ''}</small>`, [btn(`Rimetti quello di serie · € ${MOT.lavoro}`, () => done(game.motUnmount()), game.s.money < MOT.lavoro)]);
+    } else if (serie) {
+      const ps = game.motPz().filter((q) => q.dove === game.car), S0 = MOT_SERIE[game.car];
+      p(`${S0.blocco.name}. Si cambia tutto tranne il blocco. Per albero, bielle, pistoni, pompa dell'olio, testata e camme il motore va aperto: € ${MOT_LAVORO.interno} di manodopera; gli altri pezzi € ${MOT_LAVORO.esterno}.`);
+      for (const C of MOT_PARTI) {
+        if (C.id === 'blocco') continue;
+        const q = ps.find((x) => x.cat === C.id), lav = game.motLavoro(C.id);
+        row(`<b>${esc(C.label)}</b><small>${q ? `<span style="color:#ff9a5a">${esc(nome(C.id, q.id))}</span> · livello ${motLvOf(C.id, q.id)}` : `di serie: ${esc(nome(C.id, S0.sel[C.id]))}`}</small>`,
+          [q && btn(`Togli${lav ? ' · € ' + lav : ''}`, () => done(game.motTake(q.u), 'Tolto: torna in magazzino'), game.s.money < lav)]);
+      }
+      const c = game.motCalcSerie(); if (c && c.ok) wrap.appendChild(sheet(c, game));
+    } else p(`Sul motore di serie della ${carN} Nico per ora non ci lavora (per adesso solo sulla V40). Puoi metterci un motore costruito al banco.`);
+    // ---- pezzi in vendita
+    h('Pezzi in vendita');
     for (const C of MOT_PARTI) {
       const box = document.createElement('div'); box.className = 'mt-cat';
-      box.innerHTML = `<b>${ORDER.indexOf(C.id) + 1}. ${esc(C.label)} <span style="color:#ff9a5a">· livello ${game.motLiv(C.id)}</span></b>`;
+      box.innerHTML = `<b>${esc(C.label)} <span style="color:#ff9a5a">· livello ${game.motLiv(C.id)}</span></b>`;
       const chips = document.createElement('div'); chips.className = 'mt-chips';
       for (const it of C.items) {
-        const b = document.createElement('button'); b.type = 'button'; b.className = 'mt-chip'; b.setAttribute('aria-pressed', String(B[C.id] === it.id));
-        const sai = game.motPuoi(C.id, it.id), lv = it.lv || 1;
-        b.innerHTML = `<span class="mt-lv">L${lv}</span> ${esc(it.name)}<small>${sai ? (it.price ? '€ ' + fmt(it.price) : 'gratis') : '🔒 livello ' + lv + ': te lo insegna Nico'}</small>`;
-        b.disabled = !sai; b.title = it.note;
-        b.addEventListener('click', () => { B[C.id] = it.id; ctx.refresh(); });
+        if (it.hidden) continue;
+        const sai = game.motPuoi(C.id, it.id), lv = it.lv || 1, b = document.createElement('button'); b.type = 'button'; b.className = 'mt-chip';
+        b.innerHTML = `<span class="mt-lv">L${lv}</span> ${esc(it.name)}<small>${sai ? (it.price ? 'Compra · € ' + fmt(it.price) : 'Prendi · gratis') : '🔒 livello ' + lv + ': te lo insegna Nico'}</small>`;
+        b.disabled = !sai || game.s.money < it.price; b.title = it.note;
+        b.addEventListener('click', () => { const q = game.motBuyPart(C.id, it.id); done(q, q.ok && `${it.name}: in magazzino`); });
         chips.appendChild(b);
       }
-      box.appendChild(chips);
-      const note = document.createElement('p'); note.className = 'mt-note'; note.textContent = motPart(C.id, B[C.id]).note; box.appendChild(note);
-      wrap.appendChild(box);
+      box.appendChild(chips); wrap.appendChild(box);
     }
-    const c = motCalc(B);
-    wrap.appendChild(sheet(c, game));
-    const full = M.list.length >= MOT.maxMotori;
-    const go = btn(`Al cavalletto: montalo tu · € ${fmt(c.price)}`, () => banco(c.sel, ctx), game.s.money < c.price || full);
-    go.style.cssText = 'font-size:15px;padding:10px'; wrap.appendChild(go);
-    if (full) p(`In magazzino ci stanno ${MOT.maxMotori} motori: vendine uno per costruirne un altro.`);
-    else if (game.s.money < c.price) p('Non hai abbastanza soldi per tutti questi pezzi.');
-    // i tuoi motori
+    // ---- magazzino
+    h('Il tuo magazzino');
+    const mag = game.motPz().filter((q) => q.dove === 'mag');
+    if (!mag.length) p('Vuoto. I pezzi che compri finiscono qui; da qui li monti sulla tua auto o sul banco.');
+    for (const q of mag) {
+      const lav = game.motLavoro(q.cat), C = MOT_CAT[q.cat];
+      row(`<b>${esc(nome(q.cat, q.id))}</b><small>${esc(C.label)} · livello ${motLvOf(q.cat, q.id)}</small>`, [
+        serie && !built && q.cat !== 'blocco' && btn(`Sulla ${carN}${lav ? ' · € ' + lav : ''}`, () => done(game.motPut(q.u, game.car), `${nome(q.cat, q.id)} montato sulla ${carN}`), game.s.money < lav),
+        btn('Al banco', () => done(game.motPut(q.u, 'banco'), 'Sul banco')),
+        btn(`Vendi · € ${fmt(game.motValPezzo(q))}`, () => done(game.motSellPart(q.u))),
+      ]);
+    }
+    // ---- banco di lavoro
+    h('Il banco di lavoro');
+    const bs = game.motSel('banco'), bp = game.motPz().filter((q) => q.dove === 'banco'), manca = MOT_PARTI.filter((C) => !bs[C.id]);
+    p(manca.length === MOT_PARTI.length ? 'Il cavalletto è vuoto: ci metti i pezzi man mano che li compri, dal blocco in su. Quando c\'è tutto, lo accendi e diventa un motore da montare su qualsiasi auto.' : manca.length ? `Mancano: ${manca.map((C) => C.label.toLowerCase()).join(', ')}.` : 'C\'è tutto: si può accendere.');
+    { const grid = document.createElement('div'); grid.className = 'mt-bgrid';
+      for (const C of MOT_PARTI) { const q = bp.find((x) => x.cat === C.id), d = document.createElement('div'); d.className = 'mt-slot' + (q ? ' on' : '');
+        d.innerHTML = `<b>${esc(C.label)}</b><small>${q ? esc(nome(C.id, q.id)) : 'vuoto'}</small>`;
+        if (q) d.appendChild(btn('Togli', () => done(game.motTake(q.u))));
+        grid.appendChild(d); }
+      wrap.appendChild(grid); }
+    if (!manca.length) {
+      const c = motCalc(bs); if (c.ok) wrap.appendChild(sheet(c, game));
+      const full = M.list.length >= MOT.maxMotori;
+      const go = btn('Sul cavalletto: montalo e accendilo', () => banco(bs, ctx, () => game.motBuildBanco()), full); go.style.cssText = 'font-size:15px;padding:10px'; wrap.appendChild(go);
+      if (full) p(`Ci stanno ${MOT.maxMotori} motori: vendine uno per costruirne un altro.`);
+    }
+    // ---- i tuoi motori
     h('I tuoi motori');
-    if (!M.list.length) p('Ancora nessuno. Quando lo costruisci resta qui: lo monti su qualunque auto del tuo garage.');
+    if (!M.list.length) p('Ancora nessuno. Quello del banco, acceso, finisce qui: lo monti su qualunque auto del tuo garage.');
     for (const e of M.list) {
-      const ce = motCalc(e.sel), onCar = Object.keys(M.on).find((k) => M.on[k] === e.id), d = document.createElement('div'); d.className = 'mt-eng';
-      d.innerHTML = `<div><b>${esc(e.nome)}</b><small>${ce.hp} CV · ${ce.nm} Nm · ${fmt(ce.lim)} giri · ${ce.kg} kg · affidabilità ${Math.round(ce.rel * 100)} % · ${fmt(e.km || 0)} km${onCar ? ` · montato sulla ${esc(CARS[onCar].short || CARS[onCar].name)}` : ''}${e.rotto ? ' · <b style="color:#ff4a3a">ROTTO</b>' : ''}</small></div>`;
-      const a = document.createElement('div'); a.className = 'acts';
-      if (e.rotto) { const rc = Math.round(e.prezzo * MOT.revisione / 10) * 10; a.appendChild(btn(`Rifallo · € ${fmt(rc)}`, () => done(game.motRepair(e.id)), game.s.money < rc)); }
-      else if (onCar !== game.car) a.appendChild(btn(`Montalo sulla ${CARS[game.car].short || CARS[game.car].name} · € ${MOT.lavoro}`, () => { const r = game.motMount(e.id); if (r.ok) ctx.flash(`Swap fatto: ${e.nome} sulla ${CARS[game.car].short || CARS[game.car].name}`, 2.6); done(r); }, game.s.money < MOT.lavoro || !!onCar));
-      if (!onCar) a.appendChild(btn(`Vendi · € ${fmt(game.motValue(e))}`, () => done(game.motSell(e.id))));
-      d.appendChild(a); wrap.appendChild(d);
+      const ce = motCalc(e.sel), onCar = Object.keys(M.on).find((k) => M.on[k] === e.id);
+      const acts = [];
+      if (e.rotto) { const rc = Math.round(e.prezzo * MOT.revisione / 10) * 10; acts.push(btn(`Rifallo · € ${fmt(rc)}`, () => done(game.motRepair(e.id)), game.s.money < rc)); }
+      else if (onCar !== game.car) acts.push(btn(`Montalo sulla ${carN} · € ${MOT.lavoro}`, () => done(game.motMount(e.id), `Swap fatto: ${e.nome} sulla ${carN}`), game.s.money < MOT.lavoro || !!onCar));
+      if (!onCar) acts.push(btn(`Vendi · € ${fmt(game.motValue(e))}`, () => done(game.motSell(e.id))));
+      row(`<b>${esc(e.nome)}</b><small>${ce.hp} CV · ${ce.nm} Nm · ${fmt(ce.lim)} giri · ${ce.kg} kg · affidabilità ${Math.round(ce.rel * 100)} % · ${fmt(e.km || 0)} km${onCar ? ` · montato sulla ${esc(CARS[onCar].short || CARS[onCar].name)}` : ''}${e.rotto ? ' · <b style="color:#ff4a3a">ROTTO</b>' : ''}</small>`, acts);
     }
     body.appendChild(wrap);
   }
@@ -432,10 +466,11 @@
     ok: ['Bravo, va lì.', 'Perfetto. Stringi in croce, mi raccomando.', 'Così. Senti come entra?', 'Bene. Coppia di serraggio giusta.', 'Ecco fatto.'],
     no: (want, got) => `No no, ferma: ${got.toLowerCase()} va dopo. Prima ${want.toLowerCase()}: si monta dal basso verso l'alto.`,
   };
-  function banco(sel, ctx) {
+  // build: chi costruisce davvero quando giri la chiave (di serie motBuild, che paga i pezzi; dal banco motBuildBanco)
+  function banco(sel, ctx, build) {
     const game = G(); if (!game) return;
     const c = motCalc(sel); if (!c.ok) return;
-    if (game.s.money < c.price) { ctx.flash('Non hai abbastanza soldi', 2); return; }
+    if (!build && game.s.money < c.price) { ctx.flash('Non hai abbastanza soldi', 2); return; }
     const box = document.createElement('div'); box.className = 'mt-bench'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Banco di montaggio');
     box.innerHTML = `<header><h2>Banco di montaggio · ${esc(c.tipo)}</h2><button class="kbtn" type="button" data-x>Lascia stare<small>Esc</small></button></header><canvas aria-label="Il motore sul cavalletto"></canvas><div class="mt-tray" aria-label="La cassetta dei pezzi"></div><div class="mt-say"></div>`;
     document.body.appendChild(box);
@@ -467,7 +502,7 @@
     };
     const accendi = () => {
       // si paga e il motore entra in magazzino adesso: è montato e funziona
-      const r = game.motBuild(sel);
+      const r = build ? build() : game.motBuild(sel);
       if (!r.ok) { talk(r.why); return; }
       st.built = r; st.run = 0.01; ctx.save && ctx.save();
       talk('Contatto... gira, gira... ECCOLO! Senti che voce. ' + (c.rel < 0.6 ? 'Però occhio: così spinto, se lo tiri troppo si rompe.' : 'Questo dura una vita.'));

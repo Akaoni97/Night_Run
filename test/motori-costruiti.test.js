@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'pistone/motori.js']
   .map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const X = new Function(src + ';return { SupraSim, StreetGame, VG, VG_PATTERN, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motFill, motApply, motKgSerie, CARS, tuningParams, setActiveCar };')();
+const X = new Function(src + ';return { SupraSim, StreetGame, VG, VG_PATTERN, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, MOT_SERIE, motCalc, motFill, motApply, motKgSerie, motCalcSerie, motLucaMigra, tuningNascosto, CARS, tuningParams, setActiveCar };')();
 const { SupraSim, StreetGame, VG, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motApply } = X;
 
 const TURBO = { blocco: 'b4_20', albero: 'forg', bielle: 'h', pistoni: 'low', testata: 'v4', camme: 'sport', sovra: 'tm', iniettori: 'i750', centralina: 'prog' };
@@ -17,12 +17,12 @@ const viaggio = (soldi = 100000, tutto = true) => {
   if (tutto) game.motUnlockAll();
   return { sim, game };
 };
-const alPistone = (game) => { let n = 0; while (VG.stop(n).id !== 'motori') n++; game.inside = { id: 'motori', x: VG.stopX(n), phase: 'shop' }; game.s.dist = VG.stopX(n); };
+// Nico lavora da Luca: «al Pistone» vuol dire dentro Da Luca Tuning
+const alPistone = (game) => { let n = 0; while (VG.stop(n).id !== 'shop') n++; game.inside = { id: 'shop', x: VG.stopX(n), phase: 'shop' }; game.s.dist = VG.stopX(n); };
 
-test('motori: il Pistone è una tappa del Viaggio (al posto del secondo bar di ogni giro)', () => {
-  assert.equal(X.VG_PATTERN[4], 'motori');
-  let n = 0; while (VG.stop(n).id !== 'motori') n++;
-  assert.equal(VG.stop(n).name, 'Il Pistone'); assert.ok(n < 12);
+test('motori: Nico lavora da Luca, niente tappa a parte (il secondo bar resta un bar)', () => {
+  assert.equal(X.VG_PATTERN[4], 'bar'); assert.ok(!X.VG_PATTERN.includes('motori'));
+  const { game } = viaggio(); alPistone(game); assert.ok(game.motAlPistone());
 });
 
 test('motori: il calcolo coincide con la fisica (CV stimati = CV del simulatore)', () => {
@@ -123,7 +123,8 @@ test('motori: Nico insegna un livello alla volta, coi requisiti (soldi, km, moto
   assert.ok(game.motUnlock('sovra').ok); assert.equal(game.motLiv('sovra'), 2);
   // livello 3: servono km di viaggio
   game.s.dist = 0; const n3 = game.motNext('pistoni'); assert.equal(n3.lv, 3); assert.equal(n3.ok, false);
-  game.s.dist = (MOT_LIV[3].km + 1) * 1000; assert.ok(game.motUnlock('bielle').ok || game.motUnlock('albero').ok);
+  game.s.dist = (MOT_LIV[3].km + 1) * 1000; game.mot().montati = MOT_LIV[3].pezzi; alPistone(game); game.s.dist = (MOT_LIV[3].km + 1) * 1000;
+  assert.ok(game.motUnlock('albero').ok && game.motUnlock('bielle').ok, 'livello 3 con km e pezzi montati');
   // fuori dal Pistone no
   game.inside = null; assert.equal(game.motUnlock('radiatore').ok, false);
 });
@@ -184,4 +185,42 @@ test('motori: auto col motore di serie, niente bilancio di calore (come prima)',
   X.setActiveCar(game.car); const TP = X.tuningParams({}); sim.setCar(Object.assign({}, X.CARS[game.car].P));
   motApply(game, game.car, TP, sim); sim.setTune(TP.sim);
   assert.equal(sim.tune.cool, null); sim.running = true; sim.update(0.1); assert.equal(sim.hotK, 1);
+});
+
+// ---------------------------------------------------------------- negozio unico: pezzi singoli, motore di serie della V40, banco
+const v40 = (soldi = 100000, tutto = true) => { const r = viaggio(soldi, tutto); r.game.s.carId = 'v40'; return r; };
+const applica = (sim, game) => { X.setActiveCar(game.car); const TP = X.tuningParams({}); sim.setCar(Object.assign({}, X.CARS[game.car].P)); motApply(game, game.car, TP, sim); sim.setTune(TP.sim); return TP; };
+
+test('motori: un pezzo si compra e va in magazzino; montato sulla V40 di serie la cambia, smontato torna com\'era', () => {
+  const { sim, game } = v40(); alPistone(game); assert.equal(game.car, 'v40');
+  const cv0 = (applica(sim, game), sim.estimatePeak().cv);
+  const m0 = game.s.money, r = game.motBuyPart('sovra', 'tp'); assert.ok(r.ok); assert.equal(game.s.money, m0 - 2200); assert.equal(r.p.dove, 'mag');
+  const p2 = game.motBuyPart('intercooler', 'fms').p, p3 = game.motBuyPart('iniettori', 'i440').p, p4 = game.motBuyPart('centralina', 'rimap').p;
+  for (const p of [r.p, p2, p3, p4]) assert.ok(game.motPut(p.u, 'v40').ok);
+  const TP = applica(sim, game), cv1 = sim.estimatePeak().cv;
+  assert.ok(TP.sim.turbo.max > 0.5 && cv1 > cv0 * 1.35, `V40 col turbo piccolo: ${Math.round(cv0)} → ${Math.round(cv1)} CV`);
+  const c = game.motCalcSerie(); assert.ok(Math.abs(c.hp - cv1) / cv1 < 0.08, `scheda ${c.hp} CV, fisica ${Math.round(cv1)} CV`);
+  // un pezzo, un posto: sul banco lo stesso turbo non c'è più sulla V40
+  assert.ok(game.motPut(r.p.u, 'banco').ok); assert.equal(game.motSerie().sovra, undefined); assert.equal(game.motSel('banco').sovra, 'tp');
+  for (const p of [p2, p3, p4]) assert.ok(game.motTake(p.u).ok);
+  applica(sim, game); assert.ok(Math.abs(sim.estimatePeak().cv - cv0) < 1, 'senza pezzi la V40 è quella di serie');
+  // il blocco non si mette sul motore di serie
+  const b = game.motBuyPart('blocco', 'b4_20').p; assert.equal(game.motPut(b.u, 'v40').ok, false);
+});
+
+test('motori: il banco si riempie pezzo per pezzo e, completo, diventa un motore (i pezzi escono dal magazzino)', () => {
+  const { game } = v40(); alPistone(game);
+  for (const C of MOT_PARTI) { const p = game.motBuyPart(C.id, MOT_BASE[C.id]).p; game.motPut(p.u, 'banco'); }
+  const nPz = game.motPz().length; assert.equal(nPz, MOT_PARTI.length);
+  const r = game.motBuildBanco(); assert.ok(r.ok, r.why); assert.equal(game.motPz().length, 0); assert.equal(game.mot().list.length, 1);
+  assert.equal(game.motBuildBanco().ok, false, 'banco vuoto');
+});
+
+test('motori: sulla V40 i pezzi motore di Luca li fa Nico; i salvataggi vecchi li riavranno in soldi', () => {
+  assert.ok(X.tuningNascosto('v40', 'turbo') && X.tuningNascosto('v40', 'ecu') && !X.tuningNascosto('v40', 'exhaust') && !X.tuningNascosto('supra', 'turbo'));
+  const { game } = v40(); const m0 = game.s.money; game.s.owned['v40|turbo:td04'] = true;
+  const S = { tunes: { v40: { turbo: 'td04', ecu: 'remap', exhaust: 'catback' } }, tune: {} };
+  const rim = X.motLucaMigra(game, S); assert.equal(rim, 3800); assert.equal(game.s.money, m0 + 3800);
+  assert.equal(S.tunes.v40.turbo, 'none'); assert.equal(S.tunes.v40.ecu, 'oem'); assert.equal(S.tunes.v40.exhaust, 'catback');
+  assert.equal(X.motLucaMigra(game, S), 0, 'una volta sola');
 });

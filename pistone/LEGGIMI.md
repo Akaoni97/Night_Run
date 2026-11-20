@@ -1,40 +1,48 @@
-# Il Pistone · progetto in prova (motori costruiti da Nico)
+# Nico e il motore (pezzi a livelli, banco di lavoro, motori costruiti)
 
-**Stato: in prova.** È già nel gioco, ma non è detto che resti: lo gestisce il cognato (Luca), che decide se tenerlo,
-farlo diventare la modifica dei motori definitiva o toglierlo. Finché è in prova **non si mischia** con la modifica
-dei motori che c'era già: le due sezioni restano separate.
+**Stato (20/11/2026 sera): integrato da Luca, per ora solo sulla V40.** Il cognato (Luca) gestisce i motori: deciso
+con il proprietario che il negozio dei pezzi motore è uno solo, **Da Luca Tuning**, dove lavora **Nico**. Il Pistone
+non è più una tappa a parte (il secondo bar di ogni giro è tornato un bar). Quando la struttura sarà completa sulla V40
+si estende alle altre auto. L'interruttore resta (scheda Sviluppatori): spento, tutto torna come prima del Pistone.
 
-## Le due sezioni dei motori
-
-| | **A · Tuning di Luca** (quella di sempre, definitiva) | **B · Il Pistone** (questa cartella, in prova) |
-| --- | --- | --- |
-| Cosa fa | Pezzi da montare sul motore *di serie* di ogni auto | Ti costruisci un motore pezzo per pezzo e lo metti su qualsiasi auto |
-| Dove si gioca | Da Luca Tuning (e banco prova a rulli) | Il Pistone, da Nico |
-| File | `tuning.js` (Supra), `cars.js` (cataloghi di tutte le auto, `GEN_CARS`), `banco.js` | `pistone/motori.js`, `pistone/motori2d.js` |
-| Stato salvato | `game.s.owned`, pezzi scelti in `S.tune` | `game.s.vg.mot` |
-| Test | `test/motori.test.js` (il vecchio «Banco Suono 2JZ»), `test/banco.test.js` | `test/motori-costruiti.test.js` |
-| Sviluppatori | «Sblocca tutto» | riquadro «Il Pistone · progetto in prova» |
-
-Quando su un'auto c'è un motore del Pistone, turbo, intercooler, centralina, camme e frizione li decide quel motore;
-scarico, aspirazione, gomme, assetto, differenziale, cambio e peso restano di Luca. Togliendo il motore del Pistone
-l'auto torna esattamente com'era coi pezzi di Luca.
+## Come si gioca adesso
+- **Pezzi singoli a livelli.** Da Luca, nella parte di Nico, compri un pezzo alla volta (se Nico ti ha insegnato quel
+  livello del reparto). Il pezzo va in **magazzino**: un pezzo, un posto (`game.s.vg.mot.pz`, ogni pezzo ha `dove`:
+  `'mag'`, `'banco'` o l'id dell'auto). Si rivende al 55 %.
+- **Sul motore originale della V40** si monta tutto tranne il blocco (`motPut(u, 'v40')`). Manodopera di Nico:
+  € 380 per i pezzi dentro il motore (albero, bielle, pistoni, pompa dell'olio, testata, camme), € 90 per gli altri
+  (`MOT_LAVORO`, `MOT_INTERNI`). Il motore di serie è descritto in `MOT_SERIE.v40` (blocco virtuale `s_v40` e i pezzi di
+  serie che corrispondono a quelli veri): la curva vera della V40 resta la sua e i pezzi la cambiano in proporzione
+  (`motCalcSerie`, `motApplySerie`); turbo, centralina, intercooler, frizione, calore e affidabilità come per i motori
+  costruiti.
+- **Banco di lavoro**: un motore sul cavalletto che ti aspetta sempre. Ci metti i pezzi man mano (`motPut(u, 'banco')`);
+  quando ci sono tutti i 14 reparti si accende (`motBuildBanco`, scena del montaggio) e diventa un motore da montare su
+  qualsiasi auto (swap). I pezzi usati escono dal magazzino.
+- **Luca** sulla V40 non vende più turbo, intercooler, centralina e frizione (`MOT_LUCA_VIA`, `tuningNascosto`) né le
+  preparazioni pronte: restano suoi scarico, aspirazione, limitatore, gomme, assetto, differenziale e alleggerimento.
+  Chi li aveva comprati (salvataggi vecchi) se li vede rimborsati a prezzo pieno una volta sola (`motLucaMigra`).
+- **Prezzi** tarati sull'economia (~€ 290 netti al km di lavoro): insegnare un livello costa € 300 / 900 / 2.400
+  (livello 2, 3, 4) con km di viaggio (10 / 45 / 110), pezzi montati (4 per il 3, 10 per il 4) e un motore costruito
+  per il 4. Una V40 sui 200 CV costa circa € 7.000 tra pezzi e livelli; un motore da 600 CV più di una Supra.
 
 ## I file di questa cartella
 | File | Cosa c'è |
 | --- | --- |
-| `motori.js` | La logica, senza grafica: interruttore (`PISTONE`), pezzi e livelli (`MOT_PARTI`, `MOT_LIV`), il calcolo del motore (`motCalc`), i livelli che insegna Nico (`motNext`, `motUnlock`), costruire, montare, vendere, rifare, rotture e calore in strada (`motTick`, `motCalore`), lo swap su qualsiasi auto (`motApply`). Caricata anche dai test. |
-| `motori2d.js` | La grafica: il motore disegnato di lato (`drawEngine`), la facciata del Pistone, l'interno con Nico, il pannello (albero dei livelli, progetto, scheda, i tuoi motori), il banco di montaggio a tutto schermo. |
+| `motori.js` | La logica, senza grafica: interruttore (`PISTONE`), pezzi e livelli (`MOT_PARTI`, `MOT_LIV`), il calcolo del motore (`motCalc`), i livelli che insegna Nico (`motNext`, `motUnlock`), pezzi e magazzino (`motBuyPart`, `motPut`, `motTake`, `motSellPart`), banco (`motBuildBanco`), motore di serie della V40 (`MOT_SERIE`, `motCalcSerie`, `motApplySerie`), Luca senza i pezzi motore della V40 (`tuningNascosto`, `motLucaMigra`), rotture e calore in strada (`motTick`, `motCalore`), lo swap (`motApply`). Caricata anche dai test. |
+| `motori2d.js` | La grafica: il motore disegnato di lato (`drawEngine`), il pannello di Nico dentro Da Luca Tuning (livelli, motore della tua auto, pezzi in vendita, magazzino, banco di lavoro, i tuoi motori), la scena del montaggio a tutto schermo. La facciata e l'interno del vecchio Pistone ci sono ancora ma non si usano. |
 | `LEGGIMI.md` | Questo file. |
 
 ## Accenderlo, spegnerlo, toglierlo
-- **Interruttore**: scheda Sviluppatori del menu, riquadro «Il Pistone · progetto in prova» (oppure
-  `localStorage.nr_pistone = '0'` e ricarica). Spento: la tappa del Pistone torna a essere un bar, i motori costruiti
-  non vanno sulle auto (restano nel salvataggio, riaccendendo tornano). Costante `PISTONE.on` in `motori.js`.
+- **Interruttore**: scheda Sviluppatori del menu, riquadro «Il Pistone» (oppure `localStorage.nr_pistone = '0'` e
+  ricarica). Spento: i motori costruiti e i pezzi sulla V40 non contano (restano nel salvataggio, riaccendendo tornano)
+  e Luca torna a vendere i suoi pezzi motore della V40. Costante `PISTONE.on` in `motori.js`.
 - **Ogni aggancio fuori da questa cartella è segnato `[PISTONE]`**: `git grep -n "\[PISTONE\]"` li trova tutti.
   Oggi sono:
-  - `index.html`: i due `<script>`, `motApply` in `applySettings`, il ramo `motori` di `openPlace`, la lettera M sulla
-    mappa (`PLACE_ICON`), l'avviso da Luca con un motore del Pistone montato, le registrazioni della Supra spente con
-    un motore costruito (`dspCfg`);
+  - `index.html`: i due `<script>`, `motApply` in `applySettings`, il pannello di Nico nel ramo `shop` di `openPlace`
+    (e il vecchio ramo `motori`), i reparti motore della V40 nascosti da Luca e le preparazioni pronte nascoste
+    (`renderTuning`, `mountPart`), il rimborso dei salvataggi vecchi (`motLucaMigra`), la lettera M sulla mappa
+    (`PLACE_ICON`), l'avviso da Luca con un motore costruito montato, le registrazioni della Supra spente con un motore
+    costruito (`dspCfg`);
   - `sim.js`: bilancio di calore (`tune.cool`), protezione (`hotK`), pressione dell'olio (`tune.oilRpm`) — senza un
     motore del Pistone non fanno niente;
   - `sviluppatori.js`: il riquadro del Pistone;

@@ -4,6 +4,15 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · cognato (**negozio unico: Nico lavora da Luca, pezzi singoli sulla V40**)
+- Deciso col proprietario: il negozio dei pezzi motore è uno solo, Da Luca Tuning. Nico ci lavora: compri un pezzo alla
+  volta (a livelli), va in magazzino (un pezzo, un posto) e lo monti sul **motore originale della V40** (tutto tranne il
+  blocco) o sul **banco di lavoro**, dove il motore nuovo ti aspetta finché non ha tutti i 14 pezzi. Il Pistone non è più
+  una tappa: il secondo bar è tornato. Sulla V40 Luca non vende più turbo, intercooler, centralina, frizione e
+  preparazioni (chi li aveva li riavrà in soldi). Prezzi dei livelli rifatti sull'economia (€ 300/900/2.400). Test: 211.
+- Aperto: estendere alle altre auto quando la V40 è a posto; Nico non ha ancora un disegno da Luca (stasera la sua storia);
+  vendendo la V40 i pezzi montati sopra se ne vanno con lei (da decidere se tornano in magazzino).
+
 ## 20/11/2026 · cognato (**il Pistone diventa un progetto in prova, separato**)
 - Il proprietario ha passato al cognato la gestione dei motori. I motori costruiti da Nico sono un **progetto in prova**:
   cartella `pistone/` (prima `motori/`), separata dal tuning di Luca che resta la modifica dei motori di sempre.

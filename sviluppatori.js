@@ -68,7 +68,7 @@
     // [PISTONE] il progetto in prova dei motori costruiti (pistone/): acceso o spento, e i livelli di Nico
     if (typeof PISTONE !== 'undefined') {
       const P = $('devPistone');
-      P.innerHTML = `<h3>Il Pistone · progetto in prova</h3><p class="hint">I motori costruiti da Nico (cartella pistone/). Spento: la tappa non c'è e i motori costruiti non vanno sulle auto (restano salvati). Cambiando si ricarica la pagina.</p>
+      P.innerHTML = `<h3>Il Pistone · Nico</h3><p class="hint">Pezzi a livelli, banco e motori costruiti di Nico (cartella pistone/). Spento: motori costruiti e pezzi sulla V40 non contano (restano salvati) e Luca torna a vendere i suoi pezzi motore della V40. Cambiando si ricarica la pagina.</p>
 <div class="dv"><button type="button" id="devPisOn" class="big">${PISTONE.on ? 'Acceso · spegnilo' : 'Spento · accendilo'}</button>${PISTONE.on ? '<button type="button" id="devPisLiv">Sblocca tutti i livelli di Nico</button>' : ''}</div>`;
       $('devPisOn').addEventListener('click', () => { try { localStorage.setItem('nr_pistone', PISTONE.on ? '0' : '1'); } catch (e) { /* */ } save(); location.reload(); });
       const lv = $('devPisLiv'); if (lv) lv.addEventListener('click', () => { const g = G(); if (g && g.motUnlockAll && g.s.vg) { g.motUnlockAll(); save(); say('Nico ti ha insegnato tutti i livelli.'); } });
