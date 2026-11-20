@@ -81,7 +81,7 @@ test('valigette: mai un turbo tra i pezzi regalati', () => {
   const { game } = trip(); game.mode = 'career';
   for (let k = 0; k < 120; k++) for (const rar of [3, 4]) {
     game.cases().own.push({ type: 'oro' }); const pz = game.caseOpen(0, lcg(k * 7 + rar));
-    assert.ok(!/turbo/i.test(pz.name + ' ' + (pz.text || '')) || pz.rar < 3, `${pz.name}`);
+    assert.notEqual(pz.icon, 'turbo', `${pz.name}: un turbo regalato`);       // l'icona 'turbo' esce solo per la categoria turbo (un intercooler può chiamarsi «per turbo»)
   }
   for (const it of (tuning().turbo || {}).items || []) if (it.price > 0) assert.equal(game.owns('turbo', it.id), false, `turbo ${it.id} regalato`);
 });
