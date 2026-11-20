@@ -2,7 +2,8 @@
 // come la proverebbe un giocatore, senza riscrivere ogni volta l'avvio, il prologo e il viaggio fino a una tappa.
 //
 // Uso (dalla radice del repository, serve Playwright con Chromium):
-//   node strumenti/prova.js [--mob] [--tutorial] [--out cartella] passo passo ...
+//   node strumenti/prova.js [--mob] [--tutorial] [--vista 1920x1080] [--out cartella] passo passo ...
+//   (--vista: grandezza della finestra del computer, di serie 1280x720, come lo schermo vero di chi gioca)
 //   (senza --tutorial il primo lavoro è dato per fatto, altrimenti il gioco riporta sempre al Bar Sport)
 // Passi:
 //   tappa:dealer        vai 9 m prima della prossima tappa di quel tipo (bar, fuel, grill, niko, luca, style,
@@ -29,7 +30,8 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const mob = args.includes('--mob');
 const oi = args.indexOf('--out'), OUT = oi >= 0 ? path.resolve(args[oi + 1]) : process.cwd();
-const steps = args.filter((a, i) => !a.startsWith('--') && !(oi >= 0 && i === oi + 1));
+const vi = args.indexOf('--vista'), VISTA = vi >= 0 ? args[vi + 1].split('x').map(Number) : [1280, 720];
+const steps = args.filter((a, i) => !a.startsWith('--') && !(oi >= 0 && i === oi + 1) && !(vi >= 0 && i === vi + 1));
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.glb': 'model/gltf-binary', '.gltf': 'model/gltf+json', '.css': 'text/css' };
@@ -57,7 +59,7 @@ const STATO = () => {
   await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
   const URL = `http://127.0.0.1:${server.address().port}/index.html`;
   const b = await chromium.launch();
-  const page = await b.newPage({ viewport: mob ? { width: 390, height: 844 } : { width: 1280, height: 720 }, hasTouch: mob });
+  const page = await b.newPage({ viewport: mob ? { width: 390, height: 844 } : { width: VISTA[0], height: VISTA[1] }, hasTouch: mob });
   const errs = [];
   page.on('pageerror', (e) => errs.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error' && !/ERR_FAILED|ERR_ABORTED/.test(m.text())) errs.push(m.text()); });

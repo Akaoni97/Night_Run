@@ -100,10 +100,11 @@
     const style = (this.cos || {}).wheels, im = v40Img();
     if ((!style || style === 'none') && im.complete && im.naturalWidth) {
       const s2 = im.width * k;
+      if (this.wheelDraw) this.wheelDraw(g, im, cx, cy, s2, ang, speed); else {   // gira liscia (nitido2d.js)
       g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));
       if (speed > 9) { for (let i = 0; i < 4; i++) { g.save(); g.globalAlpha = i ? 0.35 : 1; g.rotate(ang + i * Math.PI / 10); g.drawImage(im, -s2 / 2, -s2 / 2, s2, s2); g.restore(); } }
       else { g.rotate(Math.round(ang / (Math.PI / 20)) * (Math.PI / 20)); g.drawImage(im, -s2 / 2, -s2 / 2, s2, s2); }
-      g.restore();
+      g.restore(); }
     } else v40.call(this, g, cx, cy, k, ang, speed, rear);
     const ri = im.complete && im.naturalWidth ? rimInfo(im) : null;
     this.tireFx(g, cx, cy, 14.4 * k + 0.6, ang, speed, { rim: ri ? ri.frac : 0.66, rgb: ri && ri.rgb, press: pressOf(rear), wear: wearOf() });
