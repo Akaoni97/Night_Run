@@ -25,7 +25,7 @@ solo guidando la Supra.
 | --- | --- |
 | `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri (4, 5 o 6: la 850 R ha i cinque, modifica Codex), carattere «Codex · deciso» opzionale (`cfg.character`, menu Guida, di serie Originale = suono di prima), collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Scoppi dello scarico a voci (fino a 6 insieme, ognuno un po' diverso: altezza, crepitio, durata, doppi «pa-pam», sgranate); carattere per auto in `voice.pop` (`f` altezza, `crack`, `len`, `thump`, `vary`, `boom` boato basso che scende di nota, `bf` sua altezza, `mid` quanto passa dal silenziatore; le Volvo usano `VOLVO_POP` col boato, Supra di serie). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. Borbottio al rilascio: `addBurble` e voci `bV`, con un livello suo nel mix (`burG`) perché a gas mollato lo scarico normale è quasi muto; copione `rilascio` in `strumenti/ascolta.mjs`. |
 | `sim.js` | Fisica (classe `SupraSim`, passo 1/4000 s): motore, turbo, frizione, cambio, gomme Pacejka, differenziale, beccheggio, wheel hop, TRC, ABS, tipi di limitatore. `sim.park` (spento di serie): cambio bloccato in folle, ruote ferme (leva in P). `sim.revMax` (m/s, spento di serie): limitatore della retromarcia, lo accende il gioco. |
-| `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), `tuningParams()`. |
+| `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), Assetto a 6 livelli comune a tutte le auto (`SUSP_LV`, `suspCat`, `suspState`, `suspResolve`: altezza in mm e rigidità regolabili da Luca, stato in `S.adj[auto]`), `tuningParams(sel, adj)`. |
 | `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
 | `samples.js` | Lettore di campioni audio caricati dall'utente (solo Supra). |
 | `street2d.js` | Tutta la grafica 2D in pixel art (classe `Street2D`), sfondi dei luoghi (`drawScenery`, `drawNearSide`), traffico, radar delle corsie. |
@@ -162,7 +162,7 @@ TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
    fatto cosa. Su GitHub i test girano da soli a ogni caricamento (`.github/workflows/test.yml`): se arriva l'email
    di test falliti, si sistema prima di tutto il resto.
    **Versione**: ogni intervento (ogni sessione con Claude o altri, o pacchetto di modifiche) alza la versione di un passo in `VERSIONI.md`
-   (v0.60 → v0.61…): la riga nell'elenco, la versione nel titolo della voce di `DIARIO.md` e nel messaggio di commit. Prima di chiudere, non dopo.
+   (v0.61 → v0.62…): la riga nell'elenco, la versione nel titolo della voce di `DIARIO.md` e nel messaggio di commit. Prima di chiudere, non dopo.
 2. Commenti, testi del gioco e messaggi di commit in italiano, nello stile del codice esistente.
 3. Nel repository niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini): l'utente li carica
    in locale nel browser (IndexedDB). Niente copie di grafica, nomi o personaggi di giochi esistenti.
@@ -194,7 +194,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 275 (compresa l'estetica premium, compresa la catena delle missioni, compresa la scelta delle fiamme, compresi i motori di Nico: livelli, pezzi singoli sulla V40, banco, calore e frizione; tolto quello della Montagna col 3D), compresa l'entrata nei locali, compresi la polizia (anche `polizia.js`), le modifiche di Codex, leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 284 (compresa l'estetica premium, compresa la catena delle missioni, compresa la scelta delle fiamme, compresi i motori di Nico: livelli, pezzi singoli sulla V40, banco, calore e frizione; tolto quello della Montagna col 3D), compresa l'entrata nei locali, compresi la polizia (anche `polizia.js`), le modifiche di Codex, leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
 - Con `strumenti/prova.js` le domande iniziali scelgono il cambio automatico: la leva parte in **P**, per guidare `js:nightRun.engineTap()` e `js:nightRun.leva('D')`.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,

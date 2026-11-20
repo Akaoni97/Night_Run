@@ -356,7 +356,7 @@ class Street2D {
     g.fillStyle = '#0b0c10'; g.beginPath(); g.arc(0, 0, R, 0, Math.PI * 2); g.fill();
     g.fillStyle = '#1c1e24'; g.beginPath(); g.arc(0, 0, R * 0.9, 0, Math.PI * 2); g.fill();
     if (style && style !== 'none') {
-      this.brake(g, 0, 0, k * (L.low ? 1.02 : 0.98), ang, rear); g.translate(0, 0);
+      this.brake(g, 0, 0, k * (L.low > 0 ? 1.02 : 0.98), ang, rear); g.translate(0, 0);
       g.save(); const blur = speed > 9; g.rotate(blur ? ang : Math.round(ang / (Math.PI / 20)) * (Math.PI / 20));
       const rc = (this.cos && this.cos.rims && this.cos.rims !== 'none') ? this.cos.rims : '#c9ced6';
       g.strokeStyle = rc; g.lineWidth = Math.max(1, 1.2 * k); g.beginPath(); g.arc(0, 0, R * 0.7, 0, Math.PI * 2); g.stroke();

@@ -149,6 +149,17 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   ereditata è malconcia (`vgInherit`, `VG_EREDITA` in `viaggio.js`: gomme a 1,45-1,7 bar e consumate, olio, candele e
   pastiglie da cambiare, sporca, un po' ammaccata, 22 % di benzina). Nel garage del prologo le altre cinque auto sono
   Panda, Audi 80, Grande Punto, Corsa e Polo (le più vecchie ed economiche). Il giocatore sceglie una delle sei: diventa la sola auto nel garage del Viaggio, malconcia (`onPick` del prologo → `eredita` in `index.html`); saltando il prologo resta la V40.
+- **Assetto a livelli** (20/11/2026, `tuning.js` + `sim.js` + pannello di Luca in `index.html`): in ogni auto l'Assetto ha 6 livelli
+  (0 originale, poi molle, molle e ammortizzatori, coilover, coilover da pista, competizione; id `oem, springs, dampers,
+  coilover|tein, race, pro`). Livello 0: niente da regolare. Dal livello 1 il pezzo parte più basso e rigido
+  (`SUSP_LV[n].h0/k0`) e due cursori sotto la tendina regolano altezza (mm rispetto all'originale, anche rialzata) e
+  rigidità (% delle molle di serie) entro i limiti del livello, sempre più larghi fino al 5 (−120/+90 mm, 50-420 %). La
+  regolazione è gratis ma da fermo e da Luca come i pezzi; cambiando pezzo si riparte dai valori di fabbrica. Stato:
+  `S.adj[auto] = { h, k }` (nel salvataggio di `banco2jz`, come `S.tunes`). La fisica: baricentro (`dcg`) e quindi trasferimento
+  di carico, aria (`cdK`), presa, beccheggio (rigidità), partenza (`launch`), saltellamento dopo i giunti (`sim.roadBump`,
+  `bumpU`) e, sotto −70 mm, il fondo che tocca sugli urti (`scrapeT`: frena un po', scintille e SCRAAAPE col `game.fx` `scrape`).
+  Il disegno segue (`look.low` in `street2d.js` e `carPic` in `interni.js`); nella vista 3D non si vede l'altezza. Il vecchio
+  assetto 'drag' della Supra è ora il livello 4 con regolazione morbida (migrazione in `fillTunes`). Test in `test/assetto.test.js`.
 - **Interni rifatti in parte (17/11/2026)**: personaggi ridisegnati (testa arrotondata con mascella, tre toni di luce,
   capelli con volume e frangia, occhi col riflesso, naso, labbra, braccia e mani a pixel netti con le dita); insegna BAR
   leggibile (prima era al rovescio), MOTEL/LIBERE dentro la finestra; dalle finestre passano le auto vere del traffico

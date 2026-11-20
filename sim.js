@@ -31,7 +31,7 @@ class SupraSim {
       we: 0, ww: 0, wo: 0, phi: 0, v: 0, acc: 0, theta: 0, gear: 0, ign: false, running: false, starter: false, crankT: 0, catchAt: 0.6,
       thr: 0, air: 0, iacI: 0, tur: 0, pipeP: 0, sec: 0, wg: 0, cut: 0, cutLim: false, cutLaunch: false, dfco: false, ovr: 9,
       clutch: 0, lock: false, shiftSeq: null, events: [], runT: 0, pumpT: 0, bovLatch: false, launchArmed: false,
-      Tc: 0, Tnet: 0, charge: 0, stalled: false,
+      Tc: 0, Tnet: 0, charge: 0, stalled: false, bumpU: 0, scrapeT: 0,
       fuel: 0.72, waterT: 74, oilT: 69, oilP: 0, volt: 12.5, odo: 48213.4, trip: 0,
       tireT: 24, tireWear: 0, park: false, damage: 0, slipPow: 0, skid: 0, brakeT: 28, winPos: 0, winT: 0, winMot: 0, lockF: false, lockR: false, locked: false, lockPow: 0, brakePow: 0, abs: false,
       run0: null, best100: null, best400: null, last100: null, last400: null,
@@ -45,6 +45,17 @@ class SupraSim {
     if (this.gear > this.P.gears.length - 1) this.gear = this.P.gears.length - 1;
   }
   topGear() { return this.P.gears.length - 1; }
+  // giunto o buca sotto le ruote (I 0..1 dal gioco): un assetto duro o radente fa saltellare la gomma, e se l'auto è troppo
+  // bassa il fondo tocca. Ritorna true se ha strisciato (il gioco ci aggiunge le scintille).
+  roadBump(I) {
+    const sp = this.tune.susp || {};
+    this.bumpU = Math.min(0.45, (this.bumpU || 0) + I * (sp.rough || 0) * 0.5);
+    if ((sp.scrapeK || 0) > 0 && this.v > 10 && I > 0.4 && Math.random() < sp.scrapeK) {
+      this.scrapeT = 0.22; this.events.push({ type: 'bump', I: Math.min(1, I * 1.5) });
+      return true;
+    }
+    return false;
+  }
   // massa vera in movimento: l'auto (P.mass: peso a secco col 90 % di carburante, più il carico) + pilota 75 kg
   // + il carburante che c'è davvero (0,74 kg/l). Il rimorchio (trailerKg) ha le sue ruote: spinge e frena, ma non pesa sugli assi.
   massNow() { const P = this.P; return Math.max(P.mass * 0.6, P.mass + 75 + (this.fuel - 0.9) * (P.tank || 60) * 0.74); }
@@ -372,12 +383,15 @@ class SupraSim {
     if (this.hopE > 0.3 && this.hopPh < h * 10.5) this.events.push({ type: 'bump', I: 0.25 * this.hopE });
     const m = this.massNow(), lift = 0.5 * 1.2 * (P.cl ?? 0.1) * P.A * this.v * this.v;   // portanza: metà per asse
     const Nr0 = m * 9.81 * P.rearW - lift * 0.5;
-    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * m * this.pz * P.cgH / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
+    const cgE = P.cgH + ((tn.susp || {}).dcg || 0);                  // baricentro: scende con l'altezza da terra
+    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * m * this.pz * cgE / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
     // differenziale: aperto (la ruota scarica gira a vuoto), Torsen (ripartisce), autobloccante (blocca)
     const dk = tn.diff === 'lsd' ? 1 : tn.diff === 'torsen' ? 0.96 : 0.87;
     // assetto: in partenza un posteriore che si "siede" (o un anteriore che non si alza) carica le ruote motrici
     const launchK = 1 + (((tn.susp || {}).launch || 1) - 1) * (1 - SIM_SS(4, 22, Math.abs(this.v)));
-    const Fmax = P.mu * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK;
+    this.bumpU = Math.max(0, (this.bumpU || 0) - h * 3.2);          // assetto duro o radente: dopo una buca la gomma molla per un attimo
+    this.scrapeT = Math.max(0, (this.scrapeT || 0) - h);
+    const Fmax = P.mu * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK * (1 - this.bumpU);
     // gomma: lo slittamento "visto" dal battistrada segue quello reale con un ritardo (lunghezza di rilassamento ~0,3 m),
     // poi curva di Pacejka della mescola: picco, e oltre la forza cala più o meno in fretta
     const ty = tn.tyre || { B: 20, C: 1.42, E: 0.1 };
@@ -413,13 +427,14 @@ class SupraSim {
     const v0 = this.v;
     // resistenza dell'aria: in scia a un'auto davanti (draft, 0..1 deciso dal gioco) ne resta meno; il rimorchio ne aggiunge
     const tk = this.trailerKg || 0;
-    const drag = 0.5 * 1.2 * (P.cd * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v);
+    const drag = 0.5 * 1.2 * (P.cd * ((tn.susp || {}).cdK || 1) * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v)
+      + (this.scrapeT > 0 ? Math.sign(this.v) * 0.06 * this.massNow() * 9.81 : 0);   // fondo che striscia: frena un po'
     // ---- freni: ogni asse frena fino a quanto tiene la sua gomma, col carico che in frenata va avanti ----------------------
     // ripartizione fissa (P.bf sull'anteriore). Con l'ABS l'asse al limite lavora a impulsi; senza ABS si blocca e striscia
     // (attrito radente, circa tre quarti), finché il pedale non si alleggerisce. I dischi si scaldano e perdono efficacia.
-    const ty2 = tn.tyre || {}, mu = (P.mu * 0.92 + 0.08) * this.tireGrip() * (ty2.brake || 1);
+    const ty2 = tn.tyre || {}, mu = (P.mu * 0.92 + 0.08) * this.tireGrip() * (ty2.brake || 1) * (1 - 0.6 * this.bumpU);
     const wf0 = P.fwd ? P.rearW : 1 - P.rearW, W = m * 9.81 - lift;
-    const Nf = SIM_CLAMP(W * wf0 - m * this.pz * P.cgH / P.wb, W * 0.15, W * 0.95), Nrb = W - Nf;
+    const Nf = SIM_CLAMP(W * wf0 - m * this.pz * cgE / P.wb, W * 0.15, W * 0.95), Nrb = W - Nf;
     const pads = (tn.maint || {}).pads ?? 1;
     const req = I.brake * m * 9.81 * (P.bk ?? 1.15) * (0.7 + 0.3 * Math.min(1, pads / 0.3)) * this.padK();
     if (pads < 0.1 && I.brake > 0.3 && Math.abs(this.v) > 3 && Math.random() < h * 3) this.events.push({ type: 'grind' });   // ferro su ferro

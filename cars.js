@@ -64,14 +64,9 @@ const TUNING_V40 = {
       { id: 'semislick', price: 1100, km: 25, brand: 'Toyo', name: 'Proxes R888R 205/45 R16', note: 'Semi-slick: +20 % di presa calde, scivolose da fredde. Con la trazione anteriore fanno la differenza in partenza.', sim: { mu: 1.2, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } } },
     ],
   },
-  suspension: {
-    label: 'Assetto',
-    items: [
-      { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Originale', note: 'Morbido da familiare: in partenza il muso si alza e scarica le ruote motrici.', sim: { susp: { pitch: 1.1, grip: 1, launch: 1 } }, look: { low: 0 } },
-      { id: 'springs', price: 600, km: 5, brand: 'Eibach', name: 'Molle sportive −35 mm', note: 'Più bassa e meno rollio: il muso si alza meno in partenza, quindi le ruote davanti restano più cariche.', sim: { susp: { pitch: 0.75, grip: 1.03, launch: 1.03 } }, look: { low: 3 } },
-      { id: 'coilover', price: 1500, km: 18, brand: 'Bilstein', name: 'Coilover B14', note: 'Assetto regolabile −45 mm, cassa quasi ferma: la familiare diventa precisa.', sim: { susp: { pitch: 0.5, grip: 1.05, launch: 1.04 } }, look: { low: 4 } },
-    ],
-  },
+  suspension: suspCat({ make: 'Volvo', ids: ['oem', 'springs', 'dampers', 'coilover', 'race', 'pro'], pitch: 1.1, fwd: true,
+    note0: 'Morbido da familiare: in partenza il muso si alza e scarica le ruote motrici. Nessuna regolazione.',
+    brand: { 1: 'Eibach', 3: 'Bilstein' }, name: { 1: 'Molle sportive −35 mm', 3: 'Coilover B14' } }),
   final: {
     label: 'Differenziale e finale',
     items: [
@@ -108,13 +103,13 @@ const V40_EX = {
   sport: { L: 3.4, r: -0.6, m: [['lp', 2600, 0.6], ['peak', 170, 1.0, 4], ['peak', 1100, 1.4, 5], ['peak', 3200, 2, 1]], g: 2.2, jet: 0.6, rasp: 0.5, tips: 1 },
   race: { L: 3.1, r: -0.66, m: [['lp', 4600, 0.55], ['peak', 190, 0.9, 3], ['peak', 1500, 1.4, 6], ['peak', 3600, 2, 2]], g: 2.5, jet: 0.9, rasp: 0.75, tips: 1 },
 };
-function v40Params(sel) {
+function v40Params(sel, adj) {
   const g0 = (k) => tuningItemOf(TUNING_V40, k, (sel || {})[k]);
-  return applyLimiter(v40ParamsBase(sel), g0('limiter'), g0('ecu').sim);
+  return applyLimiter(v40ParamsBase(sel, adj), g0('limiter'), g0('ecu').sim);
 }
-function v40ParamsBase(sel) {
+function v40ParamsBase(sel, adj) {
   const g = (k) => tuningItemOf(TUNING_V40, k, (sel || {})[k]);
-  const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = g('suspension'), fin = g('final'), cl = g('clutch'), wt = g('weight');
+  const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = suspResolve(g('suspension'), adj), fin = g('final'), cl = g('clutch'), wt = g('weight');
   const turbo = tb.sim.turbo ? Object.assign({}, tb.sim.turbo, { max: Math.min(tb.sim.turbo.max, ecu.sim.maxBoost) }) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false };
   if (tb.sim.turbo && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
   const hasT = !!tb.sim.turbo;
@@ -124,7 +119,7 @@ function v40ParamsBase(sel) {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
       idle: 800, camLow: 1, camHigh: 1, lope: 0, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
-      mu: ty.sim.mu * su.sim.susp.grip, tyre: ty.sim.tyre, susp: su.sim.susp, ic: hasT ? ic.sim.ic : null,
+      mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
       diff: fin.sim.diff, fd: fin.sim.fd, gears: null, dm: wt.sim.dm, rearOff: wt.sim.rearOff || 1,
       valve: hasT ? 'bov' : 'recirc', boostK: 0.42,     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
     },
@@ -136,7 +131,7 @@ function v40ParamsBase(sel) {
       intake: g('intake').dsp, scream: 0, lope: 0, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
     },
     look: {
-      low: (su.look || {}).low || 0, susp: su.sim.susp.pitch, exhaust: (ex.look || {}).tip || 0,
+      low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0,
       turbo: hasT, turbo2: tb.id === 'td04_19t', badge: (tb.look || {}).badge || '', fmic: hasT && !!(ic.look || {}).fmic,
     },
   };
@@ -185,10 +180,8 @@ function genCatalog(c) {
       { id: 'oem', price: 0, km: 0, brand: n.tyreBrand || 'Michelin', name: n.tyreOem || 'Originali', note: 'Stradali: presa onesta, lavorano bene da fredde.', sim: { mu: c.mu || 1.05, tyre: { B: 19, C: 1.42, E: 0.1, opt: 80, win: 70, crr: 0.012 } } },
       { id: 'sport', price: $(800), km: kk(3), brand: 'Toyo', name: 'Proxes R1R', note: 'Sportive: +6 % di presa, sterzo più pronto, ideali a 85 °C.', sim: { mu: (c.mu || 1.05) * 1.06, tyre: { B: 20, C: 1.45, E: 0.2, opt: 85, win: 60, crr: 0.012 } } },
       { id: 'semislick', price: $(1200), km: kk(25), brand: 'Toyo', name: 'Proxes R888R', note: 'Semi-slick: +20 % di presa calde, scivolose da fredde.', sim: { mu: (c.mu || 1.05) * 1.2, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } } } ] },
-    suspension: { label: 'Assetto', items: [
-      { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originale', note: c.suspNote || 'Comodo: la cassa si muove parecchio.', sim: { susp: { pitch: c.pitch || 1, grip: 1, launch: 1 } }, look: { low: 0 } },
-      { id: 'springs', price: $(600), km: kk(5), brand: 'Eibach', name: 'Molle sportive −30 mm', note: 'Più bassa, meno rollio e beccheggio.', sim: { susp: { pitch: (c.pitch || 1) * 0.7, grip: 1.03, launch: c.fwd ? 1.03 : 0.99 } }, look: { low: 2 } },
-      { id: 'coilover', price: $(1600), km: kk(18), brand: 'KW', name: 'Coilover V3', note: 'Regolabile −40 mm: cassa quasi ferma, precisa.', sim: { susp: { pitch: (c.pitch || 1) * 0.5, grip: 1.05, launch: 1.02 } }, look: { low: 3 } } ] },
+    suspension: suspCat({ make: c.make, ids: ['oem', 'springs', 'dampers', 'coilover', 'race', 'pro'], pitch: c.pitch || 1, fwd: c.fwd, price: $, km: kk,
+      note0: (c.suspNote || 'Comodo: la cassa si muove parecchio.') + ' Nessuna regolazione.' }),
     final: { label: 'Differenziale e finale', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: c.diff0.name, note: c.diff0.note, sim: { fd: c.P.fd, diff: c.diff0.diff } },
       { id: 'lsd', price: $(1600), km: kk(30), brand: 'Drexler', name: `Autobloccante al 40 %, finale ${(c.P.fd * 1.12).toFixed(2).replace('.', ',')}`, note: 'Blocca la ruota che slitta e accorcia le marce: partenze piantate, meno velocità massima.', sim: { fd: Math.round(c.P.fd * 1.12 * 100) / 100, diff: 'lsd' } } ] },
@@ -216,12 +209,12 @@ function genPresets(c) {
 }
 function genParams(c) {
   const base = genParamsBase(c);
-  return (sel) => applyLimiter(base(sel), tuningItemOf(c.tuning, 'limiter', (sel || {}).limiter), tuningItemOf(c.tuning, 'ecu', (sel || {}).ecu).sim);
+  return (sel, adj) => applyLimiter(base(sel, adj), tuningItemOf(c.tuning, 'limiter', (sel || {}).limiter), tuningItemOf(c.tuning, 'ecu', (sel || {}).ecu).sim);
 }
 function genParamsBase(c) {
-  return (sel) => {
+  return (sel, adj) => {
     const g = (k) => tuningItemOf(c.tuning, k, (sel || {})[k]);
-    const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = g('suspension'), fin = g('final'), cl = g('clutch'), wt = g('weight');
+    const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = suspResolve(g('suspension'), adj), fin = g('final'), cl = g('clutch'), wt = g('weight');
     const hasT = !!tb.sim.turbo;
     const turbo = hasT ? Object.assign({}, tb.sim.turbo, { max: Math.min(tb.sim.turbo.max, ecu.sim.maxBoost) }) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false };
     if (hasT && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
@@ -233,7 +226,7 @@ function genParamsBase(c) {
       sim: {
         turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
         idle: c.P.idle, camLow: 1, camHigh: 1, lope: (vo.lope || 0) * 0.6, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
-        mu: ty.sim.mu * su.sim.susp.grip, tyre: ty.sim.tyre, susp: su.sim.susp, ic: hasT ? ic.sim.ic : null,
+        mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
         diff: fin.sim.diff, fd: fin.sim.fd, gears: c.tuning.gearbox ? g('gearbox').sim.gears : null, dm: wt.sim.dm, rearOff: 0.6,
         valve: hasT ? 'bov' : 'recirc', boostK: c.boostK || (c.turbo ? 0.9 : 0.72),   // kit su aspirate: rapporto di compressione alto, si spinge meno
       },
@@ -244,7 +237,7 @@ function genParamsBase(c) {
         intake: g('intake').dsp, scream: 0, lope: vo.lope || 0, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
         voice: vo,
       },
-      look: { low: (su.look || {}).low || 0, susp: su.sim.susp.pitch, exhaust: (ex.look || {}).tip || 0, badge: (tb.look || {}).badge || '' },
+      look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, badge: (tb.look || {}).badge || '' },
     };
   };
 }

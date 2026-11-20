@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.60**
+**Versione attuale: v0.61**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -83,3 +83,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.58 | 20/11 | proprietario | Due bisogni nuovi: pipì (12 ore di viaggio) e cacca (24), bagno gratis nei locali |
 | v0.59 | 20/11 | proprietario | Pipì e cacca: frasi serie e comiche (pensieri, avvisi, incidente) |
 | v0.60 | 20/11 | proprietario | La piazzetta: ogni 2-3 tappe due negozi affiancati (mai Luca e Neon Kustom insieme) |
+| v0.61 | 21/11 | proprietario | Assetto a livelli: altezza e rigidità regolabili da Luca (cursori nella nuova officina), fisica e disegno che seguono |

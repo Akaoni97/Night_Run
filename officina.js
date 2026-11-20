@@ -177,6 +177,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-hint { color: #9a9486; font-size: 12.5px; margin: 6px 2px; }
 .of-cur { margin: 8px 0; padding: 8px 10px; border: 1px solid #38bdf8; border-radius: 10px; background: #0f1a22; font-size: 13px; }
 .of-swaps { max-height: 360px; overflow: auto; padding-right: 2px; }
+.of-susp { display: grid; gap: 6px; padding: 6px 2px 2px; } .of-susp.off { opacity: .45; }
+.of-sr { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; align-items: center; }
+.of-sr span { font: 400 11px/1 var(--f-data, monospace); letter-spacing: .1em; text-transform: uppercase; color: #9a9486; }
+.of-sr b { font: 600 13px/1 var(--f-body, sans-serif); color: #ffb347; text-align: right; grid-column: 2; grid-row: 1; }
+.of-sr input { grid-column: 1 / -1; width: 100%; accent-color: #ffb347; }
 .of-sw { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; }
 .of-sw .nm b { display: block; font-size: 14px; } .of-sw .nm small { color: #9a9486; font-size: 12px; }
 .of-sw .st { color: #ffd27a; font: 700 12px/1.2 var(--f-data, monospace); text-align: right; white-space: nowrap; }
@@ -201,6 +206,16 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
         ctx.apply(); ctx.save(); ctx.after && ctx.after();
         ctx.flash(s.dataset.swap === '-' ? 'Motore di serie rimontato' : 'Motore montato: ' + offEngineName(s.dataset.swap), 2); render();
       }
+    });
+    // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
+    box.addEventListener('input', (e) => {
+      const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
+      const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
+      const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
+    });
+    box.addEventListener('change', (e) => {
+      const r = e.target.closest('[data-susp]'); if (!r || !ctx.setAdj) return;
+      ctx.setAdj(r.dataset.susp === 'h' ? { h: +r.value } : { k: +r.value }, () => render()); ctx.after && ctx.after(); render();
     });
     // anteprima: passando sopra un livello le barre in alto mostrano cosa cambierebbe (non compra niente)
     let pv = null;
@@ -259,8 +274,19 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       let info = '';
       if (open[k]) info = '<div class="of-info">' + cat.items.map((it, i) => `<p><b>${i === 0 ? 'Serie' : 'Liv. ' + i}${i === ci ? ' · montato' : ''}</b> · ${E(it.brand && !['Su misura', '—', 'Integrata'].includes(it.brand) ? it.brand + ' ' : '')}${E(it.name)} — ${E(it.note || '')}</p>`).join('') + '</div>';
       h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${info}</div>`;
+      if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
     }
     return h + '<p class="of-hint">Un clic compra e monta. I livelli 1 e 2 sono sempre disponibili, i migliori si sbloccano coi chilometri. Quello che compri resta tuo.</p>';
+  }
+
+  // altezza da terra e rigidità delle molle (assetto a livelli, tuning.js): gratis, da fermi e da Luca; il livello 0 non si regola
+  function suspLab(st, h, k) {
+    return { h: !st.adjustable ? 'fissa' : h === 0 ? 'come di serie' : (h > 0 ? '+' : '−') + Math.abs(h) + ' mm', k: !st.adjustable ? 'di serie' : Math.round(k * 100) + ' %' + (k <= 0.75 ? ' · mollissima' : k >= 3 ? ' · durissima' : '') };
+  }
+  function suspBlock(ctx, item) {
+    const st = suspState(item, ctx.adj()), L = suspLab(st, st.h, st.k);
+    return `<div class="of-susp${st.adjustable ? '' : ' off'}"><div class="of-sr"><span>Altezza</span><b id="ofSuspHv">${E(L.h)}</b><input type="range" data-susp="h" min="${st.hMin}" max="${st.hMax}" step="5" value="${st.h}" ${st.adjustable ? '' : 'disabled'} aria-label="Altezza da terra"></div>`
+      + `<div class="of-sr"><span>Rigidità</span><b id="ofSuspKv">${E(L.k)}</b><input type="range" data-susp="k" min="${st.kMin}" max="${st.kMax}" step="0.1" value="${st.k}" ${st.adjustable ? '' : 'disabled'} aria-label="Rigidità delle molle"></div></div>`;
   }
 
   function drawSwap(ctx, carId, dId, career, money) {

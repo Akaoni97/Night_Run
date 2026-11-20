@@ -1,3 +1,9 @@
+## 21/11/2026 · proprietario · v0.61 (**assetto a livelli**)
+- Fatto: assetto a 6 livelli per ogni auto (`tuning.js`, `sim.js`): dal livello 1 due cursori regolano altezza (mm, anche rialzata) e rigidità (% delle molle di serie); la fisica
+  (baricentro, aria, presa, beccheggio, partenza, saltellamento e fondo che tocca) e il disegno seguono. I cursori ora stanno nella **nuova officina** di Luca (`officina.js`, gruppo
+  Ruote e telaio): il pannello a tendine su cui era scritto non c'è più. Il «ta-dum» dei giunti resta spento: dei giunti restano solo le scintille a assetto troppo basso.
+- Aperto: valori tarati a occhio, da provare in mano. Nel 3D (tolto) l'altezza non si vedeva comunque.
+
 ## 21/11/2026 · proprietario · v0.60 (**la piazzetta**)
 - Fatto: `piazzetta.js`. Ogni 2 o 3 tappe (dalla quarta) la tappa è una piazzetta con due negozi affiancati: la tappa non cambia (bacheca, lavori e consegne come prima), le si aggiunge un secondo negozio a caso tra gli altri. **Luca e Neon Kustom (Jeshka) non stanno mai nella stessa piazzetta**, le altre coppie sono tutte uguali. U sulla piazzetta chiede dove entrare. La telecamera punta al centro dei due negozi (`street2d.js`), le strisce del posto auto sono di ognuno (`entrata2d.js`). 4 test nuovi (269), la prova di fumo ci passa dentro.
 - Aperto: nella piazzetta i due negozi hanno la stessa bacheca dei lavori della tappa; l'auto parcheggia nel posto del negozio scelto ma la camera resta sul gruppo. Da guardare col gioco vero: facciate larghe come il benzinaio con un garage possono stare strette.
