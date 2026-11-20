@@ -10,6 +10,16 @@ due voci, e il controllo della sera le legge.
   delle capitali. Interruttore Premium/Classico in Impostazioni → Grafica (Classico = come prima). Provato su PC e al tocco, console pulita.
 - Aperto: non guardati uno per uno i pannelli di autosalone, sfascio e Nico (prendono lo stile comune dei pulsanti).
 
+## 20/11/2026 notte · proprietario (**grafica più nitida e dettagliata; ruote della trazione anteriore**)
+- Fatto (`nitido2d.js` nuovo, agganci piccoli in `street2d.js`): ingrandimento sullo schermo a pixel tutti uguali (prima su un 1080p
+  erano larghi 1 o 2 pixel a caso), carrozzerie e ruote dai disegni passate per Scale2x (curve e diagonali senza scalini, ruote che girano
+  lisce), contorno e luci dell'auto alla densità vera, bagliore più netto, scia della velocità più leggera e nitida. Più dettagli:
+  marciapiede a lastre con fughe, crepe e cordolo di pietra, cordolo vicino, lampioni nuovi (palo tondo, braccio curvo, base coi
+  bulloni, vetro acceso), riflessi sull'asfalto più fini, cartacce riconoscibili (`vita2d.js`). Qualità bassa e leggera come prima.
+- Fatto: sulle auto a **trazione anteriore** (V40, Panda, Golf...) ora gira forte la ruota davanti e la dietro rotola (`street2d.js`);
+  al banco di Luca girano solo i rulli sotto le ruote motrici (`banco.js`). `strumenti/prova.js --vista 1920x1080` per le foto grandi.
+- Aperto: i pedoni del marciapiede sono ancora i vecchi omini a blocchi (il prossimo passo: disegnarli come il protagonista).
+
 ## 20/11/2026 notte · proprietario (**fiamme al rilascio: medie fino a 5.000 giri, bella fiammata sopra**)
 - Fatto: provando il gioco le fiamme al rilascio non uscivano quasi mai (servivano valvola o Supra e un caso fortunato). Ora ogni auto toccata dal
   tuning ne fa: molli sotto i 5.000 giri = fiamme di livello medio, sopra = una bella fiammata grossa (nello spinto con l'ossidrica); il primo
