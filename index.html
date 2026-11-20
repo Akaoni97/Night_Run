@@ -1006,7 +1006,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <button class="kbtn" type="button" id="photoBtn">Foto<small>X</small></button>
       <button class="kbtn" type="button" id="replayBtn">Replay<small>Y</small></button>
       <label class="kbtn qsel">Ora <select id="clockSel" aria-label="Ora del giorno"><option value="auto">dinamica</option><option value="giorno">giorno</option><option value="tramonto">tramonto</option><option value="notte">notte</option></select></label>
-      <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option></select></label>
+      <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option><option value="nebbia">nebbia</option><option value="neve">neve</option><option value="vento">vento</option></select></label>
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
     </div>
   </section>
@@ -1229,6 +1229,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="gomme2d.js"></script>
 <script src="paesaggi2d.js"></script>
 <script src="vita2d.js"></script>
+<script src="meteo2d.js"></script>
 <script src="viaggio2d.js"></script>
 <script src="locali2d.js"></script>
 <script src="entrata2d.js"></script>
@@ -3427,10 +3428,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function setRainState(on, why) { if (!!S.rain === on) return; S.rain = on; applyRain(); if (why) flash(why, 2.2); }
   function applyMeteo() {
     if (S.meteo === 'sereno') setRainState(false); else if (S.meteo === 'pioggia') setRainState(true);
+    else if (S.meteo === 'nebbia' || S.meteo === 'neve' || S.meteo === 'vento') setRainState(false);   // nebbia, neve e vento: meteo2d.js
+    if (window.NightMeteo) NightMeteo.apply(S.meteo);
     $('meteoSel').value = S.meteo; $('clockSel').value = S.clock;
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   }
-  function cycleMeteo() { ensureAudio(); S.meteo = { auto: 'pioggia', pioggia: 'sereno', sereno: 'auto' }[S.meteo] || 'auto'; applyMeteo(); flash('Meteo: ' + { auto: 'dinamico', pioggia: 'pioggia', sereno: 'sereno' }[S.meteo], 1.6); }
+  function cycleMeteo() { ensureAudio(); S.meteo = { auto: 'pioggia', pioggia: 'nebbia', nebbia: 'neve', neve: 'vento', vento: 'sereno', sereno: 'auto' }[S.meteo] || 'auto'; applyMeteo(); flash('Meteo: ' + { auto: 'dinamico', pioggia: 'pioggia', sereno: 'sereno', nebbia: 'nebbia', neve: 'neve', vento: 'vento' }[S.meteo], 1.6); }
   $('meteoSel').addEventListener('change', (e) => { S.meteo = e.target.value; applyMeteo(); });
   $('clockSel').addEventListener('change', (e) => { S.clock = e.target.value; if (FIXED[S.clock]) ATM.hour = FIXED[S.clock]; applyMeteo(); });
   const sm01 = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
@@ -3447,9 +3450,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       }
     }
     if (street2d && street2d.setDaylight) street2d.setDaylight(d, ss);
+    if (window.NightMeteo) NightMeteo.tick(dt, { auto: S.meteo === 'auto', rain: !!S.rain, bg: (game.loc && game.loc.bg) || 'city', vol: S.muted ? 0 : S.vol / 100 });
     if ((ATM.txt -= dt) <= 0) {
       ATM.txt = 0.5; const hh = Math.floor(ATM.hour), mm = Math.floor((ATM.hour - hh) * 60);
-      $('hudClock').textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (S.rain ? ' · pioggia' : d > 0.5 ? ' · sole' : '');
+      $('hudClock').textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (S.rain ? ' · pioggia' : window.NightMeteo && NightMeteo.kind ? ' · ' + NightMeteo.kind : d > 0.5 ? ' · sole' : '');
       S.hour = ATM.hour;
     }
   }

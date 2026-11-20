@@ -4,6 +4,14 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 sera · proprietario (**Impostazioni nel menu e meteo nuovo**)
+- Fatto: nel menu una scheda **Impostazioni** con quattro sottoschede (Grafica, Audio, Comandi, Guida): ci sono finite le
+  regolazioni che stavano sparse in Vista, Guida ed Extra (stessi controlli, spostati). Le schede Vista ed Extra non ci
+  sono più: colore, mappa, foto, replay e «Come si gioca» stanno in Partita. File: `menu.js`.
+- Fatto: **nebbia, neve e vento** (`meteo2d.js`), dal menu Meteo o col tasto K; in «dinamico» secondo il paesaggio. La
+  neve fa scivolare più della pioggia, il vento fa sbandare l'auto sulle raffiche. Niente di `pistone/` toccato.
+- Da provare sul PC: quanto si vede nella nebbia di notte, il fruscio del vento.
+
 ## 20/11/2026 · cognato (**negozio unico: Nico lavora da Luca, pezzi singoli sulla V40**)
 - Deciso col proprietario: il negozio dei pezzi motore è uno solo, Da Luca Tuning. Nico ci lavora: compri un pezzo alla
   volta (a livelli), va in magazzino (un pezzo, un posto) e lo monti sul **motore originale della V40** (tutto tranne il
