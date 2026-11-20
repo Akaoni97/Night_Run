@@ -1593,7 +1593,7 @@ class Street2D {
       p('#16306e', 1, 12, 4, 14); p('#16306e', 7, 12, 4, 14); p('#1a1a1a', 0, 2, 5, 2); p('#1a1a1a', 7, 2, 5, 2);  // gambe e scarpe
       p(skin, 2, 36 + bob, 8, 7); p('#5a3a22', 3, 33 + bob, 6, 1); p(ink, 4, 35 + bob, 1, 1); p(ink, 8, 35 + bob, 1, 1);   // faccia e baffi
       p('#c42a1a', 1, 40 + bob, 10, 3); p('#c42a1a', 9, 38 + bob, 4, 1);                                          // cappello
-      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'N', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');
+      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'M', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');   // M di Mario sulla tuta
       const sw = Math.sin(t * 6) * 0.6; g.save(); g.translate(x + 12 * S2, gy - (24 + bob) * S2); g.rotate(-0.6 + sw);
       g.fillStyle = '#9aa3b2'; g.fillRect(0, -2, 16, 4); g.fillStyle = '#c9ced6'; g.fillRect(14, -4, 5, 8); g.restore();   // chiave inglese
       p(skin, 11, 26 + bob, 3, 3);

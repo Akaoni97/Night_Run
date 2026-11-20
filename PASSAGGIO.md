@@ -220,7 +220,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
-- **Il Pistone e Nico** (cartella `motori/`: `motori.js`, `motori2d.js`, guida `LEGGIMI.md`): motori costruiti a pezzi, 14 reparti in ordine di montaggio
+- **Il Pistone e Nico** (**progetto in prova del cognato**, cartella `pistone/`: `motori.js`, `motori2d.js`, guida `LEGGIMI.md`): motori costruiti a pezzi, 14 reparti in ordine di montaggio
   (blocco, albero, bielle, pistoni, pompa dell'olio, testata, camme, sovralimentazione, intercooler, iniettori, pompa
   della benzina, centralina, radiatore, frizione), ognuno coi livelli 1-4 (`lv` sui pezzi). I livelli li insegna Nico
   (`motNext`/`motUnlock`, prezzi e requisiti in `MOT_LIV`, legami tra reparti in `dip`): si parte tutti dal livello 1.

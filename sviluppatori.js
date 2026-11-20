@@ -30,7 +30,6 @@
     const g = G(); if (!g) return 0;
     const ids = new Set(Object.keys(g.s.cars || {})); ids.add(g.car);
     let n = 0; for (const id of ids) n += unlock(id);
-    if (g.motUnlockAll && g.s.vg) { g.motUnlockAll(); n++; save(); }   // anche tutti i livelli dei motori di Nico (motori.js)
     return n;
   }
 
@@ -57,6 +56,7 @@
 <h3>Modifiche</h3>
 <p class="hint">Sblocca tutti i pezzi dell'officina (motore, turbo, scarico, centralina, limitatore...) e tutta l'estetica, senza pagarli e senza i chilometri richiesti. Poi si montano come sempre.</p>
 <div class="dv"><button type="button" id="devUnlock" class="big">Sblocca tutto per questa auto</button><button type="button" id="devUnlockAll">Sblocca per tutte le auto del garage</button></div>
+<div id="devPistone"></div>
 <p class="res" id="devRes" aria-live="polite"></p>`;
     const $ = (id) => box.querySelector('#' + id), say = (t) => { $('devRes').textContent = t; };
     const upd = () => { const g = G(); if (g && $('devCash')) $('devCash').textContent = '€ ' + fmt(g.s.money || 0); };
@@ -65,6 +65,14 @@
     $('devAdd').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const n = +b.dataset.n; if (n) addMoney(n); else setMoney(0); upd(); say(n ? '+ € ' + fmt(n) : 'Contanti azzerati'); });
     $('devUnlock').addEventListener('click', () => { const g = G(), n = unlock(); say(`${n ? n + ' modifiche sbloccate' : 'Era già tutto sbloccato'} per ${g && g.car ? g.car : "quest'auto"}.`); });
     $('devUnlockAll').addEventListener('click', () => { const n = unlockAll(); say(n ? `${n} modifiche sbloccate in tutto il garage.` : 'Era già tutto sbloccato.'); });
+    // [PISTONE] il progetto in prova dei motori costruiti (pistone/): acceso o spento, e i livelli di Nico
+    if (typeof PISTONE !== 'undefined') {
+      const P = $('devPistone');
+      P.innerHTML = `<h3>Il Pistone · progetto in prova</h3><p class="hint">I motori costruiti da Nico (cartella pistone/). Spento: la tappa non c'è e i motori costruiti non vanno sulle auto (restano salvati). Cambiando si ricarica la pagina.</p>
+<div class="dv"><button type="button" id="devPisOn" class="big">${PISTONE.on ? 'Acceso · spegnilo' : 'Spento · accendilo'}</button>${PISTONE.on ? '<button type="button" id="devPisLiv">Sblocca tutti i livelli di Nico</button>' : ''}</div>`;
+      $('devPisOn').addEventListener('click', () => { try { localStorage.setItem('nr_pistone', PISTONE.on ? '0' : '1'); } catch (e) { /* */ } save(); location.reload(); });
+      const lv = $('devPisLiv'); if (lv) lv.addEventListener('click', () => { const g = G(); if (g && g.motUnlockAll && g.s.vg) { g.motUnlockAll(); save(); say('Nico ti ha insegnato tutti i livelli.'); } });
+    }
     setInterval(() => { if (box.offsetParent) upd(); }, 500); upd();
     return box;
   }

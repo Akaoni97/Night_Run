@@ -1,22 +1,51 @@
-# Motori · Il Pistone e Nico
+# Il Pistone · progetto in prova (motori costruiti da Nico)
 
-Tutto quello che riguarda la costruzione e la modifica dei motori sta in questa cartella. Ci lavora il cognato (Luca);
-se tocchi qualcosa qui, segnalo in `INCORSO.md` come il resto.
+**Stato: in prova.** È già nel gioco, ma non è detto che resti: lo gestisce il cognato (Luca), che decide se tenerlo,
+farlo diventare la modifica dei motori definitiva o toglierlo. Finché è in prova **non si mischia** con la modifica
+dei motori che c'era già: le due sezioni restano separate.
 
+## Le due sezioni dei motori
+
+| | **A · Tuning di Luca** (quella di sempre, definitiva) | **B · Il Pistone** (questa cartella, in prova) |
+| --- | --- | --- |
+| Cosa fa | Pezzi da montare sul motore *di serie* di ogni auto | Ti costruisci un motore pezzo per pezzo e lo metti su qualsiasi auto |
+| Dove si gioca | Da Luca Tuning (e banco prova a rulli) | Il Pistone, da Nico |
+| File | `tuning.js` (Supra), `cars.js` (cataloghi di tutte le auto, `GEN_CARS`), `banco.js` | `pistone/motori.js`, `pistone/motori2d.js` |
+| Stato salvato | `game.s.owned`, pezzi scelti in `S.tune` | `game.s.vg.mot` |
+| Test | `test/motori.test.js` (il vecchio «Banco Suono 2JZ»), `test/banco.test.js` | `test/motori-costruiti.test.js` |
+| Sviluppatori | «Sblocca tutto» | riquadro «Il Pistone · progetto in prova» |
+
+Quando su un'auto c'è un motore del Pistone, turbo, intercooler, centralina, camme e frizione li decide quel motore;
+scarico, aspirazione, gomme, assetto, differenziale, cambio e peso restano di Luca. Togliendo il motore del Pistone
+l'auto torna esattamente com'era coi pezzi di Luca.
+
+## I file di questa cartella
 | File | Cosa c'è |
 | --- | --- |
-| `motori.js` | La logica, senza grafica: pezzi e livelli (`MOT_PARTI`, `MOT_LIV`), il calcolo del motore (`motCalc`), i livelli che insegna Nico (`motNext`, `motUnlock`), costruire, montare, vendere, rifare, rotture e calore in strada (`motTick`, `motCalore`), lo swap su qualsiasi auto (`motApply`). Caricata anche dai test. |
+| `motori.js` | La logica, senza grafica: interruttore (`PISTONE`), pezzi e livelli (`MOT_PARTI`, `MOT_LIV`), il calcolo del motore (`motCalc`), i livelli che insegna Nico (`motNext`, `motUnlock`), costruire, montare, vendere, rifare, rotture e calore in strada (`motTick`, `motCalore`), lo swap su qualsiasi auto (`motApply`). Caricata anche dai test. |
 | `motori2d.js` | La grafica: il motore disegnato di lato (`drawEngine`), la facciata del Pistone, l'interno con Nico, il pannello (albero dei livelli, progetto, scheda, i tuoi motori), il banco di montaggio a tutto schermo. |
 | `LEGGIMI.md` | Questo file. |
 
-Fuori da questa cartella, ma legati ai motori:
-- `sim.js`: bilancio di calore dell'acqua e protezione della centralina (`tune.cool`, `sim.hotK`), pressione dell'olio
-  coi giri della pompa (`tune.oilRpm`). Valgono **solo** per le auto con un motore costruito: Supra e V40 di serie
-  restano come sono.
-- `index.html`: carica i due file (`motori/motori.js` prima dello script principale, `motori/motori2d.js` in fondo),
-  `applySettings` chiama `motApply`, `openPlace` apre il pannello del Pistone.
-- `sviluppatori.js`: «Sblocca tutto» sblocca anche tutti i livelli di Nico.
-- `test/motori-costruiti.test.js`: le prove (`node --test test/motori-costruiti.test.js`).
+## Accenderlo, spegnerlo, toglierlo
+- **Interruttore**: scheda Sviluppatori del menu, riquadro «Il Pistone · progetto in prova» (oppure
+  `localStorage.nr_pistone = '0'` e ricarica). Spento: la tappa del Pistone torna a essere un bar, i motori costruiti
+  non vanno sulle auto (restano nel salvataggio, riaccendendo tornano). Costante `PISTONE.on` in `motori.js`.
+- **Ogni aggancio fuori da questa cartella è segnato `[PISTONE]`**: `git grep -n "\[PISTONE\]"` li trova tutti.
+  Oggi sono:
+  - `index.html`: i due `<script>`, `motApply` in `applySettings`, il ramo `motori` di `openPlace`, la lettera M sulla
+    mappa (`PLACE_ICON`), l'avviso da Luca con un motore del Pistone montato, le registrazioni della Supra spente con
+    un motore costruito (`dspCfg`);
+  - `sim.js`: bilancio di calore (`tune.cool`), protezione (`hotK`), pressione dell'olio (`tune.oilRpm`) — senza un
+    motore del Pistone non fanno niente;
+  - `sviluppatori.js`: il riquadro del Pistone;
+  - `test/motori-costruiti.test.js`.
+- **Toglierlo del tutto**: cancellare la cartella `pistone/` e il test, togliere le righe `[PISTONE]` (in `sim.js` i
+  tre punti tornano come prima togliendo il blocco `cool` e i due fattori), le righe di `pistone/` in `AGENTS.md`
+  e il paragrafo in `PASSAGGIO.md`. Nei salvataggi resta `game.s.vg.mot`, che nessuno legge più. Il secondo bar di ogni
+  giro torna da solo.
+
+Fuori da questa cartella **non** fanno parte del Pistone (restano anche se lo togli): Officina Mario (era Niko),
+la revisione dei documenti e del motore stanco delle usate, il tuning di Luca.
 
 ## Chi è chi
 - **Nico**: il motorista del Pistone. Ti insegna i pezzi un livello alla volta e monta i motori con te sul cavalletto.

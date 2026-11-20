@@ -14,6 +14,9 @@
 //  protezione della centralina e la guarnizione che salta se insisti).
 //  Prezzi e numeri in MOT, pezzi in MOT_PARTI. Test in test/motori-costruiti.test.js.
 // ============================================================================
+// [PISTONE] interruttore del progetto in prova: spento (scheda Sviluppatori, o localStorage nr_pistone = '0') il Pistone
+// non compare tra le tappe e i motori costruiti non si montano sulle auto (restano salvati: riaccendendolo tornano)
+const PISTONE = { on: (() => { try { return typeof localStorage === 'undefined' || localStorage.getItem('nr_pistone') !== '0'; } catch (e) { return true; } })() };
 const MOT = {
   lavoro: 450,          // montare o smontare un motore su un'auto (manodopera)
   revisione: 0.35,      // rifare un motore rotto al Pistone: frazione del prezzo dei pezzi (non è la revisione di Mario)
@@ -225,7 +228,7 @@ function motKgSerie(carId) {
 
 // posto auto e porta davanti al Pistone (entrata2d.js): l'auto a sinistra del portone, si entra dal portone
 if (typeof GAME_POSTI !== 'undefined') GAME_POSTI.motori = { park: -3.3, door: 0 };
-if (typeof VG_PLACE !== 'undefined') {
+if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
   VG_PLACE.motori = { name: () => 'Il Pistone', what: 'motori', col: '#ff6a2a' };
   if (VG_PATTERN[4] === 'bar') VG_PATTERN[4] = 'motori';
 }
@@ -259,7 +262,7 @@ if (typeof VG_PLACE !== 'undefined') {
   };
   P.motUnlockAll = function () { const M = this.mot(); M.liv = Object.fromEntries(MOT_PARTI.map((C) => [C.id, 4])); };
   P.motAlPistone = function () { return !!(this.inside && this.inside.id === 'motori'); };
-  P.motOf = function (carId) { const M = this.mot(), id = M.on[carId || this.car]; return id ? M.list.find((e) => e.id === id) || null : null; };
+  P.motOf = function (carId) { if (!PISTONE.on) return null; const M = this.mot(), id = M.on[carId || this.car]; return id ? M.list.find((e) => e.id === id) || null : null; };
   // costruire: si paga e il motore entra in magazzino (lo chiama la scena del montaggio, quando l'ultimo pezzo è al suo posto)
   P.motBuild = function (sel, nome) {
     const c = motCalc(sel); if (!c.ok) return { ok: false, why: 'Manca un pezzo: ' + c.missing.map((k) => MOT_CAT[k].label.toLowerCase()).join(', ') };
@@ -388,4 +391,4 @@ function motApply(game, carId, TP, sim) {
   return c;
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { MOT, MOT_LIV, MOT_PARTI, MOT_BASE, MOT_NUOVI, motCalc, motFill, motApply, motKgSerie });
+if (typeof window !== 'undefined') Object.assign(window, { PISTONE, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, MOT_NUOVI, motCalc, motFill, motApply, motKgSerie });

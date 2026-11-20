@@ -1,10 +1,10 @@
-// Prove dei motori costruiti a pezzi (motori.js): calcolo, costruzione, swap su qualsiasi auto, rottura.
+// [PISTONE] Prove dei motori costruiti a pezzi (pistone/motori.js, progetto in prova): calcolo, costruzione, swap su qualsiasi auto, rottura.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'motori/motori.js']
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'pistone/motori.js']
   .map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
 const X = new Function(src + ';return { SupraSim, StreetGame, VG, VG_PATTERN, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motFill, motApply, motKgSerie, CARS, tuningParams, setActiveCar };')();
 const { SupraSim, StreetGame, VG, MOT, MOT_LIV, MOT_PARTI, MOT_BASE, motCalc, motApply } = X;

@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · cognato (**il Pistone diventa un progetto in prova, separato**)
+- Il proprietario ha passato al cognato la gestione dei motori. I motori costruiti da Nico sono un **progetto in prova**:
+  cartella `pistone/` (prima `motori/`), separata dal tuning di Luca che resta la modifica dei motori di sempre.
+  Interruttore nella scheda Sviluppatori (spento: niente tappa e niente swap, i motori restano salvati); ogni aggancio
+  fuori dalla cartella è segnato `[PISTONE]`; in `pistone/LEGGIMI.md` le due sezioni e come togliere il Pistone del tutto.
+- Anche: Mario sulla mappa è la O (Officina) e ha la M sulla tuta; «Sblocca tutto» non tocca più i livelli di Nico.
+
 ## 20/11/2026 · cognato (**riordino dei motori**)
 - Controllato il lavoro di tutti e due sui motori: nessun ramo con lavoro non unito, niente file doppi. Tutto in
   `motori/` con la guida `motori/LEGGIMI.md` (sezione «Da non confondere»: tuning di Luca, banco prova contro banco di
