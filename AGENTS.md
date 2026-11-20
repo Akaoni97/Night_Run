@@ -1,7 +1,7 @@
 # Night Run · guida per gli assistenti (Kimi, Claude e altri)
 
 **Avvisi importanti per il proprietario o per il cognato: `AVVISI.md`** (l'hook di inizio sessione li mostra per primi; vanno detti subito a chi ti parla e tolti quando li ha letti).
-Stato del lavoro, lavori aperti e procedure (artifact, nuovi disegni di auto): vedi `PASSAGGIO.md`.
+Stato del lavoro, lavori aperti e procedure (artifact, nuovi disegni di auto): vedi `PASSAGGIO.md`. **Cose in sospeso e da rivedere**: `SOSPESI.md` (si riporta a ogni controllo della sera e si tiene aggiornato).
 Cosa viene da Codex, cosa no e come annullarlo: `MODIFICHE_CODEX.md`.
 Comandi di Claude Code (`/compact`, `/clear`...), skill di Night Run e scorciatoie, spiegati in italiano: `COMANDI.md`.
 Gli strumenti per trasformare i disegni in auto del gioco sono in `strumenti/`. **Motori: li gestisce il cognato.** Da Luca Tuning c'è un negozio solo: Luca (scarico, aspirazione, gomme, assetto... in `tuning.js`, `cars.js`, `banco.js`) e **Nico** per il motore (pezzi a livelli, magazzino, motore di serie della V40, banco di lavoro, motori costruiti), tutto nella cartella `pistone/` (guida `pistone/LEGGIMI.md`, interruttore nella scheda Sviluppatori, agganci fuori dalla cartella segnati `[PISTONE]`). Per ora i pezzi di Nico sul motore di serie valgono solo per la V40. I documenti (storia, richieste a Codex) sono in `docs/`, i testi da cui si generano le chat in `materiale_chat/`.

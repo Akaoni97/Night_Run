@@ -1,0 +1,44 @@
+# Cose in sospeso e da rivedere
+
+Lista viva: al **controllo della sera** (quando qualcuno chiede «il check») Claude la legge e la riporta nel rapporto,
+poi la aggiorna con chi c'è (toglie quello che è fatto, aggiunge quello che salta fuori). In cima le cose più urgenti.
+Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
+
+Aggiornata il 20/11/2026 (cognato).
+
+## Da decidere insieme
+- [motori] **Vendere la V40 coi pezzi di Nico montati**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o
+  alzano il valore dell'auto all'Autosalone e allo sfascio? (cognato)
+- [motori] **Estendere i pezzi singoli alle altre auto** (oggi solo la V40, `MOT_SERIE` in `pistone/motori.js`). Per
+  ogni auto serve il suo motore di serie descritto coi pezzi di Nico. La Supra resta col suo catalogo. Quando? (cognato)
+- [motori] **Il vecchio Pistone**: facciata, interno con Nico e pannello del progetto sono ancora in
+  `pistone/motori2d.js` ma non si usano più. Cancellarli o riusarli per la scena di Nico da Luca? (cognato)
+- [personaggi] **Nico**: storia stasera. Non ha ancora un disegno nell'interno di Luca (c'è solo Luca); nel vecchio
+  Pistone era Ottone (vecchio coi baffi bianchi). Aspetto, carattere, come si sblocca. (cognato)
+- [personaggi] **Mario** al posto di Niko (officina dei tagliandi): nome cambiato in tutti i testi, lettera O sulla
+  mappa, M sulla tuta. Va bene al proprietario? (proprietario)
+- [avvisi] In `AVVISI.md` c'è ancora l'avviso del 3D tolto per il cognato: il cognato deve dire che l'ha letto, poi si
+  toglie. (cognato)
+
+## Da provare giocando (sul PC)
+- [motori] **Prezzi**: livelli di Nico € 300 / 900 / 2.400 con km e pezzi montati; una V40 sui 200 CV costa circa
+  € 7.000. Troppo, poco? (tutti e due)
+- [motori] **Suono** della V40 col turbo di Nico e dei motori costruiti montati in strada: va ascoltato. (proprietario)
+- [motori] **Calore**: sopra i ~480 CV nessun radiatore regge il gas pieno a lungo, si va in protezione (voluto, è
+  fisica vera). In coda dopo una tirata l'acqua resta alta; da fermi un motore sano non bolle (scelta: niente guasti
+  finti). Da sentire se è giusto così. (cognato)
+- [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
+  soldi una volta sola (avviso di Luca). Controllare che il messaggio arrivi e i conti tornino. (tutti e due)
+
+## Da sistemare
+- [motori] **Valigette sulla V40**: il premio «kit turbo» non trova più pezzi di Luca e dà altro. Meglio che dia un
+  turbo di Nico in magazzino. (Claude, quando si decide)
+- [motori] **Il pannello di Nico è lunghissimo** (livelli, motore, pezzi in vendita, magazzino, banco, motori): sul
+  telefono si scorre molto. Schede o sezioni chiudibili. (Claude)
+- [motori] **Magazzino senza limite**: i motori costruiti sono massimo 4, i pezzi no. Serve un limite? (cognato)
+- [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ», non il motore di Nico (quelle prove sono in
+  `test/motori-costruiti.test.js`). Rinominarlo vuol dire toccare due skill (ramo `skill`). (chi ha voglia)
+
+## Fatto di recente (si toglie al prossimo controllo)
+- Negozio unico: Nico lavora da Luca, pezzi singoli a livelli sul motore della V40, banco di lavoro, magazzino.
+- Il Pistone non è più una tappa: il secondo bar di ogni giro è tornato.

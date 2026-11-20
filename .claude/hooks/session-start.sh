@@ -36,6 +36,7 @@ if [ -f AVVISI.md ] && grep -q "^## " AVVISI.md; then
   awk '/^## /{on=1} on' AVVISI.md | head -30
 fi
 [ -f INCORSO.md ] && { echo; echo "== Lavori in corso (INCORSO.md)"; sed -n '/^| /p' INCORSO.md | tail -n +3; }
+[ -f SOSPESI.md ] && { echo; echo "== In sospeso e da rivedere (SOSPESI.md, si riporta al controllo della sera)"; grep -c "^- " SOSPESI.md | sed 's/^/  voci aperte: /'; }
 [ -f DIARIO.md ] && { echo; echo "== Ultime righe del diario (DIARIO.md)"; awk '/^## /{n++} n>=1 && n<=2' DIARIO.md | head -20; }
 echo
 echo "Regole: COMANDI.md (comandi), AGENTS.md (come lavorare). Prima di caricare su main: fetch e unione, mai push --force."
