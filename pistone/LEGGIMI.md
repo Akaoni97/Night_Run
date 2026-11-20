@@ -29,7 +29,7 @@ si estende alle altre auto. L'interruttore resta (scheda Sviluppatori): spento, 
 | File | Cosa c'è |
 | --- | --- |
 | `motori.js` | La logica, senza grafica: interruttore (`PISTONE`), pezzi e livelli (`MOT_PARTI`, `MOT_LIV`), il calcolo del motore (`motCalc`), i livelli che insegna Nico (`motNext`, `motUnlock`), pezzi e magazzino (`motBuyPart`, `motPut`, `motTake`, `motSellPart`), banco (`motBuildBanco`), motore di serie della V40 (`MOT_SERIE`, `motCalcSerie`, `motApplySerie`), Luca senza i pezzi motore della V40 (`tuningNascosto`, `motLucaMigra`), rotture e calore in strada (`motTick`, `motCalore`), lo swap (`motApply`). Caricata anche dai test. |
-| `motori2d.js` | La grafica: il motore disegnato di lato (`drawEngine`), il pannello di Nico dentro Da Luca Tuning (livelli, motore della tua auto, pezzi in vendita, magazzino, banco di lavoro, i tuoi motori), la scena del montaggio a tutto schermo. La facciata e l'interno del vecchio Pistone ci sono ancora ma non si usano. |
+| `motori2d.js` | La grafica: il motore disegnato di lato (`drawEngine`), il pannello di Nico dentro Da Luca Tuning, a schede (Livelli, La mia auto, Negozio, Magazzino con tetto di 100 pezzi, Banco, Motori), la scena del montaggio a tutto schermo. La facciata e l'interno del vecchio Pistone ci sono ancora ma non si usano. |
 | `LEGGIMI.md` | Questo file. |
 
 ## Accenderlo, spegnerlo, toglierlo

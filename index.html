@@ -482,6 +482,34 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .qsel { display: flex; gap: 6px; align-items: center; }
 .qsel select { background: #1c1a16; border: 1px solid #3a342a; color: var(--fg); font: 500 12px/1 var(--f-body); padding: 3px 4px; }
 .tgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tshop { display: grid; gap: 12px; }
+.tg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tg-tab { flex: 1 1 120px; display: grid; gap: 4px; text-align: left; padding: 9px 12px; background: #0e0d0b; border: 1px solid var(--line); color: var(--fg); font: 600 15px/1.1 var(--f-body); cursor: pointer; }
+.tg-tab small { font: 400 10.5px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.tg-tab[aria-selected=true] { border-color: var(--amber); box-shadow: inset 0 0 0 1px rgba(255,179,71,.3); color: var(--amber); }
+.tg-tab[aria-selected=true] small { color: #c9a064; }
+.tg-info { margin: 0; font-size: 13.5px; line-height: 1.45; color: #b6aa92; }
+.tg-info b { color: var(--amber); font-weight: 600; }
+.tg-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 10px; align-items: start; }
+.tcard { background: #0e0d0b; border: 1px solid var(--line); padding: 10px 12px 12px; display: grid; gap: 8px; min-width: 0; }
+.tcard.mod { border-color: #544a3b; box-shadow: inset 0 0 0 1px rgba(255,179,71,.15); }
+.tcard h4 { margin: 0; display: flex; justify-content: space-between; gap: 10px; align-items: center; font: 400 11px/1.2 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tcard.mod h4 { color: var(--amber); }
+.tpips { display: flex; gap: 3px; flex: none; }
+.tpips i { width: 14px; height: 6px; background: #2a2a30; }
+.tpips i.on { background: var(--amber); }
+.topt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 3px 10px; align-items: start; text-align: left; padding: 8px 10px; background: #17150f; border: 1px solid #2d2820; color: var(--fg); cursor: pointer; font: 500 14px/1.25 var(--f-body); }
+.topt .lv { font: 600 10px/1 var(--f-data); letter-spacing: .1em; padding: 4px 6px; background: #2a2a30; color: #c8bca4; white-space: nowrap; }
+.topt .nm b { display: block; font-weight: 600; }
+.topt .nm small { display: block; font-size: 12.5px; line-height: 1.35; color: #9b917c; margin-top: 2px; }
+.topt .st { font: 600 12px/1.2 var(--f-data); white-space: nowrap; color: #d8c9a8; text-align: right; }
+.topt:hover:not(.cur) { border-color: #5a4f3c; background: #1d1a13; }
+.topt.cur { border-color: var(--amber); background: rgba(255,179,71,.09); cursor: default; }
+.topt.cur .lv { background: var(--amber); color: #1a1308; }
+.topt.cur .st { color: var(--amber); }
+.topt.own .st { color: var(--ok, #8fd36a); }
+.topt.lock { opacity: .6; }
+.topt.poor .st { color: var(--crit); }
 .part { background: #0e0d0b; border: 1px solid var(--line); padding: 10px 12px; display: grid; gap: 6px; min-width: 0; }
 .part > span { font: 400 11px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .part select { width: 100%; background: #1c1a16; border: 1px solid #3a342a; padding: 7px 8px; font: 600 15px/1.2 var(--f-body); color: var(--fg); }
@@ -556,7 +584,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   .extras .samples { grid-column: 1 / -1; }
 }
 @media (max-width: 700px) {
-  .deck, .extras, .tgrid, .services { grid-template-columns: 1fr; }
+  .deck, .extras, .tgrid, .services, .tg-cards { grid-template-columns: 1fr; }
   .trunk-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tele { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .toggles { grid-template-columns: 1fr; }
@@ -962,7 +990,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <div class="dash" id="dash">
         <div class="dash-btns" role="group" aria-label="Comandi di guida">
           <button type="button" id="dbEngine" title="Accensione: gira la chiave e avvia il motore (da fermo si spegne)">AVVIA</button>
-          <button type="button" id="dbAuto" title="Guida automatica: AUTO 1 guida da sola dopo 15 s senza toccare niente; AUTO 2 cambia corsia da sola e tu dai gas e freno">AUTO 1</button>
+          <button type="button" id="dbAuto" title="Guida automatica: AUTO 1 guida da sola dopo 5 s senza toccare niente; AUTO 2 cambia corsia da sola e tu dai gas e freno">AUTO 1</button>
           <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
           <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
@@ -1071,7 +1099,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
         <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
         <label class="tg"><input type="checkbox" id="tLaunch"><span id="tLaunchL">Launch control 4300</span></label>
-        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 15 s senza tasti)</label>
+        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 5 s senza tasti)</label>
         <label class="tg"><input type="checkbox" id="tTc">Controllo di trazione</label>
       </div>
       <div class="field"><span>Volume</span>
@@ -1116,7 +1144,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <div class="kmbox" id="kmBox"></div>
     <div class="ups" id="carUps" hidden></div>
     <div class="presets" id="presets"></div>
-    <div class="tgrid" id="tgrid"></div>
+    <div class="tshop" id="tgrid"></div>
     <p class="hint" id="shopNote">I marchi indicano parti reali per JZA80 e 2JZ. Il carattere sonoro di ciascuna è una nostra modellazione fisica, non una registrazione del prodotto.</p>
   </section>
 
@@ -1224,6 +1252,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="pilota2d.js"></script>
 <script src="galleria2d.js"></script>
 <script src="luci2d.js"></script>
+<script src="fiamme.js"></script>
 <script src="effetti2d.js"></script>
 <script src="dettagli2d.js"></script>
 <script src="gomme2d.js"></script>
@@ -1330,7 +1359,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) /* [PISTONE] */ ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.8 : 1),
+    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {
@@ -1474,9 +1503,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // cambio: 'auto' cambia marcia da solo (con la frizione automatica), 'man' le marce le metti tu con E/Q
   function setGearbox(m) {
     S.gearbox = m; if (m === 'auto') S.autoClutch = true;
-    if (m === 'auto') leva = sim.gear === -1 ? 'R' : sim.gear > 0 ? 'D' : sim.running || Math.abs(sim.v) > 0.5 ? 'N' : 'P';
+    if (m === 'auto') leva = sim.gear === -1 ? 'R' : sim.gear > 0 ? (leva === 'S' ? 'S' : 'D') : sim.running || Math.abs(sim.v) > 0.5 ? 'N' : 'P';
     applySettings(); levaApply();
-    flash(m === 'auto' ? 'Cambio automatico: leva P R N D, E la sposta verso D e Q verso P' : 'Cambio manuale: E sale di marcia, Q scala; in folle (N) il gas fa solo salire i giri', 2.8);
+    flash(m === 'auto' ? 'Cambio automatico: leva P R N D S, E la sposta verso D e S (sport), Q verso P' : 'Cambio manuale: E sale di marcia, Q scala; in folle (N) il gas fa solo salire i giri', 2.8);
   }
   $('tTc').addEventListener('change', (e) => { S.tc = e.target.checked; applySettings(); flash(S.tc ? 'Controllo di trazione inserito: toglie gas quando le ruote slittano' : 'Controllo di trazione spento: la sgommata la gestisci tu col gas', 2.4); });
   $('tRev').addEventListener('change', (e) => { S.revMatch = e.target.checked; applySettings(); });
@@ -1580,7 +1609,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     keys.add(k);
     if (k === 'e') shiftUp();
     else if (k === 'q') shiftDown();
-    else if (k >= '1' && k <= '6') { if (game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1); else if (S.gearbox !== 'auto') shiftTo(+k); }
+    else if (k >= '1' && k <= '6' && game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1);
     else if (k === 'n') { if (S.gearbox === 'auto') setLeva('N'); else shiftTo(0); }
     else if (k === 'r') { if (S.gearbox === 'auto') setLeva('R'); else shiftTo(-1); }
     else if (k === 'i') ignToggle();
@@ -1592,7 +1621,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'p') radioNext();
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
-    else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
+    else if (k >= '1' && k <= '4' && game.s.vg && !game.prompt) vgQuick(+k);
     else if (k === '8') toggleWindows();
     else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
@@ -1663,10 +1692,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (levaHintT > 1.2 && levaHints < 4) { levaHintT = -8; levaHints++; flash(`Leva in ${leva}: premi E fino a D per partire`, 2.4); }
   }
   let boxT = 0, levaHintT = 0, levaHints = 0;
-  // ---------------------------------------------------------------- leva del cambio automatico: P R N D
-  // P parcheggio (cambio bloccato: sim.park), R retromarcia, N folle, D marcia avanti (le marce le sceglie autoBox).
-  // E sposta la leva verso D, Q verso P; N e R vanno dritti. P e R solo da fermi, D non mentre si va indietro.
-  const LEVA = ['P', 'R', 'N', 'D'];
+  // ---------------------------------------------------------------- leva del cambio automatico: P R N D S
+  // P parcheggio (cambio bloccato: sim.park), R retromarcia, N folle, D marcia avanti (le marce le sceglie autoBox), S sport (come D,
+  // ma sale di marcia più tardi e scala prima: il motore sta più alto di giri). E sposta la leva verso S, Q verso P; N e R vanno dritti.
+  // P e R solo da fermi, D e S non mentre si va indietro.
+  const LEVA = ['P', 'R', 'N', 'D', 'S'];
   let leva = 'P';
   function levaGear() {                                        // in D a velocità già alta: la marcia giusta, non la prima
     const P = sim.P, top = P.gears.length - 1, rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
@@ -1675,18 +1705,18 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   function levaApply() {                                       // la marcia vera segue la leva
     // il gioco ti accosta a un locale (U): si va avanti, quindi la leva va in D (prima la retro portava l'auto indietro)
-    if (S.gearbox === 'auto' && game.ap && (game.ap.fwd || game.ap.stopped) && !game.rulli && leva !== 'D' && Math.abs(sim.v) < 1.2) leva = 'D';   // sui rulli la leva la muovi tu
+    if (S.gearbox === 'auto' && game.ap && (game.ap.fwd || game.ap.stopped) && !game.rulli && leva !== 'D' && leva !== 'S' && Math.abs(sim.v) < 1.2) leva = 'D';   // sui rulli la leva la muovi tu
     sim.park = S.gearbox === 'auto' && leva === 'P';
     if (S.gearbox !== 'auto' || sim.shiftSeq) return;
     if ((leva === 'P' || leva === 'N') && sim.gear !== 0) sim.shift(0);
     else if (leva === 'R' && sim.gear !== -1 && Math.abs(sim.v) < 1.2) sim.shift(-1);
-    else if (leva === 'D' && sim.gear < 1 && sim.running) sim.shift(Math.abs(sim.v) > 3 ? levaGear() : 1);
+    else if ((leva === 'D' || leva === 'S') && sim.gear < 1 && sim.running) sim.shift(Math.abs(sim.v) > 3 ? levaGear() : 1);
   }
   function setLeva(L, quiet) {
     if (S.gearbox !== 'auto' || !LEVA.includes(L)) return false;
     if (L === leva) return true;
     if ((L === 'P' || L === 'R') && Math.abs(sim.v) > 1.2) { flash(`Fermati prima di mettere ${L}`, 1.4); return false; }
-    if (L === 'D' && sim.v < -1.2) { flash('Fermati prima di mettere D', 1.4); return false; }
+    if ((L === 'D' || L === 'S') && sim.v < -1.2) { flash(`Fermati prima di mettere ${L}`, 1.4); return false; }
     ensureAudio(); leva = L; boxT = 0.5; levaApply();
     if (audio.ready) audio.send({ ev: [{ type: 'click' }] });
     if (!quiet) flash('Leva   ' + LEVA.map((x) => (x === L ? `[ ${x} ]` : x)).join('   '), 1.1);
@@ -1699,10 +1729,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     return setLeva(LEVA[Math.max(0, Math.min(LEVA.length - 1, LEVA.indexOf(leva) + d))]);
   };
-  // quello che si legge sul quadro: P R N D col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
+  // quello che si legge sul quadro: P R N D S col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
   function gearLabel(short) {
     const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear;
-    if (S.gearbox === 'auto') return leva === 'D' ? (short || g < 1 ? 'D' : 'D' + g) : leva;
+    if (S.gearbox === 'auto') return leva === 'D' || leva === 'S' ? (short || g < 1 ? leva : leva + g) : leva;
     return g === -1 ? 'R' : g === 0 ? 'N' : String(g);
   }
   // cambio automatico: sale di marcia prima a gas leggero e più tardi a gas pieno, scala quando i giri calano o col
@@ -1710,10 +1740,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // aspetta un attimo; se cambi tu con E/Q aspetta di più (comandi tu)
   function autoBox(dt) {
     boxT -= dt; levaApply();
-    if (S.gearbox !== 'auto' || leva !== 'D' || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || (game.inside && !game.rulli)) return;
+    if (S.gearbox !== 'auto' || (leva !== 'D' && leva !== 'S') || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || (game.inside && !game.rulli)) return;
     const P = sim.P, top = P.gears.length - 1, lim = P.limiter, idle = P.idle, thr = sim.in.thr, g = sim.gear;
     const rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
-    const up = idle + (lim - idle) * (0.36 + 0.55 * thr), down = idle + (lim - idle) * (0.12 + 0.3 * thr);
+    const sp = leva === 'S';                                    // sport: tiene le marce più a lungo, i giri restano alti
+    const up = idle + (lim - idle) * (sp ? 0.6 + 0.34 * thr : 0.36 + 0.55 * thr), down = idle + (lim - idle) * (sp ? 0.34 + 0.3 * thr : 0.12 + 0.3 * thr);
     if (g < top && sim.rpm > up && sim.in.brake < 0.1 && rpmAt(g + 1) > idle + 350) { if (sim.shift(g + 1)) boxT = 0.7; }
     else if (g > 1 && sim.rpm < down && rpmAt(g - 1) < lim * 0.88) { if (sim.shift(g - 1)) boxT = 0.6; }
   }
@@ -2078,15 +2109,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     renderGears(); $('carUps').hidden = true;
     const grid = $('tgrid');
     $('presets').hidden = typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, 'turbo');   // [PISTONE] niente preparazioni pronte: i pezzi del motore uno per uno da Nico
-    if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
-    if (!grid.childElementCount) {
-      for (const [k, cat] of Object.entries(TUNING)) {
-        if (typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k)) continue;   // [PISTONE] questi pezzi li fa Nico (pistone/motori.js)
-        const box = document.createElement('label'); box.className = 'part'; box.dataset.k = k;
-        box.innerHTML = `<span>${cat.label}</span><select id="tu-${k}">${cat.items.map((it) => `<option value="${it.id}"></option>`).join('')}</select><p></p>`;
-        box.querySelector('select').addEventListener('change', (e) => mountPart(k, e.target.value, e.target));
-        grid.appendChild(box);
-      }
+    if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; grid.dataset.h = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
+    if (!$('presets').childElementCount) {
       const pr = $('presets');
       TUNING_PRESETS.forEach((p) => {
         const b = document.createElement('button'); b.type = 'button'; b.dataset.id = p.id;
@@ -2094,21 +2118,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         pr.appendChild(b);
       });
     }
-    grid.querySelectorAll('.part').forEach((box) => {
-      const k = box.dataset.k, it = tuningItem(k, S.tune[k]);
-      const sel = box.querySelector('select');
-      Array.from(sel.options).forEach((o) => {
-        const x = tuningItem(k, o.value), label = (['Su misura', '—', 'Integrata'].includes(x.brand) ? '' : x.brand + ' · ') + x.name;
-        const lk = game.partLocked(k, x.id);
-        o.textContent = label + (game.owns(k, x.id) ? (x.id === it.id ? '' : ' · tuo') : lk ? ` · da ${game.partKm(k, x.id)} km` : ` · € ${fmt(game.price(k, x.id))}`);
-        o.disabled = lk;
-      });
-      sel.value = it.id;
-      let note = it.note;
-      if (k === 'wastegate' && it.id === 'tial' && TP.sim.turbo.twin) note += ' Con il biturbo di serie non ha effetto.';
-      box.querySelector('p').textContent = note;
-      box.classList.toggle('mod', it.id !== TUNING[k].items[0].id);
-    });
+    renderTuneShop();
     $('presets').querySelectorAll('button').forEach((b) => {
       const p = TUNING_PRESETS.find((x) => x.id === b.dataset.id);
       b.setAttribute('aria-pressed', String(Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k])));
@@ -2228,6 +2238,57 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let trunkSig = '';
   function presetKm(p) { return game.mode === 'career' ? Math.max(0, ...Object.entries(p.sel).map(([k, id]) => (game.owns(k, id) ? 0 : game.partKm(k, id)))) : 0; }
   function presetCost(p) { return Object.entries(p.sel).reduce((a, [k, id]) => a + game.price(k, id), 0); }
+  // ---------------------------------------------------------------- negozio dei pezzi: grandi categorie, poi i pezzi a livelli
+  // I pezzi di Luca sono raggruppati (motore, turbo e aria, scarico, trasmissione, ruote e telaio); dentro una categoria ogni pezzo è
+  // un livello: SERIE (quello che c'è già) e poi LIV. 1, 2, 3... sempre migliori. Un clic sul pezzo lo compra (se serve) e lo monta.
+  const TUNE_GROUPS = [
+    { id: 'motore', name: 'Motore', cats: ['cams', 'intake', 'ecu', 'limiter'], hint: 'Camme, aspirazione, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
+    { id: 'turbo', name: 'Turbo e aria', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: quanta pressione e che fischio.' },
+    { id: 'scarico', name: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e downpipe: voce, fiamme e qualche cavallo in più.' },
+    { id: 'trasm', name: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
+    { id: 'telaio', name: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza, frenata e quanto è pronta in curva.' },
+  ];
+  let tuneTab = 'motore';
+  function renderTuneShop() {
+    const grid = $('tgrid'), E = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    if (!grid.dataset.bound) {
+      grid.dataset.bound = '1';
+      grid.addEventListener('click', (e) => {
+        const t = e.target.closest('[data-tab]'); if (t) { tuneTab = t.dataset.tab; grid.dataset.h = ''; renderTuneShop(); return; }
+        const o = e.target.closest('[data-k]'); if (o && !o.classList.contains('cur')) mountPart(o.dataset.k, o.dataset.id, null);
+      });
+    }
+    const visible = (k) => TUNING[k] && !(typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k));   // [PISTONE] questi pezzi li fa Nico
+    const groups = TUNE_GROUPS.map((g) => Object.assign({}, g, { cats: g.cats.filter(visible) }));
+    const known = new Set(TUNE_GROUPS.flatMap((g) => g.cats)), rest = Object.keys(TUNING).filter((k) => !known.has(k) && visible(k));
+    if (rest.length) groups.push({ id: 'altro', name: 'Altro', cats: rest, hint: '' });
+    const shown = groups.filter((g) => g.cats.length);
+    if (!shown.length) { if (grid.dataset.h !== '-') { grid.innerHTML = ''; grid.dataset.h = '-'; } return; }
+    if (!shown.some((g) => g.id === tuneTab)) tuneTab = shown[0].id;
+    const career = game.mode === 'career', money = game.s.money;
+    const cur = (k) => Math.max(0, TUNING[k].items.findIndex((it) => it.id === S.tune[k]));
+    const tabs = shown.map((g) => {
+      const up = g.cats.filter((k) => cur(k) > 0).length;
+      return `<button type="button" class="tg-tab" role="tab" data-tab="${g.id}" aria-selected="${g.id === tuneTab}">${E(g.name)}<small>${up ? `${up} su ${g.cats.length} migliorati` : `${g.cats.length} ${g.cats.length === 1 ? 'pezzo' : 'pezzi'} · di serie`}</small></button>`;
+    }).join('');
+    const G = shown.find((g) => g.id === tuneTab);
+    const cards = G.cats.map((k) => {
+      const cat = TUNING[k], ci = cur(k), n = cat.items.length;
+      const opts = cat.items.map((it, i) => {
+        const isCur = i === ci, owned = game.owns(k, it.id), lock = game.partLocked(k, it.id), price = game.price(k, it.id);
+        const brand = ['Su misura', '—', 'Integrata'].includes(it.brand) ? '' : it.brand + ' · ';
+        let note = it.note || '';
+        if (k === 'wastegate' && it.id === 'tial' && TP.sim.turbo.twin) note += ' Con il biturbo di serie non ha effetto.';
+        const st = isCur ? 'MONTATO' : owned ? 'TUO · MONTA' : lock ? `🔒 da ${fmt(game.partKm(k, it.id))} km` : `€ ${fmt(price)}`;
+        const cls = ['topt', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', !isCur && !owned && !lock && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');
+        return `<button type="button" class="${cls}" data-k="${k}" data-id="${it.id}" aria-pressed="${isCur}"><span class="lv">${i === 0 ? 'SERIE' : 'LIV. ' + i}</span><span class="nm"><b>${E(brand + it.name)}</b><small>${E(note)}</small></span><span class="st">${st}</span></button>`;
+      }).join('');
+      const pips = Array.from({ length: n }, (_, i) => `<i class="${i <= ci ? 'on' : ''}"></i>`).join('');
+      return `<div class="tcard${ci > 0 ? ' mod' : ''}"><h4><span>${E(cat.label)}</span><span class="tpips" title="Livello ${ci} di ${n - 1}">${pips}</span></h4>${opts}</div>`;
+    }).join('');
+    const html = `<div class="tg-tabs" role="tablist">${tabs}</div><p class="tg-info"><b>${E(G.name)}.</b> ${E(G.hint)} <br><b>SERIE</b> è quello che c'è già; <b>LIV. 1, 2, 3…</b> sono pezzi sempre migliori (e più cari). Le tacche in alto mostrano a che livello sei. Un pezzo comprato resta tuo: lo rimonti gratis.</p><div class="tg-cards">${cards}</div>`;
+    if (grid.dataset.h !== html) { grid.innerHTML = html; grid.dataset.h = html; }
+  }
   function mountPart(k, id, selEl) {
     const revert = () => { if (selEl) selEl.value = S.tune[k]; };
     if (!game.canMount()) { revert(); flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
@@ -2811,9 +2872,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- guida automatica: parte dopo 3 s senza toccare niente,
   // si spegne al primo tasto (gas, freno, marce, sterzo). Tiene la velocità a cui l'hai lasciata, cambia le marce e sorpassa.
   // Due guide automatiche (pulsante AUTO sopra il cruscotto: AUTO 1 → AUTO 2 → spento, ognuna col suo colore):
-  //  AUTO 1: dopo 15 s senza toccare niente l'auto guida da sola (gas, freno, marce, corsie) e si spegne al primo tasto.
+  //  AUTO 1: dopo 5 s senza toccare niente l'auto guida da sola (gas, freno, marce, corsie) e si spegne al primo tasto.
   //  AUTO 2: sempre attiva: tu dai gas e freni, lei cambia corsia da sola per sorpassare e tornare a destra.
-  const AUTO_IDLE_MS = 15000;
+  const AUTO_IDLE_MS = 5000;
   const autoMode = () => (S.autoMode !== undefined ? S.autoMode : S.autoLane === false ? 0 : 1);
   const auto = { on: false, assist: false, last: performance.now(), v: 0 };
   function autoDrive(dt) {
@@ -2822,7 +2883,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       || (inp.pad.thr || 0) > 0.02 || (inp.pad.brake || 0) > 0.02 || Math.abs(inp.pad.steer || 0) > 0.12;
     if (touching) auto.last = now;
     const mode = autoMode();
-    const can = mode > 0 && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > (mode === 1 ? 1.2 : 4) && !game.ap && !game.inside && game.track === 'city' && !rp.on;      // AUTO 1 riparte anche se in 15 s l'auto è quasi ferma
+    const can = mode > 0 && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > (mode === 1 ? 1.2 : 4) && !game.ap && !game.inside && game.track === 'city' && !rp.on;      // AUTO 1 riparte anche se in 5 s l'auto è quasi ferma
     const want = mode === 1 && can && now - auto.last > AUTO_IDLE_MS;
     if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`AUTO 1: guido io a ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
     if (!want && auto.on && touching) flash('Guidi tu', 0.8);
@@ -2866,7 +2927,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   $('dbAuto').addEventListener('click', () => {
     S.autoMode = { 1: 2, 2: 0, 0: 1 }[autoMode()]; S.autoLane = S.autoMode > 0; game.manualT = 0; applySettings();
-    flash(['Guida automatica spenta: guidi tu', 'AUTO 1: dopo 15 secondi senza toccare niente guida lei', 'AUTO 2: tu gas e freno, lei cambia corsia da sola'][S.autoMode], 2.2);
+    flash(['Guida automatica spenta: guidi tu', 'AUTO 1: dopo 5 secondi senza toccare niente guida lei', 'AUTO 2: tu gas e freno, lei cambia corsia da sola'][S.autoMode], 2.2);
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   });
   $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });
@@ -2878,7 +2939,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // abbaglianti: un colpo di fari a chi sta davanti (chiede strada)
   // fari: 0 spenti · 1 anabbaglianti · 2 abbaglianti (pulsante FARI sopra il contachilometri, salvato con la partita); F sfanala solo per un attimo
   // valvola di scarico (pulsante SCARICO): chiusa = silenzio, niente fiamme e quasi niente scoppi; aperta = scoppi e fiammate come sempre
-  const exhClosed = () => !!(game.s && game.s.cmd && game.s.cmd.exh === 0);
+  // la valvola c'è solo sull'auto potenziata (come il pulsante SCARICO): senza, lo scarico è quello di serie e non cambia niente
+  const exhValve = () => typeof CMD_EXH_PW !== 'undefined' && !!((sim.tune && sim.tune.pw >= CMD_EXH_PW) || (sim.extraPw || 1) > 1);
+  const exhClosed = () => exhValve() && !!(game.s && game.s.cmd && game.s.cmd.exh === 0);
   const lightsMode = () => (game.s.cmd && game.s.cmd.lights !== undefined ? game.s.cmd.lights : 1);
   const LIGHTS_NAME = ['FARI OFF', 'ANABB.', 'ABBAGL.'];
   function cycleLights() {
@@ -3223,7 +3286,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const okSito = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if ('serviceWorker' in navigator && okSito && window.top === window) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   } catch (e) { /* niente: il gioco va lo stesso */ }
-  window.nightRun = { leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
+  window.nightRun = { exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT, tier: flameTier(sim, TP.dsp.cat.pop || 0) }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
     get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
@@ -3289,11 +3352,18 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (garage && garageOn) {
       // fiammate: limitatore a taglio d'accensione, e al rilascio del gas (più a lungo con la mappa pop & bang)
-      const liftT = sim.cfg.pops ? 2.8 : 1.1;
-      flameT = exhClosed() ? 0 : (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut ? 1
-        : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : 0.38) * (1 - sim.ovr / liftT) * Math.min(1, sim.rpm / 4500) * TP.dsp.cat.pop : 0;
+      // Quando c'è fiamma: limitatore a taglio d'accensione (fiamma piena), rilascio del gas (più o meno forte secondo i giri e se c'è la mappa
+      // pop & bang), cambiata (solo sull'auto potenziata). Che tipo di fiammata esce lo decide il tuning (fiamme.js: ossidrica, libera, botto).
+      const spark = (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut, liftT = sim.cfg.pops ? 2.8 : 1.7, pot = exhValve(), catPop = TP.dsp.cat.pop || 0;
+      const ft = flameTier(sim, catPop);
+      const lift = !spark && sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (pot || game.car === 'supra' || TP.sim.ecuPops);
+      const shift = !spark && !lift && pot && ft.tier > 0 && !!sim.shiftSeq && sim.rpm > 3500;
+      const fkind = spark ? 'limiter' : lift ? 'lift' : shift ? 'shift' : '';
+      flameT = exhClosed() ? 0 : spark ? 1
+        : lift ? (sim.cfg.pops ? 0.6 : pot ? 0.5 : 0.38) * (1 - sim.ovr / liftT) * (0.55 + 0.45 * Math.min(1, sim.rpm / 4500)) * (pot ? Math.max(catPop, 0.7) : catPop)
+        : shift ? 0.42 : 0;
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
-        ign: sim.ign, brake: sim.in.brake, flame: flameT, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
+        ign: sim.ign, brake: sim.in.brake, flame: flameT, fkind: fkind, ftier: ft.tier, frpm: sim.rpm / sim.P.limiter, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
         thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd };
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
@@ -3309,7 +3379,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
       const pick = (m) => () => { game.s.vg.cambio = m; setGearbox(m); saveGame(); };
       game.ask({ kind: 'story', title: 'Il cambio', time: 900,
-        text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: leva P R N D (E la sposta verso D, Q verso P), poi gas e freno: le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare; in folle il gas fa solo salire i giri.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',
+        text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: leva P R N D S (E la sposta verso D e S, che è sport e tiene i giri più alti; Q verso P), poi gas e freno: le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare; in folle il gas fa solo salire i giri.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',
         options: [{ label: 'Automatico', act: pick('auto') }, { label: 'Manuale', act: pick('man') }] });
     }
     draw(); updateDom(dt);

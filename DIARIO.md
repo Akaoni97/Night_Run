@@ -4,6 +4,25 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**fiamme secondo il tuning**)
+- Fatto: l'auto ha un livello di preparazione (leggero, medio, spinto: `flameTier` in `fiamme.js`) e da quello dipende la fiammata: leggero fa
+  soprattutto un piccolo **botto** circolare, medio la **fiamma libera** in quattro versioni (classica, doppia lingua, lunga, tozza; arancio e
+  giallo), spinto l'**ossidrica** (getto blu sottile e rapido, diamanti, scintille) e a metà rilascio la fiamma libera. Anche le cambiate
+  danno qualche fiammata sull'auto potenziata. La mappa ECO/FORTE del turbo sposta il livello. Provate nel browser tutte e tre le famiglie.
+- Aperto: il suono dei botti non cambia con il tipo (resta quello del motore audio); le soglie dei livelli vanno sentite giocando.
+
+## 20/11/2026 notte · proprietario (**turbo vero, scarico, negozio dei pezzi a categorie**)
+- Fatto: la mappa del turbo (ECO / NORMALE / FORTE) cambia i bar in tubo (0,44 / 0,79 / 0,89 con 0,9 di massimo), non solo la coppia; scarico
+  aperto più forte (125 %), chiuso più basso (72 %) e senza fiamme; fiammata media al rilascio ai giri medi. Negozio di Luca in schede per
+  categoria (Motore, Turbo e aria, Scarico, Trasmissione, Ruote e telaio) con i pezzi a livelli e un clic per montare (`renderTuneShop`).
+
+## 20/11/2026 notte · proprietario (**briefing: AUTO 5 s, leva S, tasti, schede di Nico, vernice**)
+- Fatto: AUTO 1 dopo 5 s; leva con la **S** sport (`autoBox` tiene i giri alti); tasti 1-4 solo per mangiare e bere (via le marce dai
+  numeri, `tasti.js` aggiornato); pannello di Nico a schede (Livelli, La mia auto, Negozio, Magazzino, Banco, Motori); magazzino pezzi
+  a 100 (`MOT.maxPezzi`); valigette senza turbo; maschera vernice di Golf GTI e 205 GTI rifatta (`strumenti/maschera_scura.py`).
+- Aperto: codice morto delle vecchie gare, camion (disegni dal proprietario), alta definizione di marciapiedi e pedoni. Il cognato
+  decide i punti motori di `SOSPESI.md` (vendere la V40 coi pezzi, estendere ai altri motori, vecchio Pistone).
+
 ## 20/11/2026 sera · proprietario (**la cassa pesante non blocca più le missioni**)
 - Fatto (`missioni.js`, riga della bacheca in `index.html`): senza rimorchietto l'obiettivo dice cosa serve e dove
   («240 kg: serve il rimorchietto, al Motel Ovunque (€ 2.200)», o «attacca il rimorchio», o «fai spazio»); in bacheca
