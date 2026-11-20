@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**fluidità: palazzi preparati prima, meno lavoro a ogni fotogramma**)
+- Fatto: il palazzo che sta per entrare da destra si porta a densità doppia (`tileHD`) quando è ancora fuori schermo, uno per fotogramma
+  (`street2d.js`, `drawCity`): misurati 113 su 113 pronti prima di comparire, prima si facevano nel fotogramma in cui entravano (anche due o tre
+  insieme). Numeri con un formattatore preparato una volta (`fmt` in `index.html`, stesso risultato); pedali, quadro grande e telemetria non si
+  riscrivono col menu chiuso. Tre minuti di guida: memoria ferma a 14 MB, niente perdite.
+- Da sapere: nel browser di prova (senza scheda video) il gioco passa da solo a densità semplice dopo 3 s (`this.slow`); per provare l'alta va forzato.
+
 ## 20/11/2026 notte · proprietario (**scatti: niente più letture di pixel dalla scheda video**)
 - Fatto: misurato un minuto di guida. Timer, salvataggi e stile premium non pesano; il sospetto è nelle tele preparate al volo e poi rilette
   (~5 letture al secondo: palazzi, auto, sagome, Scale2x), che sul PC stanno nella scheda video e a ogni lettura la fermano. Ora nascono già

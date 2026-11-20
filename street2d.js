@@ -1330,7 +1330,12 @@ class Street2D {
     const shops = [];
     for (let i = i0; i < i1; i++) {
       const b = this.building(layer, i, this.districtAt ? this.districtAt((i * tileW - 260) / (30 * speed)) : undefined), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
-      if (x > this.LW || x + b.w < 0) continue;
+      if (x > this.LW || x + b.w < 0) {
+        // il palazzo che sta per entrare da destra si porta a densità doppia adesso, uno per fotogramma: quando compare
+        // è già pronto, e il lavoro non si ammucchia nel fotogramma in cui ne entrano due o tre insieme
+        if (x > this.LW && this.SS > 1 && !b.hd && this.tileHD && this._hdT !== t) { this._hdT = t; this.tileHD(b, layer); }
+        continue;
+      }
       if (this.SS > 1 && !b.hd && this.tileHD) this.tileHD(b, layer);
       g.drawImage(b.c, x, y, b.w, b.h);
       for (const s of b.signs) {

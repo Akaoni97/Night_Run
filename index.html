@@ -1292,7 +1292,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   'use strict';
   const $ = (id) => document.getElementById(id);
   const clamp = (x, a, b) => (x < a ? a : x > b ? b : x);
-  const fmt = (x, d = 0) => x.toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d });
+  // numeri all'italiana: un formattatore per numero di decimali, preparato una volta (toLocaleString lo rifà a ogni chiamata)
+  const NUMF = {};
+  const fmt = (x, d = 0) => (NUMF[d] || (NUMF[d] = new Intl.NumberFormat('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d }))).format(x);
   const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const sim = new SupraSim();
@@ -2040,7 +2042,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (audio.ready && sigBlink !== lastBlink) audio.send({ ev: [{ type: 'click' }] });   // relè delle frecce
     lastBlink = sigBlink;
     $('cluster').classList.toggle('off', !lit);
-    for (const p of ['clutch', 'brake', 'thr']) {
+    // pedali, quadro grande e telemetria stanno nel menu: col menu chiuso non si riscrivono (meno lavoro a ogni fotogramma)
+    const menuOpen = !window.gameMenu || window.gameMenu.isOpen;
+    if (menuOpen) for (const p of ['clutch', 'brake', 'thr']) {
       const v = p === 'clutch' ? (S.autoClutch ? sim.clutch : inp.clutch) : sim.in[p];
       const el = pedEls[p]; el.querySelector('.fill').style.height = (v * 100).toFixed(1) + '%';
       el.querySelector('output').textContent = Math.round(v * 100) + '%';
@@ -2059,6 +2063,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (textT < 0.08) return;
     textT = 0;
     $('engState').textContent = sim.running ? (sim.cut === 2 ? 'limitatore' : sim.cut === 3 ? '2-step' : 'in moto') : sim.starter ? 'avviamento…' : sim.ign ? 'quadro acceso' : 'motore spento';
+    const tq = sim.running ? Math.max(0, sim.Tnet) : 0, pw = tq * rpm / 7023;
+    peakTq = Math.max(peakTq, tq); peakPw = Math.max(peakPw, pw);
+    if (!menuOpen) return;
     if (lit) {
       setPod('pOilT', 'bOilT', fmt(sim.oilT) + '<small>°C</small>', (sim.oilT - 40) / 100);
       setPod('pWat', 'bWat', fmt(sim.waterT) + '<small>°C</small>', (sim.waterT - 40) / 80);
@@ -2073,8 +2080,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       setPod('pTire', 'bTire', fmt(sim.tireT) + '<small>°C · ' + fmt(Math.round((1 - sim.tireWear) * 100)) + '%</small>', (tg - 0.7) / 0.33, sim.tireT < 50 ? 'var(--info)' : sim.tireT > 115 ? 'var(--crit)' : '');
       setPod('pFuel', 'bFuel', fmt(sim.fuel * 100) + '<small>%</small>', sim.fuel);
     } else ['pOilT', 'pWat', 'pOilP', 'pAfr', 'pTire', 'pFuel'].forEach((id, i) => setPod(id, ['bOilT', 'bWat', 'bOilP', 'bAfr', 'bTire', 'bFuel'][i], '—', 0));
-    const tq = sim.running ? Math.max(0, sim.Tnet) : 0, pw = tq * rpm / 7023;
-    peakTq = Math.max(peakTq, tq); peakPw = Math.max(peakPw, pw);
     $('tTq').innerHTML = fmt(tq) + '<small>Nm</small>'; $('tTqMax').textContent = 'picco ' + fmt(peakTq) + ' Nm';
     $('tPw').innerHTML = fmt(pw) + '<small>CV</small>'; $('tPwMax').textContent = 'picco ' + fmt(peakPw) + ' CV';
     $('tThr').innerHTML = fmt(sim.thr * 100) + '<small>%</small>';
