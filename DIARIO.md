@@ -9,13 +9,14 @@ due voci, e il controllo della sera le legge.
   su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
 
 ## 20/11/2026 · proprietario (entrata nei locali)
-- Fatto: entrando in un locale l'auto non si teletrasporta più. Si ferma ~5 m prima della porta, frenata decisa, poi svolta
-  nel piazzale con le ruote che girano (in retro se la porta l'hai appena passata, attraversando le corsie se eri a
-  sinistra), lo schermo si scurisce e si apre l'interno; uscendo scende dal piazzale in avanti. File nuovo `entrata2d.js`,
-  ritocchi in `game.js` (`enterPlace`, frenata dell'accosto, `exitPlace`), un aggancio in `street2d.js`; righe del cognato
-  non toccate. Test `test/entrata.test.js` (194 in tutto).
-- Per il cognato: se ieri l'entrata faceva cose strane in un caso preciso, dimmi quale: l'ho provata da fermo, arrivando a
-  40 km/h, dalla corsia di sinistra e appena oltre la porta.
+- Fatto: entrando in un locale niente più teletrasporto. Ogni locale ha un **posto auto** accanto alla porta (strisce e P sul
+  marciapiede; al benzinaio la pompa): l'auto ci entra con le ruote che girano (in retro se la porta l'hai passata), il
+  protagonista **scende, va a piedi alla porta ed entra**, buio, interno. Uscendo esce dalla porta, risale e riparte. U
+  durante la camminata la salta. Accostando, il cambio di corsia verso destra ora è deciso anche piano (prima si
+  attraversavano le corsie a passo d'uomo e da dietro ti tamponavano: forse il problema di ieri del cognato).
+- File nuovo `entrata2d.js`; in `game.js` posti e porte (`GAME_POSTI`) e tempi (`GAME_ENT`); un aggancio in `street2d.js`,
+  una riga in `index.html` (U salta). Righe del cognato non toccate. Test `test/entrata.test.js` (195 in tutto).
+- Aperto: nel 3D l'auto si ferma e basta (manovra e omino solo nel 2D).
 
 ## 20/11/2026 mattina · proprietario (app installabile)
 - Fatto: il gioco si installa come app da Edge o Chrome (`manifest.json`, icone in `img/app/`): icona sul desktop, finestra

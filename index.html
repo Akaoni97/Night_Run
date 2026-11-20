@@ -2647,7 +2647,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (placeOpen && placeOpen.id === 'fuel') renderFuel();
   }
   function placeKey() {
-    if (game.inside) { if (game.inside.phase === 'shop') game.exitPlace(); return; }
+    if (game.inside) { if (game.inside.phase === 'shop') game.exitPlace(); else if (game.entSkip) game.entSkip(); return; }   // U mentre cammina: salta la camminata
     const p = game.placesOn ? game.nearPlace() : null;
     if (!p) { if (game.placesOn) flash('Nessun ingresso qui: guarda la mappa in basso', 1.6); return; }
     if (!p.ok) { flash('Troppo veloce: rallenta per entrare', 1.6); return; }

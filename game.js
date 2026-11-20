@@ -73,8 +73,17 @@ const MOUNTAIN = {
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
 const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
-// entrata in un locale (secondi): l'auto svolta nel piazzale e si ferma davanti, poi lo schermo si scurisce; uscendo il contrario
-const GAME_ENT_IN = 2.4, GAME_ENT_OUT = 1.8;
+// entrata in un locale: l'auto svolta nel piazzale fino al suo posto auto, il protagonista scende, va a piedi alla porta
+// ed entra, lo schermo si scurisce; uscendo il contrario (disegno in entrata2d.js). Tempi in secondi.
+const GAME_ENT = { drive: 1.9, getOut: 0.5, walkV: 1.5, door: 0.35, dark: 0.45, getIn: 0.4, back: 1.5 };
+// posto auto e porta di ogni locale, in metri dalla posizione del locale (misurati sulle facciate di locali2d.js,
+// concessionario.js e sfascio.js): il posto è accanto alla porta, al benzinaio sulla pompa e la porta è quella del market
+const GAME_POSTI = {
+  bar: { park: -3.3, door: 0 }, fuel: { park: 2.6, door: 6.1 }, grill: { park: -2.4, door: 1.2 }, motel: { park: -3, door: 0.3 },
+  niko: { park: -3.4, door: 0 }, shop: { park: -3.4, door: 0 }, style: { park: -1.6, door: 1.9 }, dealer: { park: -0.6, door: 2.9 },
+  junk: { park: -1.2, door: 2.5 },
+};
+const GAME_ENT_IN = GAME_ENT.drive + GAME_ENT.dark, GAME_ENT_OUT = GAME_ENT.back + 0.35;   // senza la camminata (minimi)
 const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/s (18 km/h: una manovra, non una corsa)
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
@@ -325,12 +334,25 @@ class StreetGame {
     const go = () => {
       // dove parcheggia nel piazzale (metri dalla porta): chi è fermo prima della porta entra andando avanti,
       // chi l'ha appena passata entra in retro; sempre dentro la facciata (da −5 a +7 m)
-      const c = this.s.dist - p.x, park = c <= -1.5 ? Math.max(-4, Math.min(2.5, c + 6)) : Math.max(-4, Math.min(6, c - 5));
-      this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0, from: c, park, z0: this.laneZ }; this.laneZ = GAME_LANE_Z[3];   // z0: la corsia da cui parte la manovra (entrata2d.js)
+      const c = this.s.dist - p.x, P = GAME_POSTI[p.id];
+      const park = P ? P.park : c <= -1.5 ? Math.max(-4, Math.min(2.5, c + 6)) : Math.max(-4, Math.min(6, c - 5));
+      const door = P ? P.door : park, E = GAME_ENT, walk = Math.abs(door - (park + 0.3)) / E.walkV;   // scende dalla portiera, poco avanti al centro dell'auto
+      const drive = Math.max(E.drive * 0.85, Math.min(3.2, 1.2 + Math.abs(park - c) * 0.11));   // manovra più lunga se il posto è lontano
+      this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0, from: c, park, door, walk, drive, z0: this.laneZ,   // z0: la corsia da cui parte la manovra
+        dur: drive + E.getOut + walk + E.door + E.dark, durOut: 0.35 + walk + E.getIn + E.back };
+      this.laneZ = GAME_LANE_Z[3];
     };
-    if (p.rel < 9) this.stopAt(null, go); else this.stopAt(p.x - 5, go);   // si ferma qualche metro prima e da lì svolta dentro
+    // vicino, o già fermi lì davanti (anche a motore spento): la manovra fino al posto la fa l'animazione
+    if (p.rel < 9 || (Math.abs(this.sim.v) < 1 && p.rel < 20)) this.stopAt(null, go); else this.stopAt(p.x + (GAME_POSTI[p.id] ? GAME_POSTI[p.id].park : 0) - 5, go);   // si ferma qualche metro prima del posto e da lì svolta dentro
+    if (this.ap) this.ap.enter = true;
     this.say(`Accosto: ${p.name}`, p.id === 'fuel' ? 'fuel' : 'buy');
     return true;
+  }
+  // U durante la camminata: si salta al buio (entrando) o all'auto che riparte (uscendo)
+  entSkip() {
+    const I = this.inside; if (!I || !I.dur) return;
+    if (I.phase === 'in' && I.t > (I.drive || GAME_ENT.drive)) I.t = Math.max(I.t, I.dur - GAME_ENT.dark);
+    else if (I.phase === 'out') I.t = Math.max(I.t, I.durOut - GAME_ENT.back);
   }
   exitPlace() {
     const I = this.inside; if (!I || I.phase !== 'shop') return;
@@ -715,8 +737,8 @@ class StreetGame {
     const I = this.inside;
     if (I) {
       I.t += dt;
-      if (I.phase === 'in' && I.t > GAME_ENT_IN) { I.phase = 'shop'; I.t = 0; }
-      if (I.phase === 'out' && I.t > GAME_ENT_OUT) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
+      if (I.phase === 'in' && I.t > (I.dur || GAME_ENT_IN)) { I.phase = 'shop'; I.t = 0; }
+      if (I.phase === 'out' && I.t > (I.durOut || GAME_ENT_OUT)) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
       if (I.fill) {
         const F = I.fill, step = Math.min(F.liters - F.got, dt * 8);
         F.got += step; sim.fuel = Math.min(1, sim.fuel + step / sim.P.tank); sim.dry = false;
@@ -966,7 +988,7 @@ class StreetGame {
       this.latV = 0;
       const zT = GAME_LANE_Z[this.lane];
       // cambio corsia deciso: ~0,7 s a velocità d'autostrada, più morbido da fermi
-      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));
+      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 || (this.ap && this.ap.enter) ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));   // accostando a un locale si va a destra decisi, anche piano (prima si attraversavano le corsie a passo d'uomo e da dietro ti tamponavano)
     }
 
   }
