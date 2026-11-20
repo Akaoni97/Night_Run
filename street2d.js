@@ -1702,12 +1702,16 @@ class Street2D {
     g.fillStyle = 'rgba(8,8,14,.7)'; g.fillRect(cx - tw / 2 - 8, 330, tw + 16, 18); this.text(g, title, cx - tw / 2, 334, I.col, 2);
   }
 
+  slowReset() { this.slow = false; this.tBad = 0; this.tAvg = undefined; try { localStorage.removeItem('nr_slow'); } catch (e) { /* ignora */ } }
+
   update(dt, s, game) {
     const st = this.st, g = this.g, W = this.LW, C = this.C;
     this.fitLo(); const SS = this.SS;
     // dispositivo lento: se il disegno a densità doppia resta sopra i 30 ms per tre secondi, si torna a quella semplice
     const tStart = performance.now();
-    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) this.slow = true; }
+    // la scelta si ricorda: se questo computer è andato a densità semplice, al prossimo avvio parte già così (si azzera scegliendo la qualità a mano)
+    if (this.slow === undefined) { try { this.slow = localStorage.getItem('nr_slow') === '1'; } catch (e) { this.slow = false; } if (this.slow) { this.fitLo(); } }
+    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) { this.slow = true; try { localStorage.setItem('nr_slow', '1'); } catch (e) { /* ignora */ } } }
     st.t += dt;
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),

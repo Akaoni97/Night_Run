@@ -125,16 +125,22 @@ test('polizia: da ricercato le altre pattuglie non ti fanno accostare, ti insegu
   assert.equal(game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }), true);
 });
 
-test('polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 km, e la multa arriva subito', () => {
+test('polizia: gli autovelox sono pochi (a volte tratti liberi di 7-12 km), il Tutor uno ogni 10-15 km lungo 0,5-1 km, e la multa arriva subito', () => {
   const { game } = trip(); const S = game.polState();
   for (let k = 0; k < 200; k++) { game.s.dist += 1000; game.polPlan(); }
-  const xs = []; let free = 0;
+  let seed = 12345; const lcg = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };   // sempre uguale: niente prova instabile
   const all = [];                                                // tutti quelli pianificati (polPlan butta i vecchi)
-  const g2 = trip(Math.random).game; for (let k = 0; k < 400; k++) { g2.s.dist += 1000; g2.polPlan(); for (const c of g2.polState().ctl) if (!all.includes(c)) all.push(c); }
+  const g2 = trip(lcg).game; for (let k = 0; k < 1500; k++) { g2.s.dist += 1000; g2.polPlan(); for (const c of g2.polState().ctl) if (c.x < g2.s.dist + 1500 && !all.includes(c)) all.push(c); }   // solo quelli già vicini: più lontano un autovelox può ancora saltare per un Tutor nuovo
   all.sort((a, b) => a.x - b.x);
-  for (let i = 1; i < all.length; i++) { const gap = (all[i].x - (all[i - 1].x2 || all[i - 1].x)) / 1000; xs.push(gap); if (gap >= 7) free++; }
-  assert.ok(Math.min(...xs) >= 2.4, 'mai uno sopra l\'altro');
+  const vel = all.filter((c) => c.k === 'velox'), tut = all.filter((c) => c.k === 'tutor');
+  const xs = []; let free = 0;
+  for (let i = 1; i < vel.length; i++) { const gap = (vel[i].x - vel[i - 1].x) / 1000; xs.push(gap); if (gap >= 7) free++; }
+  assert.ok(Math.min(...xs) >= 2.4, 'due autovelox mai uno sopra l\'altro');
   assert.ok(free / xs.length > 0.2 && free / xs.length < 0.5, 'tratti liberi ogni tanto: ' + free / xs.length);
+  assert.ok(tut.length > 30, 'ci sono Tutor');
+  for (const c of tut) assert.ok((c.x2 - c.x) >= 500 && (c.x2 - c.x) <= 1000, 'Tutor lungo da 0,5 a 1 km: ' + (c.x2 - c.x));
+  for (let i = 1; i < tut.length; i++) { const g = (tut[i].x - tut[i - 1].x) / 1000; assert.ok(g >= 9.99 && g <= 15.01, 'un Tutor ogni 10-15 km: ' + g); }
+  for (const c of tut) assert.ok(!vel.some((v) => v.x > c.x - 700 && v.x < c.x2 + 700), 'niente autovelox dentro un Tutor');
   assert.ok(S.ctl.length > 0);
   // autovelox: a 160 scatta e la multa arriva subito (niente verbale che aspetta qualche km)
   const { game: g } = trip(); g.polState().nextKm = 1e9; g.polState().ctl = [{ k: 'velox', x: g.s.dist + 30 }];

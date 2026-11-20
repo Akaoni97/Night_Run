@@ -1,5 +1,7 @@
 # Nico e il motore (pezzi a livelli, banco di lavoro, motori costruiti)
 
+> **21/11/2026: spento di serie nel browser.** Il proprietario ha chiesto un'officina semplice (due schede: Modifiche e Swap motore, `officina.js`) e il vecchio sistema di Nico, troppo complicato, non si vede più. Il codice e i test restano qui; per riaccenderlo c'è l'interruttore nella scheda Sviluppatori (`nr_pistone` = 1). Da riordinare insieme a tuo cognato: cosa tenere di Nico dentro l'officina semplice.
+
 **Stato (20/11/2026 sera): integrato da Luca, per ora solo sulla V40.** Il cognato (Luca) gestisce i motori: deciso
 con il proprietario che il negozio dei pezzi motore è uno solo, **Da Luca Tuning**, dove lavora **Nico**. Il Pistone
 non è più una tappa a parte (il secondo bar di ogni giro è tornato un bar). Quando la struttura sarà completa sulla V40

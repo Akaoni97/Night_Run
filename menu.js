@@ -42,10 +42,10 @@
     joy.addEventListener('click', () => { if (window.nightPad) { close(); window.nightPad.open(); } });
     const joyP = document.createElement('p'); joyP.className = 'hint'; joyP.textContent = 'Un pad Xbox funziona da solo. Volante, pedali, cambio a H e joystick strani si assegnano qui.';
     const SUBS = [
-      ['grafica', 'Grafica', [panel('Qualità, ora e meteo', [labelOf('q3d'), labelOf('clockSel'), labelOf('meteoSel')], 'gm-row'), q('section.uiprefs')]],
+      ['grafica', 'Grafica', [panel('Qualità, ora, meteo e prestazioni', [labelOf('q3d'), labelOf('clockSel'), labelOf('meteoSel'), labelOf('pausaSel'), labelOf('fpsSel')], 'gm-row'), q('section.uiprefs')]],
       ['audio', 'Audio', [panel('Volumi e ascolto', [fieldOf('vol'), fieldOf('radioVol'), q('.seg[data-k="view"]') && q('.seg[data-k="view"]').closest('.field'), q('.seg[data-k="character"]') && q('.seg[data-k="character"]').closest('.field')]), q('section.extras .samples')]],
       ['comandi', 'Comandi', [panel('Tasti', [tasti, tastiP]), panel('Joystick e volante', [joy, joyP]), keysPanel]],
-      ['guida', 'Guida', [panel('Aiuti alla guida', [q('section.deck .setup .toggles')])]],
+      ['guida', 'Guida', [panel('Aiuti alla guida', [q('section.deck .setup .toggles'), labelOf('suggSel')])]],
     ];
     const pagesI = {};
     for (const [id, name, els] of SUBS) {
@@ -71,7 +71,7 @@
       const how = [...document.querySelectorAll('section.extras > .panel')].find((p) => /Come si gioca/.test(p.textContent));
       return [sum, box, tools, how];
     }],
-    ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
+    ['garage', 'Officina', 'Manutenzione, rapporti, chilometri', '#ff7a3a', () => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'I pezzi e lo swap del motore si fanno da Luca Tuning (sulla mappa, tasto L): un clic e sono montati.'; return [p, q('section.tuning')]; }],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
     ['guida', 'Guida', 'Avviamento, comandi dell\'auto, cambio, limitatore', '#b8ff3a', () => [q('section.deck')]],
     ['quadro', 'Quadro e dati', 'Strumenti grandi e telemetria', '#b07bff', () => [$('cluster'), q('section.tele')]],

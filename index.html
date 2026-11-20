@@ -195,6 +195,10 @@ body.inplace.pb-sotto .trg-pop { top: 8px; bottom: auto; }   /* telefono: il pan
 .hud-goal b { color: #b8ff3a; letter-spacing: .08em; }
 .hud-goal span { font-size: 12px; color: var(--fg); }
 .hud-goal em { font-style: normal; font-size: 11px; color: #ffd23f; }
+.hud-next { border-left-color: #7fd3ff; display: grid; gap: 1px; max-width: 260px; padding-top: 3px; padding-bottom: 3px; }
+.hud-next b { color: #7fd3ff; letter-spacing: .08em; font-size: 11px; }
+.hud-next span { font-size: 12px; color: var(--fg); }
+.hud-next em { font-style: normal; font-size: 11px; color: #ffd23f; }
 @keyframes goalIn { from { transform: translateX(-12px); opacity: 0; } }
 .kbtn.first { background: linear-gradient(180deg, #4a6a12, #2a3e08); color: #f4ffd8; box-shadow: 0 0 14px rgba(184,255,58,.45); }
 #promptText { white-space: pre-line; }
@@ -494,6 +498,9 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .qsel { display: flex; gap: 6px; align-items: center; }
 .qsel select { background: #1c1a16; border: 1px solid #3a342a; color: var(--fg); font: 500 12px/1 var(--f-body); padding: 3px 4px; }
 .tgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+/* i pezzi si montano da Luca (officina.js): nel menu l'officina mostra solo statistiche, manutenzione e rapporti. Con l'interruttore del Pistone acceso resta il vecchio negozio dentro il pannello del locale */
+section.panel.tuning .tshop, section.panel.tuning .presets, section.panel.tuning #shopNote { display: none !important; }
+#placeBox section.panel.tuning .tshop, #placeBox section.panel.tuning .presets, #placeBox section.panel.tuning #shopNote { display: revert !important; }
 .tshop { display: grid; gap: 12px; }
 .tg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .tg-tab { flex: 1 1 120px; display: grid; gap: 4px; text-align: left; padding: 9px 12px; background: #0e0d0b; border: 1px solid var(--line); color: var(--fg); font: 600 15px/1.1 var(--f-body); cursor: pointer; }
@@ -991,6 +998,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div class="hud-tag" id="hudFuelTag"><b>BENZINA</b><span id="hudFuel">—</span></div>
         <div class="hud-tag"><b>ORA</b><span id="hudClock">23:00</span></div>
         <div class="hud-tag" id="hudJob" hidden></div>
+        <div class="hud-tag hud-next" id="hudNext" hidden><b id="nextTitle"></b><span id="nextText"></span><em id="nextLeft"></em></div>
         <div class="hud-tag hud-goal" id="hudGoal" hidden><b id="goalTitle">PRIMO LAVORO</b><span id="goalText"></span><em id="goalLeft"></em></div>
         <div class="hud-tag hud-vg" id="hudVg" hidden>
           <div class="vgbars"><i id="vgFood" title="Fame (1)">🍞</i><i id="vgWater" title="Sete (2)">💧</i><i id="vgSleep" title="Sonno (3)">☾</i><i id="vgWash" title="Igiene (4)">✦</i></div>
@@ -1051,6 +1059,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <label class="kbtn qsel">Ora <select id="clockSel" aria-label="Ora del giorno"><option value="auto">dinamica</option><option value="giorno">giorno</option><option value="tramonto">tramonto</option><option value="notte">notte</option></select></label>
       <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option><option value="nebbia">nebbia</option><option value="neve">neve</option><option value="vento">vento</option></select></label>
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
+      <label class="kbtn qsel">Pausa se esci <select id="pausaSel" aria-label="Pausa quando la finestra perde il fuoco"><option value="si">sì</option><option value="no">no</option></select></label>
+      <label class="kbtn qsel">Contatore FPS <select id="fpsSel" aria-label="Contatore dei fotogrammi al secondo"><option value="no">spento</option><option value="si">acceso</option></select></label>
+      <label class="kbtn qsel">Suggerimenti <select id="suggSel" aria-label="Suggerimenti dei primi minuti"><option value="si">accesi</option><option value="no">spenti</option></select></label>
     </div>
   </section>
 
@@ -1287,6 +1298,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="missioni.js"></script>
 <script src="pistone/motori.js"></script>   <!-- [PISTONE] progetto in prova: pistone/LEGGIMI.md -->
 <script src="pensieri.js"></script>
+<script src="suggerimenti.js"></script>
 <script>
 (() => {
   'use strict';
@@ -1448,9 +1460,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function applySettings() {
     const carId = game.car;
     useCar(carId);
+    if (typeof offCatalog === 'function') offCatalog(game, carId);   // officina.js: con uno swap il catalogo ha i pezzi del motore montato
     TP = tuningParams(S.tune);
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
-    const MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
+    let MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
+    if (!MOTE && typeof offSwapApply === 'function') MOTE = offSwapApply(game, carId, TP, sim, S.tune);   // officina.js: swap con il motore di un'altra auto
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
@@ -1657,6 +1671,27 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (k === 'h') hornOff();
   });
   window.addEventListener('blur', () => { keys.clear(); startOff(); });
+  // pausa quando la finestra perde il fuoco (alt-tab, un altro schermo): il gioco non va avanti da solo, si riprende con un tasto o un clic.
+  // Spenta al tocco (telefono) o dalla scelta «Pausa se esci» nelle Impostazioni.
+  let pausaF = false;
+  const pausaBox = document.createElement('div'); pausaBox.id = 'pausaBox'; pausaBox.hidden = true;
+  pausaBox.style.cssText = 'position:fixed;inset:0;z-index:95;display:grid;place-content:center;gap:6px;text-align:center;background:rgba(6,5,10,.72);color:#ffd27a;font:600 26px/1.2 var(--f-data,monospace);letter-spacing:.2em;cursor:pointer';
+  pausaBox.innerHTML = 'PAUSA<small style="font-size:12px;letter-spacing:.12em;color:#cfc8b8">premi un tasto o clicca per continuare</small>';
+  document.body.appendChild(pausaBox);
+  const coarsePtr = () => { try { return matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } };
+  function pausaOn() { if (pausaF || S.pausa === false || coarsePtr()) return; pausaF = true; pausaBox.hidden = false; try { if (audio.ctx) audio.ctx.suspend(); } catch (e) { /* ignora */ } }
+  function pausaOff() { if (!pausaF) return; pausaF = false; pausaBox.hidden = true; last = performance.now(); try { if (audio.ctx && !document.hidden) audio.ctx.resume(); } catch (e) { /* ignora */ } }
+  window.addEventListener('blur', pausaOn);
+  pausaBox.addEventListener('pointerdown', pausaOff);
+  window.addEventListener('keydown', (e) => { if (pausaF) { pausaOff(); e.preventDefault(); e.stopImmediatePropagation(); } }, true);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) last = performance.now(); });
+  // contatore dei fotogrammi (Impostazioni → Grafica): media su mezzo secondo, dice anche se il gioco è sceso da solo a densità semplice
+  const fpsBox = document.createElement('div'); fpsBox.id = 'fpsBox'; fpsBox.hidden = true;
+  fpsBox.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:60;padding:3px 8px;border-radius:6px;background:rgba(10,9,7,.72);color:#b8ff3a;font:600 12px/1.3 var(--f-data,monospace);letter-spacing:.06em;pointer-events:none';
+  document.body.appendChild(fpsBox);
+  let fpsN = 0, fpsT = 0;
+  function fpsTick(dtv) { if (!S.fps) { if (!fpsBox.hidden) fpsBox.hidden = true; return; } fpsN++; fpsT += dtv; if (fpsT >= 0.5) { const f = Math.round(fpsN / fpsT); fpsN = 0; fpsT = 0; fpsBox.hidden = false; fpsBox.style.color = f >= 50 ? '#b8ff3a' : f >= 30 ? '#ffd27a' : '#ff7a6a'; fpsBox.textContent = f + ' FPS' + (street2d && street2d.slow ? ' · densità semplice (auto)' : ''); } }
+
 
   // gamepad
   const padPrev = [];
@@ -2359,7 +2394,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   applyLook();
   $('q3d').value = S.q || 'alta';
-  $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street2d) street2d.quality = S.q; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  $('pausaSel').value = S.pausa === false ? 'no' : 'si';
+  $('pausaSel').addEventListener('change', (e) => { S.pausa = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  $('suggSel').value = S.sugg === false ? 'no' : 'si';
+  $('suggSel').addEventListener('change', (e) => { S.sugg = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  $('fpsSel').value = S.fps ? 'si' : 'no';
+  $('fpsSel').addEventListener('change', (e) => { S.fps = e.target.value === 'si'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street2d) { street2d.quality = S.q; if (street2d.slowReset) street2d.slowReset(); } try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   // vernice: ogni auto ha la sua (la Supra usa S.paint come prima)
   function carPaint() { return game.car === 'supra' ? S.paint : ((S.paints || {})[game.car] || CARS[game.car].paint0 || '#2a4b57'); }
   function setCarPaint(hex) { if (game.car === 'supra') S.paint = hex; else { S.paints = S.paints || {}; S.paints[game.car] = hex; } }
@@ -2510,6 +2551,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     vgBar('vgFood', v.needs.food); vgBar('vgWater', v.needs.water); vgBar('vgSleep', v.needs.sleep); vgBar('vgWash', v.needs.wash);
     const pax = v.pax.filter((p) => p.name);
     $('vgInfo').textContent = (pax.length ? `${pax.length}/${v.seats} a bordo · ` : '') + `carico ${fmt(v.kg, 0)}/${fmt(v.cap.kg, 0)} kg` + (v.line ? ` · linea: ${v.line.onboard} passeggeri` : '');
+    // il prossimo traguardo (obiettivo.js): pezzo che si sblocca o vantaggio dei km, più vicino
+    { const nb = $('hudNext'), tn = performance.now();
+      if (!renderTrip._n || tn - renderTrip._t > 500) { renderTrip._t = tn; renderTrip._n = { v: window.NightObiettivo ? NightObiettivo.prossimo(game) : null }; }
+      const N = renderTrip._n.v; nb.hidden = !N;
+      if (N && !nb.hidden) { $('nextTitle').textContent = N.title.toUpperCase(); $('nextText').textContent = N.text; $('nextLeft').textContent = NightObiettivo.testo(N); } }
     // obiettivo della prima missione
     const G = game.vgGoal && game.vgGoal(), gb = $('hudGoal'); gb.hidden = !G;
     if (G) { $('goalTitle').textContent = G.title.toUpperCase(); $('goalText').textContent = G.text; $('goalLeft').textContent = (G.left > 0.05 ? `tra ${fmt(G.left, 1)} km · ` : 'sei arrivato · ') + `paga € ${fmt(G.pay)}` + (G.note ? ` · ${G.note}` : ''); }
@@ -2697,16 +2743,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
-      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Scegli i pezzi dalle tendine: li monta subito. Alcuni si sbloccano solo dopo un po\' di chilometri.');
-      // [PISTONE] con un motore del Pistone montato, i pezzi del motore li decide quel motore (pistone/motori.js, motApply)
-      if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto invece te li faccio io.»`);
-      move(document.querySelector('section.panel.tuning'));
-      renderTuning(); renderServices();
-      // [PISTONE] Nico lavora qui: pezzi del motore a livelli, motore di serie, banco di lavoro, motori costruiti
-      if (window.NightMotori) {
-        const nb = document.createElement('div'); body.appendChild(nb);
-        const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
-        NightMotori.panel(nb, I, nc);
+      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca i pezzi: li monto subito. La i dice cosa fanno.');
+      if (window.NightOfficina && !(typeof PISTONE !== 'undefined' && PISTONE.on)) {      // officina semplice (officina.js): Modifiche e Swap motore (con l'interruttore del Pistone acceso resta il vecchio negozio)
+        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
+        NightOfficina.panel(body, I, ctxO);
+      } else {                                                           // [PISTONE] interruttore acceso: il vecchio negozio di Luca e Nico
+        if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto sono ancora miei.»`);
+        move(document.querySelector('section.panel.tuning'));
+        renderTuning(); renderServices();
+        if (window.NightMotori) {
+          const nb = document.createElement('div'); body.appendChild(nb);
+          const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
+          NightMotori.panel(nb, I, nc);
+        }
       }
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
@@ -3344,13 +3393,25 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
+  window.nightRun.pausa = (on) => on ? pausaOn() : pausaOff(); Object.defineProperty(window.nightRun, 'inPausa', { get: () => pausaF, configurable: true });   // pausa a mano (prove)
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
   window.nightRun.shiftUp = () => { ensureAudio(); shiftUp(); }; window.nightRun.shiftDown = () => { ensureAudio(); shiftDown(); };   // marce dal banco prova
+
+  // suggerimenti dei primi minuti (suggerimenti.js): un consiglio alla volta, solo sulla strada
+  let suggPadT = 0, suggPadV = false;
+  const suggPad = () => { if (performance.now() - suggPadT < 1000) return suggPadV; suggPadT = performance.now(); try { suggPadV = !localStorage.getItem('nr_pad') && Array.from(navigator.getGamepads ? navigator.getGamepads() : []).some((p) => p && p.connected && p.mapping !== 'standard'); } catch (e) { suggPadV = false; } return suggPadV; };
+  function suggTick(dt) {
+    if (!window.NightSugg || !game.s.vg) return;
+    NightSugg.tick({ dt, spento: S.sugg === false, say: (t) => game.say(t, 'tip'), apri: (n) => { if (n === 'joystick' && window.nightPad) window.nightPad.open(); },
+      attivo: !game.inside && !game.prompt && !placeOpen && !(window.gameMenu && gameMenu.isOpen) && !(window.telefono && telefono.isOpen) && !pausaF,
+      ctx: { motore: sim.running, fermo: sim.kmh < 1, auto: S.gearbox === 'auto', leva: S.gearbox === 'auto' ? leva : null, km: game.s.dist / 1000, kmh: sim.kmh, benzina: sim.fuel, soldi: game.s.money, padStrano: suggPad() } });
+  }
 
   // ---------------------------------------------------------------- ciclo principale
   let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
-    const dt = clamp((now - last) / 1000, 0, 0.1); last = now;
+    if (pausaF) { last = now; requestAnimationFrame(frame); return; }
+    const dt = clamp((now - last) / 1000, 0, 0.1); last = now; fpsTick(dt);
     if (rp.on) { playReplay(dt); requestAnimationFrame(frame); return; }
     readPad(); updateInputs(dt);
     if (window.NightBanco && NightBanco.on) { sim.in.thr = NightBanco.thr; sim.in.brake = NightBanco.brake; }   // anche il cambio automatico deve vedere il gas del banco
@@ -3377,6 +3438,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (Math.abs(keyAxis) < 0.01 && keyT === 0) keyAxis = 0;
     game.steerHold(clamp(keyAxis + (inp.pad.steer || 0), -1, 1));
     game.update(dt);
+    suggTick(dt);
     placesTick(dt);
     drawHudG(dt);
     if (game.perkUp) { game.perkUp = null; applySettings(); renderServices(); saveGame(); }
@@ -3681,6 +3743,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="concessionario.js"></script>
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
+<script src="obiettivo.js"></script>
+<script src="officina.js"></script>
 <script src="pistone/motori2d.js"></script>   <!-- [PISTONE] -->
 <script src="garage.js"></script>
 <script src="soccorso.js"></script>
