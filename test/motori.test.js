@@ -5,8 +5,8 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS } =
-  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS };')();
+const { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS, speedFine } =
+  new Function(src + ';return { EngineDSP, SupraSim, TUNING, TUNING_PRESETS, tuningParams, SamplePlayer, StreetGame, GAME_LANE_Z, VG, CARS, speedFine };')();
 
 function drive(sim, seconds, each) {
   for (let t = 0; t < seconds; t += 1 / 60) { each?.(sim, t); sim.update(1 / 60); sim.events.length = 0; }
@@ -145,11 +145,12 @@ const flatOut = (sim) => {
   return { thr: 1, brake: 0 };
 };
 
-test('polizia: passarle accanto in sesta costa una multa e alza il livello di ricercato', () => {
+test('polizia: passarle accanto oltre i 136 km/h costa una multa e alza il livello di ricercato', () => {
   const { sim, game } = career();
   sim.shift(1);
   for (let k = 0; k < 60 && sim.gear < 6; k++) play(sim, game, 1, flatOut);   // fino alla sesta (la massa conta pilota e benzina)
   assert.equal(sim.gear, 6);
+  assert.ok(game.kmh > 140, 'abbastanza forte: ' + game.kmh);
   game.ents.push({ id: 99, kind: 'police', lane: 0, x: game.s.dist + 60, v: 0 });
   const money = game.s.money;
   play(sim, game, 14, flatOut);
@@ -159,14 +160,24 @@ test('polizia: passarle accanto in sesta costa una multa e alza il livello di ri
   assert.ok(game.s.money < money && game.s.heat >= 1);
 });
 
-test('polizia: in quinta si passa senza problemi', () => {
+test('polizia: sotto i 136 km/h si passa senza problemi, anche in sesta', () => {
   const { sim, game } = career();
   sim.shift(1);
   play(sim, game, 10, (s) => { if (s.rpm > 6000 && s.gear < 5 && !s.shiftSeq) s.shift(s.gear + 1); return { thr: 0.8, brake: 0 }; });
   game.ents.push({ id: 99, kind: 'police', lane: 0, x: game.s.dist + 40, v: 0 });
   play(sim, game, 4, () => ({ thr: 0.5, brake: 0 }));
+  assert.ok(game.kmh < 136, 'velocità della prova: ' + game.kmh);
   assert.equal(game.prompt, null);
   assert.equal(game.s.heat, 0);
+});
+
+test('polizia: tolleranza e scaglioni delle multe', () => {
+  assert.equal(speedFine(136), null);
+  assert.equal(speedFine(130), null);
+  assert.deepEqual(speedFine(137), { over: 1, fine: 42 });
+  assert.equal(speedFine(160).fine, 173);
+  assert.equal(speedFine(200).fine, 543);
+  assert.equal(speedFine(230).fine, 845);
 });
 
 test('traffico lento in prima corsia: sorpasso automatico e rientro', () => {
@@ -195,86 +206,16 @@ test('distributore: il pieno ferma l\'auto, riempie il serbatoio e scala i soldi
   assert.ok(money - game.s.money > 80 && money - game.s.money < 100);
 });
 
-test('sfida: semaforo, conto alla rovescia, 400 m e pagamento', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'Test', car: 'Test' }, 300);
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  assert.equal(game.race.phase, 'count');
-  sim.shift(1);
-  play(sim, game, 3.3, () => ({ thr: 0, brake: 1 }));
-  assert.equal(game.race.phase, 'run');
-  const money = game.s.money;
-  play(sim, game, 25, flatOut);
-  assert.equal(game.race, null);
-  assert.ok(game.lastRace && Math.abs(game.s.money - money) === 300);
-});
-
-test('sfida: partire prima del via è falsa partenza', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'Test', car: 'Test' }, 200);
-  sim.shift(1);
-  play(sim, game, 1.5, () => ({ thr: 0, brake: 1 }));
-  play(sim, game, 2, flatOut);
-  assert.equal(game.race, null);
-  assert.equal(game.lastRace.win, false);
-});
-
 test('officina: si compra solo con i soldi sufficienti', () => {
   const { game } = career();
   assert.equal(game.owns('turbo', 't51r'), false);
   assert.equal(game.buy('turbo', 't51r').ok, false, 'costa 6000, ne hai 3000');
-  assert.equal(game.buy('bov', 'ssqv').ok, false, 'a 0 km il pezzo è ancora bloccato');
-  game.s.cars[game.car] = Object.assign(game.s.cars[game.car] || {}, { km: game.partKm('bov', 'ssqv') });
-  assert.equal(game.buy('bov', 'ssqv').ok, true);
-  assert.equal(game.s.money, 3000 - 380);
-  assert.ok(game.owns('bov', 'ssqv'));
-});
-
-test('gara: la cambiata vicino al limitatore è perfetta e più rapida', () => {
-  const { sim, game } = career();
-  game.startRace({ name: 'T', car: 'T' }, 0, { et: 30 });
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  sim.shift(1);
-  play(sim, game, 3.7, () => ({ thr: 0.6, brake: 1 }));
-  assert.equal(game.race.phase, 'run');
-  let fastT = null, slowT = null;
-  // prima → seconda a regime perfetto (ci si ferma appena la cambiata è finita)
-  for (let n = 0; n < 400 && !(fastT !== null && !sim.shiftSeq); n++) play(sim, game, 1 / 60, (s) => {
-    if (s.gear === 1 && s.rpm > s.P.limiter - 300 && !s.shiftSeq) { assert.equal(game.gradeShift(), 'perfetta'); s.shift(2); fastT = 0; }
-    if (fastT !== null && s.shiftSeq) fastT += 1 / 60;
-    return { thr: 1, brake: 0 };
-  });
-  // seconda → terza troppo presto
-  play(sim, game, 0.2, (s) => {
-    if (s.gear === 2 && !s.shiftSeq && slowT === null) { assert.equal(game.gradeShift(), 'anticipata'); s.shift(3); slowT = 0; }
-    if (slowT !== null && s.shiftSeq) slowT += 1 / 60;
-    return { thr: 1, brake: 0 };
-  });
-  play(sim, game, 0.4, (s) => { if (s.shiftSeq) slowT += 1 / 60; return { thr: 1, brake: 0 }; });
-  assert.ok(fastT < slowT, `perfetta ${fastT.toFixed(2)} s, normale ${slowT.toFixed(2)} s`);
-  assert.deepEqual(game.race.shifts, ['perfetta', 'anticipata']);
-});
-
-test('scala dei rivali: vincere avanza, perdere non costa', () => {
-  const { sim, game } = career();
-  assert.equal(game.ladderRival().name, 'Tommy');
-  const money = game.s.money;
-  game.startLadder();
-  game.race.et = 99;                         // rivale lentissimo: si vince
-  play(sim, game, 1, () => ({ thr: 0, brake: 1 }));
-  sim.shift(1);
-  play(sim, game, 3.7, () => ({ thr: 0, brake: 1 }));
-  play(sim, game, 30, flatOut);
-  assert.ok(game.result && game.result.win);
-  assert.equal(game.s.ladder, 1);
-  assert.equal(game.s.money, money + 300);
-  game.result = null;
-  game.startLadder();
-  game.race.et = 1;                          // rivale imbattibile
-  play(sim, game, 40, (s, t) => (game.race && game.race.phase !== 'run' ? { thr: 0, brake: 1 } : flatOut(s)));
-  assert.equal(game.result.win, false);
-  assert.equal(game.s.ladder, 1);
-  assert.equal(game.s.money, money + 300);
+  assert.equal(game.partKm('bov', 'ssqv'), 0, 'i livelli 1 e 2 sono già sbloccati: niente chilometri');
+  assert.equal(game.buy('limiter', '2step').ok, false, 'dal livello 3 serve ancora la strada: a 0 km è bloccato');
+  game.s.cars[game.car] = Object.assign(game.s.cars[game.car] || {}, { km: game.partKm('limiter', '2step') });
+  assert.equal(game.buy('limiter', '2step').ok, true);
+  assert.equal(game.s.money, 3000 - 850);
+  assert.ok(game.owns('limiter', '2step'));
 });
 
 test('gomme da drag: più aderenza e tempo stimato migliore', () => {
@@ -329,25 +270,6 @@ test('pioggia: sul bagnato le gomme tengono circa un quarto in meno', () => {
   assert.ok(wet < dry * 0.78 && wet > dry * 0.68, `asciutto ${dry.toFixed(2)}, bagnato ${wet.toFixed(2)}`);
 });
 
-test('montagna: guida libera, senza sterzare si finisce sul guardrail; sterzando si resta in strada', () => {
-  const run = (driver) => {
-    const { sim, game } = career();
-    game.mode = 'free'; game.track = 'mountain'; game.laneZ = 0;
-    sim.shift(1); let hit = 0;
-    for (let i = 0; i < 60 * 25; i++) {
-      driver(game); sim.in.thr = sim.kmh < 60 ? 0.6 : 0;
-      sim.update(1 / 60); game.update(1 / 60); sim.events.length = 0; if (game.rail) hit++;
-      if (sim.gear < 3 && sim.rpm > 6000) sim.shift(sim.gear + 1);
-    }
-    return { hit, dist: game.s.dist };
-  };
-  const none = run((g) => g.steerHold(0));
-  // pilota semplice: guarda la curva e l'angolo dell'auto
-  const pilot = run((g) => g.steerHold(Math.max(-1, Math.min(1, -(g.relYaw || 0) * 4 + (g.laneZ || 0) * 0.3 - 30 * 0.0))));
-  assert.ok(none.hit > 30, 'senza sterzare si tocca il guardrail');
-  assert.ok(pilot.hit < none.hit / 3, `sterzando si tocca molto meno (${pilot.hit} contro ${none.hit})`);
-});
-
 
 test('gomme: si scaldano pattinando, la presa ha un ottimo e si consumano', () => {
   const { sim } = career();
@@ -384,20 +306,20 @@ test('bagagliaio: peso sull\'auto, tanica, kit, consegne', () => {
   assert.equal(game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'pacco')).ok, false);
 });
 
-test('viaggio: primo lavoro, il pacco dal primo locale al successivo paga € 10.000', () => {
+test('viaggio: primo lavoro, il pacco dal primo locale al successivo paga € 3.000', () => {
   const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5);
   game.startTrip();
   const m0 = game.s.money, goal0 = game.vgGoal();
   assert.ok(goal0 && /Ritira/.test(goal0.text), 'all\'inizio l\'obiettivo è ritirare il pacco');
   const o = game.vgOffers(0).find((x) => x.first);
   assert.ok(o, 'la bacheca del primo locale ha il pacco');
-  assert.equal(o.pay, 10000); assert.equal(o.to, 1);
+  assert.equal(o.pay, 3000); assert.equal(o.to, 1);
   assert.ok(!game.vgOffers(1).some((x) => x.first), 'solo al primo locale');
   assert.ok(game.vgTake(o, 0).ok);
   assert.ok(!game.vgTake(o, 0).ok, 'non si prende due volte');
   assert.ok(/Consegna/.test(game.vgGoal().title), 'poi l\'obiettivo è la consegna');
   game.vgArrive(VG.stop(1));
-  assert.equal(game.s.money, m0 + 10000, 'consegnato: + € 10.000');
+  assert.equal(game.s.money, m0 + 3000, 'consegnato: + € 3.000');
   assert.ok(/Prossimo lavoro/.test(game.vgGoal().title), 'primo lavoro finito: l\'obiettivo passa al lavoro dopo');
   assert.ok(!game.vgOffers(0).some((x) => x.first), 'non torna più');
   assert.ok(!game.s.trunk.some((it) => it.first), 'il pacco è sceso');
@@ -448,22 +370,22 @@ test('viaggio: dopo il primo lavoro la catena di missioni, con le loro regole e 
   let t = take(); assert.ok(t.r.ok); assert.equal(VG.stop(t.o.to).id, 'motel');
   assert.ok(!game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'missione')).ok, 'il lavoro non si butta');
   game.s.crashes = (game.s.crashes || 0) + 2;
-  assert.equal(deliver(), 3000, 'cristalli: due botte = metà paga');
+  assert.equal(deliver(), 1000, 'cristalli: due botte = metà paga');
   // 2. a tempo: in orario paga piena
   t = take(); assert.ok(t.r.ok); assert.ok(game.vgMisState().lim > 30);
-  game.vgMisState().t = game.vgMisState().lim - 1; assert.equal(deliver(), 8000);
+  game.vgMisState().t = game.vgMisState().lim - 1; assert.equal(deliver(), 2800);
   // 3. il signore della valigetta: occupa un posto, troppa velocità abbassa la paga
   t = take(); assert.ok(t.r.ok); assert.equal(game.vgSeats(), 3, 'un posto è del signore');
-  game.vgMisState().over = 10; assert.equal(deliver(), 7200);
+  game.vgMisState().over = 10; assert.equal(deliver(), 2400);
   // 4. la cassa da 240 kg: senza rimorchio non ci sta, col rimorchio sì
   t = take(); assert.ok(!t.r.ok && /rimorchietto/.test(t.r.why));
   game.s.vg.trailer = true; game.s.vg.trailerOn = true;
-  t = take(); assert.ok(t.r.ok, t.r.why); assert.equal(deliver(), 15000);
-  // 5. la busta: senza vittoria paga poco, con la vittoria piena
-  t = take(); assert.ok(t.r.ok); game.streetRep().w++; assert.equal(deliver(), 12000);
+  t = take(); assert.ok(t.r.ok, t.r.why); assert.equal(deliver(), 4500);
+  // 5. la busta: un pacco semplice, paga piena
+  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 4000);
   // 6. la chiave, poi i lavori senza fine
-  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 20000);
-  t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 7000, 'i lavori dopo la catena pagano ancora');
+  t = take(); assert.ok(t.r.ok); assert.equal(deliver(), 6500);
+  t = take(); assert.ok(t.r.ok); assert.ok(t.o.pay >= 2500, 'i lavori dopo la catena pagano ancora');
   assert.equal(game.s.vg.misDone, 6);
 });
 
@@ -553,4 +475,39 @@ test('finestrini: il motorino li apre in circa 2,6 s e aperti in abitacolo si se
   };
   const closed = level(0), open = level(1);
   assert.ok(open > closed + 5, `chiusi ${closed.toFixed(1)} dB, aperti ${open.toFixed(1)} dB`);
+});
+
+test('viaggio: il tutorial del primo lavoro non lascia saltare il locale; poi un\'uscita saltata annulla la consegna', () => {
+  const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip(); game.mode = 'career';
+  // senza ritirare il pacco: oltre il Bar Sport ti rimette davanti, fermo
+  game.s.dist = VG.stopX(0) + 200; sim.v = 15; game.vgUpdate(0.016);
+  assert.ok(game.s.dist < VG.stopX(0), 'riportato davanti al bar'); assert.equal(sim.v, 0); assert.ok(!game.s.vg.firstDone);
+  // con il pacco in mano: il blocco è al locale della consegna
+  game.vgTake(game.vgOffers(0).find((x) => x.first), 0); game.s.dist = VG.stopX(1) + 200; sim.v = 15; game.vgUpdate(0.016);
+  assert.ok(game.s.dist < VG.stopX(1), 'riportato davanti al benzinaio'); assert.ok(game.s.trunk.some((it) => it.first), 'il pacco resta a bordo');
+  // consegna: finisce il tutorial e scatta la regola
+  game.s.dist = VG.stopX(1); game.vgArrive(VG.stop(1)); game.vgUpdate(0.016); assert.ok(game.s.vg.firstDone && game.s.vg.tutEnd);
+  const n = game.vgMisState().giverN; game.s.dist = VG.stopX(n); const o = game.vgOffers(n).find((x) => x.mission); assert.ok(game.vgTake(o, n).ok);
+  const to = game.vgMisState().toN; game.s.dist = VG.stopX(to) + 300; game.vgUpdate(0.016);
+  const m = game.vgMisState(); assert.equal(m.phase, 'go', 'missione annullata'); assert.ok(!game.s.trunk.some((it) => it.kind === 'missione')); assert.ok(m.giverN > to);
+});
+
+test('suono: al rilascio del gas il motore borbotta anche di serie, e di più con la mappa pop & bang', () => {
+  const conta = (pops) => {
+    const c = CARS.e30, tp = c.params(c.presets[0].sel), sim = new SupraSim();
+    sim.setCar(Object.assign({}, c.P)); sim.setTune(tp.sim); sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW; sim.cfg.pops = pops;
+    const dsp = new EngineDSP(48000); dsp.msg({ cfg: { tune: tp.dsp, view: 1, vol: 1, pops: pops ? 1 : 0, fx: {} } });
+    startEngine(sim);
+    let n = 0; const ap = dsp.addPop.bind(dsp), ab = dsp.addBurble.bind(dsp); dsp.addPop = (...a) => { n++; return ap(...a); }; dsp.addBurble = (...a) => { n++; return ab(...a); };
+    const bl = new Float32Array(128), br = new Float32Array(128);
+    sim.gear = 3; sim.v = 100 / 3.6; sim.ww = sim.v / sim.P.r; sim.wo = sim.ww;
+    for (let t = 0; t < 6; t += 128 / 48000) {
+      sim.in.thr = t < 2 ? 1 : 0; sim.in.clutch = 0; sim.in.brake = 0; sim.update(128 / 48000);
+      dsp.msg({ p: sim.audioParams(), ev: sim.events.splice(0) }); dsp.render(bl, br, 128);
+    }
+    return n;
+  };
+  const base = conta(false), tuned = conta(true);
+  assert.ok(base >= 8, `di serie deve borbottare un po' al rilascio (${base} schiocchi)`);
+  assert.ok(tuned > base, `con pop & bang di più (${tuned} contro ${base})`);
 });

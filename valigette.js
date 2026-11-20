@@ -2,9 +2,9 @@
 //  Night Run · Le valigette (dopo telefono.js)
 //  Valigette da aprire con dentro premi di sei rarità: comune, non comune, raro, epico, mitico, leggendario.
 //  - Si comprano nell'app Valigette del telefono (bronzo, argento, oro: cambiano le probabilità, non i premi) e si
-//    guadagnano coi lavori (catena di missioni, primo lavoro, consegne) e con le sfide vinte con gli abbaglianti.
-//  - Premi: soldi, oggetti, ticket (tagliando gratis da Niko, modifica gratuita da Luca), potenziamenti del motore
-//    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo, kit turbo,
+//    guadagnano coi lavori (catena di missioni, primo lavoro, consegne).
+//  - Premi: soldi, oggetti, ticket (tagliando gratis da Mario, modifica gratuita da Luca), potenziamenti del motore
+//    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo (mai il turbo),
 //    e nel leggendario un'auto in regalo.
 //  - Solo soldi del gioco. Garanzia: almeno un raro ogni 10 valigette, almeno un epico ogni 40. Doppioni → soldi.
 //  - L'apertura è una scena a tutto schermo (canvas + suoni sintetizzati): caduta, attesa con la luce che sale di
@@ -62,19 +62,18 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
   const part = (pick) => (g) => {
     if (typeof TUNING === 'undefined' || g.mode !== 'career') return null;
     const cand = [];
-    for (const cat in TUNING) for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });
+    for (const cat in TUNING) if (cat !== 'turbo' && !(typeof tuningNascosto === 'function' && tuningNascosto(g.car, cat))) for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });   // [PISTONE] i pezzi motore della V40 li fa Nico
     const list = pick(cand); if (!list.length) return null;
     const c = list[Math.floor(Math.random() * list.length)];
     g.s.owned[g.ownKey(c.cat + ':' + c.it.id)] = true;
     return { icon: c.cat === 'turbo' ? 'turbo' : 'pezzo', name: `${c.it.brand} ${c.it.name}`, text: `${TUNING[c.cat].label}: è tuo e sbloccato. Luca te lo monta senza farti pagare (vale € ${fmt(c.it.price)}).` };
   };
   const midParts = (cand) => { const s = cand.filter((c) => c.it.price <= 4000); return s.length ? s : cand; };
-  const turboKit = (cand) => { const t = cand.filter((c) => c.cat === 'turbo').sort((a, b) => b.it.price - a.it.price); return t.slice(0, 1); };
   const topPart = (cand) => cand.sort((a, b) => b.it.price - a.it.price).slice(0, 1);
   const ticket = (k) => (g) => {
     g.cases().tickets[k]++;
     return k === 'svc'
-      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Niko: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
+      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Mario: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
       : { icon: 'ticket_mod', name: 'Ticket modifica gratuita', text: `Da Luca: un pezzo fino a € ${fmt(CASE_MOD_MAX)} senza pagare. Si usa da solo al prossimo acquisto.` };
   };
   const car = (g) => {
@@ -97,7 +96,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     [{ w: 3, give: money(1500, 3000) }, { w: 2, give: ticket('svc') }, { w: 1, give: tyres }],
     [{ w: 2, give: ticket('mod') }, { w: 2, give: boost(0.08, 50, 'Centralina mappata') }, { w: 1, give: money(4500, 5500) }],
     [{ w: 2, give: part(midParts) }, { w: 2, give: boost(0.15, 100, 'Mappa da pista') }],
-    [{ w: 1, give: part(turboKit) }, { w: 1, give: money(25000, 25000) }, { w: 1, give: perm }],
+    [{ w: 1, give: part(topPart) }, { w: 1, give: money(25000, 25000) }, { w: 1, give: perm }],
     [{ w: 1, give: car }],
   ];
   const FALLBACK = [money(500, 900), money(2000, 3000), money(5000, 6000), money(9000, 11000), money(25000, 25000), money(60000, 60000)];
@@ -131,12 +130,12 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     return (1 + temp) * (1 + (C.perm[this.car] || 0));
   };
 
-  // ticket: il tagliando di Niko e la modifica di Luca diventano gratis finché ce n'è uno
+  // ticket: il tagliando di Mario e la modifica di Luca diventano gratis finché ce n'è uno
   const sc = P.serviceCost, sv = P.service, pr = P.price, by = P.buy;
   P.serviceCost = function (id) { const c = sc.call(this, id); return c > 0 && this.s && this.cases().tickets.svc > 0 ? 0 : c; };
   P.service = function (id) {
     const C = this.cases(), had = C.tickets.svc > 0 && sc.call(this, id) > 0;
-    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Niko non ti chiede niente', 'buy'); }
+    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Mario non ti chiede niente', 'buy'); }
     return r;
   };
   const modFree = (g, cat, id) => { const p = pr.call(g, cat, id); return p > 0 && p <= CASE_MOD_MAX && g.s && g.cases().tickets.mod > 0; };
@@ -147,15 +146,14 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     return r;
   };
 
-  // ricompense: si guardano i contatori che il gioco tiene già (missioni, lavori, sfide vinte)
+  // ricompense: si guardano i contatori che il gioco tiene già (missioni, lavori)
   P.caseRewards = function () {
     const v = this.s.vg; if (!v || !v.on) return;
-    const C = this.cases(), S = C.seen, wins = this.streetRep ? this.streetRep().w : 0;
-    if (S.mis === undefined) Object.assign(S, { mis: v.misDone || 0, first: !!v.firstDone, jobs: v.jobs || 0, wins });   // da qui in avanti, niente arretrati
+    const C = this.cases(), S = C.seen;
+    if (S.mis === undefined) Object.assign(S, { mis: v.misDone || 0, first: !!v.firstDone, jobs: v.jobs || 0 });   // da qui in avanti, niente arretrati
     if (v.firstDone && !S.first) { S.first = true; this.caseGrant('bronzo', 'il primo lavoro'); }
     while ((v.misDone || 0) > S.mis) { S.mis++; this.caseGrant(S.mis % 3 === 0 ? 'oro' : 'argento', `lavoro ${S.mis} della catena`); }
     while ((v.jobs || 0) > S.jobs) { S.jobs++; if ((S.jobs * 7919 % 100) < 22) this.caseGrant('bronzo', 'una consegna'); }
-    while (wins > S.wins) { S.wins++; this.caseGrant(S.wins % 5 === 0 ? 'argento' : 'bronzo', 'sfida vinta'); }
   };
 })();
 
@@ -558,7 +556,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
       }).join('') + `<p class="cen" style="font-size:11px">Garanzia: almeno un raro ogni ${CASE_PITY.raro} valigette, un epico ogni ${CASE_PITY.epico}. Si comprano solo coi soldi del viaggio.</p>`;
     } else if (UI.tab === 1) {
       body = own.length ? own.map((c, i) => `<div class="vgl-row"><img src="${thumb(c.type)}" alt=""><span class="tx"><b>${CASE_TYPES[c.type].name}</b><small>${c.why === 'comprata' ? 'comprata' : 'ricompensa: ' + esc(c.why)}</small></span><button class="vgl-open" data-x="open" data-i="${i}">Apri</button></div>`).join('')
-        : '<p class="cen">Nessuna valigetta da aprire. Comprane una nel Negozio, o guadagnale coi lavori e con le sfide.</p>';
+        : '<p class="cen">Nessuna valigetta da aprire. Comprane una nel Negozio, o guadagnale coi lavori.</p>';
     } else {
       const k = (g.s.dist || 0) / 1000, mine = C.boosts.filter((b) => b.car === g.car);
       body = `<div>${C.tickets.svc ? `<span class="vgl-chip">🎫 Tagliando gratis × ${C.tickets.svc}</span>` : ''}${C.tickets.mod ? `<span class="vgl-chip">🎫 Modifica gratuita × ${C.tickets.mod}</span>` : ''}${mine.map((b) => `<span class="vgl-chip">⚡ ${esc(b.name)} +${Math.round(b.pw * 100)} % · ancora ${fmt(Math.max(0, b.until - k))} km</span>`).join('')}${C.perm[g.car] ? `<span class="vgl-chip">🔧 Per sempre +${Math.round(C.perm[g.car] * 100)} %</span>` : ''}</div>`

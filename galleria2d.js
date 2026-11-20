@@ -11,7 +11,8 @@
   const S = Street2D.prototype, rnd = Street2D.rnd, PPM = 30;
   const HALF = 180;                                              // metà lunghezza della galleria, in metri
   const LAMP = 12, FAN = 120, SOS = 150;                         // passo di luci, ventole e nicchie SOS
-  const NAMES = { tokyo: 'CITTA', bassa: 'DELLA BASSA', sangimignano: 'DELLE TORRI', positano: 'DEL MARE', hakone: 'DEL PASSO', wangan: 'DELLA BAIA', route66: 'DEL DESERTO' };
+  const NAMES = { tokyo: 'CITTA', bassa: 'DELLA BASSA', sangimignano: 'DELLE TORRI', positano: 'DEL MARE', hakone: 'DEL PASSO', wangan: 'DELLA BAIA', route66: 'DEL DESERTO',
+    roma: 'DI ROMA', parigi: 'DI PARIGI', londra: 'DI LONDRA', stoccolma: 'DI STOCCOLMA', berlino: 'DI BERLINO', praga: 'DI PRAGA', vienna: 'DI VIENNA', madrid: 'DI MADRID', lisbona: 'DI LISBONA', atene: 'DI ATENE', washington: 'DI WASHINGTON' };
 
   // confini tra paesaggi in metri, dal km 0 (il primo tratto è casa, poi il giro si ripete)
   const borders = () => {

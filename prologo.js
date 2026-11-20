@@ -1,8 +1,9 @@
 // ============================================================================
 //  Night Run · Il prologo (dopo la schermata iniziale, prima di partire)
 //  Si vede a inizio partita, dopo "Accendi e parti": una lettera dello studio notarile (l'eredità di un parente),
-//  la BMW E36 blu che arriva davanti all'edificio, il colloquio col notaio, la scelta dell'auto (per ora si può
-//  prendere solo la Volvo V40) e la Volvo che imbocca l'autostrada. Poi comincia il Viaggio.
+//  la BMW E36 blu che arriva davanti all'edificio (il protagonista scende ed entra), il colloquio col notaio (lui di
+//  spalle in primo piano), la scelta dell'auto nel garage dello zio (il notaio con le chiavi) e l'auto scelta, con le
+//  ruote che girano, che imbocca l'autostrada. Poi comincia il Viaggio (e al km 0 la scelta del cambio, in index.html).
 //  Scene in pixel art su tela 640×360 (le stesse proporzioni del gioco), testi in HTML sopra.
 //  Clic, Invio o Spazio vanno avanti; Esc o SALTA chiudono tutto. Si salta anche in automatico dalle partite già iniziate.
 //  Dal resto del gioco: NightPrologo.shouldPlay(game), NightPrologo.play({ onDone, ctx }), NightPrologo.jump(n).
@@ -29,10 +30,11 @@ const PRO_NOTAIO = [
   'Una sola potrà portarsela via stasera. Le altre aspetteranno.',
   'Scelga con calma. Ma non troppa: suo zio diceva che di notte la strada si fa più lunga.',
 ];
-// le sei auto del garage: per ora solo la Volvo si può scegliere. Le altre cinque restano sotto il telo (nomi in arrivo).
+// le sei auto del garage (le più vecchie ed economiche del gioco, disegni del proprietario): il giocatore ne sceglie una,
+// che diventa la sua auto del Viaggio (malconcia: è ferma da anni). Le altre restano nel garage.
 const PRO_AUTO = [
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
-  { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' }, { id: 'telo', nome: 'Sotto un telo' },
+  { id: 'panda', nome: 'Fiat Panda', ok: true }, { id: 'a80', nome: 'Audi 80 Avant', ok: true }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
+  { id: 'punto', nome: 'Fiat Grande Punto', ok: true }, { id: 'corsa', nome: 'Opel Corsa', ok: true }, { id: 'polo', nome: 'Volkswagen Polo', ok: true },
 ];
 // si gioca il prologo solo all'inizio di un Viaggio nuovo (km 0, mai visto)
 const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 0) < 50);
@@ -48,6 +50,9 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   const load = (src) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(i); i.src = src; });
   async function prepare() {
     if (IMG.ready) return;
+    await Promise.all(PRO_AUTO.filter((a) => typeof CARS !== 'undefined' && CARS[a.id] && CARS[a.id].sprite).map(async (a) => {
+      const [b, w] = await Promise.all([load(`img/${a.id}.png`), load(`img/${a.id}_wheel.png`)]); IMG['car_' + a.id] = { b, w, D: CARS[a.id].sprite };
+    }));
     const [body, wheel, mask, v40] = await Promise.all([load('img/e36.png'), load('img/e36_wheel.png'), load('img/e36_paint.png'), load('img/v40.png')]);
     const c = document.createElement('canvas'); c.width = E36.w; c.height = E36.h; const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(body, 0, 0);
     if (mask.width) {
@@ -112,6 +117,28 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   function beam(g, x, y, len, a) { const gr = g.createLinearGradient(x, 0, x + len, 0); gr.addColorStop(0, `rgba(255,236,170,${a})`); gr.addColorStop(1, 'rgba(255,236,170,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(x, y - 3); g.lineTo(x + len, y - 26); g.lineTo(x + len, y + 22); g.lineTo(x, y + 6); g.fill(); }
   function banner(g, txt, x, y, col = '#e8d8b0', size = 11) { g.font = `${size}px "Share Tech Mono", monospace`; g.fillStyle = col; g.textAlign = 'center'; g.fillText(txt, x, y); g.textAlign = 'left'; }
 
+
+  // un'auto del garage di profilo con le ruote che girano (ang in radianti); x = bordo sinistro, ground = y dove poggiano le ruote
+  function drawCar(g, C, x, ground, ang) {
+    const D = C.D, y = Math.round(ground - (D.wy + D.wr)); g.drawImage(C.b, Math.round(x), y);
+    if (C.w.width) for (const ax of D.ax) { g.save(); g.translate(Math.round(x) + ax, y + D.wy); g.rotate(ang); g.drawImage(C.w, -C.w.width / 2, -C.w.height / 2); g.restore(); }
+    return y;
+  }
+  // il protagonista: l'aspetto scelto nell'editor (personaggio.js), in piedi di profilo o seduto di spalle
+  const myLook = () => (window.NightPG ? NightPG.now() : null);
+  function person(g, x, y, s, ph, walking, light = 0, pose) { if (typeof pgStanding === 'function') pgStanding(g, x, y, s, ph, walking, myLook(), light, performance.now() / 1000, pose); }
+  function personBack(g, x, y, t) { if (typeof pgBack === 'function') pgBack(g, x, y, t, myLook()); }
+  // il notaio in piedi (garage): giacca scura, capelli grigi, occhiali, le chiavi in mano
+  function notary(g, x, y, t, keys) {
+    const b = Math.sin(t * 1.1) * 0.6;
+    R(g, x - 6, y - 38, 6, 38, '#15151d'); R(g, x + 2, y - 38, 6, 38, '#1c1c26'); R(g, x - 8, y - 2, 10, 3, '#0a0a0e'); R(g, x + 1, y - 2, 10, 3, '#0a0a0e');   // gambe, scarpe
+    R(g, x - 10, y - 72 + b, 22, 36, '#1b1b25'); R(g, x - 3, y - 72 + b, 8, 20, '#e6e1d6'); R(g, x, y - 71 + b, 3, 15, '#7a1c24');        // giacca, camicia, cravatta
+    R(g, x - 3, y - 76 + b, 7, 5, '#b8826a'); R(g, x - 8, y - 92 + b, 16, 17, '#d9a98a'); R(g, x - 9, y - 95 + b, 18, 6, '#a4a4a4'); R(g, x - 9, y - 92 + b, 4, 10, '#a4a4a4');   // collo, testa, capelli
+    R(g, x + 2, y - 87 + b, 6, 3, '#101018'); R(g, x + 3, y - 86 + b, 4, 1, '#cfe0f0'); R(g, x + 7, y - 82 + b, 2, 3, '#c9957a');     // occhiali, naso
+    R(g, x + 10, y - 66 + b, 6, 20, '#1b1b25'); R(g, x + 11, y - 47 + b, 6, 5, '#d9a98a');                                         // braccio
+    if (keys) { const k = Math.sin(t * 6) * 1.5; R(g, x + 15 + k, y - 43 + b, 2, 6, '#c8c0a8'); R(g, x + 13 + k, y - 38 + b, 6, 4, '#e8d890'); glow(g, x + 16, y - 38, 10, 'rgba(255,230,150,A)', 0.4); }
+  }
+
   // ------------------------------------------------------------ le scene
   // ognuna: dur (s, 0 = aspetta un clic), draw(g, t), enter() opzionale
   const SC = {};
@@ -120,58 +147,102 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     for (let y = 250; y < H; y += 7) R(g, 0, y, W, 1, 'rgba(0,0,0,.25)');                               // venature del tavolo
     glow(g, 520, 90, 170, 'rgba(255,190,100,A)', 0.28 + 0.03 * Math.sin(t * 5));
   } };
-  SC.arrivo = { dur: 8, enter() { motor(70, 40, 6.5, 0.07); }, draw(g, t) {
+  SC.arrivo = { dur: 11, enter() { motor(70, 40, 6.5, 0.07); }, draw(g, t) {
     sky(g); skyline(g, 232, 3, '#0b0b16', true);
     // l'edificio dello studio
     R(g, 380, 70, 250, 190, '#2b2230'); R(g, 380, 70, 250, 4, '#3d3042'); R(g, 372, 62, 266, 10, '#1c1620');
     for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { const lit = (r + c) % 3 === 1; R(g, 400 + c * 56, 96 + r * 48, 30, 28, lit ? '#ffcf7a' : '#141018'); R(g, 400 + c * 56, 96 + r * 48 + 13, 30, 2, 'rgba(0,0,0,.35)'); }
     R(g, 436, 196, 90, 12, '#0e0b10'); banner(g, 'STUDIO FERRI', 481, 206, '#ffcf7a', 10);
-    const open = ease((t - 5.2) / 1.2); R(g, 410, 214, 150, 46, '#0c0a0e'); R(g, 410, 214, 150, 46 * (1 - open * 0.78), '#3b3640');           // saracinesca che sale
-    glow(g, 485, 240, 90, 'rgba(255,200,110,A)', 0.14 + open * 0.3);
+    // il portone a vetri: dentro l'atrio è acceso, si apre quando arriva lui
+    const open = ease((t - 8.4) / 0.8); R(g, 446, 210, 70, 44, '#1a1418'); R(g, 450, 213, 62, 41, '#e8b870');
+    R(g, 450, 213, 31 * (1 - open * 0.8), 41, '#5a4a3a'); R(g, 512 - 31 * (1 - open * 0.8), 213, 31 * (1 - open * 0.8), 41, '#5a4a3a');
+    R(g, 452, 216, 27 * (1 - open * 0.8), 35, 'rgba(255,220,160,.35)'); R(g, 483 + 29 * open * 0.8, 216, 27 * (1 - open * 0.8), 35, 'rgba(255,220,160,.35)');
+    glow(g, 481, 236, 80, 'rgba(255,200,110,A)', 0.18 + open * 0.3); R(g, 440, 252, 82, 3, '#4a4048');   // il gradino
     street(g, 0); lampGlow(g, 0);
     const x = lerp(-230, 150, ease(t / 4.8)), braking = t > 3.2 && t < 6.5, ang = t * lerp(14, 0, ease(t / 4.8)) * 2;
     glow(g, x + 90, 330, 110, 'rgba(0,0,0,A)', 0.5);
     beam(g, x + 190, 296, 170 * (1 - 0.3 * ease((t - 4.8) / 1)), 0.38);
+    // il protagonista scende dalla portiera (che si apre e si richiude) e va al portone: dalla strada sale sul marciapiede
+    const out = t > 5.4, wk = clamp((t - 6) / 2.6, 0, 1), px = lerp(x + 120, 470, ease(wk)), py = lerp(330, 254, ease(clamp((wk - 0.35) / 0.65, 0, 1))), ps = lerp(1, 0.86, wk);
+    const dOpen = t > 5 && t < 6.4 ? Math.sin(clamp((t - 5) / 1.4, 0, 1) * Math.PI) : 0;
     drawE36(g, x, 270, 1, ang); if (braking) { R(g, x + 3, 288, 5, 3, '#ff3a2a'); glow(g, x + 6, 289, 22, 'rgba(255,40,30,A)', 0.4); }
+    if (dOpen > 0) { R(g, x + 104, 284, 34 * dOpen, 26, '#1a3a8a'); R(g, x + 104, 284, 34 * dOpen, 3, '#2a5ad0'); }   // la portiera aperta verso di noi
+    if (out && t < 10) { g.globalAlpha = clamp((10 - t) / 0.6, 0, 1) * clamp((t - 5.4) / 0.3, 0, 1); person(g, px, py, ps, t * 1.6, wk > 0 && wk < 1, open * 0.25); g.globalAlpha = 1; }
     banner(g, 'Via dei Cantieri 12 · le nove di sera', W / 2, 346, 'rgba(240,230,210,.8)', 11);
   } };
   SC.studio = { dur: 0, draw(g, t) {
     R(g, 0, 0, W, H, '#211a24'); R(g, 0, 250, W, 110, '#2a1f1a'); R(g, 0, 248, W, 3, '#14100e');
     for (let x = 0; x < W; x += 36) R(g, x, 0, 1, 248, 'rgba(0,0,0,.18)');
-    R(g, 40, 50, 120, 130, '#0b0d18'); skyline(g, 180, 11, '#06070f', true); R(g, 40, 50, 120, 4, '#3b2c2a'); R(g, 98, 50, 4, 130, '#3b2c2a'); R(g, 40, 180, 120, 5, '#3b2c2a');      // finestra sulla città
-    R(g, 40, 50, 120, 130, 'rgba(10,12,28,.0)');
+    g.save(); g.beginPath(); g.rect(40, 50, 120, 130); g.clip();                                                 // finestra sulla città: i palazzi solo dentro il vetro
+    R(g, 40, 50, 120, 130, '#0b0d18'); skyline(g, 180, 11, '#06070f', true);
+    for (let i = 0; i < 26; i++) { const y = ((hash(i) * 150 + t * (60 + hash(i + 3) * 40)) % 150) + 40; R(g, 40 + hash(i + 9) * 120, y, 1, 4, 'rgba(160,180,220,.35)'); }   // pioggia
+    g.restore();
+    R(g, 40, 50, 120, 4, '#3b2c2a'); R(g, 98, 50, 4, 130, '#3b2c2a'); R(g, 40, 180, 120, 5, '#3b2c2a'); R(g, 34, 184, 132, 6, '#4a3626');
+    // orologio a pendolo tra finestra e libreria: segna le nove
+    R(g, 196, 40, 44, 150, '#2a1a12'); R(g, 200, 44, 36, 36, '#e8dcc0'); g.strokeStyle = '#1a1210'; g.lineWidth = 2; g.beginPath(); g.moveTo(218, 62); g.lineTo(218, 50); g.moveTo(218, 62); g.lineTo(208, 62); g.stroke();
+    R(g, 202, 86, 32, 96, '#140c08'); { const a = Math.sin(t * 2.6) * 0.35; g.save(); g.translate(218, 90); g.rotate(a); R(g, -1, 0, 2, 64, '#b89040'); R(g, -6, 62, 12, 12, '#d8b050'); g.restore(); }
     R(g, 470, 40, 130, 190, '#17110e'); for (let i = 0; i < 5; i++) { R(g, 470, 70 + i * 36, 130, 4, '#3a2a1a'); for (let k = 0; k < 9; k++) R(g, 476 + k * 14, 44 + i * 36, 10, 26, ['#5a2a2a', '#2a3a4a', '#4a3d1a', '#2c2c36'][(k + i) % 4]); }  // libreria
     glow(g, 300, 160, 230, 'rgba(255,190,110,A)', 0.2);
-    // il notaio dietro la scrivania
-    const talk = t % 0.4 < 0.2;
-    R(g, 270, 150, 100, 110, '#15151d'); R(g, 300, 150, 40, 70, '#e6e1d6'); R(g, 316, 152, 8, 60, '#7a1c24');                  // giacca, camicia, cravatta
-    R(g, 298, 102, 44, 50, '#d9a98a'); R(g, 296, 96, 48, 18, '#9a9a9a'); R(g, 294, 104, 6, 22, '#9a9a9a'); R(g, 340, 104, 6, 22, '#9a9a9a');     // testa e capelli grigi
-    R(g, 304, 124, 14, 8, '#101018'); R(g, 322, 124, 14, 8, '#101018'); R(g, 306, 126, 10, 4, '#cfe0f0'); R(g, 324, 126, 10, 4, '#cfe0f0'); R(g, 318, 128, 4, 2, '#101018');    // occhiali
-    R(g, 312, 140, 16, talk ? 4 : 2, '#6a2a24');
+    // il notaio dietro la scrivania: spalle tonde, capelli grigi, occhiali, la bocca che si muove solo mentre parla, sbatte gli occhi
+    const talk = !!(root && root.querySelector('.dlg') && !canNext) && t % 0.36 < 0.18, blink = (t % 4.3) < 0.12;
+    g.fillStyle = '#15151d'; g.beginPath(); g.moveTo(266, 262); g.lineTo(272, 168); g.quadraticCurveTo(320, 146, 368, 168); g.lineTo(374, 262); g.fill();   // giacca
+    R(g, 302, 152, 36, 66, '#e6e1d6'); R(g, 316, 154, 8, 58, '#7a1c24'); R(g, 314, 154, 12, 6, '#5a1018');                       // camicia, cravatta col nodo
+    g.fillStyle = '#22222e'; g.beginPath(); g.moveTo(302, 152); g.lineTo(312, 200); g.lineTo(296, 168); g.fill(); g.beginPath(); g.moveTo(338, 152); g.lineTo(328, 200); g.lineTo(344, 168); g.fill();   // revers
+    R(g, 310, 144, 20, 10, '#b8826a');                                                                                             // collo
+    g.fillStyle = '#d9a98a'; g.beginPath(); g.ellipse(320, 124, 23, 27, 0, 0, Math.PI * 2); g.fill(); g.fillStyle = '#c9957a'; g.beginPath(); g.ellipse(304, 128, 5, 14, 0, 0, Math.PI * 2); g.fill();   // testa, guancia in ombra
+    R(g, 294, 116, 6, 14, '#d9a98a'); R(g, 340, 116, 6, 14, '#d9a98a');                                                         // orecchie
+    g.fillStyle = '#a4a4a4'; g.beginPath(); g.ellipse(320, 104, 25, 13, 0, Math.PI, Math.PI * 2); g.fill(); R(g, 295, 102, 7, 18, '#a4a4a4'); R(g, 338, 102, 7, 18, '#a4a4a4'); R(g, 306, 96, 16, 3, '#c8c8c8');   // capelli
+    R(g, 305, 112, 12, 2, '#6a6a6a'); R(g, 323, 112, 12, 2, '#6a6a6a');                                                         // sopracciglia
+    R(g, 303, 116, 15, 10, '#101018'); R(g, 322, 116, 15, 10, '#101018'); R(g, 305, 118, 11, 6, blink ? '#c9957a' : '#cfe0f0'); R(g, 324, 118, 11, 6, blink ? '#c9957a' : '#cfe0f0'); R(g, 318, 119, 4, 2, '#101018');
+    if (!blink) { R(g, 309, 120, 3, 3, '#1a1a24'); R(g, 328, 120, 3, 3, '#1a1a24'); }                                            // occhi dietro le lenti
+    R(g, 318, 126, 5, 9, '#c9957a'); R(g, 312, 140, 16, talk ? 5 : 2, '#6a2a24');                                              // naso, bocca
+    R(g, 290, 214, 22, 10, '#d9a98a'); R(g, 336, 210, 22, 10, '#d9a98a');                                                       // le mani sulla scrivania
     R(g, 190, 220, 260, 14, '#4a3220'); R(g, 190, 234, 260, 40, '#2e1f14'); R(g, 200, 274, 12, 40, '#2e1f14'); R(g, 428, 274, 12, 40, '#2e1f14');   // scrivania
-    R(g, 330, 212, 50, 8, '#e4dccb'); R(g, 240, 208, 10, 12, '#ffcf7a'); glow(g, 245, 208, 60, 'rgba(255,210,130,A)', 0.4);                     // pratiche e lampada
+    R(g, 330, 212, 50, 8, '#e4dccb'); R(g, 336, 206, 40, 6, '#d8cfba');                                                          // pratiche
+    R(g, 238, 216, 16, 4, '#2a2018'); R(g, 244, 196, 3, 20, '#2a2018'); R(g, 234, 188, 22, 10, '#1f5a3a'); glow(g, 245, 206, 70, 'rgba(255,210,130,A)', 0.42);   // lampada da notaio, verde
+    R(g, 396, 206, 8, 12, '#e8e0d0'); R(g, 404, 209, 3, 6, '#e8e0d0');                                                          // la tazzina
+    personBack(g, 150, 300, t);                                                                                                    // lui, di spalle, seduto davanti
   } };
   SC.garage = { dur: 0, draw(g, t) {
     R(g, 0, 0, W, H, '#14151a'); R(g, 0, 250, W, 110, '#1b1c22'); for (let x = 0; x < W; x += 80) R(g, x, 0, 3, 250, '#0c0d11');
     const fl = hash(Math.floor(t * 9)) > 0.93 ? 0.5 : 1;
     for (let x = 80; x < W; x += 160) { R(g, x - 40, 20, 80, 5, '#d8e8ff'); glow(g, x, 24, 150, 'rgba(190,215,255,A)', 0.2 * fl); }
     R(g, 0, 246, W, 3, '#0c0d11');
+    // la parete degli attrezzi (pannello forato con le sagome), il banco da lavoro, lo scaffale con le latte d'olio
+    R(g, 20, 120, 120, 80, '#2a2c34'); for (let y = 126; y < 196; y += 8) for (let x = 26; x < 136; x += 8) R(g, x, y, 1, 1, '#16171d');
+    for (const [x, h] of [[34, 40], [48, 30], [62, 46], [80, 26], [96, 38], [114, 32]]) { R(g, x, 130, 4, h, '#0e0f14'); R(g, x - 3, 130, 10, 5, '#0e0f14'); }
+    R(g, 14, 200, 140, 10, '#3a2a1e'); R(g, 20, 210, 6, 40, '#2a1e16'); R(g, 142, 210, 6, 40, '#2a1e16'); R(g, 60, 192, 22, 8, '#8a1e1e'); R(g, 100, 194, 14, 6, '#b0a080');   // banco, cassetta rossa
+    R(g, 500, 100, 120, 6, '#2a2c34'); R(g, 500, 150, 120, 6, '#2a2c34'); R(g, 500, 200, 120, 6, '#2a2c34'); R(g, 502, 100, 4, 146, '#1a1b22'); R(g, 614, 100, 4, 146, '#1a1b22');
+    for (let i = 0; i < 6; i++) { R(g, 512 + i * 17, 82, 12, 18, ['#c8a020', '#2a5a9a', '#8a2a2a'][i % 3]); R(g, 512 + i * 17, 132, 12, 18, ['#2a7a4a', '#c8a020', '#5a5a6a'][i % 3]); }
+    R(g, 520, 180, 30, 20, '#1e2a1e'); R(g, 560, 176, 44, 24, '#3a3a40');                                                          // scatole
+    // il calendario dello zio, fermo a un mese di anni fa
+    R(g, 64, 60, 34, 46, '#e8e0d0'); R(g, 64, 60, 34, 16, '#b82a2a'); for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) R(g, 67 + c * 6, 80 + r * 6, 4, 4, r === 2 && c === 3 ? '#b82a2a' : '#8a8478');
+    for (const [x, w] of [[120, 60], [380, 90], [560, 40]]) { g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(x, 300, w, 8, 0, 0, Math.PI * 2); g.fill(); }   // macchie d'olio
+    notary(g, 112, 330, t, true); person(g, 560, 330, 0.95, 0, false, 0, 'pockets');                                                             // il notaio con le chiavi, lui che guarda le auto
   } };
   SC.strada = { dur: 13, enter() { motor(90, 160, 6, 0.1); }, draw(g, t) {
     // uscita dal garage e poi l'autostrada: scorre tutto verso sinistra, la Volvo sta quasi ferma
     sky(g); const sp = ease(t / 3) * 380, off = sp * t * 0.5;
-    skyline(g, 215, 21, '#08080f', false);
+    g.save(); g.translate(-((off * 0.05) % 700), 0); skyline(g, 205, 33, '#0c0c18', true); g.translate(700, 0); skyline(g, 205, 33, '#0c0c18', true); g.restore();   // città lontana, lenta
+    g.save(); g.translate(-((off * 0.15) % 700), 0); skyline(g, 222, 21, '#07070d', true); g.translate(700, 0); skyline(g, 222, 21, '#07070d', true); g.restore();
     for (let i = 0; i < 40; i++) { const x = ((hash(i) * 1400 - off * 0.12) % 1400 + 1400) % 1400 - 380; if (x > -10 && x < W) R(g, x, 188 + hash(i + 8) * 24, 2, 2, hash(i + 3) > 0.5 ? '#ffcf7a' : '#ff6a4a'); }   // luci lontane
     R(g, 0, 232, W, 128, '#0d0e13'); R(g, 0, 232, W, 3, '#2a2a33');
     R(g, 0, 262, W, 98, '#121319'); for (let x = -((off) % 110) - 110; x < W; x += 110) R(g, x, 306, 58, 4, '#cfc7a8'); R(g, 0, 330, W, 3, '#cfc7a8'); R(g, 0, 262, W, 2, '#cfc7a8');   // strisce
     for (let x = -((off * 1.4) % 90) - 90; x < W; x += 90) { R(g, x, 226, 3, 22, '#3a3a44'); R(g, x - 4, 232, 30, 3, '#555563'); }                                   // guardrail
+    for (let x = -((off * 1.4) % 260) - 260; x < W + 40; x += 260) { R(g, x + 20, 120, 4, 112, '#22222c'); R(g, x + 20, 118, 30, 4, '#22222c'); R(g, x + 40, 122, 12, 3, '#ffd890'); glow(g, x + 46, 128, 60, 'rgba(255,200,120,A)', 0.22); }   // lampioni
+    { const tx = ((W + 200) - ((t * 40 + off * 0.6) % (W + 400))); R(g, tx, 247, 70, 12, '#16161e'); R(g, tx + 4, 252, 3, 2, '#ff3a2a'); glow(g, tx + 5, 253, 14, 'rgba(255,50,40,A)', 0.4); }   // un camion nell'altra corsia, più lento
     const gx = 700 - (t - 4.2) * 300;                                                                                                                             // cartello a portale
     if (gx > -260 && gx < W + 20) { R(g, gx, 60, 240, 84, '#0b4a2a'); R(g, gx + 3, 63, 234, 78, '#0e5c34'); R(g, gx - 8, 60, 6, 220, '#2a2a33'); R(g, gx + 242, 60, 6, 220, '#2a2a33'); banner(g, 'AUTOSTRADA', gx + 120, 94, '#f2f2e6', 18); banner(g, 'SOLO AVANTI', gx + 120, 122, '#f2f2e6', 18); glow(g, gx + 120, 110, 160, 'rgba(160,255,200,A)', 0.12); }
     const vx = t < 3 ? lerp(-260, 130, ease(t / 3)) : 130 + Math.sin(t * 2) * 1.5, vy = 232 + (t < 3 ? 0 : Math.sin(t * 9) * 0.6);
     glow(g, vx + 100, 322, 120, 'rgba(0,0,0,A)', 0.5);
-    beam(g, vx + 196, 288, 240, 0.4); g.drawImage(IMG.v40, Math.round(vx), Math.round(vy)); R(g, vx + 2, 258, 4, 3, '#ff3a2a');
-    glow(g, vx + 198, 289, 50, 'rgba(255,240,190,A)', 0.4);
-    const fade = clamp((t - 9.5) / 1.5, 0, 1); if (fade > 0) { R(g, 0, 0, W, H, `rgba(0,0,0,${fade})`); if (t > 10.5) { g.globalAlpha = clamp((t - 10.5) / 1, 0, 1); g.font = '44px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#f0e6d2'; g.textAlign = 'center'; g.fillText('NIGHT RUN', W / 2, 190); g.font = '12px "Share Tech Mono", monospace'; g.fillStyle = '#ffb347'; g.fillText('km 0', W / 2, 216); g.textAlign = 'left'; g.globalAlpha = 1; } }
+    const C = IMG.drive || IMG.car_v40, ground = vy + 70.4, ang = (sp * t * 0.5) / 15;   // le ruote girano con la strada
+    if (C && C.b.width) {
+      const D = C.D, top = ground - (D.wy + D.wr), hx = vx + D.head[0], hy = top + D.head[1], tl = D.tail;
+      beam(g, hx, hy, 240, 0.4); drawCar(g, C, vx, ground, ang);
+      R(g, vx + tl[0], top + tl[1], tl[2], tl[3], '#ff3a2a'); glow(g, vx + tl[0] + 2, top + tl[1] + 2, 16, 'rgba(255,40,30,A)', 0.35);   // i fanali dietro
+      glow(g, hx + 2, hy + 1, 50, 'rgba(255,240,190,A)', 0.4);
+    } else { beam(g, vx + 196, 288, 240, 0.4); g.drawImage(IMG.v40, Math.round(vx), Math.round(vy)); }
+    const fade = clamp((t - 9.5) / 1.5, 0, 1); if (fade > 0) { R(g, 0, 0, W, H, `rgba(0,0,0,${fade})`); if (t > 10.5) { g.globalAlpha = clamp((t - 10.5) / 1, 0, 1); g.font = '44px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#f0e6d2'; g.textAlign = 'center'; g.fillText('NIGHT RUN', W / 2, 184); g.font = '16px "Saira Stencil One", "Russo One", Impact, sans-serif'; g.fillStyle = '#ffb347'; g.fillText('THE LAST HIGHWAY', W / 2, 208); g.font = '12px "Share Tech Mono", monospace'; g.fillStyle = '#a8936a'; g.fillText('km 0', W / 2, 234); g.textAlign = 'left'; g.globalAlpha = 1; } }
   } };
   const ORDER = ['lettera', 'arrivo', 'studio', 'garage', 'strada'];
 
@@ -223,9 +294,19 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
     clearUI(); lineI = n;
     const d = el('<div class="dlg"><h4>Il notaio</h4><p></p></div>'); root.appendChild(d); type(d.querySelector('p'), PRO_NOTAIO[n], () => hint(n < PRO_NOTAIO.length - 1 ? 'CLIC PER CONTINUARE' : 'CLIC PER SCEGLIERE L\'AUTO'));
   }
+  function chosen(id) { const C = IMG['car_' + id]; IMG.drive = C && C.b.width ? C : null; }
   function carThumb(c, a) {
     const k = c.getContext('2d'); c.width = 200; c.height = 90; k.imageSmoothingEnabled = false; R(k, 0, 0, 200, 90, 'rgba(0,0,0,0)');
-    if (a.ok) { glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2); k.drawImage(IMG.v40, 0, 8, 200, 71); }
+    if (IMG['car_' + a.id] && IMG['car_' + a.id].b.width) {   // un'auto vera del garage, con un velo di polvere
+      glow(k, 100, 70, 90, 'rgba(255,230,170,A)', 0.2);
+      const C = IMG['car_' + a.id], D = C.D, sc = Math.min(190 / D.w, 76 / D.h), w = D.w * sc, h = D.h * sc, x0 = (200 - w) / 2, y0 = 84 - (D.wy + D.wr) * sc;
+      const t = document.createElement('canvas'); t.width = 200; t.height = 90; const tx = t.getContext('2d'); tx.imageSmoothingEnabled = false;
+      tx.drawImage(C.b, x0, y0, w, h);
+      if (C.w.width) for (const ax of D.ax) { const ws = C.w.width * sc; tx.drawImage(C.w, x0 + ax * sc - ws / 2, y0 + D.wy * sc - ws / 2, ws, ws); }
+      tx.globalCompositeOperation = 'source-atop'; tx.fillStyle = 'rgba(14,16,26,.12)'; tx.fillRect(0, 0, 200, 90);
+      tx.fillStyle = 'rgba(190,180,160,.12)'; for (let i = 0; i < 260; i++) tx.fillRect(hash(i + a.id.length * 31) * 200 | 0, hash(i * 7.3 + 1) * 90 | 0, 1, 1);   // polvere
+      R(k, 30, 80, 140, 4, 'rgba(0,0,0,.35)'); k.drawImage(t, 0, 0);
+    }
     else {      // un'auto sotto il telo: gobba grigia con le pieghe
       k.fillStyle = '#3a3d48'; k.beginPath(); k.moveTo(10, 78); k.quadraticCurveTo(14, 40, 60, 34); k.quadraticCurveTo(100, 16, 140, 34); k.quadraticCurveTo(186, 42, 192, 78); k.closePath(); k.fill();
       k.strokeStyle = '#2a2c35'; k.lineWidth = 2; for (let i = 0; i < 6; i++) { k.beginPath(); k.moveTo(30 + i * 26, 76); k.quadraticCurveTo(34 + i * 26, 52, 40 + i * 24, 30 + (i % 3) * 3); k.stroke(); }
@@ -240,7 +321,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   function pick(i, node) {
     const a = PRO_AUTO[i]; if (pickLocked) return;
     if (!a.ok) { node.classList.remove('shake'); void node.offsetWidth; node.classList.add('shake'); thump(0.1); const p = root.querySelector('.dlg p'); if (p) type(p, 'Quella no. Non ancora.'); return; }
-    pickLocked = true; thump(0.2); const p = root.querySelector('.dlg p'); type(p, 'Le chiavi sono nel cruscotto. Come sempre. Buona strada.', () => setTimeout(() => go(cur + 1), 1500));
+    pickLocked = true; thump(0.2); chosen(a.id); if (opts.onPick) opts.onPick(a.id); const p = root.querySelector('.dlg p'); type(p, 'Le chiavi sono nel cruscotto. Come sempre. Buona strada.', () => setTimeout(() => go(cur + 1), 1500));
   }
 
   // clic / Invio / Spazio: va avanti dove ha senso
@@ -271,7 +352,7 @@ const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 
   }
 
   async function play(o = {}) {
-    if (root) return; opts = o; done = false; pickLocked = false; await prepare();
+    if (root) return; opts = o; done = false; pickLocked = false; IMG.drive = null; await prepare();
     actx = (typeof o.ctx === 'function' ? o.ctx() : o.ctx) || null;
     if (!document.getElementById('proCss')) { const s = document.createElement('style'); s.id = 'proCss'; s.textContent = CSS; document.head.appendChild(s); }
     root = el('<div class="pro" role="dialog" aria-label="Prologo"><canvas></canvas><button type="button" class="skip">SALTA ›</button></div>');

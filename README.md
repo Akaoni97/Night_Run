@@ -24,7 +24,7 @@ l'auto. Ma più chilometri fai, più la strada smette di tornare.
 
 - [`AGENTS.md`](AGENTS.md): com'è fatto il codice, le regole, come provare. Da leggere per primo.
 - [`PASSAGGIO.md`](PASSAGGIO.md): stato del gioco, lavori aperti, come pubblicare.
-- [`STORIA.md`](STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
+- [`docs/storia/STORIA.md`](docs/storia/STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
 - Prove automatiche: `node --test test/motori.test.js` (Node 22 o più recente).
 - Si prova in locale con `python3 -m http.server 8765` dalla cartella del repository.
 
@@ -168,8 +168,8 @@ frecce automatiche quando si cambia corsia (spie ◀ ▶ con il ticchettio del r
 
 **Bagagliaio.** 12 posti e 150 kg al massimo; tutto quello che carichi pesa sulla massa dell'auto e sul
 retrotreno (più trazione, più lenta in accelerazione). Tanica (+10 L), kit di riparazione (3 usi, solo da
-fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro) e i trofei dei
-capi battuti. Si compra e si butta dal pannello del bagagliaio.
+fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro).
+Si compra e si butta dal pannello del bagagliaio.
 
 **Schermata iniziale.** All'apertura c'è il titolo NIGHT RUN e il menu del Viaggio con il pulsante *Accendi e parti*
 (o Invio, o Spazio). La sigla con la Supra e la canzone è stata tolta: adesso a inizio Viaggio c'è il **prologo**
@@ -205,10 +205,10 @@ pronte, pezzi che costano soldi **e** chilometri, estetica a parte. Per aggiunge
   (`img/v40.png`) è l'illustrazione fornita dal giocatore.
 
 **I luoghi della città (2D).** Ogni 2,4 km: **Benzina 24H** (B), **Da Luca Tuning** (L, i pezzi delle prestazioni),
-**Officina Niko** (N, manutenzione e riparazioni) e **Neon Kustom** (E, estetica e sticker). In carriera i pezzi li
-monta solo Luca e la manutenzione la fa solo Niko.
+**Officina Mario** (N, manutenzione e riparazioni) e **Neon Kustom** (E, estetica e sticker). In carriera i pezzi li
+monta solo Luca e la manutenzione la fa solo Mario.
 
-- **Niko:** carrozziere, gomme, tagliando (olio e filtro), candele, pastiglie, lavaggio. Tutto si consuma coi
+- **Mario:** carrozziere, gomme, tagliando (olio e filtro), candele, pastiglie, lavaggio. Tutto si consuma coi
   chilometri di ogni auto: olio vecchio = pressione bassa e fino al 6 % in meno; candele consumate = accensioni
   perse a scatti; pastiglie finite = frenate lunghe e poi ferro su ferro; lo sporco si accumula (di più sotto la
   pioggia) e si vede sulle fiancate.
@@ -265,7 +265,7 @@ auto ferme negli incidenti in prima corsia hanno il muso rovinato.
 **Schermata di gioco (`menu.js`).** La strada riempie tutta la finestra, sopra c'è solo una barra sottile con
 contanti, reputazione, ricercato e il pulsante **MENU** (o tasto **Tab**; **Esc** o Tab per tornare in strada). Nel
 menu, a schede: Partita (modalità, auto, nuova carriera), Officina, Bagagliaio (anche col tasto B), Guida (pedali e
-cambio a schermo), Rivali, Vista (2D/3D, colori, mappa, foto, replay, ora, meteo, qualità, stile del quadro),
+cambio a schermo), Vista (2D/3D, colori, mappa, foto, replay, ora, meteo, qualità, stile del quadro),
 Quadro e dati (il quadro grande e la telemetria), Extra. Sul telefono compaiono i pedali GAS e FRENO sulla strada
 e, in orizzontale, testata e riquadri si rimpiccioliscono.
 
@@ -277,14 +277,14 @@ Il bagliore è a due livelli: uno stretto sulle luci e uno largo e morbido (che 
 lenti). Con qualità *bassa* niente penombra né coni.
 
 **Icone degli oggetti (`icone.js`).** Ogni oggetto ha la sua icona in pixel art 32×32 (tanica, kit, ruota di
-scorta, gomma forata, pacchi, bancale, il lavoro sigillato, trofeo, sacco di sabbia, panino, acqua, thermos, bibita,
+scorta, gomma forata, pacchi, bancale, il lavoro sigillato, sacco di sabbia, panino, acqua, thermos, bibita,
 salviette, bomboletta) e così i servizi dei locali (caffè, cornetto, pasto, doccia, letto, sapone):
 si vedono nel bagagliaio, nel negozio, al bancone, nella bacheca e nella cassa del motel.
 
 **Menu di pausa.** Il menu è una schermata a sé: a sinistra le sezioni, ognuna con la sua icona e il suo colore
 (il colore tinge titoli, pulsanti e cursori della sezione); a destra la testata e i pannelli arrotondati. La sezione
 *Partita* apre con il riassunto: la tua auto disegnata, contanti, km, reputazione, lavori fatti, guadagnato e il
-lavoro in corso. *Rivali* compare solo nelle sfide in città. Sul telefono le sezioni diventano una fila di icone in
+lavoro in corso. Sul telefono le sezioni diventano una fila di icone in
 alto. Anche i pannelli dei locali e la schermata iniziale (che ora presenta il Viaggio) hanno lo stesso stile.
 
 **Il protagonista (`pilota2d.js`).** Dentro l'auto c'è il guidatore di profilo, col giubbotto e il cappellino rosso,
@@ -422,7 +422,7 @@ con modello di aderenza, resistenza aerodinamica e frenata. Con la configurazion
 | `car3d.js` | Modello 3D dell'auto e sue animazioni |
 | `street2d.js` | Strada in pixel art cartoonesca vista di lato (vista predefinita) |
 | `street3d.js` | Strada notturna in 3D: città, arredo urbano, traffico, polizia, distributore |
-| `game.js` | Carriera: soldi, eventi, polizia, sfide, consegne, pilota automatico per le fermate |
+| `game.js` | Carriera: soldi, eventi, polizia, consegne, pilota automatico per le fermate |
 | `../test/motori.test.js` | Prove con `npm test` |
 
 ## Limitatore, quadri originali, traffico, fisica e mappa del mondo
@@ -453,7 +453,7 @@ bassi giri (forte sulla 2002 a iniezione meccanica), tempi di cambiata diversi p
 rifiutata dal sincronizzatore.
 
 **Mappa del mondo (T).** Sette posti veri con le coordinate, ognuno col suo sfondo 2D: Tokyo · Shinjuku (città, con
-benzinaio, Luca, Niko e Neon Kustom), Wangan · Bayshore Route (autostrada sopraelevata sulla baia), Hakone Turnpike
+benzinaio, Luca, Mario e Neon Kustom), Wangan · Bayshore Route (autostrada sopraelevata sulla baia), Hakone Turnpike
 (montagna, il Fuji all'orizzonte), Positano (mare, il paese sulla roccia), Bassa Reggiana (pianura, pioppi e nebbia),
 San Gimignano (paese, le torri), Route 66 ad Amboy nel Mojave (deserto, mesas e motel). Si parte da fermi.
 
@@ -464,7 +464,7 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
 (per ora solo la Volvo) e l'ingresso in autostrada. L'autostrada va solo avanti. La carriera resta (pulsante
 *Carriera*), con salvataggio e pezzi separati.
 
-- **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Niko,
+- **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Mario,
   Da Luca Tuning, Neon Kustom e il **Motel Ovunque**. Il paesaggio cambia da solo: la città di casa, la Bassa,
   San Gimignano, la costiera, Hakone, il Wangan, la Route 66, e poi ancora. Cippi chilometrici ogni km.
 - **Il guidatore.** Fame, sete, sonno e igiene calano coi km e col tempo. Col sonno basso la vista si stringe e
@@ -481,10 +481,10 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
   *Bicchieri di cristallo* per il motel (fragili: botte e frenate brusche abbassano la paga, € 6.000), *Le medicine*
   per il benzinaio (a tempo, € 8.000), *Il signore della valigetta* da portare all'autogrill (passeggero: sotto i
   120 km/h e guida dolce, € 9.000), *La cassa pesante* per Luca (240 kg: serve il rimorchietto o un furgone,
-  € 15.000), *La busta* per Neon Kustom (prima vinci una sfida con gli abbaglianti, € 12.000) e *La chiave del
+  € 15.000), *La busta* per Neon Kustom (€ 12.000) e *La chiave del
   motel* (€ 20.000). Poi lavori senza fine, con paghe che crescono. Il lavoro dopo si prende sempre alla bacheca del
   locale successivo (in verde); se la salti lo trovi alla bacheca dopo. A schermo l'obiettivo con la distanza, la
-  paga e lo stato della regola (tempo che resta, integrità, soddisfazione del passeggero, sfida vinta). Testi e
+  paga e lo stato della regola (tempo che resta, integrità, soddisfazione del passeggero). Testi e
   paghe in `VG_MISSIONS`.
 - **I lavori.** Autostoppisti sul bordo strada (fermati accanto): mancia secondo la guida, posti secondo il mezzo.
   Bacheca delle consegne in bar, autogrill e motel: scatole verso le tappe successive, più grosse col rimorchio e
@@ -494,10 +494,10 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
   Rubrica, Mappa, Foto e Orologio. Sull'autostrada compaiono cartelloni con una domanda («Portafoglio in lutto?»):
   quando li superi spunta l'icona da scaricare (download finto) di Lavori, Passeggeri e Motel. Le app strane e le
   chiamate strane compaiono da sole, con la storia. Messaggi e chiamate dipendono dai km (`TEL_SMS`, `TEL_ATTI`).
-- **La storia.** La nuova storia è in costruzione (`STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
+- **La storia.** La nuova storia è in costruzione (`docs/storia/STORIA.md`). Capitoli, eventi strani e passeggeri speciali sono
   strutture già pronte e vuote (`VG_CHAPTERS`, `VG_ODD`, `VG_STORY_PAX` in `viaggio.js`) che aspettano i testi.
 
-**Modalità.** *Il Viaggio* è la modalità principale; *Sfide in città*, *Città libera* e *Montagna* sono le
+**Modalità.** *Il Viaggio* è la modalità principale; *Città libera* e *Montagna* sono le
 modalità libere.
 
 **Cruscotto in gioco (J).** In alta definizione, nello stile del quadro di ogni auto: tachimetro con la benzina,
@@ -507,7 +507,7 @@ a scelta nelle impostazioni (turbo se c'è, olio, acqua, pressione olio, volt, A
 
 **Gomme.** Nel viaggio ogni tanto si fora (più facile con le gomme consumate): la pressione cala piano o di colpo,
 l'auto tiene meno e frena di più; sul cerchione si rovina. Si cambia con la ruota di scorta (tasto **5**, da
-fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Niko si ripara la forata.
+fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Mario si ripara la forata.
 
 **Guida e schermata.** Accanto al cruscotto (in basso a sinistra) ci sono i pulsanti AUTO, TC, LAUNCH, STRUMENTI e
 MAPPA. La **guida automatica** parte da sola dopo 3 secondi senza toccare niente: tiene la velocità, cambia le
@@ -522,9 +522,5 @@ Tutte si possono anche comprare alla concessionaria del Motel Ovunque, con motor
 Il traffico tiene la destra, sorpassa i più lenti, si sposta per tempo davanti agli ostacoli.
 
 **Strada viva (`strada.js`).** In prima corsia ogni tanto: un incidente (due auto ferme con le quattro frecce) o la
-polizia che ha fermato qualcuno. Con **F** (o il pulsante FARI) sfanali chi ti sta davanti: o si sposta e ti fa
-passare, o risponde e parte la **sfida di 2 km** (chi è davanti alla fine vince, senza premio in soldi). Le
-sportive accettano più spesso; autobus, furgoni, taxi e ambulanze mai; una volante sfanalata ti multa.
-**Reputazione**: +3 a vittoria (+5 contro una sportiva), −1 a sconfitta. A 5 rispetto (accettano di più), a 12
-+3 % di potenza, a 25 +3 % di aderenza, a 45 sconto del 15 % da Luca e Niko, a 70 altri +4 % di potenza.
+polizia che ha fermato qualcuno. Con **F** (o il pulsante FARI) sfanali chi ti sta davanti: si sposta e ti fa passare; una volante sfanalata ti multa.
 

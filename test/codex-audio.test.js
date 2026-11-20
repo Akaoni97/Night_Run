@@ -1,0 +1,62 @@
+// Modifiche Codex (adattate da Claude il 18/11): cinque cilindri della 850 R, carattere «deciso» opzionale e livelli audio.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+const dir = new URL('../', import.meta.url);
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+function engine() {
+  let seed = 71;
+  const math = Object.create(Math); math.random = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
+  return new Function('Math', src + ';return { EngineDSP, CARS };')(math);
+}
+function render(car, character, sr = 48000, rpm = 3500, thr = 0.85, view = 1) {
+  const { EngineDSP, CARS } = engine(), dsp = new EngineDSP(sr);
+  dsp.msg({ cfg: { tune: CARS[car].params(CARS[car].presets[0].sel).dsp, character, view, vol: 0.6 },
+    p: { rpm, thr, charge: thr, air: thr, running: 1 } });
+  const L = new Float32Array(sr), R = new Float32Array(sr);
+  dsp.render(L, R, sr); dsp.render(L, R, sr);
+  return { dsp, L, R };
+}
+const rms = (a) => Math.sqrt(a.reduce((s, x) => s + x * x, 0) / a.length);
+
+test('Codex: la 850 R emette 125 scoppi al secondo a 3000 giri', () => {
+  const { dsp, L, R } = render('v850', 'originale', 48000, 3000);
+  let fires = 0; const cycle = dsp.cycle.bind(dsp);
+  dsp.cycle = (c) => { fires++; cycle(c); };
+  dsp.render(L, R, L.length);
+  assert.ok(Math.abs(fires - 125) <= 2, `${fires} scoppi invece di 125`);
+});
+
+test('Codex: carattere assente e Originale danno gli stessi campioni per Supra e V40', () => {
+  for (const car of ['supra', 'v40']) {
+    assert.deepEqual(render(car, undefined).L, render(car, 'originale').L);
+    assert.deepEqual(render(car, 'inesistente').L, render(car, 'originale').L);
+  }
+});
+
+test('Codex: il profilo deciso cambia il timbro e mantiene margine nei livelli', () => {
+  for (const car of ['supra', 'v40', 'v850']) {
+    const a = render(car, 'originale').L, b = render(car, 'codex').L;
+    const delta = rms(b.map((x, i) => x - a[i]));
+    assert.ok(delta > rms(a) * 0.05, `${car}: differenza troppo piccola`);
+    assert.ok(rms(b) < rms(a) * 1.8, `${car}: aumento eccessivo di volume`);
+    for (const x of b) assert.ok(Number.isFinite(x) && Math.abs(x) <= 0.9);
+  }
+});
+
+test('Codex: tutti i veicoli e i punti di ascolto producono audio valido anche a 44,1 kHz', () => {
+  const { CARS } = engine();
+  for (const car of Object.keys(CARS)) for (const view of [0, 1, 2]) {
+    const { L, R } = render(car, 'codex', 44100, CARS[car].P?.idle || 800, 0.15, view);
+    for (const a of [L, R]) for (const x of a) assert.ok(Number.isFinite(x) && Math.abs(x) <= 0.9, `${car}, vista ${view}`);
+  }
+});
+
+test('Codex: passare da deciso a Originale e tra 4, 5, 6 cilindri non invalida l’audio', () => {
+  const { EngineDSP, CARS } = engine(), dsp = new EngineDSP(48000), L = new Float32Array(24000), R = new Float32Array(24000);
+  for (const car of ['v40', 'v850', 'supra', 'v850', 'v40']) for (const character of ['codex', 'originale']) {
+    dsp.msg({ cfg: { tune: CARS[car].params(CARS[car].presets[0].sel).dsp, character }, p: { rpm: 3500, air: 0.8, charge: 1, thr: 0.8, running: 1 } });
+    dsp.render(L, R, L.length);
+    for (const x of L) assert.ok(Number.isFinite(x) && Math.abs(x) <= 0.9);
+  }
+});

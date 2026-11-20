@@ -52,6 +52,6 @@ test('urti: il tamponamento si sente sopra il motore in tutti i punti d\'ascolto
 
 test('urti: la strisciata dura più del colpo secco', () => {
   const base = level(null, 1, 0.7, 0.9).rms;
-  const side = level({ type: 'crash', I: 0.8, kind: 'side' }, 1, 0.7, 0.9).rms, bump = level({ type: 'bump', I: 0.4 }, 1, 0.7, 0.9).rms;
+  const side = level({ type: 'crash', I: 0.8, kind: 'side' }, 1, 0.7, 0.9).rms, bump = level({ type: 'bump', I: 0.4, hit: true }, 1, 0.7, 0.9).rms;
   assert.ok(side > base * 1.15, `dopo 0,2-0,4 s la strisciata si sente ancora (${(20 * Math.log10(side / base)).toFixed(1)} dB)`); assert.ok(side > bump);
 });

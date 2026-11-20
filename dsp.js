@@ -1,5 +1,5 @@
 // ============================================================================
-//  EngineDSP · sintesi fisica del suono di un 6 cilindri in linea (2JZ-GTE)
+//  EngineDSP · sintesi fisica del suono di motori a 4, 5 e 6 cilindri in linea (nato sul 2JZ-GTE)
 //  Gira dentro un AudioWorklet (o in uno ScriptProcessor come ripiego).
 //  Nessun campione registrato: ogni scoppio è calcolato sull'angolo di manovella.
 // ============================================================================
@@ -61,6 +61,11 @@ class EngineDSP {
     this.radPrev = 0; this.dc1x = 0; this.dc1y = 0;
     this.viewLP = new BQ(); this.viewLP2 = new BQ(); this.barkPK = new BQ().set('peak', 1100, 0.9, sr, 0); this.opHP = new BQ().set('hp', 650, 0.7, sr); this.opHP2 = new BQ().set('hp', 650, 0.7, sr); this.opLP = new BQ().set('lp', 6000, 0.6, sr); this.open = 0; this.openG = 1;
     this.boomBP = new BQ().set('bp', 78, 1.6, sr);
+    // Modifica Codex (adattata da Claude): carattere «deciso» opzionale, solo sulla sintesi dello scarico.
+    // Con «Originale» (di serie) questo percorso resta escluso e il suono è identico a prima.
+    this.codexBody = new BQ().set('peak', 180, 0.8, sr, 2.5);
+    this.codexEdge = new BQ().set('peak', 1150, 0.85, sr, 3.5);
+    this.codexLoad = 0;
     this.howlBP = new BQ(); this.howlBP2 = new BQ(); this.metBP = new BQ(); this.metBP2 = new BQ(); this.metK = 0; this.howlK = 0;
     this.crackHP = new BQ().set('hp', 700, 0.7, sr);
     this.turbHP = new BQ().set('hp', 2500, 0.7, sr);
@@ -91,7 +96,12 @@ class EngineDSP {
     this.beltPh = 0;
 
     // scoppiettii (afterfire)
-    this.pops = []; this.popEnv = 0; this.popDec = Math.exp(-1 / (sr * 0.014)); this.thPh = 0;
+    // ogni scoppio è una voce sua (nota del colpo, durata, schiocco, colore del rumore, colpo sordo): fino a 6 insieme
+    this.pops = []; this.popV = []; this.popEnv = 0; this.popB = { f: 1, crack: 1, len: 1, thump: 1, vary: 1, boom: 0, bf: 1, mid: 1 };
+    this.bV = []; for (let q = 0; q < 5; q++) this.bV.push({ e: 0, dec: 0, ph: 0, f: 80, ft: 50, fd: 0, n: 0, lc: 0.1, ne: 0, nd: 0 });   // voci del borbottio (gorgoglio al rilascio)
+    this.burG = 0.75;
+    this.burLPc = new BQ().set('lp', 1700, 0.7, sr); this.burLPo = new BQ().set('lp', 4200, 0.7, sr); this.burHP = new BQ().set('hp', 40, 0.7, sr);
+    for (let q = 0; q < 6; q++) this.popV.push({ e: 0, dec: 0, f: 68, tf: 88, ph: 0, th: 0, n: 0, nc: 1, nk: 1, br: 1, tk: 1, bE: 0, bA: 0, bDec: 0, bF: 50, bT: 50, bPh: 0, bN1: 0, bN2: 0, bLc: 0.05 });
 
     // motorino d'avviamento, pompa benzina
     this.stPh = 0; this.stLP = new BQ().set('lp', 900, 0.7, sr); this.pumpPh = 0; this.pumpLP = new BQ().set('lp', 600, 0.7, sr);
@@ -159,12 +169,19 @@ class EngineDSP {
     // collettori: ghisa originale 3+3 (biturbo) oppure tubolare 6-1 a lunghezze quasi uguali (single)
     const twin = t.tb.mani === 0;
     // quattro cilindri (Volvo B4204S): ordine 1-3-4-2, uno scoppio ogni 180°; sei cilindri: 1-5-3-6-2-4 ogni 120°
+    // cinque cilindri (Volvo 850 R, modifica Codex): 1-2-4-5-3, uno scoppio ogni 144°
     if ((t.cyl || 6) === 4) { this.nCyl = 4; [0, 2, 3, 1].forEach((c, k) => { this.cyl[c].off = k * 180; }); }
+    else if (t.cyl === 5) { this.nCyl = 5; [0, 1, 3, 4, 2].forEach((c, k) => { this.cyl[c].off = k * 144; }); }
     else { this.nCyl = 6; [0, 4, 2, 5, 1, 3].forEach((c, k) => { this.cyl[c].off = k * 120; }); }
     // carattere del singolo motore (auto da disegno): collettori, durata degli impulsi, farfalle singole, urlo metallico
     const v = t.voice || {};
+    // scoppi dello scarico: nota (f, moltiplica i 68 Hz del colpo), schiocco (crack), durata (len), colpo sordo (thump),
+    // quanto cambiano da uno all'altro (vary). Di serie tutto a 1: Supra e V40 hanno la stessa media di prima
+    // boom: boato basso che scende di nota e non passa dal silenziatore (0 = niente, Supra e V40 di serie); bf: sua altezza;
+    // mid: quanto dello scoppio passa dal tubo e dal silenziatore (la parte che suona da petardo)
+    this.popB = Object.assign({ f: 1, crack: 1, len: 1, thump: 1, vary: 1, boom: 0, bf: 1, mid: 1 }, v.pop || {});
     this.vc = { diesel: v.diesel || 0, pulse: v.pulse || 1, rough: v.rough || 0, howl: v.howl || 0, metal: v.metal || 0, boomRpm: v.boomRpm || 3300, hiRpm: v.hiRpm || 6800 };
-    const L = v.mani || (this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
+    const L = v.mani || (this.nCyl === 5 ? [0.56, 0.50, 0.46, 0.50, 0.56] : this.nCyl === 4 ? [0.62, 0.58, 0.58, 0.62, 0.6, 0.6] : twin ? [0.44, 0.35, 0.30, 0.32, 0.37, 0.47] : [0.88, 0.86, 0.84, 0.84, 0.86, 0.88]);
     const split = v.split != null ? v.split : twin ? 0.22 : 0;
     this.cyl.forEach((cy, i) => {
       cy.D = Math.max(2, Math.round(((L[i] != null ? L[i] : 0.6) + (i >= 3 ? split : 0)) / 610 * sr));
@@ -197,6 +214,7 @@ class EngineDSP {
       { exh: 0.35, lp: 2600, boom: 0.0, intake: 1.0, mech: 0.8, turbo: 1.0, bov: 1.0, road: 0.15, wind: 0.1, tire: 0.3, gear: 0.45, starter: 1.0, pump: 0.25, rev: 0.08, width: 0.35, g: 1.15, er: 0.45, belt: 1.0 },
     ];
     this.mixT = Object.assign({}, V[c.view]);
+    this.mixT.character = c.character === 'codex' ? 1 : 0;   // modifica Codex: passa piano da un profilo all'altro
   }
 
   // ambiente intorno all'auto: 0 strada aperta (solo l'asfalto riflette), 1 città (i palazzi rimandano lo scarico),
@@ -230,7 +248,7 @@ class EngineDSP {
     else if (e.type === 'clunk') this.clunk = 1;
     else if (e.type === 'click') this.click = 1;
     else if (e.type === 'crash') this.hit(e.I || 0.6, e.kind || 'front');
-    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }
+    else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; if (e.hit) this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }   // la lamiera solo nei colpetti contro un'auto
     void T;
   }
 
@@ -325,13 +343,49 @@ class EngineDSP {
   }
 
   addPop(big) {
-    if (this.pops.length > 8) return;
+    if (this.pops.length > 12) return;
     const d = Math.round((0.002 + this.r() * 0.5 * 0.03 + 0.015) * this.sr);
     let a = big ? 1.3 + 0.9 * Math.abs(this.r()) : 0.45 + 0.55 * Math.abs(this.r());
     if (this.cfg.fx && this.cfg.fx.pop) a *= 0.3;
     if (this.bov.env > 0 && this.tn.bov.v === 2) a *= 0.35;   // lascia sentire lo stu-tu-tu
     if (this.T.cut === 1) a *= 0.7;        // scoppi registrati caricati: qui resta solo il crepitio
-    this.pops.push({ d: Math.max(1, d), a });
+    // ognuno un po' diverso: nota ±17 %, durata, schiocco, rumore più o meno cupo, colpo sordo; le grosse più lunghe e basse
+    const B = this.popB, k = B.vary, rr = () => this.r() * k;
+    const f = 68 * B.f * Math.exp(0.16 * rr()) * (big ? 0.92 : 1), len = B.len * Math.max(0.45, 1 + 0.35 * rr()) * (big ? 1.3 : 1);
+    // boato: BOOM grosso e lungo, bam medio, pim corto e più alto; le grosse quasi sempre BOOM
+    let bk = 0, bfm = 1, blm = 1;
+    if (B.boom > 0) {
+      const q = Math.abs(this.r());
+      if (big || q < 0.3) { bk = 1 + 0.4 * Math.abs(this.r()); bfm = 0.82; blm = 1.5; }
+      else if (q < 0.75) { bk = 0.6 + 0.3 * Math.abs(this.r()); bfm = 1; blm = 1; }
+      else { bk = 0.3; bfm = 1.55; blm = 0.45; }
+      bk *= B.boom; bfm *= B.bf * Math.exp(0.15 * rr());
+    }
+    const P = { bk, bfm, blm, d: Math.max(1, d), a, f, tf: 88 * B.f * Math.exp(0.09 * rr()), len, br: B.crack * Math.max(0.3, 1 + 0.38 * rr()), nc: Math.max(0.3, 1 - 0.5 * Math.abs(rr())), tk: B.thump * (big ? 1.15 : 0.9 + 0.2 * Math.abs(rr())) };
+    this.pops.push(P);
+    if (Math.abs(this.r()) < 0.22 * k) this.pops.push(Object.assign({}, P, { d: P.d + Math.round((0.006 + 0.008 * Math.abs(this.r())) * this.sr), a: a * (0.35 + 0.25 * Math.abs(this.r())), f: f * 1.06, len: len * 0.7 }));   // doppio colpo: pa-pam
+    else if (!big && Math.abs(this.r()) < 0.12 * k) {     // crepitio: tre-cinque schiocchi piccoli in fila
+      let dd = P.d; const n = 3 + Math.floor(Math.abs(this.r()) * 3);
+      for (let q = 0; q < n; q++) { dd += Math.round((0.004 + 0.006 * Math.abs(this.r())) * this.sr); this.pops.push(Object.assign({}, P, { d: dd, a: a * (0.14 + 0.12 * Math.abs(this.r())), f: f * (1.2 + 0.3 * Math.abs(this.r())), len: 0.35, br: P.br * 1.4, bk: P.bk * 0.35, bfm: P.bfm * 1.5, blm: 0.4 })); }
+    }
+  }
+
+  // Borbottio al rilascio: un gorgoglio basso e pieno di colpetti irregolari, raggruppati a raffiche, che resta nello scarico dopo aver mollato il gas.
+  // Ha le sue voci (bV) e un suo livello nel mix, che non dipende dal gas (a gas mollato lo scarico normale è quasi muto: i colpi dei pop restavano a -25 dB).
+  // lvl: quanto è carico (di serie ~0,55; mappa pop & bang, taglio d'accensione, decat e scarichi aperti lo alzano).
+  addBurble(lvl, hi) {
+    if (this.pops.length > 12) return;
+    const sr = this.sr, r = () => Math.abs(this.r()), B = this.popB;
+    const one = (d, a, len, f) => this.pops.push({ vb: 1, d: Math.max(1, d), a, len, f, nz: 0.45 + 0.5 * r() });
+    const a0 = (0.55 + 0.45 * r()) * (0.8 + 0.3 * lvl) * (0.6 + 0.4 * hi);
+    const f = 82 * B.f * (0.8 + 0.4 * r());
+    one(Math.round((0.002 + 0.01 * r()) * sr), a0, B.len * (0.8 + 0.8 * r()), f);
+    this.flu += 0.06 + 0.05 * lvl;                                       // piccolo strappo dell'albero: il regime balla un attimo
+    if (r() < 0.2 + 0.2 * lvl) {                                          // raffica "brrrap": tre-sei colpetti ravvicinati che calano
+      let dd = 0; const n = 3 + Math.floor(r() * 4);
+      for (let q = 0; q < n; q++) { dd += Math.round((0.022 + 0.02 * r()) * sr); one(dd, a0 * Math.pow(0.82, q + 1) * (0.7 + 0.5 * r()), 0.6 + 0.4 * r(), f * (1 + 0.1 * q) * (0.9 + 0.2 * r())); }
+    }
+    if (r() < 0.12 * lvl) this.addPop(false);                            // ogni tanto uno schiocco secco sopra il gorgoglio
   }
 
   cycle(c) {
@@ -378,6 +432,20 @@ class EngineDSP {
       else if (T.cut === 3) { ch = (this.cfg.pops ? 0.55 : 0.3) * pm; big = true; }
       if (Math.abs(this.r()) < ch) this.addPop(big || Math.abs(this.r()) < 0.15);
     }
+    // borbottio al rilascio: dopo aver mollato il gas ad alti giri il motore gorgoglia a raffiche (si spegne in qualche secondo, più lungo con le mappe pop & bang)
+    if (!fire && run && T.cut === 1 && S.rpm > 1300) {
+      const pm = this.tn.cat.pop, lvl = 0.55 + (this.cfg.pops ? 0.5 : 0) + (this.tn.spark ? 0.2 : 0) + 0.35 * Math.min(1.5, Math.max(0, pm - 1));
+      const env = Math.exp(-T.ovr / (0.9 + 1.5 * lvl)), hi = Math.min(1, (S.rpm - 1300) / 3500);
+      const cps = Math.max(12, S.rpm / 60 * this.nCyl / 2);                // scoppi al secondo: serve a contare il tempo dentro il ciclo
+      const bb = this.bb || (this.bb = { on: false, t: 0 });
+      bb.t -= 1 / cps;
+      if (bb.t <= 0) { bb.on = !bb.on; bb.t = bb.on ? 0.05 + 0.16 * Math.abs(this.r()) : 0.04 + 0.2 * Math.abs(this.r()) * (1.3 - Math.min(1, lvl * 0.6)); }
+      const rate = (7 + 8 * lvl) * env * (0.35 + 0.65 * hi);              // colpetti al secondo a gas mollato, a raffiche, metà del tempo
+      if (bb.on && Math.abs(this.r()) < Math.min(0.9, rate / (0.5 * cps))) {
+        this.addBurble(lvl, hi);
+        if (Math.abs(this.r()) < 0.05 * lvl * env) this.addPop(true);      // ogni tanto un colpo grosso
+      }
+    } else if (this.bb) this.bb.on = false;
   }
 
   control() {
@@ -408,6 +476,7 @@ class EngineDSP {
     // scalino quando entra il secondo turbo (biturbo sequenziale) — non una rampa lineare
     const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
     const ld = Math.min(1, S.charge * 1.2) * Math.min(1, S.thr * 1.6);
+    this.codexLoad = ld;
     const vc = this.vc, hi = vc.hiRpm;
     // urlo metallico in alto (sei in linea BMW, collettori in acciaio) e ululato delle farfalle singole
     this.metK = vc.metal * ss(hi - 3200, hi - 200, S.rpm) * (0.25 + 0.75 * ld);
@@ -447,7 +516,7 @@ class EngineDSP {
       const th = this.th;
       const nz = this.r(), nz2 = this.r(), nz3 = this.r();
 
-      // ---- 6 cilindri: impulsi di scarico (blowdown) e aspirazione ------------
+      // ---- impulsi di scarico (blowdown) e aspirazione, cilindro per cilindro ---
       let col = 0, inn = 0;
       for (let j = 0; j < this.nCyl; j++) {
         const c = cyl[j];
@@ -487,15 +556,54 @@ class EngineDSP {
       // ---- afterfire -------------------------------------------------------------
       for (let q = this.pops.length - 1; q >= 0; q--) {
         const pp = this.pops[q];
-        if (--pp.d <= 0) { this.popEnv = Math.min(2.5, this.popEnv + pp.a); this.thPh = 0; this.pops.splice(q, 1); }
+        if (--pp.d <= 0 && pp.vb) {
+          let w = this.bV[0]; for (const vv of this.bV) if (vv.e < w.e) w = vv;
+          w.e = Math.min(1.6, pp.a); w.f = pp.f * 1.5; w.ft = pp.f * 0.62; w.fd = Math.exp(-1 / (sr * 0.03)); w.dec = Math.exp(-1 / (sr * 0.05 * pp.len)); w.ph = 0; w.n = 0;
+          w.lc = 1 - Math.exp(-TAU * (260 + 520 * pp.nz) / sr); w.ne = 0.9 * pp.nz; w.nd = Math.exp(-1 / (sr * 0.03));
+          this.pops.splice(q, 1);
+        } else if (pp.vb) continue;
+        else if (pp.d <= 0) {
+          // la voce più quieta lascia il posto al nuovo scoppio
+          let w = this.popV[0]; for (const vv of this.popV) if (vv.e < w.e) w = vv;
+          w.e = Math.min(2.5, pp.a); w.dec = Math.exp(-1 / (sr * 0.014 * pp.len)); w.f = pp.f; w.tf = pp.tf; w.ph = 0; w.th = 0;
+          w.nc = pp.nc; w.nk = Math.sqrt((2 - pp.nc) / pp.nc); w.n = 0; w.br = pp.br; w.tk = pp.tk;
+          w.bE = Math.min(2.5, pp.a) * pp.bk; w.bA = 0;
+          if (pp.bk > 0) {
+            w.bT = 50 * pp.bfm; w.bF = w.bT * 2.4;                       // parte alto (l'onda d'urto) e cade in 25 ms
+            w.bDec = Math.exp(-1 / (sr * 0.06 * this.popB.len * pp.blm));
+            w.bLc = 1 - Math.exp(-TAU * (260 + 380 * (pp.bfm - 0.8)) / sr);  // rumore cupo: 260-600 Hz
+          }
+          this.pops.splice(q, 1);
+        }
       }
-      let pop = 0;
-      if (this.popEnv > 1e-4) {
-        this.thPh += 68 / sr;
-        pop = this.popEnv * (nz3 * 0.85 + 0.7 * Math.sin(TAU * this.thPh));
-        this.popEnv *= this.popDec;
+      let pop = 0, popC = 0, popT = 0, popE = 0, popB = 0;
+      const bG = 1 - Math.exp(-1 / (sr * 0.025)), bAt = 1 - Math.exp(-1 / (sr * 0.0015));
+      for (let q = 0; q < 6; q++) {
+        const vv = this.popV[q];
+        if (vv.bE > 1e-4) {
+          vv.bPh += vv.bF / sr; vv.bF += (vv.bT - vv.bF) * bG; vv.bA += (1 - vv.bA) * bAt;
+          vv.bN1 += vv.bLc * (nz3 - vv.bN1); vv.bN2 += vv.bLc * (vv.bN1 - vv.bN2);
+          popB += vv.bE * vv.bA * (0.8 * Math.sin(TAU * vv.bPh) + vv.bN2 * 3.2);
+          vv.bE *= vv.bDec; popE += vv.bE * 0.5;
+        }
+        if (vv.e < 1e-4) continue;
+        vv.ph += vv.f / sr; vv.th += vv.tf / sr; vv.n += vv.nc * (nz3 - vv.n);
+        const sp = vv.e * (vv.n * vv.nk * 0.85 + 0.7 * Math.sin(TAU * vv.ph));
+        pop += sp; popC += sp * vv.br; popT += Math.sin(TAU * vv.th) * Math.min(1.6, vv.e) * 0.24 * vv.tk; popE += vv.e;
+        vv.e *= vv.dec;
       }
-      x += pop * 0.9;
+      this.popEnv = popE;
+      // ---- borbottio: colpo basso che scende di nota + rumore cupo, saturato come uno scoppio nel tubo ----
+      let bur = 0;
+      for (let q = 0; q < 5; q++) {
+        const vb = this.bV[q]; if (vb.e < 1e-4) continue;
+        vb.ph += vb.f / sr; vb.f = vb.ft + (vb.f - vb.ft) * vb.fd; vb.n += vb.lc * (nz3 - vb.n);
+        bur += vb.e * (0.85 * Math.sin(TAU * vb.ph) + 2.6 * vb.ne * vb.n);
+        vb.e *= vb.dec; vb.ne *= vb.nd;
+      }
+      bur = this.burHP.p(Math.tanh(bur * 1.3) * 0.34);
+      bur = this.cfg.view === 0 ? (this.burLPo.p(bur), this.burLPc.p(bur) * 1.15) : (this.burLPc.p(bur), this.burLPo.p(bur));
+      x += pop * 0.9 * this.popB.mid;
 
       // ---- tubo principale (risonanze a quarto d'onda) --------------------------
       const pb = this.pipe, pm = 16383;
@@ -513,9 +621,8 @@ class EngineDSP {
       const rad = y - 0.9 * this.radPrev; this.radPrev = y;
       const ex = rad - this.dc1x + 0.995 * this.dc1y; this.dc1x = rad; this.dc1y = ex;
       // scoppio all'uscita del terminale: schiocco secco (crack) più un colpo sordo (thump) che non passa dal silenziatore
-      const crack = this.crackHP.p(pop) * 0.55;
-      this.thumpPh = ((this.thumpPh || 0) + 88 / sr) % 1;
-      const thump = Math.sin(TAU * this.thumpPh) * Math.min(1.6, this.popEnv) * 0.24;
+      const crack = this.crackHP.p(popC) * 0.55;
+      const thump = Math.max(-0.4, Math.min(0.4, popT));
       let met = 0;
       if (this.metK > 1e-3) { const q = this.metBP.p(ex) * 30; met = (Math.tanh(q) * 0.7 + this.metBP2.p(Math.tanh(q * 2)) * 0.25) * 0.13 * this.metK * this.openG; }
       let exh = this.barkPK.p(this.viewLP2.p(this.viewLP.p(ex + crack + met)));
@@ -525,7 +632,14 @@ class EngineDSP {
         const o = this.open, hv = this.opHP2.p(this.opHP.p(ex));
         exh += this.opLP.p(Math.tanh(hv * (6 + 10 * o)) * 0.13) * o * o * this.openG * (M.lp < 4000 ? 1.5 : 1);   // in abitacolo arriva attraverso la scocca: più forte per compensare il filtro
       }
+      if (M.character > 1e-5) {
+        // modifica Codex: più corpo nei medio-bassi e attacco quando acceleri, saturazione morbida (niente picchi)
+        const load = this.codexLoad, drive = 1 + 0.6 * load;
+        const tone = this.codexEdge.p(this.codexBody.p(exh)), shaped = Math.tanh(tone * drive) / drive;
+        exh += (shaped - exh) * M.character * (0.35 + 0.65 * load);
+      }
       exh += thump;
+      if (popB !== 0) exh += Math.tanh(popB * 1.1) * 0.25;      // boato: saturato come un colpo nel tubo, niente picchi
       const boom = this.boomBP.p(ex) * 1.6;
       // screamer pipe della wastegate: gas di scarico liberi, impulsi compresi
       if (tn.scream && S.wg > 0.005) exh += (this.scrBP.p(nz2) * 0.6 + this.scrHP.p(col) * 0.45) * S.wg * 0.4;
@@ -687,7 +801,7 @@ class EngineDSP {
         + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt + winMotor;
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
-      out = out * M.g + 1e-18;
+      out = out * M.g + bur * this.burG + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
       // urti: livello pari in tutti i punti d'ascolto (non passano dal mix del motore), poi riverbero dell'ambiente
       if (this.H) { const H = this.H; if (H.duck > 1e-3) { out *= 1 - H.duck; H.duck *= Math.exp(-1 / (sr * 0.3)); } out += this.hitSample(TAU, this.cfg.view) * 0.32; }
 

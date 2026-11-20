@@ -169,9 +169,17 @@
     g.restore();
   };
 
-  S.fxFlame = function (g, rx, exY, k, fl, y0) {
+  // tavolozze della fiamma: arancione (miscela grassa), gialla, blu alla radice con la punta arancione (magra, la classica
+  // fiammata da auto preparata). Ogni banda: [radice, punta], dall'esterno al cuore; o = contorno scuro, l = colore della luce
+  const FLAME_PAL = {
+    arancio: { b: [['#e8380c', '#e8380c'], ['#ff7a14', '#ff7a14'], ['#ffc832', '#ffc832'], ['#fff4cc', '#fff4cc']], o: 'rgba(110,18,8,.7)', l: '#ff7a20' },
+    gialla: { b: [['#ff8a1a', '#f0601a'], ['#ffc832', '#ffb020'], ['#ffe97a', '#ffe060'], ['#fffbe8', '#fff6d0']], o: 'rgba(120,60,8,.6)', l: '#ffb040' },
+    blu: { b: [['#2f5bff', '#ff5a14'], ['#4fb2ff', '#ff9a2a'], ['#bfe9ff', '#ffd65a'], ['#ffffff', '#fff4cc']], o: 'rgba(16,22,90,.6)', l: '#7aa8ff', cut: 0.42 },
+  };
+  S.fxFlame = function (g, rx, exY, k, fl, y0, pal, opt) {
+    const P = FLAME_PAL[pal] || FLAME_PAL.arancio, O = opt || {};
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
-    const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)))), H0 = (3.4 + f * 4.2) * k, fr = Math.floor(t * 30);
+    const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)) * (O.len || 1))), H0 = (3.4 + f * 4.2) * k * (O.th || 1), fr = Math.floor(t * 30);
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;                   // densità doppia: colonne e altezze a mezze unità
     const cols = [];
     for (let i = 0; i < L; i += u1) {
@@ -180,29 +188,77 @@
       cols.push([rx - 1 - i, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
         half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u]);
     }
-    g.fillStyle = 'rgba(110,18,8,.7)';                                           // contorno scuro: stacca la fiamma dallo sfondo
+    g.fillStyle = P.o;                                                           // contorno scuro: stacca la fiamma dallo sfondo
     for (const c of cols) { const y1 = rq(c[1] - c[2]), y2 = rq(c[1] + c[3]); if (y2 - y1 >= 2) g.fillRect(c[0], y1 - u1, u1, y2 - y1 + 2 * u1); }
-    const band = (col, sz, taper) => {
-      g.fillStyle = col;
+    const cut = P.cut || 0;                                                      // dove la radice blu diventa punta arancione
+    const band = (bc, sz, taper) => {
       for (const c of cols) {
         const m = sz * Math.max(0, 1 - c[4] * taper), y1 = rq(c[1] - c[2] * m), y2 = rq(c[1] + c[3] * m);
+        g.fillStyle = cut && (c[4] > cut + 0.06 * Math.sin(c[0] * 0.7 + fr) ? 1 : 0) ? bc[1] : bc[0];
         if (y2 - y1 >= u1) g.fillRect(c[0], y1, u1, y2 - y1);
         else if (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) g.fillRect(c[0], y1, u1, u1);    // punta sfrangiata
       }
     };
-    band('#e8380c', 1, 0); band('#ff7a14', 0.74, 0.25); band('#ffc832', 0.5, 0.6); band('#fff4cc', 0.27, 1.1);
+    band(P.b[0], 1, 0); band(P.b[1], 0.74, 0.25); band(P.b[2], 0.5, 0.6); band(P.b[3], 0.27, 1.1);
     if (big) {
       // scoppi grossi: radice azzurra alla bocca e nodi bianchi lungo il getto
       g.fillStyle = '#a8e4ff'; for (const c of cols) if (c[4] < 0.16) g.fillRect(c[0], rq(c[1]), u1, 1);
       g.fillStyle = '#ffffff'; for (let n = 1; n <= 3; n++) { const c = cols[Math.round(n * 6.5 * k * SS)]; if (c && c[4] < 0.6) g.fillRect(c[0], rq(c[1]) - 1, 2, 2); }
     }
     for (const c of cols) if (c[4] > 0.35 && rnd(c[0] * 1.7 + fr * 3) < 0.13) {      // lingue che si staccano sopra
-      g.fillStyle = c[4] > 0.7 ? '#e8380c' : '#ff7a14'; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
+      g.fillStyle = c[4] > 0.7 ? P.b[0][1] : P.b[1][1]; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
     }
-    const a = Math.min(1, f);
-    this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, '#ff7a20', 0.13 * a, 3);        // alone
+    const a = Math.min(1, f) * (O.dim || 1);
+    this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, P.l, 0.13 * a, 3);              // alone
     this.light(g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, '#ff8a20', 0.24 * a, 4);                  // luce sull'asfalto
     return L;
+  };
+  // le quattro versioni della fiamma libera (così l'occhio non vede sempre la stessa): 0 classica, 1 doppia lingua, 2 lunga e sottile, 3 corta e tozza
+  S.fxFlameV = function (g, rx, exY, k, fl, y0, pal, v) {
+    if (v === 1) { const L1 = this.fxFlame(g, rx, exY - 1.3 * k, k * 0.82, fl * 0.8, y0, pal, { len: 0.92, th: 0.72, dim: 0.6 }), L2 = this.fxFlame(g, rx, exY + 1.4 * k, k * 0.82, fl * 0.55, y0, pal, { len: 0.62, th: 0.72, dim: 0.5 }); return Math.max(L1, L2); }
+    if (v === 2) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.45, th: 0.55 });
+    if (v === 3) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 0.68, th: 1.5 });
+    return this.fxFlame(g, rx, exY, k, fl, y0, pal);
+  };
+  // OSSIDRICA: getto sottile e dritto, velocissimo, blu con cuore bianco e i «diamanti» luminosi lungo il getto; la punta ogni tanto vira all'arancio
+  S.fxTorch = function (g, rx, exY, k, f, y0) {
+    const t = this.st.t, SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, fr = Math.floor(t * 70);
+    const L = Math.round((20 + Math.min(1.4, f) * 30) * k * (0.78 + 0.44 * rnd(fr * 1.3))), th = 1.25 * k;
+    const rows = (x, yc, half, col) => { const y1 = rq(yc - half), y2 = rq(yc + half); g.fillStyle = col; g.fillRect(x, y1, u1, Math.max(u1, y2 - y1)); };
+    for (let i = 0; i < L; i += u1) {
+      const u = i / L, env = (u < 0.07 ? 0.55 + u / 0.07 * 0.45 : 1) * Math.pow(1 - u, 0.5), x = rx - 1 - i;
+      const yc = exY + Math.sin(i * 0.95 - t * 80) * 0.3 * u * k, half = th * env * (0.82 + 0.34 * rnd(i * 1.9 + fr));
+      rows(x, yc, half + u1, 'rgba(16,22,110,.55)');
+      rows(x, yc, half, u > 0.82 && rnd(i * 3.3 + fr) < 0.5 ? '#ff7a1c' : '#2f62ff');
+      rows(x, yc, half * 0.66, u > 0.9 && rnd(i + fr * 2) < 0.4 ? '#ffb347' : '#63c8ff');
+      rows(x, yc, half * 0.32, '#f4fcff');
+    }
+    g.fillStyle = '#ffffff';                                                       // i diamanti del getto
+    for (let n = 1; n <= 4; n++) { const i = n * L / 5.2, x = rx - 1 - i, hh = th * (0.95 - n * 0.12); if (hh > 0.3) g.fillRect(rq(x - 1), rq(exY - hh), 3, Math.max(u1, rq(hh * 2))); }
+    g.fillStyle = '#e8f8ff'; g.fillRect(rx - 1, rq(exY - th * 1.4), 2, Math.max(1, rq(th * 2.8)));   // radice alla bocca
+    const a = Math.min(1, f);
+    this.light(g, rx - L * 0.45, exY - 1, L, th * 5 + 3, '#7aa8ff', 0.17 * a, 3);
+    this.light(g, rx - L * 0.4, y0 + 1, L * 1.1 + 12, 5, '#6aa0ff', 0.18 * a, 3);
+    return L;
+  };
+  // BOTTO: niente fiamma, un piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito)
+  S.fxBang = function (g, rx, exY, k, ph, y0) {
+    const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, a = Math.max(0, 1 - ph);
+    const r = (2.4 + ph * 10.5) * k, cx = rx - (3 + ph * 5) * k, n = Math.max(18, Math.round(r * 5 * SS));
+    g.save();
+    for (let q = 0; q < n; q++) {                                                  // l'anello che si allarga e sbiadisce
+      const an = q / n * Math.PI * 2, wob = 1 + 0.07 * Math.sin(an * 3 + this.st.t * 40);
+      g.globalAlpha = a * (q % 5 === 0 ? 0.55 : 0.95); g.fillStyle = ph < 0.3 ? '#fff4d0' : ph < 0.6 ? '#ffb83c' : '#e2561c';
+      g.fillRect(rq(cx + Math.cos(an) * r * 0.9 * wob), rq(exY + Math.sin(an) * r * wob), u1 * (ph < 0.5 ? 2 : 1), u1 * (ph < 0.5 ? 2 : 1));
+    }
+    if (ph < 0.42) {                                                               // lampo bianco al centro nei primi istanti
+      const rr = (1 - ph / 0.42) * 3.4 * k; g.globalAlpha = 1; g.fillStyle = '#fffbea';
+      for (let y = -rr; y <= rr; y += u1) { const w = Math.sqrt(Math.max(0, rr * rr - y * y)); g.fillRect(rq(cx - w), rq(exY + y), Math.max(u1, rq(w * 2)), u1); }
+    }
+    g.restore();
+    this.light(g, cx, exY, r * 3 + 6, r * 2 + 4, '#ff9a30', 0.22 * a, 3);
+    this.light(g, cx, y0 + 1, r * 3.5 + 8, 5, '#ff8a20', 0.14 * a, 3);
+    return r;
   };
 
   // ---------------------------------------------------------------- ombre
@@ -255,6 +311,55 @@
     x.putImageData(im, 0, 0);
     return (B[key] = c);
   };
+  // un fascio inclinato: ang in gradi (positivo = verso la strada), w = semiapertura alla fine, hard = quanto è netto il bordo alto (taglio dell'anabbagliante).
+  // Una banda larga e piena, come il fascio dei fari nei giochi 2D: stretta al faro, si allarga e si spegne con la distanza, bordi morbidi, niente raggio sottile.
+  S.beamShaft = function (len, w, hard) {
+    hard = hard || 0;
+    const SS = this.SS || 1, key = 'band3_' + Math.round(len / 10) + '_' + Math.round(w) + '_' + Math.round(hard * 10) + '_' + SS, B = Street2D._beams || (Street2D._beams = {});
+    if (B[key]) return B[key];
+    const H = Math.ceil(w * 2 + 8), c = document.createElement('canvas'); c.width = len * SS; c.height = H * SS; c.oy = H / 2; c.lw = len; c.lh = H;
+    const x = c.getContext('2d'), im = x.createImageData(len * SS, H * SS), d = im.data, W = len * SS, oy = c.oy * SS, ss = (e) => e * e * (3 - 2 * e);
+    for (let px = 0; px < W; px++) {
+      const u = px / W, hw = (4 + (w - 4) * Math.pow(u, 0.75)) * SS, along = Math.pow(1 - u, 0.65) * (0.8 + 0.2 * Math.exp(-u * 4));
+      for (let py = Math.max(0, Math.floor(oy - hw)); py < Math.min(H * SS, Math.ceil(oy + hw)); py++) {
+        const t = (py + 0.5 - oy) / hw, at = Math.abs(t), f = t < 0 ? 0.55 - 0.45 * hard : 0.6;   // bordo alto netto con il taglio, bordo basso morbido
+        const prof = ss(Math.min(1, (1 - at) / f)), I = along * prof * (0.78 + 0.22 * (1 - at)), i = (py * W + px) * 4;
+        d[i] = 255; d[i + 1] = 238 + 10 * (1 - at); d[i + 2] = 185 + 35 * (1 - at); d[i + 3] = Math.min(255, I * 255 * 0.72);
+      }
+    }
+    x.putImageData(im, 0, 0);
+    return (B[key] = c);
+  };
+  S.fxBeamAt = function (g, fx, fy, len, ang, w, a, hard) {
+    if (a < 0.02) return;
+    const sp = this.beamShaft(len, w, hard);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, a);
+    g.translate(Math.round(fx), Math.round(fy)); g.rotate(ang * Math.PI / 180);
+    g.drawImage(sp, 0, -sp.oy, sp.lw, sp.lh); g.restore();
+  };
+  // il resto dell'effetto: alone del faro con la lama orizzontale, pozza di luce sull'asfalto dove cade l'anabbagliante, pulviscolo nel fascio
+  S.fxHeadlamp = function (g, fx, fy, groundY, a, t) {
+    if (a < 0.02) return;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    const halo = (r, al) => { const gr = g.createRadialGradient(fx, fy, 0, fx, fy, r); gr.addColorStop(0, `rgba(255,248,225,${al})`); gr.addColorStop(0.4, `rgba(255,232,170,${al * 0.35})`); gr.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = gr; g.fillRect(fx - r, fy - r, r * 2, r * 2); };
+    halo(11, 0.55 * a); halo(4, 0.5 * a);          // bagliore piccolo sul faro
+    // (la lama orizzontale è tolta: dava l'effetto raggio laser)
+    g.globalAlpha = 1;
+    // pozza sull'asfalto: ellisse schiacciata davanti all'auto, calda al centro
+    const px = fx + 120, py = groundY - 6;
+    g.save(); g.translate(px, py); g.scale(1, 0.16);
+    const pg = g.createRadialGradient(0, 0, 0, 0, 0, 150); pg.addColorStop(0, `rgba(255,240,190,${0.42 * a})`); pg.addColorStop(0.5, `rgba(255,226,160,${0.16 * a})`); pg.addColorStop(1, 'rgba(255,220,150,0)');
+    g.fillStyle = pg; g.beginPath(); g.arc(0, 0, 150, 0, 7); g.fill(); g.restore();
+    // pulviscolo: puntini che brillano nel fascio, sempre gli stessi, che respirano
+    for (let q = 0; q < 26; q++) {
+      const u = 0.12 + 0.8 * Street2D.rnd(q * 3 + 1), v = (Street2D.rnd(q * 3 + 2) - 0.5), lowB = q % 2 === 0;
+      const ang = (lowB ? 7 : -1) * Math.PI / 180, d = u * (lowB ? 300 : 420), wv = (4 + (lowB ? 22 : 26) * u) * v * 1.6;
+      const x2 = fx + Math.cos(ang) * d - Math.sin(ang) * wv, y2 = fy + Math.sin(ang) * d + Math.cos(ang) * wv;
+      const tw = 0.5 + 0.5 * Math.sin(t * (1.2 + Street2D.rnd(q + 9) * 2) + q * 2.1);
+      g.fillStyle = `rgba(255,244,210,${(0.55 * tw * (1 - u)) * a})`; g.fillRect(Math.round(x2), Math.round(y2), 1, 1);
+    }
+    g.restore();
+  };
   S.fxBeam = function (g, fx, fy, len, dn, a) {
     if (a < 0.02) return;
     const sp = this.beamSprite(len, 5, dn);
@@ -278,7 +383,7 @@
       } else {
         // riflesso del lampione: una fascia larga e tenue su tutta la fiancata e una lama stretta sul tetto e sui vetri
         const lc = l.col || '255,214,150', band = (hw, a, y1) => { const gr = x.createLinearGradient(l.x - hw, 0, l.x + hw, 0); gr.addColorStop(0, `rgba(${lc},0)`); gr.addColorStop(0.5, `rgba(${lc},${a})`); gr.addColorStop(1, `rgba(${lc},0)`); x.fillStyle = gr; x.fillRect(l.x - hw, 0, hw * 2, y1); };
-        band(l.w, l.a * 0.5, h); band(l.w * 0.3, l.a, h * 0.5);
+        band(l.w, l.a * 0.5, h);                       // solo la fascia larga e tenue sulla fiancata: la lama stretta sul tetto e sui vetri è tolta
       }
     }
     x.globalCompositeOperation = 'destination-in'; x.drawImage(spr, 0, 0);
@@ -337,15 +442,56 @@
     // scoppiettii: ogni scoppio accende la fiammata e lancia scintille e uno sbuffo di fuliggine
     st.flame = Math.max(0, st.flame - dt * 8);
     st.popFlash = Math.max(0, (st.popFlash || 0) - dt * 6);
-    if (s.flame && R() < s.flame * dt * 22) {
-      const big = R() < 0.35 + s.flame * 0.3;
-      st.flame = big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
-      for (let q = 0; q < (big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
+    // Il tipo di fiammata dipende da quanto è preparata l'auto (s.ftier: 0 leggero, 1 medio, 2 spinto) e dal momento (s.fkind):
+    // ossidrica (torch), libera (free, quattro versioni), botto (bang). Senza livello (teaser, prove) resta la fiammata libera di sempre.
+    const tier = s.ftier, tiered = tier !== undefined && typeof flameStyle === 'function';
+    st.torchT = Math.max(0, (st.torchT || 0) - dt); st.bangT = Math.max(0, (st.bangT || 0) - dt);
+    // fiammella che resta accesa mentre c'è benzina che brucia nello scarico (rilascio, limitatore) e si spegne piano dopo:
+    // tremola e cambia colore da sola; leggero niente, medio arancio e gialla, spinto blu
+    const susT = s.flame && !(tiered && tier === 0) ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
+    st.sus = susT > (st.sus || 0) ? (st.sus || 0) + (susT - (st.sus || 0)) * Math.min(1, dt * 10) : Math.max(0, (st.sus || 0) - dt * 1.6);
+    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
+    if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
+    const rateK = tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1;
+    st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
+    // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
+    const spawn = (style) => {
+      if (style === 'torch' || (style === 'big' && tier >= 2)) {                    // ossidrica: breve, rapida, con scintille incandescenti
+        st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
+        for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
+        if (style === 'torch') return;
+      }
+      if (style === 'bang') {                                                       // botto: un piccolo scoppio circolare, un filo di fuliggine
+        st.fstyle = 'bang'; st.bangT = 0.24; st.flame = Math.max(st.flame, 0.26); st.popFlash = 0.5; st.popJolt = 0.35;
+        for (let q = 0; q < 1 + ((R() * 2) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 40, dx: v * PPM * 0.5 - 30 - R() * 80, life: 1, rate: 1.4 + R(), gy: y0 });
+        this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
+        return;
+      }
+      // libera: la fiammata larga, in quattro versioni. Il livello medio (e il rilascio sotto i 5.000 giri) la fa meno decisa; la grossa è sempre piena
+      const grossa = style === 'big', med = !grossa && tiered && (tier === 1 || s.fkind === 'lift');
+      const big = grossa || R() < (0.35 + s.flame * 0.3) * (med ? 0.55 : 1), sc = grossa ? 1.15 : med ? 0.85 : 1;
+      st.fstyle = 'free'; st.flame = (big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4) * sc; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
+      st.fv = tiered ? (grossa ? (R() < 0.6 ? 0 : 3) : flameVariant(tier, R())) : 0; st.flamePal = big && R() < 0.5 && !this.flamePal && !tiered ? 'blu' : pickPal();          // ogni scoppio col suo colore
+      for (let q = 0; q < (grossa ? 8 : big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
+    };
+    // appena si molla il gas (s.fkick conta i rilasci) il primo scoppio parte subito, non quando capita; sopra i 5.000 giri ne parte un secondo
+    if (s.fkick !== undefined && s.fkick !== st.fkick) {
+      st.fkick = s.fkick;
+      if (s.fkick && tiered) { spawn(flameStyle(tier, s.fkind, 0.6, R())); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
-    if (st.flame > 0.05) {
-      const L = this.fxFlame(g, rx, exY, k, st.flame, y0), fl = Math.min(1.5, st.flame);
+    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(flameStyle(tier, s.fkind, 0.6, R())); }
+    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, R()) : 'free');
+    if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0);
+    if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
+    if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang') {
+      const L = this.fxFlameV(g, rx, exY, k, st.flame, y0, st.flamePal, st.fv || 0), fl = Math.min(1.5, st.flame);
       if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1 });
+    }
+    else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0)) {
+      // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
+      const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * vn(st.t * 7.3)) * (vn(st.t * 2.1 + 9) < 0.18 ? 0.5 : 1);
+      this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal);
     }
     // anello d'urto alla bocca negli scoppi grossi; la punta cromata si arroventa
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
@@ -414,16 +560,19 @@
     return c;
   };
   // nuvola a tre toni: corpo scuro, dorso schiarito dalla luna, pancia tinta dalle luci della città
+  // nuvola notturna: un velo morbido fatto di tanti sbuffi sfumati, scuro, col bordo di sopra schiarito dalla luna
+  // e la pancia appena tinta dalle luci di sotto (niente contorni netti: di notte le nuvole non hanno bordi)
   S.cloudHD = function (k, SS) {
-    const w = 96 + k * 26, hh = 30;
+    const w = 110 + k * 30, hh = 34;
     return this.sprite(w * SS, hh * SS, (x) => {
       x.scale(SS, SS);
-      // cumulo: base piatta, gobbe più alte al centro; il ritaglio taglia tutto quello che scende sotto la base
-      x.beginPath(); x.rect(0, 0, w, 25); x.clip();
-      const n = 8 + k, hump = (col, dy, rs, sd) => { x.fillStyle = col; for (let i = 0; i < n; i++) { const m = Math.sin(Math.PI * (i + 0.5) / n), r = (4 + 9 * m * (0.7 + 0.6 * rnd(i * 3 + k * 7 + sd))) * rs; x.beginPath(); x.arc(10 + i * ((w - 20) / (n - 1)), 23 - r * 0.55 + dy, r, 0, Math.PI * 2); x.fill(); } };
-      hump('#2c2862', 0, 1, 0); hump('#3a3580', -2.2, 0.74, 0); hump('#5650a2', -4.6, 0.42, 0);
-      x.fillStyle = '#4a316e'; x.fillRect(8, 22, w - 16, 3);                                 // pancia tinta dalla città
-      x.fillStyle = '#2c2862'; for (let i = 0; i < w - 16; i += 2) if (rnd(i + k) > 0.5) x.fillRect(8 + i, 22, 2, 1);
+      const n = 14 + k * 3, blob = (cx, cy, rx, ry, rgb, a) => { x.save(); x.translate(cx, cy); x.scale(1, ry / rx); const gr = x.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(0.6, `rgba(${rgb},${a * 0.55})`); gr.addColorStop(1, `rgba(${rgb},0)`); x.fillStyle = gr; x.fillRect(-rx, -rx, rx * 2, rx * 2); x.restore(); };
+      const pts = [];
+      for (let i = 0; i < n; i++) { const u = (i + 0.5) / n, m = Math.sin(Math.PI * u); pts.push([8 + u * (w - 16) + (rnd(i * 3 + k) - 0.5) * 8, 20 - m * (6 + 5 * rnd(i * 5 + k)), 9 + 13 * m * (0.6 + 0.5 * rnd(i * 7 + k)), 4 + 4 * m]); }
+      for (const [cx, cy, rx, ry] of pts) blob(cx, cy + 2, rx, ry + 1, '30,28,70', 0.55);          // corpo
+      for (const [cx, cy, rx, ry] of pts) blob(cx, cy + 5, rx * 0.8, ry * 0.6, '70,40,90', 0.18);    // pancia tinta dalle luci di sotto
+      x.globalCompositeOperation = 'source-atop';
+      for (const [cx, cy, rx, ry] of pts) blob(cx - 2, cy - ry * 0.6, rx * 0.7, ry * 0.5, '150,150,210', 0.22);   // dorso illuminato dalla luna
     }, false);
   };
   S.skyHD = function (g, t, dist) {
@@ -449,7 +598,7 @@
     const lay = [[3, 22, 0.5, 2, 0.55], [1, 44, 0.62, 3, 0.7], [0, 30, 0.8, 4, 0.85], [2, 66, 1, 5.5, 1], [1, 98, 0.9, 7, 0.9], [3, 120, 0.7, 4.5, 0.6]];
     lay.forEach(([k, y, sc, sp, al], n) => {
       const c = this.spr[ck][k], cw = c.width / SS * sc, span = W + 300, cx = ((-(t * sp) - dist * 0.03 * sc + n * 233) % span + span) % span - 150;
-      g.globalAlpha = al * (this.rainOn ? 0.5 : 1); g.drawImage(c, Math.round(cx), y, cw, c.height / SS * sc);
+      g.globalAlpha = al * 0.85 * (this.rainOn ? 0.5 : 1); g.drawImage(c, Math.round(cx), y, cw, c.height / SS * sc);
     });
     g.globalAlpha = 1;
   };

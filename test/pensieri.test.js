@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'pensieri.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { SupraSim, StreetGame, PENS_KM, PENS_BISOGNI, PENS_ANIMO } = new Function(src + ';return { SupraSim, StreetGame, PENS_KM, PENS_BISOGNI, PENS_ANIMO };')();
+const { SupraSim, StreetGame, PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_STATO } = new Function(src + ";return { SupraSim, StreetGame, PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_STATO };")();
 
 // una partita del Viaggio che sta guidando a 72 km/h, senza la domanda del capitolo 0
 function nuova(km = 0) {
@@ -67,4 +67,13 @@ test('pensieri: ogni frase è scritta bene', () => {
   const tutte = [...PENS_KM.map((k) => k.text), ...PENS_ANIMO, ...Object.values(PENS_BISOGNI).flat(2)];
   for (const t of tutte) assert.ok(t.length > 12 && t.length < 130, t);
   assert.equal(new Set(tutte).size, tutte.length, 'nessuna frase doppia');
+});
+
+test('pensieri: com\'è messa l\'auto (fari rotti, rosso, ricercato) si dice quando comincia, una volta', () => {
+  const { game } = (() => { const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip(); game.s.vg.firstDone = true; return { sim, game }; })();
+  const p = game.s.vg.pens || (game.vgPensTick(0), game.s.vg.pens);
+  for (const k of Object.keys(PENS_KM)) p.seen[PENS_KM[k].id] = true;
+  game.s.vg.needs = { food: 1, water: 1, sleep: 1, wash: 1 }; game.sim.v = 20; game.sim.damage = 0.5;
+  game.prompt = null; game.inside = null; p.last = -999; game.vgPensTick(1);
+  assert.ok(PENS_STATO.luci.frasi.includes(game.thought.text) || PENS_STATO.motore.frasi.includes(game.thought.text), game.thought.text);
 });

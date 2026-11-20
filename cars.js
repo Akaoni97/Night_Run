@@ -96,6 +96,8 @@ const V40_PRESETS = [
   { id: 'sleeper', name: 'Sleeper T4', sel: { exhaust: 'oem', intake: 'oem', ecu: 'remap', turbo: 'td04', intercooler: 'oem', tires: 'sport', suspension: 'oem', final: 'quaife', clutch: 'sport', weight: 'oem' } },
   { id: 'full', name: 'Familiare cattiva', sel: { exhaust: 'turboback', intake: 'pf', ecu: 'standalone', turbo: 'td04_19t', intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'quaife', clutch: 'sport', weight: 's2' } },
 ];
+// scoppi delle Volvo: boato basso (boom), poco schiocco e poco passaggio dal silenziatore, così non sembrano petardi
+const VOLVO_POP = { f: 0.8, crack: 0.45, len: 1.3, thump: 1.2, boom: 0.85, bf: 1, mid: 0.6 };
 const V40_EX = {
   stock: { L: 3.6, r: -0.4, m: [['lp', 900, 0.6], ['lp', 1600, 0.5], ['peak', 130, 1.0, 3], ['peak', 480, 2, -4]], g: 1.5, jet: 0.1, rasp: 0.05, tips: 1 },
   sport: { L: 3.4, r: -0.6, m: [['lp', 2600, 0.6], ['peak', 170, 1.0, 4], ['peak', 1100, 1.4, 5], ['peak', 3200, 2, 1]], g: 2.2, jet: 0.6, rasp: 0.5, tips: 1 },
@@ -122,6 +124,7 @@ function v40ParamsBase(sel, adj) {
       valve: hasT ? 'bov' : 'recirc', boostK: 0.42,     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
     },
     dsp: {
+      voice: { pop: VOLVO_POP },
       cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ex.dsp === 'stock' ? 2400 : 3800, g: 0.9, pop: pops ? 1.4 : hasT ? 0.7 : 0.25 },
       tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
       bov: hasT ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
@@ -159,7 +162,7 @@ function genCatalog(c) {
   const cat = {
     exhaust: { label: 'Scarico', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originale', note: n.exOem || 'Silenziatori di serie.', sim: { pw: 1 }, dsp: c.exStock },
-      { id: 'catback', price: $(800), km: kk(8), brand: n.exBrand || 'Supersprint', name: 'Catback in inox', note: 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.cyl === 6 ? 'sport6' : 'sport4', look: { tip: 1 } },
+      { id: 'catback', price: $(800), km: kk(8), brand: n.exBrand || 'Supersprint', name: 'Catback in inox', note: 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.cyl >= 5 ? 'sport6' : 'sport4', look: { tip: 1 } },
       { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: 'race', look: { tip: 2 } } ] },
     intake: { label: 'Aspirazione', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: n.inOem || 'Airbox originale', note: 'Chiusa e silenziosa.', sim: { pw: 1 }, dsp: c.inStock || { in: 1, roar: 1, wh: 1 } },
@@ -251,7 +254,7 @@ const KIT_SC = (id, brand, name, bar, price, km, note) => ({ id, brand, name, pr
 const KIT_T = (id, brand, name, bar, a, b, price, km, note, badge) => ({ id, brand, name, price, km, note, sim: { max: bar, a, b, up: 0.42, down: 0.85, twin: false }, dsp: { f0: 2000, f1: 7400, w: 0.055, wh: 0.08, damp: 2300, twin: 0, mani: 1 }, look: badge ? { badge } : {} });
 const GEN_CARS = [
   { id: 'r5', name: 'Renault 5 Turbo 2', short: 'R5 Turbo', make: 'Renault', tag: 'Renault 5 Turbo 2 · 1.4 turbo a motore centrale · trazione posteriore · 5 marce',
-    voice: { mani: [0.5, 0.45, 0.45, 0.5], rf: -0.46, pulse: 0.82, rough: 0.3, bias: [1.04, 0.95, 1.02, 0.97], metal: 0.3, metalF: 2400, boomRpm: 3900, hiRpm: 6600, bov: { f0: 2600, sw: 1300, q: 0.9, g: 0.95, chirp: 0.45 } },
+    voice: { pop: { f: 1.25, crack: 1.45, len: 0.8 }, mani: [0.5, 0.45, 0.45, 0.5], rf: -0.46, pulse: 0.82, rough: 0.3, bias: [1.04, 0.95, 1.02, 0.97], metal: 0.3, metalF: 2400, boomRpm: 3900, hiRpm: 6600, bov: { f0: 2600, sw: 1300, q: 0.9, g: 0.95, chirp: 0.45 } },
     shiftK: 1.2, hesK: 0.6, engine: 'C1J 1.4 turbo Garrett T3', mass: 970, driveW: 0.6, fwd: false, cyl: 4, exStock: GEN_EX.rally4, pitch: 0.9, mu: 1.08, ecuBrand: 'Renix', ecuMax: 1.0,
     P: { idle: 900, limiter: 6800, launchRpm: 4200, Ie: 0.12, mass: 970, r: 0.30, cd: 0.37, A: 1.85, mu: 1.08, cgH: 0.46, wb: 2.43, tank: 50, gears: [0, 3.364, 2.059, 1.381, 1.037, 0.861], rev: -3.18, fd: 3.889, clutchMax: 380 },
     turbo: { brand: 'Garrett', name: 'T3 originale (0,9 bar)', note: 'Il turbo da rally: sotto i 3000 giri dorme, poi arriva tutto insieme.', sim: { max: 0.9, a: 2400, b: 3400, up: 0.38, down: 0.8, twin: false }, dsp: { f0: 2300, f1: 8600, w: 0.07, wh: 0.11, damp: 2100, twin: 0, mani: 1 }, icHeat: 1.3 },
@@ -259,7 +262,7 @@ const GEN_CARS = [
       KIT_T('t3t4', 'Garrett', 'T3/T4 ibrido (1,6 bar)', 1.6, 3000, 4200, 4200, 40, 'Il kit Gruppo B stradale: ritardo enorme, poi una catapulta. Servono centralina e intercooler.')],
     diff0: { name: 'Aperto, finale 3,889', note: 'Con il motore dietro la trazione è già buona.', diff: 'open' }, suspNote: 'Motore centrale: in partenza il peso è già sulle ruote motrici.' },
   { id: 'b2002', name: 'BMW 2002 Turbo', short: '2002 Turbo', make: 'BMW', tag: 'BMW 2002 Turbo · 2.0 turbo KKK · trazione posteriore · 4 marce',
-    voice: { mani: [0.74, 0.64, 0.64, 0.74], rf: -0.3, pulse: 1.18, rough: 0.45, lope: 0.3, bias: [1.06, 0.93, 1.03, 0.96], boomRpm: 2800, hiRpm: 6200, bov: { v: 2, f0: 1500, sw: 500, q: 0.7, g: 0.9, chirp: 0 } },
+    voice: { pop: { f: 1.0, crack: 0.9, len: 1.2, thump: 1.2 }, mani: [0.74, 0.64, 0.64, 0.74], rf: -0.3, pulse: 1.18, rough: 0.45, lope: 0.3, bias: [1.06, 0.93, 1.03, 0.96], boomRpm: 2800, hiRpm: 6200, bov: { v: 2, f0: 1500, sw: 500, q: 0.7, g: 0.9, chirp: 0 } },
     shiftK: 1.35, hesK: 0.9, engine: 'M10 2.0 turbo KKK', mass: 1080, driveW: 0.46, fwd: false, cyl: 4, exStock: GEN_EX.old4, pitch: 1.25, mu: 1.0, ecuBrand: 'Kugelfischer', ecuMax: 0.8,
     P: { idle: 900, limiter: 6400, launchRpm: 4000, Ie: 0.16, mass: 1080, r: 0.29, cd: 0.40, A: 1.85, mu: 1.0, cgH: 0.52, wb: 2.5, tank: 70, gears: [0, 3.764, 2.02, 1.32, 1.0], rev: -4.1, fd: 3.36, clutchMax: 380 },
     turbo: { brand: 'KKK', name: 'BLD originale (0,55 bar)', note: 'Il primo turbo europeo di serie: ritardo leggendario, poi 170 CV su un\'auto da 1080 kg.', sim: { max: 0.55, a: 3000, b: 4000, up: 0.55, down: 0.9, twin: false }, dsp: { f0: 1700, f1: 6400, w: 0.045, wh: 0.13, damp: 1800, twin: 0, mani: 1 }, icHeat: 1.6 },
@@ -268,7 +271,7 @@ const GEN_CARS = [
     gearbox: { brand0: 'Getrag', name0: '4 marce originale', note0: 'Quarta diretta: a 180 km/h sei già al limitatore.', items: [{ id: 'g245', brand: 'Getrag', name: '245 a 5 marce', note: 'La quinta di riposo e marce più vicine.', price: 1800, km: 12, gears: [0, 3.368, 2.16, 1.58, 1.241, 1.0] }] },
     diff0: { name: 'Autobloccante 40 % (di serie), finale 3,36', note: 'Il Turbo aveva già l\'autobloccante.', diff: 'torsen' }, suspNote: 'Molle morbide anni 70: in partenza il muso si alza tantissimo.' },
   { id: 'e30', name: 'BMW M3 E30', short: 'M3 E30', make: 'BMW', tag: 'BMW M3 E30 · S14 2.3 16V · trazione posteriore · Getrag 265 "dogleg"',
-    voice: { mani: [0.55, 0.5, 0.5, 0.55], rf: -0.42, pulse: 0.78, rough: 0.12, lope: 0.18, howl: 0.75, howlF: 820, metal: 0.5, metalF: 3100, boomRpm: 3600, hiRpm: 7250 },
+    voice: { pop: { f: 1.2, crack: 1.25, len: 0.9 }, mani: [0.55, 0.5, 0.5, 0.55], rf: -0.42, pulse: 0.78, rough: 0.12, lope: 0.18, howl: 0.75, howlF: 820, metal: 0.5, metalF: 3100, boomRpm: 3600, hiRpm: 7250 },
     shiftK: 1.1, hesK: 0.4, engine: 'S14 2.3 16V aspirato', mass: 1200, driveW: 0.47, fwd: false, cyl: 4, exStock: GEN_EX.bmw4, pitch: 0.95, mu: 1.05, ecuBrand: 'Bosch Motronic', inStock: { in: 1.8, roar: 2.0, wh: 1 },
     naNote: 'Quattro farfalle singole: grida fino a 7250 giri.',
     P: { idle: 880, limiter: 7250, launchRpm: 4500, Ie: 0.13, mass: 1200, r: 0.30, cd: 0.33, A: 1.9, mu: 1.05, cgH: 0.48, wb: 2.565, tank: 70, gears: [0, 3.72, 2.40, 1.77, 1.26, 1.00], rev: -4.23, fd: 4.10, clutchMax: 450 },
@@ -277,7 +280,7 @@ const GEN_CARS = [
       KIT_T('turbo', 'Garrett', 'Kit turbo GT28 (1,0 bar)', 1.0, 2900, 4100, 5200, 45, 'Pistoni bassi e turbo: il 2.3 da corsa arriva a 330 CV.', 'TURBO')],
     diff0: { name: 'Autobloccante 25 %, finale 4,10', note: 'Di serie sulla M3.', diff: 'torsen' } },
   { id: 'e36', name: 'BMW M3 E36', short: 'M3 E36', make: 'BMW', tag: 'BMW M3 E36 coupé · S50 3.0 sei in linea · trazione posteriore · 5 marce',
-    voice: { mani: [0.5, 0.47, 0.45, 0.45, 0.47, 0.5], split: 0.12, rf: -0.36, pulse: 0.84, howl: 0.35, howlF: 950, metal: 0.8, metalF: 3400, boomRpm: 3400, hiRpm: 7200 },
+    voice: { pop: { f: 0.95, crack: 1.05, len: 1.05 }, mani: [0.5, 0.47, 0.45, 0.45, 0.47, 0.5], split: 0.12, rf: -0.36, pulse: 0.84, howl: 0.35, howlF: 950, metal: 0.8, metalF: 3400, boomRpm: 3400, hiRpm: 7200 },
     shiftK: 1.0, hesK: 0.25, engine: 'S50 3.0 aspirato', mass: 1460, driveW: 0.49, fwd: false, cyl: 6, exStock: GEN_EX.bmw6, pitch: 0.9, mu: 1.07, ecuBrand: 'Bosch Motronic',
     naNote: 'Sei in linea col VANOS: coppia piena da 3000 giri.',
     P: { idle: 800, limiter: 7200, launchRpm: 4000, Ie: 0.17, mass: 1460, r: 0.31, cd: 0.32, A: 2.0, mu: 1.07, cgH: 0.48, wb: 2.71, tank: 62, gears: [0, 4.20, 2.49, 1.66, 1.24, 1.00], rev: -3.89, fd: 3.15, clutchMax: 560 },
@@ -286,7 +289,7 @@ const GEN_CARS = [
       KIT_T('turbo', 'Precision', 'Kit turbo 6262 (1,0 bar)', 1.0, 2800, 4000, 6800, 45, 'Single turbo su collettore tubolare: oltre 500 CV.', 'TURBO')],
     diff0: { name: 'Autobloccante 25 %, finale 3,15', note: 'Di serie sulla M3.', diff: 'torsen' } },
   { id: 'e34', name: 'BMW M5 E34', short: 'M5 E34', make: 'BMW', tag: 'BMW M5 E34 · S38 3.6 sei in linea · trazione posteriore · 5 marce',
-    voice: { mani: [0.64, 0.6, 0.57, 0.57, 0.6, 0.64], split: 0.16, rf: -0.4, pulse: 0.95, lope: 0.12, howl: 0.85, howlF: 690, metal: 0.55, metalF: 2900, boomRpm: 3000, hiRpm: 7000 },
+    voice: { pop: { f: 0.82, crack: 0.9, len: 1.3, thump: 1.3 }, mani: [0.64, 0.6, 0.57, 0.57, 0.6, 0.64], split: 0.16, rf: -0.4, pulse: 0.95, lope: 0.12, howl: 0.85, howlF: 690, metal: 0.55, metalF: 2900, boomRpm: 3000, hiRpm: 7000 },
     shiftK: 1.05, hesK: 0.3, engine: 'S38 3.6 aspirato', mass: 1670, driveW: 0.48, fwd: false, cyl: 6, exStock: GEN_EX.bmw6, pitch: 1.0, mu: 1.07, ecuBrand: 'Bosch Motronic', inStock: { in: 1.8, roar: 2.0, wh: 1 },
     naNote: 'Sei farfalle singole, figlio del motore della M1: 315 CV a 6900 giri.',
     P: { idle: 850, limiter: 7200, launchRpm: 4000, Ie: 0.18, mass: 1670, r: 0.31, cd: 0.32, A: 2.05, mu: 1.07, cgH: 0.5, wb: 2.76, tank: 90, gears: [0, 3.51, 2.08, 1.35, 1.00, 0.81], rev: -3.71, fd: 3.91, clutchMax: 620 },
@@ -315,26 +318,26 @@ function genTq(hp, rpmHp, nm, rpmNm, lim) {
 const G5 = [0, 3.55, 1.95, 1.32, 1.03, 0.82], G6 = [0, 3.77, 2.12, 1.36, 1.03, 0.81, 0.65];
 // [id, nome, nome corto, marca, motore, kg, trazione anteriore, cilindri, CV, giri CV, Nm, giri Nm, limitatore, minimo, marce, finale, raggio ruota, cd, area, prezzo, km, diesel]
 const GEN_NEW = [
-  ['a80', 'Audi 80 Avant 2.0', 'Audi 80', 'Audi', '2.0 aspirato', 1250, true, 4, 115, 5400, 168, 3200, 6300, 800, G5, 4.1, 0.30, 0.33, 2.0, 3500, 0],
-  ['a3', 'Audi A3 Sportback 1.5 TFSI', 'A3', 'Audi', '1.5 TFSI turbo', 1300, true, 4, 150, 5000, 250, 2000, 6200, 750, G6, 3.6, 0.315, 0.30, 2.15, 17000, 60],
-  ['a112', 'Autobianchi A112 Abarth', 'A112', 'Autobianchi', '1050 Abarth', 700, true, 4, 70, 6600, 86, 4200, 7000, 900, [0, 3.58, 2.24, 1.48, 1.04, 0.86], 4.07, 0.27, 0.40, 1.6, 9000, 40],
-  ['bus', 'Autobus urbano', 'Autobus', 'Autobus', '9 litri turbodiesel', 11500, false, 6, 300, 2000, 1250, 1100, 2300, 600, [0, 3.4, 1.9, 1.4, 1.0, 0.75, 0.65], 5.4, 0.5, 0.65, 8.5, 48000, 300, 1],
-  ['doblo', 'Fiat Doblò 1.6 Multijet', 'Doblò', 'Fiat', '1.6 Multijet', 1500, true, 4, 105, 4000, 290, 1500, 4800, 780, G6, 3.8, 0.31, 0.35, 2.9, 11000, 50, 1],
-  ['panda', 'Fiat Panda 1.2', 'Panda', 'Fiat', '1.2 8V', 940, true, 4, 69, 5500, 102, 3000, 6300, 800, G5, 4.07, 0.28, 0.32, 2.1, 2800, 0],
-  ['punto', 'Fiat Grande Punto 1.4', 'Punto', 'Fiat', '1.4 8V', 1100, true, 4, 77, 6000, 115, 3000, 6500, 800, G5, 3.9, 0.29, 0.33, 2.1, 3500, 0],
-  ['golf', 'Volkswagen Golf GTI', 'Golf GTI', 'Volkswagen', '1.8 GTI', 860, true, 4, 112, 5800, 157, 3500, 6800, 850, G5, 3.9, 0.28, 0.42, 1.8, 12000, 80],
-  ['corsa', 'Opel Corsa 1.2', 'Corsa', 'Opel', '1.2 16V', 1100, true, 4, 70, 5600, 115, 4000, 6400, 800, G5, 3.9, 0.29, 0.33, 2.1, 4000, 0],
-  ['p205', 'Peugeot 205 GTI 1.9', '205 GTI', 'Peugeot', '1.9 GTI', 880, true, 4, 130, 6000, 164, 4750, 6900, 850, G5, 4.06, 0.28, 0.35, 1.75, 14000, 120],
-  ['p206', 'Peugeot 206 GTI 2.0', '206 GTI', 'Peugeot', '2.0 16V', 1100, true, 4, 136, 6000, 190, 4100, 6800, 800, G5, 4.0, 0.30, 0.33, 2.0, 7000, 40],
-  ['p308', 'Peugeot 308 1.2 PureTech', '308', 'Peugeot', '1.2 PureTech turbo', 1200, true, 4, 130, 5500, 230, 1750, 6000, 750, G6, 3.6, 0.31, 0.29, 2.2, 15000, 60],
-  ['clio', 'Renault Clio 0.9 TCe', 'Clio', 'Renault', '0.9 TCe turbo', 1050, true, 4, 90, 5250, 140, 2500, 6200, 780, G5, 4.0, 0.30, 0.32, 2.1, 9000, 20],
-  ['williams', 'Renault Clio Williams', 'Williams', 'Renault', '2.0 16V F7R', 990, true, 4, 150, 6100, 175, 4500, 6800, 850, G5, 4.07, 0.29, 0.34, 1.9, 18000, 150],
-  ['taxi', 'Taxi 2.0 diesel', 'Taxi', 'Taxi', '2.0 turbodiesel', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.29, 2.2, 8000, 30, 1],
-  ['v850', 'Volvo 850 R', '850 R', 'Volvo', '2.3 cinque cilindri turbo', 1520, true, 6, 250, 5400, 350, 2500, 6500, 800, G5, 3.6, 0.31, 0.33, 2.1, 16000, 120],
-  ['polo', 'Volkswagen Polo 1.0', 'Polo', 'Volkswagen', '1.0 MPI', 1080, true, 4, 75, 6200, 95, 3000, 6500, 800, G5, 3.9, 0.29, 0.32, 2.1, 5000, 0],
-  ['van', 'Furgone 1.5 dCi', 'Furgone', 'Furgone', '1.5 dCi', 1400, true, 4, 90, 4000, 200, 1750, 4600, 780, G5, 4.0, 0.31, 0.36, 3.0, 9000, 60, 1],
-  ['ambulanza', 'Ambulanza 2.1 CDI', 'Ambulanza', 'Ambulanza', '2.1 CDI', 2900, false, 4, 163, 3800, 360, 1400, 4500, 750, G6, 3.9, 0.35, 0.40, 4.5, 22000, 200, 1],
-  ['polizia', 'Auto della polizia (dismessa)', 'Ex polizia', 'Polizia', '2.0 TDI', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.31, 2.2, 12000, 150, 1],
+  ['a80', 'Audi 80 Avant 2.0', 'Audi 80', 'Audi', '2.0 aspirato', 1250, true, 4, 115, 5400, 168, 3200, 6300, 800, G5, 4.1, 0.30, 0.33, 2.0, 4500, 0],
+  ['a3', 'Audi A3 Sportback 1.5 TFSI', 'A3', 'Audi', '1.5 TFSI turbo', 1300, true, 4, 150, 5000, 250, 2000, 6200, 750, G6, 3.6, 0.315, 0.30, 2.15, 30000, 60],
+  ['a112', 'Autobianchi A112 Abarth', 'A112', 'Autobianchi', '1050 Abarth', 700, true, 4, 70, 6600, 86, 4200, 7000, 900, [0, 3.58, 2.24, 1.48, 1.04, 0.86], 4.07, 0.27, 0.40, 1.6, 14000, 40],
+  ['bus', 'Autobus urbano', 'Autobus', 'Autobus', '9 litri turbodiesel', 11500, false, 6, 300, 2000, 1250, 1100, 2300, 600, [0, 3.4, 1.9, 1.4, 1.0, 0.75, 0.65], 5.4, 0.5, 0.65, 8.5, 60000, 300, 1],
+  ['doblo', 'Fiat Doblò 1.6 Multijet', 'Doblò', 'Fiat', '1.6 Multijet', 1500, true, 4, 105, 4000, 290, 1500, 4800, 780, G6, 3.8, 0.31, 0.35, 2.9, 22000, 50, 1],
+  ['panda', 'Fiat Panda 1.2', 'Panda', 'Fiat', '1.2 8V', 940, true, 4, 69, 5500, 102, 3000, 6300, 800, G5, 4.07, 0.28, 0.32, 2.1, 13500, 0],
+  ['punto', 'Fiat Grande Punto 1.4', 'Punto', 'Fiat', '1.4 8V', 1100, true, 4, 77, 6000, 115, 3000, 6500, 800, G5, 3.9, 0.29, 0.33, 2.1, 14000, 0],
+  ['golf', 'Volkswagen Golf GTI', 'Golf GTI', 'Volkswagen', '1.8 GTI', 860, true, 4, 112, 5800, 157, 3500, 6800, 850, G5, 3.9, 0.28, 0.42, 1.8, 15000, 80],
+  ['corsa', 'Opel Corsa 1.2', 'Corsa', 'Opel', '1.2 16V', 1100, true, 4, 70, 5600, 115, 4000, 6400, 800, G5, 3.9, 0.29, 0.33, 2.1, 15500, 0],
+  ['p205', 'Peugeot 205 GTI 1.9', '205 GTI', 'Peugeot', '1.9 GTI', 880, true, 4, 130, 6000, 164, 4750, 6900, 850, G5, 4.06, 0.28, 0.35, 1.75, 19000, 120],
+  ['p206', 'Peugeot 206 GTI 2.0', '206 GTI', 'Peugeot', '2.0 16V', 1100, true, 4, 136, 6000, 190, 4100, 6800, 800, G5, 4.0, 0.30, 0.33, 2.0, 6500, 40],
+  ['p308', 'Peugeot 308 1.2 PureTech', '308', 'Peugeot', '1.2 PureTech turbo', 1200, true, 4, 130, 5500, 230, 1750, 6000, 750, G6, 3.6, 0.31, 0.29, 2.2, 25000, 60],
+  ['clio', 'Renault Clio 0.9 TCe', 'Clio', 'Renault', '0.9 TCe turbo', 1050, true, 4, 90, 5250, 140, 2500, 6200, 780, G5, 4.0, 0.30, 0.32, 2.1, 17000, 20],
+  ['williams', 'Renault Clio Williams', 'Williams', 'Renault', '2.0 16V F7R', 990, true, 4, 150, 6100, 175, 4500, 6800, 850, G5, 4.07, 0.29, 0.34, 1.9, 25000, 150],
+  ['taxi', 'Taxi 2.0 diesel', 'Taxi', 'Taxi', '2.0 turbodiesel', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.29, 2.2, 9000, 30, 1],
+  ['v850', 'Volvo 850 R', '850 R', 'Volvo', '2.3 cinque cilindri turbo', 1520, true, 5, 250, 5400, 350, 2500, 6500, 800, G5, 3.6, 0.31, 0.33, 2.1, 16000, 120],
+  ['polo', 'Volkswagen Polo 1.0', 'Polo', 'Volkswagen', '1.0 MPI', 1080, true, 4, 75, 6200, 95, 3000, 6500, 800, G5, 3.9, 0.29, 0.32, 2.1, 17500, 0],
+  ['van', 'Furgone 1.5 dCi', 'Furgone', 'Furgone', '1.5 dCi', 1400, true, 4, 90, 4000, 200, 1750, 4600, 780, G5, 4.0, 0.31, 0.36, 3.0, 24000, 60, 1],
+  ['ambulanza', 'Ambulanza 2.1 CDI', 'Ambulanza', 'Ambulanza', '2.1 CDI', 2900, false, 4, 163, 3800, 360, 1400, 4500, 750, G6, 3.9, 0.35, 0.40, 4.5, 25000, 200, 1],
+  ['polizia', 'Auto della polizia (dismessa)', 'Ex polizia', 'Polizia', '2.0 TDI', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.31, 2.2, 11000, 150, 1],
 ];
 for (const q of GEN_NEW) {
   const [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
@@ -342,10 +345,14 @@ for (const q of GEN_NEW) {
   const heavy = mass > 5000;
   const voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
     : { pulse: hp > 120 ? 0.85 : 1.05, rough: hp < 80 ? 0.2 : 0.1, metal: hp > 120 ? 0.35 : 0, boomRpm: lim * 0.5, hiRpm: lim };
+  // scoppi dello scarico: le piccole acute e secche, le grosse più cupe e lunghe, i diesel quasi niente schiocco
+  voice.pop = diesel ? { f: 0.7, crack: 0.5, len: 0.8 } : cyl === 6 ? { f: 0.9, crack: 1.0, len: 1.15, thump: 1.15 }
+    : hp < 80 ? { f: 1.4, crack: 1.3, len: 0.75 } : hp < 120 ? { f: 1.2, crack: 1.15, len: 0.9 } : { f: 1.08, crack: 1.1, len: 1.0 };
+  if (make === 'Volvo') voice.pop = Object.assign({}, VOLVO_POP, { f: 0.72, bf: 0.92, len: 1.5, boom: 0.65 });   // 850 R: ancora più cupa
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
     shiftK: heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: diesel ? 0.15 : 0.3, voice, buy: { price, km },
-    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: diesel ? GEN_EX.diesel : cyl === 6 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
+    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
     P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : 0.14 + mass / 12000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
       heavy ? { Iw: 36, Ks: 240000, vmax: 90 } : {}),
     turbo: null,

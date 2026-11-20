@@ -2,7 +2,10 @@
 //  CarRadio · musica di sottofondo mentre si guida, come un'autoradio
 //  Stazioni: spenta, FM 89.7 (Redline at Midnight, dal file), FM 76.1 (synth notturno
 //  generato in tempo reale con Web Audio: cassa, rullante, charleston, basso, accordi), FM 103.5 Night House
-//  (più canzoni una dopo l'altra: `list`; il titolo di quella in onda va accanto al nome della stazione).
+//  (più canzoni una dopo l'altra: `list`; il titolo di quella in onda va accanto al nome della stazione), e le due stazioni
+//  rap con le canzoni del proprietario (audio/rap/): FM 88.3 Rap di Strada (rap classico, intorno ai 90 BPM, bassi più
+//  leggeri) e FM 106.7 Trap di Mezzanotte (808 pesanti, tempo trap 76/152). Le nuove stazioni vanno in fondo: il gioco
+//  salva la stazione per numero d'ordine.
 //  Cambiando stazione si sente il fruscio della sintonia. Volume basso e separato dal motore.
 // ============================================================================
 /* global window, Audio */
@@ -21,13 +24,23 @@ class CarRadio {
         { src: 'audio/house/midnight_apex.mp3', title: 'Midnight Apex' },
         { src: 'audio/house/midnight_redline.mp3', title: 'Midnight Redline' },
       ] },
+      { id: 'rap', freq: 'FM 88.3', name: 'Rap di Strada', base: 'Rap di Strada', list: [
+        { src: 'audio/rap/asphalt_throne.mp3', title: 'Asphalt Throne' },
+        { src: 'audio/rap/liquid_gold_and_concrete.mp3', title: 'Liquid Gold and Concrete' },
+        { src: 'audio/rap/midnight_in_the_street.mp3', title: 'Midnight In The Street' },
+      ] },
+      { id: 'trap', freq: 'FM 106.7', name: 'Trap di Mezzanotte', base: 'Trap di Mezzanotte', list: [
+        { src: 'audio/rap/carbon_fiber_heart.mp3', title: 'Carbon Fiber Heart' },
+        { src: 'audio/rap/asphalt_and_will.mp3', title: 'Asphalt and Will' },
+      ] },
     ];
     this.i = 1; this.vol = 0.3; this.master = 1; this.muted = false; this.on = false;
     this.el = null; this.els = {}; this.ctx = null; this.timer = null;
     this.onChange = opts.onChange || (() => {});
   }
   get station() { return this.stations[this.i]; }
-  level() { return this.muted ? 0 : this.vol * this.master; }
+  level() { return this.muted ? 0 : this.vol * this.master * (this.duck ?? 1); }   // duck: più bassa durante gli inseguimenti
+  setDuck(k) { k = Math.max(0, Math.min(1, k)); if (Math.abs(k - (this.duck ?? 1)) < 0.01) return; this.duck = k; this.apply(); }
 
   attach(ctx) {
     if (this.ctx || !ctx) return;

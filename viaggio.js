@@ -9,6 +9,20 @@
 
 // ---------------------------------------------------------------- la strada: tappe e paesaggi
 const VG_STOP0 = 1800, VG_STEP = 3200;                     // prima tappa al km 1,8, poi una ogni 3,2 km
+// l'auto ereditata dallo zio (scelta nel prologo) nei testi della storia: {Auto} e {auto} diventano «La Panda» / «la Panda»,
+// {tipo} «un'utilitaria» / «una station wagon». Si ricorda in game.s.vg.eredita (senza: la Volvo).
+const VG_AUTO_NOME = { v40: ['la', 'Volvo', 'una station wagon'], a80: ["l'", 'Audi', 'una station wagon'], panda: ['la', 'Panda', "un'utilitaria"],
+  punto: ['la', 'Punto', "un'utilitaria"], corsa: ['la', 'Corsa', "un'utilitaria"], polo: ['la', 'Polo', "un'utilitaria"] };
+function vgTesto(game, text) {
+  if (typeof text !== 'string' || text.indexOf('{') < 0) return text;
+  const id = (game && game.s && game.s.vg && game.s.vg.eredita) || 'v40', c = typeof CARS !== 'undefined' && CARS[id];
+  const [art, nome, tipo] = VG_AUTO_NOME[id] || ['la', (c && (c.short || c.name)) || 'auto', "un'auto"];
+  const low = art.endsWith("'") ? art + nome : art + ' ' + nome, cap = low.charAt(0).toUpperCase() + low.slice(1);
+  return text.replace(/\{Auto\}/g, cap).replace(/\{auto\}/g, low).replace(/\{tipo\}/g, tipo);
+}
+// pipì e cacca: ore «di viaggio» per svuotarsi del tutto (pipì 12, cacca 24); un'ora di viaggio = minPerOra minuti veri (l'orologio del gioco
+// corre a 3 minuti per secondo, ma così sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca.
+const VG_BAGNO = { pipiOre: 12, cacaOre: 24, minPerOra: 3 };
 const VG_PATTERN = ['bar', 'fuel', 'grill', 'niko', 'bar', 'motel', 'fuel', 'shop', 'bar', 'grill', 'style', 'motel'];
 const VG_BARS = ['Bar Sport', 'Bar della Curva', 'Caffè del Ponte', 'Bar Stella', 'Bar dei Camionisti', 'Bar Luna', 'Caffè Centrale', 'Bar Ultima Sosta'];
 const VG_PLACE = {
@@ -16,12 +30,14 @@ const VG_PLACE = {
   grill: { name: () => 'Sosta 24', what: 'autogrill', col: '#ff7a3a' },
   motel: { name: () => 'Motel Ovunque', what: 'motel', col: '#ff5fa8' },
   fuel: { name: () => 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
-  niko: { name: () => 'Officina Niko', what: 'meccanico', col: '#5ad1ff' },
+  niko: { name: () => 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
   shop: { name: () => 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
   style: { name: () => 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
 };
 // il paesaggio cambia lungo la strada: da casa (città) alla pianura, al borgo, al mare, ai monti, alla baia, al deserto… e poi ancora
-const VG_ROUTE = [['tokyo', 12], ['bassa', 45], ['sangimignano', 40], ['positano', 50], ['hakone', 45], ['wangan', 55], ['route66', 60]];
+// il giro delle dodici capitali (capitali.js) con in mezzo i paesaggi di sempre; dopo Washington si torna al Wangan e il giro riparte da Roma
+const VG_ROUTE = [['tokyo', 12], ['wangan', 30], ['roma', 12], ['sangimignano', 30], ['parigi', 12], ['bassa', 30], ['londra', 12], ['hakone', 30], ['stoccolma', 12], ['bassa', 30], ['berlino', 12],
+  ['sangimignano', 30], ['praga', 12], ['hakone', 30], ['vienna', 12], ['positano', 30], ['madrid', 12], ['positano', 30], ['lisbona', 12], ['sangimignano', 30], ['atene', 12], ['route66', 30], ['washington', 12], ['route66', 30]];
 const VG_ROUTE_LEN = VG_ROUTE.reduce((a, r) => a + r[1], 0);
 
 const VG = {
@@ -52,7 +68,7 @@ Object.assign(INV, {
   scatola: { name: 'Scatola da consegnare', kg: 20, price: 0, note: 'Va lasciata al locale scritto sull\'etichetta.' },
   bancale: { name: 'Bancale', kg: 1000, price: 0, note: 'Merce su bancale per il camion.' },
   bomboletta: { name: 'Bomboletta gonfia e ripara', kg: 0.5, price: 18, note: 'Rigonfia la gomma bucata a 1,9 bar e tappa quasi tutto il buco. Arrivi al prossimo gommista.' },
-  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Niko te la ripara e torna a essere la ruota di scorta.' },
+  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Mario te la ripara e torna a essere la ruota di scorta.' },
 });
 const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette', 'bomboletta', 'scorta'];
 
@@ -61,13 +77,13 @@ const VG_SEATS = { v40: 4, supra: 1, r5: 1, b2002: 3, e30: 3, e36: 3, e34: 4, va
 const VG_CARGO = { van: { kg: 900, slots: 24 }, truck: { kg: 9000, slots: 18 }, bus: { kg: 300, slots: 16 } };
 const VG_TRAILER = { kg: 300, slots: 10, mass: 320 };
 const VG_SHOP = [
-  { id: 'trailer', name: 'Gancio e rimorchietto', price: 1600, km: 20, note: 'Dieci posti e 300 kg in più per le scatole. Più peso, frenate lunghe e sopra i 110 km/h il rimorchio comincia a sbandare.' },
-  { id: 'b2002', name: 'BMW 2002 Turbo (usata)', price: 16000, km: 60, car: true, note: 'Turbo anni \'70 e un ritardo leggendario.' },
-  { id: 'e30', name: 'BMW M3 E30 (usata)', price: 24000, km: 120, car: true, note: 'Quattro farfalle e un cambio dogleg.' },
-  { id: 'e36', name: 'BMW M3 E36 (usata)', price: 21000, km: 120, car: true, note: 'Sei in linea che urla.' },
-  { id: 'e34', name: 'BMW M5 E34 (usata)', price: 26000, km: 160, car: true, note: 'La berlina che non sembra.' },
-  { id: 'r5', name: 'Renault 5 Turbo 2', price: 30000, km: 220, car: true, note: 'Motore dietro, rally nel sangue.' },
-  { id: 'supra', name: 'Toyota Supra RZ', price: 34000, km: 260, car: true, note: 'Il 2JZ. Lo sai.' },
+  { id: 'trailer', name: 'Gancio e rimorchietto', price: 2200, km: 20, note: 'Dieci posti e 300 kg in più per le scatole. Più peso, frenate lunghe e sopra i 110 km/h il rimorchio comincia a sbandare.' },
+  { id: 'b2002', name: 'BMW 2002 Turbo (usata)', price: 55000, km: 60, car: true, note: 'Turbo anni \'70 e un ritardo leggendario.' },
+  { id: 'e30', name: 'BMW M3 E30 (usata)', price: 75000, km: 120, car: true, note: 'Quattro farfalle e un cambio dogleg.' },
+  { id: 'e36', name: 'BMW M3 E36 (usata)', price: 28000, km: 120, car: true, note: 'Sei in linea che urla.' },
+  { id: 'e34', name: 'BMW M5 E34 (usata)', price: 32000, km: 160, car: true, note: 'La berlina che non sembra.' },
+  { id: 'r5', name: 'Renault 5 Turbo 2', price: 95000, km: 220, car: true, note: 'Motore dietro, rally nel sangue.' },
+  { id: 'supra', name: 'Toyota Supra RZ', price: 65000, km: 260, car: true, note: 'Il 2JZ. Lo sai.' },
 ];
 
 // le auto del pacchetto del giocatore si comprano alla concessionaria del motel; posti a sedere secondo la carrozzeria
@@ -94,7 +110,7 @@ const VG_RUMORS = [
 // capitoli: si leggono al passaggio dei chilometri. Per ora solo la partenza: il resto lo scrive la nuova storia
 // (km, title, text; ogni capitolo si legge una volta)
 const VG_CHAPTERS = [
-  { km: 0, title: 'Km 0', text: 'La Volvo di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano diecimila. Metti la prima.' },
+  { km: 0, title: 'Km 0', text: '{Auto} di tuo zio, il motore ancora freddo. In tasca pochi soldi, nel bagagliaio la ruota di scorta. Davanti l\'autostrada, e un cartello solo: «SOLO AVANTI». Al bar del km 1,8 qualcuno ti aspetta con un lavoro: un pacco da portare al benzinaio dopo, pagano tremila. Metti la prima.' },
 ];
 
 // ---------------------------------------------------------------- eventi strani (per ora vuoto: li scrive la nuova storia)
@@ -110,7 +126,7 @@ const VG_STORY_PAX = [];
 
 // ---------------------------------------------------------------- stato
 function vgFresh() {
-  return { on: true, needs: { food: 0.9, water: 0.9, sleep: 0.95, wash: 0.9 }, cassa: [], garage: ['v40'], owned: {}, trailer: false, trailerOn: false,
+  return { on: true, needs: { food: 0.9, water: 0.9, sleep: 0.95, wash: 0.9, pee: 1, poo: 1 }, cassa: [], garage: ['v40'], owned: {}, trailer: false, trailerOn: false,
     pax: [], seen: {}, chapters: {}, stops: 0, fuelStops: 0, lastKm: 0, nextHitch: 1.2, nextOdd: 8, oddCount: 0, lastMotel: -1, sleepAt: null,
     jobs: 0, earned: 0, line: null, horrorT: 0, glitch: 0, blackout: 0, again: null };
 }
@@ -131,6 +147,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     this.loc = GAME_LOCS[0]; this.s.loc = 'tokyo';
     this.sim.fuel = 0.6; this.sim.damage = 0; this.sim.tireWear = 0;
     this.applyMass();
+    this.prompt = null;
     this.vgChapter(0);
   };
 
@@ -194,6 +211,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       const N = v.needs;
       if (d.food) N.food = Math.min(1, N.food + d.food);
       if (d.water) N.water = Math.min(1, N.water + d.water);
+      if (d.water) N.pee = Math.max(0, (N.pee ?? 1) - d.water * 0.2);
+      if (d.food) N.poo = Math.max(0, (N.poo ?? 1) - d.food * 0.12);
       if (d.sleep) N.sleep = Math.min(1, N.sleep + d.sleep);
       if (d.wash) N.wash = Math.min(1, N.wash + d.wash);
       this.s.trunk.splice(i, 1); this.applyMass();
@@ -280,16 +299,27 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (ap.t > 14 && this.ap === ap) {
         T.p[i] = TYRE_P; T.leak[i] = 0; this.ap = null;
         if (!this.addItem('forata')) this.say('La gomma forata non ci sta nel bagagliaio: la lasci sul ciglio della strada');
-        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Niko.`, 'buy');
+        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Mario.`, 'buy');
       }
     };
     return { ok: true };
+  };
+  // l'auto ereditata (all'inizio del primo Viaggio): è rimasta ferma anni nel garage dello zio. Gomme mezze sgonfie e
+  // consumate, olio e candele da cambiare, pastiglie basse, polvere, qualche ammaccatura, poca benzina. Una volta sola.
+  const VG_EREDITA = { p: [1.55, 1.7, 1.45, 1.65], wear: 0.55, damage: 0.14, oil: 0.22, plugs: 0.35, pads: 0.3, dirt: 0.95, fuel: 0.22 };
+  P.vgInherit = function () {
+    const v = this.s.vg; if (!v || v.inherited) return false;
+    v.inherited = 1; const E = VG_EREDITA, T = this.tyres(), sim = this.sim;
+    T.p = E.p.slice(); T.leak = [0, 0, 0, 0];
+    sim.tireWear = Math.max(sim.tireWear || 0, E.wear); sim.damage = Math.max(sim.damage || 0, E.damage); sim.fuel = Math.min(sim.fuel, E.fuel);
+    const m = this.maint(); m.oil = Math.min(m.oil, E.oil); m.plugs = Math.min(m.plugs, E.plugs); m.pads = Math.min(m.pads, E.pads); m.dirt = Math.max(m.dirt, E.dirt);
+    return true;
   };
   P.inflate = function () { const T = this.tyres(); for (let i = 0; i < 4; i++) if (T.leak[i] < 0.05) T.p[i] = TYRE_P; return { ok: true }; };
   P.repairTyre = function () {
     const i = this.s.trunk.findIndex((it) => it.kind === 'forata'); if (i < 0) return { ok: false, why: 'Non hai gomme forate da riparare' };
     if (this.s.money < 25) return { ok: false, why: 'Costa € 25' };
-    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Niko ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
+    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Mario ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
   };
 
   // ------------------------------------------------------------ ciclo del viaggio
@@ -301,19 +331,29 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const lid = VG.locAt(km);
     if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap && !this.race) {
       const was = this.loc && this.loc.id; this.setLoc(lid);
-      if (was && was !== lid) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
+      if (was && was !== lid && !this.loc.cap) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
     }
     // bisogni: con i km e col tempo (di più a motore acceso)
     const N = v.needs, t = dt / 60;
+    if (!(N.pee >= 0)) N.pee = 1; if (!(N.poo >= 0)) N.poo = 1;       // vecchi salvataggi: nascono tranquilli
     const tired = 1 + (v.sleepAt !== null && km - v.sleepAt > 150 ? 0.5 : 0);
     N.food = Math.max(0, N.food - dkm / 60 - t * 0.003);
     N.water = Math.max(0, N.water - dkm / 45 - t * 0.004);
     N.sleep = Math.max(0, N.sleep - dkm / 140 * tired - t * 0.002);
     N.wash = Math.max(0, N.wash - dkm / 180 - t * 0.001);
+    // pipì e cacca: solo col tempo (non coi km), piano piano; 1 = tranquillo, 0 = non ce la fai più (come gli altri bisogni)
+    N.pee = Math.max(0, N.pee - t / (VG_BAGNO.pipiOre * VG_BAGNO.minPerOra));
+    N.poo = Math.max(0, N.poo - t / (VG_BAGNO.cacaOre * VG_BAGNO.minPerOra));
+    for (const k of ['pee', 'poo']) if (N[k] <= 0 && !this.inside) {      // a zero, fuori da un locale: te la fai addosso
+      N[k] = 0.6; N.wash = Math.max(0, N.wash - 0.5); v['warn' + k] = 0;
+      const M = k === 'pee' ? ['Non ce l\'hai fatta: te la sei fatta addosso. I jeans ricordano.', 'Ecco. Il caldo dei pantaloni dice che hai perso.', 'Cedimento strutturale. Pantaloni bagnati e dignità a zero.']
+        : ['Non ce l\'hai fatta. Meglio non pensarci: ti serve una doccia, e un esorcista.', 'È successo. Non ne parleremo mai più. Finestrino aperto.', 'Il sedile non sarà più lo stesso, e nemmeno tu.'];
+      this.say(M[Math.floor(Math.random() * M.length)], 'bad');
+    }
     const low = Math.min(N.food, N.water, N.sleep);
-    for (const k of ['food', 'water', 'sleep', 'wash']) {
+    for (const k of ['food', 'water', 'sleep', 'wash', 'pee', 'poo']) {
       const was = v['warn' + k] || 0, lvl = N[k] < 0.08 ? 2 : N[k] < 0.25 ? 1 : 0;
-      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'] }[k][lvl - 1], 'bad');
+      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'], pee: ['Ti scappa la pipì', 'Non ce la fai più: o un bagno o la piazzola'], poo: ['Ti serve un bagno, e non per lavarti le mani', 'Oh merda: ti stai cagando addosso. Un bagno, subito'] }[k][lvl - 1], 'bad');
       v['warn' + k] = lvl;
     }
     // sonno: colpi di sonno sempre più frequenti; a zero ti addormenti
@@ -344,10 +384,11 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 
   P.vgChapter = function (k) {
-    const v = this.s.vg, c = VG_CHAPTERS.find((q) => q.km === k); if (!c) return;
-    v.chapters[k] = true;
-    this.prompt = null;
-    this.ask({ kind: 'story', title: c.title, text: c.text, time: 40, options: [{ label: k === 0 ? 'Parti' : 'Continua' }] });
+    const v = this.s.vg, c = VG_CHAPTERS.find((q) => q.km === k); if (!c || this.prompt) return;
+    // Modifica Codex (adattata da Claude): il capitolo è letto quando lo confermi (o quando scade il tempo, che vale
+    // come conferma), non quando compare: se ricarichi la pagina mentre è aperto, o se un locale chiude la domanda, ritorna
+    this.ask({ kind: 'story', title: c.title, text: vgTesto(this, c.text), time: 40,
+      options: [{ label: k === 0 ? 'Parti' : 'Continua', act: () => { v.chapters[k] = true; } }] });
   };
 
   // ------------------------------------------------------------ autostoppisti
@@ -366,7 +407,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (!story) { v.recent.push(name); if (v.recent.length > 8) v.recent.shift(); }
       const far = 3 + Math.floor(Math.random() * 14);
       this.ents.push({ id: this.id++, kind: 'hitch', lane: 0, x: d + 260 + Math.random() * 120, v: 0, name, story: story ? story.id : null,
-        to: Math.round(km + far), pay: Math.round(18 + far * (3.5 + Math.random() * 2)) });
+        to: Math.round(km + far), pay: Math.round(30 + far * (9 + Math.random() * 4)) });
     }
     // ci si ferma accanto: la domanda
     for (const e of this.ents) {
@@ -439,8 +480,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 
   // ------------------------------------------------------------ lavori: bacheca dei locali
-  // prima missione: al primo locale c'è un pacco da portare alla tappa dopo, paga € 10.000 (soldi da spendere subito)
-  const VG_FIRST = { pay: 10000, kg: 4, from: 0, to: 1 };
+  // prima missione: al primo locale c'è un pacco da portare alla tappa dopo, paga € 3.000 (per rimettere in sesto l'auto ereditata)
+  const VG_FIRST = { pay: 3000, kg: 4, from: 0, to: 1 };
   P.vgFirstOffer = function () {
     const dest = VG.stop(VG_FIRST.to);
     return { k: 'primo', kind: 'scatola', kg: VG_FIRST.kg, to: VG_FIRST.to, toName: dest.name, kmTo: Math.round(dest.x / 100) / 10, pay: VG_FIRST.pay, first: true };
@@ -462,7 +503,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     for (let k = 0; k < 3; k++) {
       const hops = 1 + Math.floor(h(k) * 6), to = n + hops, dest = VG.stop(to), kmTo = (dest.x / 1000);
       const kg = Math.round(base * (1 + h(k + 5) * (car === 'truck' ? 1 : 3)));
-      const pay = Math.round((12 + hops * 3.2 * (car === 'truck' ? 9 : car === 'van' ? 2.4 : 1) * (1 + kg / (base * 3))) * (car === 'truck' ? 6 : 1) / 5) * 5;
+      const pay = Math.round((12 + hops * 3.2 * (car === 'truck' ? 9 : car === 'van' ? 2.4 : 1) * (1 + kg / (base * 3))) * (car === 'truck' ? 6 : 1) * 4 / 5) * 5;
       offers.push({ k, kind, kg, to, toName: dest.name, kmTo: Math.round(kmTo * 10) / 10, pay });
     }
     return offers;
@@ -488,24 +529,33 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     const v = this.s.vg, L = v.line;
     const off = Math.floor(L.onboard * (0.2 + Math.random() * 0.4)), on = pl.n >= L.to ? 0 : Math.floor(Math.random() * 9);
     L.onboard = Math.min(40, L.onboard - off + on);
-    const pay = on * 6; L.earned += pay; this.s.money += pay; v.earned += pay;
+    const pay = on * 12; L.earned += pay; this.s.money += pay; v.earned += pay;
     this.say(`Fermata ${pl.name}: scendono ${off}, salgono ${on} (+ € ${pay})${L.onboard ? `, a bordo ${L.onboard}` : ''}`, 'money');
     if (pl.n >= L.to) { this.say(`Fine linea: incassati € ${L.earned}`, 'money'); v.line = null; v.jobs++; }
   };
 
   // ------------------------------------------------------------ servizi dei locali
   P.vgPay = function (eur, what) {
-    if (this.s.money < eur) return { ok: false, why: `Costa € ${eur}` };
+    const fido = typeof GAME_FIDO === 'number' ? GAME_FIDO : 0;   // cibo, bevande e motel anche in rosso, fino al credito
+    if (this.s.money - eur < -fido) return { ok: false, why: this.s.money < 0 ? `Sei in rosso di € ${Math.round(-this.s.money)}: niente più credito` : `Costa € ${eur}` };
+    if (this.s.money - eur < 0) this.say('Pagato a credito: sei in rosso', 'buy');
     this.s.money -= eur; if (what) this.say(`${what}: − € ${eur}`, 'buy'); return { ok: true };
   };
   P.vgEat = function (food, water, eur, what) {
     const r = this.vgPay(eur, what); if (!r.ok) return r;
-    const N = this.s.vg.needs; N.food = Math.min(1, N.food + food); N.water = Math.min(1, N.water + water); return r;
+    const N = this.s.vg.needs; N.pee = Math.max(0, (N.pee ?? 1) - water * 0.2); N.poo = Math.max(0, (N.poo ?? 1) - food * 0.12); N.food = Math.min(1, N.food + food); N.water = Math.min(1, N.water + water); return r;
+  };
+  // il bagno (bar, autogrill, benzinaio, motel): gratis. kind 'pee' o 'poo'
+  P.vgBagno = function (kind) {
+    const v = this.s.vg; if (!v || (kind !== 'pee' && kind !== 'poo')) return { ok: false };
+    const N = v.needs, was = N[kind] ?? 1; N[kind] = 1; v['warn' + kind] = 0;
+    this.say(was > 0.85 ? 'Non ti scappava davvero, ma ormai sei qui.' : kind === 'pee' ? 'Che sollievo.' : 'Sollevato. Una vita nuova.', 'info');
+    return { ok: true, was };
   };
   P.vgShower = function (eur) { const r = this.vgPay(eur, 'Doccia'); if (r.ok) this.s.vg.needs.wash = 1; return r; };
   P.vgSleep = function () {
     const v = this.s.vg, km = vgKm(this), n = this.inside ? VG.stopIndex(this.inside.x) : -1;
-    const r = this.vgPay(45, 'Notte al Motel Ovunque'); if (!r.ok) return r;
+    const r = this.vgPay(60, 'Notte al Motel Ovunque'); if (!r.ok) return r;
     v.needs.sleep = 1; v.needs.wash = Math.min(1, v.needs.wash + 0.2); v.needs.food = Math.max(0, v.needs.food - 0.15); v.needs.water = Math.max(0, v.needs.water - 0.2);
     v.lastMotel = n; v.sleepAt = km;
     return r;
@@ -525,7 +575,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgTrailer = function (on) {
     const v = this.s.vg; if (!v.trailer) return { ok: false, why: 'Non hai il rimorchio' };
     if (VG_CARGO[this.car]) return { ok: false, why: 'Il rimorchio si attacca alle auto' };
-    if (!on && (this.s.trunk || []).length > TRUNK_SLOTS) return { ok: false, why: 'Prima scarica: nel bagagliaio non ci sta tutto' };
+    if (!on && ((this.s.trunk || []).length > TRUNK_SLOTS || this.trunkKg() > TRUNK_KG)) return { ok: false, why: 'Prima scarica: nel bagagliaio non ci sta tutto' };
     v.trailerOn = on; this.applyMass(); return { ok: true };
   };
   // cassa del motel: si sposta con te di motel in motel
@@ -564,4 +614,4 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
 })();
 
-if (typeof window !== 'undefined') Object.assign(window, { VG, VG_SHOP, VG_CHAPTERS, VG_ODD, VG_STORY_PAX, VG_FOODS, VG_SEATS, VG_RUMORS, vgOn });
+if (typeof window !== 'undefined') Object.assign(window, { vgTesto, VG_AUTO_NOME, VG, VG_SHOP, VG_CHAPTERS, VG_ODD, VG_STORY_PAX, VG_FOODS, VG_SEATS, VG_RUMORS, vgOn });

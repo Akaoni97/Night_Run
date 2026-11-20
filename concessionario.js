@@ -303,12 +303,15 @@ if (typeof VG_PLACE !== 'undefined') {
     const h4 = (t) => { const h = document.createElement('h4'); h.textContent = t; h.style.cssText = 'margin:4px 0 0;font:400 14px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:#b69cff'; wrap.appendChild(h); };
     const btn = (label, cls, fn, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn ' + (cls || ''); b.innerHTML = label; if (dis) b.disabled = true; b.addEventListener('click', act(fn)); return b; };
 
+    // le cinque auto del garage dello zio che non hai scelto nel prologo sono finite qui, in salone
+    const zio = (id) => typeof GAR_ZIO !== 'undefined' && GAR_ZIO.includes(id) && id !== (v.eredita || 'v40');
+    const ZIO = '<em style="display:block;font:italic 600 11px/1.3 system-ui;color:#ffb347">Era nel garage dello zio</em>';
     // scheda grande di un'auto (occasione o quella scelta)
     const big = (id, isDeal) => {
       const it = VG_SHOP.find((q) => q.id === id), price = g.dlPrice(id, n), plan = g.dlFinPlan(price), lock = k < it.km, testing = v.test && v.test.id === id;
       const d = document.createElement('div'); d.className = 'dl-deal';
       d.innerHTML = `${isDeal ? `<span class="rib">OCCASIONE −${Math.round(DL.deal * 100)} %</span>` : ''}<div class="dl-pic"><img alt="${esc(CARS[id].name)}" src="${pic(id, redraw)}"></div>`
-        + `<div class="dl-name">${esc(CARS[id].name)}<small>${esc(it.note || CARS[id].tag || '')}</small></div>`
+        + `<div class="dl-name">${esc(CARS[id].name)}<small>${esc(it.note || CARS[id].tag || '')}</small>${zio(id) ? ZIO : ''}</div>`
         + `<div class="dl-price">${price !== it.price ? `<s>€ ${fmt(it.price)}</s>` : ''}€ ${fmt(price)}</div>${specRow(g, id)}`;
       const a = document.createElement('div'); a.className = 'dl-acts';
       if (lock) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = `Arriva in salone dal km ${it.km}.`; d.appendChild(p); }
@@ -333,7 +336,7 @@ if (typeof VG_PLACE !== 'undefined') {
         for (const it of list) {
           const lock = k < it.km, s = g.dlSpec(it.id), price = g.dlPrice(it.id, n);
           const c = document.createElement('button'); c.type = 'button'; c.className = `dl-card ${lock ? 'lock' : ''} ${(sel || deal) === it.id ? 'sel' : ''}`;
-          c.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(it.id, redraw)}"></div><b>${esc(CARS[it.id].name)}</b><small>${s.cv} CV · ${fmt(s.kg)} kg</small><span class="p">${lock ? 'dal km ' + it.km : '€ ' + fmt(price)}${it.id === deal ? ' ★' : ''}</span>`;
+          c.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(it.id, redraw)}"></div><b>${esc(CARS[it.id].name)}</b><small>${s.cv} CV · ${fmt(s.kg)} kg</small>${zio(it.id) ? ZIO : ''}<span class="p">${lock ? 'dal km ' + it.km : '€ ' + fmt(price)}${it.id === deal ? ' ★' : ''}</span>`;
           c.addEventListener('click', () => { UI.sel = it.id; redraw(); const b = document.getElementById('placeBody'); if (b) b.scrollTo({ top: 0, behavior: 'smooth' }); });
           grid.appendChild(c);
         }
@@ -391,34 +394,48 @@ if (typeof VG_PLACE !== 'undefined') {
   const S = Street2D.prototype, prevTrip = S.drawTripPlace;
   S.drawTripPlace = function (g, e, x, st, near, open) {
     if (e.id !== 'dealer') return prevTrip ? prevTrip.call(this, g, e, x, st, near, open) : false;
-    const C = this.C, t = st.t || 0, ink = C.ink, L = x - 168, Rr = x + 168, top = 118, gy = 216, lav = '#b69cff';
-    // piazzale davanti
-    g.fillStyle = '#23263a'; g.fillRect(x - 70, gy, 140, 16); g.fillStyle = '#4a5070'; g.fillRect(x - 70, gy, 140, 1);
+    // salone di vetro: fascia scura con la scritta illuminata, portale d'ingresso col marchio, faretti sul soffitto,
+    // tre auto in vetrina (disegni del giocatore) con la pedana che gira, pavimento lucido; fuori bandiere, fioriere, totem
+    const C = this.C, t = st.t || 0, ink = C.ink, X = Math.round(x), L = X - 150, Rr = X + 150, top = 124, gy = 216, lav = '#b69cff';
+    const n = 1 - (this.day || 0), mixc = (a, b, k) => { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); return `rgb(${[16, 8, 0].map((sh) => Math.round(((A >> sh) & 255) + ((((B >> sh) & 255) - ((A >> sh) & 255)) * k))).join(',')})`; };
+    if (this.lcYard) this.lcYard(g, X, 300);
     // fari che spazzano il cielo dagli angoli del tetto
-    g.save(); g.globalCompositeOperation = 'lighter';
-    for (const [bx, ph] of [[L + 12, 0], [Rr - 12, 1.7]]) {
-      const a = -Math.PI / 2 + Math.sin(t * 0.5 + ph) * 0.5, len = 260, w = 0.06;
-      const gr = g.createLinearGradient(bx, top, bx + Math.cos(a) * len, top + Math.sin(a) * len); gr.addColorStop(0, 'rgba(200,180,255,.22)'); gr.addColorStop(1, 'rgba(200,180,255,0)');
-      g.fillStyle = gr; g.beginPath(); g.moveTo(bx, top); g.lineTo(bx + Math.cos(a - w) * len, top + Math.sin(a - w) * len); g.lineTo(bx + Math.cos(a + w) * len, top + Math.sin(a + w) * len); g.closePath(); g.fill();
-    }
-    g.restore();
-    // edificio: telaio d'acciaio e una vetrata intera
-    g.fillStyle = ink; g.fillRect(L - 2, top - 2, Rr - L + 4, gy - top + 2);
-    g.fillStyle = '#1b1a26'; g.fillRect(L, top, Rr - L, 20);                           // fascia del tetto
-    g.fillStyle = '#2c2a3c'; g.fillRect(L, top, Rr - L, 2);
+    if (n > 0.15) { g.save(); g.globalCompositeOperation = 'lighter';
+      for (const [bx, ph] of [[L + 12, 0], [Rr - 12, 1.7]]) {
+        const a = -Math.PI / 2 + Math.sin(t * 0.5 + ph) * 0.5, len = 260, w = 0.06;
+        const gr = g.createLinearGradient(bx, top, bx + Math.cos(a) * len, top + Math.sin(a) * len); gr.addColorStop(0, `rgba(200,180,255,${0.22 * n})`); gr.addColorStop(1, 'rgba(200,180,255,0)');
+        g.fillStyle = gr; g.beginPath(); g.moveTo(bx, top); g.lineTo(bx + Math.cos(a - w) * len, top + Math.sin(a - w) * len); g.lineTo(bx + Math.cos(a + w) * len, top + Math.sin(a + w) * len); g.closePath(); g.fill();
+      } g.restore(); }
+    // fascia del tetto: pannelli scuri, scritta, riga di LED
+    g.fillStyle = ink; g.fillRect(L - 3, top - 3, Rr - L + 6, 25);
+    const fg = g.createLinearGradient(0, top, 0, top + 20); fg.addColorStop(0, '#2a2838'); fg.addColorStop(1, '#16141f'); g.fillStyle = fg; g.fillRect(L, top, Rr - L, 20);
+    for (let q = L + 24; q < Rr; q += 24) { g.fillStyle = '#121019'; g.fillRect(q, top, 1, 20); }
     const name = 'AUTOSALONE NOTTE', nw = this.textW(name, 2);
-    this.text(g, name, Math.round(x - nw / 2), top + 5, Math.floor(t * 0.6) % 7 === 0 && (t % 1) < 0.12 ? '#6a5a9a' : lav, 2);
-    this.light(g, x, top + 10, nw + 20, 16, lav, 0.08, 3);
-    const gT = top + 20, gH = gy - gT;
-    const gr = g.createLinearGradient(0, gT, 0, gy); gr.addColorStop(0, '#3a3456'); gr.addColorStop(0.75, '#5a4f82'); gr.addColorStop(1, '#2a2440');
-    g.fillStyle = gr; g.fillRect(L, gT, Rr - L, gH);                                       // salone illuminato
-    for (let q = 0; q < 6; q++) { g.fillStyle = 'rgba(255,255,255,.07)'; g.fillRect(L + 20 + q * 56, gT + 2, 26, 3); }    // plafoniere
+    if (this.lcNeon) this.lcNeon(g, name, Math.round(L + 12), top + 5, lav, 2, t, 77, nw); else this.text(g, name, L + 12, top + 5, lav, 2);
+    g.fillStyle = Math.floor(t * 0.6) % 7 === 0 && (t % 1) < 0.12 ? '#4a3a7a' : lav; g.fillRect(L, top + 19, Rr - L, 1);
+    if (n > 0.1) this.light(g, X, top + 20, (Rr - L) * 0.45, 4, lav, 0.07 * n, 2);
+    // salone
+    const gT = top + 22, gH = gy - gT, pL = X + 64, pW = 48;
+    const gr = g.createLinearGradient(0, gT, 0, gy); gr.addColorStop(0, mixc('#4a5468', '#3a3456', n)); gr.addColorStop(0.75, mixc('#5a6478', '#5a4f82', n)); gr.addColorStop(1, mixc('#3a4050', '#2a2440', n));
+    g.fillStyle = gr; g.fillRect(L, gT, Rr - L, gH);
+    // parete di fondo: manifesto con la strada e il tramonto, illuminato
+    const mg = g.createLinearGradient(0, gT + 6, 0, gT + 30); mg.addColorStop(0, '#ff7a9a'); mg.addColorStop(0.6, '#b07bff'); mg.addColorStop(1, '#3a2c6a');
+    g.globalAlpha = 0.35 + 0.25 * n; g.fillStyle = mg; g.fillRect(L + 40, gT + 6, 120, 24); g.fillStyle = '#ffd9a0'; this.span(g, L + 100, gT + 24, 8, 5);
+    g.fillStyle = '#1a1430'; g.fillRect(L + 40, gT + 26, 120, 4); g.globalAlpha = 1;
+    // binari dei faretti sul soffitto, coni di luce sulle auto
+    g.fillStyle = '#16141f'; g.fillRect(L, gT, Rr - L, 3);
+    const cars = [[X - 108, 0.36], [X - 18, 0.44], [X + 132, 0.0]];
+    for (const [cx] of cars.slice(0, 2)) for (const o of [-24, 24]) {
+      g.fillStyle = '#2a2838'; g.fillRect(cx + o - 2, gT + 3, 4, 3); g.fillStyle = n > 0.1 ? '#ffffff' : '#c8ccd6'; g.fillRect(cx + o - 1, gT + 6, 2, 1);
+      if (n > 0.1) { g.save(); g.globalCompositeOperation = 'lighter'; const cg = g.createLinearGradient(0, gT + 7, 0, gy - 6); cg.addColorStop(0, `rgba(235,230,255,${0.16 * n})`); cg.addColorStop(1, 'rgba(235,230,255,0)'); g.fillStyle = cg;
+        g.beginPath(); g.moveTo(cx + o - 1, gT + 7); g.lineTo(cx + o + 1, gT + 7); g.lineTo(cx + o * 0.3 + 16, gy - 6); g.lineTo(cx + o * 0.3 - 16, gy - 6); g.closePath(); g.fill(); g.restore(); }
+    }
     // pavimento lucido
-    g.fillStyle = '#4a4270'; g.fillRect(L, gy - 14, Rr - L, 14); for (let q = L; q < Rr; q += 16) { g.fillStyle = '#433b66'; g.fillRect(q, gy - 14, 1, 14); }
-    // tre auto in vetrina (disegni del giocatore), quella in mezzo sulla pedana
+    g.fillStyle = mixc('#4a5060', '#4a4270', n); g.fillRect(L, gy - 14, Rr - L, 14); for (let q = L; q < Rr; q += 16) { g.fillStyle = mixc('#40465a', '#433b66', n); g.fillRect(q, gy - 14, 1, 14); }
+    // due auto in vetrina (disegni del giocatore), quella in mezzo sulla pedana che gira
     const pool = DL_SPORT.filter((id) => CARS[id] && CARS[id].sprite), h = Math.abs(Math.round(e.x)) % 97;
-    const ids = [pool[h % pool.length], pool[(h + 3) % pool.length], pool[(h + 5) % pool.length]];
-    [[x - 108, 0.36], [x, 0.44], [x + 108, 0.36]].forEach(([cx, k], i) => {
+    const ids = [pool[h % pool.length], pool[(h + 3) % pool.length]];
+    cars.slice(0, 2).forEach(([cx, k], i) => {
       const spr = this.trafficSprite && this.trafficSprite(ids[i], 'orig', k); if (!spr) return;
       const base = gy - 6, y = base - Math.round(spr.geo.wy * k + spr.geo.wr * k);
       if (i === 1) { g.fillStyle = '#2a2244'; g.beginPath(); g.ellipse(cx, base - 1, spr.width * 0.58, 4, 0, 0, 7); g.fill(); g.fillStyle = lav; g.beginPath(); g.ellipse(cx, base - 2, spr.width * 0.56, 3, 0, 0, 7); g.fill();
@@ -426,29 +443,53 @@ if (typeof VG_PLACE !== 'undefined') {
       g.drawImage(spr, Math.round(cx - spr.width / 2), y);
       if (spr.wheelImg && spr.wheelImg.width) for (const ax of spr.geo.ax) { const ww = spr.wheelImg.width * k, wh = spr.wheelImg.height * k; g.drawImage(spr.wheelImg, Math.round(cx - spr.width / 2 + ax * k - ww / 2), Math.round(y + spr.geo.wy * k - wh / 2), ww, wh); }
       g.save(); g.globalAlpha = 0.18; g.scale(1, -1); g.drawImage(spr, Math.round(cx - spr.width / 2), -(base * 2 - y) - 2); g.restore();   // riflesso sul pavimento
+      // cartellino del prezzo sul parabrezza
+      g.fillStyle = ink; g.fillRect(Math.round(cx + spr.width * 0.08), y + 4, 12, 7); g.fillStyle = '#ffd23f'; g.fillRect(Math.round(cx + spr.width * 0.08) + 1, y + 5, 10, 5);
     });
-    this.light(g, x, gy - 30, 90, 40, '#d8ccff', 0.1, 2);
-    // montanti della vetrata, riflesso del vetro
-    for (let q = L; q <= Rr; q += 56) { g.fillStyle = ink; g.fillRect(q - 1, gT, 3, gH); g.fillStyle = '#5a5a70'; g.fillRect(q, gT, 1, gH); }
-    g.save(); g.globalAlpha = 0.07; g.fillStyle = '#fff'; for (let q = 0; q < 5; q++) { const sx = L + ((q * 83 + t * 6) % (Rr - L)); g.beginPath(); g.moveTo(sx, gT); g.lineTo(sx + 14, gT); g.lineTo(sx - 20, gy); g.lineTo(sx - 34, gy); g.fill(); } g.restore();
-    // porta scorrevole
-    const dW = 44, dL = x + 56 - dW / 2, oh = Math.round(dW / 2 * open);
-    g.fillStyle = ink; g.fillRect(dL - 2, gy - 52, dW + 4, 52); g.fillStyle = 'rgba(230,220,255,.35)'; g.fillRect(dL, gy - 50, dW / 2 - oh, 50); g.fillRect(dL + dW / 2 + oh, gy - 50, dW / 2 - oh, 50);
-    // totem con l'insegna
-    const px = Rr + 28;
-    g.fillStyle = ink; g.fillRect(px - 3, 62, 6, gy - 62); g.fillStyle = '#3a3a4a'; g.fillRect(px - 2, 62, 4, gy - 62);
-    g.fillStyle = ink; g.fillRect(px - 26, 50, 52, 40); g.fillStyle = '#16122a'; g.fillRect(px - 24, 52, 48, 36);
-    this.text(g, 'AUTO', px - Math.round(this.textW('AUTO', 2) / 2), 56, lav, 2);
+    if (n > 0.1) this.light(g, X - 60, gy - 30, 110, 40, '#d8ccff', 0.08 * n, 2);
+    // montanti della vetrata e riflessi del vetro
+    for (let q = L; q <= pL; q += 52) { g.fillStyle = ink; g.fillRect(q - 1, gT, 3, gH); g.fillStyle = '#5a5a70'; g.fillRect(q, gT, 1, gH); }
+    g.save(); g.globalAlpha = 0.06 + 0.06 * (1 - n); g.fillStyle = '#fff'; for (let q = 0; q < 5; q++) { const sx = L + ((q * 83 + t * 6) % (pL - L)); g.beginPath(); g.moveTo(sx, gT); g.lineTo(sx + 14, gT); g.lineTo(sx - 20, gy); g.lineTo(sx - 34, gy); g.fill(); } g.restore();
+    // a destra del portale: ufficio vendite con la scrivania e il venditore
+    const oL = pL + pW + 2;
+    g.fillStyle = mixc('#3a4050', '#2c2848', n); g.fillRect(oL, gT, Rr - oL, gH);
+    g.fillStyle = 'rgba(20,16,30,.8)'; g.fillRect(oL + 6, gy - 22, 26, 3); g.fillRect(oL + 8, gy - 19, 2, 13); g.fillRect(oL + 28, gy - 19, 2, 13);
+    g.fillStyle = '#5ad1ff'; g.fillRect(oL + 12, gy - 28, 8, 6); if (n > 0.1) this.light(g, oL + 16, gy - 25, 8, 6, '#5ad1ff', 0.08 * n, 2);
+    g.fillStyle = 'rgba(20,14,18,.8)'; g.fillRect(oL + 22, gy - 34, 5, 5); g.fillRect(oL + 21, gy - 29, 7, 9); g.fillStyle = '#4a4a8a'; g.fillRect(oL + 21, gy - 28, 7, 3);
+    for (const q of [oL - 1, Rr - 1]) { g.fillStyle = ink; g.fillRect(q, gT, 3, gH); }
+    this.text(g, 'RATE', oL + 9, gT + 6, '#ffd23f'); this.text(g, 'FACILI', oL + 9, gT + 13, '#ffd23f');
+    // portale d'ingresso: più alto del tetto, col marchio tondo e le porte scorrevoli
+    g.fillStyle = ink; g.fillRect(pL - 3, top - 18, pW + 6, gy - top + 18);
+    const pg = g.createLinearGradient(0, top - 16, 0, gT); pg.addColorStop(0, '#3a3450'); pg.addColorStop(1, '#22202e'); g.fillStyle = pg; g.fillRect(pL - 2, top - 17, pW + 4, gT - top + 17);
+    g.fillStyle = ink; this.span(g, pL + pW / 2, top + 2, 13, 13); g.fillStyle = '#16122a'; this.span(g, pL + pW / 2, top + 2, 11, 11);
+    g.fillStyle = lav; this.span(g, pL + pW / 2, top + 2, 10, 10); g.fillStyle = '#16122a'; this.span(g, pL + pW / 2, top + 2, 8, 8);
+    this.text(g, 'N', pL + pW / 2 - 1, top - 1, lav); if (n > 0.1) this.light(g, pL + pW / 2, top + 2, 18, 18, lav, 0.1 * n, 3);
+    const dT = gT + 6, dH = gy - dT, half = pW / 2, oh = Math.round((half - 3) * open);
+    g.fillStyle = mixc('#4a5468', '#8a7ab8', n); g.fillRect(pL, dT, pW, dH);
+    g.fillStyle = 'rgba(200,190,240,.3)'; g.fillRect(pL, dT, half - oh, dH); g.fillRect(pL + half + oh, dT, half - oh, dH);
+    g.fillStyle = '#5a5a70'; g.fillRect(pL + half - oh - 1, dT, 1, dH); g.fillRect(pL + half + oh, dT, 1, dH); g.fillRect(pL, dT, pW, 1);
+    if (n > 0.1) this.light(g, pL + half, gy + 5, 30 + 16 * open, 7, '#e8e0ff', (0.08 + 0.06 * open) * n, 3);
+    // fioriere ai lati dell'ingresso
+    if (this.lcPlant) { this.lcPlant(g, pL - 8, 31, true); this.lcPlant(g, L - 2, 43); }
+    // bandiere a vela e totem con l'insegna, a destra
+    for (const [fx, col] of [[Rr + 10, lav], [Rr + 24, '#ffd23f']]) {
+      g.fillStyle = ink; g.fillRect(fx, gy - 64, 1, 64);
+      for (let r = 0; r < 48; r++) { const w = Math.round(8 * Math.sin((r + 4) / 52 * Math.PI) + Math.sin(t * 3 + r * 0.2 + fx) * 1.2); g.fillStyle = r > 16 && r < 30 ? '#16122a' : col; g.fillRect(fx + 1, gy - 64 + r, Math.max(1, w), 1); }
+    }
+    const px = Rr + 52;
+    g.fillStyle = ink; g.fillRect(px - 3, 134, 6, gy - 134); g.fillStyle = '#3a3a4a'; g.fillRect(px - 2, 134, 4, gy - 134);
+    g.fillStyle = ink; g.fillRect(px - 26, 96, 52, 40); g.fillStyle = '#16122a'; g.fillRect(px - 24, 98, 48, 36);
+    this.text(g, 'AUTO', px - Math.round(this.textW('AUTO', 2) / 2), 102, lav, 2);
     const blink = Math.floor(t * 2) % 2;
-    this.text(g, 'OCCASIONI', px - Math.round(this.textW('OCCASIONI', 1) / 2), 72, blink ? '#ffd23f' : '#8a7a2a', 1);
-    this.light(g, px, 70, 50, 40, lav, 0.1, 3);
+    this.text(g, 'OCCASIONI', px - Math.round(this.textW('OCCASIONI', 1) / 2), 118, blink && n > 0.05 ? '#ffd23f' : '#8a7a2a', 1);
+    if (n > 0.1) this.light(g, px, 116, 50, 40, lav, 0.1 * n, 3);
     // festoni di bandierine dal totem al tetto
     for (let q = 0; q < 14; q++) {
-      const f = q / 13, bx = Rr - 4 + (px - Rr + 4) * f, by = top + 2 + (58 - top + 2) * f + Math.sin(f * Math.PI) * 10;
+      const f = q / 13, bx = Rr - 4 + (px - Rr + 4) * f, by = top + 2 + (104 - top + 2) * f + Math.sin(f * Math.PI) * 10;
       const col = ['#ff3b4a', '#ffd23f', '#3b9bff', '#4ade80'][q % 4], fl = Math.sin(t * 6 + q) > 0 ? 1 : 0;
       g.fillStyle = col; g.fillRect(Math.round(bx), Math.round(by), 3, 3 + fl); g.fillRect(Math.round(bx) + 1, Math.round(by) + 3 + fl, 1, 1);
     }
-    this.placeTag(g, x, top - 18, 'CONCESSIONARIO', lav, near);
+    this.placeTag(g, pL + half, dT + 4, 'CONCESSIONARIO', lav, near);
     return true;
   };
 })();

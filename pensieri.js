@@ -1,8 +1,10 @@
 // ============================================================================
 //  Night Run · I pensieri del protagonista (dopo missioni.js)
 //  Ogni tanto il protagonista dice cosa pensa: un testo scritto sulla strada, 8-10 secondi, senza vignetta e senza riquadro.
-//  Tre sorgenti: PENS_KM (uno scritto, a un certo km: la radio, il navigatore...), PENS_BISOGNI (fame, sete, sonno, igiene:
-//  due livelli, prima presto e poi con urgenza) e PENS_ANIMO (pensieri a caso, ognuno una sola volta per partita).
+//  Quattro sorgenti: PENS_KM (uno scritto, a un certo km: la radio, il navigatore...), PENS_BISOGNI (fame, sete, sonno,
+//  igiene: due livelli, prima presto e poi con urgenza), PENS_STATO (com'è messa l'auto e la situazione: fari rotti, spia
+//  del motore, gomma, pioggia, soldi in rosso, ricercato; una volta quando comincia) e PENS_ANIMO (pensieri a caso, ognuno
+//  una sola volta per partita).
 //  Non si ripetono: ogni gruppo si pesca da un mazzo mescolato, che si ricarica solo quando è finito.
 //  I TESTI SONO SEGNAPOSTO (tranne la radio): si cambiano qui. La storia nuova ne aggiunge con game.vgThink(testo).
 //  Stato in game.s.vg.pens; l'ultimo pensiero in game.thought ({ text, left, id }), che il testo a schermo legge.
@@ -11,12 +13,12 @@ const PENS_KM = [
   { km: 1, id: 'radio', text: 'La radio gracchia. E queste stazioni non le ho mai sentite, eppure sono sempre in zona.' },
   { km: 3.5, id: 'navigatore', text: 'Il navigatore del telefono dice solo «prosegui dritto». Utile.' },
   { km: 6, id: 'uscite', text: 'Guido da un po\' e non ho ancora visto un\'uscita. Non mi ricordavo questa strada così.' },
-  { km: 9, id: 'volvo', text: 'La Volvo di zio Claudio non l\'avevo mai guidata. Si sente che l\'ha tenuta bene.' },
+  { km: 9, id: 'volvo', text: '{Auto} di zio Claudio non l\'avevo mai guidata. Si sente che l\'ha tenuta bene.' },   // {Auto}: l'auto scelta nel garage
   { km: 13, id: 'bar', text: 'Tanti bar, tutti aperti. A quest\'ora, poi.' },
   { km: 18, id: 'cartello', text: 'Sono sicuro di aver già visto quel cartello. Forse no.' },
 ];
 // [soglia del livello 1, soglia del livello 2]: sotto la prima parla presto, sotto la seconda con urgenza
-const PENS_SOGLIE = { food: [0.45, 0.2], water: [0.45, 0.2], sleep: [0.45, 0.2], wash: [0.35, 0.15] };
+const PENS_SOGLIE = { food: [0.45, 0.2], water: [0.45, 0.2], sleep: [0.45, 0.2], wash: [0.35, 0.15], pee: [0.4, 0.15], poo: [0.4, 0.15] };
 const PENS_BISOGNI = {
   food: [
     ['Lo stomaco comincia a farsi sentire.', 'Un panino non mi farebbe schifo.', 'Non mangio da un po\'. Al prossimo bar mi fermo.', 'Ho un buco allo stomaco.', 'Speriamo che il prossimo bar sia aperto: ho fame.'],
@@ -34,18 +36,39 @@ const PENS_BISOGNI = {
     ['Avrei bisogno di una doccia.', 'Mi sento appiccicoso. Una doccia ci starebbe.'],
     ['Faccio schifo anche a me stesso.', 'Mi sento uno straccio sporco.'],
   ],
+  pee: [
+    ['Ho bevuto come un cammello e adesso la vescica presenta il conto.', 'Un bagno. Anche brutto. Anche senza porta.', 'Ogni buca la sento in un posto preciso, e non è la schiena.', 'Non è urgente. Non ancora. Ma lo sarà, e lo sa.', 'Al prossimo locale mi fermo, e stavolta non ci penso due volte.', 'Il sedile vibra. Io le sento tutte, una per una.', 'Il rumore dell\'acqua alla radio non aiuta. Per niente.'],
+    ['Se arrivo al prossimo locale senza incidenti mi faccio una statua.', 'Il corpo ha smesso di chiedere e ha cominciato a minacciare.', 'Guido con le gambe incrociate. Questo è il mio livello adesso.', 'Non resisto più: o trovo un bagno o mi fermo in mezzo alla strada.', 'Oh merda. Letteralmente no, ma la pipì sì. Vi prego, un bagno.', 'Ogni dosso è un esame di coscienza.', 'Se mi scappa ancora un po\' divento un cartello di pericolo.'],
+  ],
+  poo: [
+    ['La pancia borbotta una cosa che non è fame.', 'Mi sa che il panino di prima ha altri programmi per me.', 'Il corpo mi manda segnali. Per ora gentili.', 'Sento una pressione sorda e costante. Il prossimo bagno è un appuntamento fissato.', 'Non è il momento. Ma il momento sta arrivando e non ha fretta.', 'Una pausa tecnica non mi dispiacerebbe. Di quelle lunghe, con la porta chiusa.'],
+    ['Oh merda. No, aspetta, quasi: mi sto cagando addosso.', 'Se mi viene adesso, questa macchina diventa un luogo del delitto.', 'Stringo tutto. Tutto. Fino alla pace con me stesso.', 'Devo andare in bagno. Adesso. Non è una richiesta.', 'Qualcuno mi dica che il prossimo locale è vicino. Anche una bugia pietosa va bene.', 'Se esco vivo da questo viaggio lo racconto solo a mio cognato.', 'Prometto di non mangiare più niente per il resto della vita. Ma fatemi arrivare.'],
+  ],
 };
 // a caso, ogni tanto, mentre si guida: ognuno una sola volta per partita
 const PENS_ANIMO = [
   'Che silenzio. Solo il motore e la strada.',
-  'La Volvo tira bene, per essere una station wagon.',
+  '{Auto} tira bene, per essere {tipo}.',
   'Chissà cosa aveva in mente lo zio con tutte quelle auto sotto i teli.',
   'Di notte la strada sembra più lunga. Come diceva il notaio.',
   'Ho la strada quasi tutta per me.',
   'Chissà se prima o poi arrivo a una fine.',
   'Ho lasciato la luce accesa a casa? Boh.',
   'Mi sa che ho esagerato col caffè.',
+  'A quest\'ora ogni canzone sembra scritta apposta per chi guida da solo.',
+  'Conto le strisce bianche. Poi perdo il conto. Poi ricomincio.',
+  'Chi guida di notte ha sempre qualcosa da cui scappare. O verso cui correre.',
+  'Le luci dei camion da lontano sembrano un paese che si muove.',
 ];
+// com'è messa l'auto e la situazione: `on` dice se vale adesso; parla quando comincia (e lo ripete dopo PENS_RIPETI)
+const PENS_STATO = {
+  luci: { on: (g) => (g.sim.damage || 0) > 0.35, frasi: ['I fari vanno e vengono. Qualche botta di troppo, e si vede.', 'Si è accesa la spia delle luci. Con questi fari a singhiozzo di notte è un terno al lotto.'] },
+  motore: { on: (g) => (g.sim.damage || 0) > 0.6 || !!(g.carState && g.carState().tired), frasi: ['La spia del motore è accesa. Finché tira, tiro avanti. Poi si vedrà.', 'Spia gialla sul quadro. Da Mario prima che diventi rossa.'] },
+  gomma: { on: (g) => g.tyres && Math.min(...g.tyres().p) < 1.9, frasi: ['Il volante tira da una parte. Una gomma è giù.', 'Spia delle gomme. Al prossimo benzinaio le gonfio, o da Mario se perde.'] },
+  pioggia: { on: (g) => (g.sim.wet || 0) > 0.5, frasi: ['Con quest\'acqua l\'auto galleggia. Piede leggero.', 'Pioggia. Le frenate si allungano, meglio tenere le distanze.'] },
+  rosso: { on: (g) => g.s.money < 0, frasi: ['Sono in rosso. Il prossimo lavoro lo prendo senza fare storie.', 'Conto in negativo. Per la benzina mi fanno ancora credito, ma non durerà.'] },
+  ricercato: { on: (g) => !!(g.s.pol && g.s.pol.fuga), frasi: ['Tutte le volanti hanno la mia targa. Devo sparire in un parcheggio.', 'Sirene in giro. Il primo locale che trovo, mi ci infilo.'] },
+};
 const PENS_PAUSA = 25;                    // secondi minimi tra un pensiero e il prossimo
 const PENS_ANIMO_OGNI = [150, 150];       // i pensieri a caso arrivano ogni 150-300 secondi di guida
 const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con un'altra frase) ogni 7 minuti
@@ -70,6 +93,7 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
   P.vgThink = function (text) {
     const p = stato(this);
     this.thoughtN = (this.thoughtN || 0) + 1;
+    text = typeof vgTesto === 'function' ? vgTesto(this, text) : text;
     this.thought = { text, left: Math.max(8, Math.min(10, 7.5 + text.length * 0.025)), id: this.thoughtN };
     p.last = p.t;
   };
@@ -91,7 +115,15 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
       p.lvl[n] = lvl;
       if (lvl && (lvl > was || p.t - (p.nag[n] || 0) > PENS_RIPETI)) { p.nag[n] = p.t; this.vgThink(this.vgPensDraw(PENS_BISOGNI[n][lvl - 1], n + lvl)); return; }
     }
-    // 3. un pensiero a caso, ogni tanto
+    // 3. com'è messa l'auto o la situazione, quando comincia
+    p.st = p.st || {};
+    for (const [id, q] of Object.entries(PENS_STATO)) {
+      let on = false; try { on = !!q.on(this); } catch (e) { on = false; }
+      const was = p.st[id];
+      if (on && (!was || p.t - was > PENS_RIPETI)) { p.st[id] = p.t; this.vgThink(this.vgPensDraw(q.frasi, 'st' + id)); return; }
+      if (!on && was) p.st[id] = 0;
+    }
+    // 4. un pensiero a caso, ogni tanto
     if (p.t >= p.nextAmb) {
       const left = PENS_ANIMO.filter((_, i) => !p.seen['a' + i]);
       p.nextAmb = p.t + PENS_ANIMO_OGNI[0] + (this.rnd || Math.random)() * PENS_ANIMO_OGNI[1];
@@ -124,8 +156,9 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
   const visibile = (e) => { if (!e) return null; const b = e.getBoundingClientRect(); return b.width < 1 || b.height < 1 ? null : b; };
   // dove mettere il testo: accanto alla barra se c'è spazio (almeno 200 px), altrimenti sopra l'angolo in basso a destra
   const posizione = (stage) => {
-    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap')), ln = visibile(document.querySelector('.lanebtn.r'));
-    const fine = ln ? ln.left - 12 : r.right - 12;                       // il testo finisce prima del bottone della corsia
+    const r = stage.getBoundingClientRect(), mm = visibile(document.querySelector('.minimap'));
+    let fine = r.right - 12;                                             // il testo finisce prima dei comandi della metà destra (bottone corsia, pedali al tocco)
+    for (const sel of ['.lanebtn.r', '.touchpedals']) { const b = visibile(document.querySelector(sel)); if (b && b.left > r.left + r.width / 2) fine = Math.min(fine, b.left - 28); }
     if (mm) {
       const libero = fine - (mm.right + 16);
       if (libero >= 200) return { accanto: true, left: Math.round(mm.right + 16 - r.left), bottom: Math.round(r.bottom - mm.bottom), maxW: Math.min(libero, 420) };
@@ -150,4 +183,4 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     el.classList.toggle('on', th.left > 0.8 && !nascosto);
   }, 150);
 })();
-if (typeof window !== 'undefined') Object.assign(window, { PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_SOGLIE });
+if (typeof window !== 'undefined') Object.assign(window, { PENS_KM, PENS_BISOGNI, PENS_ANIMO, PENS_SOGLIE, PENS_STATO });

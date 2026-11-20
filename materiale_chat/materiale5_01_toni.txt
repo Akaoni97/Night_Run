@@ -1,0 +1,93 @@
+Nota · Toni manuali del blocco Elena; queste righe prevalgono sulle precedenti.
+
+ELE_pasta_01 · A pacato · B ironico · C freddo
+ELE_pasta_02 · A freddo
+ELE_pasta_03 · A pacato · B sincero
+ELE_pasta_04 · A pacato · B freddo
+ELE_pasta_05 · A sincero · B freddo
+ELE_pasta_06 · A freddo
+ELE_pasta_07 · A sboccato
+ELE_turno_01 · A evasivo · B gentile · C freddo
+ELE_turno_02 · A sincero · B freddo
+ELE_turno_03 · A pacato · B sincero
+ELE_turno_04 · A freddo · B sincero
+ELE_turno_05 · A sincero · B evasivo
+ELE_turno_06 · A freddo
+ELE_turno_07 · A gentile
+ELE_coinquilino_01 · A pacato · B freddo · C ironico
+ELE_coinquilino_02 · A sincero · B sincero
+ELE_coinquilino_03 · A freddo · B pacato
+ELE_coinquilino_04 · A freddo · B pacato
+ELE_coinquilino_05 · A pacato
+ELE_coinquilino_06 · A sincero
+ELE_coinquilino_07 · A freddo
+ELE_cena_01 · A sincero · B evasivo · C freddo
+ELE_cena_02 · A sincero · B sincero · C evasivo
+ELE_cena_03 · A sincero · B freddo
+ELE_cena_04 · A sincero
+ELE_cena_05 · A sincero
+ELE_cena_06 · A sincero
+ELE_cena_07 · A freddo
+ELE_bollette_01 · A sincero · B freddo · C sincero
+ELE_bollette_02 · A sincero · B ironico
+ELE_bollette_03 · A freddo · B pacato
+ELE_bollette_04 · A sincero · B freddo
+ELE_bollette_05 · A sincero
+ELE_bollette_06 · A freddo
+ELE_bollette_07 · A freddo
+ELE_richiamo_01 · A sincero · B freddo · C sincero
+ELE_richiamo_02 · A sincero · B ironico
+ELE_richiamo_03 · A freddo · B pacato
+ELE_richiamo_04 · A sincero · B freddo
+ELE_richiamo_05 · A sincero
+ELE_richiamo_06 · A freddo
+ELE_richiamo_07 · A sincero
+ELE_distanza_01 · A sincero · B pacato · C freddo
+ELE_distanza_02 · A sincero · B sincero
+ELE_distanza_03 · A pacato · B freddo
+ELE_distanza_04 · A pacato · B freddo
+ELE_distanza_05 · A sincero · B freddo
+ELE_distanza_06 · A sincero · B evasivo
+ELE_distanza_07 · A sincero
+ELE_riparazione_01 · A sincero · B evasivo · C freddo
+ELE_riparazione_02 · A sincero · B sincero
+ELE_riparazione_03 · A sincero · B freddo
+ELE_riparazione_04 · A sincero · B sincero
+ELE_riparazione_05 · A sincero · B freddo
+ELE_riparazione_06 · A sincero
+ELE_riparazione_07 · A evasivo
+ELE_nonno_01 · A pacato · B freddo · C ironico
+ELE_nonno_02 · A evasivo · B sincero
+ELE_nonno_03 · A sincero · B pacato
+ELE_nonno_04 · A sincero · B freddo
+ELE_nonno_05 · A evasivo
+ELE_nonno_06 · A sincero
+ELE_nonno_07 · A sincero
+ELE_cena_ritorno_01 · A sincero · B sincero · C evasivo
+ELE_cena_ritorno_02 · A sincero · B sincero
+ELE_cena_ritorno_03 · A sincero · B freddo
+ELE_cena_ritorno_04 · A sincero · B freddo
+ELE_cena_ritorno_05 · A sincero
+ELE_cena_ritorno_06 · A sincero
+ELE_cena_ritorno_07 · A sincero
+V2_CASA_03_M2 · A pacato · B pacato
+V2_CASA_03_Q2_M2 · A pacato
+V2_CASA_03_M3 · A pacato · B pacato · C pacato
+V2_CASA_03_Q2_M3 · A pacato · B pacato
+V2_CASA_03_Q3_M4 · A pacato
+V2_CASA_03_Q3_M5 · A pacato · B pacato
+V2_CASA_03_M6 · A pacato · B pacato · C pacato
+V2_CASA_03_Q2_M6 · A pacato · B pacato
+V2_CASA_03_Q3_M6 · A pacato · B pacato
+V2_CASA_03 · A pacato · B pacato · C pacato
+V2_CASA_03_Q2_M7 · A pacato · B pacato
+V2_CASA_03_Q3_M7 · A pacato · B pacato
+V2_CASA_03_P_M2 · A pacato · B pacato
+V2_CASA_03_P_Q2_M2 · A pacato
+V2_CASA_03_P_M3 · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q2_M3 · A pacato · B pacato
+V2_CASA_03_P_M6 · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q2_M6 · A pacato · B pacato
+V2_CASA_03_P · A pacato · B pacato · C pacato
+V2_CASA_03_P_Q2_M7 · A pacato · B pacato
+

@@ -8,7 +8,7 @@ description: Dove e come si scrive la storia di Night Run (horror graduale) - ca
 ## Di chi è
 **La storia la scrive il cognato del proprietario e la carica lui.** Un assistente non inventa trama, nomi o
 battute dei personaggi della storia, a meno che chi scrive la storia lo chieda esplicitamente in quella sessione.
-Quello che è deciso è in `STORIA.md`; si aggiorna solo quando lo chiede chi scrive la storia.
+Quello che è deciso è in `docs/storia/STORIA.md`; si aggiorna solo quando lo chiede chi scrive la storia.
 
 Venditori, meccanici, commessi dei negozi nuovi restano **generici** (nessun nome, nessun ruolo nella trama): così
 chi scrive la storia può dargliene uno.
@@ -30,6 +30,9 @@ psicologico. Il telefono è lo strumento principale. La vecchia storia è stata 
 | Chiamate | `telefono.js` | `window.telefono.ring(...)` |
 | App che compaiono | `telefono.js` | `window.telefono.install(id)` / `addApp(...)` |
 | Cartelloni sulla strada | `telefono.js` | `TEL_APP_OFFERS` |
+
+Nei testi si può scrivere `{Auto}` / `{auto}` (l'auto scelta nel garage, con l'articolo: «La Panda», «l'Audi») e
+`{tipo}` («un'utilitaria», «una station wagon»): li sostituisce `vgTesto` in `viaggio.js`.
 
 ## Provare un momento della storia
 Senza guidare per ore: `node strumenti/prova.js km:150 aspetta:3000 foto:momento stato` (skill `night-run-prova`).

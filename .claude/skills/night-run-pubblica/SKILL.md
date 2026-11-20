@@ -1,6 +1,6 @@
 ---
 name: night-run-pubblica
-description: Porta il lavoro su Night Run al giocatore - unisce le pull request del cognato, commit in italiano con le righe finali, push su main (GitHub Pages), aggiorna la copia giocabile come artifact su claude.ai e PASSAGGIO.md. Usala a fine lavoro, quando l'utente dice "pubblica", "carica", "unisci", o quando arriva una pull request del cognato.
+description: Porta il lavoro su Night Run al giocatore - commit in italiano con le righe finali, push diretto su main (GitHub Pages, senza pull request), aggiorna la copia giocabile come artifact su claude.ai e PASSAGGIO.md. Usala a fine lavoro, quando l'utente dice "pubblica", "carica", "unisci", o quando c'è un ramo da portare su main.
 ---
 
 # Pubblicare Night Run
@@ -9,13 +9,21 @@ description: Porta il lavoro su Night Run al giocatore - unisce le pull request 
 - `git fetch origin main` e porta il tuo ramo in pari: il cognato (`cestinomail98-collab`) lavora in parallelo.
 - `git ls-remote origin` mostra anche i rami e le pull request aperte (`refs/pull/N/head`). Il `fetch` normale
   prende solo `main`: per un altro ramo `git fetch origin <ramo>:refs/remotes/origin/<ramo>`.
-- Pull request del cognato verso `main`: si uniscono quando il proprietario lo chiede. Prima leggi il diff, fai
-  girare i test e, se tocca il gioco, provala nel browser (`night-run-prova`). In caso di conflitti, risolvili tenendo
-  il lavoro di tutti e due e dillo.
-- Il cognato a volte usa Kimi Code (rami `kimi/...`): se tocca gli stessi file, chiedi al proprietario prima di unire.
+- **Su `main` si carica direttamente**, chiunque dei due lavori (proprietario o cognato): niente pull request, niente
+  approvazione. Il cognato ha piena libertà di aggiungere, cambiare ed eliminare.
+- Prima del push: `git fetch origin main` e `git merge` (mai `push --force`, mai riscrivere la storia di `main`).
+  In caso di conflitti, risolvili tenendo il lavoro di tutti e due e dillo. Test che passano e, se tocchi il gioco,
+  prova nel browser (`night-run-prova`).
+- Un ramo a parte (anche `kimi/...` o una pull request aperta per abitudine) si unisce su `main` direttamente da chi
+  ci lavora. Il controllo lo fanno insieme la sera (`night-run-sera`).
+
+## All'inizio del lavoro
+- Una riga in `INCORSO.md` (chi, cosa, file che tocchi, da quando), caricata subito su `main`.
 
 ## Commit
 - Messaggio in italiano: prima riga che dice cosa cambia per il giocatore, poi i dettagli.
+- Ultima riga prima di Co-Authored-By: `Per: proprietario` o `Per: cognato` (chi ha chiesto il lavoro: se non lo sai,
+  chiedilo una volta all'inizio della sessione).
 - Righe finali come chiedono le istruzioni della sessione (Co-Authored-By e Claude-Session).
 - Niente file di prova, foto o WAV nel repository; niente file presi da mod o senza licenza.
 
@@ -33,10 +41,16 @@ URL: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (versione attuale in `PAS
 3. Pubblica con lo stesso `url`, passando in `files` i `.js` (e le immagini di `img/`) cambiati.
 4. Aggiorna il numero di versione in `PASSAGGIO.md` e committalo.
 
+## A fine lavoro
+- Togli la tua riga da `INCORSO.md`.
+- In cima a `DIARIO.md` (sotto il titolo) una voce `## gg/mm/aaaa · proprietario|cognato` con 2-3 righe: fatto, aperto,
+  cosa serve dall'altro.
+- Dopo il push, se puoi, guarda che i test su GitHub siano verdi.
+
 ## Documentazione
 Ogni funzione nuova va in `AGENTS.md` (tabella dei file, conteggio dei test) e `PASSAGGIO.md` ("Com'è fatto il
-gioco", lavori aperti). `STORIA.md` si tocca solo se lo chiede il proprietario.
+gioco", lavori aperti). `docs/storia/STORIA.md` si tocca solo se lo chiede il proprietario.
 
 ## Rapporto finale
-In italiano: cosa è cambiato per il giocatore, cosa è stato provato e cosa no, link all'artifact, link alle pull
-request scritti per intero (`https://github.com/Akaoni97/Night_Run/pull/N`).
+In italiano: cosa è cambiato per il giocatore, cosa è stato provato e cosa no, link all'artifact e, se ci sono,
+link alle pull request scritti per intero (`https://github.com/Akaoni97/Night_Run/pull/N`).

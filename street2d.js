@@ -52,6 +52,7 @@ class Street2D {
   }
 
   // ---------------------------------------------------------------- utilità
+  static WHEEL_FIX = { e30: [-1, -3], e34: [-1, -2], r5: [-1, 0], b2002: [0, -4], a112: [2, -1] };   // cerchi fuori asse rispetto alla gomma (vedi wheelConc)
   static rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   static shade(hex, k) {
     const n = parseInt(hex.slice(1), 16), f = (c) => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
@@ -99,7 +100,7 @@ class Street2D {
 
   sprite(w, h, draw, outline = true) {
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + 2;
-    const x = c.getContext('2d'); x.translate(1, 1); draw(x);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.translate(1, 1); draw(x);
     const im = x.getImageData(0, 0, c.width, c.height), d = im.data, W = c.width, H = c.height;
     for (let i = 3; i < d.length; i += 4) d[i] = d[i] < 110 ? 0 : 255;
     if (outline) {
@@ -178,16 +179,44 @@ class Street2D {
     const key = 'gens' + k + this.carId + (this.carKey || '') + (this.cosKey || '') + ((this.genImgs().ready) ? 1 : 0);
     if (this.spr[key]) return this.spr[key];
     const D = this.genDef(), b = this.genBase(), c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
     c.geo = { w: D.w, ax: D.ax }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
+  }
+  // Alcune ruote disegnate hanno il cerchio fuori asse rispetto alla gomma (il mozzo sta più in alto o di lato): girando, il mozzo balla.
+  // WHEEL_FIX = di quanti pixel (x, y) il centro del cerchio è lontano dal centro della gomma. wheelConc rifà la ruota concentrica:
+  // il cerchio si sposta sul centro, la corona di gomma si ridisegna uniforme (colore e grana presi dalla gomma vera). Misure: strumenti/centro_ruote.py.
+  static wheelConc(im, id) {
+    const fx = Street2D.WHEEL_FIX[id];
+    if (!fx || !im || !im.width) return im;
+    if (im._conc) return im._conc;
+    const S = im.width, o = document.createElement('canvas'); o.width = S; o.height = S;
+    const ox = o.getContext('2d', { willReadFrequently: true }); ox.imageSmoothingEnabled = false; ox.drawImage(im, 0, 0);
+    const src = ox.getImageData(0, 0, S, S).data;
+    let x0 = S, x1 = -1; for (let i = 3; i < src.length; i += 4) if (src[i]) { const px = (i >> 2) % S; if (px < x0) x0 = px; if (px > x1) x1 = px; }
+    const Rt = (x1 - x0 + 1) / 2, Rr = 0.72 * Rt, c = S / 2, dx = fx[0], dy = fx[1];
+    const lumAt = (i) => (src[i] + src[i + 1] + src[i + 2]) / 3, isTire = (px, py, i) => src[i + 3] && lumAt(i) < 70 && Math.hypot(px + 0.5 - (c + dx), py + 0.5 - (c + dy)) > Rr * 0.98;
+    let r = 0, g = 0, b = 0, n = 0;
+    for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) { const i = (py * S + px) * 4; if (isTire(px, py, i)) { r += src[i]; g += src[i + 1]; b += src[i + 2]; n++; } }
+    const med = n ? [r / n, g / n, b / n] : [28, 28, 32];
+    const c2 = document.createElement('canvas'); c2.width = S; c2.height = S; const x = c2.getContext('2d'), out = x.createImageData(S, S), d = out.data;
+    for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) {
+      const i = (py * S + px) * 4, rr = Math.hypot(px + 0.5 - c, py + 0.5 - c);
+      if (rr <= Rr) { const sx = px + dx, sy = py + dy; if (sx >= 0 && sx < S && sy >= 0 && sy < S) { const j = (sy * S + sx) * 4; d[i] = src[j]; d[i + 1] = src[j + 1]; d[i + 2] = src[j + 2]; d[i + 3] = src[j + 3]; } }
+      else if (rr <= Rt - 0.3 && rr >= Rr - 1.5) {
+        if (isTire(px, py, i)) { d[i] = src[i]; d[i + 1] = src[i + 1]; d[i + 2] = src[i + 2]; d[i + 3] = 255; }
+        else { d[i] = med[0]; d[i + 1] = med[1]; d[i + 2] = med[2]; d[i + 3] = 255; }
+      }
+    }
+    x.putImageData(out, 0, 0);
+    return (im._conc = c2);
   }
   // ruota del disegno che gira: i vuoti scuri tra le razze diventano trasparenti (dietro c'è il freno), colore cerchi a scelta
   genWheelImg() {
     const G = this.genImgs(), D = this.genDef(), col = this.cos && this.cos.rims && this.cos.rims !== 'none' ? this.cos.rims : '';
     if (!G.ready || !G.wheel.width) return null;
     if (G.wcache[col]) return G.wcache[col];
-    const S = G.wheel.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(G.wheel, 0, 0);
+    const S = G.wheel.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(Street2D.wheelConc(G.wheel, this.carId), 0, 0);
     const d = x.getImageData(0, 0, S, S), p = d.data, R = D.wr, n = col ? parseInt(col.slice(1), 16) : 0;
     for (let i = 0; i < p.length; i += 4) {
       const xx = (i / 4) % S - S / 2 + 0.5, yy = Math.floor(i / 4 / S) - S / 2 + 0.5, rr = Math.hypot(xx, yy), l = (p[i] + p[i + 1] + p[i + 2]) / 3;
@@ -202,6 +231,7 @@ class Street2D {
     const wi = this.genWheelImg(), D = this.genDef(); if (!wi) return;
     this.brake(g, Math.round(cx), Math.round(cy), k * D.wr / 15, ang, rear);
     const s2 = wi.width * k;
+    if (this.wheelDraw) { this.wheelDraw(g, wi, cx, cy, s2, ang, speed); return; }   // gira liscia (nitido2d.js)
     g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));
     if (speed > 9) { for (let i = 0; i < 4; i++) { g.save(); g.globalAlpha = i ? 0.35 : 1; g.rotate(ang + i * Math.PI / 10); g.drawImage(wi, -s2 / 2, -s2 / 2, s2, s2); g.restore(); } }
     else { g.rotate(Math.round(ang / (Math.PI / 20)) * (Math.PI / 20)); g.drawImage(wi, -s2 / 2, -s2 / 2, s2, s2); }
@@ -231,7 +261,7 @@ class Street2D {
     const C0 = this.cos || {}, L = Object.assign({}, this.v40Look || {}, { clean: (C0.dirt ?? 0.8) < 0.35, kit: C0.kit === 'kit', spoiler: C0.spoiler === 'roof' });
     const hex = this.v40Paint || '#2a4b57', key = 'v40b' + JSON.stringify(L) + (this.cosKey || '') + hex + (this.v40Ready ? 'img' : '');
     if (this.spr[key]) return this.spr[key];
-    const W = 200, H = 71, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    const W = 200, H = 71, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true });
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), ww, hh); };
     const sh = (k) => Street2D.shade(hex, k), ink = this.C.ink;
     if (this.v40Ready) {
@@ -315,7 +345,7 @@ class Street2D {
     const key = 'v40s' + k + (this.carKey || '') + (this.cosKey || '') + (this.v40Ready ? 'i' : '');
     if (this.spr[key]) return this.spr[key];
     const b = this.v40Base(), c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(71 * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
     c.geo = { w: 200, ax: [41, 156] }; c.img = true; c.hd = b;
     return (this.spr[key] = c);
   }
@@ -346,7 +376,7 @@ class Street2D {
   // carrozzeria ricolorata: i pixel rosso vernice prendono il colore scelto mantenendo luci e ombre
   supraBase(hex) {
     if (this.paintBase[hex]) return this.paintBase[hex];
-    const c = document.createElement('canvas'); c.width = 200; c.height = 58; const x = c.getContext('2d');
+    const c = document.createElement('canvas'); c.width = 200; c.height = 58; const x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(this.sImg, 0, 0);
     const cos = this.cos || {}, stripe = cos.stripe && cos.stripe !== 'none' ? parseInt(cos.stripe.slice(1), 16) : null;
     {
@@ -383,7 +413,7 @@ class Street2D {
     const key = 'img' + hex + k;
     if (this.spr[key]) return this.spr[key];
     const c = document.createElement('canvas'); c.width = Math.ceil(200 * k); c.height = Math.ceil(58 * k);
-    const x = c.getContext('2d'); x.imageSmoothingEnabled = false; x.drawImage(this.supraBase(hex), 0, 0, c.width, c.height);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(this.supraBase(hex), 0, 0, c.width, c.height);
     c.geo = Street2D.GEO.supra; c.img = true; c.hd = this.supraBase(hex);
     return (this.spr[key] = c);
   }
@@ -538,8 +568,8 @@ class Street2D {
       this.spr[bk] = base;
     }
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
-    const cx = c.getContext('2d'); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = G.wheel; c.k = k; c.hd = base;
+    const cx = c.getContext('2d', { willReadFrequently: true }); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
     return (this.spr[key] = c);
   }
 
@@ -674,7 +704,6 @@ class Street2D {
   setRain(on) { this.rainOn = on; }
   setDaylight(d, ss) { this.day = d; this.sunset = ss; }
   resetCamera() {}
-  raceCam() {}
 
   resize() {
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
@@ -689,7 +718,7 @@ class Street2D {
   // Tela interna: le coordinate restano quelle di sempre (360 righe), ma con qualità alta ogni unità vale
   // 2×2 pixel veri (720 righe): gli sprite di prima si vedono uguali, il resto si può disegnare più fine.
   fitLo() {
-    const SS = this.SS = this.quality === 'bassa' || this.slow ? 1 : 2;
+    const SS = this.SS = this.quality === 'bassa' || this.quality === 'leggera' || this.slow ? 1 : 2;   // leggera: come alta ma a densità normale e senza bagliore (prove da telefono)
     if (this.lo.width !== this.LW * SS || this.lo.height !== this.LH * SS) { this.lo.width = this.LW * SS; this.lo.height = this.LH * SS; this.skyCache = null; this.tiles.clear(); }
     this.g.setTransform(SS, 0, 0, SS, 0, 0); this.g.imageSmoothingEnabled = false;
   }
@@ -747,14 +776,18 @@ class Street2D {
   drawSky(g, t, dist) {
     const W = this.LW;
     this.skyHD(g, t, dist);                                                    // fondo, stelle, luna e nuvole: effetti2d.js
+    // tinta del cielo per paesaggio: ogni posto ha la sua notte (la città resta viola)
+    const TINT = { plain: ['40,70,110', '120,130,150', 0.28], mountain: ['14,34,84', '40,60,110', 0.3], sea: ['16,56,120', '60,110,170', 0.26], village: ['60,40,90', '170,110,80', 0.22], desert: ['70,24,70', '220,110,90', 0.26] }[this._bg];
+    if (TINT && (this.day || 0) < 0.8) { const gr = g.createLinearGradient(0, 0, 0, 224); gr.addColorStop(0, `rgba(${TINT[0]},${TINT[2]})`); gr.addColorStop(0.7, `rgba(${TINT[0]},${TINT[2] * 0.6})`); gr.addColorStop(1, `rgba(${TINT[1]},${TINT[2] * 0.9})`); g.fillStyle = gr; g.fillRect(0, 0, W, 224); }
     const ax = ((t * 12) % (W + 80)) - 40, ay = 22 + Math.sin(t * 0.2) * 3;
     g.fillStyle = '#2a2850'; g.fillRect(Math.round(ax), Math.round(ay), 8, 2); g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 2, 6);
     if (Math.floor(t * 2) % 2) { g.fillStyle = '#ff3b3b'; g.fillRect(Math.round(ax) + 3, Math.round(ay) - 2, 1, 1); } else { g.fillStyle = '#ffffff'; g.fillRect(Math.round(ax) + 7, Math.round(ay), 1, 1); }
     const night = 1 - (this.day || 0);
     if (night < 0.2) return;
-    // fari pubblicitari della città che spazzano il cielo (due coni lenti, viola e ciano)
+    // fari pubblicitari della città che spazzano il cielo (due coni lenti, viola e ciano): solo dove c'è la città
+    const urb = !this._bg || this._bg === 'city' || this._bg === 'highway';
     g.save(); g.globalCompositeOperation = 'lighter';
-    for (let q = 0; q < 2; q++) {
+    for (let q = 0; urb && q < 2; q++) {
       const bx = ((q ? W * 0.72 : W * 0.18) - dist * 0.03 % W + W) % W, a = -Math.PI / 2 + Math.sin(t * (0.23 + q * 0.07) + q * 2) * 0.55;
       const len = 260, wdt = 0.06, col = q ? '120,230,255' : '190,130,255';
       const gr = g.createLinearGradient(bx, 200, bx + Math.cos(a) * len, 200 + Math.sin(a) * len);
@@ -765,7 +798,7 @@ class Street2D {
     g.restore();
     // elicottero col faro di ricerca, ogni tanto
     const hp = (t % 46) / 46;
-    if (hp < 0.55) {
+    if (urb && hp < 0.55) {
       const hx = W + 40 - hp / 0.55 * (W + 80), hy = 62 + Math.sin(t * 0.7) * 6, rot = Math.floor(t * 30) % 2;
       g.save(); g.globalCompositeOperation = 'lighter';
       const sa = Math.PI / 2 + Math.sin(t * 0.9) * 0.35, gr = g.createLinearGradient(hx, hy, hx + Math.cos(sa) * 170, hy + Math.sin(sa) * 170);
@@ -819,7 +852,7 @@ class Street2D {
     const h = haze ? Math.round((70 + Math.floor(r(2) * 80)) * (0.6 + 0.4 * D.farH)) : far ? Math.round((46 + Math.floor(r(2) * 70)) * D.farH) : 64 + Math.floor(r(2) * 92);
     if (far && !haze && D.land && this.landmark && r(41) < D.landP) { t = this.landmark(D.land, r, D); this.tiles.set(key, t); return t; }   // punto di riferimento del quartiere
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + 26;
-    const x = c.getContext('2d'), top = 25;
+    const x = c.getContext('2d', { willReadFrequently: true }), top = 25;
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(xx, yy, ww, hh); };
     const meta = { w: w + 2, h: h + 26, signs: [], beacons: [], shop: null };
     if (haze) {
@@ -928,7 +961,7 @@ class Street2D {
     const dims = { house: [62, 50], konbini: [70, 50], office: [60, 128], shrine: [72, 62], park: [66, 40], warehouse: [68, 54], ramen: [56, 48], parking: [70, 74] }[kind];
     const w = dims[0] + Math.floor(r(1) * 6), h = dims[1] + Math.floor(r(2) * (kind === 'office' ? 30 : 10)), top = 30;
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + top + 1;
-    const x = c.getContext('2d'), gy = top + h;                              // gy: livello del marciapiede
+    const x = c.getContext('2d', { willReadFrequently: true }), gy = top + h;                              // gy: livello del marciapiede
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), ww, hh); };
     const meta = { w: w + 2, h: h + top + 1, signs: [], beacons: [], shop: null, glows: [] };
     const win = (xx, yy, ww, hh, lit, col) => { px(ink, xx - 1, yy - 1, ww + 2, hh + 2); px(lit ? col : '#0d1426', xx, yy, ww, hh); if (lit) px(Street2D.shade(col, 0.35), xx, yy, ww, 1); };
@@ -1075,7 +1108,7 @@ class Street2D {
     if (bg === 'highway') {
       // Wangan: la città dall'altra parte della baia, l'acqua con i riflessi, un ponte strallato, la barriera antirumore
       this.drawCity(g, dist, t, 'haze', 0.025, 172, 50);
-      { const hz = g.createLinearGradient(0, 60, 0, 174); hz.addColorStop(0, 'rgba(40,30,80,0)'); hz.addColorStop(0.35, 'rgba(40,30,80,.5)'); hz.addColorStop(1, 'rgba(40,30,80,.62)'); g.fillStyle = hz; g.fillRect(0, 60, W, 114); }   // la città è lontana, dall'altra parte della baia: quasi solo luci
+      { const hz = g.createLinearGradient(0, 60, 0, 174); hz.addColorStop(0, 'rgba(40,30,80,0)'); hz.addColorStop(0.35, 'rgba(40,30,80,.3)'); hz.addColorStop(1, 'rgba(40,30,80,.42)'); g.fillStyle = hz; g.fillRect(0, 60, W, 114); }   // la città è lontana, dall'altra parte della baia: quasi solo luci
       this.tileRun(dist * 0.06, 1100, (i, x) => {
         if (rnd(i * 7.1) < 0.45) return;
         const bx = x + 200, top = 96, deck = 166;
@@ -1297,7 +1330,12 @@ class Street2D {
     const shops = [];
     for (let i = i0; i < i1; i++) {
       const b = this.building(layer, i, this.districtAt ? this.districtAt((i * tileW - 260) / (30 * speed)) : undefined), x = Math.round(i * tileW - off + Street2D.rnd(i * 3.1 + speed) * 10), y = baseY - b.h + 1;
-      if (x > this.LW || x + b.w < 0) continue;
+      if (x > this.LW || x + b.w < 0) {
+        // il palazzo che sta per entrare da destra si porta a densità doppia adesso, uno per fotogramma: quando compare
+        // è già pronto, e il lavoro non si ammucchia nel fotogramma in cui ne entrano due o tre insieme
+        if (x > this.LW && this.SS > 1 && !b.hd && this.tileHD && this._hdT !== t) { this._hdT = t; this.tileHD(b, layer); }
+        continue;
+      }
       if (this.SS > 1 && !b.hd && this.tileHD) this.tileHD(b, layer);
       g.drawImage(b.c, x, y, b.w, b.h);
       for (const s of b.signs) {
@@ -1426,7 +1464,7 @@ class Street2D {
     g.fillStyle = '#23263a'; g.fillRect(x - 56, 216, 112, 16); g.fillStyle = '#4a5070'; g.fillRect(x - 56, 216, 112, 1);
     for (let k = -50; k < 50; k += 10) { g.fillStyle = '#2f3450'; g.fillRect(x + k, 224, 6, 1); }
     if (e.id === 'shop' || e.id === 'niko') {
-      const niko = e.id === 'niko', sign = niko ? 'OFFICINA NIKO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
+      const niko = e.id === 'niko', sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
       g.fillStyle = C.ink; g.fillRect(L - 2, top - 2, R - L + 4, 216 - top + 2);
       g.fillStyle = niko ? '#33302a' : '#2b2f3e'; g.fillRect(L, top, R - L, 216 - top);
       for (let yy = top + 6; yy < 216; yy += 6) { g.fillStyle = '#252836'; g.fillRect(L, yy, R - L, 1); for (let xx = L + ((yy / 6) % 2 ? 0 : 6); xx < R; xx += 12) g.fillRect(xx, yy - 6, 1, 6); }   // mattoni
@@ -1482,7 +1520,7 @@ class Street2D {
       this.placeTag(g, x, top - 16, 'ESTETICA', '#ff2e88', near);
     }
   }
-  // personaggi: Niko (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
+  // personaggi: Mario (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
   // primo piano fuori città: sotto la carreggiata (y 339–360)
   drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, t) {
     const W = this.LW, rnd = Street2D.rnd;
@@ -1522,7 +1560,7 @@ class Street2D {
     g.fillStyle = Math.floor(t * 4) % 2 || Math.abs(game.laneZ - (GAME_LANE_Z[game.lane] ?? 3.5)) < 0.3 ? 'rgba(184,255,58,.16)' : 'rgba(184,255,58,.3)'; g.fillRect(x0 + 4, tl - 4, w - 8, 9);
     const sim = game.sim, myV = sim ? sim.v : 0;
     for (const e of game.ents) {
-      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'rival' || e.kind === 'ghost')) continue;
+      if (!(e.kind === 'traffic' || e.kind === 'police' || e.kind === 'ghost')) continue;
       const rel = e.x - dist; if (rel < from || rel > to || e.lane === 0) continue;
       const z = e._z ?? GAME_LANE_Z[e.lane], len = Math.max(3, Math.round((e.len || 4.6) / (to - from) * (w - 8) * 1.6));
       const same = Math.abs(z - game.laneZ) < 1.7, warn = same && rel > 0 && rel < 14 + myV * 1.2 && myV > (e.v || 0) + 1;
@@ -1536,6 +1574,19 @@ class Street2D {
     g.fillStyle = this.paintHex || '#ff5a3a'; g.fillRect(px0 - 3, py0 - 2, 6, 5); g.fillStyle = '#b8ff3a'; g.fillRect(px0 + 3, py0 - 1, 2, 3);
     this.text(g, 'CORSIA ' + (game.lane || 1), x0 + 4, y0 + 37, '#b8ff3a');
     if (game.blocked) this.text(g, 'CODA', x0 + w - 24, y0 + 37, '#ffb000');
+    // inseguimento (polizia.js): le volanti oltre il radar come lampeggianti sul bordo, e quante sono
+    const cs = game.pol && game.pol.cs;
+    if (cs && cs.length) {
+      const ph = Math.floor(t * 6) % 2;
+      for (const C of cs) {
+        const rel = -C.gap; if (rel >= from && rel <= to) continue;
+        const ex = rel < from ? x0 + 2 : x0 + w - 4, z = GAME_LANE_Z[C.e.lane] ?? 0;
+        g.fillStyle = ph ? '#ff2e4d' : '#4f7bff'; g.fillRect(ex, ly(z) - 2, 2, 5);
+      }
+      const lbl = 'VOLANTI ' + cs.length;
+      g.fillStyle = 'rgba(8,9,16,.72)'; g.fillRect(x0, y0 + h, w, 10);
+      this.text(g, lbl, x0 + 4, y0 + h + 2, ph ? '#ff2e4d' : '#ffd23f');
+    }
   }
 
   person(g, x, gy, who, t) {
@@ -1548,7 +1599,7 @@ class Street2D {
       p('#16306e', 1, 12, 4, 14); p('#16306e', 7, 12, 4, 14); p('#1a1a1a', 0, 2, 5, 2); p('#1a1a1a', 7, 2, 5, 2);  // gambe e scarpe
       p(skin, 2, 36 + bob, 8, 7); p('#5a3a22', 3, 33 + bob, 6, 1); p(ink, 4, 35 + bob, 1, 1); p(ink, 8, 35 + bob, 1, 1);   // faccia e baffi
       p('#c42a1a', 1, 40 + bob, 10, 3); p('#c42a1a', 9, 38 + bob, 4, 1);                                          // cappello
-      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'N', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');
+      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'M', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');   // M di Mario sulla tuta
       const sw = Math.sin(t * 6) * 0.6; g.save(); g.translate(x + 12 * S2, gy - (24 + bob) * S2); g.rotate(-0.6 + sw);
       g.fillStyle = '#9aa3b2'; g.fillRect(0, -2, 16, 4); g.fillStyle = '#c9ced6'; g.fillRect(14, -4, 5, 8); g.restore();   // chiave inglese
       p(skin, 11, 26 + bob, 3, 3);
@@ -1582,7 +1633,7 @@ class Street2D {
       for (let xx = 0; xx < W; xx += 48) { g.fillStyle = '#252937'; g.fillRect(xx, 40, 46, 200); g.fillStyle = '#181a24'; g.fillRect(xx + 46, 40, 2, 200); }
       // neon e tubi fluorescenti
       for (let xx = 30; xx < W; xx += 110) { g.fillStyle = C.ink; g.fillRect(xx, 18, 70, 6); g.fillStyle = '#eef6ff'; g.fillRect(xx + 2, 19, 66, 3); this.light(g, xx + 35, 24, 90, 40, '#dfeaff', 0.06, 3); }
-      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'NIKO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', W - 150, 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
+      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'MARIO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', Math.max(W - 150, W - 218 + this.textW(niko ? 'MARIO' : 'LUCA', 3) + 8), 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
       if (!niko) for (let q = 0; q < 3; q++) { g.fillStyle = ['#ff2e88', '#2ee6ff', '#b07bff'][q]; g.fillRect(0, 96 + q * 3, W, 1); this.light(g, W / 2, 97 + q * 3, W * 0.5, 6, ['#ff2e88', '#2ee6ff', '#b07bff'][q], 0.05, 2); }
       // pannello forato con attrezzi
       g.fillStyle = '#3b3326'; g.fillRect(24, 70, 150, 90);
@@ -1639,7 +1690,7 @@ class Street2D {
     }
     // la Supra (vernice, cerchi, neon, strisce)
     const GI = this.geo(), spr = this.carSprite(K), left = Math.round(cx - 100 * K), top = Math.round(gy - (GI.wy + GI.wr) * K - lift + GI.low * K);
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     this.shadow(g, cx, gy, 120, 6);
     if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
     g.imageSmoothingEnabled = false; this.body(g, spr, left, top);
@@ -1651,18 +1702,29 @@ class Street2D {
     g.fillStyle = 'rgba(8,8,14,.7)'; g.fillRect(cx - tw / 2 - 8, 330, tw + 16, 18); this.text(g, title, cx - tw / 2, 334, I.col, 2);
   }
 
+  slowReset() { this.slow = false; this.tBad = 0; this.tAvg = undefined; try { localStorage.removeItem('nr_slow'); } catch (e) { /* ignora */ } }
+
   update(dt, s, game) {
     const st = this.st, g = this.g, W = this.LW, C = this.C;
     this.fitLo(); const SS = this.SS;
     // dispositivo lento: se il disegno a densità doppia resta sopra i 30 ms per tre secondi, si torna a quella semplice
     const tStart = performance.now();
-    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) this.slow = true; }
+    // la scelta si ricorda: se questo computer è andato a densità semplice, al prossimo avvio parte già così (si azzera scegliendo la qualità a mano)
+    if (this.slow === undefined) { try { this.slow = localStorage.getItem('nr_slow') === '1'; } catch (e) { this.slow = false; } if (this.slow) { this.fitLo(); } }
+    if (this.tPrev !== undefined && SS > 1) { this.tAvg = (this.tAvg ?? this.tPrev) * 0.97 + this.tPrev * 0.03; this.tBad = this.tAvg > 30 ? (this.tBad || 0) + dt : 0; if (this.tBad > 3) { this.slow = true; try { localStorage.setItem('nr_slow', '1'); } catch (e) { /* ignora */ } } }
     st.t += dt;
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
     // in accelerazione resta un attimo indietro, in frenata va avanti
-    const camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
+    let camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
+    // fermi (o quasi) davanti a un locale del viaggio: l'inquadratura scivola avanti e mette la facciata al centro, l'auto a sinistra
+    if (game && game.placesOn && !game.inside && Math.abs(s.v) < 6 && !this.camHold) {
+      const p = game.placesBetween(dist - 12, dist + 40)[0];
+      if (p) camT = Math.max(0.3, Math.min(0.5, 0.64 - (p.x - dist) * 30 / W));   // non sotto 0,3: l'auto resta fuori dal quadro strumenti
+      if (p && p.twin) camT = Math.max(0.16, Math.min(0.5, (W * 0.5 - (p.x - dist) * 30) / W));   // piazzetta (piazzetta.js): si punta al centro dei due negozi, che stanno ai due lati di p.x
+    }
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
+    if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)
     const PPM = 30, carX = Math.round(W * st.cam), K0 = 0.78;
     const kq = (y) => Math.round(K0 * this.laneS(y) / 0.04) * 0.04;   // scala quantizzata: pochi sprite in cache
     const wx = (m) => Math.round(carX + (m - dist) * PPM);
@@ -1701,6 +1763,7 @@ class Street2D {
 
     if (game && game.inside && game.inside.phase === 'shop') { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
     // ---- sfondo: cielo, tre piani di città, foschia
+    this._bg = (game && game.loc && game.loc.bg) || this.bg || 'city';            // il cielo sa dove sei (fari e elicottero solo in città)
     this.drawSky(g, st.t, dist);
     // temporale: con la pioggia ogni tanto un fulmine (saetta nel cielo, lampo su tutta la scena, poi il tuono)
     st.bolt = Math.max(0, (st.bolt || 0) - dt * 3.2);
@@ -1721,6 +1784,7 @@ class Street2D {
     }
     // luogo della mappa del mondo: la città di sempre o uno sfondo dedicato
     const bg = (game && game.loc && game.loc.bg) || this.bg || 'city';
+    if (this.vitaSky) this.vitaSky(g, dist, st.t, bg);                         // uccelli, fuochi d'artificio, lampi lontani (vita2d.js)
     let shops = [];
     const TUN = this.tunnelSpan ? this.tunnelSpan(game, visFrom, visTo) : null;   // galleria tra due paesaggi (galleria2d.js)
     const DM = bg === 'city' && this.districtMix ? this.districtMix(dist) : null, lampCol = DM ? DM.lamp : '#ffcf7a';
@@ -1735,21 +1799,27 @@ class Street2D {
       shops = this.drawCity(g, dist, st.t, 'mid', 0.22, 216, 72);
     } else this.drawScenery(g, dist, st.t, bg, { wx, visFrom, visTo });
     // velocità: lo sfondo lascia una scia (copie spostate e trasparenti), più lunga quanto più si va forte
-    const smear = Math.min(1, Math.max(0, (Math.abs(s.v) - 12) / 40));
+    // (più leggera e a densità vera dal 20/11/2026: parte dai 70 km/h circa, così in crociera lo sfondo resta nitido)
+    const smear = Math.min(1, Math.max(0, (Math.abs(s.v) - 20) / 50));
     if (smear > 0.02 && this.quality !== 'bassa') {
-      // una sola copia dello sfondo a risoluzione logica (la scia è comunque sfocata), poi tre passate spostate
-      const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W) { sm.width = W; sm.height = 192; }
-      const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W, 192);
-      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[5, 0.32], [11, 0.2], [18, 0.12]]) { g.globalAlpha = a * smear; g.drawImage(sm, -o * (0.5 + smear), 40, W, 192); } g.restore();
+      // una sola copia dello sfondo, poi tre passate spostate
+      const sm = this.sm || (this.sm = document.createElement('canvas')); if (sm.width !== W * SS || sm.height !== 192 * SS) { sm.width = W * SS; sm.height = 192 * SS; }
+      const sg = sm.getContext('2d'); sg.imageSmoothingEnabled = false; sg.drawImage(this.lo, 0, 40 * SS, W * SS, 192 * SS, 0, 0, W * SS, 192 * SS);
+      g.save(); g.imageSmoothingEnabled = true; for (const [o, a] of [[4, 0.17], [9, 0.09], [15, 0.04]]) { g.globalAlpha = a * smear; g.drawImage(sm, o * (0.5 + smear), 40, W, 192); }
+      g.restore();   // lo sfondo scorre a sinistra: la scia resta dietro, a destra
     }
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
+    let walkHD = false;                                                         // lastre e cordolo a densità doppia (nitido2d.js)
     if (bg === 'city' || bg === 'village') {
+    walkHD = !!(this.walkHD && this.walkHD(g, dist, PPM, W));
+    if (!walkHD) {
     g.fillStyle = C.ink; g.fillRect(0, 215, W, 1);
     g.fillStyle = C.walk; g.fillRect(0, 216, W, 16);
     g.fillStyle = '#353a55'; for (let x = -((dist * PPM) % 32); x < W; x += 32) g.fillRect(Math.round(x), 216, 1, 16);
     g.fillRect(0, 222, W, 1);
     g.fillStyle = '#4a5070'; g.fillRect(0, 230, W, 2);
+    }
     for (const sh of shops) { this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3); if (this.lightAdd) this.lightAdd(sh.x, 232, sh.w * 0.9 + 20, 30, Street2D.rgb(sh.col), 0.5); }
     if (bg === 'city' && this.districtPeople) this.districtPeople(g, wx, visFrom, visTo, st.t);   // pedoni e oggetti del quartiere
     else for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
@@ -1767,7 +1837,7 @@ class Street2D {
     if (TUN) this.drawTunnelBack(g, TUN, wx, W, st.t);
     if (game && game.s && game.s.vg && this.drawKmPosts) this.drawKmPosts(g, wx, visFrom, visTo);   // cippi del viaggio
     // ---- carreggiata
-    g.fillStyle = C.road2; g.fillRect(0, 232, W, 4);
+    if (!walkHD) { g.fillStyle = C.road2; g.fillRect(0, 232, W, 4); }
     const rt = this.roadTile(), ro = ((dist * PPM) % rt.lw + rt.lw) % rt.lw;
     for (let x = -ro; x < W; x += rt.lw) g.drawImage(rt, Math.round(x), 236, rt.lw, 104);
     for (let m = Math.ceil(visFrom / 47) * 47; m < visTo; m += 47) { const x = wx(m); g.fillStyle = '#14172a'; g.fillRect(x, 236, 3, 104); g.fillStyle = '#3a3f58'; g.fillRect(x + 3, 236, 1, 104); }
@@ -1786,6 +1856,7 @@ class Street2D {
     for (let m = Math.ceil(visFrom / 23) * 23; m < visTo; m += 23) { const x = wx(m); g.fillStyle = C.ink; g.fillRect(x - 1, 330, 14, 6); g.fillStyle = '#12141f'; g.fillRect(x, 331, 12, 4); g.fillStyle = '#3a3f58'; for (let k = 1; k < 12; k += 3) g.fillRect(x + k, 331, 1, 4); }
     g.fillStyle = C.line; g.fillRect(0, 238, W, 2); g.fillRect(0, 335, W, 2);
     for (let x = -((dist * PPM) % (12 * PPM)); x < W; x += 12 * PPM) { g.fillRect(Math.round(x), 262, Math.round(4.5 * PPM), 2); g.fillRect(Math.round(x), 300, Math.round(4.5 * PPM), 2); }
+    if (!urban && !TUN && this.pStuds) this.pStuds(g, dist, PPM, carX, 1 - (this.day || 0));   // catarifrangenti (paesaggi2d.js)
     // incroci: strisce pedonali ogni 260 m (il semaforo si disegna davanti, alla fine)
     for (let m = Math.floor((visFrom - 140) / 260) * 260 + 130; urban && m < visTo + 10; m += 260) {
       const x = wx(m);
@@ -1804,7 +1875,7 @@ class Street2D {
 
     if (bg === 'city' && this.districtRoad) { this._t = st.t; this.districtRoad(g, wx, visFrom, visTo, TUN); }   // asfalto del quartiere
     // ---- corsia scelta: frecce luminose dipinte sull'asfalto davanti all'auto (si spostano col cambio corsia)
-    if (game && game.track === 'city' && !game.inside && !game.race && this.laneRadar !== false && Math.abs(s.v) > 0.5) {
+    if (game && game.track === 'city' && !game.inside && this.laneRadar !== false && Math.abs(s.v) > 0.5) {
       const ly = Math.round(this.laneY(GAME_LANE_Z[game.lane] ?? 3.5)) - 6, pulse = 0.25 + 0.15 * Math.sin(st.t * 6);
       for (let q = 0; q < 4; q++) {
         const xx = Math.round(carX + (110 + q * 26 + ((st.t * 40) % 26)) * 1), a = pulse * (1 - q * 0.2);
@@ -1814,7 +1885,7 @@ class Street2D {
     }
     // ---- asfalto a specchio: la città (neon, finestre) si riflette capovolta e tremolante sulla strada
     const wetA = this.quality === 'bassa' ? 0 : (this.rainOn ? 0.26 : 0.09) * (1 - 0.7 * (this.day || 0));
-    if (wetA > 0.02) {
+    if (wetA > 0.02 && !(this.wetHD && this.wetHD(g, W, st.t, wetA))) {          // riflesso morbido a mezze unità (nitido2d.js)
       if (!this.rf) this.rf = document.createElement('canvas');
       if (this.rf.width !== W) { this.rf.width = W; this.rf.height = 106; }
       const rg = this.rf.getContext('2d'); rg.clearRect(0, 0, W, 106); rg.drawImage(this.lo, 0, 110 * SS, W * SS, 106 * SS, 0, 0, W, 106);
@@ -1834,13 +1905,14 @@ class Street2D {
       g.fillStyle = `rgba(6,6,10,${mk.a})`; g.fillRect(x, mk.y, mw, 2); g.fillStyle = `rgba(6,6,10,${mk.a * 0.4})`; g.fillRect(x, mk.y - 1, mw, 1); g.fillRect(x, mk.y + 2, mw, 1);
     }
     this.marks = this.marks.filter((mk) => wx(mk.m) > -60).slice(-400);
+    if (this.vitaRoad) this.vitaRoad(g, dist, st.t, bg, dt, s, wx, carX);      // foglie, cartacce, rotolacampo (vita2d.js)
 
     // ---- lampioni: alone piccolo, pozza a terra, riflesso sul bagnato (niente fasci)
-    const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
+    const lampX = [], lampAll = [], lampSp = { city: 24, village: 30, sea: 32, highway: 40, plain: 55 }[bg] || 0, lampRgb = Street2D.rgb(lampCol);
     for (let lm = Math.floor(visFrom / (lampSp || 1)) * lampSp; lampSp && lm < visTo + lampSp; lm += lampSp) {
       if (TUN && lm > TUN.a - 30 && lm < TUN.b + 4) continue;                  // in galleria niente lampioni
       const x = wx(lm), bro = !!DM && Street2D.rnd(lm * 0.77 + 3) < DM.broken, on = !bro || Math.sin(st.t * 23 + lm) + Math.sin(st.t * 7.3 + lm * 2) > 1.55;   // rotto: si accende a scatti
-      lampAll.push([x, on]); if (!on) continue;
+      lampAll.push([x, on, lm]); if (!on) continue;
       lampX.push(x);
       if (this.lampCone) this.lampCone(g, x, lampCol, st.t, this.rainOn);
       if (this.lightAdd) { this.lightAdd(x + 18, 296, 160, 70, lampRgb, 0.85); this.lightAdd(x + 18, 228, 90, 18, lampRgb, 0.6); }
@@ -1850,13 +1922,17 @@ class Street2D {
       for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
       g.restore();
     }
+    this._lampX = TUN ? [] : lampX; this._shops = shops;
     if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) { lampX.push(wx(m) - 18); if (this.lightAdd) this.lightAdd(wx(m), 290, 110, 70, '255,179,71', 0.55); }   // le luci della volta scorrono sulla carrozzeria
-    for (const [x, on] of lampAll) {
+    for (const [x, on, lm] of lampAll) {
+      if (this.lampHD && this.lampHD(g, x, on, lampCol, lm)) { if (!on) continue; }   // lampione a densità doppia (nitido2d.js)
+      else {
       g.fillStyle = C.ink; g.fillRect(x - 2, 118, 5, 112); g.fillRect(x, 118, 24, 5); g.fillRect(x - 4, 222, 9, 8); g.fillRect(x - 3, 214, 7, 4);
       g.fillStyle = '#4a5070'; g.fillRect(x - 1, 120, 2, 108); g.fillRect(x + 1, 119, 21, 2); g.fillStyle = '#5c6386'; g.fillRect(x - 3, 223, 7, 1);
       g.fillStyle = C.ink; g.fillRect(x + 12, 121, 14, 6);
       if (!on) { g.fillStyle = '#2a2d3a'; g.fillRect(x + 13, 125, 12, 3); continue; }
       g.fillStyle = lampCol; g.fillRect(x + 13, 125, 12, 3); g.fillStyle = '#fff6d8'; g.fillRect(x + 15, 125, 8, 1);
+      }
       if (!this.day || this.day < 0.5) { const tw = 0.6 + 0.4 * Math.sin(st.t * 3 + x * 0.1); g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${lampRgb},${0.5 * tw})`; g.fillRect(x + 5, 126, 28, 1); g.fillRect(x + 18, 117, 1, 20); g.fillStyle = `rgba(${lampRgb},${0.25 * tw})`; g.fillRect(x - 8, 126, 54, 1); g.restore(); }
       this.light(g, x + 19, 127, 14, 8, lampCol, 0.1, 3);
     }
@@ -1873,7 +1949,10 @@ class Street2D {
     // profondità = altezza sullo schermo: chi sta più in alto (più lontano) si disegna prima
     const yOf = (e) => this.laneY(zOf(e));
     for (const e of items) e._y = yOf(e);
-    items.sort((a, b) => a._y - b._y);
+    // a pari profondità (prima corsia e locali stanno tutti a z 9) prima i locali, poi le auto: l'usato col cartello
+    // VENDESI e le facciate restano dietro il traffico che passa in prima corsia
+    const back = (e) => (e.kind === 'place' || e.kind === 'station' ? 0 : 1);
+    items.sort((a, b) => a._y - b._y || back(a) - back(b));
     const front = [];
     const drawEnt = (e) => {
       const x = wx(e.x);
@@ -1906,6 +1985,7 @@ class Street2D {
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
+      e._scr = { left, sy, w, y, k, h: spr.height };                              // dove è finito sullo schermo (il furgone del soccorso, soccorso.js)
       // altezza di fanali e fari: dai dati del disegno (tail/head) se ci sono, altrimenti il riferimento vecchio
       const tY = GG.tail ? Math.round((GG.tail[1] + GG.tail[3] / 2) * k) : T0 + Math.round(35 * k), hY = GG.head ? Math.round(GG.head[1] * k) : T0 + Math.round(36 * k);
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);
@@ -1914,23 +1994,29 @@ class Street2D {
       this.body(g, spr, left, sy);
       if (this.hazeOf && this.quality !== 'bassa') {                              // velo di foschia: più forte nelle corsie lontane
         const hzA = (0.07 + Math.max(0, Math.min(1, (318 - y) / 44)) * 0.2) * (1 - 0.5 * (this.day || 0));
-        g.save(); g.globalAlpha = hzA; g.drawImage(this.hazeOf(spr, DM ? DM.haze.map((v) => Math.min(255, v + 40)).join(',') : '110,100,150'), left, sy); g.restore();
+        g.save(); g.globalAlpha = hzA; g.drawImage(this.hazeOf(spr, DM ? DM.haze.map((v) => Math.min(255, v + 40)).join(',') : '110,100,150'), left, sy, w, spr.height); g.restore();
       }
       if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
       const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
       for (const ax of GG.ax) {
         const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
-        if (ws) { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
+        if (ws) { if (this.wheelDraw) this.wheelDraw(g, wi, wx2, wy2, ws, ang, 0, Math.PI / 12); else { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
+          if (this.tireFx) { const ri = this.tireRim(wi); this.tireFx(g, wx2, wy2, GG.wr * k + 0.5, Math.round(ang / (Math.PI / 12)) * (Math.PI / 12), e.v || 0, { rim: ri && ri.frac, rgb: ri && ri.rgb }); } }   // gomme (gomme2d.js)
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
-      this.light(g, left + 3, sy + tY, 8, 6, '#ff2a2a', 0.15, 2);
-      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, 110 * k, 16, '255,240,200', e.hazard ? 0.15 : 0.55); this.lightAdd(left, sy + tY, 22, 12, '255,40,40', 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
+      // luci dei freni accese quando frena (e.acc, game.js); fari che lampeggiano quando sfanala (e.flashT, strada.js)
+      const brk = (e.acc || 0) < -1.3 && (e.v || 0) > 0.5, flash = e.flashT > 0 && Math.floor(e.flashT * 6) % 2 === 0;
+      this.light(g, left + 3, sy + tY, brk ? 12 : 8, brk ? 8 : 6, '#ff2a2a', brk ? 0.6 : 0.15, 2);
+      if (brk) { g.fillStyle = '#ff4a3a'; g.fillRect(left + 1, sy + tY - 1, 3, 3); }
+      if (flash) { this.light(g, left + w - 2, sy + hY + k, 10, 6, '#ffe7a0', 0.7, 3); g.fillStyle = '#fffbe8'; g.fillRect(left + w - 4, sy + hY, 4, 3); }
+      if (this.lightAdd) { this.lightAdd(left + w + 70 * k, y - 4, (flash ? 160 : 110) * k, flash ? 24 : 16, '255,240,200', e.hazard ? 0.15 : flash ? 1.1 : 0.55); this.lightAdd(left, sy + tY, brk ? 30 : 22, brk ? 16 : 12, '255,40,40', brk ? 0.9 : 0.45); this.lightAdd(x, y - 24 * k, w * 0.55, 34 * k, '190,200,240', 0.16); if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) this.lightAdd(x, y - 10, w * 0.8, 30, '255,160,40', 0.5); }
       if ((e.hazard || e.hazT > 0) && Math.floor(st.t * 2.4) % 2 === 0) {   // quattro frecce (anche dopo un urto)
         g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3);
         this.light(g, left + 4, sy + tY + 4 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + hY + k, 12, 7, '#ffa020', 0.35, 3);
       }
       if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3); this.light(g, left + 4, sy + tY + 4 * k, 9, 6, '#ffa020', 0.3, 3); }
       if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
+      if (e.skidT > 0.85 && !(this.cool['skid' + e.id] > st.t) && (this.cool['skid' + e.id] = st.t + 2.5)) this.comic('SCREEECH!', left + w * 0.1, sy - 10, '#f4f1e6', 2);
       if (e.kind === 'police') {
         const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
         const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
@@ -1952,11 +2038,12 @@ class Street2D {
 
     // ---- la Supra
     const IN = game && game.inside;
-    let entE = 0;
-    if (IN) { const ez = (t) => t * t * (3 - 2 * Math.min(1, Math.max(0, t))); entE = IN.phase === 'in' ? ez(Math.min(1, IN.t / 1.3)) : IN.phase === 'out' ? 1 - ez(Math.min(1, IN.t / 1.1)) : 1; }
-    const entLift = IN ? (IN.id === 'fuel' ? 12 : 30) * entE : 0;
-    const entA = IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
-    const entDX = IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
+    // entrata nel locale: la manovra nel piazzale la decide entrata2d.js (`entPose`); senza il file, quella di prima
+    let entE = 0, EP = IN && this.entPose ? this.entPose(IN, wx, carX, dist) : null;
+    if (IN && !EP) { const ez = (t) => t * t * (3 - 2 * Math.min(1, Math.max(0, t))); entE = IN.phase === 'in' ? ez(Math.min(1, IN.t / 1.3)) : IN.phase === 'out' ? 1 - ez(Math.min(1, IN.t / 1.1)) : 1; }
+    const entLift = EP ? EP.lift : IN ? (IN.id === 'fuel' ? 12 : 30) * entE : 0;
+    const entA = EP ? EP.a : IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
+    const entDX = EP ? EP.dx : IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
     const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
     const spr0 = this.carSprite(k), spr = (s.damage || 0) > 0.01 ? this.damaged(spr0, s.damage, this.geo()) : spr0, SW = spr.width, left = Math.round(carX + entDX - SW / 2);
     const hlK = (s.damage || 0) > 0.35 ? (Math.sin(st.t * 37) + Math.sin(st.t * 13.7) > 0.3 ? 0.45 : 0.12) : 1;   // faro rotto: debole e tremolante
@@ -1966,19 +2053,14 @@ class Street2D {
     const GE0 = this.geo();
     if (s.ign) this.light(g, left + SW + (s.high ? 110 : 60) * k, y0 - 2, s.high ? 150 : 80, s.high ? 9 : 7, '#fff2c4', s.high ? 0.1 : 0.08, 4);   // pozza dei fari (più lunga con gli abbaglianti)
     if (this.lightAdd) {
-      if (s.ign) { this.lightAdd(left + SW + (s.high ? 160 : 100) * k, y0 - 6, (s.high ? 230 : 150) * k, 24, '255,244,214', 0.85 * (typeof hlK === 'number' ? hlK : 1)); }
+      if (s.ign && s.lamps !== false) { this.lightAdd(left + SW + (s.high ? 160 : 100) * k, y0 - 6, (s.high ? 230 : 150) * k, 24, '255,244,214', 0.85 * (typeof hlK === 'number' ? hlK : 1)); }
       this.lightAdd(left + SW / 2, y0 - 24 * k, SW * 0.75, 44 * k, '225,225,255', 0.38);          // luce di riempimento: il protagonista resta leggibile
       this.lightAdd(left, y0 - 18 * k, 50, 22, '255,40,40', s.brake > 0.05 ? 0.7 : s.ign ? 0.25 : 0);
     }
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
-    // fascio dei fari nell'aria, di notte e sotto la pioggia
-    if (s.ign && (this.day || 0) < 0.6) {
-      const fx = left + SW - 4, fy = y0 - 22 * k;
-      this.fxBeam(g, fx, fy, (s.high ? 300 : 190), (y0 - fy) * 0.9 + 4, (0.55 + (this.rainOn ? 0.3 : 0) + (s.high ? 0.15 : 0)) * (1 - (this.day || 0)) * hlK);
-    }
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
-    const glow = this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
+    const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita
     if (this.rainOn && spr.img) {
@@ -2003,9 +2085,9 @@ class Street2D {
     if (spr.getContext && this.quality !== 'bassa') {
       const night = 1 - (this.day || 0) * 0.8, ph = 0.5 + 0.5 * Math.sin(dist / 23);
       g.globalCompositeOperation = 'lighter';
-      g.globalAlpha = 0.55 * night * ph; g.drawImage(this.rimOf(spr, '#ff4fb0'), 0, 0);
-      g.globalAlpha = 0.55 * night * (1 - ph); g.drawImage(this.rimOf(spr, '#4fe6ff'), 0, 0);
-      g.globalAlpha = 0.25 * (1 - night * 0.7); g.drawImage(this.rimOf(spr, '#fff6e0'), 0, 0);
+      g.globalAlpha = 0.55 * night * ph; g.drawImage(this.rimOf(spr, '#ff4fb0'), 0, 0, SW, spr.height);
+      g.globalAlpha = 0.55 * night * (1 - ph); g.drawImage(this.rimOf(spr, '#4fe6ff'), 0, 0, SW, spr.height);
+      g.globalAlpha = 0.25 * (1 - night * 0.7); g.drawImage(this.rimOf(spr, '#fff6e0'), 0, 0, SW, spr.height);
       g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
       // lampioni che scorrono sulla lamiera, rosso degli stop, arancio della fiammata
       const bl = [], nt2 = 1 - (this.day || 0);
@@ -2038,7 +2120,7 @@ class Street2D {
     // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
-    if (s.ign) this.light(g, left + SW - 6, top + 33 * k, s.high ? 20 : 12, s.high ? 9 : 6, '#fff2c4', s.high ? 0.3 : 0.2, 3);
+    if (s.ign && s.lamps !== false) this.light(g, left + GE.head[0] * k, top + GE.head[1] * k, s.high ? 9 : 6, s.high ? 5 : 4, '#fff2c4', s.high ? 0.22 : 0.15, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
     const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
@@ -2047,8 +2129,11 @@ class Street2D {
       if (s.brakeT != null) this.brakeHot = Math.max(0, Math.min(1, (s.brakeT - 400) / 330));
       else this.brakeHot = Math.min(1, Math.max(0, (this.brakeHot || 0) - dt * 0.18) + (s.brake > 0.5 && Math.abs(s.v) > 15 ? dt * 0.25 * s.brake : 0));
       const wfn = this.wheelFn();
-      wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, st.spin, Math.abs(s.ww * 0.322), true);
-      wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4), k, st.front, Math.abs(s.v), false);
+      // le ruote motrici girano con la fisica (pattinano, si bloccano), le altre rotolano con l'auto:
+      // trazione posteriore (Supra, BMW...) dietro, trazione anteriore (V40, Panda, Golf...) davanti
+      const fwd = !!s.fwd, spinV = Math.abs(s.ww * 0.322), rollV = Math.abs(s.v);
+      wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, fwd ? st.front : st.spin, fwd ? rollV : spinV, true);
+      wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4), k, fwd ? st.spin : st.front, fwd ? spinV : rollV, false);
       if (this.brakeHot > 0.05) {                                     // il disco rosso si vede tra i raggi (brake); qui il riflesso a terra
         const hb = this.brakeHot, nt = 1 - (this.day || 0) * 0.8;
         for (const [q, b] of [[0, bR], [1, bF]]) {
@@ -2068,19 +2153,32 @@ class Street2D {
       const GH = this.geo(), hx2 = left + GH.head[0] * k, hy2 = top + GH.head[1] * k, nt = 1 - (this.day || 0) * 0.75, tlx = left + (GH.tail[0] + 2) * k, tly = top + (GH.tail[1] + 3) * k;
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
-      fl(hx2, hy2, (s.high ? 150 : 95) * nt, '190,225,255', 0.55 * nt * hlK, 2); fl(hx2, hy2, 40 * nt, '255,255,255', 0.7 * nt * hlK, 1);
-      g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 6, 2, 12);
+      if (s.lamps !== false) {
+        // (la striscia anamorfica orizzontale dei fari è tolta: sembrava un raggio laser; il fascio è la banda di luce più su)
+        fl(hx2, hy2, 9 * nt, '255,255,255', 0.5 * nt * hlK, 2);
+        g.fillStyle = `rgba(255,255,255,${0.6 * nt * hlK})`; g.fillRect(Math.round(hx2) - 1, Math.round(hy2) - 4, 2, 8);
+      }
       const br = s.brake > 0.05 ? 1 : 0.45;
       fl(tlx, tly, 26 * br * nt + 6, '255,40,60', 0.5 * br * nt, 2);
       const spd = Math.abs(s.v);
       if (spd > 8) { const len = Math.min(220, (spd - 8) * 5.5), gr = g.createLinearGradient(tlx - len, 0, tlx, 0); gr.addColorStop(0, 'rgba(255,30,50,0)'); gr.addColorStop(1, `rgba(255,40,60,${0.35 * nt})`); g.fillStyle = gr; g.fillRect(tlx - len, tly - 1, len, 2); }
       g.restore();
     }
+    // ---- fascio dei fari: parte dal faro vero di ogni auto (GE.head, nello sprite), sopra la carrozzeria, di notte e sotto la pioggia
+    if (s.ign && s.lamps !== false && (this.day || 0) < 0.6) {
+      const fx = left + GE.head[0] * k + 1, fy = top + GE.head[1] * k;
+      const night = (1 - (this.day || 0)) * hlK, wet = this.rainOn ? 0.3 : 0;
+      // anabbagliante: una banda larga che scende sulla strada, col taglio netto in alto; abbagliante: una seconda banda più alta e più lunga, il taglio si alza
+      const bz = Math.min(1.5, Math.max(0.85, GE.h / 66));   // i mezzi grandi hanno un fascio più largo
+      this.fxBeamAt(g, fx, fy, 380, 7, 28 * bz, (s.high ? 0.8 : 1) * (1 + wet) * night, 0.8);
+      if (s.high) this.fxBeamAt(g, fx, fy - 1, 520, -1, 30 * bz, (1 + wet * 0.5) * night, 0.3);
+      this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
+    }
     // ---- effetti
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));
     // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
     this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
-    if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02)) this.lightAdd(rx - 20, exY, 90, 40, '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0)) * 0.9);
+    if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02 || (st.sus || 0) > 0.03)) this.lightAdd(rx - 20, exY, 90, 40, st.flame > 0.05 && st.flamePal === 'blu' ? '150,170,255' : '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0, (st.sus || 0) * 0.45)) * 0.9);
     if (s.v > 16) {
       // linee di velocità affusolate (più fitte e lunghe con la velocità)
       const n = Math.min(30, (s.v - 16) * 1.2), fr = Math.floor(st.t * 24);
@@ -2126,21 +2224,22 @@ class Street2D {
       if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
       if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
     }
-    if (game) for (const f of game.fx) { if (f.k === 'challenge') this.comic('SFIDA! 2 KM', carX + 40, carTop - 30, '#ff2e88', 4, '#ffd23f'); else if (f.k === 'streetWin') this.comic('VINTA!', carX + 40, carTop - 30, '#b8ff3a', 5); else if (f.k === 'streetLose') this.comic('PERSA...', carX + 40, carTop - 30, '#8a93b0', 4); if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
+    if (game) for (const f of game.fx) { if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
     if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
     if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
     if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
     if (game && game.siren && !st.prevSiren) this.comic('ALT! POLIZIA', carX + 40, carTop - 30, '#4f7bff', 3);
-    if (game && game.race && game.race.phase === 'run' && game.race.tt < 0.05 && cd('go', 2)) this.comic('VIA!', carX + 80, carTop - 30, '#b8ff3a', 6, '#163a8c');
     st.prevV = s.v; st.prevFlame = st.flame; st.prevSiren = !!(game && game.siren);
     // ---- marciapiede vicino con oggetti in primo piano (fuori città: barriera, guardrail, roccia, erba o sabbia)
     if (!urban) this.drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, st.t);
     else {
+    if (!(this.curbHD && this.curbHD(g, dist, PPM, W))) {                         // cordolo a densità doppia (nitido2d.js)
     g.fillStyle = C.ink; g.fillRect(0, 339, W, 2);
     g.fillStyle = '#5c6386'; g.fillRect(0, 341, W, 2);
     g.fillStyle = C.curb; g.fillRect(0, 343, W, 17);
     g.fillStyle = '#4a5070'; for (let x = -((dist * PPM) % 40); x < W; x += 40) g.fillRect(Math.round(x), 343, 1, 17);
     g.fillStyle = '#33384f'; g.fillRect(0, 351, W, 1);
+    }
     for (let m = Math.floor(visFrom / 17) * 17; m < visTo; m += 17) {
       const k = Math.round(m / 17); if (Street2D.rnd(k + 300) < 0.42) continue;
       const kind = Street2D.rnd(k + 303) < 0.06 ? 6 : Math.floor(Street2D.rnd(k + 301) * 6);
@@ -2151,6 +2250,7 @@ class Street2D {
     }
 
     if (this.lightPass) this.lightPass(g, W, 1 - (this.day || 0), this.rainOn);   // penombra notturna e pozze di luce (luci2d.js)
+    if (this.vitaFront && !(game && game.inside)) this.vitaFront(g, dist, st.t, bg, dt, s);   // riflessi, falene, lucciole, raggi di sole (vita2d.js)
     this.drawComics(g, dt);
     // ---- linee di velocità sopra i 90 km/h circa
     if (Math.abs(s.v) > 25) {
@@ -2188,44 +2288,9 @@ class Street2D {
     }
     if (TUN) this.drawTunnelFront(g, TUN, wx, W);
 
-    // ---- gara: semaforo da drag grande, barra di avanzamento, striscione a scacchi
-    if (game && game.race) {
-      const R = game.race, tx = Math.round(W * 0.66), ty = 74;
-      if (R.phase === 'count' || (R.phase === 'run' && R.tt < 1.6)) {
-        const lit = R.phase === 'run' ? 4 : R.t < 1 ? 3 : R.t < 2 ? 2 : R.t < 3 ? 1 : 0;
-        g.fillStyle = C.ink; g.fillRect(tx - 2, ty + 120, 6, 40); g.fillRect(tx - 18, ty - 4, 38, 128);
-        g.fillStyle = '#1b1d28'; g.fillRect(tx - 16, ty - 2, 34, 124);
-        for (let i = 0; i < 4; i++) {
-          const on = i < 3 ? lit > i && lit < 4 : lit === 4, col = i < 3 ? '#ffb000' : '#3cff6a', yy = ty + 14 + i * 30;
-          g.fillStyle = on ? col : '#33281a'; this.span(g, tx + 1, yy, 10, 10);
-          if (on) { g.fillStyle = '#fff6d0'; this.span(g, tx - 2, yy - 3, 3, 3); this.light(g, tx + 1, yy, 34, 30, col, 0.28, 4); }
-        }
-      }
-      if (R.phase === 'run') {
-        const rival = game.ents.find((e) => e.kind === 'rival'), bx = Math.round(W * 0.3), bw = Math.round(W * 0.4), by = 14;
-        g.fillStyle = 'rgba(8,8,14,.75)'; g.fillRect(bx - 4, by - 4, bw + 8, 14);
-        g.fillStyle = '#3a3f58'; g.fillRect(bx, by + 3, bw, 2);
-        for (let q = 0; q <= 4; q++) g.fillRect(bx + Math.round(bw * q / 4), by, 1, 8);
-        for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : C.ink; g.fillRect(bx + bw - 3 + (q % 2) * 3, by - 2 + Math.floor(q / 2) * 4, 3, 4); }
-        const mark = (m, col) => { const xx = bx + Math.round(Math.max(0, Math.min(1, m / 402.3)) * bw); g.fillStyle = C.ink; g.fillRect(xx - 4, by - 1, 9, 8); g.fillStyle = col; g.fillRect(xx - 3, by, 7, 6); };
-        if (rival) mark(rival.x - R.x0, '#b8b8c8');
-        mark(game.s.dist - R.x0, this.paintHex);
-      }
-    }
-
     if (DM && this.districtBanner && game && !game.inside) this.districtBanner(g, dist, dt);
     // ---- segnalatore della corsia (radar delle tre corsie)
     if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
-    if (game && game.street) {   // sfida in corsa: barra dei 2 km con le due auto
-      const R = game.street, bx = Math.round(W * 0.3), bw = Math.round(W * 0.4), by = 46, f = (m) => Math.max(0, Math.min(1, m / ST_RACE_M));
-      g.fillStyle = 'rgba(8,8,14,.78)'; g.fillRect(bx - 6, by - 6, bw + 12, 26);
-      g.fillStyle = '#3a3f58'; g.fillRect(bx, by + 3, bw, 2);
-      for (let q = 0; q < 6; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : C.ink; g.fillRect(bx + bw - 3 + (q % 2) * 3, by - 2 + Math.floor(q / 2) * 4, 3, 4); }
-      const mk = (m, col) => { const xx = bx + Math.round(f(m) * bw); g.fillStyle = C.ink; g.fillRect(xx - 4, by - 1, 9, 8); g.fillStyle = col; g.fillRect(xx - 3, by, 7, 6); };
-      mk(R.e.x - R.x0, '#b8b8c8'); mk(dist - R.x0, this.paintHex || '#ff5a3a');
-      const gap = Math.round(-(R.gap || 0)), txt = (gap >= 0 ? '+' : '') + gap + ' M · ' + Math.max(0, Math.round((ST_RACE_M - (dist - R.x0)) / 10) * 10) + ' M ALLA FINE';
-      this.text(g, txt, bx, by + 10, gap >= 0 ? '#b8ff3a' : '#ff5a3a');
-    }
     if (game && game.track === 'city' && !game.inside && this.laneRadar !== false) this.drawLaneRadar(g, game, dist, st.t);
 
     // ---- su schermo
@@ -2250,8 +2315,10 @@ class Street2D {
       const sw = this.LW / z, sh = this.LH / z, f = this.zoomFocus || this.fxFocus || { x: this.LW / 2, y: this.LH / 2 };
       const sx = Math.max(0, Math.min(this.LW - sw, f.x - sw / 2)), sy = Math.max(0, Math.min(this.LH - sh + pad, f.y - sh / 2));
       src = [sx, sy, sw, sh];
-      c.drawImage(this.lo, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);
-    } else c.drawImage(this.lo, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
+      if (this.blit) this.blit(c, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);   // ingrandimento nitido (nitido2d.js)
+      else c.drawImage(this.lo, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);
+    } else if (this.blit) this.blit(c, 0, 0, this.lo.width, this.lo.height, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
+    else c.drawImage(this.lo, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
     // bagliore a due livelli (luci2d.js); senza il file resta quello semplice
     if (this.glowPass) this.glowPass(c, src, SS);
     else if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {

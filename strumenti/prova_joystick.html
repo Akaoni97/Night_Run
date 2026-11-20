@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night Run · Prova del joystick</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 20px; background: #12101a; color: #ece6d6; font: 14px/1.45 system-ui, sans-serif; }
+  h1 { margin: 0 0 4px; font-size: 20px; color: #ffb347; }
+  p { margin: 6px 0; color: #cfc8b8; }
+  .pad { margin: 16px 0; padding: 14px; border: 1px solid #4a4458; border-radius: 10px; background: #1b1826; }
+  .pad h2 { margin: 0 0 6px; font-size: 15px; color: #ffd27a; word-break: break-all; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 3px 0; font: 12px/1 ui-monospace, monospace; }
+  .row b { width: 120px; color: #9aa; font-weight: 600; }
+  .bar { flex: 1; max-width: 260px; height: 10px; background: #2a2636; border-radius: 5px; overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: #b8ff3a; }
+  .bar.ax i { background: #38bdf8; }
+  .gioco { color: #ffb347; }
+  .nota { color: #ff7a6a; }
+  button { padding: 8px 14px; border-radius: 8px; border: 1px solid #ffb347; background: #ffb347; color: #1a1206; font-weight: 700; cursor: pointer; }
+  textarea { width: 100%; height: 150px; background: #0c0a12; color: #ece6d6; border: 1px solid #4a4458; border-radius: 8px; padding: 8px; font: 12px/1.4 ui-monospace, monospace; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<h1>Prova del joystick</h1>
+<p>Tieni questa pagina in primo piano e <b>premi un tasto del joystick</b>: il browser non lo mostra finché non lo tocchi. Poi muovi uno alla volta gas, freno, sterzo e cambio.</p>
+<p>Le righe in <span class="gioco">arancio</span> sono quelle che il gioco usa oggi (valgono solo per un pad «standard», tipo Xbox).</p>
+<div id="pads"></div>
+<p id="nessuno" class="nota">Nessun joystick visto. Premi un tasto, o scollega e ricollega il cavo.</p>
+<h2 style="font-size:15px;color:#ffd27a">Cosa è cambiato mentre muovevi (da mandare a Claude)</h2>
+<textarea id="rapporto" readonly></textarea>
+<p><button id="copia" type="button">Copia il rapporto</button> <span id="ok"></span></p>
+<script>
+// Gioco oggi (index.html, readPad): gas = pulsante 7, freno = 6, frizione = 1, marcia su = 0 o 5, marcia giù = 2 o 4,
+// avviamento = 3, sterzo = croce 14/15 e asse 0. Tutto presuppone la mappa «standard».
+const GIOCO = { b: { 7: 'gas', 6: 'freno', 1: 'frizione', 0: 'marcia su', 5: 'marcia su', 2: 'marcia giù', 4: 'marcia giù', 3: 'avviamento', 14: 'sterzo +', 15: 'sterzo -' }, a: { 0: 'sterzo' } };
+const visti = {};        // pad.index -> { b: Set, a: Set } indici che si sono mossi
+const base = {};         // valori di partenza degli assi
+const $ = (id) => document.getElementById(id);
+function riga(el, nome, v, asse, nomeGioco) {
+  return `<div class="row ${nomeGioco ? 'gioco' : ''}"><b>${nome}${nomeGioco ? ' · ' + nomeGioco : ''}</b><span class="bar ${asse ? 'ax' : ''}"><i style="width:${asse ? Math.round((v + 1) * 50) : Math.round(v * 100)}%"></i></span><span>${v.toFixed(2)}</span></div>`;
+}
+function giro() {
+  const pads = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).filter((p) => p && p.connected);
+  $('nessuno').style.display = pads.length ? 'none' : '';
+  let html = '';
+  for (const p of pads) {
+    const v = visti[p.index] || (visti[p.index] = { b: new Set(), a: new Set() });
+    const b0 = base[p.index] || (base[p.index] = p.axes.slice());
+    p.buttons.forEach((bt, i) => { if (bt.value > 0.5 || bt.pressed) v.b.add(i); });
+    p.axes.forEach((x, i) => { if (Math.abs(x - b0[i]) > 0.3) v.a.add(i); });
+    html += `<div class="pad"><h2>#${p.index} · ${p.id}</h2>
+      <div class="row"><b>mappa</b><span class="${p.mapping === 'standard' ? '' : 'nota'}">${p.mapping || '(vuota: NON standard)'}</span></div>
+      <div class="row"><b>pulsanti / assi</b><span>${p.buttons.length} / ${p.axes.length}</span></div>`;
+    p.buttons.forEach((bt, i) => { html += riga(null, 'pulsante ' + i, bt.value, false, GIOCO.b[i]); });
+    p.axes.forEach((x, i) => { html += riga(null, 'asse ' + i, x, true, GIOCO.a[i]); });
+    html += '</div>';
+  }
+  $('pads').innerHTML = html;
+  $('rapporto').value = pads.map((p) => {
+    const v = visti[p.index] || { b: new Set(), a: new Set() };
+    return `JOYSTICK #${p.index}\nid: ${p.id}\nmappa: ${p.mapping || '(vuota, non standard)'}\npulsanti: ${p.buttons.length}, assi: ${p.axes.length}\n` +
+      `pulsanti mossi: ${[...v.b].sort((x, y) => x - y).join(', ') || 'nessuno'}\nassi mossi: ${[...v.a].sort((x, y) => x - y).join(', ') || 'nessuno'}\n` +
+      `valori assi ora: ${p.axes.map((x) => x.toFixed(2)).join(' ')}\nbrowser: ${navigator.userAgent}\n`;
+  }).join('\n');
+  requestAnimationFrame(giro);
+}
+requestAnimationFrame(giro);
+$('copia').addEventListener('click', () => {
+  $('rapporto').select();
+  try { navigator.clipboard.writeText($('rapporto').value); $('ok').textContent = 'Copiato.'; } catch (e) { document.execCommand('copy'); $('ok').textContent = 'Copiato.'; }
+});
+</script>
+</body>
+</html>

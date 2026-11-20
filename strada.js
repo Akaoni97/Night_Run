@@ -1,100 +1,69 @@
 // ============================================================================
-//  Night Run · La strada viva: sfide lanciate con gli abbaglianti, reputazione, eventi in prima corsia
-//  (incidenti con le quattro frecce, la polizia che ferma qualcuno) e un traffico che si comporta da autostrada.
+//  Night Run · La strada viva: abbaglianti per chiedere strada, eventi in prima corsia
+//  (incidenti con le quattro frecce, la polizia che ferma qualcuno) e un traffico che si comporta da autostrada
+//  (destra, sorpasso a sinistra, caratteri dei guidatori: vedi trafficDriver in game.js).
 //  Si aggancia a StreetGame (game.js), caricato dopo viaggio.js.
 // ============================================================================
 
-// auto "che ci stanno": con gli abbaglianti accettano la sfida più spesso; i mezzi da lavoro non accettano mai
-const ST_SPORTY = ['golf', 'p205', 'p206', 'williams', 'v850', 'a3', 'e30', 'e36', 'e34', 'r5', 'b2002', 'a112', 'supra'];
-const ST_NEVER = ['bus', 'van', 'doblo', 'ambulanza', 'taxi'];
-const ST_RACE_M = 2000;                                      // sfida in corsa: due chilometri fissi
-// reputazione: cosa si sblocca vincendo le sfide di strada
-const ST_REP_PERKS = [
-  { rep: 5, id: 'rep_rispetto', name: 'Rispetto', note: 'Le auto sportive accettano più spesso le sfide.' },
-  { rep: 12, id: 'rep_mappa', name: 'Rimappatura da strada', note: '+3 % di potenza su tutte le auto.' },
-  { rep: 25, id: 'rep_gomme', name: 'Gomme scelte dai ragazzi del porto', note: '+3 % di aderenza.' },
-  { rep: 45, id: 'rep_sconto', name: 'Amici in officina', note: '15 % di sconto da Luca e da Niko.' },
-  { rep: 70, id: 'rep_leggenda', name: 'Leggenda della notte', note: 'Altri +4 % di potenza.' },
-];
+// categorie delle auto (le usano il Garage e i documenti: una Panda e una M5 non sono nella stessa classe)
+const ST_CAT = {
+  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112'],
+  familiare: ['v40', 'a80', 'a3', 'p308', 'v850', 'taxi'],
+  hot: ['golf', 'p205', 'p206', 'williams', 'r5'],
+  sportiva: ['e30', 'e36', 'e34', 'b2002', 'supra'],
+  lavoro: ['bus', 'van', 'doblo', 'ambulanza', 'polizia'],
+};
+const ST_CAT_NAME = { utilitaria: 'utilitarie', familiare: 'familiari', hot: 'piccole sportive', sportiva: 'sportive', lavoro: 'mezzi da lavoro' };
+const ST_CAT_ONE = { utilitaria: 'un\'utilitaria', familiare: 'una familiare', hot: 'una piccola sportiva', sportiva: 'una sportiva', lavoro: 'un mezzo da lavoro' };
+function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return k; return 'familiare'; }
 
 (function () {
   const P = StreetGame.prototype;
   const kmh = (v) => Math.round(v * 3.6);
 
-  // ------------------------------------------------------------ reputazione e suoi vantaggi
-  P.streetRep = function () { const s = this.s; s.street = s.street || { w: 0, l: 0, rep: 0 }; return s.street; };
-  P.repPerk = function (id) { const r = this.streetRep(), p = ST_REP_PERKS.find((q) => q.id === id); return !!p && r.rep >= p.rep; };
-  const pp = P.perkPow, pg = P.perkGrip, dc = P.disc;
-  P.perkPow = function () { return pp.call(this) + (this.repPerk('rep_mappa') ? 0.03 : 0) + (this.repPerk('rep_leggenda') ? 0.04 : 0); };
-  P.perkGrip = function () { return pg.call(this) * (this.repPerk('rep_gomme') ? 1.03 : 1); };
-  P.disc = function () { return dc.call(this) * (this.repPerk('rep_sconto') ? 0.85 : 1); };
-
   // ------------------------------------------------------------ abbaglianti: si chiede strada a chi sta davanti
   P.flashLights = function () {
-    const d = this.s.dist, sim = this.sim;
-    if (this.race || this.street || this.inside || this.track !== 'city') return null;
+    const d = this.s.dist;
+    if (this.inside || this.track !== 'city') return null;
     const lead = this.ents.filter((e) => (e.kind === 'traffic' || e.kind === 'police') && !e.hazard && Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 1.7 && e.x - d > 4 && e.x - d < 75).sort((a, b) => a.x - b.x)[0];
     if (!lead) return null;
     if (lead.kind === 'police') {
+      if (typeof POL !== 'undefined' && POL.off) return null;   // polizia disabilitata (sviluppatori)
       if (lead.flashed) return null; lead.flashed = true;
       const fine = 80; this.s.money -= fine; this.s.heat = Math.min(3, (this.s.heat || 0) + 0.5);
       this.say(`Hai sfanalato una volante. Accosta, verbale: − € ${fine}`, 'police'); return 'police';
     }
     if (lead.flashed) return null;
     lead.flashed = true;
-    const rep = this.streetRep();
-    const sporty = ST_SPORTY.includes(lead.vt), never = ST_NEVER.includes(lead.vt);
-    const chance = never ? 0 : (sporty ? 0.65 : 0.22) + (this.repPerk('rep_rispetto') ? 0.15 : 0) + Math.min(0.15, rep.rep * 0.004);
-    if (Math.random() < chance && sim.v > 8) { this.startStreetRace(lead); return 'race'; }
-    // non ci sta: mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
+    // mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
     const to = lead.lane > 1 ? lead.lane - 1 : lead.lane + 1;
     lead.to = to; lead.sig = 1.0; lead.yield = 4;
-    this.say(`${(CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto'} davanti mette la freccia e ti fa passare`, 'info');
+    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto';
+    this.say(`${nm} davanti mette la freccia e ti fa passare`, 'info');
     return 'yield';
   };
 
-  // ------------------------------------------------------------ sfida in corsa: due chilometri, chi è davanti vince
-  P.startStreetRace = function (e) {
-    const c = CARS[e.vt] || {}, hp = (c.P && c.P.tq) ? Math.max(...c.P.tq.map(([r, t]) => (t - 16 - 0.0035 * r - 0.9e-6 * r * r) * r / 7023)) : 120;
-    e.racing = true; e.hazard = false;
-    e.rPow = hp * 735.5 * (0.78 + Math.random() * 0.17);       // potenza alla ruota, con un pilota più o meno bravo
-    e.rMass = (c.mass || 1200) + 80; e.rCdA = ((c.P && c.P.cd) || 0.33) * ((c.P && c.P.A) || 2.1);
-    e.rMaxV = Math.max(e.v, 0);
-    this.street = { e, x0: this.s.dist, end: this.s.dist + ST_RACE_M, t: 0, name: c.short || 'Auto' };
-    this.fx.push({ k: 'challenge' });
-    this.say(`Ha risposto con gli abbaglianti: sfida! ${ST_RACE_M / 1000} km, chi è davanti vince`, 'race');
-  };
-  P.updateStreetRace = function (dt) {
-    const R = this.street; if (!R) return;
-    const e = R.e, sim = this.sim; R.t += dt;
-    if (!this.ents.includes(e)) { this.street = null; return; }
-    // l'avversario accelera con la sua potenza, frenato da aria e rotolamento; cambia corsia se ha qualcuno davanti
-    const v = Math.max(3, e.v), Fd = 0.5 * 1.2 * e.rCdA * v * v + 0.013 * e.rMass * 9.81;
-    const a = Math.min(7.5, (e.rPow / v - Fd) / e.rMass);
-    e.v = Math.max(0, e.v + a * dt);
-    const block = this.ents.find((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.lane && o.x > e.x && o.x - e.x < 30 + e.v * 0.8);
-    if (block && !e.sig) {
-      const free = [e.lane + 1, e.lane - 1].filter((l) => l >= 1 && l <= 3 && !this.ents.some((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === l && Math.abs(o.x - e.x) < 25));
-      if (free.length) { e.lane = free[0]; } else e.v = Math.min(e.v, block.v);
+  // ------------------------------------------------------------ eventi tra le tappe, uno ogni 8-10 km: incidente o controllo
+  // della polizia in prima corsia, una gomma che comincia a perdere, uno che ha fretta e ti sfanala da dietro
+  P.spawnRoadEvent = function (kind) {
+    const d = this.s.dist, x = d + 650 + Math.random() * 250, r = Math.random();
+    kind = kind || (r < 0.35 ? 'crash' : r < 0.6 ? 'stop' : r < 0.8 ? 'gomma' : 'fretta');
+    if (kind === 'gomma') {                       // foratura lenta: la pressione scende piano (viaggio.js), si vede sul quadro
+      if (!this.tyres) return;
+      const T = this.tyres(), i = Math.floor(Math.random() * 4); if (T.leak[i]) return;
+      T.leak[i] = 0.008 + Math.random() * 0.01;
+      this.say('Un colpo secco sotto la scocca: hai preso qualcosa. Tieni d\'occhio la pressione delle gomme', 'info');
+      if (this.vgThink && this.s.vg) this.vgThink('Cos\'era quel botto? Speriamo non una gomma. Al prossimo benzinaio do un\'occhiata.');
+      return;
     }
-    const my = this.s.dist - R.x0, his = e.x - R.x0;
-    R.gap = his - my;
-    if (my >= ST_RACE_M || his >= ST_RACE_M || R.t > 120) {
-      const win = my >= his, rep = this.streetRep();
-      if (win) { rep.w++; rep.rep += 3 + (ST_SPORTY.includes(e.vt) ? 2 : 0); } else { rep.l++; rep.rep = Math.max(0, rep.rep - 1); }
-      this.s.rep = (this.s.rep || 0) + (win ? 2 : 0);
-      e.racing = false; e.vT = e.vBase || e.v * 0.8;
-      this.street = null;
-      this.fx.push({ k: win ? 'streetWin' : 'streetLose' });
-      const unlocked = ST_REP_PERKS.filter((p) => win && rep.rep >= p.rep && rep.rep - (3 + (ST_SPORTY.includes(e.vt) ? 2 : 0)) < p.rep);
-      this.say(`${win ? 'Vinta' : 'Persa'} contro ${R.name} per ${Math.abs(Math.round(R.gap))} m · ${rep.w} vinte, ${rep.l} perse · reputazione ${rep.rep}` + (unlocked.length ? ` · sbloccato: ${unlocked.map((p) => p.name).join(', ')}` : ''), win ? 'money' : 'bad');
-      if (unlocked.length) this.perkUp = true;
+    if (kind === 'fretta') {                      // un aggressivo arriva forte da dietro nella tua corsia e sfanala (trafficAI)
+      const sim = this.sim; if (sim.v < 15) return;
+      const L = GAME_TRAFFIC.filter((t) => t.len < 6 && t.vt !== 'ambulanza'), a = L[Math.floor(Math.random() * L.length)], vb = sim.v + 9;
+      this.ents.push({ id: this.id++, kind: 'traffic', vt: a.vt, len: a.len || 4.4, lane: this.lane, x: d - 90, v: vb, vT: vb, vBase: vb, color: 'orig', fretta: true,
+        drv: { t: 'aggressivo', T: 0.6, a: 2.6, b: 4 } });
+      this.say('Fari negli specchietti: arriva uno che ha fretta', 'info');
+      return;
     }
-  };
-
-  // ------------------------------------------------------------ eventi in prima corsia: incidente, controllo della polizia
-  P.spawnRoadEvent = function () {
-    const d = this.s.dist, x = d + 650 + Math.random() * 250, kind = Math.random() < 0.55 ? 'crash' : 'stop';
     if (this.ents.some((e) => e.hazard && Math.abs(e.x - x) < 300)) return;
     const pick = () => GAME_TRAFFIC[Math.floor(Math.random() * GAME_TRAFFIC.length)];
     if (kind === 'crash') {
@@ -112,22 +81,89 @@ const ST_REP_PERKS = [
     }
   };
 
-  // ------------------------------------------------------------ traffico più umano
+  // ------------------------------------------------------------ traffico da autostrada
+  // Si tiene la destra e si sorpassa a sinistra, guardando prima chi arriva forte da dietro (anche il giocatore).
+  // Il carattere del guidatore (trafficDriver in game.js) cambia il modo: l'aggressivo sorpassa appena può, se è bloccato
+  // in corsia di sorpasso si attacca e sfanala, e se dura ti supera a destra; il prudente rientra presto; il centralista
+  // si mette in seconda corsia e ci resta. La velocità e la distanza da chi sta davanti le decide trafficAccel (game.js).
   P.trafficAI = function (dt) {
-    const d = this.s.dist;
+    const d = this.s.dist, sim = this.sim, mov = (o) => o.kind === 'traffic' || o.kind === 'police';
+    // la corsia `lane` è libera per e? `front` metri davanti e `back` dietro, più lo spazio per chi arriva più veloce
+    const free = (e, lane, back, front) => {
+      const le = e.len || 4.6;
+      for (const o of this.ents) {
+        if (o === e || !mov(o) || (o.lane !== lane && o.to !== lane)) continue;
+        const dx = o.x - e.x, need = ((o.len || 4.6) + le) / 2;
+        if (dx > -(need + back + Math.max(0, (o.v || 0) - e.v) * 2.5) && dx < need + front + Math.max(0, e.v - (o.v || 0)) * 2) return false;
+      }
+      if (Math.abs(this.laneZ - GAME_LANE_Z[lane]) < 1.7) {
+        const dx = d - e.x, need = (le + 4.5) / 2;
+        if (dx > -(need + back + Math.max(0, sim.v - e.v) * 2.5) && dx < need + front + Math.max(0, e.v - sim.v) * 2) return false;
+      }
+      return true;
+    };
     for (const e of this.ents) {
       if (e.kind !== 'traffic' || e.still || e.racing) continue;
+      const D = this.trafficDriver(e), heavy = (e.len || 4.6) > 8;
       e.yield = Math.max(0, (e.yield || 0) - dt);
+      e.flashT = Math.max(0, (e.flashT || 0) - dt);
+      // uscita alla tappa del viaggio: circa uno su sei di chi passa (mai i pesanti) mette la freccia a destra, va in prima,
+      // rallenta e si ferma davanti al locale (corsia 0, dove si parcheggia); chi segue si accoda o lo sorpassa a sinistra
+      if (this.s.vg && typeof VG !== 'undefined' && !heavy && !e.police) {
+        const n = Math.ceil((e.x + 80 - VG_STOP0) / VG_STEP), X = VG.stopX(n);
+        if (e.exitN !== n && !(e.exitX > 0) && X - e.x < 450) {                                     // si decide una volta, a 450 m dalla tappa
+          e.exitN = n; e.exitX = 0;
+          if (X - e.x > 120 && Math.random() < 1 / 6) {
+            const k = this.ents.filter((o) => o.exitN === n && o.exitX > 0).length;
+            if (k < 3) e.exitX = X - 12 + k * 7;
+          }
+        }
+        if (e.exitX > 0) {
+          if (e.lane > 1) {
+            if (e.exitX - e.x < 40) { e.exitX = 0; continue; }                     // non è riuscito a rientrare in tempo: tira dritto
+            if (!e.to && free(e, e.lane - 1, 12, 20)) { e.to = e.lane - 1; e.sig = 1.2; }
+            continue;
+          }
+          if (e.x > e.exitX + 6) { e.exitX = 0; continue; }                         // l'ha mancata: tira dritto
+          e.sig = Math.max(e.sig || 0, 0.4); e.to = 0;                               // freccia a destra finché non si ferma
+          if (e.v < 0.8 && e.exitX - e.x < 9) { e.lane = 0; e.still = true; e.parked = true; e.sig = 0; e.exitX = 0; e.v = 0; }
+          continue;
+        }
+      }
       if (e.sig > 0 || e.to) continue;
-      const near = (lane, back, front) => this.ents.some((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && (o.lane === lane || o.to === lane) && o.x - e.x > -back && o.x - e.x < front)
-        || (Math.abs(this.laneZ - GAME_LANE_Z[lane]) < 1.7 && d - e.x > -back && d - e.x < front);
-      const lead = this.ents.find((o) => o !== e && (o.kind === 'traffic' || o.kind === 'police') && o.lane === e.lane && o.x > e.x && o.x - e.x < 60 + e.v * 1.2);
+      // chi ha davanti nella sua corsia (anche il giocatore)
+      let lead = null, lgap = Infinity, leadV = Infinity, meLead = false;
+      for (const o of this.ents) {
+        if (o === e || !mov(o) || o.lane !== e.lane || o.x <= e.x) continue;
+        const g = o.x - e.x - ((o.len || 4.6) + (e.len || 4.6)) / 2; if (g < lgap) { lgap = g; lead = o; leadV = o.v || 0; }
+      }
+      if (!this.inside && d > e.x && Math.abs(this.laneZ - GAME_LANE_Z[e.lane]) < 1.7 && !(D.t === 'distratto' && !(e.alertT > 0))) {   // il distratto non ti vede
+        const g = d - e.x - ((e.len || 4.6) + 4.5) / 2; if (g < lgap) { lgap = g; lead = null; leadV = sim.v; meLead = true; }
+      }
+      const want = e.vT || e.vBase || e.v, close = lgap < 60 + e.v * 1.5, slower = close && leadV < want - (heavy ? 0.4 : 1.5);
       // ostacolo fermo davanti (incidente, controllo): si sposta per tempo
-      if (lead && lead.still && e.lane < 3 && !near(e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
-      // qualcuno più lento davanti: sorpassa a sinistra se c'è spazio
-      if (lead && lead.v < e.v - 1.5 && e.lane < 3 && Math.random() < dt * 0.8 && !near(e.lane + 1, 20 + e.v * 0.4, 30)) { e.to = e.lane + 1; e.sig = 1.2; continue; }
-      // tiene la destra: rientra quando la corsia a destra è libera per un buon tratto
-      if (e.lane > 1 && !e.yield && Math.random() < dt * 0.25 && !near(e.lane - 1, 18, 70 + e.v)) { const r = this.ents.find((o) => o.kind === 'traffic' && o.lane === e.lane - 1 && o.x > e.x && o.x - e.x < 90 && o.v < e.v - 2); if (!r) { e.to = e.lane - 1; e.sig = 1.4; } }
+      if (lead && lead.still && close && e.lane < (heavy ? 2 : 3) && free(e, e.lane + 1, 15, 35)) { e.to = e.lane + 1; e.sig = 0.8; continue; }
+      // più lento davanti: sorpasso a sinistra, mai a destra
+      if (slower && e.lane < (heavy ? 2 : 3) && Math.random() < dt * (D.t === 'aggressivo' ? 2 : D.t === 'prudente' ? 0.5 : 0.9) && free(e, e.lane + 1, 20 + e.v * 0.3, 25)) {   // i pesanti non vanno in terza
+        e.to = e.lane + 1; e.sig = D.t === 'aggressivo' ? 0.7 : 1.3; continue;
+      }
+      // aggressivo bloccato in corsia di sorpasso: si attacca, sfanala, e se dura ti supera a destra
+      if (D.t === 'aggressivo' && slower && e.lane === 3 && lgap < 12 + e.v * 1.1) {
+        e.blockT = (e.blockT || 0) + dt;
+        if (!e.flashT && e.blockT > 1.5 && Math.random() < dt * 0.6) {
+          e.flashT = 0.9;
+          if (meLead && !e.flashedMe) { e.flashedMe = true; this.fx.push({ k: 'flashed', id: e.id }); this.say('Uno attaccato dietro ti sfanala: in corsia di sorpasso si sorpassa', 'info'); }
+        }
+        if (e.blockT > 7 && Math.random() < dt * 0.3 && free(e, 2, 12, 40)) { e.to = 2; e.sig = 0.5; e.blockT = 0; continue; }
+      } else e.blockT = 0;
+      // centralista: va in seconda corsia e ci resta
+      if (D.t === 'centralista') { if (e.lane === 1 && !slower && Math.random() < dt * 0.3 && free(e, 2, 15, 40)) { e.to = 2; e.sig = 1.6; } continue; }
+      // tiene la destra: rientra quando a destra c'è spazio per un buon tratto e nessuno più lento da ripassare subito
+      if (e.lane > 1 && !e.yield && Math.random() < dt * (D.t === 'prudente' ? 0.4 : 0.25) && free(e, e.lane - 1, 18, 50 + e.v)) {
+        const r = this.ents.some((o) => mov(o) && o.lane === e.lane - 1 && o.x > e.x && o.x - e.x < 90 && o.v < want - 2);
+        const meR = Math.abs(this.laneZ - GAME_LANE_Z[e.lane - 1]) < 1.7 && d > e.x && d - e.x < 90 && sim.v < want - 2;
+        if (!r && !meR) { e.to = e.lane - 1; e.sig = 1.4; }
+      }
     }
   };
 
@@ -136,11 +172,10 @@ const ST_REP_PERKS = [
     up.call(this, dt);
     if (this.track !== 'city' || this.inside) return;
     this.trafficAI(dt);
-    this.updateStreetRace(dt);
     // un evento ogni tanto (nel viaggio e in autostrada), sempre in prima corsia
     const km = this.s.dist / 1000;
-    if (this.nextRoadEvent === undefined) this.nextRoadEvent = km + 4 + Math.random() * 6;
-    if (km > this.nextRoadEvent && !this.race) { this.nextRoadEvent = km + 7 + Math.random() * 12; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
+    if (this.nextRoadEvent === undefined) this.nextRoadEvent = km + 5 + Math.random() * 4;
+    if (km > this.nextRoadEvent) { this.nextRoadEvent = km + 8 + Math.random() * 2; if (this.s.vg || (this.loc && this.loc.bg === 'highway')) this.spawnRoadEvent(); }
   };
 })();
-if (typeof window !== 'undefined') Object.assign(window, { ST_REP_PERKS, ST_RACE_M });
+if (typeof window !== 'undefined') Object.assign(window, { ST_CAT, ST_CAT_NAME, ST_CAT_ONE, stCat });
