@@ -1,6 +1,6 @@
 # Night Run Electron — rapporto del 20/11/2026
 
-Base: `main`, commit `a7375df032cc5ac7c653f4f5a01e9fc2bfb57818`. Ramo di consegna: `desktop`. `main` non viene modificato o unito da questo lavoro.
+Base: `main`, commit `a7375df032cc5ac7c653f4f5a01e9fc2bfb57818`. Ramo locale di consegna: `desktop`. `main` non viene modificato o unito da questo lavoro. **Caricamento remoto non riuscito:** Git locale senza credenziali, connettore GitHub con errore HTTP 403 «Resource not accessible by integration», browser senza sessione autenticata. Si consegnano anche archivio sorgenti e bundle Git del ramo; il caricamento online resta da eseguire con un accesso autorizzato in scrittura.
 
 Richiesta applicata: file fornito dal proprietario, comprese le cinque decisioni sui salvataggi. **Una discrepanza nel testo:** in questo commit il proprietario aveva già eliminato il 3D e three.js, come documentato in `AGENTS.md`. Si conserva il gioco 2D corrente; il controllo «vista 3D» non è applicabile. Nessuna libreria 3D o modalità rimossa viene reintrodotta.
 
