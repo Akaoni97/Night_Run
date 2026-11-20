@@ -4,6 +4,14 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · proprietario (3D: locali, paesaggi, luci)
+- Fatto: `viaggio3d.js` (file nuovo, `street3d.js` non toccato): nel 3D ci sono i locali del Viaggio con le stesse facciate
+  del 2D (si entra anche dal 3D), i paesaggi (pianura, borgo, deserto, mare, montagna, autostrada) al posto della città
+  sempre uguale, luci più belle (niente macchie bianche, coni sotto i lampioni). Provato con three.js preso da npm (il CDN
+  qui è chiuso): notte, giorno, abitacolo, dentro un locale.
+- Aperto: nel 3D l'auto è sempre la Supra (servono modelli .glb); paesaggi ancora semplici, da arricchire.
+- Serve dal cognato: provarlo sul PC (vista 3D dal menu Vista) e dire cosa manca.
+
 ## 20/11/2026 · proprietario (controllo grande e scritte leggibili)
 - Fatto: controllo della sera su 30 commit (polizia, banco, Jeshka, migliorie, caricamento): tutto provato nel browser, 191 test.
 - Fatto: `leggibile.js`, file nuovo e separato: al telefono la finestra della polizia era coperta da STRUMENTI/DATI e gli

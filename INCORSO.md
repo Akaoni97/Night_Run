@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | 3D: luci e atmosfera, locali del Viaggio, paesaggi del Viaggio | `street3d.js`, file nuovo per il 3D | 20/11 |
