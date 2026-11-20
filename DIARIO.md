@@ -1,21 +1,30 @@
-## 21/11/2026 · proprietario · v0.59 (**la piazzetta**)
+## 21/11/2026 · proprietario · v0.60 (**la piazzetta**)
 - Fatto: `piazzetta.js`. Ogni 2 o 3 tappe (dalla quarta) la tappa è una piazzetta con due negozi affiancati: la tappa non cambia (bacheca, lavori e consegne come prima), le si aggiunge un secondo negozio a caso tra gli altri. **Luca e Neon Kustom (Jeshka) non stanno mai nella stessa piazzetta**, le altre coppie sono tutte uguali. U sulla piazzetta chiede dove entrare. La telecamera punta al centro dei due negozi (`street2d.js`), le strisce del posto auto sono di ognuno (`entrata2d.js`). 4 test nuovi (269), la prova di fumo ci passa dentro.
 - Aperto: nella piazzetta i due negozi hanno la stessa bacheca dei lavori della tappa; l'auto parcheggia nel posto del negozio scelto ma la camera resta sul gruppo. Da guardare col gioco vero: facciate larghe come il benzinaio con un garage possono stare strette.
 
-## 21/11/2026 · proprietario · v0.58 (**frasi di pipì e cacca**)
+## 21/11/2026 · proprietario · v0.59 (**frasi di pipì e cacca**)
 - Fatto: nuovi pensieri (`pensieri.js`, `pee` e `poo`, sette frasi a livello, serie e comiche: «Oh merda, mi sto cagando addosso»), avvisi e tre frasi a testa per l'incidente quando arrivi a zero (`viaggio.js`). Testi miei, da rivedere.
 
-## 21/11/2026 · proprietario · v0.57 (**pipì e cacca**)
+## 21/11/2026 · proprietario · v0.58 (**pipì e cacca**)
 - Fatto: due bisogni nuovi nel quadro (🚽 e 💩) e nei pensieri. Solo col tempo: la pipì si svuota in 12 «ore di viaggio», la cacca in 24, e un'ora di viaggio vale 3 minuti veri (`VG_BAGNO` in `viaggio.js`: l'orologio del gioco corre a 3 minuti per secondo e a ore di gioco vere sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca. Il bagno è gratis in bar, autogrill, benzinaio e motel. A zero fuori da un locale te la fai addosso e l'igiene crolla. 4 test nuovi (265).
 - Aperto: i tempi sono da provare (pipì ogni ~36 min veri, cacca ogni ~72): si cambiano in `VG_BAGNO`.
 
-## 21/11/2026 · proprietario · v0.56 (**Sviluppatori: cinque strumenti in più**)
+## 21/11/2026 · proprietario · v0.57 (**Sviluppatori: cinque strumenti in più**)
 - Fatto: scheda Sviluppatori con **Vai a** (km o prossima tappa di ogni tipo), **Bisogni e benzina** (riempi, o infiniti), **Danni e usura** (ripara, o indistruttibile), **Meteo e ora** (pulsanti), **Storia e telefono** (flag di chat/storia, tutte le app, L'ultima porta). Le spunte si ricordano nel browser (`nr_dev`). Provati nel browser, senza errori in console.
 - Aperto: nessun test automatico per questi strumenti (usano la pagina); li copre la prova a mano.
 
-## 21/11/2026 · proprietario · v0.55 (**Sviluppatori: Disabilita polizia**)
+## 21/11/2026 · proprietario · v0.56 (**Sviluppatori: Disabilita polizia**)
 - Fatto: nella scheda Sviluppatori la spunta **Disabilita polizia** (`POL.off` in `polizia.js`, `game.polOffSet`): la polizia c'è e si vede, ma non può fermarti, multarti né inseguirti (fermi per velocità, posto di controllo, etilometro, coda, sfanalare una volante); autovelox e Tutor restano sulla strada ma non multano; accesa, il ricercato e i verbali in arrivo si azzerano. Si ricorda nel browser. 1 test nuovo (261).
 - Aperto: nessuno.
+
+## 20/11/2026 notte · proprietario (**v0.55 · assicurazione, traino, diario**)
+- Fatto: (1) **assicurazione con franchigia** (`documenti.js`): in regola, carrozzeria e soccorso costano al massimo € 150; il resto lo copre lei ed è un sinistro
+  (premio +25 % l'uno, al massimo il doppio, ne sparisce uno ogni 300 km); scaduta si paga tutto. (2) **Guasti e traino** (`soccorso.js`): da fermo con motore
+  rotto o gomma a terra la domanda propone l'app; servizio **Traino** (motore rotto → da Luca, dove Nico lo rifà; auto distrutta → da Mario): catena, buio,
+  si arriva davanti all'officina (premi U), € 60 + € 12 al km; non si può con una consegna in corso prima dell'officina. (3) **Diario** (`diario.js`, app nel telefono):
+  capitali, incidenti, fughe, motore rotto, auto nuove, soccorso, ogni 100 km, con foto piccole fuori dal salvataggio.
+- Aperto: la prossima officina dello stesso tipo è lontana (Mario e Luca ogni ~38 km): il traino salta quella strada (eventi, bisogni sì, odometro no). Se è troppo,
+  si può far arrivare al locale più vicino anche indietro. Il diario scrive anche «Arrivo a Tokyo» al km 0.
 
 ## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
 - Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è

@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.59**
+**Versione attuale: v0.60**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -77,8 +77,9 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.52 | 20/11 | proprietario | Conteggio delle versioni (regola in `AGENTS.md`) |
 | v0.53 | 20/11 | proprietario | Questo elenco delle versioni (`VERSIONI.md`, al posto di `VERSIONE.md`) |
 | v0.54 | 20/11 | proprietario | Officina semplice (Modifiche e Swap, anteprima), Tutor ogni 10-15 km, prova di fumo su GitHub, pausa, suggerimenti, prossimo traguardo, qualità ricordata e FPS |
-| v0.55 | 20/11 | proprietario | Sviluppatori: «Disabilita polizia» (non ferma, non multa, non insegue; autovelox e Tutor spenti) |
-| v0.56 | 20/11 | proprietario | Sviluppatori: vai a km o tappa, riempi bisogni, ripara, indistruttibile, meteo e ora, flag della storia, tutte le app |
-| v0.57 | 20/11 | proprietario | Due bisogni nuovi: pipì (12 ore di viaggio) e cacca (24), bagno gratis nei locali |
-| v0.58 | 20/11 | proprietario | Pipì e cacca: frasi serie e comiche (pensieri, avvisi, incidente) |
-| v0.59 | 20/11 | proprietario | La piazzetta: ogni 2-3 tappe due negozi affiancati (mai Luca e Neon Kustom insieme) |
+| v0.55 | 20/11 | proprietario | Assicurazione con franchigia e sinistri, traino e domande sui guasti, diario di viaggio |
+| v0.56 | 20/11 | proprietario | Sviluppatori: «Disabilita polizia» (non ferma, non multa, non insegue; autovelox e Tutor spenti) |
+| v0.57 | 20/11 | proprietario | Sviluppatori: vai a km o tappa, riempi bisogni, ripara, indistruttibile, meteo e ora, flag della storia, tutte le app |
+| v0.58 | 20/11 | proprietario | Due bisogni nuovi: pipì (12 ore di viaggio) e cacca (24), bagno gratis nei locali |
+| v0.59 | 20/11 | proprietario | Pipì e cacca: frasi serie e comiche (pensieri, avvisi, incidente) |
+| v0.60 | 20/11 | proprietario | La piazzetta: ogni 2-3 tappe due negozi affiancati (mai Luca e Neon Kustom insieme) |
