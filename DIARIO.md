@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**briefing: AUTO 5 s, leva S, tasti, schede di Nico, vernice**)
+- Fatto: AUTO 1 dopo 5 s; leva con la **S** sport (`autoBox` tiene i giri alti); tasti 1-4 solo per mangiare e bere (via le marce dai
+  numeri, `tasti.js` aggiornato); pannello di Nico a schede (Livelli, La mia auto, Negozio, Magazzino, Banco, Motori); magazzino pezzi
+  a 100 (`MOT.maxPezzi`); valigette senza turbo; maschera vernice di Golf GTI e 205 GTI rifatta (`strumenti/maschera_scura.py`).
+- Aperto: codice morto delle vecchie gare, camion (disegni dal proprietario), alta definizione di marciapiedi e pedoni. Il cognato
+  decide i punti motori di `SOSPESI.md` (vendere la V40 coi pezzi, estendere ai altri motori, vecchio Pistone).
+
 ## 20/11/2026 sera · proprietario (**tutti gli interni in alta definizione**)
 - Fatto: come il bar, anche benzinaio, Sosta 24, motel, Mario, Luca, Neon Kustom, Autosalone e sfascio (`interni_hd.js`):
   doppia densità, profondità, materiali, luci, persone disegnate come il protagonista e **scritte leggibili** (carattere 5×7:

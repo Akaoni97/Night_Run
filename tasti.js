@@ -18,7 +18,7 @@ const TASTI = [
   ['meteo', 'k', 'Meteo', 'Vista e suono'], ['foto', 'x', 'Foto', 'Vista e suono'], ['replay', 'y', 'Replay', 'Vista e suono'],
 ];
 // tasti fissi che non si cambiano (si elencano soltanto)
-const TASTI_FISSI = [['Frecce', 'Gas, freno, marcia su e giù'], ['1 - 6', 'Marce, o le risposte alle domande'], ['Esc', 'Chiude quello che è aperto']];
+const TASTI_FISSI = [['Frecce', 'Gas, freno, marcia su e giù'], ['1 - 6', 'Risposte alle domande'], ['1 - 4', 'Mangiare, bere, caffè e salviette dal bagagliaio'], ['Esc', 'Chiude quello che è aperto']];
 
 (function tasti() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;

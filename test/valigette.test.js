@@ -77,6 +77,15 @@ test('valigette: il leggendario regala un\'auto che non hai, nel garage del mote
   assert.equal(pz.rar, 5); assert.ok(pz.car && v.garage.includes(pz.car), `auto ${pz.car} nel garage`);
 });
 
+test('valigette: mai un turbo tra i pezzi regalati', () => {
+  const { game } = trip(); game.mode = 'career';
+  for (let k = 0; k < 120; k++) for (const rar of [3, 4]) {
+    game.cases().own.push({ type: 'oro' }); const pz = game.caseOpen(0, lcg(k * 7 + rar));
+    assert.ok(!/turbo/i.test(pz.name + ' ' + (pz.text || '')) || pz.rar < 3, `${pz.name}`);
+  }
+  for (const it of (tuning().turbo || {}).items || []) if (it.price > 0) assert.equal(game.owns('turbo', it.id), false, `turbo ${it.id} regalato`);
+});
+
 test('valigette: i lavori danno valigette', () => {
   const { game } = trip();
   game.caseRewards();                                             // fotografia di partenza

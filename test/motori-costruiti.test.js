@@ -208,6 +208,18 @@ test('motori: un pezzo si compra e va in magazzino; montato sulla V40 di serie l
   const b = game.motBuyPart('blocco', 'b4_20').p; assert.equal(game.motPut(b.u, 'v40').ok, false);
 });
 
+test('motori: il magazzino dei pezzi ha un tetto (100): oltre non si compra e non si toglie un pezzo montato', () => {
+  const { game } = v40(); alPistone(game); game.s.money = 1e9;
+  assert.equal(MOT.maxPezzi, 100);
+  for (let i = 0; i < MOT.maxPezzi; i++) assert.ok(game.motBuyPart('iniettori', 'i440').ok, 'pezzo ' + i);
+  const m = game.s.money, r = game.motBuyPart('iniettori', 'i440');
+  assert.equal(r.ok, false); assert.match(r.why, /pieno/); assert.equal(game.s.money, m, 'non si paga un pezzo che non entra');
+  const pz = game.motPz().find((q) => q.dove === 'mag'); assert.ok(game.motPut(pz.u, 'banco').ok);                // uno sul banco: libera un posto
+  assert.ok(game.motBuyPart('iniettori', 'i440').ok);
+  assert.equal(game.motTake(pz.u).ok, false, 'tornando in magazzino sarebbe il 101°');
+  assert.ok(game.motSellPart(game.motPz().find((q) => q.dove === 'mag').u).ok); assert.ok(game.motTake(pz.u).ok);
+});
+
 test('motori: il banco si riempie pezzo per pezzo e, completo, diventa un motore (i pezzi escono dal magazzino)', () => {
   const { game } = v40(); alPistone(game);
   for (const C of MOT_PARTI) { const p = game.motBuyPart(C.id, MOT_BASE[C.id]).p; game.motPut(p.u, 'banco'); }

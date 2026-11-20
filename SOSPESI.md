@@ -4,7 +4,7 @@ Lista viva: al **controllo della sera** (quando qualcuno chiede «il check») Cl
 poi la aggiorna con chi c'è (toglie quello che è fatto, aggiunge quello che salta fuori). In cima le cose più urgenti.
 Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
 
-Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario).
+Aggiornata il 20/11/2026 notte (briefing col proprietario e il cognato).
 
 ## Da decidere insieme
 - [interni] **Gli interni nuovi** (tutti e nove in `interni_hd.js`): da guardare sul PC. Le persone usano la pixel art
@@ -46,21 +46,21 @@ Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario
   soldi una volta sola (avviso di Luca). Controllare che il messaggio arrivi e i conti tornino. (tutti e due)
 
 ## Da sistemare
-- [guida] **Leva in D uscendo da un locale a motore spento**: entrando, l'accosto automatico mette la leva in D; se il
-  motore era spento, uscendo l'avviamento viene rifiutato («metti la leva in P») finché non premi Q. C'era già prima,
-  si vede soprattutto con `strumenti/prova.js`. Meglio rimettere la leva in P quando si entra da fermi. (Claude)
-  stesso momento (si vede bene saltando di km, ma succede anche giocando dopo una tappa). Una fila unica con le
-  priorità. (Claude)
-- [telefono] **Al telefono in verticale** il riquadro dei traguardi esce sopra «Gira il telefono». (Claude, piccolo)
-- [motori] **Valigette sulla V40**: il premio «kit turbo» non trova più pezzi di Luca e dà altro. Meglio che dia un
-  turbo di Nico in magazzino. (Claude, quando si decide)
-- [motori] **Il pannello di Nico è lunghissimo** (livelli, motore, pezzi in vendita, magazzino, banco, motori): sul
-  telefono si scorre molto. Schede o sezioni chiudibili. (Claude)
-- [motori] **Magazzino senza limite**: i motori costruiti sono massimo 4, i pezzi no. Serve un limite? (cognato)
+- [telefono] **Al telefono in verticale** il riquadro dei traguardi esce sopra «Gira il telefono». Il proprietario ha detto che va
+  bene così (il gioco è per il PC): si lascia. (nessuno)
 - [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ», non il motore di Nico (quelle prove sono in
   `test/motori-costruiti.test.js`). Rinominarlo vuol dire toccare due skill (ramo `skill`). (chi ha voglia)
+- [pulizia] **Codice morto delle vecchie gare** e dei vecchi pezzi di storia: la coupé «rival» in 3D (il 3D non c'è più), `s.rep`
+  (la reputazione di strada, che veniva dalle sfide al semaforo), i blocchi cambio e pedali nascosti nella scheda Guida, le app
+  strane del telefono (Ultima Uscita, Segreteria, 03:07) e `TEL_ATTI`, la tabella dei momenti della vecchia storia. Non si vede in
+  gioco: è roba che non fa più niente e confonde chi legge il codice. Toglierla è sicuro con i test; da fare quando c'è tempo. (Claude)
+- [disegni] **Camion** (traffico lento, lavori pesanti): la logica c'è, il proprietario manda i disegni. (proprietario)
+- [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, scritte delle insegne**: si fa tra poco. (proprietario, Claude)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 20/11 (dal briefing): **AUTO 1 si inserisce dopo 5 s**; la leva ha la **S** (sport, giri più alti); i tasti **1-4 solo per mangiare e bere** (le
+  marce non stanno più sui numeri); pannello di Nico **a schede**; **tetto di 100 pezzi** in magazzino; **niente turbo** nelle valigette;
+  maschera della vernice rifatta per Golf GTI e 205 GTI; test di officina e 0-100 già a posto (Supra di serie 5,83 s, 400 m in 13,9 s).
 - Il cognato ha letto gli avvisi del 3D tolto e dell'app installabile: tolti da `AVVISI.md`.
 - Check completo del 20/11 sera: tutte le tappe, telefono, paesaggi, suono (V40 e Supra misurati), salvataggio vecchio
   col 3D ricaricato: nessun errore. Corretto il vento che velava di polvere anche la città (ora solo nel deserto).

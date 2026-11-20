@@ -203,7 +203,7 @@
     if (t !== lastG) { lastG = t; gearEl.textContent = t; gearEl.classList.remove('pop'); void gearEl.offsetWidth; gearEl.classList.add('pop'); }
     // spente a fine corsa (aria-disabled e non disabled: un pulsante disabilitato sotto il dito non riceve il rilascio)
     // col cambio automatico le palette spostano la leva (▲ verso D, ▼ verso P)
-    bUp.setAttribute('aria-disabled', String(lv ? lv === 'D' : g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(lv ? lv === 'P' : g <= 0));
+    bUp.setAttribute('aria-disabled', String(lv ? lv === 'S' : g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(lv ? lv === 'P' : g <= 0));
   }, 120);
 
   // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito

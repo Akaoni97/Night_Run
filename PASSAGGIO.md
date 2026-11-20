@@ -90,7 +90,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   dopo un fallimento, calibrazione di lampade e metri delle incursioni.
 - **Tutorial del primo lavoro** (`missioni.js`): finché non è finito non si può superare il locale giusto; poi un'uscita saltata annulla la consegna.
 - **Comandi dell'auto** (`comandi.js`): rimorchio, turbo (ECO/NORMALE/FORTE), scarico (aperto/silenzio), neon; **fari** spenti/anabbaglianti/abbaglianti
-  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: rotondo accanto al quadro). Cambio e pedali sono nascosti nella scheda Guida del menu.
+  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: rotondo accanto al quadro). Cambio e pedali sono nascosti nella scheda Guida del menu. **AUTO 1 si inserisce dopo 5 s** senza toccare niente; la leva ha anche **S (sport)**; i tasti 1-4 sono solo per mangiare e bere.
 - **Comandi da telefono (18/11/2026)** (`menu.js`, solo al tocco, `html.tdash`): servono per le prove, il gioco è pensato
   per il PC (regola 7 di `AGENTS.md`). Quadro in alto a sinistra con AVVIA accanto; FRENO e GAS in basso a destra con
   sopra le palette del cambio ▼/▲ e la marcia in mezzo; ◀ ▶ affiancati a sinistra; STRUMENTI e DATI aprono due finestrelle
@@ -102,7 +102,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
   ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Mario) e modifica gratuita fino a € 5.000
   (Luca); potenziamenti a tempo (+8 % per 50 km, +15 % per 100 km) e per sempre (+3 %, mitico); pezzo vero del
-  catalogo (epico), kit turbo (mitico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
+  catalogo, mai il turbo (epico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
   primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
   Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
 - **Interni** (`interni.js`): entrando in un locale (U) la strada lascia il posto a una scena in pixel art del locale,
@@ -233,9 +233,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 
 ## Lavori aperti e idee in sospeso
 
-- **Dal report di verifica del 18/11/2026** restano aperti: i tasti 1-4 per mangiare e bere sono intercettati dalle marce (`index.html` gestione tasti),
-  il test dell'officina (la SSQV si sblocca a 5 km) e il riferimento 0-100 della Supra (6,27 s contro i 6 del test). Il menu non ferma il gioco: è voluto
-  (ci si ferma in una postazione).
+- **Dal report di verifica del 18/11/2026**: tasti 1-4 liberati dalle marce, test dell'officina e 0-100 della Supra (5,83 s) già a posto. Il menu non ferma il gioco: è voluto (ci si ferma in una postazione).
 - **Pulizia da fare più avanti:** il codice morto delle vecchie gare (coupé 3D «rival», `s.rep`), i blocchi cambio e pedali nascosti nella scheda Guida,
   le app strane del telefono (Ultima Uscita, Segreteria, 03:07) e `TEL_ATTI`, residui della vecchia storia.
 - **Nuova storia (in corso, dal 17/11/2026)**: il proprietario vuole una storia horror **graduale** (prima tutto tranquillo, poi una piccola cosa, poi il macabro). Fatti: i **pensieri del protagonista** (`pensieri.js`: testo sulla strada di 8-10 s per radio, bisogni e pensieri a caso), il **telefono** (`telefono.js`: app normali, app da scaricare con i cartelloni sulla strada, app strane) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada). Il parente morto è **zio Claudio**. La **vecchia storia è stata cancellata** (era in `docs/storia/STORIA.md`, nei capitoli ed eventi di `viaggio.js` e nei testi di `missioni.js`): non rimetterla, se serve è nella cronologia git. Da fare: scrivere la storia vera (`STORIA.md` dice cosa è deciso e cosa manca), i nomi delle altre 5 auto del garage e il loro sblocco, gli effetti horror (bussare nel bagagliaio senza niente, chiamate strane, app che compaiono da sole).
@@ -243,7 +241,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
   (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
 - Manca il disegno di un **camion** (traffico lento a 90 km/h, lavori pesanti: la logica c'è, serve il disegno).
-- Sulle auto molto scure (Golf GTI, 205 GTI) il cambio di vernice prende poco (maschera povera).
+- Golf GTI e 205 GTI: maschera della vernice rifatta il 20/11 con `strumenti/maschera_scura.py` (prima prendeva il 16-26 %, ora il 73-77 %); restano un po' colorati i sedili dietro i finestrini.
 - La V40 è nel traffico: ruota e maschera della vernice sono ricavate dal disegno con `strumenti/v40_traffico.py`
   (`img/v40_wheel.png`, `img/v40_paint.png`); la V40 guidata dal giocatore resta disegnata a parte (`v40Base`).
 - Il traffico mette il bagliore di fanali e frecce all'altezza giusta di ogni disegno (dati `tail`/`head`).

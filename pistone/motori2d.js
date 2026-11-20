@@ -251,6 +251,11 @@
   // ---------------------------------------------------------------- il pannello del Pistone
   const css = document.createElement('style');
   css.textContent = `
+  .mt-sec{display:grid;gap:10px}.mt-sec[hidden]{display:none}
+  .mt-tabs{display:flex;flex-wrap:wrap;gap:4px;position:sticky;top:0;z-index:2;padding:6px 0;background:var(--bg,#101014)}
+  .mt-tab{flex:1 1 auto;padding:8px 10px;border-radius:5px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--muted);font:600 12px/1 var(--f-data);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .mt-tab i{font-style:normal;margin-left:6px;padding:1px 5px;border-radius:8px;background:rgba(255,255,255,.1);color:var(--fg)}
+  .mt-tab[aria-selected=true]{border-color:#ff6a2a;background:rgba(255,106,42,.16);color:#ffb88a}
   .mt-wrap{display:grid;gap:10px}.mt-h{margin:6px 0 0;font:400 17px/1.1 var(--f-display);letter-spacing:.04em;color:var(--fg)}
   .mt-cat{display:grid;gap:5px;padding:8px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:rgba(0,0,0,.18)}
   .mt-cat>b{font:600 11px/1 var(--f-data);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -328,22 +333,23 @@
     return d;
   }
 
-  let lastCtx = null;
+  let lastCtx = null, tabSel = 'La mia auto';
   // il pannello di Nico, dentro Da Luca Tuning: livelli, motore di serie dell'auto, pezzi in vendita, magazzino, banco
   function panel(body, I, ctx) {
     const game = G(); if (!game) return; lastCtx = ctx;
     const M = game.mot(), car = CARS[game.car], carN = car.short || car.name, wrap = document.createElement('div'); wrap.className = 'mt-wrap';
-    const h = (t) => { const e = document.createElement('h4'); e.className = 'mt-h'; e.textContent = t; wrap.appendChild(e); };
-    const p = (t) => { const e = document.createElement('p'); e.className = 'hint'; e.style.margin = '0'; e.textContent = t; wrap.appendChild(e); };
+    const secs = []; let cur = wrap;                                 // le sezioni stanno in schede: se ne vede una alla volta
+    const h = (t, tab, n) => { const d = document.createElement('div'); d.className = 'mt-sec'; const e = document.createElement('h4'); e.className = 'mt-h'; e.textContent = t; d.appendChild(e); secs.push({ tab, n, d }); cur = d; };
+    const p = (t) => { const e = document.createElement('p'); e.className = 'hint'; e.style.margin = '0'; e.textContent = t; cur.appendChild(e); };
     const btn = (t, f, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = t; b.disabled = !!dis; b.addEventListener('click', f); return b; };
     const done = (r, msg) => { if (r && r.ok === false) { if (r.why) ctx.flash(r.why, 2.4); } else { if (msg) ctx.flash(msg, 2.2); ctx.save(); } ctx.refresh(); };
-    const row = (html, acts) => { const d = document.createElement('div'); d.className = 'mt-eng'; d.innerHTML = `<div>${html}</div>`; const a = document.createElement('div'); a.className = 'acts'; for (const b of acts) if (b) a.appendChild(b); d.appendChild(a); wrap.appendChild(d); return d; };
+    const row = (html, acts) => { const d = document.createElement('div'); d.className = 'mt-eng'; d.innerHTML = `<div>${html}</div>`; const a = document.createElement('div'); a.className = 'acts'; for (const b of acts) if (b) a.appendChild(b); d.appendChild(a); cur.appendChild(d); return d; };
     const nome = (cat, id) => { const it = motPart(cat, id); return it ? it.name : id; };
     const serie = !!MOT_SERIE[game.car], built = game.motOf();
     const h0 = document.createElement('h3'); h0.className = 'mt-h'; h0.style.cssText = 'font-size:22px;color:#ff9a5a;margin-top:14px'; h0.textContent = 'Nico · il motore'; wrap.appendChild(h0);
     p('Nico: «Qui da Luca il motore lo faccio io. Un pezzo alla volta: lo compri, sta in magazzino, e lo mettiamo dove vuoi tu, sul motore della tua macchina o sul banco, dove c\'è il motore nuovo che mi aspetta. E non basta che ogni pezzo sia forte: devono andare d\'accordo. Un turbo grosso con un radiatore piccolo ti cuoce la testata.»');
     // ---- quello che ti ha insegnato Nico
-    h('Quello che ti ha insegnato Nico');
+    h('Quello che ti ha insegnato Nico', 'Livelli');
     { const tree = document.createElement('div'); tree.className = 'mt-tree';
       for (const C of MOT_PARTI) {
         const lv = game.motLiv(C.id), nx = game.motNext(C.id), r = document.createElement('div'); r.className = 'mt-tr';
@@ -358,9 +364,9 @@
         }
         r.appendChild(a); tree.appendChild(r);
       }
-      wrap.appendChild(tree); }
+      cur.appendChild(tree); }
     // ---- il motore dell'auto che guidi
-    h(`Il motore della ${carN}`);
+    h(`Il motore della ${carN}`, 'La mia auto');
     if (built) {
       const c = motCalc(built.sel);
       row(`<b>${esc(built.nome)}</b><small>motore costruito al banco · ${c.hp} CV · ${c.nm} Nm${built.rotto ? ' · <b style="color:#ff4a3a">ROTTO</b>' : ''}</small>`, [btn(`Rimetti quello di serie · € ${MOT.lavoro}`, () => done(game.motUnmount()), game.s.money < MOT.lavoro)]);
@@ -373,10 +379,10 @@
         row(`<b>${esc(C.label)}</b><small>${q ? `<span style="color:#ff9a5a">${esc(nome(C.id, q.id))}</span> · livello ${motLvOf(C.id, q.id)}` : `di serie: ${esc(nome(C.id, S0.sel[C.id]))}`}</small>`,
           [q && btn(`Togli${lav ? ' · € ' + lav : ''}`, () => done(game.motTake(q.u), 'Tolto: torna in magazzino'), game.s.money < lav)]);
       }
-      const c = game.motCalcSerie(); if (c && c.ok) wrap.appendChild(sheet(c, game));
+      const c = game.motCalcSerie(); if (c && c.ok) cur.appendChild(sheet(c, game));
     } else p(`Sul motore di serie della ${carN} Nico per ora non ci lavora (per adesso solo sulla V40). Puoi metterci un motore costruito al banco.`);
     // ---- pezzi in vendita
-    h('Pezzi in vendita');
+    h('Pezzi in vendita', 'Negozio');
     for (const C of MOT_PARTI) {
       const box = document.createElement('div'); box.className = 'mt-cat';
       box.innerHTML = `<b>${esc(C.label)} <span style="color:#ff9a5a">· livello ${game.motLiv(C.id)}</span></b>`;
@@ -389,11 +395,11 @@
         b.addEventListener('click', () => { const q = game.motBuyPart(C.id, it.id); done(q, q.ok && `${it.name}: in magazzino`); });
         chips.appendChild(b);
       }
-      box.appendChild(chips); wrap.appendChild(box);
+      box.appendChild(chips); cur.appendChild(box);
     }
     // ---- magazzino
-    h('Il tuo magazzino');
     const mag = game.motPz().filter((q) => q.dove === 'mag');
+    h(`Il tuo magazzino · ${mag.length} / ${MOT.maxPezzi} pezzi`, 'Magazzino', `${mag.length}`);
     if (!mag.length) p('Vuoto. I pezzi che compri finiscono qui; da qui li monti sulla tua auto o sul banco.');
     for (const q of mag) {
       const lav = game.motLavoro(q.cat), C = MOT_CAT[q.cat];
@@ -404,7 +410,7 @@
       ]);
     }
     // ---- banco di lavoro
-    h('Il banco di lavoro');
+    h('Il banco di lavoro', 'Banco');
     const bs = game.motSel('banco'), bp = game.motPz().filter((q) => q.dove === 'banco'), manca = MOT_PARTI.filter((C) => !bs[C.id]);
     p(manca.length === MOT_PARTI.length ? 'Il cavalletto è vuoto: ci metti i pezzi man mano che li compri, dal blocco in su. Quando c\'è tutto, lo accendi e diventa un motore da montare su qualsiasi auto.' : manca.length ? `Mancano: ${manca.map((C) => C.label.toLowerCase()).join(', ')}.` : 'C\'è tutto: si può accendere.');
     { const grid = document.createElement('div'); grid.className = 'mt-bgrid';
@@ -412,15 +418,15 @@
         d.innerHTML = `<b>${esc(C.label)}</b><small>${q ? esc(nome(C.id, q.id)) : 'vuoto'}</small>`;
         if (q) d.appendChild(btn('Togli', () => done(game.motTake(q.u))));
         grid.appendChild(d); }
-      wrap.appendChild(grid); }
+      cur.appendChild(grid); }
     if (!manca.length) {
-      const c = motCalc(bs); if (c.ok) wrap.appendChild(sheet(c, game));
+      const c = motCalc(bs); if (c.ok) cur.appendChild(sheet(c, game));
       const full = M.list.length >= MOT.maxMotori;
-      const go = btn('Sul cavalletto: montalo e accendilo', () => banco(bs, ctx, () => game.motBuildBanco()), full); go.style.cssText = 'font-size:15px;padding:10px'; wrap.appendChild(go);
+      const go = btn('Sul cavalletto: montalo e accendilo', () => banco(bs, ctx, () => game.motBuildBanco()), full); go.style.cssText = 'font-size:15px;padding:10px'; cur.appendChild(go);
       if (full) p(`Ci stanno ${MOT.maxMotori} motori: vendine uno per costruirne un altro.`);
     }
     // ---- i tuoi motori
-    h('I tuoi motori');
+    h(`I tuoi motori · ${M.list.length} / ${MOT.maxMotori}`, 'Motori', `${M.list.length}`);
     if (!M.list.length) p('Ancora nessuno. Quello del banco, acceso, finisce qui: lo monti su qualunque auto del tuo garage.');
     for (const e of M.list) {
       const ce = motCalc(e.sel), onCar = Object.keys(M.on).find((k) => M.on[k] === e.id);
@@ -430,6 +436,12 @@
       if (!onCar) acts.push(btn(`Vendi · € ${fmt(game.motValue(e))}`, () => done(game.motSell(e.id))));
       row(`<b>${esc(e.nome)}</b><small>${ce.hp} CV · ${ce.nm} Nm · ${fmt(ce.lim)} giri · ${ce.kg} kg · affidabilità ${Math.round(ce.rel * 100)} % · ${fmt(e.km || 0)} km${onCar ? ` · montato sulla ${esc(CARS[onCar].short || CARS[onCar].name)}` : ''}${e.rotto ? ' · <b style="color:#ff4a3a">ROTTO</b>' : ''}</small>`, acts);
     }
+    // ---- barra delle schede: si cambia scheda senza ridisegnare (resta la posizione di scorrimento)
+    if (!secs.some((x) => x.tab === tabSel)) tabSel = 'La mia auto';
+    const bar = document.createElement('div'); bar.className = 'mt-tabs'; bar.setAttribute('role', 'tablist');
+    const show = (tab) => { tabSel = tab; for (const x of secs) { x.d.hidden = x.tab !== tab; x.b.setAttribute('aria-selected', String(x.tab === tab)); } };
+    for (const x of secs) { const b = document.createElement('button'); b.type = 'button'; b.className = 'mt-tab'; b.setAttribute('role', 'tab'); b.innerHTML = esc(x.tab) + (x.n != null ? `<i>${x.n}</i>` : ''); b.addEventListener('click', () => show(x.tab)); bar.appendChild(b); x.b = b; }
+    wrap.appendChild(bar); for (const x of secs) wrap.appendChild(x.d); show(tabSel);
     body.appendChild(wrap);
   }
 

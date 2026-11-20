@@ -962,7 +962,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <div class="dash" id="dash">
         <div class="dash-btns" role="group" aria-label="Comandi di guida">
           <button type="button" id="dbEngine" title="Accensione: gira la chiave e avvia il motore (da fermo si spegne)">AVVIA</button>
-          <button type="button" id="dbAuto" title="Guida automatica: AUTO 1 guida da sola dopo 15 s senza toccare niente; AUTO 2 cambia corsia da sola e tu dai gas e freno">AUTO 1</button>
+          <button type="button" id="dbAuto" title="Guida automatica: AUTO 1 guida da sola dopo 5 s senza toccare niente; AUTO 2 cambia corsia da sola e tu dai gas e freno">AUTO 1</button>
           <button type="button" id="dbTc" title="Controllo di trazione">TC</button>
           <button type="button" id="dbLaunch" title="Launch control (L)">LAUNCH</button>
           <button type="button" id="dbHud" title="Strumenti in gioco (J)">STRUM.</button>
@@ -1071,7 +1071,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
         <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
         <label class="tg"><input type="checkbox" id="tLaunch"><span id="tLaunchL">Launch control 4300</span></label>
-        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 15 s senza tasti)</label>
+        <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 5 s senza tasti)</label>
         <label class="tg"><input type="checkbox" id="tTc">Controllo di trazione</label>
       </div>
       <div class="field"><span>Volume</span>
@@ -1474,7 +1474,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // cambio: 'auto' cambia marcia da solo (con la frizione automatica), 'man' le marce le metti tu con E/Q
   function setGearbox(m) {
     S.gearbox = m; if (m === 'auto') S.autoClutch = true;
-    if (m === 'auto') leva = sim.gear === -1 ? 'R' : sim.gear > 0 ? 'D' : sim.running || Math.abs(sim.v) > 0.5 ? 'N' : 'P';
+    if (m === 'auto') leva = sim.gear === -1 ? 'R' : sim.gear > 0 ? (leva === 'S' ? 'S' : 'D') : sim.running || Math.abs(sim.v) > 0.5 ? 'N' : 'P';
     applySettings(); levaApply();
     flash(m === 'auto' ? 'Cambio automatico: leva P R N D, E la sposta verso D e Q verso P' : 'Cambio manuale: E sale di marcia, Q scala; in folle (N) il gas fa solo salire i giri', 2.8);
   }
@@ -1580,7 +1580,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     keys.add(k);
     if (k === 'e') shiftUp();
     else if (k === 'q') shiftDown();
-    else if (k >= '1' && k <= '6') { if (game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1); else if (S.gearbox !== 'auto') shiftTo(+k); }
+    else if (k >= '1' && k <= '6' && game.prompt && +k <= game.prompt.options.length) game.answer(+k - 1);
     else if (k === 'n') { if (S.gearbox === 'auto') setLeva('N'); else shiftTo(0); }
     else if (k === 'r') { if (S.gearbox === 'auto') setLeva('R'); else shiftTo(-1); }
     else if (k === 'i') ignToggle();
@@ -1592,7 +1592,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'p') radioNext();
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
-    else if (k >= '1' && k <= '4' && game.s.vg) vgQuick(+k);
+    else if (k >= '1' && k <= '4' && game.s.vg && !game.prompt) vgQuick(+k);
     else if (k === '8') toggleWindows();
     else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
@@ -1663,10 +1663,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (levaHintT > 1.2 && levaHints < 4) { levaHintT = -8; levaHints++; flash(`Leva in ${leva}: premi E fino a D per partire`, 2.4); }
   }
   let boxT = 0, levaHintT = 0, levaHints = 0;
-  // ---------------------------------------------------------------- leva del cambio automatico: P R N D
-  // P parcheggio (cambio bloccato: sim.park), R retromarcia, N folle, D marcia avanti (le marce le sceglie autoBox).
-  // E sposta la leva verso D, Q verso P; N e R vanno dritti. P e R solo da fermi, D non mentre si va indietro.
-  const LEVA = ['P', 'R', 'N', 'D'];
+  // ---------------------------------------------------------------- leva del cambio automatico: P R N D S
+  // P parcheggio (cambio bloccato: sim.park), R retromarcia, N folle, D marcia avanti (le marce le sceglie autoBox), S sport (come D,
+  // ma sale di marcia più tardi e scala prima: il motore sta più alto di giri). E sposta la leva verso S, Q verso P; N e R vanno dritti.
+  // P e R solo da fermi, D e S non mentre si va indietro.
+  const LEVA = ['P', 'R', 'N', 'D', 'S'];
   let leva = 'P';
   function levaGear() {                                        // in D a velocità già alta: la marcia giusta, non la prima
     const P = sim.P, top = P.gears.length - 1, rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
@@ -1675,18 +1676,18 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   function levaApply() {                                       // la marcia vera segue la leva
     // il gioco ti accosta a un locale (U): si va avanti, quindi la leva va in D (prima la retro portava l'auto indietro)
-    if (S.gearbox === 'auto' && game.ap && (game.ap.fwd || game.ap.stopped) && !game.rulli && leva !== 'D' && Math.abs(sim.v) < 1.2) leva = 'D';   // sui rulli la leva la muovi tu
+    if (S.gearbox === 'auto' && game.ap && (game.ap.fwd || game.ap.stopped) && !game.rulli && leva !== 'D' && leva !== 'S' && Math.abs(sim.v) < 1.2) leva = 'D';   // sui rulli la leva la muovi tu
     sim.park = S.gearbox === 'auto' && leva === 'P';
     if (S.gearbox !== 'auto' || sim.shiftSeq) return;
     if ((leva === 'P' || leva === 'N') && sim.gear !== 0) sim.shift(0);
     else if (leva === 'R' && sim.gear !== -1 && Math.abs(sim.v) < 1.2) sim.shift(-1);
-    else if (leva === 'D' && sim.gear < 1 && sim.running) sim.shift(Math.abs(sim.v) > 3 ? levaGear() : 1);
+    else if ((leva === 'D' || leva === 'S') && sim.gear < 1 && sim.running) sim.shift(Math.abs(sim.v) > 3 ? levaGear() : 1);
   }
   function setLeva(L, quiet) {
     if (S.gearbox !== 'auto' || !LEVA.includes(L)) return false;
     if (L === leva) return true;
     if ((L === 'P' || L === 'R') && Math.abs(sim.v) > 1.2) { flash(`Fermati prima di mettere ${L}`, 1.4); return false; }
-    if (L === 'D' && sim.v < -1.2) { flash('Fermati prima di mettere D', 1.4); return false; }
+    if ((L === 'D' || L === 'S') && sim.v < -1.2) { flash(`Fermati prima di mettere ${L}`, 1.4); return false; }
     ensureAudio(); leva = L; boxT = 0.5; levaApply();
     if (audio.ready) audio.send({ ev: [{ type: 'click' }] });
     if (!quiet) flash('Leva   ' + LEVA.map((x) => (x === L ? `[ ${x} ]` : x)).join('   '), 1.1);
@@ -1699,10 +1700,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     return setLeva(LEVA[Math.max(0, Math.min(LEVA.length - 1, LEVA.indexOf(leva) + d))]);
   };
-  // quello che si legge sul quadro: P R N D col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
+  // quello che si legge sul quadro: P R N D S col cambio automatico (in D anche la marcia, se c'è spazio), numeri in manuale
   function gearLabel(short) {
     const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear;
-    if (S.gearbox === 'auto') return leva === 'D' ? (short || g < 1 ? 'D' : 'D' + g) : leva;
+    if (S.gearbox === 'auto') return leva === 'D' || leva === 'S' ? (short || g < 1 ? leva : leva + g) : leva;
     return g === -1 ? 'R' : g === 0 ? 'N' : String(g);
   }
   // cambio automatico: sale di marcia prima a gas leggero e più tardi a gas pieno, scala quando i giri calano o col
@@ -1710,10 +1711,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // aspetta un attimo; se cambi tu con E/Q aspetta di più (comandi tu)
   function autoBox(dt) {
     boxT -= dt; levaApply();
-    if (S.gearbox !== 'auto' || leva !== 'D' || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || (game.inside && !game.rulli)) return;
+    if (S.gearbox !== 'auto' || (leva !== 'D' && leva !== 'S') || !S.autoClutch || !sim.running || sim.shiftSeq || sim.gear < 1 || boxT > 0 || (game.inside && !game.rulli)) return;
     const P = sim.P, top = P.gears.length - 1, lim = P.limiter, idle = P.idle, thr = sim.in.thr, g = sim.gear;
     const rpmAt = (n) => Math.abs(sim.wo * sim.ratio(n)) * 9.5493;
-    const up = idle + (lim - idle) * (0.36 + 0.55 * thr), down = idle + (lim - idle) * (0.12 + 0.3 * thr);
+    const sp = leva === 'S';                                    // sport: tiene le marce più a lungo, i giri restano alti
+    const up = idle + (lim - idle) * (sp ? 0.6 + 0.34 * thr : 0.36 + 0.55 * thr), down = idle + (lim - idle) * (sp ? 0.34 + 0.3 * thr : 0.12 + 0.3 * thr);
     if (g < top && sim.rpm > up && sim.in.brake < 0.1 && rpmAt(g + 1) > idle + 350) { if (sim.shift(g + 1)) boxT = 0.7; }
     else if (g > 1 && sim.rpm < down && rpmAt(g - 1) < lim * 0.88) { if (sim.shift(g - 1)) boxT = 0.6; }
   }
@@ -2811,9 +2813,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- guida automatica: parte dopo 3 s senza toccare niente,
   // si spegne al primo tasto (gas, freno, marce, sterzo). Tiene la velocità a cui l'hai lasciata, cambia le marce e sorpassa.
   // Due guide automatiche (pulsante AUTO sopra il cruscotto: AUTO 1 → AUTO 2 → spento, ognuna col suo colore):
-  //  AUTO 1: dopo 15 s senza toccare niente l'auto guida da sola (gas, freno, marce, corsie) e si spegne al primo tasto.
+  //  AUTO 1: dopo 5 s senza toccare niente l'auto guida da sola (gas, freno, marce, corsie) e si spegne al primo tasto.
   //  AUTO 2: sempre attiva: tu dai gas e freni, lei cambia corsia da sola per sorpassare e tornare a destra.
-  const AUTO_IDLE_MS = 15000;
+  const AUTO_IDLE_MS = 5000;
   const autoMode = () => (S.autoMode !== undefined ? S.autoMode : S.autoLane === false ? 0 : 1);
   const auto = { on: false, assist: false, last: performance.now(), v: 0 };
   function autoDrive(dt) {
@@ -2822,7 +2824,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       || (inp.pad.thr || 0) > 0.02 || (inp.pad.brake || 0) > 0.02 || Math.abs(inp.pad.steer || 0) > 0.12;
     if (touching) auto.last = now;
     const mode = autoMode();
-    const can = mode > 0 && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > (mode === 1 ? 1.2 : 4) && !game.ap && !game.inside && game.track === 'city' && !rp.on;      // AUTO 1 riparte anche se in 15 s l'auto è quasi ferma
+    const can = mode > 0 && S.autoClutch && sim.running && sim.gear > 0 && Math.abs(sim.v) > (mode === 1 ? 1.2 : 4) && !game.ap && !game.inside && game.track === 'city' && !rp.on;      // AUTO 1 riparte anche se in 5 s l'auto è quasi ferma
     const want = mode === 1 && can && now - auto.last > AUTO_IDLE_MS;
     if (want && !auto.on) { auto.v = Math.max(sim.v, game.s.vg ? 22 : 10); flash(`AUTO 1: guido io a ${Math.round(auto.v * 3.6)} km/h, tocca un tasto per riprendere`, 1.8); }
     if (!want && auto.on && touching) flash('Guidi tu', 0.8);
@@ -2866,7 +2868,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   $('dbAuto').addEventListener('click', () => {
     S.autoMode = { 1: 2, 2: 0, 0: 1 }[autoMode()]; S.autoLane = S.autoMode > 0; game.manualT = 0; applySettings();
-    flash(['Guida automatica spenta: guidi tu', 'AUTO 1: dopo 15 secondi senza toccare niente guida lei', 'AUTO 2: tu gas e freno, lei cambia corsia da sola'][S.autoMode], 2.2);
+    flash(['Guida automatica spenta: guidi tu', 'AUTO 1: dopo 5 secondi senza toccare niente guida lei', 'AUTO 2: tu gas e freno, lei cambia corsia da sola'][S.autoMode], 2.2);
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   });
   $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });

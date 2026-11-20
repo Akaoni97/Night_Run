@@ -21,6 +21,7 @@ const MOT = {
   lavoro: 450,          // montare o smontare un motore su un'auto (manodopera)
   revisione: 0.35,      // rifare un motore rotto al Pistone: frazione del prezzo dei pezzi (non è la revisione di Mario)
   maxMotori: 4,         // motori che si tengono in magazzino
+  maxPezzi: 100,        // pezzi che si tengono in magazzino (montati e sul banco non contano)
   vendita: 0.55,        // rivendere un motore: frazione del prezzo dei pezzi (meno l'usura)
   // calore: quota della potenza all'albero che finisce nell'acqua (un motore a benzina butta circa un terzo
   // dell'energia nello scarico, un terzo nel raffreddamento e un terzo lo dà alle ruote); capacità termica di
@@ -296,6 +297,7 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
     if (!this.motAlPistone()) return { ok: false, why: 'I pezzi si comprano da Luca' };
     if (!this.motPuoi(cat, id)) return { ok: false, why: `È di livello ${it.lv}: prima te lo deve insegnare Nico` };
     if (this.mode === 'career' && this.s.money < it.price) return { ok: false, why: `Servono € ${fmt(it.price)}` };
+    if (this.motPz().filter((q) => q.dove === 'mag').length >= MOT.maxPezzi) return { ok: false, why: `Il magazzino è pieno: ci stanno ${MOT.maxPezzi} pezzi, vendine qualcuno` };
     if (this.mode === 'career') this.s.money -= it.price;
     const M = this.mot(); M.nU = (M.nU || 0) + 1;
     const p = { u: 'p' + M.nU, cat, id, dove: 'mag' }; this.motPz().push(p);
@@ -332,6 +334,7 @@ if (typeof VG_PLACE !== 'undefined' && PISTONE.on) {
   P.motTake = function (u) {
     const p = this.motPezzo(u); if (!p || p.dove === 'mag') return { ok: false, why: 'È già in magazzino' };
     if (!this.motAlPistone()) return { ok: false, why: 'Si fa da Luca, sul banco di Nico' };
+    if (this.motPz().filter((q) => q.dove === 'mag').length >= MOT.maxPezzi) return { ok: false, why: `Il magazzino è pieno: ci stanno ${MOT.maxPezzi} pezzi, vendine qualcuno` };
     const costo = p.dove === 'banco' ? 0 : this.motLavoro(p.cat);
     if (this.s.money < costo) return { ok: false, why: `La manodopera costa € ${costo}` };
     this.s.money -= costo; p.dove = 'mag'; return { ok: true, costo };
