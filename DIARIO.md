@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**estetica premium: layout, banner, icone**)
+- Fatto: `premium.css` e `premium.js`. Icone disegnate al posto di emoji e simboli (barra in alto, bisogni, cruscotto a tessere, frecce, avvisi,
+  pannelli dei locali, telefono); vetro scuro e pulsanti metallici; avvisi con icona e barra del tempo; traguardo dorato; titoli dei quartieri e
+  delle capitali. Interruttore Premium/Classico in Impostazioni → Grafica (Classico = come prima). Provato su PC e al tocco, console pulita.
+- Aperto: non guardati uno per uno i pannelli di autosalone, sfascio e Nico (prendono lo stile comune dei pulsanti).
+
 ## 20/11/2026 notte · proprietario (**fiamme al rilascio: medie fino a 5.000 giri, bella fiammata sopra**)
 - Fatto: provando il gioco le fiamme al rilascio non uscivano quasi mai (servivano valvola o Supra e un caso fortunato). Ora ogni auto toccata dal
   tuning ne fa: molli sotto i 5.000 giri = fiamme di livello medio, sopra = una bella fiammata grossa (nello spinto con l'ossidrica); il primo
