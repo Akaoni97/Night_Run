@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Luca) | Motori a livelli: albero dei pezzi 1-4, calore e raffreddamento, Nico al Pistone, Officina Niko → Mario | `motori.js`, `motori2d.js`, testi di Niko (`game.js`, `locali2d.js`, `interni.js`, `documenti.js`, `index.html`), `sim.js` (temperatura) | 20/11 11:20 |
