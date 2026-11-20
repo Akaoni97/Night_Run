@@ -24,7 +24,7 @@
 // ============================================================================
 const POL = {
   liberoP: 0.35, libero: [7, 12], gap: [2.5, 6],   // km fra un controllo e l'altro: a volte un tratto libero
-  tutorP: 0.35, tutorLen: [4, 9],                     // km di tratto col Tutor
+  tutorGap: [10, 15], tutorLen: [0.5, 1],             // Tutor: uno ogni 10-15 km (inizio con inizio), tratto lungo da 500 m a 1 km
   cartello: 500,                                      // m: cartello prima dell'autovelox o del Tutor
   verbale: [0, 0],                                    // km dopo i quali arriva il verbale: 0 = la multa arriva subito (vecchi salvataggi con verbali in attesa li pagano come prima)
   codaKm: [6, 14], codaP: 0.25, codaLen: [1.5, 3],    // pattuglia in coda: ogni quanto ci si prova, probabilità, km
@@ -352,14 +352,22 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   };
   const sim0 = (g) => Math.max(0, g.sim.v * 0.6);
 
-  // ------------------------------------------------------------ autovelox e Tutor: pochi, a volte niente per 7-12 km
+  // ------------------------------------------------------------ autovelox (pochi, a volte niente per 7-12 km) e Tutor (uno ogni 10-15 km, lungo 0,5-1 km)
   P.polPlan = function () {
     const S = st(this), km = this.s.dist / 1000;
+    if (S.nextKm >= 1e8) return;                 // pianificazione spenta (prove)
     if (S.nextKm === null || S.nextKm === undefined) S.nextKm = km + between(this, POL.gap);
+    if (S.nextTutor === null || S.nextTutor === undefined) S.nextTutor = km + between(this, POL.tutorGap);
+    const sopra = (x) => S.ctl.some((c) => c.k === 'tutor' && x > c.x - 700 && x < c.x2 + 700);        // niente autovelox dentro o accanto a un Tutor
+    while (S.nextTutor < km + 3.2) {
+      const x = S.nextTutor * 1000, x2 = x + between(this, POL.tutorLen) * 1000;
+      S.ctl = S.ctl.filter((c) => c.k === 'tutor' || c.ents || !(c.x > x - 700 && c.x < x2 + 700));    // l'autovelox già pianificato lì vicino salta (se non è già comparso)
+      S.ctl.push({ k: 'tutor', x, x2 });
+      S.nextTutor += between(this, POL.tutorGap);
+    }
     while (S.nextKm < km + 3.2) {
-      const x = S.nextKm * 1000, tutor = R(this) < POL.tutorP;
-      if (tutor) { const len = between(this, POL.tutorLen) * 1000; S.ctl.push({ k: 'tutor', x, x2: x + len }); S.nextKm += len / 1000; }
-      else S.ctl.push({ k: 'velox', x });
+      const x = S.nextKm * 1000;
+      if (!sopra(x)) S.ctl.push({ k: 'velox', x });
       S.nextKm += R(this) < POL.liberoP ? between(this, POL.libero) : between(this, POL.gap);
     }
     S.ctl = S.ctl.filter((c) => (c.x2 || c.x) > this.s.dist - 400);
