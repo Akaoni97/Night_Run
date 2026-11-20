@@ -17,6 +17,7 @@
 //   aspetta:1500        aspetta in millisecondi
 //   js:espressione      valuta del codice nella pagina (g = game, sim, v2 = view2d) e stampa il risultato
 //   foto:nome           salva nome.png nella cartella --out (1280×720, o 390×844 con --mob)
+//   verifica:dentro     la prova fallisce se non sei dentro un locale (serve alla prova di fumo)
 //   stato               stampa lo stato del gioco in breve (km, soldi, auto, locale, bisogni...)
 // Alla fine stampa lo stato e gli errori della console. Esce con codice 1 se ci sono errori.
 // Le domande iniziali scelgono il cambio automatico: la leva parte in P. Per guidare: js:nightRun.engineTap() e js:nightRun.leva('D').
@@ -94,6 +95,9 @@ const STATO = () => {
       await page.waitForTimeout(900);
       const dentro = await page.evaluate(() => { const g = nightRun.game; return g.inside ? g.inside.id : null; });
       log(dentro ? 'entrato: ' + dentro : 'entra: nessun locale vicino');
+    } else if (k === 'verifica') {          // verifica:dentro → se non sei in un locale, la prova fallisce (la usa strumenti/fumo.js)
+      const ok = await page.evaluate((w) => w === 'dentro' ? !!nightRun.game.inside : true, a);
+      if (!ok) { errs.push('verifica ' + a + ': non sono dentro un locale'); log('verifica', a, ': FALLITA'); } else log('verifica', a, ': ok');
     } else if (k === 'esci') { await page.evaluate(() => nightRun.game.exitPlace()); await page.waitForTimeout(2000);
     } else if (k === 'soldi') { await page.evaluate((m) => { nightRun.game.s.money = m; }, +a);
     } else if (k === 'tel') {

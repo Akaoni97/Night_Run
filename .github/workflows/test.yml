@@ -16,3 +16,26 @@ jobs:
           node-version: 22
       - name: Tutti i test
         run: node --test test/*.test.js
+  # Prova di fumo nel browser: una tappa per tipo (si arriva, si entra, si esce), qualche punto della strada e il telefono.
+  # Fallisce se la console del browser segna un errore o se un locale non si apre. Dettagli in strumenti/fumo.js.
+  fumo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Playwright (solo per questa prova, non entra nel repository)
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Prova di fumo nel browser
+        run: node strumenti/fumo.js --out fumo-foto
+      - name: Foto della prova (se qualcosa va storto)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fumo-foto
+          path: fumo-foto
+          if-no-files-found: ignore

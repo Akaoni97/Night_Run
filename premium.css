@@ -126,6 +126,10 @@
 :root:not(.classico) #hudGoal b { color: #c8ff6a; }
 :root:not(.classico) #hudGoal span { font-size: 13px; }
 :root:not(.classico) #hudGoal em { font: 500 11.5px/1.25 var(--p-f-data); color: #ffd36a; }
+:root:not(.classico) #hudNext { --pi: var(--pi-info); --tc: #7fd3ff; display: grid; gap: 2px; background: linear-gradient(90deg, rgba(127, 211, 255, .1), rgba(127, 211, 255, .02)); }
+:root:not(.classico) #hudNext b { color: #9fe0ff; }
+:root:not(.classico) #hudNext span { font-size: 12.5px; }
+:root:not(.classico) #hudNext em { font: 500 11.5px/1.25 var(--p-f-data); color: #ffd36a; }
 :root:not(.classico) #hudVg { display: grid; gap: 6px; padding: 8px 9px 7px; }
 :root:not(.classico) #hudVg::before { content: none; }
 /* i bisogni: icona disegnata (al posto delle emoji) e barra che va dal rosso al verde */

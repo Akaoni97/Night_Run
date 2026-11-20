@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'pistone/motori.js', 'officina.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapApply, offSwapDo, offSwapOf, offCatalog, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
+const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offPreview, offSwapApply, offSwapDo, offSwapOf, offCatalog, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
 
 const nuovo = (car = 'v40') => {
   E.setActiveCar(car);
@@ -79,4 +79,14 @@ test('officina: lo swap si paga una volta sola, vuole i soldi e i chilometri, e 
   assert.ok(E.offSwapDo(game, S, 'v40', 'e30').ok); assert.equal(game.s.money, m1, 'rimontarlo è gratis');
   // dopo lo swap il turbo ecc. sono quelli del nuovo motore, di serie
   applica(game, S, sim); const m = E.getT(); for (const k of E.OFF_MOTORE) if (m[k]) assert.equal(S.tune[k], m[k].items[0].id, k);
+});
+
+test('officina: l\'anteprima di un pezzo dice quanto cambia senza montarlo', () => {
+  const { game, S } = nuovo('v40');
+  const cat = E.CARS.v40.tuning, stock = Object.assign({}, S.tune);
+  const k = ['intake', 'cams', 'ecu'].find((x) => cat[x] && cat[x].items.length > 2) || Object.keys(cat).find((x) => cat[x].items.length > 2);
+  const d = E.offPreview(game, stock, k, cat[k].items[2].id);
+  assert.ok(d, 'l\'anteprima c\'è');
+  assert.ok(Number.isFinite(d.dcv) && Number.isFinite(d.dnm) && Number.isFinite(d.det));
+  assert.equal(stock[k], cat[k].items[0].id, 'non cambia la selezione passata');
 });

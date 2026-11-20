@@ -71,6 +71,22 @@ function offEstimate(id) {
   return (_offEst[id] = r);
 }
 // prezzo (con lo sconto del giocatore) e km di sblocco di uno swap
+// anteprima di un pezzo (prima di pagare): quanto cambiano CV e Nm montandolo al posto di quello montato adesso. Stessa stima dell'officina
+// su una fisica usa e getta, per differenza (così gli errori di stima si cancellano); con uno swap guarda il motore del donatore.
+function offPicco(carId, sel, dId) {
+  const id = dId || carId, s = new SupraSim(), D = offParamsOf(id, dId ? offStrip(sel, dId) : sel);
+  s.setCar(id === 'supra' ? null : Object.assign({}, CARS[id].P)); s.setTune(D.sim);
+  const e = s.estimatePeak(); return { cv: e.cv, nm: e.nm };
+}
+function offPreview(game, sel, k, itemId) {
+  try {
+    const dId = offSwapOf(game, game.car), a = offPicco(game.car, sel, dId), b = offPicco(game.car, Object.assign({}, sel, { [k]: itemId }), dId);
+    const mass = game.sim.P.mass + 75, cv0 = game.sim.estimatePeak().cv, f = (cv) => 5.825 * Math.pow(mass * 2.2046 / (cv * 0.986), 1 / 3);
+    const dcv = b.cv - a.cv;
+    return { dcv, dnm: b.nm - a.nm, det: f(Math.max(10, cv0 + dcv)) - f(cv0) };
+  } catch (err) { return null; }
+}
+
 function offSwapPrice(game, id) {
   const e = offEstimate(id), full = OFF.base + e.cv * OFF.euroPerCv, disc = game && game.disc ? game.disc() : 1;
   return Math.round(full * disc / 10) * 10;
@@ -125,7 +141,7 @@ function offSwapDo(game, S, carId, donorId) {
   return { ok: true };
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offSwapApply, offCatalog, offSwapDo, offEngineName });
+if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offPreview, offSwapApply, offCatalog, offSwapDo, offEngineName });
 
 // ---------------------------------------------------------------- la schermata
 (function officina() {
@@ -149,6 +165,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-head b { font-size: 14px; } .of-head em { font-style: normal; color: #8a8478; font-size: 12px; margin-left: 6px; }
 .of-i { width: 24px; height: 24px; border-radius: 50%; border: 1px solid #6a6478; background: #14121c; color: #cfc8b8; font: italic 700 13px/1 Georgia, serif; cursor: pointer; flex: none; }
 .of-i[aria-expanded="true"] { background: #38bdf8; color: #06121a; border-color: #38bdf8; }
+.of-d { display: block; margin-top: 2px; font: 700 11px/1 ui-monospace, monospace; font-style: normal; color: #a9a396; } .of-d.su { color: #8fe0a0; } .of-d.giu { color: #ff8a7a; }
 .of-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
 .of-chip { display: flex; flex-direction: column; align-items: flex-start; min-width: 78px; padding: 6px 9px; border: 1px solid #4a4458; border-bottom-width: 3px; border-radius: 9px; background: #262232; color: #ece6d6; cursor: pointer; font: 700 12px/1.15 var(--f-data, monospace); text-align: left; }
 .of-chip small { font-weight: 500; color: #a9a396; margin-top: 2px; }
@@ -185,14 +202,29 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
         ctx.flash(s.dataset.swap === '-' ? 'Motore di serie rimontato' : 'Motore montato: ' + offEngineName(s.dataset.swap), 2); render();
       }
     });
+    // anteprima: passando sopra un livello le barre in alto mostrano cosa cambierebbe (non compra niente)
+    let pv = null;
+    const sumEl = () => box.querySelector('.of-sum');
+    const pvOff = () => { clearTimeout(pv); if (box._pvOn) { box._pvOn = false; const s = sumEl(); if (s) s.outerHTML = summary(ctx); } };
+    box.addEventListener('mouseover', (e) => {
+      const c = e.target.closest('[data-k]'); if (!c) return pvOff();
+      if (c.classList.contains('cur')) return pvOff();
+      clearTimeout(pv);
+      pv = setTimeout(() => { const d = offPreview(ctx.game, ctx.S.tune, c.dataset.k, c.dataset.id), s = sumEl(); if (d && s) { box._pvOn = true; s.outerHTML = summary(ctx, d); } }, 90);
+    });
+    box.addEventListener('mouseleave', pvOff);
+    box.addEventListener('click', () => { clearTimeout(pv); box._pvOn = false; }, true);
     render();
     return box;
   }
 
-  function summary(ctx) {
+  // d = anteprima di un pezzo (offPreview): sotto ogni numero la differenza, verde se migliora e rossa se peggiora
+  function summary(ctx, d) {
     const sim = ctx.sim, g = ctx.game, est = sim.estimatePeak(), et = g.etEstimate(), kgcv = (sim.P.mass + 75) / est.cv;
-    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small></div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small></div>`
-      + `<div><b>${kgcv.toFixed(1).replace('.', ',')}</b><small>kg per CV</small></div><div><b>${et.toFixed(1).replace('.', ',')} s</b><small>400 m stimati</small></div></div>`;
+    const dl = (v, dec, unit, buonoSeNeg) => { if (!d || Math.abs(v) < Math.pow(10, -dec) / 2) return d ? '<i class="of-d">=</i>' : ''; const ok = buonoSeNeg ? v < 0 : v > 0; return `<i class="of-d ${ok ? 'su' : 'giu'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(dec).replace('.', ',')}${unit}</i>`; };
+    const kgcv2 = d ? (sim.P.mass + 75) / Math.max(10, est.cv + d.dcv) - kgcv : 0;
+    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small>${d ? dl(d.dcv, 0, ' CV', false) : ''}</div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small>${d ? dl(d.dnm, 0, ' Nm', false) : ''}</div>`
+      + `<div><b>${kgcv.toFixed(1).replace('.', ',')}</b><small>kg per CV</small>${d ? dl(kgcv2, 2, '', true) : ''}</div><div><b>${et.toFixed(1).replace('.', ',')} s</b><small>400 m stimati</small>${d ? dl(d.det, 2, ' s', true) : ''}</div></div>`;
   }
 
   function draw(box, ctx) {
