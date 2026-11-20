@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario | Interni più belli: prototipo del bar (doppia densità, profondità, materiali, luci) | interni.js (scena del bar e disegno a doppia densità) | 20/11 |
