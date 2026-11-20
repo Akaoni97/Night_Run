@@ -31,8 +31,6 @@ Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario
 - [storia] **Testi segnaposto ancora nel gioco**: pensieri del protagonista (`pensieri.js`), testi del prologo
   (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D (`STORIA_EPI` in `storia.js`, scritti da Claude). Chi li riscrive e
   quando? (cognato, la storia è sua)
-- [avvisi] In `AVVISI.md` c'è ancora l'avviso del 3D tolto per il cognato: il cognato deve dire che l'ha letto, poi si
-  toglie. (cognato)
 
 ## Da provare giocando (sul PC)
 - [motori] **Prezzi**: livelli di Nico € 300 / 900 / 2.400 con km e pezzi montati; una V40 sui 200 CV costa circa
@@ -51,7 +49,6 @@ Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario
 - [guida] **Leva in D uscendo da un locale a motore spento**: entrando, l'accosto automatico mette la leva in D; se il
   motore era spento, uscendo l'avviamento viene rifiutato («metti la leva in P») finché non premi Q. C'era già prima,
   si vede soprattutto con `strumenti/prova.js`. Meglio rimettere la leva in P quando si entra da fermi. (Claude)
-- [avvisi] **Troppi messaggi insieme**: traguardi, avvisi a destra, pensieri e telefono possono uscire tutti nello
   stesso momento (si vede bene saltando di km, ma succede anche giocando dopo una tappa). Una fila unica con le
   priorità. (Claude)
 - [telefono] **Al telefono in verticale** il riquadro dei traguardi esce sopra «Gira il telefono». (Claude, piccolo)
@@ -64,6 +61,7 @@ Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario
   `test/motori-costruiti.test.js`). Rinominarlo vuol dire toccare due skill (ramo `skill`). (chi ha voglia)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- Il cognato ha letto gli avvisi del 3D tolto e dell'app installabile: tolti da `AVVISI.md`.
 - Check completo del 20/11 sera: tutte le tappe, telefono, paesaggi, suono (V40 e Supra misurati), salvataggio vecchio
   col 3D ricaricato: nessun errore. Corretto il vento che velava di polvere anche la città (ora solo nel deserto).
 - `AVVISI.md` aggiornato: niente più «Il Pistone tappa al km 14,6» né «il proprietario lavora sul 3D».

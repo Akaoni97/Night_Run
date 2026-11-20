@@ -18,19 +18,3 @@ Formato: `## data · per chi · da chi` e due o tre righe.
   entra a piedi (U salta la camminata). Accostando, il passaggio alla corsia di destra ora è deciso: niente più tamponi.
 - **Motori**: li gestisce il cognato. Da Luca c'è Nico coi pezzi a livelli; l'officina dei tagliandi è di **Mario**.
 - Check: nessun errore in tutte le tappe, 211 test passati. Le cose da decidere sono in `SOSPESI.md`.
-
-## 20/11/2026 sera · per il cognato · dal proprietario · **IL 3D NON C'È PIÙ**
-- Il proprietario ha deciso di **togliere il 3D**: farebbero tutti i modelli 3D delle auto, troppo lungo e costoso.
-  Il gioco ora è **solo 2D**. Spariti: vista 3D e Abitacolo, la modalità **Montagna** (era solo 3D), la Vetrina (G),
-  la telecamera (C), il caricamento di modelli .glb e three.js. Cancellati `car3d.js`, `street3d.js`, `viaggio3d.js`
-  e `models/`. Se un giorno servisse, sono nella storia di git.
-- Al posto del 3D: **la costruzione del motore**. Oggi i motori li gestisci tu (Nico da Luca, cartella `pistone/`).
-- Il weekend quindi è tutto 2D: segnate in `INCORSO.md` cosa toccate.
-
-## 20/11/2026 · per il cognato · dal proprietario
-- **Il gioco ora si installa come app sul PC** (Edge o Chrome: menu → «App» → «Installa Night Run»; in Chrome l'icona col
-  monitor in fondo alla barra degli indirizzi). Icona sul desktop e nel menu Start, finestra sua, salvataggi uguali al sito.
-- **Si aggiorna da sola**: ogni caricamento su `main` arriva nell'app alla prossima apertura (o con Ctrl+R), dopo il
-  minuto o due che serve a GitHub Pages. Niente da reinstallare. I dettagli: `PASSAGGIO.md`, «Il gioco come app sul PC».
-- L'exe vero (Electron, per Steam) si fa più avanti, come nel tuo `docs/pubblicazione/PERCORSO.md`.
-- Weekend: il 3D non c'è più (vedi l'avviso sopra), si lavora tutti e due sul 2D. Segnate in `INCORSO.md` cosa toccate, soprattutto `index.html`.
