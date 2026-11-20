@@ -3296,7 +3296,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.nightRun.shiftUp = () => { ensureAudio(); shiftUp(); }; window.nightRun.shiftDown = () => { ensureAudio(); shiftDown(); };   // marce dal banco prova
 
   // ---------------------------------------------------------------- ciclo principale
-  let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0;
+  let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now;
     if (rp.on) { playReplay(dt); requestAnimationFrame(frame); return; }
@@ -3353,18 +3353,24 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (garage && garageOn) {
       // fiammate: limitatore a taglio d'accensione, e al rilascio del gas (più a lungo con la mappa pop & bang)
-      // Quando c'è fiamma: limitatore a taglio d'accensione (fiamma piena), rilascio del gas (più o meno forte secondo i giri e se c'è la mappa
-      // pop & bang), cambiata (solo sull'auto potenziata). Che tipo di fiammata esce lo decide il tuning (fiamme.js: ossidrica, libera, botto).
-      const spark = (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut, liftT = sim.cfg.pops ? 2.8 : 1.7, pot = exhValve(), catPop = TP.dsp.cat.pop || 0;
+      // Quando c'è fiamma: limitatore a taglio d'accensione (fiamma piena), rilascio del gas, cambiata (solo sull'auto potenziata).
+      // Rilascio: sotto i 5.000 giri (letti quando molli) fiamme di livello medio, sopra una bella fiammata grossa; la prima parte subito.
+      // Che tipo di fiammata esce lo decide il tuning (fiamme.js: ossidrica, libera, botto, grossa).
+      const spark = (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut, pot = exhValve(), catPop = TP.dsp.cat.pop || 0;
       const ft = flameTier(sim, catPop);
-      const lift = !spark && sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (pot || game.car === 'supra' || TP.sim.ecuPops);
+      if (sim.cut === 1 && flameCut !== 1) { flameRpm0 = sim.rpm; flameKick++; }                            // appena molli il gas
+      flameCut = sim.cut;
+      const liftHigh = flameRpm0 >= FLAME_BIG_RPM, liftT = sim.cfg.pops ? 2.8 : liftHigh ? 2 : 1.6;
+      const armed = pot || ft.tier > 0 || game.car === 'supra' || TP.sim.ecuPops;                         // auto toccata dal tuning (o Supra)
+      const lift = !spark && sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && armed;
       const shift = !spark && !lift && pot && ft.tier > 0 && !!sim.shiftSeq && sim.rpm > 3500;
-      const fkind = spark ? 'limiter' : lift ? 'lift' : shift ? 'shift' : '';
+      const fkind = spark ? 'limiter' : lift ? (liftHigh ? 'liftHigh' : 'lift') : shift ? 'shift' : '';
       flameT = exhClosed() ? 0 : spark ? 1
-        : lift ? (sim.cfg.pops ? 0.6 : pot ? 0.5 : 0.38) * (1 - sim.ovr / liftT) * (0.55 + 0.45 * Math.min(1, sim.rpm / 4500)) * (pot ? Math.max(catPop, 0.7) : catPop)
+        : lift ? (liftHigh ? 0.85 : 0.5) * (sim.cfg.pops ? 1.2 : 1) * (1 - sim.ovr / liftT) * (0.6 + 0.4 * Math.min(1, sim.rpm / 4500))
         : shift ? 0.42 : 0;
+      const kick = exhClosed() || !lift ? 0 : flameKick;                                                   // il primo scoppio non aspetta il caso
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
-        ign: sim.ign, brake: sim.in.brake, flame: flameT, fkind: fkind, ftier: ft.tier, frpm: sim.rpm / sim.P.limiter, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
+        ign: sim.ign, brake: sim.in.brake, flame: flameT, fkind: fkind, ftier: ft.tier, frpm: sim.rpm / sim.P.limiter, fkick: kick, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
         thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd };
       garage.update(dt, vs, game);
       recordFrame(dt, vs);

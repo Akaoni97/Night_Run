@@ -453,24 +453,35 @@
     const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
     if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
     const rateK = tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1;
-    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) {
-      const style = tiered ? flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, R()) : 'free';
-      st.fstyle = style;
-      if (style === 'torch') {                                                      // ossidrica: breve, rapida, con scintille incandescenti
-        st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7; st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
+    st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
+    // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
+    const spawn = (style) => {
+      if (style === 'torch' || (style === 'big' && tier >= 2)) {                    // ossidrica: breve, rapida, con scintille incandescenti
+        st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
         for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
-      } else if (style === 'bang') {                                                // botto: un piccolo scoppio circolare, un filo di fuliggine
-        st.bangT = 0.24; st.flame = Math.max(st.flame, 0.26); st.popFlash = 0.5; st.popJolt = 0.35;
+        if (style === 'torch') return;
+      }
+      if (style === 'bang') {                                                       // botto: un piccolo scoppio circolare, un filo di fuliggine
+        st.fstyle = 'bang'; st.bangT = 0.24; st.flame = Math.max(st.flame, 0.26); st.popFlash = 0.5; st.popJolt = 0.35;
         for (let q = 0; q < 1 + ((R() * 2) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 40, dx: v * PPM * 0.5 - 30 - R() * 80, life: 1, rate: 1.4 + R(), gy: y0 });
         this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
-      } else {                                                                      // libera: la fiammata larga, in quattro versioni; il medio la fa meno decisa
-        const big = R() < (0.35 + s.flame * 0.3) * (tiered && tier === 1 ? 0.55 : 1), sc = tiered && tier === 1 ? 0.85 : 1;
-        st.flame = (big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4) * sc; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
-        st.fv = tiered ? flameVariant(tier, R()) : 0; st.flamePal = big && R() < 0.5 && !this.flamePal && !tiered ? 'blu' : pickPal();          // ogni scoppio col suo colore
-        for (let q = 0; q < (big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
-        this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
+        return;
       }
+      // libera: la fiammata larga, in quattro versioni. Il livello medio (e il rilascio sotto i 5.000 giri) la fa meno decisa; la grossa è sempre piena
+      const grossa = style === 'big', med = !grossa && tiered && (tier === 1 || s.fkind === 'lift');
+      const big = grossa || R() < (0.35 + s.flame * 0.3) * (med ? 0.55 : 1), sc = grossa ? 1.15 : med ? 0.85 : 1;
+      st.fstyle = 'free'; st.flame = (big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4) * sc; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
+      st.fv = tiered ? (grossa ? (R() < 0.6 ? 0 : 3) : flameVariant(tier, R())) : 0; st.flamePal = big && R() < 0.5 && !this.flamePal && !tiered ? 'blu' : pickPal();          // ogni scoppio col suo colore
+      for (let q = 0; q < (grossa ? 8 : big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
+      this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
+    };
+    // appena si molla il gas (s.fkick conta i rilasci) il primo scoppio parte subito, non quando capita; sopra i 5.000 giri ne parte un secondo
+    if (s.fkick !== undefined && s.fkick !== st.fkick) {
+      st.fkick = s.fkick;
+      if (s.fkick && tiered) { spawn(flameStyle(tier, s.fkind, 0.6, R())); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
+    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(flameStyle(tier, s.fkind, 0.6, R())); }
+    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, R()) : 'free');
     if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
     if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang') {

@@ -14,6 +14,13 @@ due voci, e il controllo della sera le legge.
   al banco di Luca girano solo i rulli sotto le ruote motrici (`banco.js`). `strumenti/prova.js --vista 1920x1080` per le foto grandi.
 - Aperto: i pedoni del marciapiede sono ancora i vecchi omini a blocchi (il prossimo passo: disegnarli come il protagonista).
 
+## 20/11/2026 notte · proprietario (**fiamme al rilascio: medie fino a 5.000 giri, bella fiammata sopra**)
+- Fatto: provando il gioco le fiamme al rilascio non uscivano quasi mai (servivano valvola o Supra e un caso fortunato). Ora ogni auto toccata dal
+  tuning ne fa: molli sotto i 5.000 giri = fiamme di livello medio, sopra = una bella fiammata grossa (nello spinto con l'ossidrica); il primo
+  scoppio parte subito appena molli il gas, sopra i 5.000 ne parte un secondo. Provato in folle a più giri: sotto 4.800 tre fiamme medie, da 5.600
+  fiamme grosse. Il numero dei giri (5.000) è `FLAME_BIG_RPM` in `fiamme.js`.
+- Aperto: da sentire/vedere giocando sull'auto vera (il livello dipende da quanto è preparata).
+
 ## 20/11/2026 notte · proprietario (**fiamme secondo il tuning**)
 - Fatto: l'auto ha un livello di preparazione (leggero, medio, spinto: `flameTier` in `fiamme.js`) e da quello dipende la fiammata: leggero fa
   soprattutto un piccolo **botto** circolare, medio la **fiamma libera** in quattro versioni (classica, doppia lingua, lunga, tozza; arancio e
