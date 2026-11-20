@@ -13,8 +13,11 @@
 //    Una la scansi cambiando corsia e accelerando; con un'auto scassata ti riprende, e tre davanti fanno muro.
 //    Distanziata di 450 m una volante sparisce; resti ricercato, e quando le hai perse tutte a volte c'è un posto di
 //    blocco. Le volanti vanno sempre avanti: se ti fermi in un locale tirano dritto e si dimenticano di te.
-//  - AUTOVELOX e TUTOR (s.pol.ctl): pochi, a volte niente per 7-12 km. Cartello 500 m prima, segnati sulla mappa in
-//    basso. Il verbale arriva sul telefono qualche km dopo (s.pol.verb).
+//  - POSTO DI CONTROLLO (la volante ferma in prima corsia, strada.js): passi e ti multano (documenti scaduti e, sempre, la
+//    velocità oltre il limite), niente accostare e niente inseguimento: ti inseguono solo se sei già ricercato (polCheck).
+//  - AUTOVELOX e TUTOR (s.pol.ctl): pochi, a volte niente per 7-12 km. Cartello 500 m prima; l'autovelox è un palo con una
+//    cassetta quadrata che flasha, il Tutor un palo con la telecamera all'inizio e uno alla fine. La multa arriva subito
+//    (e un messaggio sul telefono). Pattuglie, posti di controllo, autovelox e Tutor stanno sulla mappa in basso (polMap).
 //  - PATTUGLIA IN CODA: ogni tanto una volante ti si mette dietro per un paio di km; se passi i 136 ti ferma.
 //  - ETILOMETRO: al bar si bevono alcolici (s.vg.alc, grammi per litro). Un bar su cinque ha la volante fuori: all'uscita
 //    ti fa soffiare. Da ubriaco niente effetti grafici: la testa ciondola (pilota2d.js) e il protagonista ci scherza su.
@@ -23,7 +26,7 @@ const POL = {
   liberoP: 0.35, libero: [7, 12], gap: [2.5, 6],   // km fra un controllo e l'altro: a volte un tratto libero
   tutorP: 0.35, tutorLen: [4, 9],                     // km di tratto col Tutor
   cartello: 500,                                      // m: cartello prima dell'autovelox o del Tutor
-  verbale: [2, 5],                                    // km dopo i quali arriva il verbale sul telefono
+  verbale: [0, 0],                                    // km dopo i quali arriva il verbale: 0 = la multa arriva subito (vecchi salvataggi con verbali in attesa li pagano come prima)
   codaKm: [6, 14], codaP: 0.25, codaLen: [1.5, 3],    // pattuglia in coda: ogni quanto ci si prova, probabilità, km
   barOgni: 5,                                         // un bar su cinque ha l'etilometro
   alcLimite: 0.5, alcCala: 0.00035,                   // g/l: limite e quanto cala al secondo
@@ -370,10 +373,32 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     }
     return out;
   };
+  // per la mappa in basso: tutto quello che riguarda la polizia, col tipo di segno da disegnare. t: 'patrol' (volante in giro o ferma),
+  // 'check' (posto di controllo), 'block' (posto di blocco da ricercato), 'tail' (volante in coda), 'alcol' (etilometro), 'chase' (ti
+  // inseguono), 'velox' (autovelox), 'tutor0' e 'tutor1' (inizio e fine del Tutor), 'span' (il tratto sorvegliato dal Tutor, da x a x2)
+  const POL_MAP_NOMI = { patrol: 'Pattuglia', check: 'Posto di controllo: passi e ti multano', block: 'Posto di blocco', tail: 'Volante dietro di te', alcol: 'Volante con l\'etilometro',
+    chase: 'Volante all\'inseguimento', velox: 'Autovelox', tutor0: 'Inizio Tutor', tutor1: 'Fine Tutor' };
+  P.polMap = function (a, b) {
+    const d = this.s.dist, S = st(this), out = [];
+    for (const e of this.ents) {
+      if (e.kind !== 'police' || e.chase || e.pursuit || e.x < a || e.x > b) continue;      // chase: quella che ti sta fermando; pursuit: sotto
+      const t = e.block ? 'block' : e.alcol ? 'alcol' : e.tail ? 'tail' : e.busy ? 'check' : 'patrol';
+      if (t === 'block' && out.some((o) => o.t === 'block' && Math.abs(o.x - e.x) < 30)) continue;   // le due volanti del blocco sono un segno solo
+      out.push({ x: e.x, t, name: POL_MAP_NOMI[t] });
+    }
+    for (const C of (this.pol && this.pol.cs) || []) { const x = d - C.gap; if (x >= a && x <= b) out.push({ x, t: 'chase', name: POL_MAP_NOMI.chase }); }
+    for (const c of S.ctl) {
+      if (c.k === 'velox') { if (c.x > a && c.x < b) out.push({ x: c.x, t: 'velox', name: POL_MAP_NOMI.velox }); continue; }
+      if (c.x2 > a && c.x < b) out.push({ x: c.x, x2: c.x2, t: 'span', name: `Tutor: ${((c.x2 - c.x) / 1000).toFixed(1).replace('.', ',')} km di velocità media controllata` });
+      if (c.x > a && c.x < b) out.push({ x: c.x, t: 'tutor0', name: POL_MAP_NOMI.tutor0 });
+      if (c.x2 > a && c.x2 < b) out.push({ x: c.x2, t: 'tutor1', name: POL_MAP_NOMI.tutor1 });
+    }
+    return out;
+  };
   P.polCams = function (dt, d0) {
     const S = st(this), d = this.s.dist, kmh = this.kmh;
     this.polT = (this.polT || 0) + dt;
-    for (const o of this.ents) if (o.kind === 'velox' && o.flashT > 0) o.flashT -= dt;
+    for (const o of this.ents) if ((o.kind === 'velox' || o.kind === 'tutor') && o.flashT > 0) o.flashT -= dt;
     for (const c of S.ctl) {
       // cartello, autovelox e portali sulla strada quando si avvicinano (la strada butta via quello che è troppo lontano)
       if (!c.ents && c.x - d < 1300) {
@@ -391,13 +416,13 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
       if (c.k === 'tutor' && c.t0 !== undefined && d0 < c.x2 && d >= c.x2) {
         const avg = (c.x2 - c.x) / Math.max(1, this.polT - c.t0) * 3.6, sf = speedFine(avg); c.t0 = undefined;
         this.say(`Fine Tutor: media ${Math.round(avg)} km/h`, sf ? 'police' : 'info');
-        if (sf) this.polVerbale(sf, Math.round(avg), 'Tutor (media)');
+        if (sf) { const cam = this.ents.find((o) => o.ctl === c && o.kind === 'tutor' && o.end); if (cam) cam.flashT = 0.35; this.polVerbale(sf, Math.round(avg), 'Tutor (media)'); }
       }
     }
     // verbali: arrivano qualche km dopo, sul telefono
     for (const V of S.verb) if (!V.done && d >= V.due) {
       V.done = true; this.s.money -= V.fine; this.s.fines = (this.s.fines || 0) + V.fine;
-      const txt = `Verbale: ${V.what}, ${V.kmh} km/h (limite ${GAME_SPEED_LIMIT}). Addebitati € ${fmt(V.fine)}.`;
+      const txt = `${V.what === 'autovelox' ? 'Flash! ' : ''}Verbale: ${V.what}, ${V.kmh} km/h (limite ${GAME_SPEED_LIMIT}). Addebitati € ${fmt(V.fine)}.`;
       if (typeof window !== 'undefined' && window.telefono && window.telefono.sms) window.telefono.sms('Polizia Stradale', txt, { bad: 1 });
       this.say(txt, 'police');
     }
@@ -405,7 +430,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
   };
   P.polVerbale = function (sf, kmh, what) {
     if (this.statAdd) this.statAdd('verbali');
-    st(this).verb.push({ fine: sf.fine, kmh, what, due: this.s.dist + between(this, POL.verbale) * 1000 });
+    st(this).verb.push({ fine: sf.fine, kmh, what, due: this.s.dist + between(this, POL.verbale) * 1000 });   // con POL.verbale [0, 0] la multa scatta nello stesso passaggio
   };
 
   // ------------------------------------------------------------ pattuglia in coda
@@ -484,8 +509,23 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     return r;
   };
 
-  // ------------------------------------------------------------ posto di controllo (strada.js): ora ti fanno accostare
-  P.docControllo = function () { return this.polStop(null, 'docs') ? { ok: true, fermo: true } : { ok: true, multa: 0 }; };
+  // ------------------------------------------------------------ posto di controllo (strada.js): passi e ti multano
+  // e = la volante del posto di controllo, docs = questa volta guardano anche i documenti (a caso, DOC.controllo). La velocità la
+  // vedono sempre. Niente accostare, niente scuse, niente inseguimento: da ricercato nemmeno multano, ti inseguono (update).
+  P.polCheck = function (e, docs) {
+    if (st(this).fuga || (e && e.block) || this.prompt) return false;
+    const kmh = this.kmh, sf = speedFine(kmh), heat = this.s.heat || 0, sc = docs && typeof this.docScaduti === 'function' && typeof DOC !== 'undefined' ? this.docScaduti() : [];
+    let tot = 0; const voci = [];
+    if (sf) { const f = Math.round(sf.fine * (1 + heat * 0.3) / 10) * 10; tot += f; voci.push(`velocità ${Math.round(kmh)} km/h, limite ${GAME_SPEED_LIMIT}: € ${fmt(f)}`); }
+    if (sc.length) { const f = sc.reduce((a, x) => a + DOC.multa[x], 0); tot += f; voci.push(`${sc.map((x) => DOC_NOMI[x].toLowerCase()).join(', ')} ${sc.length > 1 ? 'scaduti' : 'scaduta'}: € ${fmt(f)}`); }
+    if (docs) this.s.docCtl = (this.s.docCtl || 0) + 1;
+    if (!tot) { if (docs) this.say('Posto di controllo: patente e libretto. «Tutto in regola, buona strada.»', 'police'); return false; }
+    this.s.money -= tot; this.s.fines = (this.s.fines || 0) + tot; this.s.heat = Math.min(5, heat + 1);
+    if (this.statAdd) this.statAdd('verbali');
+    if (e) e.fined = true;
+    this.say(`Posto di controllo: ${voci.join(' · ')}. Passi e ti multano: − € ${fmt(tot)}.${sc.length ? ' Mettiti in regola dall\'app Libretto' + (sc.includes('rev') ? ' e da Mario' : '') : ''}`, 'police');
+    return true;
+  };
   // la volante ferma ti ferma per velocità: con tutto il resto (documenti, contesta, scappa)
   P.busted = function (e) { const sf = speedFine(this.kmh) || { over: 1, fine: 42 }; this.polStop(e, 'speed', { kmh: this.kmh, sf }); };
   P.payFine = function () { if (this.pol && this.pol.stop) this.polPay(this.pol.stop); };
@@ -533,19 +573,42 @@ if (typeof window !== 'undefined') Object.assign(window, { POL, POL_ALCOLICI, PO
       if (this.lightAdd) this.lightAdd(X, top + h / 2, 70, 40, '160,190,255', 0.25);
       return true;
     }
-    if (e.kind === 'velox') {                       // palo con la cassetta grigia e l'obiettivo; lampo bianco se scatta
-      g.fillStyle = C.ink; g.fillRect(X - 2, 150, 5, 78);
-      g.fillStyle = C.ink; g.fillRect(X - 9, 134, 20, 18); g.fillStyle = '#8c8f94'; g.fillRect(X - 8, 135, 18, 16);
-      g.fillStyle = '#e07020'; g.fillRect(X - 8, 135, 18, 3); g.fillStyle = '#14161e'; g.fillRect(X + 3, 141, 6, 6); g.fillStyle = '#5a6a8a'; g.fillRect(X + 4, 142, 2, 2);
-      if (e.flashT > 0) { const k = Math.min(1, e.flashT / 0.2); g.fillStyle = '#ffffff'; g.fillRect(X + 2, 140, 8, 8); this.light(g, X + 6, 144, 60, 44, '#ffffff', 0.9 * k, 3); this.light(g, X + 6, 150, 180, 120, '#f0f4ff', 0.4 * k, 4); if (this.lightAdd) this.lightAdd(X + 6, 230, 260, 120, '255,255,255', 1.2); }
+    // palo grigio: contorno, corpo con la luce da un lato, fasce gialle e nere in basso, base
+    const palo = (top, bottom = 228) => {
+      g.fillStyle = C.ink; g.fillRect(X - 3, top, 6, bottom - top + 2);
+      g.fillStyle = '#7b828c'; g.fillRect(X - 2, top, 4, bottom - top); g.fillStyle = '#a7aeb8'; g.fillRect(X - 2, top, 1, bottom - top);
+      for (let y = bottom - 30; y < bottom - 2; y += 8) { g.fillStyle = '#e8c020'; g.fillRect(X - 2, y, 4, 4); g.fillStyle = '#1a1a1e'; g.fillRect(X - 2, y + 4, 4, 4); }
+      g.fillStyle = C.ink; g.fillRect(X - 6, bottom - 3, 12, 5); g.fillStyle = '#6a6e76'; g.fillRect(X - 5, bottom - 2, 10, 3);
+    };
+    const t = this.st.t;
+    if (e.kind === 'velox') {                       // autovelox: palo con la cassetta quadrata, obiettivo verso chi arriva, finestra del flash; lampo bianco se scatta
+      palo(148);
+      const bx = X - 12, by = 122, bw = 24, bh = 26, flash = e.flashT > 0 ? Math.min(1, e.flashT / 0.2) : 0;
+      g.fillStyle = C.ink; g.fillRect(bx - 1, by - 1, bw + 2, bh + 2);
+      g.fillStyle = '#b8bec8'; g.fillRect(bx, by, bw, bh);
+      g.fillStyle = '#dde1e8'; g.fillRect(bx, by, bw, 2); g.fillStyle = '#8b929c'; g.fillRect(bx, by + bh - 3, bw, 3); g.fillRect(bx + bw - 3, by, 3, bh);
+      g.fillStyle = '#e07020'; g.fillRect(bx, by + 3, bw, 3);                                                     // fascia arancio
+      g.fillStyle = '#10131c'; g.fillRect(bx + 2, by + 9, 10, 10); g.fillStyle = '#243a6a'; g.fillRect(bx + 3, by + 10, 8, 8); g.fillStyle = '#6fa0ff'; g.fillRect(bx + 4, by + 11, 2, 2);   // obiettivo
+      g.fillStyle = flash ? '#ffffff' : '#5a4a1a'; g.fillRect(bx + 14, by + 10, 6, 8);                            // finestra del flash
+      g.fillStyle = Math.floor(t * 1.6) % 2 === 0 ? '#ff3030' : '#601818'; g.fillRect(bx + bw - 5, by + 20, 3, 3);   // spia di stato
+      if (flash) {
+        g.fillStyle = '#ffffff'; g.fillRect(bx + 2, by + 9, 10, 10); g.fillRect(bx + 14, by + 10, 6, 8);
+        this.light(g, X - 6, 138, 70, 50, '#ffffff', 0.9 * flash, 3); this.light(g, X - 6, 150, 200, 130, '#f0f4ff', 0.45 * flash, 4);
+        if (this.lightAdd) this.lightAdd(X - 6, 230, 280, 120, '255,255,255', 1.2);
+      }
       return true;
     }
-    // Tutor: portale a sbalzo sopra la strada, con la scritta
-    g.fillStyle = C.ink; g.fillRect(X - 2, 118, 5, 110); g.fillRect(X - 2, 116, 90, 5);
-    g.fillStyle = '#5a5e66'; g.fillRect(X - 1, 117, 88, 3);
-    g.fillStyle = C.ink; g.fillRect(X + 30, 120, 34, 12); g.fillStyle = '#1d4fa8'; g.fillRect(X + 31, 121, 32, 10);
-    this.text(g, e.end ? 'FINE' : 'TUTOR', X + 33 + (e.end ? 4 : 0), 123, '#f4f1e6');
-    for (const k of [12, 72]) { g.fillStyle = '#14161e'; g.fillRect(X + k, 121, 6, 5); g.fillStyle = '#c02020'; g.fillRect(X + k + 2, 122, 2, 2); }
+    // Tutor: un palo con la telecamera all'inizio del tratto e uno alla fine (spia verde all'inizio, rossa alla fine), con la targa blu; alla fine, se ti multa, un lampo
+    palo(118);
+    const flash = e.flashT > 0 ? Math.min(1, e.flashT / 0.2) : 0;
+    g.fillStyle = C.ink; g.fillRect(X - 14, 112, 20, 3); g.fillStyle = '#6a7079'; g.fillRect(X - 13, 113, 18, 1);                  // braccio
+    g.fillStyle = C.ink; g.fillRect(X - 17, 100, 24, 14); g.fillStyle = '#2a3f78'; g.fillRect(X - 16, 101, 22, 12);               // corpo della telecamera
+    g.fillStyle = '#3d5aa8'; g.fillRect(X - 16, 101, 22, 2); g.fillStyle = '#1a2a58'; g.fillRect(X - 16, 111, 22, 2);
+    g.fillStyle = '#10131c'; g.fillRect(X - 15, 104, 7, 7); g.fillStyle = '#6fd0ff'; g.fillRect(X - 14, 105, 5, 5); g.fillStyle = '#e8f8ff'; g.fillRect(X - 13, 106, 2, 2);   // obiettivo
+    g.fillStyle = e.end ? (Math.floor(t * 1.4) % 2 === 0 ? '#ff4030' : '#661810') : (Math.floor(t * 1.4) % 2 === 0 ? '#39ff7a' : '#14662e'); g.fillRect(X, 104, 3, 3);   // spia
+    g.fillStyle = C.ink; g.fillRect(X - 17, 138, 36, 14); g.fillStyle = '#e8e6df'; g.fillRect(X - 16, 139, 34, 12); g.fillStyle = '#1d4fa8'; g.fillRect(X - 15, 140, 32, 10);   // targa blu
+    this.text(g, e.end ? 'FINE' : 'TUTOR', X - 14 + (e.end ? 8 : 0), 142, '#f4f1e6');
+    if (flash) { g.fillStyle = '#ffffff'; g.fillRect(X - 15, 104, 7, 7); this.light(g, X - 10, 108, 80, 56, '#ffffff', 0.9 * flash, 3); this.light(g, X - 10, 150, 220, 130, '#f0f4ff', 0.4 * flash, 4); }
     return true;
   };
 })();

@@ -240,6 +240,18 @@ body.inplace.pb-sotto .trg-pop { top: 8px; bottom: auto; }   /* telefono: il pan
 .mm-you { position: absolute; left: 10%; top: 3px; width: 6px; height: 16px; margin-left: -3px; background: var(--fg); box-shadow: 0 0 0 1px #000, 0 0 8px var(--amber); z-index: 1; }
 .mm-pin { position: absolute; top: 2px; transform: translateX(-50%); min-width: 18px; height: 18px; padding: 0 3px; display: grid; place-items: center; font: 400 11px/1 var(--f-display); font-style: normal; color: #0a0d18; box-shadow: 0 0 0 1px #000; }
 .mm-pin.far { opacity: .55; }
+.mm-pin.ico { background: none; box-shadow: none; padding: 0; min-width: 18px; top: 2px; filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000); }
+.mm-pin.ico svg { width: 18px; height: 18px; display: block; }
+.mm-pin.chase { z-index: 3; filter: drop-shadow(0 0 3px #ff2a3a) drop-shadow(0 0 3px #2a6bff); animation: mmChase .5s steps(1) infinite; }
+.mm-pin.block { z-index: 2; filter: drop-shadow(0 0 2px #ff2a3a) drop-shadow(0 0 1px #000); }
+.mm-pin.velox, .mm-pin.tutor0, .mm-pin.tutor1 { z-index: 2; }
+.mm-span { position: absolute; top: 5px; height: 12px; background: rgba(47,98,255,.26); border-top: 1px solid rgba(120,160,255,.85); border-bottom: 1px solid rgba(120,160,255,.85); z-index: 0; }
+.mm-span.in { background: rgba(47,98,255,.5); box-shadow: 0 0 8px rgba(80,130,255,.9); }
+.mm-pin svg .lb1 { fill: #2a6bff; animation: mmLb .5s steps(1) infinite; }
+.mm-pin svg .lb2 { fill: #ff2a3a; animation: mmLb .5s steps(1) infinite reverse; }
+@keyframes mmLb { 50% { opacity: .15; } }
+@keyframes mmChase { 50% { transform: translateX(-50%) scale(1.18); } }
+@media (prefers-reduced-motion: reduce) { .mm-pin svg .lb1, .mm-pin svg .lb2, .mm-pin.chase { animation: none; } }
 .mm-pin.police { color: #fff; background: linear-gradient(90deg, #c4001f, #1c3cff); }
 .mm-pin.cargo { z-index: 1; min-width: 11px; height: 11px; padding: 0 1px; top: 0; transform: translateX(45%); font-size: 8px; }
 .mm-goal { z-index: 2; top: 0; height: 22px; min-width: 20px; color: #141a04; background: var(--lime, #b8ff3a); font-size: 13px; box-shadow: 0 0 0 1px #000, 0 0 10px rgba(184,255,58,.8); animation: mmGoal 1.2s ease-in-out infinite; }
@@ -2591,6 +2603,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('enterBtn').addEventListener('click', placeKey);
   $('placeExit').addEventListener('click', () => game.exitPlace());
   // mappa a barra: 300 m dietro, 2,7 km davanti; scorre mentre si guida
+  // segni della polizia sulla mappa in basso (16×16 a pixel netti): volante coi lampeggianti che alternano blu e rosso, posto di controllo (sbarra a strisce
+  // con la luce), posto di blocco (due volanti affiancate), autovelox (palo con la cassetta quadrata), Tutor (palo con la telecamera, spia verde all'inizio e rossa alla fine)
+  const MM_SVG = (b) => `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">${b}</svg>`;
+  const MM_CAR = (x, w) => `<rect x="${x}" y="9" width="${w}" height="3" fill="#f2f4f8"/><rect x="${x + 1}" y="7" width="${w - 2}" height="2" fill="#f2f4f8"/><rect x="${x + 1}" y="10" width="${w - 2}" height="1" fill="#1c3cff"/><rect x="${x + 2}" y="7" width="1" height="1" fill="#243a5e"/><rect x="${x + w - 3}" y="7" width="1" height="1" fill="#243a5e"/><rect x="${x + 1}" y="12" width="2" height="2" fill="#111"/><rect x="${x + w - 3}" y="12" width="2" height="2" fill="#111"/>`;
+  const MM_ICON = {
+    patrol: MM_SVG(`<rect x="1" y="8" width="14" height="4" fill="#f2f4f8"/><rect x="3" y="5" width="9" height="3" fill="#f2f4f8"/><rect x="4" y="6" width="3" height="2" fill="#243a5e"/><rect x="8" y="6" width="3" height="2" fill="#243a5e"/><rect x="1" y="10" width="14" height="1" fill="#1c3cff"/><rect x="5" y="2" width="2" height="3" class="lb1"/><rect x="8" y="2" width="2" height="3" class="lb2"/><rect x="3" y="12" width="3" height="3" fill="#111"/><rect x="10" y="12" width="3" height="3" fill="#111"/>`),
+    check: MM_SVG(`<rect x="1" y="6" width="14" height="4" fill="#f2f2f2"/><rect x="2" y="6" width="2" height="4" fill="#d9222a"/><rect x="6" y="6" width="2" height="4" fill="#d9222a"/><rect x="10" y="6" width="2" height="4" fill="#d9222a"/><rect x="2" y="10" width="2" height="5" fill="#555"/><rect x="12" y="10" width="2" height="5" fill="#555"/><rect x="6" y="2" width="2" height="3" class="lb1"/><rect x="8" y="2" width="2" height="3" class="lb2"/>`),
+    block: MM_SVG(`${MM_CAR(0, 7)}${MM_CAR(9, 7)}<rect x="2" y="4" width="1" height="3" class="lb1"/><rect x="4" y="4" width="1" height="3" class="lb2"/><rect x="11" y="4" width="1" height="3" class="lb1"/><rect x="13" y="4" width="1" height="3" class="lb2"/>`),
+    velox: MM_SVG(`<rect x="7" y="9" width="2" height="7" fill="#7d8590"/><rect x="2" y="0" width="12" height="10" fill="#101216"/><rect x="3" y="1" width="10" height="8" fill="#bfc5ce"/><rect x="3" y="1" width="10" height="2" fill="#ff8a1a"/><rect x="4" y="4" width="4" height="4" fill="#0d1224"/><rect x="5" y="5" width="1" height="1" fill="#6fa8ff"/><rect x="10" y="4" width="2" height="4" fill="#ffd75a"/><rect x="6" y="14" width="4" height="2" fill="#e8c020"/>`),
+    tutor0: MM_SVG(`<rect x="7" y="8" width="2" height="8" fill="#7d8590"/><rect x="1" y="1" width="12" height="7" fill="#101216"/><rect x="2" y="2" width="10" height="5" fill="#2a4fb8"/><rect x="3" y="3" width="3" height="3" fill="#9fe7ff"/><rect x="9" y="3" width="2" height="2" fill="#39ff7a"/><rect x="6" y="14" width="4" height="2" fill="#e8c020"/>`),
+    tutor1: MM_SVG(`<rect x="7" y="8" width="2" height="8" fill="#7d8590"/><rect x="1" y="1" width="12" height="7" fill="#101216"/><rect x="2" y="2" width="10" height="5" fill="#2a4fb8"/><rect x="3" y="3" width="3" height="3" fill="#9fe7ff"/><rect x="9" y="3" width="2" height="2" fill="#ff4030"/><rect x="6" y="14" width="4" height="2" fill="#e8c020"/>`),
+  };
+  MM_ICON.tail = MM_ICON.alcol = MM_ICON.chase = MM_ICON.patrol;
   function renderMiniMap() {
     const tr = $('mmTrack'), d = game.s.dist, back = 300, ahead = 2700, span = back + ahead;
     const pos = (x) => ((x - d + back) / span * 100).toFixed(2) + '%';
@@ -2599,12 +2624,18 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const add = (x, txt, bg, cls = '', title = '') => { const i = document.createElement('i'); i.className = 'mm-pin ' + cls; i.textContent = txt; i.style.left = pos(x); if (bg) i.style.background = bg; if (title) i.title = title; tr.appendChild(i); };
     const next = {};
     for (const p of game.placesBetween(d - back, d + ahead)) { add(p.x, PLACE_ICON[p.id], p.col, p.x - d > 1500 ? 'far' : '', p.name); if (p.x - d > -5 && !next[p.id]) next[p.id] = p; }
-    for (const e of game.ents) {
-      if (e.kind === 'drop' && e.x - d > -back) add(Math.min(e.x, d + ahead - 30), 'C', '#b8ff3a', '', 'Consegna');
-      if (e.kind === 'police' && !e.chase && e.x - d > -back && e.x - d < 450) add(e.x, '!', null, 'police', 'Polizia');
+    for (const e of game.ents) if (e.kind === 'drop' && e.x - d > -back) add(Math.min(e.x, d + ahead - 30), 'C', '#b8ff3a', '', 'Consegna');
+    // la polizia (polizia.js, polMap): pattuglie, posti di controllo e di blocco, volanti che ti inseguono, autovelox e Tutor (inizio, fine e il tratto in mezzo)
+    let nearPol = null;
+    if (game.polMap) for (const q of game.polMap(d - back, d + ahead)) {
+      if (q.t === 'span') {
+        const l = Math.max(0, (q.x - d + back) / span), r = Math.min(1, (q.x2 - d + back) / span), i = document.createElement('i');
+        i.className = 'mm-span' + (d > q.x && d < q.x2 ? ' in' : ''); i.title = q.name; i.style.left = (l * 100).toFixed(2) + '%'; i.style.width = ((r - l) * 100).toFixed(2) + '%'; tr.appendChild(i); continue;
+      }
+      const i = document.createElement('i'); i.className = 'mm-pin ico ' + q.t + (q.x - d > 1500 ? ' far' : ''); i.title = q.name; i.innerHTML = MM_ICON[q.t] || MM_ICON.patrol; i.style.left = pos(q.x); tr.appendChild(i);
+      if (q.x > d && q.t !== 'tutor1' && (!nearPol || q.x < nearPol.x)) nearPol = q;
     }
-    // autovelox (V) e Tutor (T inizio e fine), da polizia.js: si vedono da lontano, così si sa dove si può tirare
-    if (game.polPins) for (const q of game.polPins(d - back, d + ahead)) add(q.x, q.t, q.end ? '#7f8aa8' : '#ff9a2e', q.x - d > 1500 ? 'far' : '', q.name);
+    else if (game.polPins) for (const q of game.polPins(d - back, d + ahead)) add(q.x, q.t, q.end ? '#7f8aa8' : '#ff9a2e', q.x - d > 1500 ? 'far' : '', q.name);
     // il Viaggio: la meta del lavoro in corso (bandierina che pulsa; oltre la barra resta sul bordo con la distanza)
     // e le soste dove vanno consegnati scatole e bancali caricati
     if (game.s.vg && typeof VG !== 'undefined') {
@@ -2623,6 +2654,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     const low = sim.fuel * sim.P.tank < 15;
     const parts = ['fuel', 'shop', 'niko', 'style', 'dealer', 'junk', 'motori'].filter((k) => next[k]).map((k) => `<b style="color:${next[k].col}">${PLACE_ICON[k]}</b> ${next[k].what} ${fmtDist(next[k].x - d)}`);
+    if (nearPol && nearPol.x - d < 1500) parts.push(`<b style="color:${nearPol.t === 'velox' ? '#ff9a2e' : nearPol.t === 'tutor0' ? '#6c9bff' : '#ff6a7a'}">${nearPol.t === 'velox' ? 'Autovelox' : nearPol.t === 'tutor0' ? 'Tutor' : nearPol.t === 'check' ? 'Controllo' : nearPol.t === 'block' ? 'Blocco' : 'Polizia'}</b> ${fmtDist(nearPol.x - d)}`);
     const html = (low ? '<b style="color:var(--warn)">Riserva!</b> ' : '') + parts.join(' · ');
     if ($('mmNext').innerHTML !== html) $('mmNext').innerHTML = html;
   }

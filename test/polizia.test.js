@@ -125,7 +125,7 @@ test('polizia: da ricercato le altre pattuglie non ti fanno accostare, ti insegu
   assert.equal(game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }), true);
 });
 
-test('polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 km, e il verbale arriva dopo', () => {
+test('polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 km, e la multa arriva subito', () => {
   const { game } = trip(); const S = game.polState();
   for (let k = 0; k < 200; k++) { game.s.dist += 1000; game.polPlan(); }
   const xs = []; let free = 0;
@@ -136,16 +136,59 @@ test('polizia: autovelox e Tutor sono pochi, a volte con tratti liberi di 7-12 k
   assert.ok(Math.min(...xs) >= 2.4, 'mai uno sopra l\'altro');
   assert.ok(free / xs.length > 0.2 && free / xs.length < 0.5, 'tratti liberi ogni tanto: ' + free / xs.length);
   assert.ok(S.ctl.length > 0);
-  // autovelox: a 160 scatta, il verbale arriva qualche km dopo
+  // autovelox: a 160 scatta e la multa arriva subito (niente verbale che aspetta qualche km)
   const { game: g } = trip(); g.polState().nextKm = 1e9; g.polState().ctl = [{ k: 'velox', x: g.s.dist + 30 }];
   const m = g.s.money; run(g, 1.5, 160 / 3.6);
-  assert.equal(g.polState().verb.length, 1); assert.equal(g.s.money, m, 'non subito');
-  g.s.dist += 6000; g.update(1 / 30); assert.equal(g.s.money, m - 173);
+  assert.equal(g.polState().verb.length, 0, 'nessun verbale in attesa'); assert.equal(g.s.money, m - 173, 'multa subito');
   // Tutor: conta la media, non la punta
   const { game: t } = trip(); t.polState().nextKm = 1e9; t.polState().ctl = [{ k: 'tutor', x: t.s.dist + 10, x2: t.s.dist + 1010 }];
   run(t, 4, 40); run(t, 30, 30);                                // una punta a 144 e poi 108: media sotto i 136
-  assert.equal(t.polState().verb.length, 0);
+  assert.equal(t.polState().verb.length, 0); const mt = t.s.money;
+  assert.equal(t.s.money, mt, 'sotto la media non si paga');
+  // Tutor: tutto a 160 per 1.000 m, e alla fine (subito) la multa, con il lampo della telecamera di fine tratto
+  const { game: u } = trip(); u.polState().nextKm = 1e9; u.polState().ctl = [{ k: 'tutor', x: u.s.dist + 10, x2: u.s.dist + 1010 }];
+  const mu = u.s.money; run(u, 26, 160 / 3.6);
+  assert.equal(u.s.money, mu - 173, 'multa alla fine del tratto'); assert.equal(u.polState().verb.length, 0);
+  assert.ok(u.ents.some((o) => o.kind === 'tutor' && o.end && o.flashT !== undefined), 'la telecamera di fine tratto ha lampeggiato');
   assert.ok(t.polPins(t.s.dist - 5000, t.s.dist + 5000).length >= 0);
+});
+
+test('polizia: il posto di controllo non ti ferma e non ti insegue: passi e ti multano (documenti e velocità); da ricercato niente multa, ti inseguono', () => {
+  const posto = (game, dx = 5) => { const e = { id: 700 + dx, kind: 'police', lane: 1, x: game.s.dist + dx, v: 0, busy: true, still: true, hazard: true }; game.ents.push(e); return e; };
+  // in regola e piano: niente
+  { const { game } = trip(); game.docRnd = () => 0; game.sim.v = 30 / 3.6; const m = game.s.money; posto(game); game.update(1 / 30);
+    assert.equal(game.s.money, m); assert.ok(!game.pol.stop); assert.ok(!game.ap); }
+  // documenti scaduti: multa subito, senza fermarti né far partire una volante che ti segue
+  { const { game } = trip(); game.docRnd = () => 0; game.docs().ass = 0; game.sim.v = 30 / 3.6; const m = game.s.money; const e = posto(game); game.update(1 / 30);
+    assert.equal(game.s.money, m - DOC.multa.ass); assert.ok(!game.pol.stop); assert.ok(!game.ap); assert.ok(!e.chase, 'nessuna volante che ti insegue'); assert.ok(!game.prompt);
+    assert.equal(game.s.heat, 1); }
+  // velocità: la vedono sempre, anche se i documenti non li guardano questa volta
+  { const { game } = trip(); game.docRnd = () => 0.99; const m = game.s.money; posto(game, 30); run(game, 1.5, 160 / 3.6);
+    assert.equal(game.s.money, m - 170); assert.ok(!game.pol.stop); assert.ok(!game.ap); }
+  // da ricercato: nessuna multa al posto di controllo (ti inseguono e basta)
+  { const { game } = trip(() => 0.9); game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
+    game.pol.rinfT = 1e9; const m = game.s.money; posto(game, 30); run(game, 1.5, 200 / 3.6);
+    assert.equal(game.polState().fuga, true); assert.ok(!game.pol.stop);
+    assert.ok(game.s.money >= m - 1, 'nessuna multa da ricercato: ' + (m - game.s.money)); }
+});
+
+test('polizia: la mappa in basso conosce pattuglie, posti di controllo e di blocco, inseguitori, autovelox e Tutor', () => {
+  const { game } = trip(); const d = game.s.dist, S = game.polState(); S.nextKm = 1e9;
+  S.ctl = [{ k: 'velox', x: d + 700 }, { k: 'tutor', x: d + 1000, x2: d + 2300 }];
+  game.ents.push({ id: 801, kind: 'police', lane: 1, x: d + 300, v: 0, busy: true, still: true, hazard: true });     // posto di controllo
+  game.ents.push({ id: 802, kind: 'police', lane: 0, x: d + 520, v: 0 });                                            // pattuglia ferma
+  game.ents.push({ id: 803, kind: 'police', lane: 1, x: d + 1300, v: 0, busy: true, still: true, hazard: true, block: true });
+  game.ents.push({ id: 804, kind: 'police', lane: 2, x: d + 1303, v: 0, busy: true, still: true, hazard: true, block: true });   // le due del blocco sono un segno solo
+  game.ents.push({ id: 805, kind: 'police', lane: 1, x: d + 900, v: 20, chase: true });                              // quella che ti sta fermando non c'è
+  const m = game.polMap(d - 300, d + 2700), tipi = m.map((q) => q.t).sort();
+  assert.deepEqual(tipi, ['block', 'check', 'patrol', 'span', 'tutor0', 'tutor1', 'velox']);
+  const span = m.find((q) => q.t === 'span'); assert.equal(span.x2 - span.x, 1300); assert.match(span.name, /1,3 km/);
+  // ricercato: le volanti che ti inseguono sono dietro di te (anche fuori dall'elenco della strada)
+  S.fuga = true; game.pol.cs = [{ e: { x: d - 120 }, gap: 120 }, { e: { x: d - 500 }, gap: 500 }];
+  const ch = game.polMap(d - 300, d + 2700).filter((q) => q.t === 'chase'); assert.equal(ch.length, 1); assert.equal(Math.round(d - ch[0].x), 120);
+  // volante in coda e con l'etilometro
+  game.ents.push({ id: 806, kind: 'police', lane: 1, x: d - 50, v: 25, tail: true }, { id: 807, kind: 'police', lane: 0, x: d + 150, v: 0, alcol: true });
+  const t2 = game.polMap(d - 300, d + 2700).map((q) => q.t); assert.ok(t2.includes('tail') && t2.includes('alcol'));
 });
 
 test('polizia: la pattuglia in coda ti ferma solo se passi i 136', () => {
