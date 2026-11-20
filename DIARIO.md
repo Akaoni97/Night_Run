@@ -219,6 +219,22 @@ due voci, e il controllo della sera le legge.
 - Aperto: gli epiloghi A, C, D non li ho toccati (sono trama); il punto 4 (obiettivo vicino) da spiegare meglio.
 - Da provare sul PC: grandezza delle spie sul quadro, volume della sirena.
 
+## 20/11/2026 notte · proprietario (joystick, volante e pedali)
+- Fatto: `joystick.js`. Il gioco leggeva solo il PRIMO dispositivo collegato e presumeva la mappa «standard»: con cambio a H, scheda pedali e pad insieme prendeva il
+  cambio (niente assi) e il resto sembrava morto. Ora i comandi si assegnano premendo/muovendo il controllo giusto (Impostazioni → Comandi → Joystick e volante),
+  ognuno su un dispositivo diverso, pedali calibrati, cambio a H (una marcia per pulsante, folle a nessuno premuto). Di serie vale solo il pad standard.
+  `strumenti/prova_joystick.html` mostra cosa vede il browser. 7 test nuovi, 241 in tutto; provato nel browser con tre dispositivi finti (Hsifter, Maple, pad Xbox).
+- Aperto: provarlo con i dispositivi veri (pedali Maple: quale asse è quale; cambio a H nel manuale con la frizione); nell'automatico solo la R del cambio a H serve.
+
+## 19/11/2026 notte · proprietario (storia: blocco Elena di Codex)
+- Fatto: integrato il pacchetto di Codex per Elena (`materiale5_01_*`, 8 file; rapporto in `docs/storia/RAPPORTO_CODEX_5_01_ELENA.md`). Dieci scene
+  nuove (80 nodi, 124 risposte, ognuna con uno scontro: Pasta, Turno, Coinquilino, Cena, Bollette, Richiamo, Distanza, Riparazione, Nonno, Cena di ritorno)
+  al posto di 96 vecchi nodi; prima sera e litigio restano come erano. Elena si apre alle soglie 25/50/75/100. `chat_dati.js`: 908 nodi, identico alla
+  prova di Codex. L'importatore ora applica `rimuovi_nodi` e `sostituisci_unlock` (nuova attivazione: `materiale5_01_ingressi.json`). 183 test, cinque
+  adattati a mano (Elena non parte più dai chilometri; ritirate le `V2_ELE_n*` e `s*`).
+- Aperto: provarla giocando (scene e battute), approvare i dettagli [P1-P4] del rapporto (sedia, trapano, conto, piatto); i vecchi salvataggi con una chat
+  aperta su un nodo ritirato non sono migrati (partita nuova). Blocchi B (Rosa e Livia), C (tre soste), D (presenza), E (contesti) ancora da fare a Codex.
+
 ## 19/11/2026 sera · cognato (inseguimenti)
 - Fatto: da ricercato le volanti si sommano (quelle che bruci e i rinforzi da dietro) e ti fermano solo tagliandoti la
   strada: ti superano, ti si piazzano davanti, inchiodano fino a 50; sotto i 60 con una davanti ti prendono (multone,
@@ -232,6 +248,16 @@ due voci, e il controllo della sera le legge.
   bruci ti insegue; si semina solo entrando in un locale o negozio, e lì il ricercato torna a zero (`polizia.js`).
 - Aperto: l'inseguimento non ti prende più mai, quindi la multa da fuga oggi non arriva; dirlo se la si vuole indietro.
 - Serve dal proprietario: provarlo sul PC (inseguimento con sirena, posto di blocco bruciato).
+
+## 19/11/2026 sera · proprietario (storia: le proposte sono nel gioco)
+- Fatto: le tre scene di prova di `docs/storia/REVISIONE_DIALOGHI.md` sono nelle chat. Elena, la prima sera (`ELE_ritiro_*`: temperino, trapano,
+  bugia «domani la vendo», rinfaccio) e il litigio (`ELE_litigio_*`: ventisei ore di silenzio, niente scuse di manuale, riparazione più avanti col flag
+  `elena_litigio`). Rosa e Livia in vivavoce (`ROS_vivavoce_*`, dopo il passato di Rosa). Dario (nuovo, [P]): il vero rinfaccia il trasloco saltato,
+  la presenza lo imita più avanti (`ev_imitazione_dario`, Lisbona) e gli dà ragione subito: è il segno. Tutto da `materiale_chat/materiale4_01_*.txt`
+  con l'importatore (`chat_dati.js` rigenerato, 1004 nodi); 180 test, uno nuovo per ogni regola (scelte finte, litigio, Dario, vivavoce).
+- Ritirate: `V2_ELE_n3_01` (la foto promessa non esiste più nella nuova scena). Il flag `e08c` ora lo dà il «non mi va di spiegarlo» del litigio.
+- Aperto: riscrivere il resto di Elena (altri 30 nodi di cortesie), Rosa, Livia e la presenza con le stesse regole; le tre soste di Codex nei file
+  dedicati; le scene nel mondo (furgone di Rosa, banco pacchi, motel, piazzola). Serve dal cognato: approvare i fatti [P] (Dario, trapano, trasloco).
 
 ## 19/11/2026 pomeriggio · cognato (pubblicazione)
 - Fatto: `docs/pubblicazione/PERCORSO.md`, il percorso per farne un gioco da installare (Electron, niente riscritture),

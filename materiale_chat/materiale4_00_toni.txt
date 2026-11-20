@@ -1,0 +1,25 @@
+TONI DELLE RISPOSTE NUOVE (revisione dei dialoghi). Si aggiunge in coda alla tabella di materiale3_01_toni.txt: le righe dopo valgono sopra.
+ELE_ritiro_01 · A sincero · B evasivo · C freddo
+ELE_ritiro_02 · A sincero · B freddo
+ELE_ritiro_03 · A gentile · B ironico
+ELE_ritiro_04 · A pacato
+ELE_ritiro_05 · A sincero · B freddo
+ELE_ritiro_06 · A sincero · B freddo · C freddo
+ELE_ritiro_07 · A gentile · B evasivo
+ELE_ritiro_07b · A gentile · B evasivo
+ELE_ritiro_07c · A gentile · B evasivo
+ELE_litigio_01 · A freddo · B sincero · C sincero
+ELE_litigio_02 · A freddo · B gentile
+ELE_litigio_03 · A ironico · B sincero
+ELE_litigio_04 · A freddo · B sincero
+ELE_litigio_05 · A gentile · B freddo
+ELE_litigio_06 · A evasivo · B sincero
+ROS_vivavoce_01 · A sincero · B pacato · C evasivo
+DAR_traslochi_01 · A gentile · B evasivo
+DAR_traslochi_02 · A evasivo · B sincero · C freddo
+DAR_traslochi_03 · A freddo · B sincero
+DAR_traslochi_04 · A sincero · B freddo
+DAR_traslochi_05 · A freddo · B sincero
+DAR_imit_01 · A pacato · B pacato · C freddo
+DAR_imit_02 · A sincero · B gentile
+DAR_imit_03 · A sincero · B gentile
