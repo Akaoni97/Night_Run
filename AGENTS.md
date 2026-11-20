@@ -122,6 +122,9 @@ Strumenti: `node strumenti/prova.js [--mob] [--out cartella] passo...` (per esem
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
 `node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore|urti|scoppi> <file.wav> [vista] [ambiente]`
 (variabili `PRESET=<id>` per la preparazione, `POPS=1` per accendere gli scoppi, `CARATTERE=codex` per il carattere deciso).
+Partita intera a tempo accelerato: `node strumenti/giocatore.js --km 200 --out cartella` (un giocatore automatico prudente:
+lavori, missioni, benzina, cibo, motel, Mario, documenti; non compra auto né pezzi; diario in `diario.json`, ~25 minuti veri
+per 200 km). Serve a misurare ritmo ed economia dopo un cambio di prezzi o paghe.
 
 ## Plugin ECC (Everything Claude Code)
 `.claude/settings.json` attiva il plugin `ecc@ecc` (repository `affaan-m/everything-claude-code`): aprendo la

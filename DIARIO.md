@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 sera · proprietario (**prova dei primi 200 km col giocatore automatico**)
+- Fatto: `strumenti/giocatore.js` gioca una partita nuova del Viaggio da solo a tempo accelerato (~6×: 200 km in 25
+  minuti veri) e scrive il diario (soldi, spese, lavori, bisogni, eventi). Due partite da 200 km, nessun errore.
+  Risultati e decisioni in `SOSPESI.md` (economia, rimorchio che blocca le missioni, missione da 38 km, danni).
+- Per il cognato: si può rilanciare dopo ogni cambio di prezzi o paghe (`--km`, `--vel`, `--guida`).
+
 ## 20/11/2026 sera · proprietario (**tutti gli interni in alta definizione**)
 - Fatto: come il bar, anche benzinaio, Sosta 24, motel, Mario, Luca, Neon Kustom, Autosalone e sfascio (`interni_hd.js`):
   doppia densità, profondità, materiali, luci, persone disegnate come il protagonista e **scritte leggibili** (carattere 5×7:
