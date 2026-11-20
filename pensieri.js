@@ -18,7 +18,7 @@ const PENS_KM = [
   { km: 18, id: 'cartello', text: 'Sono sicuro di aver già visto quel cartello. Forse no.' },
 ];
 // [soglia del livello 1, soglia del livello 2]: sotto la prima parla presto, sotto la seconda con urgenza
-const PENS_SOGLIE = { food: [0.45, 0.2], water: [0.45, 0.2], sleep: [0.45, 0.2], wash: [0.35, 0.15] };
+const PENS_SOGLIE = { food: [0.45, 0.2], water: [0.45, 0.2], sleep: [0.45, 0.2], wash: [0.35, 0.15], pee: [0.4, 0.15], poo: [0.4, 0.15] };
 const PENS_BISOGNI = {
   food: [
     ['Lo stomaco comincia a farsi sentire.', 'Un panino non mi farebbe schifo.', 'Non mangio da un po\'. Al prossimo bar mi fermo.', 'Ho un buco allo stomaco.', 'Speriamo che il prossimo bar sia aperto: ho fame.'],
@@ -35,6 +35,14 @@ const PENS_BISOGNI = {
   wash: [
     ['Avrei bisogno di una doccia.', 'Mi sento appiccicoso. Una doccia ci starebbe.'],
     ['Faccio schifo anche a me stesso.', 'Mi sento uno straccio sporco.'],
+  ],
+  pee: [
+    ['Un bagno non mi dispiacerebbe.', 'Ho bevuto troppo. Al prossimo locale mi fermo.'],
+    ['Non resisto più: o trovo un bagno o mi fermo in mezzo alla strada.', 'Se non arrivo al prossimo locale faccio una sciocchezza.'],
+  ],
+  poo: [
+    ['Sento che il corpo vuole fare il suo mestiere. Un bagno vero, però.', 'Mi servirà un bagno, prima o poi.'],
+    ['Devo andare in bagno. Adesso. Non è una richiesta.', 'Stringo i denti. Il prossimo locale è la mia salvezza.'],
   ],
 };
 // a caso, ogni tanto, mentre si guida: ognuno una sola volta per partita

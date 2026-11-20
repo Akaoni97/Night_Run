@@ -49,7 +49,7 @@
   // ---- bisogni, benzina, danni: una volta (riempi, ripara) o sempre (infiniti, indistruttibile: si rimettono al massimo ogni 0,3 s)
   function riempi() {
     const g = G(); if (!g) return false;
-    const N = g.s.vg && g.s.vg.needs; if (N) { N.food = N.water = N.sleep = N.wash = 1; }
+    const N = g.s.vg && g.s.vg.needs; if (N) { N.food = N.water = N.sleep = N.wash = N.pee = N.poo = 1; }
     g.sim.fuel = 1; save(); return true;
   }
   function ripara() {
@@ -60,7 +60,7 @@
   const devSet = (k, v) => { dev[k] = !!v; try { localStorage.setItem(DEVK, JSON.stringify(dev)); } catch (e) { /* ignora */ } };
   setInterval(() => {
     const g = G(); if (!g || !g.sim) return;
-    if (dev.bisogni) { const N = g.s.vg && g.s.vg.needs; if (N) { N.food = N.water = N.sleep = N.wash = 1; } g.sim.fuel = 1; }
+    if (dev.bisogni) { const N = g.s.vg && g.s.vg.needs; if (N) { N.food = N.water = N.sleep = N.wash = N.pee = N.poo = 1; } g.sim.fuel = 1; }
     if (dev.indistruttibile) { g.sim.damage = 0; g.sim.tireWear = 0; }
   }, 300);
   // ---- meteo e ora: gli stessi selettori delle Impostazioni

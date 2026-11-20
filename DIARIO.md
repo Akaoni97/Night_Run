@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.57 (**pipì e cacca**)
+- Fatto: due bisogni nuovi nel quadro (🚽 e 💩) e nei pensieri. Solo col tempo: la pipì si svuota in 12 «ore di viaggio», la cacca in 24, e un'ora di viaggio vale 3 minuti veri (`VG_BAGNO` in `viaggio.js`: l'orologio del gioco corre a 3 minuti per secondo e a ore di gioco vere sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca. Il bagno è gratis in bar, autogrill, benzinaio e motel. A zero fuori da un locale te la fai addosso e l'igiene crolla. 4 test nuovi (265).
+- Aperto: i tempi sono da provare (pipì ogni ~36 min veri, cacca ogni ~72): si cambiano in `VG_BAGNO`.
+
 ## 21/11/2026 · proprietario · v0.56 (**Sviluppatori: cinque strumenti in più**)
 - Fatto: scheda Sviluppatori con **Vai a** (km o prossima tappa di ogni tipo), **Bisogni e benzina** (riempi, o infiniti), **Danni e usura** (ripara, o indistruttibile), **Meteo e ora** (pulsanti), **Storia e telefono** (flag di chat/storia, tutte le app, L'ultima porta). Le spunte si ricordano nel browser (`nr_dev`). Provati nel browser, senza errori in console.
 - Aperto: nessun test automatico per questi strumenti (usano la pagina); li copre la prova a mano.

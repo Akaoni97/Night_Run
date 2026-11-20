@@ -20,6 +20,9 @@ function vgTesto(game, text) {
   const low = art.endsWith("'") ? art + nome : art + ' ' + nome, cap = low.charAt(0).toUpperCase() + low.slice(1);
   return text.replace(/\{Auto\}/g, cap).replace(/\{auto\}/g, low).replace(/\{tipo\}/g, tipo);
 }
+// pipì e cacca: ore «di viaggio» per svuotarsi del tutto (pipì 12, cacca 24); un'ora di viaggio = minPerOra minuti veri (l'orologio del gioco
+// corre a 3 minuti per secondo, ma così sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca.
+const VG_BAGNO = { pipiOre: 12, cacaOre: 24, minPerOra: 3 };
 const VG_PATTERN = ['bar', 'fuel', 'grill', 'niko', 'bar', 'motel', 'fuel', 'shop', 'bar', 'grill', 'style', 'motel'];
 const VG_BARS = ['Bar Sport', 'Bar della Curva', 'Caffè del Ponte', 'Bar Stella', 'Bar dei Camionisti', 'Bar Luna', 'Caffè Centrale', 'Bar Ultima Sosta'];
 const VG_PLACE = {
@@ -123,7 +126,7 @@ const VG_STORY_PAX = [];
 
 // ---------------------------------------------------------------- stato
 function vgFresh() {
-  return { on: true, needs: { food: 0.9, water: 0.9, sleep: 0.95, wash: 0.9 }, cassa: [], garage: ['v40'], owned: {}, trailer: false, trailerOn: false,
+  return { on: true, needs: { food: 0.9, water: 0.9, sleep: 0.95, wash: 0.9, pee: 1, poo: 1 }, cassa: [], garage: ['v40'], owned: {}, trailer: false, trailerOn: false,
     pax: [], seen: {}, chapters: {}, stops: 0, fuelStops: 0, lastKm: 0, nextHitch: 1.2, nextOdd: 8, oddCount: 0, lastMotel: -1, sleepAt: null,
     jobs: 0, earned: 0, line: null, horrorT: 0, glitch: 0, blackout: 0, again: null };
 }
@@ -208,6 +211,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       const N = v.needs;
       if (d.food) N.food = Math.min(1, N.food + d.food);
       if (d.water) N.water = Math.min(1, N.water + d.water);
+      if (d.water) N.pee = Math.max(0, (N.pee ?? 1) - d.water * 0.2);
+      if (d.food) N.poo = Math.max(0, (N.poo ?? 1) - d.food * 0.12);
       if (d.sleep) N.sleep = Math.min(1, N.sleep + d.sleep);
       if (d.wash) N.wash = Math.min(1, N.wash + d.wash);
       this.s.trunk.splice(i, 1); this.applyMass();
@@ -330,15 +335,23 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     }
     // bisogni: con i km e col tempo (di più a motore acceso)
     const N = v.needs, t = dt / 60;
+    if (!(N.pee >= 0)) N.pee = 1; if (!(N.poo >= 0)) N.poo = 1;       // vecchi salvataggi: nascono tranquilli
     const tired = 1 + (v.sleepAt !== null && km - v.sleepAt > 150 ? 0.5 : 0);
     N.food = Math.max(0, N.food - dkm / 60 - t * 0.003);
     N.water = Math.max(0, N.water - dkm / 45 - t * 0.004);
     N.sleep = Math.max(0, N.sleep - dkm / 140 * tired - t * 0.002);
     N.wash = Math.max(0, N.wash - dkm / 180 - t * 0.001);
+    // pipì e cacca: solo col tempo (non coi km), piano piano; 1 = tranquillo, 0 = non ce la fai più (come gli altri bisogni)
+    N.pee = Math.max(0, N.pee - t / (VG_BAGNO.pipiOre * VG_BAGNO.minPerOra));
+    N.poo = Math.max(0, N.poo - t / (VG_BAGNO.cacaOre * VG_BAGNO.minPerOra));
+    for (const k of ['pee', 'poo']) if (N[k] <= 0 && !this.inside) {      // a zero, fuori da un locale: te la fai addosso
+      N[k] = 0.6; N.wash = Math.max(0, N.wash - 0.5); v['warn' + k] = 0;
+      this.say(k === 'pee' ? 'Non ce l\'hai fatta: te la sei fatta addosso. Che vergogna.' : 'Non ce l\'hai fatta. Meglio non pensarci: ti serve una doccia.', 'bad');
+    }
     const low = Math.min(N.food, N.water, N.sleep);
-    for (const k of ['food', 'water', 'sleep', 'wash']) {
+    for (const k of ['food', 'water', 'sleep', 'wash', 'pee', 'poo']) {
       const was = v['warn' + k] || 0, lvl = N[k] < 0.08 ? 2 : N[k] < 0.25 ? 1 : 0;
-      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'] }[k][lvl - 1], 'bad');
+      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'], pee: ['Ti scappa la pipì', 'Non ce la fai più: cerca un bagno'], poo: ['Ti serve un bagno, e non per lavarti le mani', 'Devi andare in bagno. Subito.'] }[k][lvl - 1], 'bad');
       v['warn' + k] = lvl;
     }
     // sonno: colpi di sonno sempre più frequenti; a zero ti addormenti
@@ -528,7 +541,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
   P.vgEat = function (food, water, eur, what) {
     const r = this.vgPay(eur, what); if (!r.ok) return r;
-    const N = this.s.vg.needs; N.food = Math.min(1, N.food + food); N.water = Math.min(1, N.water + water); return r;
+    const N = this.s.vg.needs; N.pee = Math.max(0, (N.pee ?? 1) - water * 0.2); N.poo = Math.max(0, (N.poo ?? 1) - food * 0.12); N.food = Math.min(1, N.food + food); N.water = Math.min(1, N.water + water); return r;
+  };
+  // il bagno (bar, autogrill, benzinaio, motel): gratis. kind 'pee' o 'poo'
+  P.vgBagno = function (kind) {
+    const v = this.s.vg; if (!v || (kind !== 'pee' && kind !== 'poo')) return { ok: false };
+    const N = v.needs, was = N[kind] ?? 1; N[kind] = 1; v['warn' + kind] = 0;
+    this.say(was > 0.85 ? 'Non ti scappava davvero, ma ormai sei qui.' : kind === 'pee' ? 'Che sollievo.' : 'Sollevato. Una vita nuova.', 'info');
+    return { ok: true, was };
   };
   P.vgShower = function (eur) { const r = this.vgPay(eur, 'Doccia'); if (r.ok) this.s.vg.needs.wash = 1; return r; };
   P.vgSleep = function () {
