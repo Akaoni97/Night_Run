@@ -7,9 +7,9 @@ Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
 Aggiornata il 20/11/2026 sera (check completo del gioco, 43/55, col proprietario).
 
 ## Da decidere insieme
-- [interni] **Lo stile del bar nuovo** (prototipo in `interni_hd.js`): se piace, si rifanno uno alla volta benzinaio,
-  Sosta 24, motel, Mario, Neon Kustom, Autosalone, sfascio e Luca (questo col cognato, per Nico). Le persone usano la
-  pixel art del protagonista, più grossa del resto della scena: rifarle più fini è un lavoro a parte. (proprietario)
+- [interni] **Gli interni nuovi** (tutti e nove in `interni_hd.js`): da guardare sul PC. Le persone usano la pixel art
+  del protagonista, più grossa del resto della scena: rifarle più fini è un lavoro a parte. Nico da Luca: lo disegna il
+  cognato quando decide com'è. (proprietario, cognato per Nico)
 - [motori] **Vendere la V40 coi pezzi di Nico montati**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o
   alzano il valore dell'auto all'Autosalone e allo sfascio? (cognato)
 - [motori] **Estendere i pezzi singoli alle altre auto** (oggi solo la V40, `MOT_SERIE` in `pistone/motori.js`). Per

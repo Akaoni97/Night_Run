@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 sera · proprietario (**tutti gli interni in alta definizione**)
+- Fatto: come il bar, anche benzinaio, Sosta 24, motel, Mario, Luca, Neon Kustom, Autosalone e sfascio (`interni_hd.js`):
+  doppia densità, profondità, materiali, luci, persone disegnate come il protagonista e **scritte leggibili** (carattere 5×7:
+  prezzi a led, cartelli, menu, chiavi, calendario, CV del banco, prezzo in vetrina). Le scene vecchie restano (`_vecchio`).
+- Per il cognato: da Luca c'è solo Luca; Nico lo aggiungi tu quando decidi come è fatto (`HD.shop` in `interni_hd.js`).
+
 ## 20/11/2026 sera · proprietario (**interni più belli: prototipo del bar**)
 - Fatto: il bar rifatto in alta definizione (`interni_hd.js`): doppia densità come la strada, profondità su tre piani,
   materiali e luci vere, barista disegnata come il protagonista che lavora tra caffè e brioche. `interni.js` ora sa

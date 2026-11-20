@@ -809,7 +809,7 @@
   window.NightInterni = {
     SCENE,
     // gli attrezzi di disegno, per le scene scritte in altri file (interni_hd.js)
-    kit: { W, H, rng, R, P, shade, shade2, glow, cone, text, textW, neon, carPic, traffic, rain, drops, frame, clock, bottles, wood, outside, person, BAYER },
+    kit: { W, H, rng, R, P, shade, shade2, glow, cone, text, textW, neon, carPic, traffic, rain, drops, frame, clock, bottles, wood, outside, person, BAYER, dealerCar, junkCar },
     open(place) {
       const id = place && place.id; if (!SCENE[id]) return false;
       mount(); if (!cv) return false;

@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario | Interni in alta definizione: tutti gli altri otto (benzinaio, Sosta 24, motel, Mario, Luca senza Nico, Neon, Autosalone, sfascio) | interni_hd.js (nuovo codice), interni.js (solo lettura) | 20/11 |
