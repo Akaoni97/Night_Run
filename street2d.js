@@ -1984,6 +1984,7 @@ class Street2D {
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);
       const T0 = Math.round((GG.wy - GG.wr - 42 + 15) * k);                       // riferimento per luci e frecce (come le vecchie sagome)
+      e._scr = { left, sy, w, y, k, h: spr.height };                              // dove è finito sullo schermo (il furgone del soccorso, soccorso.js)
       // altezza di fanali e fari: dai dati del disegno (tail/head) se ci sono, altrimenti il riferimento vecchio
       const tY = GG.tail ? Math.round((GG.tail[1] + GG.tail[3] / 2) * k) : T0 + Math.round(35 * k), hY = GG.head ? Math.round(GG.head[1] * k) : T0 + Math.round(36 * k);
       this.light(g, left + w + 50 * k, y - 2, 70 * k, 6, '#fff2c4', 0.06, 3);

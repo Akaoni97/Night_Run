@@ -1,3 +1,19 @@
+## 20/11/2026 notte · proprietario (**v0.53 · elenco delle versioni**)
+- Fatto: `VERSIONI.md` (al posto di `VERSIONE.md`): versione attuale, regola e una riga per ogni versione con giorno, chi e cosa. Da v0.01 a v0.50 è
+  ricostruito dalle voci del diario (approssimato), da v0.51 è esatto. Da qui in poi lo compila chi fa l'intervento, prima di chiuderlo.
+
+## 20/11/2026 notte · proprietario (**v0.52 · conteggio delle versioni**)
+- Fatto: `VERSIONI.md`. Ogni intervento (sessione o pacchetto di modifiche) alza la versione di un passo; si parte da v0.50 (le 50 voci del diario prima
+  di oggi), il soccorso è la v0.51. Regola aggiunta in `AGENTS.md` (regola 1).
+- Aperto: la versione non è ancora mostrata nel gioco (titolo o menu): se la vuoi vedere in Impostazioni, dimmelo.
+
+## 20/11/2026 notte · proprietario (**v0.51 · soccorso stradale: chiami il furgone e ti sistema l'auto**)
+- Fatto: app **Soccorso** nel telefono (`soccorso.js`): scegli uno o più servizi (pieno, carrozzeria, gomme, gomme nuove, manutenzione) col prezzo vero di ciascuno
+  più l'uscita (€ 40). L'auto accosta nella corsia più a destra, il furgone ti supera e si ferma davanti con le quattro frecce, il meccanico scende e lavora
+  (martello, aria, olio, pompa) e l'auto migliora davvero poco per volta; si paga alla fine. Riquadro con le barre e «Accelera ×4». Dal «A secco» si arriva all'app.
+- Aperto: nel gioco non c'è una corsia d'emergenza vera, quindi si lavora nella corsia più a destra (il traffico rallenta per le quattro frecce); il furgone è il
+  `van` del traffico, un carro attrezzi vero verrà dopo. Non provato su telefono in orizzontale (solo il riquadro e l'app, che sono HTML come il resto).
+
 # Diario di Night Run
 
 Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, cosa resta aperto, cosa serve
