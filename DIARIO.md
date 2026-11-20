@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**fiamme secondo il tuning**)
+- Fatto: l'auto ha un livello di preparazione (leggero, medio, spinto: `flameTier` in `fiamme.js`) e da quello dipende la fiammata: leggero fa
+  soprattutto un piccolo **botto** circolare, medio la **fiamma libera** in quattro versioni (classica, doppia lingua, lunga, tozza; arancio e
+  giallo), spinto l'**ossidrica** (getto blu sottile e rapido, diamanti, scintille) e a metà rilascio la fiamma libera. Anche le cambiate
+  danno qualche fiammata sull'auto potenziata. La mappa ECO/FORTE del turbo sposta il livello. Provate nel browser tutte e tre le famiglie.
+- Aperto: il suono dei botti non cambia con il tipo (resta quello del motore audio); le soglie dei livelli vanno sentite giocando.
+
 ## 20/11/2026 notte · proprietario (**turbo vero, scarico, negozio dei pezzi a categorie**)
 - Fatto: la mappa del turbo (ECO / NORMALE / FORTE) cambia i bar in tubo (0,44 / 0,79 / 0,89 con 0,9 di massimo), non solo la coppia; scarico
   aperto più forte (125 %), chiuso più basso (72 %) e senza fiamme; fiammata media al rilascio ai giri medi. Negozio di Luca in schede per
