@@ -4,6 +4,11 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**turbo vero, scarico, negozio dei pezzi a categorie**)
+- Fatto: la mappa del turbo (ECO / NORMALE / FORTE) cambia i bar in tubo (0,44 / 0,79 / 0,89 con 0,9 di massimo), non solo la coppia; scarico
+  aperto più forte (125 %), chiuso più basso (72 %) e senza fiamme; fiammata media al rilascio ai giri medi. Negozio di Luca in schede per
+  categoria (Motore, Turbo e aria, Scarico, Trasmissione, Ruote e telaio) con i pezzi a livelli e un clic per montare (`renderTuneShop`).
+
 ## 20/11/2026 notte · proprietario (**briefing: AUTO 5 s, leva S, tasti, schede di Nico, vernice**)
 - Fatto: AUTO 1 dopo 5 s; leva con la **S** sport (`autoBox` tiene i giri alti); tasti 1-4 solo per mangiare e bere (via le marce dai
   numeri, `tasti.js` aggiornato); pannello di Nico a schede (Livelli, La mia auto, Negozio, Magazzino, Banco, Motori); magazzino pezzi

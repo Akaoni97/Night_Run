@@ -482,6 +482,34 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .qsel { display: flex; gap: 6px; align-items: center; }
 .qsel select { background: #1c1a16; border: 1px solid #3a342a; color: var(--fg); font: 500 12px/1 var(--f-body); padding: 3px 4px; }
 .tgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.tshop { display: grid; gap: 12px; }
+.tg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tg-tab { flex: 1 1 120px; display: grid; gap: 4px; text-align: left; padding: 9px 12px; background: #0e0d0b; border: 1px solid var(--line); color: var(--fg); font: 600 15px/1.1 var(--f-body); cursor: pointer; }
+.tg-tab small { font: 400 10.5px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.tg-tab[aria-selected=true] { border-color: var(--amber); box-shadow: inset 0 0 0 1px rgba(255,179,71,.3); color: var(--amber); }
+.tg-tab[aria-selected=true] small { color: #c9a064; }
+.tg-info { margin: 0; font-size: 13.5px; line-height: 1.45; color: #b6aa92; }
+.tg-info b { color: var(--amber); font-weight: 600; }
+.tg-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 10px; align-items: start; }
+.tcard { background: #0e0d0b; border: 1px solid var(--line); padding: 10px 12px 12px; display: grid; gap: 8px; min-width: 0; }
+.tcard.mod { border-color: #544a3b; box-shadow: inset 0 0 0 1px rgba(255,179,71,.15); }
+.tcard h4 { margin: 0; display: flex; justify-content: space-between; gap: 10px; align-items: center; font: 400 11px/1.2 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tcard.mod h4 { color: var(--amber); }
+.tpips { display: flex; gap: 3px; flex: none; }
+.tpips i { width: 14px; height: 6px; background: #2a2a30; }
+.tpips i.on { background: var(--amber); }
+.topt { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 3px 10px; align-items: start; text-align: left; padding: 8px 10px; background: #17150f; border: 1px solid #2d2820; color: var(--fg); cursor: pointer; font: 500 14px/1.25 var(--f-body); }
+.topt .lv { font: 600 10px/1 var(--f-data); letter-spacing: .1em; padding: 4px 6px; background: #2a2a30; color: #c8bca4; white-space: nowrap; }
+.topt .nm b { display: block; font-weight: 600; }
+.topt .nm small { display: block; font-size: 12.5px; line-height: 1.35; color: #9b917c; margin-top: 2px; }
+.topt .st { font: 600 12px/1.2 var(--f-data); white-space: nowrap; color: #d8c9a8; text-align: right; }
+.topt:hover:not(.cur) { border-color: #5a4f3c; background: #1d1a13; }
+.topt.cur { border-color: var(--amber); background: rgba(255,179,71,.09); cursor: default; }
+.topt.cur .lv { background: var(--amber); color: #1a1308; }
+.topt.cur .st { color: var(--amber); }
+.topt.own .st { color: var(--ok, #8fd36a); }
+.topt.lock { opacity: .6; }
+.topt.poor .st { color: var(--crit); }
 .part { background: #0e0d0b; border: 1px solid var(--line); padding: 10px 12px; display: grid; gap: 6px; min-width: 0; }
 .part > span { font: 400 11px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .part select { width: 100%; background: #1c1a16; border: 1px solid #3a342a; padding: 7px 8px; font: 600 15px/1.2 var(--f-body); color: var(--fg); }
@@ -556,7 +584,7 @@ code { font: 400 12.5px/1 var(--f-data); color: var(--amber); }
   .extras .samples { grid-column: 1 / -1; }
 }
 @media (max-width: 700px) {
-  .deck, .extras, .tgrid, .services { grid-template-columns: 1fr; }
+  .deck, .extras, .tgrid, .services, .tg-cards { grid-template-columns: 1fr; }
   .trunk-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .tele { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .toggles { grid-template-columns: 1fr; }
@@ -1116,7 +1144,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <div class="kmbox" id="kmBox"></div>
     <div class="ups" id="carUps" hidden></div>
     <div class="presets" id="presets"></div>
-    <div class="tgrid" id="tgrid"></div>
+    <div class="tshop" id="tgrid"></div>
     <p class="hint" id="shopNote">I marchi indicano parti reali per JZA80 e 2JZ. Il carattere sonoro di ciascuna è una nostra modellazione fisica, non una registrazione del prodotto.</p>
   </section>
 
@@ -2080,15 +2108,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     renderGears(); $('carUps').hidden = true;
     const grid = $('tgrid');
     $('presets').hidden = typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, 'turbo');   // [PISTONE] niente preparazioni pronte: i pezzi del motore uno per uno da Nico
-    if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
-    if (!grid.childElementCount) {
-      for (const [k, cat] of Object.entries(TUNING)) {
-        if (typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k)) continue;   // [PISTONE] questi pezzi li fa Nico (pistone/motori.js)
-        const box = document.createElement('label'); box.className = 'part'; box.dataset.k = k;
-        box.innerHTML = `<span>${cat.label}</span><select id="tu-${k}">${cat.items.map((it) => `<option value="${it.id}"></option>`).join('')}</select><p></p>`;
-        box.querySelector('select').addEventListener('change', (e) => mountPart(k, e.target.value, e.target));
-        grid.appendChild(box);
-      }
+    if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; grid.dataset.h = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
+    if (!$('presets').childElementCount) {
       const pr = $('presets');
       TUNING_PRESETS.forEach((p) => {
         const b = document.createElement('button'); b.type = 'button'; b.dataset.id = p.id;
@@ -2096,21 +2117,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         pr.appendChild(b);
       });
     }
-    grid.querySelectorAll('.part').forEach((box) => {
-      const k = box.dataset.k, it = tuningItem(k, S.tune[k]);
-      const sel = box.querySelector('select');
-      Array.from(sel.options).forEach((o) => {
-        const x = tuningItem(k, o.value), label = (['Su misura', '—', 'Integrata'].includes(x.brand) ? '' : x.brand + ' · ') + x.name;
-        const lk = game.partLocked(k, x.id);
-        o.textContent = label + (game.owns(k, x.id) ? (x.id === it.id ? '' : ' · tuo') : lk ? ` · da ${game.partKm(k, x.id)} km` : ` · € ${fmt(game.price(k, x.id))}`);
-        o.disabled = lk;
-      });
-      sel.value = it.id;
-      let note = it.note;
-      if (k === 'wastegate' && it.id === 'tial' && TP.sim.turbo.twin) note += ' Con il biturbo di serie non ha effetto.';
-      box.querySelector('p').textContent = note;
-      box.classList.toggle('mod', it.id !== TUNING[k].items[0].id);
-    });
+    renderTuneShop();
     $('presets').querySelectorAll('button').forEach((b) => {
       const p = TUNING_PRESETS.find((x) => x.id === b.dataset.id);
       b.setAttribute('aria-pressed', String(Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k])));
@@ -2230,6 +2237,57 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let trunkSig = '';
   function presetKm(p) { return game.mode === 'career' ? Math.max(0, ...Object.entries(p.sel).map(([k, id]) => (game.owns(k, id) ? 0 : game.partKm(k, id)))) : 0; }
   function presetCost(p) { return Object.entries(p.sel).reduce((a, [k, id]) => a + game.price(k, id), 0); }
+  // ---------------------------------------------------------------- negozio dei pezzi: grandi categorie, poi i pezzi a livelli
+  // I pezzi di Luca sono raggruppati (motore, turbo e aria, scarico, trasmissione, ruote e telaio); dentro una categoria ogni pezzo è
+  // un livello: SERIE (quello che c'è già) e poi LIV. 1, 2, 3... sempre migliori. Un clic sul pezzo lo compra (se serve) e lo monta.
+  const TUNE_GROUPS = [
+    { id: 'motore', name: 'Motore', cats: ['cams', 'intake', 'ecu', 'limiter'], hint: 'Camme, aspirazione, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
+    { id: 'turbo', name: 'Turbo e aria', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: quanta pressione e che fischio.' },
+    { id: 'scarico', name: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e downpipe: voce, fiamme e qualche cavallo in più.' },
+    { id: 'trasm', name: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
+    { id: 'telaio', name: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza, frenata e quanto è pronta in curva.' },
+  ];
+  let tuneTab = 'motore';
+  function renderTuneShop() {
+    const grid = $('tgrid'), E = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    if (!grid.dataset.bound) {
+      grid.dataset.bound = '1';
+      grid.addEventListener('click', (e) => {
+        const t = e.target.closest('[data-tab]'); if (t) { tuneTab = t.dataset.tab; grid.dataset.h = ''; renderTuneShop(); return; }
+        const o = e.target.closest('[data-k]'); if (o && !o.classList.contains('cur')) mountPart(o.dataset.k, o.dataset.id, null);
+      });
+    }
+    const visible = (k) => TUNING[k] && !(typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k));   // [PISTONE] questi pezzi li fa Nico
+    const groups = TUNE_GROUPS.map((g) => Object.assign({}, g, { cats: g.cats.filter(visible) }));
+    const known = new Set(TUNE_GROUPS.flatMap((g) => g.cats)), rest = Object.keys(TUNING).filter((k) => !known.has(k) && visible(k));
+    if (rest.length) groups.push({ id: 'altro', name: 'Altro', cats: rest, hint: '' });
+    const shown = groups.filter((g) => g.cats.length);
+    if (!shown.length) { if (grid.dataset.h !== '-') { grid.innerHTML = ''; grid.dataset.h = '-'; } return; }
+    if (!shown.some((g) => g.id === tuneTab)) tuneTab = shown[0].id;
+    const career = game.mode === 'career', money = game.s.money;
+    const cur = (k) => Math.max(0, TUNING[k].items.findIndex((it) => it.id === S.tune[k]));
+    const tabs = shown.map((g) => {
+      const up = g.cats.filter((k) => cur(k) > 0).length;
+      return `<button type="button" class="tg-tab" role="tab" data-tab="${g.id}" aria-selected="${g.id === tuneTab}">${E(g.name)}<small>${up ? `${up} su ${g.cats.length} migliorati` : `${g.cats.length} ${g.cats.length === 1 ? 'pezzo' : 'pezzi'} · di serie`}</small></button>`;
+    }).join('');
+    const G = shown.find((g) => g.id === tuneTab);
+    const cards = G.cats.map((k) => {
+      const cat = TUNING[k], ci = cur(k), n = cat.items.length;
+      const opts = cat.items.map((it, i) => {
+        const isCur = i === ci, owned = game.owns(k, it.id), lock = game.partLocked(k, it.id), price = game.price(k, it.id);
+        const brand = ['Su misura', '—', 'Integrata'].includes(it.brand) ? '' : it.brand + ' · ';
+        let note = it.note || '';
+        if (k === 'wastegate' && it.id === 'tial' && TP.sim.turbo.twin) note += ' Con il biturbo di serie non ha effetto.';
+        const st = isCur ? 'MONTATO' : owned ? 'TUO · MONTA' : lock ? `🔒 da ${fmt(game.partKm(k, it.id))} km` : `€ ${fmt(price)}`;
+        const cls = ['topt', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', !isCur && !owned && !lock && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');
+        return `<button type="button" class="${cls}" data-k="${k}" data-id="${it.id}" aria-pressed="${isCur}"><span class="lv">${i === 0 ? 'SERIE' : 'LIV. ' + i}</span><span class="nm"><b>${E(brand + it.name)}</b><small>${E(note)}</small></span><span class="st">${st}</span></button>`;
+      }).join('');
+      const pips = Array.from({ length: n }, (_, i) => `<i class="${i <= ci ? 'on' : ''}"></i>`).join('');
+      return `<div class="tcard${ci > 0 ? ' mod' : ''}"><h4><span>${E(cat.label)}</span><span class="tpips" title="Livello ${ci} di ${n - 1}">${pips}</span></h4>${opts}</div>`;
+    }).join('');
+    const html = `<div class="tg-tabs" role="tablist">${tabs}</div><p class="tg-info"><b>${E(G.name)}.</b> ${E(G.hint)} <br><b>SERIE</b> è quello che c'è già; <b>LIV. 1, 2, 3…</b> sono pezzi sempre migliori (e più cari). Le tacche in alto mostrano a che livello sei. Un pezzo comprato resta tuo: lo rimonti gratis.</p><div class="tg-cards">${cards}</div>`;
+    if (grid.dataset.h !== html) { grid.innerHTML = html; grid.dataset.h = html; }
+  }
   function mountPart(k, id, selEl) {
     const revert = () => { if (selEl) selEl.value = S.tune[k]; };
     if (!game.canMount()) { revert(); flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
