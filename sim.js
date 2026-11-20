@@ -69,9 +69,9 @@ class SupraSim {
     let best = { cv: 0, nm: 0, rpmCv: 0, rpmNm: 0 };
     for (let rpm = 1000; rpm <= P.limiter; rpm += 50) {
       const frac = tc.twin ? SIM_SS(tc.a, tc.b, rpm) * 0.6 + 0.4 * SIM_SS(3800, 4400, rpm) : Math.pow(SIM_SS(tc.a, tc.b, rpm), 1.3);
-      const boost = tc.max * Math.min(1, frac * 1.18);
+      const boost = tc.max * (this.boostCtl || 1) * Math.min(1, frac * 1.18);      // la mappa del turbo (ECO / NORMALE / FORTE) cambia la pressione
       const camK = SIM_SS(3000, 5500, rpm), camF = tn.camLow * (1 - camK) + tn.camHigh * camK;
-      const T = this.tqAt(rpm) * tn.pw * (this.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * (this.boostCtl || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm);
+      const T = this.tqAt(rpm) * tn.pw * (this.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm);
       const cv = T * rpm / 7023;
       if (cv > best.cv) { best.cv = cv; best.rpmCv = rpm; }
       if (T > best.nm) { best.nm = T; best.rpmNm = rpm; }
@@ -82,8 +82,10 @@ class SupraSim {
   tireGrip() {
     const ty = this.tune.tyre || {}, d = (this.tireT - (ty.opt || 90)) / (ty.win || 65);
     const cooked = this.tireT > 110 ? (this.tireT - 110) * 0.004 : 0;
-    // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1)
-    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * (this.wet || 0)) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
+    // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1), e sopra i 130 km/h un velo d'acqua
+    // (aquaplaning) ne toglie fino a un altro 12 % verso i 190
+    const wet = this.wet || 0, aqua = wet ? 0.12 * wet * SIM_CLAMP((Math.abs(this.v) - 36) / 17, 0, 1) : 0;
+    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * wet - aqua) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
   }
   get rpm() { return Math.max(0, this.we) * 9.5493; }
   get kmh() { return Math.abs(this.v) * 3.6; }
@@ -133,10 +135,25 @@ class SupraSim {
     for (let i = 0; i < n; i++) this.step(h);
     // grandezze lente: temperature, carburante, cronometri
     const load = this.running ? SIM_CLAMP(this.charge, 0, 2.4) * this.rpm / 7000 : 0;
-    this.waterT += ((this.running ? 86 + 5 * load : this.waterT > 40 ? 60 : this.waterT) - this.waterT) * dt * 0.012;
+    const cool = this.tune.cool;
+    if (cool && this.running) {
+      // [PISTONE] motore costruito (pistone/motori.js): bilancio di calore vero. Entra nell'acqua una quota della potenza all'albero
+      // (più un po' al minimo e di più con l'aria calda dell'intercooler); la porta via il radiatore in proporzione
+      // alla differenza con l'aria e al flusso d'aria (ventola da fermi, vento in corsa), ma solo se il termostato è aperto
+      const Pw = Math.max(0, (this.Tnet || 0) * this.we), air = cool.fan + (1 - cool.fan) * Math.min(1, Math.abs(this.v) / 28);
+      const qIn = Pw * cool.quota * (1 + 0.25 * (this.iat || 0)) + 3500;
+      const open = SIM_SS(84, 94, this.waterT), dTa = Math.max(0, this.waterT - 25);
+      const qOut = cool.kw * 1000 * dTa / 70 * air * open + 900 * dTa / 70;
+      this.waterT = SIM_CLAMP(this.waterT + (qIn - qOut) / (cool.C || 90000) * dt, 10, 135);
+      this.hotK = 1 - 0.45 * SIM_SS(cool.prot, cool.prot + 4, this.waterT);   // protezione: la centralina taglia la potenza
+    } else {
+      this.waterT += ((this.running ? 86 + 5 * load : this.waterT > 40 ? 60 : this.waterT) - this.waterT) * dt * 0.012;
+      this.hotK = 1;
+    }
     this.oilT += ((this.running ? 90 + 14 * load : 60) - this.oilT) * dt * 0.006;
     const mt = this.tune.maint || {}, oilK = 0.35 + 0.65 * Math.min(1, (mt.oil ?? 1) / 0.25);
-    const oilTarget = (this.running ? (this.oilT > 85 ? 0.9 : 1.4) + 4.0 * Math.min(1, this.rpm / 5500) : (this.starter ? 0.35 : 0)) * oilK;
+    const oilDrop = this.tune.oilRpm ? /* [PISTONE] */ 1 - 0.45 * SIM_SS(this.tune.oilRpm, this.tune.oilRpm + 1500, this.rpm) : 1;   // pompa piccola per quei giri
+    const oilTarget = (this.running ? (this.oilT > 85 ? 0.9 : 1.4) + 4.0 * Math.min(1, this.rpm / 5500) * oilDrop : (this.starter ? 0.35 : 0)) * oilK;
     this.oilP += (oilTarget - this.oilP) * Math.min(1, dt * 4);
     // temperatura delle gomme: scaldano con lo slittamento e con la frenata, raffreddano con l'aria
     // dischi: ricevono quasi tutta l'energia della frenata (capacità termica ~7 J/K per kg d'auto), l'aria li raffredda
@@ -307,7 +324,7 @@ class SupraSim {
     this.wg = SIM_CLAMP((drive - 1) * 3, 0, 1);
     const tau = tgtT > this.tur ? tc.up * ((tn.ic && tn.ic.lag) || 1) : (closed && cfg.valve === 'flutter' ? 0.5 : tc.down * (closed ? 1.6 : 1));
     this.tur += (tgtT - this.tur) * Math.min(1, h / tau);
-    if (!closed) this.pipeP += (tc.max * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
+    if (!closed) this.pipeP += (tc.max * (this.boostCtl || 1) * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
     else this.pipeP += (0 - this.pipeP) * Math.min(1, h / (cfg.valve === 'flutter' ? 0.45 : 0.07));
     if (closed && !this.bovLatch && this.pipeP > (cfg.valve === 'flutter' ? 0.1 : 0.2)) {
       this.bovLatch = true;
@@ -329,7 +346,7 @@ class SupraSim {
     const maintK = 1 - Math.max(0, 0.25 - (mt.oil ?? 1)) * 0.25;
     if (burning && (mt.plugs ?? 1) < 0.4 && Math.random() < (0.4 - mt.plugs) * h * 30) this.misT = 0.04 + Math.random() * 0.05;
     this.misT = Math.max(0, (this.misT || 0) - h);
-    const Tcomb = burning ? Tind * tn.pw * (this.extraPw || 1) * camF * lopeF * maintK * (1 - 0.18 * this.iat) * (this.misT > 0 ? 0.4 : 1) * this.softK * (1 - (this.hes || 0)) * Math.max(0, this.air * (1 + 0.78 * (tn.boostK || 1) * (this.boostCtl || 1) * this.pipeP) - 0.1) / 0.9 : 0;
+    const Tcomb = burning ? Tind * tn.pw * (this.extraPw || 1) * (this.hotK || 1) /* [PISTONE] */ * camF * lopeF * maintK * (1 - 0.18 * this.iat) * (this.misT > 0 ? 0.4 : 1) * this.softK * (1 - (this.hes || 0)) * Math.max(0, this.air * (1 + 0.78 * (tn.boostK || 1) * this.pipeP) - 0.1) / 0.9 : 0;
     const Tfric = rpm > 0 ? 16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm + 9 * (1 - this.air) * (rpm / 3000) : 0;
     let Tcomp = 0;
     if (!this.running && rpm > 0.5) Tcomp = -38 * Math.sin(3 * this.theta) * SIM_CLAMP(1 - rpm / 700, 0, 1);

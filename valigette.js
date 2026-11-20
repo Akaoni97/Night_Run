@@ -3,8 +3,8 @@
 //  Valigette da aprire con dentro premi di sei rarità: comune, non comune, raro, epico, mitico, leggendario.
 //  - Si comprano nell'app Valigette del telefono (bronzo, argento, oro: cambiano le probabilità, non i premi) e si
 //    guadagnano coi lavori (catena di missioni, primo lavoro, consegne).
-//  - Premi: soldi, oggetti, ticket (tagliando gratis da Niko, modifica gratuita da Luca), potenziamenti del motore
-//    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo, kit turbo,
+//  - Premi: soldi, oggetti, ticket (tagliando gratis da Mario, modifica gratuita da Luca), potenziamenti del motore
+//    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo (mai il turbo),
 //    e nel leggendario un'auto in regalo.
 //  - Solo soldi del gioco. Garanzia: almeno un raro ogni 10 valigette, almeno un epico ogni 40. Doppioni → soldi.
 //  - L'apertura è una scena a tutto schermo (canvas + suoni sintetizzati): caduta, attesa con la luce che sale di
@@ -62,19 +62,18 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
   const part = (pick) => (g) => {
     if (typeof TUNING === 'undefined' || g.mode !== 'career') return null;
     const cand = [];
-    for (const cat in TUNING) for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });
+    for (const cat in TUNING) if (cat !== 'turbo' && !(typeof tuningNascosto === 'function' && tuningNascosto(g.car, cat))) for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });   // [PISTONE] i pezzi motore della V40 li fa Nico
     const list = pick(cand); if (!list.length) return null;
     const c = list[Math.floor(Math.random() * list.length)];
     g.s.owned[g.ownKey(c.cat + ':' + c.it.id)] = true;
     return { icon: c.cat === 'turbo' ? 'turbo' : 'pezzo', name: `${c.it.brand} ${c.it.name}`, text: `${TUNING[c.cat].label}: è tuo e sbloccato. Luca te lo monta senza farti pagare (vale € ${fmt(c.it.price)}).` };
   };
   const midParts = (cand) => { const s = cand.filter((c) => c.it.price <= 4000); return s.length ? s : cand; };
-  const turboKit = (cand) => { const t = cand.filter((c) => c.cat === 'turbo').sort((a, b) => b.it.price - a.it.price); return t.slice(0, 1); };
   const topPart = (cand) => cand.sort((a, b) => b.it.price - a.it.price).slice(0, 1);
   const ticket = (k) => (g) => {
     g.cases().tickets[k]++;
     return k === 'svc'
-      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Niko: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
+      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Mario: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
       : { icon: 'ticket_mod', name: 'Ticket modifica gratuita', text: `Da Luca: un pezzo fino a € ${fmt(CASE_MOD_MAX)} senza pagare. Si usa da solo al prossimo acquisto.` };
   };
   const car = (g) => {
@@ -97,7 +96,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     [{ w: 3, give: money(1500, 3000) }, { w: 2, give: ticket('svc') }, { w: 1, give: tyres }],
     [{ w: 2, give: ticket('mod') }, { w: 2, give: boost(0.08, 50, 'Centralina mappata') }, { w: 1, give: money(4500, 5500) }],
     [{ w: 2, give: part(midParts) }, { w: 2, give: boost(0.15, 100, 'Mappa da pista') }],
-    [{ w: 1, give: part(turboKit) }, { w: 1, give: money(25000, 25000) }, { w: 1, give: perm }],
+    [{ w: 1, give: part(topPart) }, { w: 1, give: money(25000, 25000) }, { w: 1, give: perm }],
     [{ w: 1, give: car }],
   ];
   const FALLBACK = [money(500, 900), money(2000, 3000), money(5000, 6000), money(9000, 11000), money(25000, 25000), money(60000, 60000)];
@@ -131,12 +130,12 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     return (1 + temp) * (1 + (C.perm[this.car] || 0));
   };
 
-  // ticket: il tagliando di Niko e la modifica di Luca diventano gratis finché ce n'è uno
+  // ticket: il tagliando di Mario e la modifica di Luca diventano gratis finché ce n'è uno
   const sc = P.serviceCost, sv = P.service, pr = P.price, by = P.buy;
   P.serviceCost = function (id) { const c = sc.call(this, id); return c > 0 && this.s && this.cases().tickets.svc > 0 ? 0 : c; };
   P.service = function (id) {
     const C = this.cases(), had = C.tickets.svc > 0 && sc.call(this, id) > 0;
-    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Niko non ti chiede niente', 'buy'); }
+    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Mario non ti chiede niente', 'buy'); }
     return r;
   };
   const modFree = (g, cat, id) => { const p = pr.call(g, cat, id); return p > 0 && p <= CASE_MOD_MAX && g.s && g.cases().tickets.mod > 0; };

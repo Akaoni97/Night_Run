@@ -27,7 +27,7 @@ const VG_PLACE = {
   grill: { name: () => 'Sosta 24', what: 'autogrill', col: '#ff7a3a' },
   motel: { name: () => 'Motel Ovunque', what: 'motel', col: '#ff5fa8' },
   fuel: { name: () => 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
-  niko: { name: () => 'Officina Niko', what: 'meccanico', col: '#5ad1ff' },
+  niko: { name: () => 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
   shop: { name: () => 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
   style: { name: () => 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
 };
@@ -65,7 +65,7 @@ Object.assign(INV, {
   scatola: { name: 'Scatola da consegnare', kg: 20, price: 0, note: 'Va lasciata al locale scritto sull\'etichetta.' },
   bancale: { name: 'Bancale', kg: 1000, price: 0, note: 'Merce su bancale per il camion.' },
   bomboletta: { name: 'Bomboletta gonfia e ripara', kg: 0.5, price: 18, note: 'Rigonfia la gomma bucata a 1,9 bar e tappa quasi tutto il buco. Arrivi al prossimo gommista.' },
-  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Niko te la ripara e torna a essere la ruota di scorta.' },
+  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Mario te la ripara e torna a essere la ruota di scorta.' },
 });
 const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette', 'bomboletta', 'scorta'];
 
@@ -294,7 +294,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (ap.t > 14 && this.ap === ap) {
         T.p[i] = TYRE_P; T.leak[i] = 0; this.ap = null;
         if (!this.addItem('forata')) this.say('La gomma forata non ci sta nel bagagliaio: la lasci sul ciglio della strada');
-        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Niko.`, 'buy');
+        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Mario.`, 'buy');
       }
     };
     return { ok: true };
@@ -314,7 +314,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.repairTyre = function () {
     const i = this.s.trunk.findIndex((it) => it.kind === 'forata'); if (i < 0) return { ok: false, why: 'Non hai gomme forate da riparare' };
     if (this.s.money < 25) return { ok: false, why: 'Costa € 25' };
-    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Niko ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
+    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Mario ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
   };
 
   // ------------------------------------------------------------ ciclo del viaggio
@@ -521,7 +521,9 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
 
   // ------------------------------------------------------------ servizi dei locali
   P.vgPay = function (eur, what) {
-    if (this.s.money < eur) return { ok: false, why: `Costa € ${eur}` };
+    const fido = typeof GAME_FIDO === 'number' ? GAME_FIDO : 0;   // cibo, bevande e motel anche in rosso, fino al credito
+    if (this.s.money - eur < -fido) return { ok: false, why: this.s.money < 0 ? `Sei in rosso di € ${Math.round(-this.s.money)}: niente più credito` : `Costa € ${eur}` };
+    if (this.s.money - eur < 0) this.say('Pagato a credito: sei in rosso', 'buy');
     this.s.money -= eur; if (what) this.say(`${what}: − € ${eur}`, 'buy'); return { ok: true };
   };
   P.vgEat = function (food, water, eur, what) {

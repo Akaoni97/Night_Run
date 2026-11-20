@@ -2,12 +2,12 @@
 //  Night Run · I comandi dell'auto (dopo storia.js)
 //  Una seconda fila di pulsanti sotto quelli di guida (AUTO, TC, LAUNCH...), accanto al cambio e ai pedali. Compaiono solo quando servono:
 //    RIMORCHIO  aggancia / sgancia (se hai comprato il gancio; lo sgancio controlla slot e chili rimasti in auto)
-//    TURBO      pressione della turbina: ECO 70 % · NORMALE · FORTE 115 % (solo con un turbo montato)
-//    SCARICO    valvola di scarico: APERTO (scoppi e fiammate) o SILENZIO (niente fiamme, scoppi rarissimi e smorzati, motore pieno) (dopo un po' di potenziamento)
+//    TURBO      pressione vera della turbina (cambia bar, coppia, fischio e calore): ECO 60 % · NORMALE · FORTE 120 % (solo con un turbo montato)
+//    SCARICO    valvola di scarico: APERTO (rumore pieno e forte, scoppi e fiammate) o SILENZIO (niente fiamme, rumore più basso, scoppi rarissimi e smorzati) (dopo un po' di potenziamento)
 //    NEON       accende e spegne il neon sotto l'auto (se l'hai montato da Neon Kustom)
 //  Lo stato sta in `game.s.cmd` e si salva con la partita. Funzioni pure provate in test/comandi.test.js.
 // ============================================================================
-const CMD_BOOST = [{ id: 'eco', label: 'ECO', k: 0.7 }, { id: 'norm', label: 'NORMALE', k: 1 }, { id: 'forte', label: 'FORTE', k: 1.15 }];
+const CMD_BOOST = [{ id: 'eco', label: 'ECO', k: 0.6 }, { id: 'norm', label: 'NORMALE', k: 1 }, { id: 'forte', label: 'FORTE', k: 1.2 }];
 const CMD_EXH_PW = 1.05;                                   // potenziamento (fattore di potenza) da cui compare la valvola di scarico
 function cmdState(s) { if (!s.cmd) s.cmd = { boost: 1, exh: 1, neon: 1 }; return s.cmd; }
 // cosa c'è da comandare adesso (sim = SupraSim, game = StreetGame, cos = abbellimenti dell'auto)
@@ -43,7 +43,7 @@ function cmdApply(game, sim, view2d) {
     row = document.createElement('div'); row.className = 'dash-btns cmd'; row.setAttribute('role', 'group'); row.setAttribute('aria-label', 'Comandi dell\'auto'); row.hidden = true;
     const add = (id, title, fn) => { const b = document.createElement('button'); b.type = 'button'; b.id = 'cm' + id; b.title = title; b.addEventListener('click', fn); row.appendChild(b); btn[id] = b; };
     add('Trailer', 'Rimorchio: aggancia o sgancia', () => { const g = NR().game, r = g.vgTrailer(!(g.s.vg && g.s.vg.trailerOn)); if (!r.ok) g.say(r.why, 'bad'); else { g.say(g.s.vg.trailerOn ? 'Rimorchio agganciato' : 'Rimorchio sganciato', 'info'); } refresh(); });
-    add('Boost', 'Pressione della turbina', () => { const g = NR().game, b = cmdBoostNext(g.s); g.say(`Turbo: ${b.label}`, 'info'); refresh(); });
+    add('Boost', 'Pressione della turbina', () => { const n = NR(), g = n.game, b = cmdBoostNext(g.s), bar = n.sim && n.sim.tune && n.sim.tune.turbo ? ` · fino a ${(n.sim.tune.turbo.max * b.k).toFixed(2).replace('.', ',')} bar` : ''; g.say(`Turbo: ${b.label}${bar}`, 'info'); refresh(); });
     add('Exh', 'Valvola di scarico: aperto o silenzio', () => { const g = NR().game, e = cmdExhToggle(g.s); g.say(e ? 'Scarico aperto' : 'Scarico in silenzio', 'info'); refresh(); });
     add('Neon', 'Neon sotto l\'auto', () => { const g = NR().game, n = cmdNeonToggle(g.s); g.say(n ? 'Neon acceso' : 'Neon spento', 'info'); refresh(); });
     base.parentNode.insertBefore(row, base.nextSibling);

@@ -205,10 +205,10 @@ pronte, pezzi che costano soldi **e** chilometri, estetica a parte. Per aggiunge
   (`img/v40.png`) è l'illustrazione fornita dal giocatore.
 
 **I luoghi della città (2D).** Ogni 2,4 km: **Benzina 24H** (B), **Da Luca Tuning** (L, i pezzi delle prestazioni),
-**Officina Niko** (N, manutenzione e riparazioni) e **Neon Kustom** (E, estetica e sticker). In carriera i pezzi li
-monta solo Luca e la manutenzione la fa solo Niko.
+**Officina Mario** (N, manutenzione e riparazioni) e **Neon Kustom** (E, estetica e sticker). In carriera i pezzi li
+monta solo Luca e la manutenzione la fa solo Mario.
 
-- **Niko:** carrozziere, gomme, tagliando (olio e filtro), candele, pastiglie, lavaggio. Tutto si consuma coi
+- **Mario:** carrozziere, gomme, tagliando (olio e filtro), candele, pastiglie, lavaggio. Tutto si consuma coi
   chilometri di ogni auto: olio vecchio = pressione bassa e fino al 6 % in meno; candele consumate = accensioni
   perse a scatti; pastiglie finite = frenate lunghe e poi ferro su ferro; lo sporco si accumula (di più sotto la
   pioggia) e si vede sulle fiancate.
@@ -447,7 +447,7 @@ bassi giri (forte sulla 2002 a iniezione meccanica), tempi di cambiata diversi p
 rifiutata dal sincronizzatore.
 
 **Mappa del mondo (T).** Sette posti veri con le coordinate, ognuno col suo sfondo 2D: Tokyo · Shinjuku (città, con
-benzinaio, Luca, Niko e Neon Kustom), Wangan · Bayshore Route (autostrada sopraelevata sulla baia), Hakone Turnpike
+benzinaio, Luca, Mario e Neon Kustom), Wangan · Bayshore Route (autostrada sopraelevata sulla baia), Hakone Turnpike
 (montagna, il Fuji all'orizzonte), Positano (mare, il paese sulla roccia), Bassa Reggiana (pianura, pioppi e nebbia),
 San Gimignano (paese, le torri), Route 66 ad Amboy nel Mojave (deserto, mesas e motel). Si parte da fermi.
 
@@ -458,7 +458,7 @@ una lettera sull'eredità, la E36 blu che arriva allo studio notarile, il colloq
 (per ora solo la Volvo) e l'ingresso in autostrada. L'autostrada va solo avanti. La carriera resta (pulsante
 *Carriera*), con salvataggio e pezzi separati.
 
-- **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Niko,
+- **La strada.** Una tappa ogni 3,2 km: bar (nomi diversi), Benzina 24H, autogrill *Sosta 24*, Officina Mario,
   Da Luca Tuning, Neon Kustom e il **Motel Ovunque**. Il paesaggio cambia da solo: la città di casa, la Bassa,
   San Gimignano, la costiera, Hakone, il Wangan, la Route 66, e poi ancora. Cippi chilometrici ogni km.
 - **Il guidatore.** Fame, sete, sonno e igiene calano coi km e col tempo. Col sonno basso la vista si stringe e
@@ -501,7 +501,7 @@ a scelta nelle impostazioni (turbo se c'è, olio, acqua, pressione olio, volt, A
 
 **Gomme.** Nel viaggio ogni tanto si fora (più facile con le gomme consumate): la pressione cala piano o di colpo,
 l'auto tiene meno e frena di più; sul cerchione si rovina. Si cambia con la ruota di scorta (tasto **5**, da
-fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Niko si ripara la forata.
+fermi, un po' di lavoro), si rigonfia con la bomboletta, al benzinaio si gonfiano, da Mario si ripara la forata.
 
 **Guida e schermata.** Accanto al cruscotto (in basso a sinistra) ci sono i pulsanti AUTO, TC, LAUNCH, STRUMENTI e
 MAPPA. La **guida automatica** parte da sola dopo 3 secondi senza toccare niente: tiene la velocità, cambia le

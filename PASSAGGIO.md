@@ -9,8 +9,15 @@ gioco fa, sezione per sezione).
 - Repository **`Akaoni97/Night_Run`**, solo il gioco, alla radice. Il ramo **`main`** è quello pubblicato su Pages.
   Fino al 16/11/2026 il gioco stava in `Akaoni97/RandomEgg-s` (cartella `motori/`, ramo
   `claude/peaceful-goodall-tvifol`): la storia delle modifiche è stata portata qui, lì non si lavora più.
-- Copia giocabile anche come artifact privato su claude.ai: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD
-  (ultima versione pubblicata: 119, facciate dei locali).
+- Copie giocabili come artifact privati su claude.ai (ognuno aggiorna la sua):
+  - del proprietario: https://claude.ai/artifact/PstSTNEs7iTjYCtRfTKodD (ultima versione pubblicata: 132, grafica più nitida e ruote della trazione anteriore);
+  - del cognato: https://claude.ai/artifact/XJDCR8GCQSYz95XXtXoyrs.
+
+## Il gioco come app sul PC
+Da Edge o Chrome, sul sito https://akaoni97.github.io/Night_Run/: menu (i tre puntini) → «App» → «Installa Night Run»
+(in Chrome a volte è l'icona col monitor e la freccia in fondo alla barra degli indirizzi). Diventa un'icona sul desktop e
+nel menu Start, si apre in una finestra sua e si aggiorna da sola a ogni caricamento su `main`. I salvataggi sono gli
+stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per più avanti: `docs/pubblicazione/PERCORSO.md`.
 
 ## Regole del proprietario (importanti)
 1. **Rispondere sempre e solo in italiano**, anche nei messaggi brevi durante il lavoro. Commenti nel codice e
@@ -26,7 +33,7 @@ gioco fa, sezione per sezione).
 
 ## Com'è fatto il gioco oggi (in breve)
 - **Il Viaggio** (modalità principale, `viaggio.js` + `viaggio2d.js`): autostrada infinita dal km 0 sotto casa con
-  una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Niko, Da Luca Tuning, Neon
+  una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Mario, Da Luca Tuning, Neon
   Kustom, Motel Ovunque con la cassa che ti segue), paesaggi che cambiano coi km, bisogni del guidatore (fame,
   sete, sonno, igiene), lavori (autostoppisti, consegne, rimorchio, furgone e autobus), il prologo di apertura (`prologo.js`)
   e il telefono (`telefono.js`). La storia dopo il km 0 è da scrivere: capitoli, eventi strani e passeggeri speciali
@@ -83,7 +90,7 @@ gioco fa, sezione per sezione).
   dopo un fallimento, calibrazione di lampade e metri delle incursioni.
 - **Tutorial del primo lavoro** (`missioni.js`): finché non è finito non si può superare il locale giusto; poi un'uscita saltata annulla la consegna.
 - **Comandi dell'auto** (`comandi.js`): rimorchio, turbo (ECO/NORMALE/FORTE), scarico (aperto/silenzio), neon; **fari** spenti/anabbaglianti/abbaglianti
-  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: rotondo accanto al quadro). Cambio e pedali sono nascosti nella scheda Guida del menu.
+  col pulsante FARI (F sfanala); **accensione** con AVVIA (telefono: rotondo accanto al quadro). Cambio e pedali sono nascosti nella scheda Guida del menu. **AUTO 1 si inserisce dopo 5 s** senza toccare niente; la leva ha anche **S (sport)**; i tasti 1-4 sono solo per mangiare e bere.
 - **Comandi da telefono (18/11/2026)** (`menu.js`, solo al tocco, `html.tdash`): servono per le prove, il gioco è pensato
   per il PC (regola 7 di `AGENTS.md`). Quadro in alto a sinistra con AVVIA accanto; FRENO e GAS in basso a destra con
   sopra le palette del cambio ▼/▲ e la marcia in mezzo; ◀ ▶ affiancati a sinistra; STRUMENTI e DATI aprono due finestrelle
@@ -93,9 +100,9 @@ gioco fa, sezione per sezione).
 - **Fari** (`effetti2d.js`): due coni volumetrici (anabbagliante e abbagliante), alone, pozza sull'asfalto, pulviscolo.
 - **Valigette** (`valigette.js`, app nel telefono di `telefono.js` agganciata con `window.telefono.addApp`): bronzo
   € 1.500, argento € 6.000, oro € 18.000; sei rarità con probabilità dichiarate nell'app; garanzia raro ogni 10 ed epico
-  ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Niko) e modifica gratuita fino a € 5.000
+  ogni 40. Premi: soldi, tanica, bomboletta, olio; ticket tagliando gratis (Mario) e modifica gratuita fino a € 5.000
   (Luca); potenziamenti a tempo (+8 % per 50 km, +15 % per 100 km) e per sempre (+3 %, mitico); pezzo vero del
-  catalogo (epico), kit turbo (mitico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
+  catalogo, mai il turbo (epico), auto in regalo nel garage del motel (leggendario). Ricompense: bronzo per il
   primo lavoro, argento per ogni lavoro della catena (oro ogni terzo), bronzo per il 22 % delle consegne, Il premio si dà al tocco su "Apri", prima della scena (se si chiude non si perde).
   Scena d'apertura: caduta, gradini di luce per ogni livello di rarità, serrature, esplosione, raggi, premio che sale.
 - **Interni** (`interni.js`): entrando in un locale (U) la strada lascia il posto a una scena in pixel art del locale,
@@ -127,7 +134,7 @@ gioco fa, sezione per sezione).
   passeggeri ~€ 30 + 9-13 al km, autobus € 12 a passeggero; tagliando 120, candele 140, pastiglie 180, gomme da 420,
   motel 60. Ritmo misurato (40 lavori di fila, strumento in scratchpad non salvato): ~€ 290 netti al km coi lavori più
   ~€ 30 da consegne e passeggeri; una Panda nuova dopo ~45 km di lavoro, la Supra dopo ~200 (si sblocca al km 260).
-- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Niko, controlli della polizia (vedi AGENTS.md).
+- **Documenti (17/11/2026)**: `documenti.js`, app Libretto, revisione da Mario, controlli della polizia (vedi AGENTS.md).
   Mettere in regola l'auto ereditata costa ~€ 830 (assicurazione 400, bollo con mora ~345, revisione 85).
 - **Gare tolte (17/11/2026, ramo del cognato)**: niente più sfide al semaforo, con gli abbaglianti, scala dei rivali e reputazione di strada; le categorie restano per Garage e documenti. La voce qui sotto sulle sfide per categoria è superata. **Le gare torneranno (18/11/2026, deciso dal cognato)**, ma come attività secondaria per guadagnare, accanto alle consegne: il gioco non è centrato su di loro.
 - **Garage e categorie (17/11/2026)**: app Garage nel telefono (`garage.js`); categorie utilitarie, familiari, piccole
@@ -148,7 +155,7 @@ gioco fa, sezione per sezione).
   (stessi disegni della strada, con ruote e fari), dietro l'auto parcheggiata. La tua auto negli interni si ridisegna due
   volte al secondo: al Neon Kustom vernice, cerchi, kit e spoiler provati si vedono subito (prima un aggiornamento ogni
   mezzo secondo rimetteva quelli comprati, e i cerchi finivano sotto la carrozzeria). Pannello: valori dell'officina su
-  tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Niko e Neon Kustom.
+  tre colonne, l'annuncio dell'usato in fondo. Provati gli acquisti in bar, benzinaio, autogrill, Mario e Neon Kustom.
 - **Traguardi** (`traguardi.js`): 27 traguardi in `TRG_LIST` (lavori, catena, km, valigette, garage, 200 e
   250 km/h, freni oltre 600 °C, ruote bloccate senza ABS, 20 s in scia, finestrini giù sopra i 150, in galleria vicino
   al limitatore, 30 km senza danni, ruota 7 giorni di fila, benzina sotto il 3 %, € 50.000, motel, 5 locali). Premio in soldi o valigetta
@@ -167,8 +174,8 @@ gioco fa, sezione per sezione).
   nel viaggio non funzionava (l'accosto automatico restava acceso e lo bloccava).
 - **Usato dei privati** (`usato.js`, app Annunci): a circa 4 tappe su 10 un privato vende la sua auto (cartello VENDESI
   davanti al locale). Entrando in quel locale c'è l'annuncio: guardarla (scopre carrozzeria e gomme), farci un giro
-  (motore e freni), Niko a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
-  accetta), compra. I difetti restano sull'auto: si sistemano da Niko (servizi, carrozziere, gomme, revisione del motore).
+  (motore e freni), Mario a € 120 (tutto, anche olio e km scalati), una sola trattativa (più difetti hai scoperto, più
+  accetta), compra. I difetti restano sull'auto: si sistemano da Mario (servizi, carrozziere, gomme, revisione del motore).
   Un'auto sana comprata bene si rivende all'Autosalone con guadagno (traguardo Commerciante).
 - **Sfascio Ruggine** (`sfascio.js`): decima tappa di ogni giro (al posto del secondo autogrill), primo al km 30,6.
   Rovistare tra sei carcasse (€ 20, una volta: niente, soldi, oggetti, ticket, un pezzo, una valigetta, raramente
@@ -213,12 +220,20 @@ gioco fa, sezione per sezione).
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
+- **Nico e il motore** (dal 20/11 sera da Luca Tuning, negozio unico; pezzi singoli a livelli, magazzino, banco di lavoro, per ora sul motore di serie della sola V40; guida aggiornata in `pistone/LEGGIMI.md`) (cartella `pistone/`: `motori.js`, `motori2d.js`, guida `LEGGIMI.md`): motori costruiti a pezzi, 14 reparti in ordine di montaggio
+  (blocco, albero, bielle, pistoni, pompa dell'olio, testata, camme, sovralimentazione, intercooler, iniettori, pompa
+  della benzina, centralina, radiatore, frizione), ognuno coi livelli 1-4 (`lv` sui pezzi). I livelli li insegna Nico
+  (`motNext`/`motUnlock`, prezzi e requisiti in `MOT_LIV`, legami tra reparti in `dip`): si parte tutti dal livello 1.
+  I pezzi devono andare d'accordo: robustezza (`reg`, CV per cilindro), benzina (iniettori e pompa), aria
+  (intercooler contro i bar del turbo), olio (giri della pompa), frizione (Nm), calore (radiatore contro i kW che il
+  motore butta nell'acqua). In strada `sim.js` fa il bilancio di calore vero solo per i motori costruiti
+  (`tune.cool`): l'acqua sale, oltre `prot` la centralina taglia la potenza (`sim.hotK`), oltre `prot + 8` per
+  `MOT.cottura` secondi salta la guarnizione (`motCalore`). L'officina dei tagliandi ora è di **Mario** (id interno
+  sempre `niko`, per i salvataggi); Ottone è diventato Nico.
 
 ## Lavori aperti e idee in sospeso
 
-- **Dal report di verifica del 18/11/2026** restano aperti: i tasti 1-4 per mangiare e bere sono intercettati dalle marce (`index.html` gestione tasti),
-  il test dell'officina (la SSQV si sblocca a 5 km) e il riferimento 0-100 della Supra (6,27 s contro i 6 del test). Il menu non ferma il gioco: è voluto
-  (ci si ferma in una postazione).
+- **Dal report di verifica del 18/11/2026**: tasti 1-4 liberati dalle marce, test dell'officina e 0-100 della Supra (5,83 s) già a posto. Il menu non ferma il gioco: è voluto (ci si ferma in una postazione).
 - **Pulizia da fare più avanti:** il codice morto delle vecchie gare (coupé 3D «rival», `s.rep`), i blocchi cambio e pedali nascosti nella scheda Guida,
   le app strane del telefono (Ultima Uscita, Segreteria, 03:07) e `TEL_ATTI`, residui della vecchia storia.
 - **Nuova storia (in corso, dal 17/11/2026)**: il proprietario vuole una storia horror **graduale** (prima tutto tranquillo, poi una piccola cosa, poi il macabro). Fatti: i **pensieri del protagonista** (`pensieri.js`: testo sulla strada di 8-10 s per radio, bisogni e pensieri a caso), il **telefono** (`telefono.js`: app normali, app da scaricare con i cartelloni sulla strada, app strane) e il **prologo** (`prologo.js`: lettera → E36 blu → notaio → scelta, solo la Volvo → autostrada). Il parente morto è **zio Claudio**. La **vecchia storia è stata cancellata** (era in `docs/storia/STORIA.md`, nei capitoli ed eventi di `viaggio.js` e nei testi di `missioni.js`): non rimetterla, se serve è nella cronologia git. Da fare: scrivere la storia vera (`STORIA.md` dice cosa è deciso e cosa manca), i nomi delle altre 5 auto del garage e il loro sblocco, gli effetti horror (bussare nel bagagliaio senza niente, chiamate strane, app che compaiono da sole).
@@ -226,7 +241,7 @@ gioco fa, sezione per sezione).
   carrozzerie a grandezza piena, palazzi (`tileHD`), fumo, fiamme, fari e asfalto fini, danni sul disegno
   (`damaged`). Da fare: marciapiedi, pedoni e oggetti, scritte delle insegne, luoghi del viaggio (bar, motel...). Il proprietario vuole un pixel "più moderno, senza esagerare".
 - Manca il disegno di un **camion** (traffico lento a 90 km/h, lavori pesanti: la logica c'è, serve il disegno).
-- Sulle auto molto scure (Golf GTI, 205 GTI) il cambio di vernice prende poco (maschera povera).
+- Golf GTI e 205 GTI: maschera della vernice rifatta il 20/11 con `strumenti/maschera_scura.py` (prima prendeva il 16-26 %, ora il 73-77 %); restano un po' colorati i sedili dietro i finestrini.
 - La V40 è nel traffico: ruota e maschera della vernice sono ricavate dal disegno con `strumenti/v40_traffico.py`
   (`img/v40_wheel.png`, `img/v40_paint.png`); la V40 guidata dal giocatore resta disegnata a parte (`v40Base`).
 - Il traffico mette il bagliore di fanali e frecce all'altezza giusta di ogni disegno (dati `tail`/`head`).

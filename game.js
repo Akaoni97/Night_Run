@@ -3,6 +3,8 @@
 //  Indipendente dalla grafica: la scena 3D legge `ents`, `laneZ`, `s.dist`.
 // ============================================================================
 const GAME_FUEL_PRICE = 1.95;            // € al litro
+// in rosso si può andare (multe, rate): per benzina, cibo e motel ti fanno credito fino a GAME_FIDO euro sotto zero
+const GAME_FIDO = 500;
 const GAME_COLORS = [0x2b4c7e, 0x8a8f96, 0x1d1f22, 0xe8e6df, 0x6b1b14, 0x2f5d3a, 0xb38b2d];
 // traffico: tipi di veicolo con lunghezza (m), velocità tipica (m/s) e peso nella miscela
 // velocità in autostrada (km/h): auto 110–135, kei 100–120, furgoni 100–125, camion 85–92, autobus 90–100; in città circa la metà
@@ -20,7 +22,7 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
 const GAME_LOCS = [
   { id: 'tokyo', name: 'Tokyo · Shinjuku', country: 'Giappone', bg: 'city', lat: 35.6938, lon: 139.7034, traffic: 1.1, places: true,
-    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Niko e il Neon Kustom.' },
+    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Mario e il Neon Kustom.' },
   { id: 'wangan', name: 'Wangan · Bayshore Route', country: 'Giappone', bg: 'highway', lat: 35.4614, lon: 139.6800, traffic: 1.6, mix: { truck: 2.6, bus: 0.3, kei: 0.5, taxi: 0.6 },
     note: 'L\'autostrada sopraelevata sulla baia di Tokyo verso Daikoku: barriere antirumore, lampioni al sodio, la città sull\'acqua.' },
   { id: 'hakone', name: 'Hakone Turnpike', country: 'Giappone', bg: 'mountain', lat: 35.2420, lon: 139.1040, traffic: 0.5, mix: { truck: 0.2, bus: 0.2, taxi: 0.2 },
@@ -58,24 +60,25 @@ const GAME_LOCS = [
 ];
 const GAME_LANE_Z = { 0: 6.1, 1: 3.5, 2: 0, 3: -3.5 };
 
-// strada di montagna: la direzione cambia con la distanza percorsa (somma di sinusoidi), raggi fino a ~60 m.
-// theta > 0 = la strada gira a sinistra. Carreggiata di 8 m (due corsie), guardrail a 4,6 m dal centro.
-const MOUNTAIN = {
-  half: 4.6,
-  theta: (s) => 0.55 * Math.sin(s / 140) + 0.35 * Math.sin(s / 61 + 1.3) + 0.2 * Math.sin(s / 29 + 0.4),
-  // quota della strada (m) e pendenza: salite e discese
-  height: (s) => 9 * Math.sin(s / 170) + 4 * Math.sin(s / 53 + 0.7),
-  slope: (s) => 9 / 170 * Math.cos(s / 170) + 4 / 53 * Math.cos(s / 53 + 0.7),
-  kappa: (s) => 0.55 / 140 * Math.cos(s / 140) + 0.35 / 61 * Math.cos(s / 61 + 1.3) + 0.2 / 29 * Math.cos(s / 29 + 0.4),
-};
 // luoghi fissi lungo la strada di città (vista 2D): si ripetono ogni GAME_PLACE_CYCLE metri
 const GAME_PLACE_CYCLE = 2400;
 const GAME_BACK_MAX = 60;                // metri che si possono fare in retromarcia dal punto più lontano raggiunto (per tornare davanti a un locale)
+// entrata in un locale: l'auto svolta nel piazzale fino al suo posto auto, il protagonista scende, va a piedi alla porta
+// ed entra, lo schermo si scurisce; uscendo il contrario (disegno in entrata2d.js). Tempi in secondi.
+const GAME_ENT = { drive: 1.9, getOut: 0.5, walkV: 1.5, door: 0.35, dark: 0.45, getIn: 0.4, back: 1.5 };
+// posto auto e porta di ogni locale, in metri dalla posizione del locale (misurati sulle facciate di locali2d.js,
+// concessionario.js e sfascio.js): il posto è accanto alla porta, al benzinaio sulla pompa e la porta è quella del market
+const GAME_POSTI = {
+  bar: { park: -3.3, door: 0 }, fuel: { park: 2.6, door: 6.1 }, grill: { park: -2.4, door: 1.2 }, motel: { park: -3, door: 0.3 },
+  niko: { park: -3.4, door: 0 }, shop: { park: -3.4, door: 0 }, style: { park: -1.6, door: 1.9 }, dealer: { park: -0.6, door: 2.9 },
+  junk: { park: -1.2, door: 2.5 },
+};
+const GAME_ENT_IN = GAME_ENT.drive + GAME_ENT.dark, GAME_ENT_OUT = GAME_ENT.back + 0.35;   // senza la camminata (minimi)
 const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/s (18 km/h: una manovra, non una corsa)
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
   { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
-  { id: 'niko', at: 1450, name: 'Officina Niko', what: 'meccanico', col: '#5ad1ff' },
+  { id: 'niko', at: 1450, name: 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
   { id: 'style', at: 1950, name: 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
 ];
 // sticker e decalcomanie (Neon Kustom): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
@@ -86,7 +89,7 @@ const GAME_STICKERS = [
   { id: 'flames', name: 'Fiamme', price: 350 },
 ];
 const GAME_STICKER_SLOTS = [['st_door', 'Portiera'], ['st_rear', 'Parafango posteriore'], ['st_glass', 'Vetro posteriore']];
-// manutenzione da Niko: quanto dura ogni cosa (km di gioco) e quanto costa
+// manutenzione da Mario: quanto dura ogni cosa (km di gioco) e quanto costa
 const GAME_SERVICES = [
   { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 120, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
   { id: 'plugs', name: 'Candele nuove', km: 90, price: 140, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
@@ -161,7 +164,7 @@ class StreetGame {
     this.nextSpawn = 250; this.id = 1;
     this.siren = 0;
     this.autoLane = true;      // sorpasso automatico (si può spegnere)
-    this.track = 'city';       // 'city' oppure 'mountain' (solo in modalità libera)
+    this.track = 'city';       // c'era anche 'mountain' (la montagna in 3D, tolta il 20/11/2026)
     this.loc = GAME_LOCS[0];   // luogo della mappa del mondo (sfondo 2D e traffico)
     this.manualT = 0;          // secondi in cui la corsia l'ha scelta il pilota
     this.steerIn = 0;          // sterzo libero tenuto dal pilota: +1 sinistra, -1 destra
@@ -253,7 +256,7 @@ class StreetGame {
       const sx = e.exitX - e.x, need = (v * v) / (2 * Math.max(0.5, sx - 1));
       if (need > 1.9 || sx < 3) acc = Math.min(acc, sx < 3 ? -3 : -Math.min(3.5, need));
     }
-    const maxB = D.t === 'distratto' && isMe ? 4.5 : 8.5;
+    const maxB = (D.t === 'distratto' && isMe ? 4.5 : 8.5) * (1 - 0.3 * (sim.wet || 0));   // sul bagnato si frena meno
     return { acc: Math.max(-maxB, Math.min(D.a, acc)), gap, vl, isMe };
   }
 
@@ -318,10 +321,28 @@ class StreetGame {
   enterPlace(p) {
     if (!p || !p.ok) return false;
     this.prompt = null; this.lane = 3; this.manualT = 0; this.free = false;
-    const go = () => { this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0 }; this.laneZ = GAME_LANE_Z[3]; };
-    if (p.rel < 4) { this.stopAt(null, go); } else this.stopAt(p.x, go);
+    const go = () => {
+      // dove parcheggia nel piazzale (metri dalla porta): chi è fermo prima della porta entra andando avanti,
+      // chi l'ha appena passata entra in retro; sempre dentro la facciata (da −5 a +7 m)
+      const c = this.s.dist - p.x, P = GAME_POSTI[p.id];
+      const park = P ? P.park : c <= -1.5 ? Math.max(-4, Math.min(2.5, c + 6)) : Math.max(-4, Math.min(6, c - 5));
+      const door = P ? P.door : park, E = GAME_ENT, walk = Math.abs(door - (park + 0.3)) / E.walkV;   // scende dalla portiera, poco avanti al centro dell'auto
+      const drive = Math.max(E.drive * 0.85, Math.min(3.2, 1.2 + Math.abs(park - c) * 0.11));   // manovra più lunga se il posto è lontano
+      this.inside = { id: p.id, x: p.x, name: p.name, col: p.col, phase: 'in', t: 0, from: c, park, door, walk, drive, z0: this.laneZ,   // z0: la corsia da cui parte la manovra
+        dur: drive + E.getOut + walk + E.door + E.dark, durOut: 0.35 + walk + E.getIn + E.back };
+      this.laneZ = GAME_LANE_Z[3];
+    };
+    // vicino, o già fermi lì davanti (anche a motore spento): la manovra fino al posto la fa l'animazione
+    if (p.rel < 9 || (Math.abs(this.sim.v) < 1 && p.rel < 20)) this.stopAt(null, go); else this.stopAt(p.x + (GAME_POSTI[p.id] ? GAME_POSTI[p.id].park : 0) - 5, go);   // si ferma qualche metro prima del posto e da lì svolta dentro
+    if (this.ap) this.ap.enter = true;
     this.say(`Accosto: ${p.name}`, p.id === 'fuel' ? 'fuel' : 'buy');
     return true;
+  }
+  // U durante la camminata: si salta al buio (entrando) o all'auto che riparte (uscendo)
+  entSkip() {
+    const I = this.inside; if (!I || !I.dur) return;
+    if (I.phase === 'in' && I.t > (I.drive || GAME_ENT.drive)) I.t = Math.max(I.t, I.dur - GAME_ENT.dark);
+    else if (I.phase === 'out') I.t = Math.max(I.t, I.durOut - GAME_ENT.back);
   }
   exitPlace() {
     const I = this.inside; if (!I || I.phase !== 'shop') return;
@@ -330,6 +351,8 @@ class StreetGame {
       this.say(`Rifornimento interrotto: ${I.fill.got.toFixed(1).replace('.', ',')} litri, − € ${c.toFixed(2).replace('.', ',')}`, 'fuel');
     }
     I.fill = null; I.phase = 'out'; I.t = 0;
+    // si riesce dal piazzale andando avanti: la strada riparte qualche metro più in là (mai indietro)
+    I.outFrom = I.x + (I.park ?? 0); this.s.dist = Math.max(this.s.dist, I.outFrom + 4.5); I.outTo = this.s.dist;
   }
   // rifornimento alla pompa: litri che entrano un po' alla volta
   startFill(liters) {
@@ -338,8 +361,9 @@ class StreetGame {
     liters = Math.max(0, Math.min(liters, miss));
     if (liters < 0.5) return { ok: false, why: 'Il serbatoio è già pieno' };
     const cost = liters * GAME_FUEL_PRICE;
-    if (this.mode === 'career' && cost > this.s.money + 0.5) liters = Math.max(0, this.s.money / GAME_FUEL_PRICE);
-    if (liters < 0.5) return { ok: false, why: 'Non hai abbastanza soldi' };
+    if (this.mode === 'career' && cost > this.s.money + GAME_FIDO + 0.5) liters = Math.max(0, (this.s.money + GAME_FIDO) / GAME_FUEL_PRICE);
+    if (liters < 0.5) return { ok: false, why: `Sei in rosso oltre i € ${GAME_FIDO}: niente più credito, servono soldi` };
+    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: il benzinaio ti fa credito, per stavolta', 'fuel');
     I.fill = { liters, got: 0, cost: 0 };
     return { ok: true };
   }
@@ -359,7 +383,7 @@ class StreetGame {
     this.say(`${c ? c.label : 'Sticker'}: ${it.name} − € ${it.price}`, 'buy');
     return { ok: true, paid: it.price };
   }
-  // ------------------------------------------------------------ manutenzione (Niko)
+  // ------------------------------------------------------------ manutenzione (Mario)
   maint() { const st = this.carState(); return st.maint || (st.maint = { oil: 1, plugs: 1, pads: 1, dirt: st.clean === false ? 0.8 : 0.2 }); }
   wear(km, braking) {
     const m = this.maint();
@@ -372,7 +396,7 @@ class StreetGame {
     const s = GAME_SERVICES.find((x) => x.id === id), m = this.maint(), c = this.serviceCost(id);
     const level = id === 'wash' ? 1 - m.dirt : m[id];
     if (level > 0.97) return { ok: false, why: 'Non serve: è a posto' };
-    if (c > this.s.money) return { ok: false, why: `Niko vuole € ${c}` };
+    if (c > this.s.money) return { ok: false, why: `Mario vuole € ${c}` };
     this.s.money -= c; if (id === 'wash') m.dirt = 0; else m[id] = 1;
     this.say(`${s.name}${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
   }
@@ -654,8 +678,9 @@ class StreetGame {
           const need = v * v / (2 * Math.max(rel, 0.8));
           out.brake = v > vt + 0.4 ? Math.min(1, need / 10.3 * 1.4 + (v - vt) * 0.05) : 0;
           if (v < vt - 1 && rel > 4 && this.sim.gear >= 1) out.thr = Math.min(0.5, 0.08 + (vt - v) * 0.1);
+          if (rel < 1 && v < 2.5) out.brake = Math.max(out.brake, 0.7);   // arrivati: si frena deciso (prima gli ultimi centimetri si facevano a passo d'uomo)
         }
-        if (v < 0.25 && Math.abs(this.sim.v) < 0.25 && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
+        if (Math.abs(this.sim.v) < (ap.atX !== null && rel < 1 ? 0.6 : 0.25) && (ap.atX === null || rel < 6)) {   // fermi davvero, anche se si arrivava in retro
           ap.stopped = true;
           if ((this.sim.gear > 1 || this.sim.gear === -1) && this.sim.cfg.autoClutch) this.sim.shift(1);
           if (ap.onStop) ap.onStop();
@@ -668,7 +693,8 @@ class StreetGame {
   update(dt) {
     const sim = this.sim, d0 = this.s.dist;
     if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
-    if (sim.v > 0) this.s.dist += sim.v * dt;
+    if (this.rulli) { /* sui rulli del banco prova (banco.js): le ruote girano ma l'auto resta ferma nel negozio */ }
+    else if (sim.v > 0) this.s.dist += sim.v * dt;
     else if (sim.v < 0) {                  // retromarcia: si torna indietro di poco, l'autostrada resta a senso unico
       const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = Math.min(d0, Math.max(0, far - GAME_BACK_MAX));
       this.s.dist = Math.max(lim, d0 + sim.v * dt);
@@ -701,8 +727,8 @@ class StreetGame {
     const I = this.inside;
     if (I) {
       I.t += dt;
-      if (I.phase === 'in' && I.t > 1.3) { I.phase = 'shop'; I.t = 0; }
-      if (I.phase === 'out' && I.t > 1.1) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
+      if (I.phase === 'in' && I.t > (I.dur || GAME_ENT_IN)) { I.phase = 'shop'; I.t = 0; }
+      if (I.phase === 'out' && I.t > (I.durOut || GAME_ENT_OUT)) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
       if (I.fill) {
         const F = I.fill, step = Math.min(F.liters - F.got, dt * 8);
         F.got += step; sim.fuel = Math.min(1, sim.fuel + step / sim.P.tank); sim.dry = false;
@@ -869,64 +895,6 @@ class StreetGame {
     if (this.prevLane !== undefined && this.lane !== this.prevLane) this.signal = { dir: this.lane > this.prevLane ? 'L' : 'R', t: 2.6 };
     this.prevLane = this.lane;
     if (this.signal) { this.signal.t -= dt; if (this.signal.t <= 0) this.signal = null; }
-    // strada di montagna: niente corsie fisse, in curva la Supra viene spinta verso l'esterno (v²·κ):
-    // va tenuta in strada con lo sterzo; contro il guardrail rallenta, struscia e si ammacca
-    if (this.track === 'mountain') {
-      // guida libera: l'auto ha una sua direzione (relYaw rispetto alla strada). Lo sterzo dà un angolo alle ruote,
-      // l'angolo dà una rotazione (v·tanδ/passo) limitata dall'aderenza: se si esagera l'auto allarga (sottosterzo).
-      // Se la strada curva e non si sterza, si va dritti verso il bordo. Nessun aiuto automatico.
-      const v = Math.max(0, sim.v), grip = (sim.P.mu || 1.1) * sim.tireGrip() * 9.81;
-      const dMax = 0.55 / (1 + v * 0.06);                                   // sterzo pieno: meno angolo in velocità
-      this.steerAngle = (this.steerAngle || 0) + (this.steerIn * dMax - (this.steerAngle || 0)) * Math.min(1, dt * 9);
-      let yawRate = v * Math.tan(this.steerAngle) / 2.55;
-      const aMax = grip * 0.95; this.slide = 0;
-      if (v > 1 && Math.abs(yawRate * v) > aMax) { this.slide = Math.min(1, (Math.abs(yawRate * v) - aMax) / aMax); yawRate = Math.sign(yawRate) * aMax / v; }
-      // sovrasterzo di potenza: con le ruote che pattinano la coda gira di più
-      const wheelSlip = Math.max(0, sim.ww * sim.P.r - sim.v) / Math.max(4, sim.v);
-      if (wheelSlip > 0.12 && Math.abs(this.steerAngle) > 0.02) yawRate += Math.sign(this.steerAngle) * Math.min(0.9, wheelSlip * 1.6);
-      this.relYaw = (this.relYaw || 0) + (yawRate - MOUNTAIN.kappa(d) * v) * dt;
-      this.relYaw = Math.max(-1.2, Math.min(1.2, this.relYaw));
-      this.laneZ -= v * Math.sin(this.relYaw) * dt;
-      sim.grade = MOUNTAIN.slope(d);
-      // traffico: corsia di destra (o = +2) nel nostro senso, corsia di sinistra (o = -2) in senso opposto;
-      // rallentano nelle curve strette. Urtarli ammacca e frena di colpo (frontale molto peggio)
-      if (!this.mtnCars) {
-        const cols = [0x2b4c7e, 0xd8d8d0, 0x1c1c22, 0x8a1c1c, 0x3f6f4a, 0xb9a46a, 0x5a5f68];
-        this.mtnCars = [];
-        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 90 + k * 110, o: 2, dir: 1, v: 0, base: 13 + Math.random() * 6, color: cols[k % cols.length] });
-        for (let k = 0; k < 4; k++) this.mtnCars.push({ s: d + 140 + k * 150, o: -2, dir: -1, v: 0, base: 14 + Math.random() * 7, color: cols[(k + 3) % cols.length] });
-      }
-      for (const c of this.mtnCars) {
-        const tgt = Math.min(c.base, Math.sqrt(3.2 / Math.max(0.002, Math.abs(MOUNTAIN.kappa(c.s)))));
-        c.v += (tgt - c.v) * Math.min(1, dt * 0.8);
-        c.s += c.dir * c.v * dt;
-        const rel = c.s - d;
-        if (c.dir > 0 && (rel < -70 || rel > 520)) { c.s = d + 260 + Math.random() * 200; c.v = c.base * 0.8; }
-        if (c.dir < 0 && rel < -70) { c.s = d + 300 + Math.random() * 220; c.v = c.base; }
-        if (Math.abs(rel) < 4.3 && Math.abs(c.o - this.laneZ) < 1.75) {
-          if (!c.hit) {
-            c.hit = true; const head = c.dir < 0;
-            sim.v *= head ? 0.15 : 0.55; sim.damage = Math.min(1, sim.damage + (head ? 0.3 : 0.12));
-            this.laneZ -= Math.sign(c.o - this.laneZ || 1) * 0.6; this.relYaw = (this.relYaw || 0) * 0.3;
-            this.s.crashes = (this.s.crashes || 0) + 1; this.fx.push({ k: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
-            sim.events.push({ type: 'crash', I: head ? 1.5 : 0.9, kind: 'front' });
-            this.say(head ? 'Frontale! Resta nella tua corsia' : 'Tamponamento', 'bad');
-          }
-        } else if (Math.abs(rel) > 7) c.hit = false;
-      }
-      const lim = MOUNTAIN.half - 1.0;
-      this.rail = 0;
-      if (Math.abs(this.laneZ) > lim) {
-        this.rail = Math.sign(this.laneZ); this.laneZ = this.rail * lim;
-        // il guardrail raddrizza l'auto lungo la strada e la rallenta
-        if (Math.sign(-this.relYaw) === this.rail) this.relYaw *= 0.3;
-        if (v > 3) { sim.v *= 1 - Math.min(0.5, dt * 1.2); sim.damage = Math.min(1, sim.damage + dt * 0.012 * v / 20); if (Math.random() < dt * 10) this.fx.push({ k: 'scrape', side: this.rail });
-          // guardrail: la strisciata si sente finché ci si resta attaccati
-          if ((this.railSndT = (this.railSndT || 0) - dt) <= 0) { this.railSndT = 0.4; sim.events.push({ type: 'crash', I: Math.min(1, 0.3 + v * 0.02), kind: 'side' }); } }
-      }
-      this.free = true; this.lane = 1; this.prevLane = 1; this.signal = null;
-      return;
-    }
     // sterzo libero: velocità laterale che cresce con la velocità, nessuno scatto tra le corsie
     const freeOK = !this.ap && sim.v > 0.3;
     if (freeOK && Math.abs(this.steerIn) > 0.05) {
@@ -952,7 +920,7 @@ class StreetGame {
       this.latV = 0;
       const zT = GAME_LANE_Z[this.lane];
       // cambio corsia deciso: ~0,7 s a velocità d'autostrada, più morbido da fermi
-      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));
+      this.laneZ += Math.sign(zT - this.laneZ) * Math.min(Math.abs(zT - this.laneZ), dt * (sim.v > 1 || (this.ap && this.ap.enter) ? 3 + Math.min(2.6, sim.v * 0.07) : 0.8));   // accostando a un locale si va a destra decisi, anche piano (prima si attraversavano le corsie a passo d'uomo e da dietro ti tamponavano)
     }
 
   }

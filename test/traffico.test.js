@@ -106,3 +106,33 @@ test('traffico: un pesante dietro un altro pesante appena più lento lo sorpassa
   }
   assert.ok(seconda > 0, 'prima o poi va in seconda a sorpassare');
 });
+
+test('eventi tra le tappe: uno ogni 8-10 km; foratura lenta e uno che ha fretta da dietro', () => {
+  const { game } = setup(); game.nextRoadEvent = 9; const km = [];
+  game.spawnRoadEvent = function () { km.push(this.s.dist / 1000); };
+  for (let i = 0; i < 400; i++) { game.s.dist += 250; game.update(1 / 60); }
+  for (let i = 1; i < km.length; i++) { const g = km[i] - km[i - 1]; assert.ok(g >= 8 && g <= 10.3, 'distanza ' + g); }
+  const b = setup().game; b.spawnRoadEvent('gomma'); assert.ok(b.tyres().leak.some((l) => l > 0), 'una gomma perde');
+  b.sim.v = 30; b.spawnRoadEvent('fretta');
+  const f = b.ents.find((e) => e.fretta); assert.ok(f && f.x < b.s.dist && f.lane === b.lane && f.v > b.sim.v && f.drv.t === 'aggressivo');
+});
+
+test('soldi in rosso: benzina e cibo a credito fino a 500 €, oltre no', () => {
+  const { game, sim } = setup(); game.s.money = -100; sim.fuel = 0.2;
+  game.inside = { id: 'fuel', x: game.s.dist };
+  assert.ok(game.startFill(20).ok, 'benzina a credito'); game.inside.fill = null;
+  assert.ok(game.vgPay(10, 'Panino').ok); assert.equal(game.s.money, -110);
+  game.s.money = -495; assert.equal(game.vgPay(10, 'Panino').ok, false, 'oltre il credito no');
+  assert.equal(game.startFill(20).ok, true, 'quel poco che resta del credito'); game.inside.fill = null;
+  game.s.money = -600; assert.equal(game.startFill(20).ok, false);
+});
+
+test('pioggia: meno aderenza, di più sopra i 130 (aquaplaning); il traffico frena meno; asciutto come prima', () => {
+  const { sim, game } = setup(); sim.v = 20; const asc = sim.tireGrip();
+  sim.wet = 1; const lento = sim.tireGrip(); sim.v = 50; const forte = sim.tireGrip();
+  assert.ok(lento < asc * 0.75 && forte < lento * 0.9, `${asc} ${lento} ${forte}`);
+  sim.wet = 0; assert.equal(sim.tireGrip(), asc, 'asciutto: niente cambia anche veloce');
+  const e = car(game, 20, 30, 'normale'); game.ents.push({ id: 5, kind: 'traffic', vt: 'polo', len: 4, lane: e.lane, x: e.x + 6, v: 0, vT: 0, vBase: 0, still: true });
+  const dry = game.trafficAccel(e, game.s.dist).acc; sim.wet = 1; const wet = game.trafficAccel(e, game.s.dist).acc;
+  assert.ok(wet > dry && dry <= -8, `${dry} ${wet}`);
+});

@@ -1,23 +1,23 @@
 // ============================================================================
 //  Night Run · L'usato dei privati (dopo concessionario.js)
 //  Annunci nell'app Annunci del telefono: un privato aspetta alla tappa con la sua auto e il cartello VENDESI.
-//  Quando entri in quella tappa, nel pannello c'è l'annuncio: la guardi, ci fai un giro, chiami Niko a vederla,
+//  Quando entri in quella tappa, nel pannello c'è l'annuncio: la guardi, ci fai un giro, chiami Mario a vederla,
 //  tratti sul prezzo (più difetti hai scoperto, più è facile) e la compri. Le auto possono nascondere difetti:
-//  carrozzeria rifatta, gomme finite, freni finiti, tagliando mai fatto, motore stanco (−15 % finché Niko non lo
+//  carrozzeria rifatta, gomme finite, freni finiti, tagliando mai fatto, motore stanco (−15 % finché Mario non lo
 //  revisiona), chilometri scalati. Comprata bene e sistemata, all'Autosalone si rivende con guadagno.
 //  Stato in game.s.vg.usato. Gli annunci vengono dalla strada (sempre gli stessi per la stessa tappa).
 // ============================================================================
 const US = {
   chance: 0.4,          // probabilità che a una tappa ci sia un annuncio
   ahead: 10,            // quante tappe avanti si vedono nell'app
-  niko: 120,            // Niko che viene a vederla
+  niko: 120,            // Mario che viene a vederla
   tired: 0.85,          // potenza col motore stanco
   nego: [[0.1, 0.6, 0.15], [0.2, 0.3, 0.2], [0.3, 0.08, 0.22]],   // sconto, probabilità di base, in più per ogni difetto scoperto
 };
 const US_NAMES = ['Marco', 'Giulia', 'Sandro', 'Rita', 'Ivo', 'Lorena', 'Tonino', 'Paola', 'Franco', 'Elena', 'Bruno', 'Silvana', 'Dario', 'Nadia', 'Gino', 'Teresa'];
 const US_LINES = ['Tenuta come una figlia.', 'Unico proprietario, sempre in garage.', 'La vendo perché mi trasferisco.', 'Mai fatto un incidente, giuro.', 'Tagliandi fatti tutti, il libretto l\'ho perso.',
   'Va che è una meraviglia.', 'Era di mio padre, la usava solo la domenica.', 'Prezzo trattabile, ma poco.', 'Ho bisogno di soldi, fai tu.', 'Qualche graffietto, niente di che.'];
-// difetti: see = come si scopre prima di comprare (eye: guardandola, drive: facendo un giro, niko: solo Niko)
+// difetti: see = come si scopre prima di comprare (eye: guardandola, drive: facendo un giro, niko: solo Mario)
 const US_DEF = {
   carrozzeria: { name: 'Carrozzeria rifatta male', note: 'sotto la vernice stucco e ruggine', see: 'eye', apply: (st) => { st.damage = Math.max(st.damage || 0, 0.35); } },
   gomme: { name: 'Gomme finite', note: 'battistrada quasi liscio', see: 'eye', apply: (st) => { st.tireWear = Math.max(st.tireWear || 0, 0.85); } },
@@ -78,11 +78,11 @@ const US_DEF_IDS = Object.keys(US_DEF);
   };
   P.usNiko = function (n) {
     const L = this.usAt(n); if (!L || !atStop(this, n)) return { ok: false, why: 'L\'auto è a un\'altra tappa' };
-    const I = this.usInsp(n); if (I.niko) return { ok: false, why: 'Niko l\'ha già vista' };
-    if (this.s.money < US.niko) return { ok: false, why: `Niko vuole € ${US.niko} per venire` };
+    const I = this.usInsp(n); if (I.niko) return { ok: false, why: 'Mario l\'ha già vista' };
+    if (this.s.money < US.niko) return { ok: false, why: `Mario vuole € ${US.niko} per venire` };
     this.s.money -= US.niko; I.niko = true; I.look = true; I.drive = true;
     const got = [...reveal(I, L, 'eye', 1), ...reveal(I, L, 'drive', 1), ...reveal(I, L, 'niko', 1)];
-    return { ok: true, got, msg: L.defects.length ? `Niko: «${I.rev.map((d) => US_DEF[d].name).join('. ')}.» (− € ${US.niko})` : `Niko: «Questa è sana. Prendila.» (− € ${US.niko})` };
+    return { ok: true, got, msg: L.defects.length ? `Mario: «${I.rev.map((d) => US_DEF[d].name).join('. ')}.» (− € ${US.niko})` : `Mario: «Questa è sana. Prendila.» (− € ${US.niko})` };
   };
   // trattativa: una sola volta per annuncio. level 0, 1, 2 = −10, −20, −30 %
   P.usNego = function (n, level, rnd = Math.random) {
@@ -114,11 +114,11 @@ const US_DEF_IDS = Object.keys(US_DEF);
     return { ok: true, price };
   };
 
-  // motore stanco: revisione da Niko
+  // motore stanco: revisione da Mario
   P.usRevCost = function (id = this.car) { const it = VG_SHOP.find((q) => q.id === id); return r50((it ? it.price : 4000) * 0.06 + 500); };
   P.usRevision = function () {
     const st = this.carState(); if (!st.tired) return { ok: false, why: 'Il motore è a posto' };
-    const c = this.usRevCost(); if (this.s.money < c) return { ok: false, why: `Niko vuole € ${fmt(c)}` };
+    const c = this.usRevCost(); if (this.s.money < c) return { ok: false, why: `Mario vuole € ${fmt(c)}` };
     this.s.money -= c; st.tired = false; if (st.defects) st.defects = st.defects.filter((d) => d !== 'motore');
     this.say(`Motore revisionato: fasce, guarnizioni, valvole (− € ${fmt(c)})`, 'buy'); return { ok: true };
   };
@@ -161,7 +161,7 @@ const US_DEF_IDS = Object.keys(US_DEF);
 .us-msg{font-size:13.5px;color:#f7d9ad;padding:6px 8px;background:#0b0a08;box-shadow:inset 0 0 0 1px #2a251d}`;
   document.head.appendChild(CSS);
 
-  // sezione nel pannello del locale: l'annuncio di questa tappa, e da Niko la revisione del motore
+  // sezione nel pannello del locale: l'annuncio di questa tappa, e da Mario la revisione del motore
   const UI = { msg: {} };
   function panel(body, I, ctx) {
     const holder = document.createElement('div'); holder.className = 'us-hold'; holder.style.cssText = 'display:grid;gap:12px'; body.appendChild(holder);
@@ -173,7 +173,7 @@ const US_DEF_IDS = Object.keys(US_DEF);
     const n = Math.round((I.x - VG_STOP0) / VG_STEP);
     if (I.id === 'niko' && g.carState().tired) {
       const d = document.createElement('div'); d.className = 'us-box';
-      d.innerHTML = `<h4>Revisione del motore</h4><p class="hint" style="margin:0">Niko: «Questo motore è stanco: fasce, guarnizioni, valvole. Te lo rimetto in piedi.» Torna la potenza piena e all'Autosalone vale di più.</p>`;
+      d.innerHTML = `<h4>Revisione del motore</h4><p class="hint" style="margin:0">Mario: «Questo motore è stanco: fasce, guarnizioni, valvole. Te lo rimetto in piedi.» Torna la potenza piena e all'Autosalone vale di più.</p>`;
       const a = document.createElement('div'); a.className = 'us-acts';
       const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn buy'; b.textContent = `Revisione · € ${fmt(g.usRevCost())}`;
       b.addEventListener('click', () => { const r = g.usRevision(); if (!r.ok) ctx.flash(r.why, 2.2); else { ctx.save(); ctx.refresh(); } });
@@ -183,7 +183,7 @@ const US_DEF_IDS = Object.keys(US_DEF);
     const In = g.usInsp(n), price = g.usPrice(L);
     g.us().seen[n] = 1;
     const d = document.createElement('div'); d.className = 'us-box';
-    const defs = In.rev.length ? In.rev.map((x) => `<span title="${esc(US_DEF[x].note)}">${esc(US_DEF[x].name)}</span>`).join('') : (In.niko ? '<span class="ok">Niko: è sana</span>' : '<span class="ok">Nessun difetto trovato (finora)</span>');
+    const defs = In.rev.length ? In.rev.map((x) => `<span title="${esc(US_DEF[x].note)}">${esc(US_DEF[x].name)}</span>`).join('') : (In.niko ? '<span class="ok">Mario: è sana</span>' : '<span class="ok">Nessun difetto trovato (finora)</span>');
     d.innerHTML = `<h4>Vendesi · l'annuncio di ${esc(L.seller)}</h4>
       <div class="us-top"><img alt="" src="${pic(L.id, ctx.refresh)}"><div><b>${esc(CARS[L.id].name)}</b><small>${fmt(L.km)} km dichiarati · nel parcheggio</small><q>${esc(L.line)}</q><div class="us-price">${price !== L.price ? `<s>€ ${fmt(L.price)}</s>` : ''}€ ${fmt(price)}</div></div></div>
       <div class="us-defs">${defs}</div>${UI.msg[n] ? `<div class="us-msg">${esc(UI.msg[n])}</div>` : ''}`;
@@ -191,7 +191,7 @@ const US_DEF_IDS = Object.keys(US_DEF);
     const btn = (label, cls, fn, dis) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn ' + cls; b.innerHTML = label; b.disabled = !!dis; b.addEventListener('click', () => { const r = fn(); if (r && r.ok === false) ctx.flash(r.why, 2.4); else { if (r && r.msg) UI.msg[n] = r.msg; ctx.save(); } ctx.refresh(); }); a.appendChild(b); };
     btn('Guardala bene<small> · gratis</small>', '', () => g.usLook(n), In.look);
     btn('Fai un giro<small> · gratis</small>', '', () => g.usDrive(n), In.drive);
-    btn(`Chiama Niko<small> · € ${US.niko}</small>`, '', () => g.usNiko(n), In.niko || g.s.money < US.niko);
+    btn(`Chiama Mario<small> · € ${US.niko}</small>`, '', () => g.usNiko(n), In.niko || g.s.money < US.niko);
     if (!In.nego) US.nego.forEach(([dd], lv) => btn(`Offri −${Math.round(dd * 100)} %<small> · ${Math.round(g.usChance(n, lv) * 100)} % che accetti</small>`, '', () => g.usNego(n, lv)));
     btn(`Compra · € ${fmt(price)}`, 'buy', () => g.usBuy(n), g.s.money < price || g.s.vg.garage.includes(L.id));
     d.appendChild(a);

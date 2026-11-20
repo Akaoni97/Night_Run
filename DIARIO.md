@@ -4,6 +4,199 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**estetica premium: layout, banner, icone**)
+- Fatto: `premium.css` e `premium.js`. Icone disegnate al posto di emoji e simboli (barra in alto, bisogni, cruscotto a tessere, frecce, avvisi,
+  pannelli dei locali, telefono); vetro scuro e pulsanti metallici; avvisi con icona e barra del tempo; traguardo dorato; titoli dei quartieri e
+  delle capitali. Interruttore Premium/Classico in Impostazioni → Grafica (Classico = come prima). Provato su PC e al tocco, console pulita.
+- Aperto: non guardati uno per uno i pannelli di autosalone, sfascio e Nico (prendono lo stile comune dei pulsanti).
+
+## 20/11/2026 notte · proprietario (**grafica più nitida e dettagliata; ruote della trazione anteriore**)
+- Fatto (`nitido2d.js` nuovo, agganci piccoli in `street2d.js`): ingrandimento sullo schermo a pixel tutti uguali (prima su un 1080p
+  erano larghi 1 o 2 pixel a caso), carrozzerie e ruote dai disegni passate per Scale2x (curve e diagonali senza scalini, ruote che girano
+  lisce), contorno e luci dell'auto alla densità vera, bagliore più netto, scia della velocità più leggera e nitida. Più dettagli:
+  marciapiede a lastre con fughe, crepe e cordolo di pietra, cordolo vicino, lampioni nuovi (palo tondo, braccio curvo, base coi
+  bulloni, vetro acceso), riflessi sull'asfalto più fini, cartacce riconoscibili (`vita2d.js`). Qualità bassa e leggera come prima.
+- Fatto: sulle auto a **trazione anteriore** (V40, Panda, Golf...) ora gira forte la ruota davanti e la dietro rotola (`street2d.js`);
+  al banco di Luca girano solo i rulli sotto le ruote motrici (`banco.js`). `strumenti/prova.js --vista 1920x1080` per le foto grandi.
+- Aperto: i pedoni del marciapiede sono ancora i vecchi omini a blocchi (il prossimo passo: disegnarli come il protagonista).
+
+## 20/11/2026 notte · proprietario (**fiamme al rilascio: medie fino a 5.000 giri, bella fiammata sopra**)
+- Fatto: provando il gioco le fiamme al rilascio non uscivano quasi mai (servivano valvola o Supra e un caso fortunato). Ora ogni auto toccata dal
+  tuning ne fa: molli sotto i 5.000 giri = fiamme di livello medio, sopra = una bella fiammata grossa (nello spinto con l'ossidrica); il primo
+  scoppio parte subito appena molli il gas, sopra i 5.000 ne parte un secondo. Provato in folle a più giri: sotto 4.800 tre fiamme medie, da 5.600
+  fiamme grosse. Il numero dei giri (5.000) è `FLAME_BIG_RPM` in `fiamme.js`.
+- Aperto: da sentire/vedere giocando sull'auto vera (il livello dipende da quanto è preparata).
+
+## 20/11/2026 notte · proprietario (**fiamme secondo il tuning**)
+- Fatto: l'auto ha un livello di preparazione (leggero, medio, spinto: `flameTier` in `fiamme.js`) e da quello dipende la fiammata: leggero fa
+  soprattutto un piccolo **botto** circolare, medio la **fiamma libera** in quattro versioni (classica, doppia lingua, lunga, tozza; arancio e
+  giallo), spinto l'**ossidrica** (getto blu sottile e rapido, diamanti, scintille) e a metà rilascio la fiamma libera. Anche le cambiate
+  danno qualche fiammata sull'auto potenziata. La mappa ECO/FORTE del turbo sposta il livello. Provate nel browser tutte e tre le famiglie.
+- Aperto: il suono dei botti non cambia con il tipo (resta quello del motore audio); le soglie dei livelli vanno sentite giocando.
+
+## 20/11/2026 notte · proprietario (**turbo vero, scarico, negozio dei pezzi a categorie**)
+- Fatto: la mappa del turbo (ECO / NORMALE / FORTE) cambia i bar in tubo (0,44 / 0,79 / 0,89 con 0,9 di massimo), non solo la coppia; scarico
+  aperto più forte (125 %), chiuso più basso (72 %) e senza fiamme; fiammata media al rilascio ai giri medi. Negozio di Luca in schede per
+  categoria (Motore, Turbo e aria, Scarico, Trasmissione, Ruote e telaio) con i pezzi a livelli e un clic per montare (`renderTuneShop`).
+
+## 20/11/2026 notte · proprietario (**briefing: AUTO 5 s, leva S, tasti, schede di Nico, vernice**)
+- Fatto: AUTO 1 dopo 5 s; leva con la **S** sport (`autoBox` tiene i giri alti); tasti 1-4 solo per mangiare e bere (via le marce dai
+  numeri, `tasti.js` aggiornato); pannello di Nico a schede (Livelli, La mia auto, Negozio, Magazzino, Banco, Motori); magazzino pezzi
+  a 100 (`MOT.maxPezzi`); valigette senza turbo; maschera vernice di Golf GTI e 205 GTI rifatta (`strumenti/maschera_scura.py`).
+- Aperto: codice morto delle vecchie gare, camion (disegni dal proprietario), alta definizione di marciapiedi e pedoni. Il cognato
+  decide i punti motori di `SOSPESI.md` (vendere la V40 coi pezzi, estendere ai altri motori, vecchio Pistone).
+
+## 20/11/2026 sera · proprietario (**la cassa pesante non blocca più le missioni**)
+- Fatto (`missioni.js`, riga della bacheca in `index.html`): senza rimorchietto l'obiettivo dice cosa serve e dove
+  («240 kg: serve il rimorchietto, al Motel Ovunque (€ 2.200)», o «attacca il rimorchio», o «fai spazio»); in bacheca
+  c'è «Lascia perdere»: la cassa la porta un altro e il lavoro dopo (la busta) arriva alla bacheca successiva. Test in
+  `test/missioni.test.js`.
+
+## 20/11/2026 sera · proprietario (**prova dei primi 200 km col giocatore automatico**)
+- Fatto: `strumenti/giocatore.js` gioca una partita nuova del Viaggio da solo a tempo accelerato (~6×: 200 km in 25
+  minuti veri) e scrive il diario (soldi, spese, lavori, bisogni, eventi). Due partite da 200 km, nessun errore.
+  Risultati e decisioni in `SOSPESI.md` (economia, rimorchio che blocca le missioni, missione da 38 km, danni).
+- Per il cognato: si può rilanciare dopo ogni cambio di prezzi o paghe (`--km`, `--vel`, `--guida`).
+
+## 20/11/2026 sera · proprietario (**tutti gli interni in alta definizione**)
+- Fatto: come il bar, anche benzinaio, Sosta 24, motel, Mario, Luca, Neon Kustom, Autosalone e sfascio (`interni_hd.js`):
+  doppia densità, profondità, materiali, luci, persone disegnate come il protagonista e **scritte leggibili** (carattere 5×7:
+  prezzi a led, cartelli, menu, chiavi, calendario, CV del banco, prezzo in vetrina). Le scene vecchie restano (`_vecchio`).
+- Per il cognato: da Luca c'è solo Luca; Nico lo aggiungi tu quando decidi come è fatto (`HD.shop` in `interni_hd.js`).
+
+## 20/11/2026 sera · proprietario (**interni più belli: prototipo del bar**)
+- Fatto: il bar rifatto in alta definizione (`interni_hd.js`): doppia densità come la strada, profondità su tre piani,
+  materiali e luci vere, barista disegnata come il protagonista che lavora tra caffè e brioche. `interni.js` ora sa
+  disegnare una scena a doppia densità (solo se la scena lo chiede: gli altri interni sono identici). Il bar vecchio
+  resta in `SCENE.bar_vecchio`.
+- Aperto: se lo stile piace, gli altri otto interni uno alla volta (quello di Luca col cognato, per Nico).
+
+## 20/11/2026 sera · proprietario (**Impostazioni nel menu e meteo nuovo**)
+- Fatto: nel menu una scheda **Impostazioni** con quattro sottoschede (Grafica, Audio, Comandi, Guida): ci sono finite le
+  regolazioni che stavano sparse in Vista, Guida ed Extra (stessi controlli, spostati). Le schede Vista ed Extra non ci
+  sono più: colore, mappa, foto, replay e «Come si gioca» stanno in Partita. File: `menu.js`.
+- Fatto: **nebbia, neve e vento** (`meteo2d.js`), dal menu Meteo o col tasto K; in «dinamico» secondo il paesaggio. La
+  neve fa scivolare più della pioggia, il vento fa sbandare l'auto sulle raffiche. Niente di `pistone/` toccato.
+- Da provare sul PC: quanto si vede nella nebbia di notte, il fruscio del vento.
+
+## 20/11/2026 · cognato (**negozio unico: Nico lavora da Luca, pezzi singoli sulla V40**)
+- Deciso col proprietario: il negozio dei pezzi motore è uno solo, Da Luca Tuning. Nico ci lavora: compri un pezzo alla
+  volta (a livelli), va in magazzino (un pezzo, un posto) e lo monti sul **motore originale della V40** (tutto tranne il
+  blocco) o sul **banco di lavoro**, dove il motore nuovo ti aspetta finché non ha tutti i 14 pezzi. Il Pistone non è più
+  una tappa: il secondo bar è tornato. Sulla V40 Luca non vende più turbo, intercooler, centralina, frizione e
+  preparazioni (chi li aveva li riavrà in soldi). Prezzi dei livelli rifatti sull'economia (€ 300/900/2.400). Test: 211.
+- Aperto: estendere alle altre auto quando la V40 è a posto; Nico non ha ancora un disegno da Luca (stasera la sua storia);
+  vendendo la V40 i pezzi montati sopra se ne vanno con lei (da decidere se tornano in magazzino).
+
+## 20/11/2026 · cognato (**il Pistone diventa un progetto in prova, separato**)
+- Il proprietario ha passato al cognato la gestione dei motori. I motori costruiti da Nico sono un **progetto in prova**:
+  cartella `pistone/` (prima `motori/`), separata dal tuning di Luca che resta la modifica dei motori di sempre.
+  Interruttore nella scheda Sviluppatori (spento: niente tappa e niente swap, i motori restano salvati); ogni aggancio
+  fuori dalla cartella è segnato `[PISTONE]`; in `pistone/LEGGIMI.md` le due sezioni e come togliere il Pistone del tutto.
+- Anche: Mario sulla mappa è la O (Officina) e ha la M sulla tuta; «Sblocca tutto» non tocca più i livelli di Nico.
+
+## 20/11/2026 · cognato (**riordino dei motori**)
+- Controllato il lavoro di tutti e due sui motori: nessun ramo con lavoro non unito, niente file doppi. Tutto in
+  `motori/` con la guida `motori/LEGGIMI.md` (sezione «Da non confondere»: tuning di Luca, banco prova contro banco di
+  montaggio, revisioni di Mario contro motore rifatto al Pistone, `test/motori.test.js` che è il vecchio Banco Suono).
+- Da Luca, con un motore del Pistone montato, ora c'è scritto che turbo, intercooler, centralina, camme e frizione sono
+  quelli del motore di Nico (prima i pezzi di Luca sembravano montati ma non contavano). Vetrina del Pistone: RICOSTRUZIONI
+  al posto di REVISIONI (le revisioni sono di Mario).
+
+## 20/11/2026 · cognato (**motori a livelli, Nico e Mario**)
+- Fatto: al Pistone **Nico** (era Ottone) insegna i pezzi a livelli 1-4, reparto per reparto, con requisiti (soldi, km,
+  motori costruiti, livelli di altri reparti). Reparti nuovi: pompa dell'olio, intercooler, pompa della benzina,
+  radiatore, frizione (14 in tutto). I pezzi devono andare d'accordo: intercooler piccolo col turbo grande = aria calda e
+  battito; radiatore piccolo = l'acqua sale in strada, protezione della centralina, guarnizione che salta se insisti;
+  frizione piccola slitta; pompa dell'olio o della benzina piccole si sentono. Bilancio di calore vero in `sim.js`, solo
+  per i motori costruiti. L'officina dei tagliandi ora è di **Mario** (id interno sempre `niko`). Test: 208.
+- Aperto: prezzi e requisiti dei livelli da provare giocando; sopra i ~480 CV nessun radiatore regge il gas pieno a lungo
+  (si va in protezione, voluto); Nico ha ancora l'aspetto di Ottone (vecchio coi baffi bianchi).
+- Per il proprietario: Niko → Mario e Ottone → Nico in tutti i testi, guarda se ti va bene.
+
+## 20/11/2026 · proprietario → **AVVISO PER IL COGNATO**
+- **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
+  su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
+
+## 20/11/2026 sera · proprietario (**costruzione del motore**, al posto del 3D)
+- Fatto: locale nuovo **Il Pistone** (al posto del secondo bar di ogni giro, primo al km 14,6). Progetti un motore pezzo
+  per pezzo (blocco 4/5/6 cilindri, albero, bielle, pistoni, testata, camme, turbo o volumetrico, iniettori, centralina)
+  con CV, coppia, giri, peso, affidabilità e curva che cambiano; lo monti a mano sul cavalletto (si parte dal basso,
+  Ottone ti corregge), lo accendi, e poi lo metti su **qualsiasi auto** (swap: cambiano guida, suono e peso). Motori
+  troppo spinti si rompono tirandoli al limitatore. File `motori.js`, `motori2d.js`; test (200 in tutto).
+- Anche: `strumenti/prova.js` (passo `entra`) aspetta la fine della camminata nei locali.
+- Da provare sul PC: il suono dei motori swappati in strada e quanto costano i pezzi rispetto ai guadagni.
+
+## 20/11/2026 sera · proprietario (**via il 3D**)
+- Deciso dal proprietario: il 3D si toglie (servirebbero tutti i modelli delle auto). Cancellati `car3d.js`,
+  `street3d.js`, `viaggio3d.js`, `models/supra_mk4.glb`; da `index.html` vista 3D/Abitacolo, Montagna, Vetrina,
+  telecamera, modelli .glb, three.js; da `game.js` la guida in montagna; tasti C e G; crediti e licenze del modello.
+  Tolto il test della Montagna (194). `sw.js` non toccato (la riga di three.js lì non fa più niente).
+- Al posto del 3D: costruzione del motore in un locale nuovo (in corso).
+
+## 20/11/2026 · proprietario (entrata nei locali)
+- Fatto: entrando in un locale niente più teletrasporto. Ogni locale ha un **posto auto** accanto alla porta (strisce e P sul
+  marciapiede; al benzinaio la pompa): l'auto ci entra con le ruote che girano (in retro se la porta l'hai passata), il
+  protagonista **scende, va a piedi alla porta ed entra**, buio, interno. Uscendo esce dalla porta, risale e riparte. U
+  durante la camminata la salta. Accostando, il cambio di corsia verso destra ora è deciso anche piano (prima si
+  attraversavano le corsie a passo d'uomo e da dietro ti tamponavano: forse il problema di ieri del cognato).
+- File nuovo `entrata2d.js`; in `game.js` posti e porte (`GAME_POSTI`) e tempi (`GAME_ENT`); un aggancio in `street2d.js`,
+  una riga in `index.html` (U salta). Righe del cognato non toccate. Test `test/entrata.test.js` (195 in tutto).
+- Aperto: nel 3D l'auto si ferma e basta (manovra e omino solo nel 2D).
+
+## 20/11/2026 mattina · proprietario (app installabile)
+- Fatto: il gioco si installa come app da Edge o Chrome (`manifest.json`, icone in `img/app/`): icona sul desktop, finestra
+  sua, sempre aggiornato. Come si fa: `PASSAGGIO.md`, «Il gioco come app sul PC». Provato: Chromium la dà installabile.
+- Deciso: l'exe per Steam più avanti (piano di `docs/pubblicazione/PERCORSO.md`). Weekend: proprietario sul 3D, cognato sul 2D.
+
+## 20/11/2026 · proprietario (3D: locali, paesaggi, luci)
+- Fatto: `viaggio3d.js` (file nuovo, `street3d.js` non toccato): nel 3D ci sono i locali del Viaggio con le stesse facciate
+  del 2D (si entra anche dal 3D), i paesaggi (pianura, borgo, deserto, mare, montagna, autostrada) al posto della città
+  sempre uguale, luci più belle (niente macchie bianche, coni sotto i lampioni). Provato con three.js preso da npm (il CDN
+  qui è chiuso): notte, giorno, abitacolo, dentro un locale.
+- Aperto: nel 3D l'auto è sempre la Supra (servono modelli .glb); paesaggi ancora semplici, da arricchire.
+- Serve dal cognato: provarlo sul PC (vista 3D dal menu Vista) e dire cosa manca.
+
+## 20/11/2026 · proprietario (controllo grande e scritte leggibili)
+- Fatto: controllo della sera su 30 commit (polizia, banco, Jeshka, migliorie, caricamento): tutto provato nel browser, 191 test.
+- Fatto: `leggibile.js`, file nuovo e separato: al telefono la finestra della polizia era coperta da STRUMENTI/DATI e gli
+  avvisi finivano sotto la finestra e sulla striscia gialla. Ora la domanda sta sopra e gli avvisi che la coprirebbero
+  aspettano. Nessun file del cognato toccato; sul PC non cambia niente se non c'è sovrapposizione.
+- Prossimo: lavorare insieme sul 3D.
+
+## 19/11/2026 · proprietario (autosalone e sfascio)
+- Fatto: facciate rifatte anche per Autosalone Notte (`concessionario.js`: fascia scura con la scritta, portale col marchio,
+  faretti sulle auto, ufficio vendite, porta scorrevole, bandiere e totem più bassi) e Sfascio Ruggine (`sfascio.js`: gru a
+  traliccio col magnete, pile di carcasse fatte coi disegni veri ingialliti, lamiera col filo spinato, copricerchi,
+  cancello a rete che scorre, ufficio nel container, ATTENTI AL CANE). Nuovo `lcWreck` in `locali2d.js`.
+- PASSAGGIO: ora ci sono tutti e due gli artifact (proprietario e cognato), ognuno aggiorna il suo.
+
+## 20/11/2026 notte · cognato (Jeshka e Luca)
+- Fatto: storia secondaria «Ti tengo compagnia» (`jeshka.js`) dalla proposta di Codex, riscritta: sei scene nei
+  negozi Neon e tuning, il cavo, Jeshka in macchina col messaggio falso, i cinque lampi, incontro e finale. 191 test.
+- Aperto: Jeshka non è Rosa (la storia principale non cambia); entrate tramite Marco e incursione non fatte.
+- Da provare: tutta la catena giocando dal km 20 in poi.
+
+## 19/11/2026 sera · cognato (caricamento)
+- Fatto: la grafica 3D (three.js dal CDN, car3d.js, street3d.js, circa 900 KB) si scarica solo se apri la vista 3D,
+  la montagna o la vetrina; le registrazioni della Supra solo con la Supra; `sw.js` salva immagini, suoni e modelli
+  nel browser (seconda volta più veloce, si gioca anche senza rete; il codice arriva sempre fresco).
+- Banco prova: sui rulli c'è l'auto vera, col suo cambio (anche automatico) e il suo suono.
+- Da provare: la vista 3D su GitHub Pages (qui non c'è rete verso il CDN per provarla).
+
+## 19/11/2026 sera · cognato (banco prova)
+- Fatto: banco prova a rulli da Da Luca Tuning (`banco.js`): auto sui rulli, acceleratore graduato, freno, marce,
+  curva di CV e coppia con quella di prima in grigio per confrontare prima e dopo i pezzi. 187 test.
+- Aperto: il banco non ha suono (il motore audio segue solo l'auto vera); se serve si collega dopo.
+
+## 19/11/2026 sera · cognato (migliorie)
+- Fatto: scuse assurde che a volte passano (anche il bagno); un evento ogni 8-10 km (incidente, controllo, foratura,
+  uno che ha fretta); credito in rosso fino a 500 € per benzina, cibo e motel; nascondiglio con rischio (1 su 3 ti
+  aspettano fuori); sirena e radio che seguono la distanza, volanti nel radar; statistiche nella scheda Partita;
+  aquaplaning e frenate più corte per tutti sul bagnato; spie sul quadro; pensieri sullo stato dell'auto.
+- Aperto: gli epiloghi A, C, D non li ho toccati (sono trama); il punto 4 (obiettivo vicino) da spiegare meglio.
+- Da provare sul PC: grandezza delle spie sul quadro, volume della sirena.
+
 ## 19/11/2026 notte · proprietario (storia: blocco Elena di Codex)
 - Fatto: integrato il pacchetto di Codex per Elena (`materiale5_01_*`, 8 file; rapporto in `docs/storia/RAPPORTO_CODEX_5_01_ELENA.md`). Dieci scene
   nuove (80 nodi, 124 risposte, ognuna con uno scontro: Pasta, Turno, Coinquilino, Cena, Bollette, Richiamo, Distanza, Riparazione, Nonno, Cena di ritorno)

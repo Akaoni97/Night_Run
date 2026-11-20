@@ -22,7 +22,39 @@
     quadro: '<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
     svil: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
     extra: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+    imp: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
   };
+  // pezzi della pagina che si spostano: un riquadro col titolo, e il blocco (.field) che contiene un controllo
+  const panel = (title, els, cls = '') => { const box = document.createElement('div'); box.className = 'panel ' + cls; const h = document.createElement('h2'); h.textContent = title; box.appendChild(h); for (const el of els) if (el) box.appendChild(el); return box; };
+  const fieldOf = (id) => { const el = $(id); return el ? el.closest('.field') || el : null; };
+  const labelOf = (id) => { const el = $(id); return el ? el.closest('label') || el : null; };
+  // Impostazioni: tutte le regolazioni in un posto solo, divise in sottoschede (Grafica, Audio, Comandi, Guida).
+  // I controlli sono quelli di sempre (stessi id): si spostano qui da Vista, Guida ed Extra.
+  function impostazioni() {
+    const wrapI = document.createElement('div'); wrapI.className = 'gm-imp';
+    const bar = document.createElement('div'); bar.className = 'gm-subs'; bar.setAttribute('role', 'tablist'); bar.setAttribute('aria-label', 'Impostazioni');
+    wrapI.appendChild(bar);
+    const keys = q('section.extras .keys'), keysPanel = keys && keys.closest('.panel');
+    const tasti = document.createElement('button'); tasti.type = 'button'; tasti.className = 'kbtn'; tasti.innerHTML = 'Cambia i tasti<small>scegli tu cosa fa ogni tasto</small>';
+    tasti.addEventListener('click', () => { if (window.nightTasti) { close(); window.nightTasti.open(); } });
+    const tastiP = document.createElement('p'); tastiP.className = 'hint'; tastiP.textContent = 'I tasti cambiati restano salvati in questo browser. Qui sotto i comandi di serie.';
+    const SUBS = [
+      ['grafica', 'Grafica', [panel('Qualità, ora e meteo', [labelOf('q3d'), labelOf('clockSel'), labelOf('meteoSel')], 'gm-row'), q('section.uiprefs')]],
+      ['audio', 'Audio', [panel('Volumi e ascolto', [fieldOf('vol'), fieldOf('radioVol'), q('.seg[data-k="view"]') && q('.seg[data-k="view"]').closest('.field'), q('.seg[data-k="character"]') && q('.seg[data-k="character"]').closest('.field')]), q('section.extras .samples')]],
+      ['comandi', 'Comandi', [panel('Tasti', [tasti, tastiP]), keysPanel]],
+      ['guida', 'Guida', [panel('Aiuti alla guida', [q('section.deck .setup .toggles')])]],
+    ];
+    const pagesI = {};
+    for (const [id, name, els] of SUBS) {
+      const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.textContent = name; bar.appendChild(b);
+      const pg = document.createElement('div'); pg.className = 'gm-subpage'; pg.hidden = true; for (const el of els) if (el) pg.appendChild(el); wrapI.appendChild(pg);
+      pagesI[id] = { b, pg }; b.addEventListener('click', () => sub(id));
+    }
+    let cur = 'grafica';
+    function sub(id) { cur = id; for (const k in pagesI) { pagesI[k].pg.hidden = k !== id; pagesI[k].b.setAttribute('aria-selected', String(k === id)); } body.scrollTop = 0; window.dispatchEvent(new Event('resize')); }
+    sub(cur); wrapI.sub = sub;
+    return wrapI;
+  }
   // le schede: nome, titolo, sottotitolo, colore, pezzi della pagina da spostarci
   const TABS = [
     ['partita', 'Partita', 'Il viaggio, l\'auto, le modalità', '#ffb347', () => {
@@ -31,22 +63,29 @@
       const h = document.createElement('h2'); h.textContent = 'Modalità e auto'; box.appendChild(h);
       for (const el of [q('.carsel'), $('modeSw'), $('btnNew'), $('audioState')]) if (el) box.appendChild(el);
       const tag = $('carTag'); if (tag) { const p = document.createElement('p'); p.className = 'hint'; p.appendChild(tag); box.appendChild(p); }
-      return [sum, box];
+      // colore della carrozzeria e strumenti (mappa, schermo intero, foto, replay): prima stavano nella scheda Vista
+      const tools = panel('Colore e strumenti', [$('swatches'), $('mapBtn'), $('fsBtn2'), $('photoBtn'), $('replayBtn')], 'gm-row');
+      const how = [...document.querySelectorAll('section.extras > .panel')].find((p) => /Come si gioca/.test(p.textContent));
+      return [sum, box, tools, how];
     }],
     ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
-    ['guida', 'Guida', 'Comandi dell\'auto, aiuti, limitatore', '#b8ff3a', () => [q('section.deck')]],
-    ['vista', 'Vista', 'Grafica, colori, ora e meteo', '#7fd3ff', () => {
-      const box = document.createElement('div'); box.className = 'panel';
-      const h = document.createElement('h2'); h.textContent = 'Vista e grafica'; box.appendChild(h);
-      const rb = q('.roadbar'); if (rb) box.appendChild(rb);
-      return [box, q('section.uiprefs')];
-    }],
+    ['guida', 'Guida', 'Avviamento, comandi dell\'auto, cambio, limitatore', '#b8ff3a', () => [q('section.deck')]],
     ['quadro', 'Quadro e dati', 'Strumenti grandi e telemetria', '#b07bff', () => [$('cluster'), q('section.tele')]],
-    ['extra', 'Extra', 'Suoni, comandi, note', '#c9c2b0', () => [q('section.extras')]],
+    ['imp', 'Impostazioni', 'Grafica, audio, comandi, aiuti alla guida', '#7fd3ff', () => [impostazioni()]],
     ['svil', 'Sviluppatori', 'Soldi e modifiche sbloccate', '#ff6a8a', () => [window.NightDev && NightDev.panel()]],
   ];
+  // stile delle sottoschede delle Impostazioni
+  { const css = document.createElement('style'); css.textContent = '.gm-subs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;position:sticky;top:0;z-index:2;padding:6px 0;background:inherit}'
+    + '.gm-subs button{padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--fg,#eee);font:600 13px/1 var(--f-data,monospace);letter-spacing:.08em;text-transform:uppercase;cursor:pointer}'
+    + '.gm-subs button[aria-selected=true]{background:var(--acc,#7fd3ff);color:#0b0a08;border-color:transparent}.gm-subpage{display:grid;gap:14px}.gm-subpage[hidden]{display:none}'
+    + '.gm-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.gm-row>h2{flex-basis:100%}.gm-imp .panel .toggles{display:grid;gap:8px}';
+    document.head.appendChild(css); }
+  // la scheda Guida: il riquadro rimasto (limitatore, launch, strumenti del tuning) prende un titolo che dice cosa c'è
+  { const h = q('section.deck .setup h2'); if (h && h.firstChild && h.firstChild.nodeType === 3) h.firstChild.textContent = 'Limitatore e launch '; }
 
+  // quello che resta vuoto dopo gli spostamenti (la barra sotto la strada, il riquadro degli extra) si nasconde
+  const hideEmpty = () => { for (const el of [q('.roadbar'), q('section.extras')]) if (el && !el.querySelector('button, input, select, li, .keys')) el.hidden = true; };
   // messaggi (flash) sopra la strada invece che dentro il quadro grande
   const msg = $('msg'); if (msg) stage.appendChild(msg);
 
@@ -67,6 +106,7 @@
     for (const el of els) pg.appendChild(el);
     body.appendChild(pg); pages[id] = { b, pg, title, sub, col };
   }
+  hideEmpty();
   let last = 'partita';
   function show(id) {
     if (!pages[id] || pages[id].b.hidden) id = Object.keys(pages)[0];
@@ -90,6 +130,7 @@
     el.innerHTML = `<div class="gs-car"><canvas width="10" height="10" aria-hidden="true"></canvas><div><small>${vg ? 'Il Viaggio' : g.mode === 'free' ? 'Città libera' : 'Città'}</small><b>${car.name}</b><span>${car.engine || ''}</span></div></div>`
       + '<div class="gs-stats">' + stat('Contanti', '€ ' + fmt(s.money), 'money') + stat(vg ? 'Km del viaggio' : 'Km', fmt((s.dist || 0) / 1000, 1))
       + stat('Reputazione', fmt(s.rep)) + (vg ? stat('Lavori fatti', fmt(vg.jobs)) + stat('Guadagnato', '€ ' + fmt(vg.earned)) : '') + '</div>'
+      + (g.statList ? '<div class="gs-nums"><h3>Statistiche</h3>' + g.statList().map((x) => stat(x.nome, x.testo)).join('') + '</div>' : '')
       + (goal ? `<div class="gs-goal"><small>${goal.title}</small><b>${goal.text}</b><span>${goal.left > 0.05 ? 'tra ' + fmt(goal.left, 1) + ' km · ' : ''}paga € ${fmt(goal.pay)}${goal.note ? ' · ' + goal.note : ''}</span></div>` : '');
     // l'auto: lo stesso disegno della strada, ingrandito a pixel netti
     const cv = el.querySelector('canvas');
@@ -162,7 +203,7 @@
     if (t !== lastG) { lastG = t; gearEl.textContent = t; gearEl.classList.remove('pop'); void gearEl.offsetWidth; gearEl.classList.add('pop'); }
     // spente a fine corsa (aria-disabled e non disabled: un pulsante disabilitato sotto il dito non riceve il rilascio)
     // col cambio automatico le palette spostano la leva (▲ verso D, ▼ verso P)
-    bUp.setAttribute('aria-disabled', String(lv ? lv === 'D' : g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(lv ? lv === 'P' : g <= 0));
+    bUp.setAttribute('aria-disabled', String(lv ? lv === 'S' : g >= (sim.topGear ? sim.topGear() : 6))); bDn.setAttribute('aria-disabled', String(lv ? lv === 'P' : g <= 0));
   }, 120);
 
   // ---------------------------------------------------------------- telefono: meno roba sulla strada, schermo intero a portata di dito

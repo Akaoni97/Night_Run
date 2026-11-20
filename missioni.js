@@ -20,7 +20,7 @@ const VG_MISSIONS = [
     give: 'Un signore in giacca, con una valigetta stretta al petto, sale dietro: «Sosta 24, prego. E piano, ho il cuore delicato: sopra i 120 mi viene l\'ansia.»',
     end: 'Il signore scende, si sistema la giacca e conta le banconote due volte.' },
   { id: 'cassa', kind: 'pesante', title: 'La cassa pesante', what: 'una cassa da 240 kg', to: 'shop', kg: 240, pay: 4500,
-    give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (concessionaria del Motel Ovunque) o un furgone.',
+    give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (si compra al Motel Ovunque, € 2.200) o un furgone.',
     end: 'Luca apre la cassa con un piede di porco e guarda il motore per un minuto buono. Poi ride.' },
   { id: 'busta', kind: 'pacco', title: 'La busta', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 4000,
     give: 'Dalla bacheca: una busta chiusa da portare a Neon Kustom.',
@@ -66,6 +66,14 @@ const VG_MIS_MORE = {
     return v.mis;
   };
   P.vgMisState = function () { return misState(this); };
+  // cosa serve per un lavoro che non ci sta nel bagagliaio (da scrivere nell'obiettivo e in bacheca)
+  const misNeed = (g, M) => {
+    const v = g.s.vg, T = typeof VG_SHOP !== 'undefined' && VG_SHOP.find((q) => q.id === 'trailer'), cap = g.vgCap();
+    if (cap.kg >= M.kg) return `${fmtEur(M.kg)} kg: fai spazio nel bagagliaio`;
+    if (!v.trailer) return `${fmtEur(M.kg)} kg: serve il rimorchietto, al Motel Ovunque${T ? ` (€ ${fmtEur(T.price)})` : ''}`;
+    if (!v.trailerOn) return `${fmtEur(M.kg)} kg: attacca il rimorchio (al Motel Ovunque)`;
+    return `${fmtEur(M.kg)} kg: non ci sta, serve un furgone`;
+  };
 
   // regola in corso: quanto vale la paga adesso (0..1) e cosa scrivere a schermo
   P.vgMisRule = function () {
@@ -86,15 +94,28 @@ const VG_MIS_MORE = {
       const M = this.vgMission(m.i), to = nextStop(n, [M.to], 1), dest = VG.stop(to);
       out.unshift({ k: 'mis' + m.i, kind: 'missione', kg: M.kg, to, toName: dest.name, kmTo: Math.round(dest.x / 100) / 10, pay: M.pay, mission: true, title: M.title, rule: M.kind, give: M.give });
     }
+    // il lavoro della catena non ci sta (la cassa pesante senza rimorchio): si può lasciar perdere e passare a quello dopo,
+    // così la catena non si ferma per sempre
+    if (m && m.phase === 'go' && n === m.giverN) {
+      const M = this.vgMission(m.i);
+      if (M.kg > 0 && !this.trunkFits(M.kg)) out.splice(1, 0, { k: 'salta' + m.i, kind: 'missione', salta: true, kg: 0, pay: 0, title: M.title, need: misNeed(this, M) });
+    }
     return out;
   };
   const take = P.vgTake;
   P.vgTake = function (o, n) {
+    if (o && o.salta) {
+      const m = misState(this); if (!m || m.phase !== 'go' || n !== m.giverN) return { ok: false, why: 'Questo lavoro non è più disponibile' };
+      const M = this.vgMission(m.i);
+      Object.assign(m, { i: m.i + 1, giverN: nextStop(n, VG_BOARDS, 1) });
+      this.say(`Lasci perdere: ${M.title.toLowerCase()} la porterà qualcun altro. Il prossimo lavoro è alla bacheca dopo.`, 'job');
+      return { ok: true };
+    }
     if (!o || !o.mission) return take.call(this, o, n);
     const v = this.s.vg, m = misState(this), M = m && this.vgMission(m.i);
     if (!m || m.phase !== 'go' || n !== m.giverN) return { ok: false, why: 'Questo lavoro non è più disponibile' };
     if (M.pax && v.pax.length >= (VG_SEATS[this.car] || 3)) return { ok: false, why: 'Non c\'è posto: fai scendere qualcuno prima' };
-    if (M.kg > 0 && !this.trunkFits(M.kg)) return { ok: false, why: M.kind === 'pesante' ? `Pesa ${M.kg} kg: serve il rimorchietto (Motel Ovunque) o un furgone` : 'Non ci sta nel bagagliaio' };
+    if (M.kg > 0 && !this.trunkFits(M.kg)) return { ok: false, why: M.kind === 'pesante' ? `Pesa ${M.kg} kg: ${misNeed(this, M).replace(/^[\d.]+ kg: /, '')}, o lascia perdere` : 'Non ci sta nel bagagliaio' };
     v.taken = v.taken || {}; v.taken[n + ':' + o.k] = true;
     const dest = VG.stop(o.to);
     Object.assign(m, { phase: 'carry', toN: o.to, t: 0, c0: this.s.crashes || 0, dmg: this.sim.damage || 0, harsh: 0, over: 0, pax: M.pax || null,
@@ -152,8 +173,8 @@ const VG_MIS_MORE = {
     const m = misState(this); if (!m) return null;
     const M = this.vgMission(m.i), km = this.s.dist;
     if (m.phase === 'go') {
-      const A = VG.stop(m.giverN);
-      return { title: 'Prossimo lavoro', text: `${M.title} · bacheca di ${A.name}`, left: Math.max(0, (A.x - km) / 1000), pay: M.pay, x: A.x };
+      const A = VG.stop(m.giverN), need = M.kg > 0 && !this.trunkFits(M.kg) ? misNeed(this, M) : '';
+      return { title: 'Prossimo lavoro', text: `${M.title} · bacheca di ${A.name}`, left: Math.max(0, (A.x - km) / 1000), pay: M.pay, x: A.x, note: need };
     }
     const B = VG.stop(m.toN), R = this.vgMisRule() || {};
     return { title: M.title, text: `${M.pax ? 'Accompagna ' + M.pax[0].toLowerCase() + M.pax.slice(1) : 'Porta ' + M.what} a ${B.name} · km ${fmtKm(B.x)}`, left: Math.max(0, (B.x - km) / 1000), pay: Math.round(M.pay * (R.k ?? 1) / 50) * 50, x: B.x, note: R.note };

@@ -33,4 +33,8 @@ echo; echo "== test (sul main aggiornato)"
 tmp=$(mktemp -d); git worktree add -q --detach "$tmp" origin/main 2>/dev/null
 ( cd "$tmp" && node --test test/*.test.js 2>&1 | grep -E "^# (pass|fail)" | sed 's/^# /  /' )
 git worktree remove --force "$tmp" 2>/dev/null
+if [ -f SOSPESI.md ]; then
+  echo; echo "== Cose in sospeso e da rivedere (SOSPESI.md): vanno nel rapporto, poi si aggiorna la lista"
+  grep -E "^## |^- " SOSPESI.md | sed 's/^## /  ## /; s/^- /    - /' | cut -c1-160
+fi
 echo; echo "Dopo averlo guardato insieme: strumenti/controllo_sera.sh fatto"

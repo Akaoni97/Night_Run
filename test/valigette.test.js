@@ -43,7 +43,7 @@ test('valigette: le frequenze seguono le probabilità dichiarate (argento)', () 
   CASE_TYPES.argento.odds.forEach((p, i) => { const f = cnt[i] / n * 100; assert.ok(Math.abs(f - p) < Math.max(2, p * 0.25), `${CASE_RAR[i].name}: ${f.toFixed(1)} % contro ${p} %`); });
 });
 
-test('valigette: ticket tagliando e modifica rendono gratis Niko e Luca, una volta', () => {
+test('valigette: ticket tagliando e modifica rendono gratis Mario e Luca, una volta', () => {
   const { game } = trip(), C = game.cases();
   game.s.money = 100000; game.maint().oil = 0.2; C.tickets.svc = 1;
   assert.equal(game.serviceCost('oil'), 0);
@@ -75,6 +75,15 @@ test('valigette: il leggendario regala un\'auto che non hai, nel garage del mote
   game.cases().own.push({ type: 'oro' });
   const pz = game.caseOpen(0, () => 0.999);                       // l'ultimo esito: leggendario
   assert.equal(pz.rar, 5); assert.ok(pz.car && v.garage.includes(pz.car), `auto ${pz.car} nel garage`);
+});
+
+test('valigette: mai un turbo tra i pezzi regalati', () => {
+  const { game } = trip(); game.mode = 'career';
+  for (let k = 0; k < 120; k++) for (const rar of [3, 4]) {
+    game.cases().own.push({ type: 'oro' }); const pz = game.caseOpen(0, lcg(k * 7 + rar));
+    assert.notEqual(pz.icon, 'turbo', `${pz.name}: un turbo regalato`);       // l'icona 'turbo' esce solo per la categoria turbo (un intercooler può chiamarsi «per turbo»)
+  }
+  for (const it of (tuning().turbo || {}).items || []) if (it.price > 0) assert.equal(game.owns('turbo', it.id), false, `turbo ${it.id} regalato`);
 });
 
 test('valigette: i lavori danno valigette', () => {

@@ -25,11 +25,19 @@ psicologico. Il telefono è lo strumento principale: lì si sviluppano le cose s
 - **I pensieri del protagonista** (fatto, `pensieri.js`): ogni tanto scrive cosa pensa, sulla strada, 8-10 secondi, senza vignetta: la radio che non conosce le stazioni (km 1), il navigatore, fame, sete, sonno, igiene, pensieri a caso. Non si ripetono. I testi sono segnaposto.
 - **Effetti pensati**: il bussare nel bagagliaio (poi non c'è niente), chiamate strane, app che compaiono da sole.
 
+- **Storia secondaria «Ti tengo compagnia»** (chiesta dal cognato il 20/11/2026, dalla proposta di Codex, fatta in
+  `jeshka.js`): Jeshka (meccanica russa, Neon Kustom) e Luca (Da Luca Tuning) si sono persi per un'ora a un'area di
+  servizio e da allora ognuno si è fermato ad aspettare l'altro. Il giocatore li conosce nei due negozi, porta il cavo
+  di lei con il nastro di lui, la accompagna e al piazzale del tuning lampeggia cinque volte (il segnale della signora
+  del furgone). Jeshka è un personaggio nuovo: **non è Rosa**, che resta con Ottavio nella storia principale. Lungo il
+  tragitto un numero sconosciuto scrive «Ti tengo compagnia» come lui: la strada imita le voci, e lei lo smaschera.
+  Restano fuori, per ora: l'entrata tramite Marco e quella durante un'incursione.
+
 ## Da decidere
 - Chi era Claudio, perché la strada, qual è il segreto.
 - Le altre 5 auto del garage: nomi e quando si sbloccano.
 - Gli atti, i chilometri dei momenti chiave, il finale.
-- Se Niko, Luca, il barista, il benzinaio hanno un ruolo nella storia o restano negozi.
+- Se Mario, Luca, il barista, il benzinaio hanno un ruolo nella storia o restano negozi.
 - Quali effetti e quando (sonno, specchietto, radio, cassa del motel...).
 
 ## Dove si attacca nel codice

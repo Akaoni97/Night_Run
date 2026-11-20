@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · Le facciate dei locali del Viaggio (dopo viaggio2d.js)
-//  Bar, benzinaio, autogrill Sosta 24, Motel Ovunque, Officina Niko, Da Luca Tuning, Neon Kustom: edifici a due piani o
+//  Bar, benzinaio, autogrill Sosta 24, Motel Ovunque, Officina Mario, Da Luca Tuning, Neon Kustom: edifici a due piani o
 //  capannoni con materiali veri (intonaco, mattoni, lamiera, pannelli), vetrine con l'interno acceso e chi c'è dentro,
 //  insegne al neon che ogni tanto sfarfallano, tende, lampade a muro, piante, tavolini, pompe, e la luce che cade sul
 //  marciapiede. Di giorno le vetrine riflettono il cielo e i neon sono quasi spenti.
@@ -441,7 +441,7 @@
     this.placeTag(g, X, T + fl + 10, 'MOTEL', '#ff5fa8', near);
   };
 
-  // ---------------------------------------------------------------- Officina Niko e Da Luca Tuning: capannone col portone sezionale
+  // ---------------------------------------------------------------- Officina Mario e Da Luca Tuning: capannone col portone sezionale
   S.lcGarage = function (g, e, X, st, near, open) {
     const C = this.C, t = st.t, n = 1 - (this.day || 0), s = Math.round(e.x) % 971, ink = C.ink, niko = e.id === 'niko';
     const L = X - 130, W = 260, T = niko ? 112 : 110, dL = X - 52, dW = 104, dT = 140, dH = GY - dT, oh = Math.round(dH * open);
@@ -464,7 +464,7 @@
     }
     g.fillStyle = ink; g.fillRect(L - 1, T, 1, GY - T); g.fillRect(L + W, T, 1, GY - T);
     // insegna
-    const sign = niko ? 'OFFICINA NIKO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
+    const sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
     if (niko) {
       this.lcBox(g, sL, T + 8, sw + 16, 18, '#163a6c'); g.fillStyle = '#2a5a9a'; g.fillRect(sL, T + 8, sw + 16, 1);
       this.text(g, sign, sL + 8, T + 12, '#f4f1e6', 2);
@@ -499,7 +499,7 @@
     this.text(g, niko ? 'GOMME' : 'CERCHI', L + 14, 186, niko ? '#ffb000' : '#ff5fa8');
     this.text(g, niko ? 'REVISIONI' : 'ELABORAZIONI', L + 14, 194, '#e8e6df');
     this.lcLamp(g, L + 37, 145);
-    // a destra: gomme, fusto, compressore (Niko) / ruote in esposizione e bandiere (Luca)
+    // a destra: gomme, fusto, compressore (Mario) / ruote in esposizione e bandiere (Luca)
     if (niko) {
       for (let q = 0; q < 5; q++) { g.fillStyle = ink; g.fillRect(dL + dW + 12, GY - 7 - q * 7, 22, 7); g.fillStyle = '#1b1b20'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 5); g.fillStyle = '#34343c'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 1); }
       g.fillStyle = ink; g.fillRect(L + W - 22, GY - 22, 16, 22); g.fillStyle = '#c42a1a'; g.fillRect(L + W - 21, GY - 21, 14, 21); g.fillStyle = '#8a1a10'; g.fillRect(L + W - 21, GY - 16, 14, 1); g.fillRect(L + W - 21, GY - 8, 14, 1);
@@ -564,6 +564,23 @@
     g.fillStyle = on1 && n > 0.05 ? '#b07bff' : '#3a2a5a'; g.fillRect(L + W - 8, T + 40, 2, GY - T - 50); g.fillRect(L + W - 20, T + 40, 14, 2);
     this.lcPlant(g, L + 56, s + 9);
     this.placeTag(g, X + 56, dT + 6, 'ESTETICA', '#ff2e88', near);
+  };
+
+  // ---------------------------------------------------------------- carcasse (sfascio): il disegno vero dell'auto, ingiallito,
+  // scurito, con ruggine e un vetro rotto; in cache a grandezza piena (si scala al disegno: con la densità doppia resta nitido)
+  S.lcWreck = function (id) {
+    const key = 'lcwreck' + id; if (this.spr[key]) return this.spr[key];
+    if (typeof CARS === 'undefined' || !CARS[id] || !CARS[id].sprite) return null;
+    const spr = this.trafficSprite(id, 'orig', 1); if (!spr || !spr.hd) return null;
+    const b = spr.hd, w = b.width, h = b.height, G = spr.geo, c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.imageSmoothingEnabled = false;
+    try { x.filter = 'sepia(0.7) saturate(0.5) brightness(0.55) contrast(1.15)'; } catch (e) { /* senza filtri */ }
+    x.drawImage(b, 0, 0);
+    if (spr.wheelImg && spr.wheelImg.width) for (const ax of G.ax) x.drawImage(spr.wheelImg, Math.round(ax - spr.wheelImg.width / 2), Math.round(G.wy - spr.wheelImg.height / 2));
+    x.filter = 'none'; x.globalCompositeOperation = 'source-atop';
+    for (let q = 0; q < 26; q++) { const r = rnd(w * 3 + q * 7.7); x.fillStyle = q % 3 ? 'rgba(120,56,22,.5)' : 'rgba(18,12,8,.55)'; x.fillRect(Math.floor(rnd(q + w) * w), Math.floor(h * 0.25 + r * h * 0.6), 3 + Math.floor(rnd(q * 2 + h) * 12), 2 + Math.floor(r * 4)); }
+    x.fillStyle = 'rgba(8,6,6,.75)'; x.beginPath(); x.moveTo(w * 0.62, h * 0.18); x.lineTo(w * 0.74, h * 0.22); x.lineTo(w * 0.7, h * 0.42); x.lineTo(w * 0.6, h * 0.36); x.closePath(); x.fill();
+    c.geo = G; return (this.spr[key] = c);
   };
 
   // ---------------------------------------------------------------- aggancio

@@ -13,12 +13,12 @@ const TASTI = [
   ['launch', 'l', 'Launch control', 'Guida'], ['clacson', 'h', 'Clacson', 'Guida'], ['fari', 'f', 'Sfanala (chiedi strada)', 'Guida'],
   ['finestrini', '8', 'Finestrini su / giù', 'Auto'], ['scorta', '9', 'Monta la ruota di scorta', 'Auto'], ['bagagliaio', 'b', 'Bagagliaio', 'Auto'], ['entra', 'u', 'Entra / esci dal locale', 'Auto'],
   ['menu', 'Tab', 'Menu', 'Schermate'], ['telefono', '0', 'Telefono', 'Schermate'], ['mappa', 't', 'Mappa del mondo', 'Schermate'], ['strumenti', 'j', 'Cambia strumenti', 'Schermate'],
-  ['garage', 'g', 'Salone delle auto', 'Schermate'], ['schermo', 'z', 'Schermo intero', 'Schermate'],
-  ['camera', 'c', 'Telecamera', 'Vista e suono'], ['ascolto', 'v', 'Punto d\'ascolto', 'Vista e suono'], ['radio', 'p', 'Radio: stazione dopo', 'Vista e suono'], ['muto', 'm', 'Audio sì / no', 'Vista e suono'],
+  ['schermo', 'z', 'Schermo intero', 'Schermate'],
+  ['ascolto', 'v', 'Punto d\'ascolto', 'Vista e suono'], ['radio', 'p', 'Radio: stazione dopo', 'Vista e suono'], ['muto', 'm', 'Audio sì / no', 'Vista e suono'],
   ['meteo', 'k', 'Meteo', 'Vista e suono'], ['foto', 'x', 'Foto', 'Vista e suono'], ['replay', 'y', 'Replay', 'Vista e suono'],
 ];
 // tasti fissi che non si cambiano (si elencano soltanto)
-const TASTI_FISSI = [['Frecce', 'Gas, freno, marcia su e giù'], ['1 - 6', 'Marce, o le risposte alle domande'], ['Esc', 'Chiude quello che è aperto']];
+const TASTI_FISSI = [['Frecce', 'Gas, freno, marcia su e giù'], ['1 - 6', 'Risposte alle domande'], ['1 - 4', 'Mangiare, bere, caffè e salviette dal bagagliaio'], ['Esc', 'Chiude quello che è aperto']];
 
 (function tasti() {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;

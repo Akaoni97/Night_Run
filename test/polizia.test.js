@@ -167,3 +167,26 @@ test('polizia: etilometro a un bar su cinque, multa sopra 0,5 g/l, l\'alcol cala
   game.s.vg.alc = 0.2; assert.equal(game.polStop(null, 'alcol', { gl: 0.2 }), false, 'sotto il limite si riparte');
   game.s.vg.alc = 1; game.polAlc(1000); assert.ok(game.s.vg.alc < 0.7);
 });
+
+test('polizia: ogni tanto tra le scuse ce n\'è una assurda, che passa spesso; quella del bagno a volte passa', () => {
+  const q = POL_SCUSE.find((x) => /urgenza/.test(x.t)); assert.ok(q.p[0] >= 0.25, 'il bagno a volte passa');
+  for (const r of POL_SCUSE.filter((x) => x.raro)) assert.ok(r.p[0] >= 0.4, r.t);
+  const rari = (k) => { const { game } = trip(() => k); game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(1); return game.prompt.options.filter((o) => POL_SCUSE.some((x) => x.raro && o.label.startsWith(x.t.replace(/[«»]/g, '').slice(0, 20)))).length; };
+  assert.equal(rari(0.2), 1, 'con un po\' di fortuna esce l\'assurda'); assert.equal(rari(0.6), 0, 'di solito no');
+});
+
+test('polizia: entrando in un locale con la volante a ridosso, a volte ti aspettano fuori; da lontano no', () => {
+  const ricercato = (k, gap) => {
+    const { game } = trip(() => 0.9); game.polStop(null, 'speed', { kmh: 150, sf: { over: 13, fine: 173 } }); game.ap.onStop(); game.answer(2);
+    game.pol.rinfT = 1e9; const C = game.pol.ch; C.t = 10; C.gap = gap; C.e.x = game.s.dist - gap; if (!game.ents.includes(C.e)) game.ents.push(C.e);
+    game.polRnd = () => k; return game;
+  };
+  const a = ricercato(0.1, 12); assert.ok(a.enterPlace({ ok: true, id: 'bar', x: a.s.dist + 3, name: 'Bar', rel: 3 }));
+  assert.equal(a.polState().fuga, true, 'ancora ricercato'); assert.ok(a.polState().aspetta);
+  a.inside = { id: 'bar', x: a.s.dist, phase: 'shop', t: 0 }; a.exitPlace();
+  assert.ok(a.pol.ch, 'la volante fuori riparte'); assert.equal(a.polState().aspetta, null);
+  const b = ricercato(0.1, 80); b.enterPlace({ ok: true, id: 'bar', x: b.s.dist + 3, name: 'Bar', rel: 3 });
+  assert.equal(b.polState().fuga, false, 'lontana: seminata');
+  const c = ricercato(0.9, 12); c.enterPlace({ ok: true, id: 'bar', x: c.s.dist + 3, name: 'Bar', rel: 3 });
+  assert.equal(c.polState().fuga, false, 'vicina ma non ti hanno visto');
+});

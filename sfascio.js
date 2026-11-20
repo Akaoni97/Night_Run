@@ -2,7 +2,7 @@
 //  Night Run · Lo sfasciacarrozze: Sfascio Ruggine (dopo usato.js)
 //  Tappa nuova: prende il posto del secondo autogrill di ogni giro (VG_PATTERN[9], primo al km 30,6).
 //  Dentro: pezzi usati per l'auto che guidi a meno della metà (Luca te li monta gratis), la carcassa da rimettere in
-//  strada (si paga poco, ha tutti i difetti: con Niko, carrozziere e gomme torna a valere all'Autosalone),
+//  strada (si paga poco, ha tutti i difetti: con Mario, carrozziere e gomme torna a valere all'Autosalone),
 //  rottamare un'auto tua, e rovistare tra le carcasse (€ 20, una volta per tappa: scegli quale e vedi cosa trovi).
 //  Stato in game.s.vg.sfascio.
 // ============================================================================
@@ -36,7 +36,7 @@ if (typeof VG_PLACE !== 'undefined') {
   P.jkStock = function (n) {
     const T = CARS[this.car] && CARS[this.car].tuning; if (!T) return [];
     const pre = this.car === 'supra' ? '' : this.car + '|', cand = [];
-    for (const cat in T) for (const it of T[cat].items || []) if (it.price > 0 && !this.s.owned[pre + cat + ':' + it.id]) cand.push({ cat, it });
+    for (const cat in T) if (!(typeof tuningNascosto === 'function' && tuningNascosto(this.car, cat))) for (const it of T[cat].items || []) if (it.price > 0 && !this.s.owned[pre + cat + ':' + it.id]) cand.push({ cat, it });   // [PISTONE] i pezzi motore della V40 li fa Nico
     if (!cand.length) return [];
     const h = (k) => VG.hash(n * 17 + k * 3.7 + carHash(this.car) * 0.13), out = [];
     for (let k = 0; out.length < Math.min(4, cand.length) && k < 30; k++) { const c = cand[Math.floor(h(k) * cand.length)]; if (!out.includes(c)) out.push(c); }
@@ -74,7 +74,7 @@ if (typeof VG_PLACE !== 'undefined') {
     if (this.s.money < W.price) return { ok: false, why: `Costa € ${fmt(W.price)}` };
     this.s.money -= W.price; this.jk().wreck[n] = W.id;
     this.usGive(W.id, W.km, W.defects, { damage: W.damage }, W.price);
-    this.say(`Carcassa della ${CARS[W.id].name} (− € ${fmt(W.price)}): è nel tuo garage. Niko e il carrozziere ti aspettano.`, 'buy');
+    this.say(`Carcassa della ${CARS[W.id].name} (− € ${fmt(W.price)}): è nel tuo garage. Mario e il carrozziere ti aspettano.`, 'buy');
     return { ok: true, price: W.price };
   };
 
@@ -168,7 +168,7 @@ if (typeof VG_PLACE !== 'undefined') {
       const d = document.createElement('div'); d.className = 'jk-wreck';
       d.innerHTML = `<div style="display:grid;place-items:center"><img alt="" src="${pic(W.id, ctx.refresh)}"></div><b style="font:400 18px/1.1 var(--f-display)">${esc(CARS[W.id].name)} · € ${fmt(W.price)}</b>`
         + `<small style="color:var(--muted)">${fmt(W.km)} km · carrozzeria al ${Math.round(W.damage * 100)} % · motore stanco, freni e gomme finiti, tagliando da fare</small>`
-        + `<div class="jk-est"><span>Carrozziere</span><b>€ ${fmt(R.body)}</b><span>Revisione del motore (Niko)</span><b>€ ${fmt(R.rev)}</b><span>Gomme nuove</span><b>€ ${fmt(R.tyres)}</b><span>Tagliando, candele, pastiglie</span><b>€ ${fmt(R.svc)}</b>`
+        + `<div class="jk-est"><span>Carrozziere</span><b>€ ${fmt(R.body)}</b><span>Revisione del motore (Mario)</span><b>€ ${fmt(R.rev)}</b><span>Gomme nuove</span><b>€ ${fmt(R.tyres)}</b><span>Tagliando, candele, pastiglie</span><b>€ ${fmt(R.svc)}</b>`
         + `<span class="tot">Dopo, all'Autosalone vale circa</span><b class="tot" style="color:var(--lime)">€ ${fmt(R.after)}</b><span>Ci guadagni (o ci perdi)</span><b style="color:${R.profit >= 0 ? 'var(--lime)' : 'var(--crit)'}">${R.profit >= 0 ? '+' : '−'} € ${fmt(Math.abs(R.profit))}</b></div>`;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = `Comprala · € ${fmt(W.price)}`; b.disabled = g.s.money < W.price;
       b.addEventListener('click', () => done(g.jkBuyWreck())); d.appendChild(b); wrap.appendChild(d);
@@ -205,44 +205,82 @@ if (typeof VG_PLACE !== 'undefined') {
   const S = Street2D.prototype, prev = S.drawTripPlace;
   S.drawTripPlace = function (g, e, x, st, near, open) {
     if (e.id !== 'junk') return prev ? prev.call(this, g, e, x, st, near, open) : false;
-    const C = this.C, ink = C.ink, t = st.t || 0, gy = 216, L = x - 170, Rr = x + 170, orange = '#e0874a';
-    g.fillStyle = '#2a2420'; g.fillRect(x - 40, gy, 80, 16);
-    // gru con il magnete che dondola
-    const cx = x + 90, top = 70, arm = 120, sw = Math.sin(t * 0.6) * 0.12;
-    g.fillStyle = ink; g.fillRect(cx - 4, top, 8, gy - top); g.fillStyle = '#c8a020'; g.fillRect(cx - 3, top, 6, gy - top);
-    for (let y = top + 6; y < gy; y += 10) { g.fillStyle = '#8a6a10'; g.fillRect(cx - 3, y, 6, 1); }
-    g.fillStyle = ink; g.fillRect(cx - arm, top - 3, arm + 30, 7); g.fillStyle = '#c8a020'; g.fillRect(cx - arm, top - 2, arm + 28, 5);
-    const mx = cx - arm + 10 + Math.sin(sw) * 40, my = top + 60;
-    g.strokeStyle = '#8a8f9e'; g.lineWidth = 1; g.beginPath(); g.moveTo(cx - arm + 10, top + 3); g.lineTo(mx, my); g.stroke();
-    g.fillStyle = ink; g.fillRect(mx - 13, my, 26, 8); g.fillStyle = '#5a5e6e'; g.fillRect(mx - 12, my + 1, 24, 6);
-    g.fillStyle = '#6a3a3a'; g.fillRect(mx - 18, my + 8, 36, 12); g.fillStyle = '#4a2a2a'; g.fillRect(mx - 18, my + 14, 36, 2);   // un'auto schiacciata appesa
-    // pile di auto schiacciate dietro la recinzione
-    const cols = ['#6a3a3a', '#3a4a6a', '#5a5a3a', '#4a5a5a', '#6a5a4a', '#3a3a4a', '#7a4a2a'];
-    for (let p = 0; p < 3; p++) for (let k = 0; k < 5 - p; k++) {
-      const bx = L + 14 + p * 70 + (k % 2) * 6, by = gy - 64 - k * 13;
-      g.fillStyle = ink; g.fillRect(bx - 1, by - 1, 58, 14); g.fillStyle = cols[(p * 5 + k) % cols.length]; g.fillRect(bx, by, 56, 12);
-      g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(bx, by + 8, 56, 4); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(bx + 8, by + 2, 10, 2);
-    }
-    // recinzione di lamiera ondulata col cancello
-    g.fillStyle = ink; g.fillRect(L - 2, gy - 52, Rr - L + 4, 52);
-    for (let q = L; q < Rr; q += 4) { g.fillStyle = (q / 4) % 2 ? '#5a5248' : '#6a6258'; g.fillRect(q, gy - 50, 4, 50); }
-    for (let k = 0; k < 9; k++) { g.fillStyle = 'rgba(140,70,30,.45)'; g.fillRect(L + ((k * 53) % (Rr - L - 20)), gy - 50 + ((k * 17) % 40), 6 + (k % 3) * 4, 4 + (k % 2) * 6); }   // ruggine
-    const gW = 70, gL = x - 30 - gW / 2, oh = Math.round(gW / 2 * open);
-    g.fillStyle = '#1a1612'; g.fillRect(gL, gy - 48, gW, 48);
-    g.fillStyle = '#3a342c'; g.fillRect(gL, gy - 48, gW / 2 - oh, 48); g.fillRect(gL + gW / 2 + oh, gy - 48, gW / 2 - oh, 48);
-    for (let q = 0; q < 6; q++) { g.fillStyle = '#2a2420'; g.fillRect(gL + 2 + q * 6, gy - 46, 1, 44); }
-    // insegna dipinta a mano
-    g.fillStyle = ink; g.fillRect(x - 76, gy - 82, 92, 26); g.fillStyle = '#e8dcc0'; g.fillRect(x - 75, gy - 81, 90, 24);
-    this.text(g, 'SFASCIO', x - 70, gy - 78, '#b02a1a', 2); this.text(g, 'RUGGINE', x - 54, gy - 65, '#2a2420', 1);
-    // bidone col fuoco e il lampione
-    const bx = Rr - 30;
-    g.fillStyle = ink; g.fillRect(bx - 8, gy - 22, 16, 22); g.fillStyle = '#4a4a4a'; g.fillRect(bx - 7, gy - 21, 14, 20);
+    // piazzale recintato di notte: gru col magnete, pile di carcasse vere (i disegni delle auto, ingialliti e schiacciati),
+    // lamiera ondulata col filo spinato, cancello a rete che scorre, ufficio in un container, bidone col fuoco, faro sul palo
+    const C = this.C, ink = C.ink, t = st.t || 0, gy = 216, X = Math.round(x), L = X - 150, Rr = X + 172, orange = '#e0874a';
+    const n = 1 - (this.day || 0), rnd = Street2D.rnd, seed = Math.round(e.x) % 953;
+    const POOL = ['panda', 'punto', 'corsa', 'polo', 'golf', 'clio', 'a80', 'p205', 'p206', 'taxi', 'v40', 'e30', 'r5', 'a112'].filter((id) => typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite);
+    const wreck = (i) => this.lcWreck && POOL.length ? this.lcWreck(POOL[(seed + i * 5) % POOL.length]) : null;
+    // un'auto schiacciata: lo stesso disegno, alto la metà
+    const crushed = (c, cx, by, k, sq) => { if (!c) return; const w = c.width * k, h = c.height * k * sq; g.drawImage(c, Math.round(cx - w / 2), Math.round(by - h), Math.round(w), Math.round(h)); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(Math.round(cx - w / 2), Math.round(by - 2), Math.round(w), 2); };
+    this.lcYard && this.lcYard(g, X - 28, 96);
+    // faro sul palo a sinistra, col cono di luce
+    const fx = L + 6;
+    g.fillStyle = ink; g.fillRect(fx, 102, 4, gy - 102); g.fillRect(fx, 100, 22, 4); g.fillStyle = n > 0.15 ? '#f4f0d8' : '#9a9888'; g.fillRect(fx + 16, 104, 9, 3);
+    if (n > 0.15) { g.save(); g.globalCompositeOperation = 'lighter'; const cg = g.createLinearGradient(0, 107, 0, gy); cg.addColorStop(0, `rgba(255,240,200,${0.2 * n})`); cg.addColorStop(1, 'rgba(255,240,200,0)');
+      g.fillStyle = cg; g.beginPath(); g.moveTo(fx + 16, 107); g.lineTo(fx + 25, 107); g.lineTo(fx + 80, gy); g.lineTo(fx - 20, gy); g.closePath(); g.fill(); g.restore(); }
+    // gru: torre a traliccio, cabina, braccio verso sinistra, contrappeso, cavo e magnete con una carcassa
+    const tx = X + 128, top = 98, arm = 168;
+    g.fillStyle = ink; g.fillRect(tx - 7, top, 14, gy - top);
+    g.fillStyle = '#c8a020'; g.fillRect(tx - 6, top, 2, gy - top); g.fillRect(tx + 4, top, 2, gy - top);
+    for (let y = top + 2; y < gy - 4; y += 10) { g.fillStyle = '#c8a020'; for (let q = 0; q < 10; q++) { g.fillRect(tx - 4 + q, y + q, 1, 1); g.fillRect(tx + 4 - q, y + q, 1, 1); } g.fillRect(tx - 4, y, 8, 1); }
+    g.fillStyle = ink; g.fillRect(tx - arm, top - 4, arm + 44, 7); g.fillStyle = '#c8a020'; g.fillRect(tx - arm, top - 3, arm + 42, 5); g.fillStyle = '#8a6a10'; for (let q = tx - arm; q < tx + 40; q += 8) g.fillRect(q, top - 3, 1, 5);
+    this.lcBox ? this.lcBox(g, tx + 26, top + 3, 16, 12, '#7a7470') : 0; g.fillStyle = '#5a5450'; g.fillRect(tx + 26, top + 8, 16, 1);   // contrappeso
+    this.lcBox ? this.lcBox(g, tx - 12, top + 4, 14, 12, '#c8a020') : 0; g.fillStyle = n > 0.15 ? '#ffe2a0' : '#6a7a90'; g.fillRect(tx - 10, top + 6, 8, 5);   // cabina
+    if (n > 0.15) this.light(g, tx - 6, top + 8, 8, 6, '#ffd9a0', 0.1 * n, 2);
+    g.fillStyle = Math.floor(t * 1.5) % 2 ? '#ff3a2a' : '#5a1a14'; g.fillRect(tx - arm, top - 7, 3, 3);   // luce rossa in punta
+    if (n > 0.15 && Math.floor(t * 1.5) % 2) this.light(g, tx - arm + 1, top - 6, 6, 6, '#ff3a2a', 0.18 * n, 2);
+    const hx = X + 70, sw = Math.sin(t * 0.6) * 0.12, len = 44, mx = hx + Math.sin(sw) * len, my = top + 3 + Math.cos(sw) * len;
+    g.strokeStyle = '#8a8f9e'; g.lineWidth = 1; g.beginPath(); g.moveTo(hx, top + 3); g.lineTo(mx, my); g.stroke();
+    g.fillStyle = ink; g.fillRect(Math.round(mx) - 10, Math.round(my), 20, 6); g.fillStyle = '#5a5e6e'; g.fillRect(Math.round(mx) - 9, Math.round(my) + 1, 18, 4);
+    crushed(wreck(9), mx, my + 6 + 13, 0.3, 0.55);
+    // pile di carcasse schiacciate dietro la recinzione
+    for (const [px, nn, k0] of [[L + 44, 4, 0], [X - 34, 3, 4]]) for (let q = 0; q < nn; q++) crushed(wreck(k0 + q), px + (q % 2 ? 5 : -4), gy - 44 - q * 13, 0.3, 0.45);
+    // recinzione di lamiera ondulata con la ruggine che cola e il filo spinato
+    const fT = gy - 48, gW = 64, gL = X - 28 - gW / 2;
+    g.fillStyle = ink; g.fillRect(L - 2, fT - 2, Rr - L + 4, gy - fT + 2);
+    for (let q = L; q < Rr; q += 4) { const sh = (q / 4) % 2; g.fillStyle = sh ? '#5a5248' : '#6a6258'; g.fillRect(q, fT, 4, gy - fT); }
+    for (let k = 0; k < 18; k++) { const rx = L + Math.floor(rnd(seed + k) * (Rr - L - 6)), ry = fT + Math.floor(rnd(seed + k * 3) * 16); g.fillStyle = 'rgba(140,66,26,.45)'; g.fillRect(rx, ry, 2 + (k % 3), 8 + Math.floor(rnd(k + 1) * 24)); }
+    for (let q = L; q < Rr; q += 46) { g.fillStyle = ink; g.fillRect(q, fT - 8, 2, 10); }
+    g.fillStyle = '#8a8f9e'; for (let q = L; q < Rr; q++) { const y = fT - 5 + Math.round(Math.sin(q * 0.55) * 2); g.fillRect(q, y, 1, 1); if (q % 7 === 0) g.fillRect(q, y - 1, 1, 3); }
+    // copricerchi inchiodati sulla lamiera
+    for (let q = 0; q < 5; q++) { const cx = L + 18 + q * 15, cy = fT + 14 + (q % 2) * 6; g.fillStyle = ink; this.span(g, cx, cy, 6, 6); g.fillStyle = ['#c9ced6', '#9aa0aa', '#d9a82e', '#c9ced6', '#7a808a'][q]; this.span(g, cx, cy, 5, 5); g.fillStyle = 'rgba(0,0,0,.4)'; this.span(g, cx + 1, cy + 1, 2, 2); g.fillStyle = '#fff'; g.fillRect(cx - 3, cy - 3, 1, 1); }
+    this.lcBox ? this.lcBox(g, L + 26, fT + 30, 40, 13, '#e8dcc0') : 0; this.text(g, 'ATTENTI', L + 32, fT + 32, '#b02a1a'); this.text(g, 'AL CANE', L + 32, fT + 38, '#2a2420');
+    // cancello a rete che scorre: dietro si vede il piazzale con una carcassa intera
+    g.fillStyle = '#1e1a16'; g.fillRect(gL, fT, gW, gy - fT);
+    if (n > 0.15) this.light(g, gL + gW / 2, gy - 10, gW * 0.5, 10, '#ffe0a0', 0.05 * n, 2);
+    { const c = wreck(2); if (c) { const k = 0.32; g.save(); g.beginPath(); g.rect(gL, fT, gW, gy - fT); g.clip(); g.drawImage(c, Math.round(gL + gW / 2 - c.width * k / 2), Math.round(gy - 3 - c.height * k), Math.round(c.width * k), Math.round(c.height * k)); g.restore(); } }
+    const oh = Math.round(gW * 0.9 * open), gx = gL + oh;
+    g.save(); g.beginPath(); g.rect(gL, fT, gW, gy - fT); g.clip();
+    g.fillStyle = ink; g.fillRect(gx, fT, gW, 2); g.fillRect(gx, gy - 2, gW, 2); g.fillRect(gx, fT, 2, gy - fT); g.fillRect(gx + gW - 2, fT, 2, gy - fT); g.fillRect(gx + gW / 2 - 1, fT, 2, gy - fT);
+    g.fillStyle = 'rgba(150,156,170,.55)'; for (let q = -48; q < gW; q += 5) for (let y = 0; y < 48; y += 1) { const a = gx + q + y, b = gx + q + 48 - y; if (a > gx && a < gx + gW) g.fillRect(a, fT + y, 1, 1); if (y % 2 === 0 && b > gx && b < gx + gW) g.fillRect(b, fT + y, 1, 1); }
+    g.restore();
+    // insegna dipinta su compensato, su due pali, con la lampada a collo d'oca
+    const sL = X - 82, sT = fT - 40;
+    g.fillStyle = ink; g.fillRect(sL + 10, sT + 26, 3, fT - sT - 26); g.fillRect(sL + 86, sT + 26, 3, fT - sT - 26);
+    this.lcBox ? this.lcBox(g, sL, sT, 100, 27, '#e2d4b4') : 0; g.fillStyle = '#c8b894'; for (let q = sT + 4; q < sT + 27; q += 5) g.fillRect(sL, q, 100, 1);
+    this.text(g, 'SFASCIO', sL + 8, sT + 4, '#b02a1a', 2); this.text(g, 'RUGGINE', sL + 64, sT + 10, '#2a2420', 1);
+    this.text(g, 'PEZZI USATI - CARCASSE', sL + 6, sT + 18, '#4a3a2a', 1);
+    for (let q = 0; q < 6; q++) { g.fillStyle = 'rgba(120,56,22,.5)'; g.fillRect(sL + 4 + q * 17, sT + 22 + (q % 2), 2, 4 + (q % 3) * 2); }
+    if (this.lcLamp) { this.lcLamp(g, sL + 30, sT - 1, '#ffe2a8', true); this.lcLamp(g, sL + 70, sT - 1, '#ffe2a8', true); }
+    // ufficio in un container: lamiera, finestra accesa con le veneziane, porta, scalino, condizionatore
+    const oL = X + 22, oW = 76, oT = gy - 40;
+    g.fillStyle = ink; g.fillRect(oL - 1, oT - 1, oW + 2, gy - oT + 1);
+    for (let q = oL; q < oL + oW; q += 3) { g.fillStyle = (q - oL) % 6 ? '#3a5a4a' : '#2e4a3c'; g.fillRect(q, oT, 3, gy - oT - 2); }
+    g.fillStyle = '#4a6a5a'; g.fillRect(oL, oT, oW, 2);
+    if (this.lcGlass) this.lcGlass(g, oL + 8, oT + 10, 28, 16, { col: '#ffd9a0', noSpill: true, inside: (g2, x0, y0, w, h) => { for (let yy = y0 + 1; yy < y0 + h; yy += 2) { g2.fillStyle = 'rgba(80,60,40,.5)'; g2.fillRect(x0, yy, w, 1); } } });
+    g.fillStyle = ink; g.fillRect(oL + 46, oT + 8, 16, gy - oT - 8); g.fillStyle = '#5a6a5a'; g.fillRect(oL + 47, oT + 9, 14, gy - oT - 9); g.fillStyle = '#d8b040'; g.fillRect(oL + 58, oT + 22, 2, 2);
+    g.fillStyle = ink; g.fillRect(oL + 44, gy - 3, 20, 3); this.text(g, 'UFFICIO', oL + 6, oT + 30, '#e8e6df');
+    if (this.lcLamp) this.lcLamp(g, oL + 54, oT + 4);
+    this.lcBox ? this.lcBox(g, oL + oW - 12, oT + 8, 10, 8, '#8a8c94') : 0;
+    // pila di gomme e bidone col fuoco
+    for (let q = 0; q < 4; q++) { g.fillStyle = ink; g.fillRect(Rr - 54, gy - 7 - q * 7, 22, 7); g.fillStyle = '#1b1b20'; g.fillRect(Rr - 53, gy - 6 - q * 7, 20, 5); g.fillStyle = '#34343c'; g.fillRect(Rr - 53, gy - 6 - q * 7, 20, 1); }
+    const bx = Rr - 14;
+    g.fillStyle = ink; g.fillRect(bx - 8, gy - 22, 16, 22); g.fillStyle = '#4a4a4a'; g.fillRect(bx - 7, gy - 21, 14, 20); g.fillStyle = '#3a3a3a'; g.fillRect(bx - 7, gy - 15, 14, 1); g.fillRect(bx - 7, gy - 8, 14, 1);
     for (let k = 0; k < 5; k++) { const f = Math.sin(t * 9 + k * 1.7); g.fillStyle = k % 2 ? '#ffb000' : '#ff5a1e'; g.fillRect(bx - 6 + k * 3, gy - 26 - Math.round(4 + f * 3), 2, Math.round(4 + f * 3)); }
+    for (let k = 0; k < 4; k++) { const ph = (t * 0.8 + k * 0.29) % 1; g.fillStyle = `rgba(255,${150 + k * 20},60,${1 - ph})`; g.fillRect(Math.round(bx - 2 + Math.sin(k * 3 + t * 2) * 4), Math.round(gy - 30 - ph * 30), 1, 1); }
     this.light(g, bx, gy - 26, 60, 40, '#ff7a1e', 0.12 + 0.04 * Math.sin(t * 7), 3);
-    g.fillStyle = ink; g.fillRect(L + 4, 90, 4, gy - 90); g.fillRect(L + 4, 88, 20, 5); g.fillStyle = '#f4f0d8'; g.fillRect(L + 18, 92, 8, 3);
-    g.save(); g.globalCompositeOperation = 'lighter'; const cg = g.createLinearGradient(0, 95, 0, gy); cg.addColorStop(0, 'rgba(255,240,200,.18)'); cg.addColorStop(1, 'rgba(255,240,200,0)');
-    g.fillStyle = cg; g.beginPath(); g.moveTo(L + 18, 95); g.lineTo(L + 26, 95); g.lineTo(L + 70, gy); g.lineTo(L - 20, gy); g.fill(); g.restore();
-    this.placeTag(g, x, gy - 104, 'SFASCIO', orange, near);
+    this.placeTag(g, X - 28, fT + 6, 'SFASCIO', orange, near);
     return true;
   };
 })();

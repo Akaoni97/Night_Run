@@ -39,7 +39,8 @@ class CarRadio {
     this.onChange = opts.onChange || (() => {});
   }
   get station() { return this.stations[this.i]; }
-  level() { return this.muted ? 0 : this.vol * this.master; }
+  level() { return this.muted ? 0 : this.vol * this.master * (this.duck ?? 1); }   // duck: più bassa durante gli inseguimenti
+  setDuck(k) { k = Math.max(0, Math.min(1, k)); if (Math.abs(k - (this.duck ?? 1)) < 0.01) return; this.duck = k; this.apply(); }
 
   attach(ctx) {
     if (this.ctx || !ctx) return;
