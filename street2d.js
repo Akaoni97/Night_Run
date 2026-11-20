@@ -1721,6 +1721,7 @@ class Street2D {
     if (game && game.placesOn && !game.inside && Math.abs(s.v) < 6 && !this.camHold) {
       const p = game.placesBetween(dist - 12, dist + 40)[0];
       if (p) camT = Math.max(0.3, Math.min(0.5, 0.64 - (p.x - dist) * 30 / W));   // non sotto 0,3: l'auto resta fuori dal quadro strumenti
+      if (p && p.twin) camT = Math.max(0.16, Math.min(0.5, (W * 0.5 - (p.x - dist) * 30) / W));   // piazzetta (piazzetta.js): si punta al centro dei due negozi, che stanno ai due lati di p.x
     }
     st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
     if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)

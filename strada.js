@@ -28,6 +28,7 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     const lead = this.ents.filter((e) => (e.kind === 'traffic' || e.kind === 'police') && !e.hazard && Math.abs(GAME_LANE_Z[e.lane] - this.laneZ) < 1.7 && e.x - d > 4 && e.x - d < 75).sort((a, b) => a.x - b.x)[0];
     if (!lead) return null;
     if (lead.kind === 'police') {
+      if (typeof POL !== 'undefined' && POL.off) return null;   // polizia disabilitata (sviluppatori)
       if (lead.flashed) return null; lead.flashed = true;
       const fine = 80; this.s.money -= fine; this.s.heat = Math.min(3, (this.s.heat || 0) + 0.5);
       this.say(`Hai sfanalato una volante. Accosta, verbale: − € ${fine}`, 'police'); return 'police';

@@ -8,8 +8,10 @@ const path = require('path');
 const oi = process.argv.indexOf('--out');
 const extra = oi >= 0 ? ['--out', process.argv[oi + 1]] : [];
 const tappe = ['bar', 'fuel', 'grill', 'niko', 'shop', 'style', 'motel', 'dealer', 'junk'];
+const piazzette = [['piazza', 0], ['piazza', 1]];                     // piazzetta (piazzetta.js): entra nel primo e nel secondo negozio
 const passi = ['soldi:50000'];
 for (const t of tappe) passi.push(`tappa:${t}`, 'aspetta:800', 'entra', 'aspetta:2500', 'verifica:dentro', 'esci', 'aspetta:3000');
+for (const [t, i] of piazzette) passi.push(`tappa:${t}`, 'aspetta:800', `entra:${i}`, 'aspetta:2500', 'verifica:dentro', 'esci', 'aspetta:3000');
 passi.push('km:5', 'aspetta:600', 'km:40', 'aspetta:600', 'km:120', 'aspetta:600', 'tel', 'aspetta:600', 'tel', 'foto:fine', 'stato');
 const r = spawnSync('node', [path.join(__dirname, 'prova.js'), ...extra, ...passi], { stdio: 'inherit' });
 process.exit(r.status === null ? 1 : r.status);
