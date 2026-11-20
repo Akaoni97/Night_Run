@@ -32,7 +32,7 @@
     const sd = tx.getImageData(0, 0, w, h), s32 = new Uint32Array(sd.data.buffer), W2 = w * 2;
     for (let i = 0; i < s32.length; i++) if ((s32[i] >>> 24) < 8) s32[i] = 0;          // trasparenti tutti uguali
     const c = document.createElement('canvas'); c.width = W2; c.height = h * 2;
-    const x = c.getContext('2d'), im = x.createImageData(W2, h * 2), d32 = new Uint32Array(im.data.buffer);
+    const x = c.getContext('2d', { willReadFrequently: true }), im = x.createImageData(W2, h * 2), d32 = new Uint32Array(im.data.buffer);
     for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) {
       const i = y * w + xx, P = s32[i], A = y > 0 ? s32[i - w] : P, D = y < h - 1 ? s32[i + w] : P, C = xx > 0 ? s32[i - 1] : P, B = xx < w - 1 ? s32[i + 1] : P;
       const o = (y * 2) * W2 + xx * 2;
@@ -71,7 +71,7 @@
     spr._hd2 = spr._hd2 || {};
     if (spr._hd2[key]) return spr._hd2[key];
     const src = x2(spr.hd), W = spr.width * SS, H = spr.height * SS, c = document.createElement('canvas'); c.width = W; c.height = H;
-    const x = c.getContext('2d'), exact = src.width === W && src.height === H;
+    const x = c.getContext('2d', { willReadFrequently: true }), exact = src.width === W && src.height === H;
     x.imageSmoothingEnabled = !exact; x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, W, H);
     if (!exact) {   // bordo della sagoma netto: niente aloni mezzi trasparenti attorno all'auto
       const im = x.getImageData(0, 0, W, H), d = im.data;

@@ -4,6 +4,13 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 notte · proprietario (**scatti: niente più letture di pixel dalla scheda video**)
+- Fatto: misurato un minuto di guida. Timer, salvataggi e stile premium non pesano; il sospetto è nelle tele preparate al volo e poi rilette
+  (~5 letture al secondo: palazzi, auto, sagome, Scale2x), che sul PC stanno nella scheda video e a ogni lettura la fermano. Ora nascono già
+  «nel processore» (`willReadFrequently` alla creazione: 13 righe in `street2d.js`, `quartieri2d.js`, `nitido2d.js`). Ridisegnate a ogni
+  fotogramma: invariate. Nel browser di prova (senza scheda video) lo scatto non si vede: va sentito giocando sul PC.
+- Aperto: i palazzi creano ~9 tele al secondo mentre si guida (la cache tiene 260 tessere): se gli scatti restano, il prossimo passo è lì.
+
 ## 20/11/2026 notte · proprietario (**polizia: posti di controllo che multano al passaggio, autovelox, Tutor e mappa**)
 - Fatto: il **posto di controllo** non ti ferma più e non fa partire nessuna volante: passi e ti multano (velocità sempre, documenti scaduti a caso),
   da ricercato non multano, ti inseguono (`polCheck` in `polizia.js`). **Autovelox** (palo con la cassetta quadrata, flasha) e **Tutor** (un palo con
