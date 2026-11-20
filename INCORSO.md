@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario | Via il 3D e costruzione del motore (locale nuovo) | cancella car3d.js, street3d.js, viaggio3d.js; index.html (viste, Montagna, carica3d), sw.js, game.js; nuovi motori.js e scena di montaggio | 20/11 |
