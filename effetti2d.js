@@ -402,8 +402,8 @@
     const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); return q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
     if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
     if (s.flame && R() < s.flame * dt * 22) {
-      const big = R() < 0.35 + s.flame * 0.3;
-      st.flame = big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
+      const med = !!s.flameMed, big = !med && R() < 0.35 + s.flame * 0.3;      // flameMed: rilascio ai giri medi, fiammata media (niente botto né scritta)
+      st.flame = med ? 0.34 + R() * 0.2 : big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4; st.popFlash = med ? 0.3 : big ? 1 : 0.55; st.popJolt = med ? 0.25 : big ? 1.2 : 0.5;
       st.flamePal = big && R() < 0.5 && !this.flamePal ? 'blu' : pickPal();          // ogni scoppio col suo colore
       for (let q = 0; q < (big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });

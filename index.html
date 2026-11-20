@@ -1330,7 +1330,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) /* [PISTONE] */ ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !(game.s.cmd && game.s.cmd.exh === 0) ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (game.s.cmd && game.s.cmd.exh === 0 ? 0.8 : 1),
+    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {
@@ -2880,7 +2880,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // abbaglianti: un colpo di fari a chi sta davanti (chiede strada)
   // fari: 0 spenti · 1 anabbaglianti · 2 abbaglianti (pulsante FARI sopra il contachilometri, salvato con la partita); F sfanala solo per un attimo
   // valvola di scarico (pulsante SCARICO): chiusa = silenzio, niente fiamme e quasi niente scoppi; aperta = scoppi e fiammate come sempre
-  const exhClosed = () => !!(game.s && game.s.cmd && game.s.cmd.exh === 0);
+  // la valvola c'è solo sull'auto potenziata (come il pulsante SCARICO): senza, lo scarico è quello di serie e non cambia niente
+  const exhValve = () => typeof CMD_EXH_PW !== 'undefined' && !!((sim.tune && sim.tune.pw >= CMD_EXH_PW) || (sim.extraPw || 1) > 1);
+  const exhClosed = () => exhValve() && !!(game.s && game.s.cmd && game.s.cmd.exh === 0);
   const lightsMode = () => (game.s.cmd && game.s.cmd.lights !== undefined ? game.s.cmd.lights : 1);
   const LIGHTS_NAME = ['FARI OFF', 'ANABB.', 'ABBAGL.'];
   function cycleLights() {
@@ -3225,7 +3227,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const okSito = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if ('serviceWorker' in navigator && okSito && window.top === window) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   } catch (e) { /* niente: il gioco va lo stesso */ }
-  window.nightRun = { leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
+  window.nightRun = { exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
     get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
@@ -3291,11 +3293,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (garage && garageOn) {
       // fiammate: limitatore a taglio d'accensione, e al rilascio del gas (più a lungo con la mappa pop & bang)
-      const liftT = sim.cfg.pops ? 2.8 : 1.1;
+      // limitatore a taglio d'accensione: fiamma piena (e il botto). Rilascio ai giri medi: fiamma media, solo con l'auto potenziata e la valvola aperta
+      const liftT = sim.cfg.pops ? 2.8 : 1.7, pot = exhValve();
+      const flameMed = !((sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut) && !sim.cfg.pops && pot;      // al rilascio ai giri medi: scoppietti piccoli, niente botto
       flameT = exhClosed() ? 0 : (sim.cut === 2 || sim.cut === 3) && TP.sim.sparkCut ? 1
-        : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : 0.38) * (1 - sim.ovr / liftT) * Math.min(1, sim.rpm / 4500) * TP.dsp.cat.pop : 0;
+        : sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && (pot || game.car === 'supra' || TP.sim.ecuPops) ? (sim.cfg.pops ? 0.6 : pot ? 0.5 : 0.38) * (1 - sim.ovr / liftT) * (0.55 + 0.45 * Math.min(1, sim.rpm / 4500)) * (pot ? Math.max(TP.dsp.cat.pop || 0, 0.7) : TP.dsp.cat.pop) : 0;
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
-        ign: sim.ign, brake: sim.in.brake, flame: flameT, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
+        ign: sim.ign, brake: sim.in.brake, flame: flameT, flameMed: flameMed, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
         thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd };
       garage.update(dt, vs, game);
       recordFrame(dt, vs);

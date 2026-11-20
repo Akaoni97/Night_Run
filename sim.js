@@ -69,9 +69,9 @@ class SupraSim {
     let best = { cv: 0, nm: 0, rpmCv: 0, rpmNm: 0 };
     for (let rpm = 1000; rpm <= P.limiter; rpm += 50) {
       const frac = tc.twin ? SIM_SS(tc.a, tc.b, rpm) * 0.6 + 0.4 * SIM_SS(3800, 4400, rpm) : Math.pow(SIM_SS(tc.a, tc.b, rpm), 1.3);
-      const boost = tc.max * Math.min(1, frac * 1.18);
+      const boost = tc.max * (this.boostCtl || 1) * Math.min(1, frac * 1.18);      // la mappa del turbo (ECO / NORMALE / FORTE) cambia la pressione
       const camK = SIM_SS(3000, 5500, rpm), camF = tn.camLow * (1 - camK) + tn.camHigh * camK;
-      const T = this.tqAt(rpm) * tn.pw * (this.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * (this.boostCtl || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm);
+      const T = this.tqAt(rpm) * tn.pw * (this.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm);
       const cv = T * rpm / 7023;
       if (cv > best.cv) { best.cv = cv; best.rpmCv = rpm; }
       if (T > best.nm) { best.nm = T; best.rpmNm = rpm; }
@@ -324,7 +324,7 @@ class SupraSim {
     this.wg = SIM_CLAMP((drive - 1) * 3, 0, 1);
     const tau = tgtT > this.tur ? tc.up * ((tn.ic && tn.ic.lag) || 1) : (closed && cfg.valve === 'flutter' ? 0.5 : tc.down * (closed ? 1.6 : 1));
     this.tur += (tgtT - this.tur) * Math.min(1, h / tau);
-    if (!closed) this.pipeP += (tc.max * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
+    if (!closed) this.pipeP += (tc.max * (this.boostCtl || 1) * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
     else this.pipeP += (0 - this.pipeP) * Math.min(1, h / (cfg.valve === 'flutter' ? 0.45 : 0.07));
     if (closed && !this.bovLatch && this.pipeP > (cfg.valve === 'flutter' ? 0.1 : 0.2)) {
       this.bovLatch = true;
@@ -346,7 +346,7 @@ class SupraSim {
     const maintK = 1 - Math.max(0, 0.25 - (mt.oil ?? 1)) * 0.25;
     if (burning && (mt.plugs ?? 1) < 0.4 && Math.random() < (0.4 - mt.plugs) * h * 30) this.misT = 0.04 + Math.random() * 0.05;
     this.misT = Math.max(0, (this.misT || 0) - h);
-    const Tcomb = burning ? Tind * tn.pw * (this.extraPw || 1) * (this.hotK || 1) /* [PISTONE] */ * camF * lopeF * maintK * (1 - 0.18 * this.iat) * (this.misT > 0 ? 0.4 : 1) * this.softK * (1 - (this.hes || 0)) * Math.max(0, this.air * (1 + 0.78 * (tn.boostK || 1) * (this.boostCtl || 1) * this.pipeP) - 0.1) / 0.9 : 0;
+    const Tcomb = burning ? Tind * tn.pw * (this.extraPw || 1) * (this.hotK || 1) /* [PISTONE] */ * camF * lopeF * maintK * (1 - 0.18 * this.iat) * (this.misT > 0 ? 0.4 : 1) * this.softK * (1 - (this.hes || 0)) * Math.max(0, this.air * (1 + 0.78 * (tn.boostK || 1) * this.pipeP) - 0.1) / 0.9 : 0;
     const Tfric = rpm > 0 ? 16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm + 9 * (1 - this.air) * (rpm / 3000) : 0;
     let Tcomp = 0;
     if (!this.running && rpm > 0.5) Tcomp = -38 * Math.sin(3 * this.theta) * SIM_CLAMP(1 - rpm / 700, 0, 1);
