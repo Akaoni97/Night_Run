@@ -73,7 +73,7 @@
     const dims = { shack: [60, 44], tower: [48, 138], boutique: [64, 50], hotel: [72, 92], factory: [76, 58], containers: [70, 46], market: [70, 44] }[kind];
     const w = dims[0] + Math.floor(r(1) * 8), h = dims[1] + Math.floor(r(2) * (kind === 'tower' ? 36 : kind === 'hotel' ? 18 : 10)), top = 30;
     const c = document.createElement('canvas'); c.width = w + 2; c.height = h + top + 1;
-    const x = c.getContext('2d'), gy = top + h;
+    const x = c.getContext('2d', { willReadFrequently: true }), gy = top + h;
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), Math.round(ww), Math.round(hh)); };
     const meta = { w: w + 2, h: h + top + 1, signs: [], beacons: [], shop: null, glows: [] };
     const ball = (cx, cy, rr, col) => { for (let dy = -rr; dy <= rr; dy++) { const ww = Math.round(Math.sqrt(rr * rr - dy * dy) * 2); px(dy < -rr / 3 ? sh(col, 0.25) : dy > rr / 3 ? sh(col, -0.3) : col, cx - ww / 2, cy + dy, ww, 1); } };
@@ -219,7 +219,7 @@
   S.landmark = function (kind, r, D) {
     const dims = { ferris: [92, 96], crane: [76, 104], spire: [30, 150], tank: [40, 74], pagoda: [56, 100] }[kind] || [40, 80];
     const w = dims[0], h = dims[1], top = 25, c = document.createElement('canvas'); c.width = w + 2; c.height = h + 26;
-    const x = c.getContext('2d'), gy = top + h, base = D.far[0], dk = sh(base, -0.25), lt = sh(base, 0.5);
+    const x = c.getContext('2d', { willReadFrequently: true }), gy = top + h, base = D.far[0], dk = sh(base, -0.25), lt = sh(base, 0.5);
     const px = (col, xx, yy, ww = 1, hh = 1) => { x.fillStyle = col; x.fillRect(Math.round(xx), Math.round(yy), Math.round(ww), Math.round(hh)); };
     const line = (x0, y0, x1, y1, col) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let k = 0; k <= n; k++) px(col, x0 + (x1 - x0) * k / n, y0 + (y1 - y0) * k / n); };
     const meta = { w: w + 2, h: h + 26, signs: [], beacons: [], shop: null, glows: [] };
