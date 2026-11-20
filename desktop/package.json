@@ -1,0 +1,43 @@
+{
+  "name": "night-run",
+  "productName": "Night Run: The Last Highway",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Night Run: The Last Highway per Windows, giocabile senza rete",
+  "author": "Akaoni97",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "prestart": "node copia-gioco.js",
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "test:integrazione": "node test/integrazione.cjs",
+    "predist": "node copia-gioco.js",
+    "dist": "electron-builder --win --x64"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0",
+    "playwright": "1.65.1"
+  },
+  "build": {
+    "appId": "it.akaoni97.nightrun",
+    "productName": "Night Run The Last Highway",
+    "asar": true,
+    "directories": { "output": "dist", "buildResources": "risorse" },
+    "files": ["main.js", "preload.js", "salvataggi.js", "app/**/*", "LEGGIMI.md"],
+    "win": {
+      "icon": "app/img/app/icona-512.png",
+      "target": ["nsis", "portable"],
+      "signAndEditExecutable": true
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "artifactName": "Night-Run-${version}-Installazione.${ext}"
+    },
+    "portable": { "artifactName": "Night-Run-${version}-Portatile.${ext}" }
+  }
+}

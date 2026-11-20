@@ -1,3 +1,9 @@
+## 21/11/2026 · proprietario · v0.62 (**Night Run per Windows, da Codex**)
+- Fatto: unito il lavoro di Codex (Electron). `desktop/` (finestra del gioco con sandbox, protocollo `app://`, salvataggi in `%APPDATA%\night-run\salvataggi` con backup, build per
+  installatore e portatile), `vendor/fonts/` (30 caratteri locali con le licenze al posto di Google Fonts), `sw.js` col nuovo `VERSIONE`. Guida in `desktop/LEGGIMI.md`.
+- Aperto: l'installatore e il portatile non sono nel repository (si costruiscono da `desktop/` con `npm run dist`) e **non provati da me** (qui non c'è Windows): da provare sul PC con
+  l'installatore di Codex, soprattutto l'ascolto del motore, una guida lunga e l'installazione e disinstallazione.
+
 ## 21/11/2026 · proprietario · v0.61 (**assetto a livelli**)
 - Fatto: assetto a 6 livelli per ogni auto (`tuning.js`, `sim.js`): dal livello 1 due cursori regolano altezza (mm, anche rialzata) e rigidità (% delle molle di serie); la fisica
   (baricentro, aria, presa, beccheggio, partenza, saltellamento e fondo che tocca) e il disegno seguono. I cursori ora stanno nella **nuova officina** di Luca (`officina.js`, gruppo
