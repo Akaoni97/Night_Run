@@ -23,6 +23,12 @@ due voci, e il controllo della sera le legge.
 - Aperto: codice morto delle vecchie gare, camion (disegni dal proprietario), alta definizione di marciapiedi e pedoni. Il cognato
   decide i punti motori di `SOSPESI.md` (vendere la V40 coi pezzi, estendere ai altri motori, vecchio Pistone).
 
+## 20/11/2026 sera · proprietario (**la cassa pesante non blocca più le missioni**)
+- Fatto (`missioni.js`, riga della bacheca in `index.html`): senza rimorchietto l'obiettivo dice cosa serve e dove
+  («240 kg: serve il rimorchietto, al Motel Ovunque (€ 2.200)», o «attacca il rimorchio», o «fai spazio»); in bacheca
+  c'è «Lascia perdere»: la cassa la porta un altro e il lavoro dopo (la busta) arriva alla bacheca successiva. Test in
+  `test/missioni.test.js`.
+
 ## 20/11/2026 sera · proprietario (**prova dei primi 200 km col giocatore automatico**)
 - Fatto: `strumenti/giocatore.js` gioca una partita nuova del Viaggio da solo a tempo accelerato (~6×: 200 km in 25
   minuti veri) e scrive il diario (soldi, spese, lavori, bisogni, eventi). Due partite da 200 km, nessun errore.

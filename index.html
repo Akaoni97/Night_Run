@@ -2545,7 +2545,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       jr.appendChild(row(v.line ? `Linea in corso: ${v.line.onboard} a bordo` : 'Prendi la linea notturna <small>8 fermate</small>', () => (v.line ? { ok: false, why: 'Hai già una linea' } : game.vgStartLine(n))));
     } else for (const o of game.vgOffers(n)) {
       const taken = v.taken && v.taken[n + ':' + o.k];
-      const b = row(IC(o.first || o.mission ? 'missione' : o.kind) + (o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : o.mission ? `${taken ? '✓ ' : '★ '}${o.title} per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}${o.kg >= 50 ? ` · ${fmt(o.kg, 0)} kg` : ''}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`), () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
+      const b = row(IC(o.first || o.mission || o.salta ? 'missione' : o.kind) + (o.salta ? `Lascia perdere «${o.title}» <small>${o.need} · il prossimo lavoro alla bacheca dopo</small>` : o.first ? `${taken ? '✓ ' : '★ '}Primo lavoro: un pacco per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}</small>` : o.mission ? `${taken ? '✓ ' : '★ '}${o.title} per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${fmt(o.pay)}${o.kg >= 50 ? ` · ${fmt(o.kg, 0)} kg` : ''}</small>` : `${taken ? '✓ ' : ''}${fmt(o.kg, 0)} kg per ${o.toName} <small>km ${fmt(o.kmTo, 1)} · € ${o.pay}</small>`), () => { const q = game.vgTake(o, n); if (q.ok) openPlace(I); return q; });
       if ((o.first || o.mission) && !taken) b.classList.add('first');
       if (o.give) b.title = o.give;
       jr.appendChild(b);
