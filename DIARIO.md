@@ -4,6 +4,10 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 20/11/2026 · proprietario → **AVVISO PER IL COGNATO**
+- **Leggi `AVVISI.md`**: il gioco ora si installa come app sul PC da Edge o Chrome e si aggiorna da sola a ogni caricamento
+  su `main`. Da adesso gli avvisi importanti stanno lì e l'hook di inizio sessione li mostra per primi.
+
 ## 20/11/2026 mattina · proprietario (app installabile)
 - Fatto: il gioco si installa come app da Edge o Chrome (`manifest.json`, icone in `img/app/`): icona sul desktop, finestra
   sua, sempre aggiornato. Come si fa: `PASSAGGIO.md`, «Il gioco come app sul PC». Provato: Chromium la dà installabile.

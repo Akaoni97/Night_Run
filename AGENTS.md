@@ -1,5 +1,6 @@
 # Night Run · guida per gli assistenti (Kimi, Claude e altri)
 
+**Avvisi importanti per il proprietario o per il cognato: `AVVISI.md`** (l'hook di inizio sessione li mostra per primi; vanno detti subito a chi ti parla e tolti quando li ha letti).
 Stato del lavoro, lavori aperti e procedure (artifact, nuovi disegni di auto): vedi `PASSAGGIO.md`.
 Cosa viene da Codex, cosa no e come annullarlo: `MODIFICHE_CODEX.md`.
 Comandi di Claude Code (`/compact`, `/clear`...), skill di Night Run e scorciatoie, spiegati in italiano: `COMANDI.md`.

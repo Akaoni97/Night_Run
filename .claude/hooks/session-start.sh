@@ -1,6 +1,7 @@
 #!/bin/bash
 # Night Run · all'inizio di ogni sessione di Claude (del proprietario o del cognato): si mette in pari con main e dice
-# a Claude cosa è cambiato, chi sta lavorando su cosa (INCORSO.md) e le ultime righe del diario (DIARIO.md).
+# a Claude cosa è cambiato, gli avvisi importanti (AVVISI.md, da dire subito), chi sta lavorando su cosa (INCORSO.md)
+# e le ultime righe del diario (DIARIO.md).
 # Non installa niente (il gioco non ha dipendenze). Non perde mai lavoro: si aggiorna da solo solo se si è su main,
 # senza modifiche in sospeso e con un avanzamento semplice; altrimenti lo dice e basta.
 set -uo pipefail
@@ -29,6 +30,10 @@ if timeout 20 git fetch -q origin main 2>/dev/null; then
   fi
 else
   echo "(GitHub non raggiungibile adesso: non ho potuto controllare le novità su main.)"
+fi
+if [ -f AVVISI.md ] && grep -q "^## " AVVISI.md; then
+  echo; echo "== !!! AVVISI IMPORTANTI (AVVISI.md): dillo SUBITO a chi ti parla, all'inizio della prima risposta !!!"
+  awk '/^## /{on=1} on' AVVISI.md | head -30
 fi
 [ -f INCORSO.md ] && { echo; echo "== Lavori in corso (INCORSO.md)"; sed -n '/^| /p' INCORSO.md | tail -n +3; }
 [ -f DIARIO.md ] && { echo; echo "== Ultime righe del diario (DIARIO.md)"; awk '/^## /{n++} n>=1 && n<=2' DIARIO.md | head -20; }
