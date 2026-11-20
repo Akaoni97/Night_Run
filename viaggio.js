@@ -346,12 +346,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     N.poo = Math.max(0, N.poo - t / (VG_BAGNO.cacaOre * VG_BAGNO.minPerOra));
     for (const k of ['pee', 'poo']) if (N[k] <= 0 && !this.inside) {      // a zero, fuori da un locale: te la fai addosso
       N[k] = 0.6; N.wash = Math.max(0, N.wash - 0.5); v['warn' + k] = 0;
-      this.say(k === 'pee' ? 'Non ce l\'hai fatta: te la sei fatta addosso. Che vergogna.' : 'Non ce l\'hai fatta. Meglio non pensarci: ti serve una doccia.', 'bad');
+      const M = k === 'pee' ? ['Non ce l\'hai fatta: te la sei fatta addosso. I jeans ricordano.', 'Ecco. Il caldo dei pantaloni dice che hai perso.', 'Cedimento strutturale. Pantaloni bagnati e dignità a zero.']
+        : ['Non ce l\'hai fatta. Meglio non pensarci: ti serve una doccia, e un esorcista.', 'È successo. Non ne parleremo mai più. Finestrino aperto.', 'Il sedile non sarà più lo stesso, e nemmeno tu.'];
+      this.say(M[Math.floor(Math.random() * M.length)], 'bad');
     }
     const low = Math.min(N.food, N.water, N.sleep);
     for (const k of ['food', 'water', 'sleep', 'wash', 'pee', 'poo']) {
       const was = v['warn' + k] || 0, lvl = N[k] < 0.08 ? 2 : N[k] < 0.25 ? 1 : 0;
-      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'], pee: ['Ti scappa la pipì', 'Non ce la fai più: cerca un bagno'], poo: ['Ti serve un bagno, e non per lavarti le mani', 'Devi andare in bagno. Subito.'] }[k][lvl - 1], 'bad');
+      if (lvl > was) this.say({ food: ['Ti brontola lo stomaco', 'Hai fame: ti tremano le mani'], water: ['Hai la gola secca', 'Hai una sete che non vedi niente'], sleep: ['Ti si chiudono gli occhi', 'Stai per addormentarti al volante'], wash: ['Ti senti appiccicoso', 'I passeggeri aprono il finestrino'], pee: ['Ti scappa la pipì', 'Non ce la fai più: o un bagno o la piazzola'], poo: ['Ti serve un bagno, e non per lavarti le mani', 'Oh merda: ti stai cagando addosso. Un bagno, subito'] }[k][lvl - 1], 'bad');
       v['warn' + k] = lvl;
     }
     // sonno: colpi di sonno sempre più frequenti; a zero ti addormenti

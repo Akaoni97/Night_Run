@@ -37,12 +37,12 @@ const PENS_BISOGNI = {
     ['Faccio schifo anche a me stesso.', 'Mi sento uno straccio sporco.'],
   ],
   pee: [
-    ['Un bagno non mi dispiacerebbe.', 'Ho bevuto troppo. Al prossimo locale mi fermo.'],
-    ['Non resisto più: o trovo un bagno o mi fermo in mezzo alla strada.', 'Se non arrivo al prossimo locale faccio una sciocchezza.'],
+    ['Ho bevuto come un cammello e adesso la vescica presenta il conto.', 'Un bagno. Anche brutto. Anche senza porta.', 'Ogni buca la sento in un posto preciso, e non è la schiena.', 'Non è urgente. Non ancora. Ma lo sarà, e lo sa.', 'Al prossimo locale mi fermo, e stavolta non ci penso due volte.', 'Il sedile vibra. Io le sento tutte, una per una.', 'Il rumore dell\'acqua alla radio non aiuta. Per niente.'],
+    ['Se arrivo al prossimo locale senza incidenti mi faccio una statua.', 'Il corpo ha smesso di chiedere e ha cominciato a minacciare.', 'Guido con le gambe incrociate. Questo è il mio livello adesso.', 'Non resisto più: o trovo un bagno o mi fermo in mezzo alla strada.', 'Oh merda. Letteralmente no, ma la pipì sì. Vi prego, un bagno.', 'Ogni dosso è un esame di coscienza.', 'Se mi scappa ancora un po\' divento un cartello di pericolo.'],
   ],
   poo: [
-    ['Sento che il corpo vuole fare il suo mestiere. Un bagno vero, però.', 'Mi servirà un bagno, prima o poi.'],
-    ['Devo andare in bagno. Adesso. Non è una richiesta.', 'Stringo i denti. Il prossimo locale è la mia salvezza.'],
+    ['La pancia borbotta una cosa che non è fame.', 'Mi sa che il panino di prima ha altri programmi per me.', 'Il corpo mi manda segnali. Per ora gentili.', 'Sento una pressione sorda e costante. Il prossimo bagno è un appuntamento fissato.', 'Non è il momento. Ma il momento sta arrivando e non ha fretta.', 'Una pausa tecnica non mi dispiacerebbe. Di quelle lunghe, con la porta chiusa.'],
+    ['Oh merda. No, aspetta, quasi: mi sto cagando addosso.', 'Se mi viene adesso, questa macchina diventa un luogo del delitto.', 'Stringo tutto. Tutto. Fino alla pace con me stesso.', 'Devo andare in bagno. Adesso. Non è una richiesta.', 'Qualcuno mi dica che il prossimo locale è vicino. Anche una bugia pietosa va bene.', 'Se esco vivo da questo viaggio lo racconto solo a mio cognato.', 'Prometto di non mangiare più niente per il resto della vita. Ma fatemi arrivare.'],
   ],
 };
 // a caso, ogni tanto, mentre si guida: ognuno una sola volta per partita

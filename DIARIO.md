@@ -1,3 +1,6 @@
+## 21/11/2026 · proprietario · v0.58 (**frasi di pipì e cacca**)
+- Fatto: nuovi pensieri (`pensieri.js`, `pee` e `poo`, sette frasi a livello, serie e comiche: «Oh merda, mi sto cagando addosso»), avvisi e tre frasi a testa per l'incidente quando arrivi a zero (`viaggio.js`). Testi miei, da rivedere.
+
 ## 21/11/2026 · proprietario · v0.57 (**pipì e cacca**)
 - Fatto: due bisogni nuovi nel quadro (🚽 e 💩) e nei pensieri. Solo col tempo: la pipì si svuota in 12 «ore di viaggio», la cacca in 24, e un'ora di viaggio vale 3 minuti veri (`VG_BAGNO` in `viaggio.js`: l'orologio del gioco corre a 3 minuti per secondo e a ore di gioco vere sarebbe una pausa bagno ogni 4 minuti). Bere fa venire prima la pipì, mangiare la cacca. Il bagno è gratis in bar, autogrill, benzinaio e motel. A zero fuori da un locale te la fai addosso e l'igiene crolla. 4 test nuovi (265).
 - Aperto: i tempi sono da provare (pipì ogni ~36 min veri, cacca ogni ~72): si cambiano in `VG_BAGNO`.
