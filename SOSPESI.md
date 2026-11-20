@@ -4,7 +4,7 @@ Lista viva: al **controllo della sera** (quando qualcuno chiede «il check») Cl
 poi la aggiorna con chi c'è (toglie quello che è fatto, aggiunge quello che salta fuori). In cima le cose più urgenti.
 Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
 
-Aggiornata il 20/11/2026 (cognato).
+Aggiornata il 20/11/2026 sera (controllo della sera col proprietario).
 
 ## Da decidere insieme
 - [motori] **Vendere la V40 coi pezzi di Nico montati**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o
@@ -31,6 +31,9 @@ Aggiornata il 20/11/2026 (cognato).
   soldi una volta sola (avviso di Luca). Controllare che il messaggio arrivi e i conti tornino. (tutti e due)
 
 ## Da sistemare
+- [guida] **Leva in D uscendo da un locale a motore spento**: entrando, l'accosto automatico mette la leva in D; se il
+  motore era spento, uscendo l'avviamento viene rifiutato («metti la leva in P») finché non premi Q. C'era già prima,
+  si vede soprattutto con `strumenti/prova.js`. Meglio rimettere la leva in P quando si entra da fermi. (Claude)
 - [motori] **Valigette sulla V40**: il premio «kit turbo» non trova più pezzi di Luca e dà altro. Meglio che dia un
   turbo di Nico in magazzino. (Claude, quando si decide)
 - [motori] **Il pannello di Nico è lunghissimo** (livelli, motore, pezzi in vendita, magazzino, banco, motori): sul
@@ -40,5 +43,4 @@ Aggiornata il 20/11/2026 (cognato).
   `test/motori-costruiti.test.js`). Rinominarlo vuol dire toccare due skill (ramo `skill`). (chi ha voglia)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- Negozio unico: Nico lavora da Luca, pezzi singoli a livelli sul motore della V40, banco di lavoro, magazzino.
-- Il Pistone non è più una tappa: il secondo bar di ogni giro è tornato.
+- `AVVISI.md` aggiornato: niente più «Il Pistone tappa al km 14,6» né «il proprietario lavora sul 3D».

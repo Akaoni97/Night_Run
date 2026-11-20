@@ -14,9 +14,7 @@ Formato: `## data · per chi · da chi` e due o tre righe.
   Il gioco ora è **solo 2D**. Spariti: vista 3D e Abitacolo, la modalità **Montagna** (era solo 3D), la Vetrina (G),
   la telecamera (C), il caricamento di modelli .glb e three.js. Cancellati `car3d.js`, `street3d.js`, `viaggio3d.js`
   e `models/`. Se un giorno servisse, sono nella storia di git.
-- Al posto del 3D: **la costruzione del motore**, già nel gioco: locale nuovo **Il Pistone** (al posto del secondo bar
-  di ogni giro, primo al km 14,6). Scegli i pezzi, lo monti a mano sul cavalletto, lo metti su qualsiasi auto.
-  File `pistone/motori.js` e `pistone/motori2d.js` (guida in `pistone/LEGGIMI.md`).
+- Al posto del 3D: **la costruzione del motore**. Oggi i motori li gestisci tu (Nico da Luca, cartella `pistone/`).
 - Il weekend quindi è tutto 2D: segnate in `INCORSO.md` cosa toccate.
 
 ## 20/11/2026 · per il cognato · dal proprietario
@@ -25,4 +23,4 @@ Formato: `## data · per chi · da chi` e due o tre righe.
 - **Si aggiorna da sola**: ogni caricamento su `main` arriva nell'app alla prossima apertura (o con Ctrl+R), dopo il
   minuto o due che serve a GitHub Pages. Niente da reinstallare. I dettagli: `PASSAGGIO.md`, «Il gioco come app sul PC».
 - L'exe vero (Electron, per Steam) si fa più avanti, come nel tuo `docs/pubblicazione/PERCORSO.md`.
-- Weekend: il proprietario lavora sul **3D**, tu sul **2D**. Segnate in `INCORSO.md` cosa toccate, soprattutto `index.html`.
+- Weekend: il 3D non c'è più (vedi l'avviso sopra), si lavora tutti e due sul 2D. Segnate in `INCORSO.md` cosa toccate, soprattutto `index.html`.
