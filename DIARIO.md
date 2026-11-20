@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.56 (**Sviluppatori: cinque strumenti in più**)
+- Fatto: scheda Sviluppatori con **Vai a** (km o prossima tappa di ogni tipo), **Bisogni e benzina** (riempi, o infiniti), **Danni e usura** (ripara, o indistruttibile), **Meteo e ora** (pulsanti), **Storia e telefono** (flag di chat/storia, tutte le app, L'ultima porta). Le spunte si ricordano nel browser (`nr_dev`). Provati nel browser, senza errori in console.
+- Aperto: nessun test automatico per questi strumenti (usano la pagina); li copre la prova a mano.
+
 ## 21/11/2026 · proprietario · v0.55 (**Sviluppatori: Disabilita polizia**)
 - Fatto: nella scheda Sviluppatori la spunta **Disabilita polizia** (`POL.off` in `polizia.js`, `game.polOffSet`): la polizia c'è e si vede, ma non può fermarti, multarti né inseguirti (fermi per velocità, posto di controllo, etilometro, coda, sfanalare una volante); autovelox e Tutor restano sulla strada ma non multano; accesa, il ricercato e i verbali in arrivo si azzerano. Si ricorda nel browser. 1 test nuovo (261).
 - Aperto: nessuno.
