@@ -494,6 +494,9 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .qsel { display: flex; gap: 6px; align-items: center; }
 .qsel select { background: #1c1a16; border: 1px solid #3a342a; color: var(--fg); font: 500 12px/1 var(--f-body); padding: 3px 4px; }
 .tgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+/* i pezzi si montano da Luca (officina.js): nel menu l'officina mostra solo statistiche, manutenzione e rapporti. Con l'interruttore del Pistone acceso resta il vecchio negozio dentro il pannello del locale */
+section.panel.tuning .tshop, section.panel.tuning .presets, section.panel.tuning #shopNote { display: none !important; }
+#placeBox section.panel.tuning .tshop, #placeBox section.panel.tuning .presets, #placeBox section.panel.tuning #shopNote { display: revert !important; }
 .tshop { display: grid; gap: 12px; }
 .tg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
 .tg-tab { flex: 1 1 120px; display: grid; gap: 4px; text-align: left; padding: 9px 12px; background: #0e0d0b; border: 1px solid var(--line); color: var(--fg); font: 600 15px/1.1 var(--f-body); cursor: pointer; }
@@ -1448,9 +1451,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function applySettings() {
     const carId = game.car;
     useCar(carId);
+    if (typeof offCatalog === 'function') offCatalog(game, carId);   // officina.js: con uno swap il catalogo ha i pezzi del motore montato
     TP = tuningParams(S.tune);
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
-    const MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
+    let MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
+    if (!MOTE && typeof offSwapApply === 'function') MOTE = offSwapApply(game, carId, TP, sim, S.tune);   // officina.js: swap con il motore di un'altra auto
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
@@ -2697,16 +2702,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
-      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Scegli i pezzi dalle tendine: li monta subito. Alcuni si sbloccano solo dopo un po\' di chilometri.');
-      // [PISTONE] con un motore del Pistone montato, i pezzi del motore li decide quel motore (pistone/motori.js, motApply)
-      if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto invece te li faccio io.»`);
-      move(document.querySelector('section.panel.tuning'));
-      renderTuning(); renderServices();
-      // [PISTONE] Nico lavora qui: pezzi del motore a livelli, motore di serie, banco di lavoro, motori costruiti
-      if (window.NightMotori) {
-        const nb = document.createElement('div'); body.appendChild(nb);
-        const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
-        NightMotori.panel(nb, I, nc);
+      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca i pezzi: li monto subito. La i dice cosa fanno.');
+      if (window.NightOfficina && !(typeof PISTONE !== 'undefined' && PISTONE.on)) {      // officina semplice (officina.js): Modifiche e Swap motore (con l'interruttore del Pistone acceso resta il vecchio negozio)
+        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
+        NightOfficina.panel(body, I, ctxO);
+      } else {                                                           // [PISTONE] interruttore acceso: il vecchio negozio di Luca e Nico
+        if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto sono ancora miei.»`);
+        move(document.querySelector('section.panel.tuning'));
+        renderTuning(); renderServices();
+        if (window.NightMotori) {
+          const nb = document.createElement('div'); body.appendChild(nb);
+          const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
+          NightMotori.panel(nb, I, nc);
+        }
       }
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
@@ -3681,6 +3689,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="concessionario.js"></script>
 <script src="usato.js"></script>
 <script src="sfascio.js"></script>
+<script src="officina.js"></script>
 <script src="pistone/motori2d.js"></script>   <!-- [PISTONE] -->
 <script src="garage.js"></script>
 <script src="documenti.js"></script>

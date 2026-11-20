@@ -71,7 +71,7 @@
       const how = [...document.querySelectorAll('section.extras > .panel')].find((p) => /Come si gioca/.test(p.textContent));
       return [sum, box, tools, how];
     }],
-    ['garage', 'Officina', 'Manutenzione, rapporti, pezzi', '#ff7a3a', () => [q('section.tuning')]],
+    ['garage', 'Officina', 'Manutenzione, rapporti, chilometri', '#ff7a3a', () => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'I pezzi e lo swap del motore si fanno da Luca Tuning (sulla mappa, tasto L): un clic e sono montati.'; return [p, q('section.tuning')]; }],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],
     ['guida', 'Guida', 'Avviamento, comandi dell\'auto, cambio, limitatore', '#b8ff3a', () => [q('section.deck')]],
     ['quadro', 'Quadro e dati', 'Strumenti grandi e telemetria', '#b07bff', () => [$('cluster'), q('section.tele')]],

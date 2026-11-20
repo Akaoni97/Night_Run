@@ -4,6 +4,12 @@ Due o tre righe a fine sessione, le più recenti in alto: cosa è stato fatto, c
 dall'altro. Lo scrive Claude a fine lavoro (skill `night-run-pubblica`); l'hook di inizio sessione mostra le ultime
 due voci, e il controllo della sera le legge.
 
+## 21/11/2026 · proprietario (**officina semplice: Modifiche e Swap motore; Tutor ogni 10-15 km**)
+- Fatto: `officina.js`. Da Luca una schermata sola a due schede (era un pannello di 3.600 px con Nico e sei schede): **Modifiche** (pezzi a livelli in riquadri, un clic compra e monta, la i spiega, livelli SERIE/1/2 sempre sbloccati e km solo dal 3 in su) e
+  **Swap motore** (il motore di un'altra auto del gioco: curva, giri, turbo, cilindri, voce e peso; i pezzi del motore dopo lo swap sono quelli del nuovo motore). Il vecchio Nico resta in `pistone/` ma spento di serie (interruttore in Sviluppatori); nel menu la scheda
+  Officina non ha più il negozio. 5 test nuovi (246 in tutto), provato nel browser: V40 140 CV → motore Supra 330 CV, turbo e pezzi del donatore comprabili. **Polizia**: un Tutor ogni 10-15 km lungo da 500 m a 1 km, niente autovelox a 700 m da lui; la prova del Tutor era instabile e ora è deterministica.
+- Aperto: **da dire a tuo cognato** (i motori sono suoi): Nico è spento di serie, da decidere cosa riportare nell'officina semplice (interni V40, banco, motori costruiti). Non fatto: anteprima prima/dopo sulle barre, interni del motore (albero, bielle...) come pezzi semplici.
+
 ## 20/11/2026 notte · proprietario (**fluidità: palazzi preparati prima, meno lavoro a ogni fotogramma**)
 - Fatto: il palazzo che sta per entrare da destra si porta a densità doppia (`tileHD`) quando è ancora fuori schermo, uno per fotogramma
   (`street2d.js`, `drawCity`): misurati 113 su 113 pronti prima di comparire, prima si facevano nel fotogramma in cui entravano (anche due o tre

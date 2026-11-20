@@ -517,7 +517,11 @@ class StreetGame {
   nextPerk() { return GAME_KM_PERKS.find((p) => !this.hasPerk(p.id)) || null; }
   // ogni pezzo chiede anche un po' di strada: più costa, più chilometri servono per sbloccarlo
   // ogni pezzo chiede anche un po' di strada (km del pezzo, oppure: più costa, più chilometri)
-  partKm(cat, id) { const it = tuningItem(cat, id); if (!it || !it.price) return 0; return it.km ?? Math.max(5, Math.round(it.price / 150 / 5) * 5); }
+  partKm(cat, id) {                                          // i livelli 1 e 2 sono sempre sbloccati: i chilometri servono solo dal 3 in su
+    const it = tuningItem(cat, id); if (!it || !it.price) return 0;
+    const c = TUNING[cat], lv = c ? c.items.findIndex((x) => x.id === id) : -1; if (lv >= 0 && lv <= 2) return 0;
+    return it.km ?? Math.max(5, Math.round(it.price / 150 / 5) * 5);
+  }
   partLocked(cat, id) { return this.mode === 'career' && !this.owns(cat, id) && this.odo < this.partKm(cat, id); }
   owns(cat, id) { return this.mode === 'free' || !TUNING[cat] || TUNING[cat].items[0].id === id || tuningItem(cat, id).price === 0 || !!this.s.owned[this.ownKey(cat + ':' + id)]; }
   price(cat, id) { return this.owns(cat, id) ? 0 : Math.round(tuningItem(cat, id).price * this.disc() / 10) * 10; }
