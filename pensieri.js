@@ -103,7 +103,7 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     p.t += dt;
     if (this.thought && this.thought.left > 0) this.thought.left -= dt;
     // non si pensa in un locale, durante una domanda, in gara, o da fermi
-    if (this.prompt || this.inside || this.race || Math.abs(this.sim.v) < 2 || p.t - p.last < PENS_PAUSA) return;
+    if (this.prompt || this.inside || Math.abs(this.sim.v) < 2 || p.t - p.last < PENS_PAUSA) return;
     const km = vgKm(this);
     // 1. un pensiero scritto, a un certo km
     const k = PENS_KM.find((q) => km >= q.km && !p.seen[q.id]);

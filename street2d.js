@@ -1945,7 +1945,6 @@ class Street2D {
     if (game && game.placesOn) for (const p of game.placesBetween(visFrom - 160, visTo + 160)) items.push(p);
     const zOf = (e) => {
       if (e.kind === 'station' || e.kind === 'place' || e.lane === 0) return 9;
-      if (e.kind === 'line' || e.kind === 'drop') return 1.75;
       e._z = e._z === undefined ? GAME_LANE_Z[e.lane] : e._z + (GAME_LANE_Z[e.lane] - e._z) * Math.min(1, dt * 1.8);   // cambio corsia morbido
       return e._z;
     };
@@ -1963,27 +1962,6 @@ class Street2D {
       if (this.drawTripEnt && this.drawTripEnt(g, e, x, st)) return;
       if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); if (this.lightAdd) { this.lightAdd(x, 240, 170, 60, '255,214,150', 0.6); this.lightAdd(x, 300, 140, 40, e.col ? Street2D.rgb(e.col) : '255,200,120', 0.3); } return; }
       if (e.kind === 'station') { this.drawStation(g, x); return; }
-      if (e.kind === 'drop') {
-        for (const p of [-36, 32]) { g.fillStyle = C.ink; g.fillRect(x + p - 2, 184, 9, 148); g.fillStyle = '#b8ff3a'; g.fillRect(x + p, 186, 5, 144); g.fillStyle = '#e8ffb0'; g.fillRect(x + p, 186, 1, 144); }
-        g.fillStyle = C.ink; g.fillRect(x - 44, 168, 92, 22); g.fillStyle = '#b8ff3a'; g.fillRect(x - 42, 170, 88, 18);
-        this.text(g, 'CONSEGNA', x - 31, 174, C.ink, 2);
-        this.light(g, x, 300, 70, 30, '#b8ff3a', 0.05, 3);
-        return;
-      }
-      if (e.kind === 'line') {
-        for (let y = 240; y < 334; y += 6) for (let k = 0; k < 2; k++) { g.fillStyle = ((y / 6 + k) | 0) % 2 ? '#f4f1e6' : C.ink; g.fillRect(x + k * 6, y, 6, 6); }
-        if (e.finish) {
-          // arco a scacchi sopra la carreggiata con bandiere
-          g.fillStyle = C.ink; g.fillRect(x - 3, 96, 6, 240); g.fillRect(x + 40, 96, 6, 240);
-          for (let yy = 96; yy < 118; yy += 6) for (let xx = x - 3; xx < x + 46; xx += 6) { g.fillStyle = ((yy - 96) / 6 + (xx - x + 3) / 6) % 2 ? '#f4f1e6' : C.ink; g.fillRect(xx, yy, 6, 6); }
-          const fw = Math.round(Math.sin(st.t * 9) * 2);
-          for (const fx2 of [x - 3, x + 40]) { g.fillStyle = C.ink; g.fillRect(fx2 + 2, 70, 2, 28); for (let q = 0; q < 4; q++) { g.fillStyle = q % 2 ? '#f4f1e6' : '#111'; g.fillRect(fx2 + 4, 70 + q * 4 + (q % 2 ? fw : 0), 10, 4); } }
-          g.fillStyle = C.ink; g.fillRect(x - 2, 132, 8, 108); g.fillStyle = '#b8ff3a'; g.fillRect(x, 134, 4, 104);
-          g.fillStyle = C.ink; g.fillRect(x - 36, 120, 78, 20); g.fillStyle = '#b8ff3a'; g.fillRect(x - 34, 122, 74, 16);
-          this.text(g, 'ARRIVO', x - 21, 125, C.ink, 2);
-        }
-        return;
-      }
       const y = e._y ?? this.laneY(zOf(e)), k = kq(y), spr0 = this.otherSprite(e.kind, e.color, k, e.vt), spr = spr0 && e.dent && spr0.hd ? this.damaged(spr0, 0.75, spr0.geo) : spr0, sc = k;
       if (!spr) return;                                                           // disegno non ancora caricato
       const GG = spr.geo, w = spr.width, left = Math.round(x - w / 2), sy = Math.round(y - (GG.wy + GG.wr) * k - 1);

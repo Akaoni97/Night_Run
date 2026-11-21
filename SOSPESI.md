@@ -9,7 +9,7 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
-Aggiornata il 21/11/2026 sera (v0.76, Luca con Claude): **numeri uguali a prima**, aggiunte solo due righe al 16.
+Aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codice morto), il 17 (Test 1) e il 19 (alta definizione leggera); il 20 si lascia così. **Numeri cambiati**: il 18 (camion) ora è il 16, il 21 (aspetto dei personaggi) è il 17.
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 1. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
@@ -44,17 +44,11 @@ Aggiornata il 21/11/2026 sera (v0.76, Luca con Claude): **numeri uguali a prima*
     massimo» lo azzera. Da provare sul PC guidando in città: se scende senza motivo, si alza `PREST.ms` (24 ms). (tutti e due)
 
 ## Da sistemare
-16. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
-    scheda Guida, app strane del telefono, `TEL_ATTI`), e quello rimasto dal motore costruito di Nico: motore rotto in
-    `soccorso.js` e `diario.js` (`motOf`), bilancio di calore `tune.cool` in `sim.js`; le scene vecchie degli interni (`SCENE.<id>_vecchio` in `interni.js`, ancora con
-    la barista e la cassiera di prima) e la tessera «niko» nel codice (id interno dell'Officina Nico). Sicuro con i test. (Claude, quando c'è tempo)
-17. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
-18. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
-19. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
-20. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
-21. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
+16. [disegni] **Camion**: la logica c'è, i disegni del proprietario arrivano tra poco. (proprietario)
+17. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 21/11 sera (v0.77, Luca): codice morto tolto (scene vecchie degli interni, vecchie consegne della città e reputazione, sfide, traguardo ARRIVO, pedali e cambio nascosti nella scheda Guida, calore e motore rotto del Pistone); `test/motori.test.js` → `test/test1.test.js` («Test 1»); insegne grandi e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`). Il riquadro dei traguardi in verticale si lascia così.
 - 21/11 sera (v0.76, Luca): aspetto dei personaggi (Nico giovane e tatuato, Tito pazzo, Rocco fisicato, Massimo barbone).
 - In corso in un'altra sessione (Luca): campioni audio dei pezzi del motore (`INCORSO.md`).
 - 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.

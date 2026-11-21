@@ -1,7 +1,7 @@
 // ============================================================================
 //  Night Run · Il diario di viaggio (dopo statistiche.js)
 //  App Diario nel telefono: una riga per ogni momento importante del Viaggio, con una piccola foto presa in quel momento
-//  quando serve. Si scrive da solo: arrivo in una capitale, incidente grosso, fuga dalla polizia, motore rotto, auto
+//  quando serve. Si scrive da solo: arrivo in una capitale, incidente grosso, fuga dalla polizia, auto
 //  nuova, soccorso e traino, ogni 100 km. Le righe stanno in `game.s.vg.dia` (testo corto, si salva con la partita);
 //  le foto (192×108, JPEG) in `localStorage` `nr_diario_foto`, al massimo `DIA.fotoMax`, fuori dal salvataggio per non appesantirlo.
 //  Gli altri file chiamano `game.diaAdd(tipo, testo, conFoto)` se c'è. Costanti in `DIA`.
@@ -54,10 +54,6 @@ const DIA_TIPI = { cap: ['Capitale', '#ffd86a'], urto: ['Incidente', '#ff6b5a'],
     const fuga = !!(this.s.pol && this.s.pol.fuga);
     if (this._diaFuga === false && fuga) this.diaAdd('fuga', 'Scappi alla polizia', true);
     this._diaFuga = fuga;
-    // motore rotto
-    const e = this.motOf && this.motOf(), rotto = !!(e && e.rotto);
-    if (this._diaRotto === false && rotto) this.diaAdd('guasto', 'Il motore si rompe');
-    this._diaRotto = rotto;
     // auto nuova
     const nG = (v.garage || []).length;
     if (this._diaG !== undefined && nG > this._diaG) { const id = v.garage[nG - 1]; this.diaAdd('auto', `Nuova auto: ${(typeof CARS !== 'undefined' && CARS[id] && CARS[id].name) || id}`, true); }

@@ -20,3 +20,4 @@ Formato: `## data · per chi · da chi` e due o tre righe.
 - **Neon Kustom → Russian Kùstòm** (Jeshka resta lì). **Motel Ovunque → Motel 4Ever**, gestito da **Tito**.
 - Personaggi nuovi: **Nabir** al bar, **Rossana** al benzinaio, **Phill Grill** alla cassa della Sosta 24, **Rocco Lostallone** all'Autosalone, **Massimo Lo Sfascio** allo sfascio. Luca Tuning come prima.
 - *Aggiornamento v0.76*: Nico è giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo un barbone.
+- *Aggiornamento v0.77*: pulito il codice che non si usava più (sparita la «Reputazione» in alto, che restava sempre a 0); insegne grandi e oggetti del marciapiede più definiti; il vecchio test si chiama «Test 1».

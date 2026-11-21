@@ -23,7 +23,6 @@ const LG = { prezzo: 150, vicino: 60, davanti: 9 };      // costo del passaggio,
   // perché non si può partire adesso (testo) o null
   P.lgWhy = function () {
     if (!this.s.vg) return 'Serve un Viaggio in corso.';
-    if (this.race) return 'Non durante una sfida.';
     if (this.inside) return 'Prima esci dal locale.';
     if (!this.canMount()) return 'Fermati prima: ti vengono a prendere da fermo.';
     const n = this.lgNear();

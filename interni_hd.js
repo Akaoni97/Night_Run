@@ -6,8 +6,7 @@
 //  cono e la pozza, insegne, frigo, fari delle auto che passano e scorrono sui muri), persone disegnate come il
 //  protagonista (pgStanding di personaggio.js) e piccole animazioni.
 //  Tutti e nove: bar (Nabir), benzinaio (Rossana), Sosta 24 (Phill Grill), Motel 4Ever (Tito), Officina Nico, Luca, Russian Kùstòm (Jeshka), Autosalone (Rocco Lostallone), sfascio (Massimo Lo Sfascio).
-//  Scritte col carattere 5×7 leggibile (t5, neon5, sign). Le scene vecchie restano in NightInterni.SCENE.<id>_vecchio;
-//  per tornare a una: NightInterni.SCENE.fuel = NightInterni.SCENE.fuel_vecchio (o togliere questo file da index.html).
+//  Scritte col carattere 5×7 leggibile (t5, neon5, sign). Le scene vecchie a densità semplice sono state tolte (v0.77).
 // ============================================================================
 (() => {
   const NI = window.NightInterni; if (!NI || !NI.kit || !NI.SCENE) return;
@@ -757,6 +756,6 @@
     hot: [{ x: 250, y: 200, w: 240, h: 100, label: 'La carcassa', go: 'La carcassa' }, { x: 100, y: 220, w: 140, h: 100, label: 'Massimo · rovista', go: 'Rovista' }, { x: 250, y: 20, w: 240, h: 150, label: 'Pezzi usati', go: 'Pezzi usati' }],
   };
 
-  // le scene nuove al posto delle vecchie; le vecchie restano come <id>_vecchio (per tornarci: SCENE.fuel = SCENE.fuel_vecchio...)
-  for (const id in HD) { NI.SCENE[id + '_vecchio'] = NI.SCENE[id]; NI.SCENE[id] = HD[id]; }
+  // le scene di tutti i locali
+  for (const id in HD) NI.SCENE[id] = HD[id];
 })();

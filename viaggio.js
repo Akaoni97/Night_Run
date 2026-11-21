@@ -242,12 +242,6 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (r && vgOn(this)) { const v = this.s.vg; v.pendingPlace = { id: p.id, n: VG.stopIndex(p.x), name: p.name }; }
     return r;
   };
-  // gli eventi casuali della carriera: nel viaggio niente consegne della carriera (ci sono i lavori)
-  const sp = P.spawn;
-  P.spawn = function () {
-    if (vgOn(this)) { const j = this.job; this.job = this.job || { fake: true }; sp.call(this); if (this.job && this.job.fake) this.job = j; return; }
-    sp.call(this);
-  };
   const up = P.update;
   P.update = function (dt) { const d0 = this.s.dist; up.call(this, dt); this.tyreUpdate(dt, Math.abs(this.s.dist - d0) / 1000); if (vgOn(this)) this.vgUpdate(dt); };
 
@@ -329,7 +323,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (this.mode !== 'career') return;
     // paesaggio della strada
     const lid = VG.locAt(km);
-    if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap && !this.race) {
+    if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap) {
       const was = this.loc && this.loc.id; this.setLoc(lid);
       if (was && was !== lid && !this.loc.cap) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
     }
@@ -359,14 +353,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // sonno: colpi di sonno sempre più frequenti; a zero ti addormenti
     v.blackout = Math.max(0, v.blackout - dt * 1.4);
     if (Math.abs(sim.v) > 3 && N.sleep < 0.22 && !v.blackout && Math.random() < dt * (0.22 - N.sleep) * 0.9) {
-      v.blackout = 1; if (Math.random() < 0.5 && !this.race && !this.ap) { this.lane = Math.max(1, Math.min(3, this.lane + (Math.random() < 0.5 ? 1 : -1))); this.manualT = 2; }
+      v.blackout = 1; if (Math.random() < 0.5 && !this.ap) { this.lane = Math.max(1, Math.min(3, this.lane + (Math.random() < 0.5 ? 1 : -1))); this.manualT = 2; }
       this.say('Colpo di sonno!', 'bad');
     }
     // fame e sete a zero: le mani non rispondono bene (il gas va e viene)
     v.weak = low < 0.08 ? 1 : 0;
     // rimorchio sopra i 110 km/h: sbanda
     v.sway = v.trailerOn && !VG_CARGO[this.car] ? Math.max(0, (Math.abs(sim.v) * 3.6 - 110) / 30) : 0;
-    if (v.sway > 0.6 && Math.random() < dt * v.sway * 0.4 && !this.race) { this.say('Il rimorchio sbanda: rallenta!', 'bad'); sim.v *= 0.985; }
+    if (v.sway > 0.6 && Math.random() < dt * v.sway * 0.4) { this.say('Il rimorchio sbanda: rallenta!', 'bad'); sim.v *= 0.985; }
     // capitoli
     for (const c of VG_CHAPTERS) if (km >= c.km && !v.chapters[c.km]) { if (!this.prompt) this.vgChapter(c.km); break; }
     // locale appena raggiunto (si gestisce quando si è dentro)
@@ -378,7 +372,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // linea dell'autobus: fermate lungo la strada
     // quello che non torna
     v.glitch = Math.max(0, v.glitch - dt);
-    if (km > v.nextOdd && !this.prompt && !this.inside && !this.race && !this.ap) this.vgOdd('road', km);
+    if (km > v.nextOdd && !this.prompt && !this.inside && !this.ap) this.vgOdd('road', km);
     // cippi chilometrici: cartelli speciali piazzati poco avanti
     this.ents = this.ents.filter((e) => !(e.kind === 'vgsign' || e.kind === 'parked') || e.x - this.s.dist > -150);
   };
@@ -395,7 +389,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgSeats = function () { return VG_SEATS[this.car] || 3; };
   P.vgHitch = function (dt, km) {
     const v = this.s.vg, d = this.s.dist;
-    if (this.car === 'bus' || this.race) return;
+    if (this.car === 'bus') return;
     // compare al bordo strada più avanti
     if (km > v.nextHitch && !this.ents.some((e) => e.kind === 'hitch')) {
       v.nextHitch = km + 2.5 + Math.random() * 4.5;
@@ -446,7 +440,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (st && st.mirror) v.mirror = 1;
       // chi non scende: sparisce a metà strada
       if (st && st.vanish && km > p.from + 3 && !p.gone) { p.gone = true; }
-      if (km >= p.to - 0.05 && !p.leaving && !this.ap && !this.race) {
+      if (km >= p.to - 0.05 && !p.leaving && !this.ap) {
         p.leaving = true;
         const stopX = Math.max(this.s.dist + 40, p.to * 1000);
         this.stopAt(stopX, () => { this.vgDrop(p); const ap = this.ap; if (ap) ap.tick = () => { if (ap.t > 1.4 && this.ap === ap) this.ap = null; }; });   // scende, saluta, si riparte

@@ -421,23 +421,12 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .kbtn.lit { background: linear-gradient(180deg, #423a2e, #27221b); color: var(--amber); }
 .start { background: linear-gradient(180deg, #3a0d1c, #1d0610); color: #ffc2d0; }
 .start.on { background: linear-gradient(180deg, #ff2e63, #a8002c); color: #fff; box-shadow: 0 0 18px rgba(255,46,99,.5); }
-.pedals { display: grid; grid-template-columns: 0.9fr 1.1fr 1fr; gap: 10px; align-items: end; }
-.pedal {
   position: relative; height: 150px; border: 1px solid var(--line);
   background: repeating-linear-gradient(0deg, transparent 0 9px, rgba(255,179,71,.06) 9px 11px), #0e0d0b;
   overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;
 }
-.pedal.gas { height: 170px; }
-.pedal .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(0deg, rgba(201,221,90,.9), rgba(255,179,71,.5)); }
-.pedal.brake .fill { background: linear-gradient(0deg, rgba(255,90,58,.9), rgba(255,90,58,.35)); }
-.pedal.clutch .fill { background: linear-gradient(0deg, color-mix(in srgb, var(--muted) 85%, transparent), color-mix(in srgb, var(--muted) 30%, transparent)); }
-.pedal label { position: absolute; left: 0; right: 0; top: 8px; text-align: center; font: 400 13px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; pointer-events: none; }
-.pedal output { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: 400 14px/1 var(--f-data); pointer-events: none; }
-.pedal kbd { position: absolute; left: 50%; transform: translateX(-50%); top: 27px; pointer-events: none; }
-.pedal.disabled { opacity: .45; }
 kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var(--line); border-bottom-width: 2px; padding: 2px 5px; background: #0e0d0b; }
 .hint { margin: 0; color: var(--muted); font-size: 14px; }
-.gate-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .g { border: 1px solid var(--line); background: #15120e; padding: 12px 0; font: 400 22px/1 var(--f-display); text-align: center; touch-action: manipulation; color: var(--fg); }
 .g:hover { border-color: #4a4234; }
 .g.cur { background: var(--amber); color: #1a1206; border-color: var(--amber); box-shadow: 0 0 16px rgba(255,179,71,.45); }
@@ -445,10 +434,6 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .g.r { color: var(--crit); }
 .g.r.cur { color: #fff; background: var(--crit); border-color: var(--crit); }
 .g.blank { visibility: hidden; }
-.seq { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.seq .kbtn { font-size: 18px; padding: 12px 8px; }
-.ratio { font: 400 13.5px/1.4 var(--f-data); color: var(--muted); }
-.ratio b { color: var(--fg); font-weight: 400; }
 .field { display: grid; gap: 6px; }
 .field > span { font: 400 11px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .seg { display: flex; flex-wrap: wrap; gap: 4px; background: #0e0d0b; border: 1px solid var(--line); padding: 3px; }
@@ -952,7 +937,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     </div>
     <div class="career" id="career">
       <div class="chip money" id="chipMoney"><b>Contanti</b><span id="hudMoney">€ 3.000</span></div>
-      <div class="chip"><b>Reputazione</b><span id="hudRep">0</span></div>
       <div class="chip"><b>Ricercato</b><div class="heat" id="hudHeat"><i></i><i></i><i></i><i></i><i></i></div></div>
       <label class="carsel"><b>Auto</b><select id="carSw" aria-label="Auto in garage (si cambia da fermi)"></select></label>
       <div class="modesw" id="modeSw" role="group" aria-label="Modalità">
@@ -1077,32 +1061,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <button class="kbtn start" id="btnStart" type="button">Avviamento<small>tieni premuto · Invio</small></button>
         <button class="kbtn" id="btnOff" type="button">Spegni<small>tasto O</small></button>
       </div>
-      <div class="pedals" hidden>
-        <div class="pedal clutch" id="pedClutch" data-p="clutch"><label>Frizione</label><kbd>Spazio</kbd><div class="fill"></div><output>0%</output></div>
-        <div class="pedal brake" id="pedBrake" data-p="brake"><label>Freno</label><kbd>S ↓</kbd><div class="fill"></div><output>0%</output></div>
-        <div class="pedal gas" id="pedGas" data-p="thr"><label>Gas</label><kbd>W ↑</kbd><div class="fill"></div><output>0%</output></div>
-      </div>
-      <p class="hint" id="pedHint" hidden>Tocca e trascina un pedale per dosarlo. Più in alto premi, più affondi.</p>
-    </div>
-
-    <div class="panel gearbox" hidden>
-      <h2>Cambio <em id="gearName">folle</em></h2>
-      <div class="gate-grid" id="gateGrid">
-        <button class="g r" data-g="-1" type="button" aria-label="Retromarcia">R</button>
-        <button class="g" data-g="1" type="button">1</button>
-        <button class="g" data-g="3" type="button">3</button>
-        <button class="g" data-g="5" type="button">5</button>
-        <button class="g n" data-g="0" type="button">FOLLE</button>
-        <span class="g blank"></span>
-        <button class="g" data-g="2" type="button">2</button>
-        <button class="g" data-g="4" type="button">4</button>
-        <button class="g" data-g="6" type="button">6</button>
-      </div>
-      <div class="seq">
-        <button class="kbtn" id="btnDown" type="button">− Scala<small>Q · ←</small></button>
-        <button class="kbtn" id="btnUp" type="button">+ Sali<small>E · →</small></button>
-      </div>
-      <div class="ratio" id="ratio">Rapporti: 3,827 · 2,360 · 1,685 · 1,312 · 1,000 · 0,793 · finale 3,133</div>
     </div>
 
     <div class="panel setup">
@@ -1287,6 +1245,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="locali2d.js"></script>
 <script src="entrata2d.js"></script>
 <script src="nitido2d.js"></script>
+<script src="insegne2d.js"></script>   <!-- alta definizione leggera di insegne e oggetti -->
 <script src="prestazioni.js"></script>   <!-- Impostazioni → Grafica → Prestazioni -->
 <script src="hudpro.js"></script>
 <script src="icone.js"></script>
@@ -1518,10 +1477,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = S.pops; $('tLaunch').checked = S.launch;
     $('tRev').disabled = !S.autoClutch;
     $('vol').value = S.vol; $('volOut').textContent = S.muted ? 'muto' : S.vol;
-    $('pedClutch').classList.toggle('disabled', S.autoClutch);
-    $('pedHint').textContent = S.autoClutch
-      ? 'Frizione automatica: cambia con E/Q. Tocca e trascina un pedale per dosarlo.'
-      : 'Frizione manuale: tienila giù (Spazio) per cambiare e per partire, poi rilasciala dando gas.';
     const pre = TUNING_PRESETS.find((p) => Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k]));
     $('cfgName').textContent = pre ? pre.name.toLowerCase() : 'su misura';
     if (radio) radio.setMaster(S.vol / 100, S.muted);
@@ -1561,7 +1516,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- comandi
   const keys = new Set();
   const inp = { thr: 0, brake: 0, clutch: 0, touch: { thr: null, brake: null, clutch: null }, pad: { thr: 0, brake: 0, clutch: 0 } };
-  const GEAR_NAMES = { '-1': 'retromarcia', 0: 'folle', 1: 'prima', 2: 'seconda', 3: 'terza', 4: 'quarta', 5: 'quinta', 6: 'sesta' };
 
   function shiftTo(g) {
     ensureAudio();
@@ -1610,19 +1564,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((t) => bs.addEventListener(t, startOff));
   bs.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); startOn(); } });
   bs.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.stopPropagation(); startOff(); } });
-  $('btnUp').addEventListener('click', shiftUp);
-  $('btnDown').addEventListener('click', shiftDown);
-  $('gateGrid').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (b) shiftTo(+b.dataset.g); });
-
-  document.querySelectorAll('.pedal').forEach((el) => {
-    const p = el.dataset.p;
-    const set = (e) => { const r = el.getBoundingClientRect(); inp.touch[p] = clamp(1 - (e.clientY - r.top - 18) / (r.height - 36), 0, 1); };
-    el.addEventListener('pointerdown', (e) => { if (p === 'clutch' && S.autoClutch) return; ensureAudio(); el.setPointerCapture(e.pointerId); set(e); });
-    el.addEventListener('pointermove', (e) => { if (inp.touch[p] !== null) set(e); });
-    const up = () => { inp.touch[p] = null; };
-    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('lostpointercapture', up);
-  });
-
   const KEYMAP = { arrowup: 'w', arrowdown: 's', arrowright: 'e', arrowleft: 'q' };
   window.addEventListener('keydown', (e) => {
     if (e.target.closest && e.target.closest('input, textarea')) return;
@@ -2065,9 +2006,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const sl = $('shiftlights');
   for (let i = 0; i < 10; i++) { const el = document.createElement('i'); el.className = i < 4 ? 'lg' : i < 7 ? 'ly' : 'lr'; sl.appendChild(el); leds.push(el); }
   const lamp = {}; document.querySelectorAll('.lamp').forEach((l) => { lamp[l.dataset.l] = l; });
-  const pedEls = { clutch: $('pedClutch'), brake: $('pedBrake'), thr: $('pedGas') };
-  const gateBtns = Array.from(document.querySelectorAll('#gateGrid [data-g]'));
-  let peakTq = 0, peakPw = 0, blink = 0, textT = 0, lastGear = null;
+  let peakTq = 0, peakPw = 0, blink = 0, textT = 0;
 
   function setPod(id, bar, txt, frac, color) {
     $(id).innerHTML = txt; const b = $(bar); b.style.width = (clamp(frac, 0, 1) * 100).toFixed(1) + '%'; b.style.background = color || '';
@@ -2092,21 +2031,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (audio.ready && sigBlink !== lastBlink) audio.send({ ev: [{ type: 'click' }] });   // relè delle frecce
     lastBlink = sigBlink;
     $('cluster').classList.toggle('off', !lit);
-    // pedali, quadro grande e telemetria stanno nel menu: col menu chiuso non si riscrivono (meno lavoro a ogni fotogramma)
+    // quadro grande e telemetria stanno nel menu: col menu chiuso non si riscrivono (meno lavoro a ogni fotogramma)
     const menuOpen = !window.gameMenu || window.gameMenu.isOpen;
-    if (menuOpen) for (const p of ['clutch', 'brake', 'thr']) {
-      const v = p === 'clutch' ? (S.autoClutch ? sim.clutch : inp.clutch) : sim.in[p];
-      const el = pedEls[p]; el.querySelector('.fill').style.height = (v * 100).toFixed(1) + '%';
-      el.querySelector('output').textContent = Math.round(v * 100) + '%';
-    }
-    if (sim.gear !== lastGear) {
-      lastGear = sim.gear;
-      gateBtns.forEach((b) => b.classList.toggle('cur', +b.dataset.g === sim.gear));
-      $('gearName').textContent = GEAR_NAMES[sim.gear];
-      const g = sim.gear;
-      $('ratio').innerHTML = g === 0 ? 'Rapporti: 3,827 · 2,360 · 1,685 · 1,312 · 1,000 · 0,793 · finale 3,133'
-        : `<b>${GEAR_NAMES[g]}</b> ${fmt(Math.abs(g < 0 ? sim.P.rev : sim.P.gears[g]), 3)} : 1 × finale 3,133 · ${fmt(1000 / (Math.abs(sim.ratio(g)) / sim.P.r) * 0.10472 * 3.6, 1)} km/h ogni 1000 giri`;
-    }
     $('btnIgn').classList.toggle('lit', sim.ign);
     if (sim.running && sim.starter === false) $('btnStart').classList.remove('on');
     textT += dt;
@@ -2378,7 +2304,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   // altezza e rigidità dell'assetto: gratis, ma da fermi e da Luca come i pezzi
   function setSuspAdj(patch, revert) {
-    if (!game.canMount()) { revert(); flash(game.race ? 'Non durante una sfida' : 'L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
+    if (!game.canMount()) { revert(); flash('L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
     if (game.needsShop()) { revert(); flash('L\'assetto lo regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
     const st = suspState(tuningItem('suspension', S.tune.suspension), adjOf());
     S.adj[ACTIVE_CAR] = { h: st.h, k: st.k, ...patch };
@@ -3283,7 +3209,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const s = game.s;
     $('hudMoney').textContent = (s.money < 0 ? '− € ' : '€ ') + fmt(Math.abs(Math.floor(s.money)));
     $('chipMoney').classList.toggle('neg', s.money < 0);
-    $('hudRep').textContent = fmt(s.rep);
     heatPips.forEach((p, i) => p.classList.toggle('on', s.heat > i + 0.05));
     $('hudDist').textContent = fmt(s.dist / 1000, 1);
     renderTrip(); game.paintHex = carPaint(); dashBtns();
@@ -3291,9 +3216,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const liters = sim.fuel * sim.P.tank;
     $('hudFuel').textContent = fmt(liters, 1) + ' L' + (sim.fuelRate > 0.0008 ? ` · ${fmt(sim.fuelRate * 3600, 0)} L/h` : '');
     $('hudFuelTag').classList.toggle('fuel-low', sim.fuel < 0.15);
-    const j = game.job, jb = $('hudJob');
-    jb.hidden = !j;
-    if (j) jb.innerHTML = `<b>CONSEGNA</b>${fmt(Math.max(0, j.to - s.dist) / 1000, 1)} km · ${Math.max(0, Math.ceil((j.deadline - j.t) / 60))} min per il bonus`;
     const rd = game.mode === 'career' ? game.radar() : null;
     $('radar').hidden = rd === null;
     if (rd !== null) $('radar').textContent = `POLIZIA ${Math.round(rd / 10) * 10} m${sim.gear === sim.topGear() && sim.gear >= 5 ? ' · SCALA UNA MARCIA' : ''}`;
