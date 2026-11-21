@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Luca), con Claude | Pistone cancellato (peso del motore nello swap), sezione Prestazioni nelle impostazioni, valore delle auto elaborate | `pistone/`, `index.html`, `street2d.js`, `officina.js`, `concessionario.js`, `menu.js`, `sviluppatori.js`, file nuovo `prestazioni.js` | 21/11/2026 sera |
