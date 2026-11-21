@@ -1,6 +1,19 @@
-## 21/11/2026 · proprietario · v0.63 (**sospesi numerati**)
+## 21/11/2026 · proprietario · v0.65 (**sospesi numerati**)
 - Fatto: `SOSPESI.md` riscritto con punti numerati (regola: sempre elenco numerato, numerazione continua). Economia, missione della valigetta e danni sono in pausa fino alla fine (punti 1-3). Aggiunti il 16 (cosa riportare di Nico) e il 17 (provare la versione Windows).
 - Aperto: decisioni sui punti 4-16; nessuna richiesta all'altro.
+
+## 21/11/2026 · proprietario · v0.64 (**Luca Garage**)
+- Fatto: app **Luca Garage** nel telefono (`lucagarage.js`): ti lascia davanti al negozio di Luca più vicino (davanti o dietro) per € 150, da fermi e fuori dai locali. Si scarica con un
+  cartellone sulla strada al km 26 (dopo l'app Motel); in Sviluppatori c'è «Sblocca Luca Garage» (`NightDev.luca`). Unita dopo l'officina v0.63.
+- Aperto: «Luca Garage» non esisteva, è un'interpretazione: prezzo e cartellone si ritoccano in `LG` e `TEL_APP_OFFERS`. Il pulsante nel telefono non è stato cliccato col mouse (Shadow DOM), provata la stessa funzione `lgGo`.
+
+## 21/11/2026 · proprietario · v0.63 (**officina di Luca: pezzi nuovi per la V40 e pallini verde/rosso**)
+- Fatto: sulla V40 (`cars.js`) nuovi pezzi: turbo da **0,5 / 1,0 / 1,5 bar** (oltre ai due che c'erano; ogni turbo ha il suo flusso, la centralina originale tiene a 1 bar),
+  **downpipe** (reparto Downpipe e catalizzatore: cat sportivo e decat), **terminale**, **airbox con presa d'aria fredda**, **camme** (sportive e da corsa), **cambio** (ravvicinato e
+  corto da drag), **gomme da drag** (livello 3), **frizione da corsa**. La preparazione «Drag 450» (`V40_PRESETS`) arriva a ~520 CV, 620 Nm. Nell'officina (`officina.js`) ogni livello ha un
+  **pallino**: verde = ce l'hai (un clic **monta**), rosso = non ce l'hai (un clic **compra**, poi lo monti), col lucchetto servono i km.
+- Aperto: solo la V40 ha i pezzi nuovi (le altre auto hanno ancora i loro cataloghi più corti, `genCatalog` e `TUNING_SUPRA`). I pezzi di Nico (`pistone/`, magazzino) restano spenti: non sono
+  nell'officina semplice. Le cifre (CV, prezzi, km) sono tarate a occhio.
 
 ## 21/11/2026 · proprietario · v0.62 (**Night Run per Windows, da Codex**)
 - Fatto: unito il lavoro di Codex (Electron). `desktop/` (finestra del gioco con sandbox, protocollo `app://`, salvataggi in `%APPDATA%\night-run\salvataggi` con backup, build per

@@ -168,6 +168,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-d { display: block; margin-top: 2px; font: 700 11px/1 ui-monospace, monospace; font-style: normal; color: #a9a396; } .of-d.su { color: #8fe0a0; } .of-d.giu { color: #ff8a7a; }
 .of-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
 .of-chip { display: flex; flex-direction: column; align-items: flex-start; min-width: 78px; padding: 6px 9px; border: 1px solid #4a4458; border-bottom-width: 3px; border-radius: 9px; background: #262232; color: #ece6d6; cursor: pointer; font: 700 12px/1.15 var(--f-data, monospace); text-align: left; }
+.of-lv { display: flex; align-items: center; gap: 5px; }
+.of-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px #0006; }
+.of-dot.on { background: #2fd16a; } .of-dot.off { background: #ff453a; }
+.of-chip.cur .of-dot { box-shadow: 0 0 0 2px #1a1206; }
+.of-chip.buy small { color: #ffd27a; } .of-chip.lock small { color: #ff8a7a; }
 .of-chip small { font-weight: 500; color: #a9a396; margin-top: 2px; }
 .of-chip.cur { background: #ffb347; border-color: #ffb347; color: #1a1206; } .of-chip.cur small { color: #3a2a0a; }
 .of-chip.own { border-color: #8fe0a0; } .of-chip.own small { color: #8fe0a0; }
@@ -198,7 +203,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
-      const c = e.target.closest('[data-k]'); if (c && !c.classList.contains('cur')) { ctx.mount(c.dataset.k, c.dataset.id); ctx.after && ctx.after(); render(); return; }
+      const c = e.target.closest('[data-k]');
+      if (c && !c.classList.contains('cur')) {
+        if (c.classList.contains('buy') && ctx.buy) ctx.buy(c.dataset.k, c.dataset.id);            // pallino rosso: si compra (va nel magazzino), poi si monta
+        else ctx.mount(c.dataset.k, c.dataset.id);
+        ctx.after && ctx.after(); render(); return;
+      }
       const s = e.target.closest('[data-swap]');
       if (s) {
         const r = offSwapDo(ctx.game, ctx.S, ctx.game.car, s.dataset.swap === '-' ? null : s.dataset.swap);
@@ -266,9 +276,9 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const cat = T[k], ci = cur(k);
       const chips = cat.items.map((it, i) => {
         const isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id);
-        const st = isCur ? 'montato' : owned ? 'tuo' : lock ? `🔒 ${fmt(g.partKm(k, it.id))} km` : `€ ${fmt(price)}`;
-        const cls = ['of-chip', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', !isCur && !owned && !lock && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');
-        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}>${i === 0 ? 'SERIE' : 'LIV. ' + i}<small>${E(st)}</small></button>`;
+        const st = isCur ? 'montato' : owned ? 'MONTA' : lock ? `🔒 ${fmt(g.partKm(k, it.id))} km` : `COMPRA € ${fmt(price)}`;
+        const buy = !isCur && !owned && !lock, cls = ['of-chip', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', buy ? 'buy' : '', buy && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');   // pallino verde = ce l'hai (si monta), rosso = da comprare o ancora bloccato
+        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}><span class="of-lv"><i class="of-dot ${isCur || owned ? 'on' : 'off'}"></i>${i === 0 ? 'SERIE' : 'LIV. ' + i}</span><small>${E(st)}</small></button>`;
       }).join('');
       const c = cat.items[ci];
       let info = '';
@@ -276,7 +286,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
     }
-    return h + '<p class="of-hint">Un clic compra e monta. I livelli 1 e 2 sono sempre disponibili, i migliori si sbloccano coi chilometri. Quello che compri resta tuo.</p>';
+    return h + '<p class="of-hint"><b style="color:#2fd16a">●</b> verde: ce l\'hai nel magazzino, un clic lo <b>monta</b>. <b style="color:#ff453a">●</b> rosso: non ce l\'hai, un clic lo <b>compra</b> (poi lo monti); con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
   }
 
   // altezza da terra e rigidità delle molle (assetto a livelli, tuning.js): gratis, da fermi e da Luca; il livello 0 non si regola
