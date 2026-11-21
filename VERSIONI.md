@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.73**
+**Versione attuale: v0.74**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -95,4 +95,5 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.70 | 21/11 | proprietario | Editor della storia (`strumenti/editor_storia.html`): mappa a bivi delle chat, testo originale e nuovo affiancati, file di modifiche che Claude assorbe in `chat_modifiche.js` |
 | v0.71 | 21/11 | cognato | Più sprint in accelerazione: le auto potenti non perdono più la spinta quando sgommano (gomma, trasferimento di carico, controllo di trazione, cambiate); 0-100 del Supra 6,1 → 5,8 s, E36 6,6 → 6,1 s |
 | v0.72 | 21/11 | proprietario | Controllo della sera del 21/11 (sospesi senza doppioni, decisioni di Nico) e pedoni in alta definizione leggeri (`quartieri2d.js`: chi cammina è disegnato come il protagonista, pose in memoria) |
-| v0.73 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
+| v0.73 | 21/11 | cognato | Frizione: il kit frizione e volano non slitta più (terzo livello «da corsa» su ogni auto, bidisco della Supra con la sua capacità); quella di serie slitta solo su un motore molto potente |
+| v0.74 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
