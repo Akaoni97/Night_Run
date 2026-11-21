@@ -52,7 +52,7 @@ class Street2D {
   }
 
   // ---------------------------------------------------------------- utilità
-  static WHEEL_FIX = { e30: [-1, -3], e34: [-1, -2], r5: [-1, 0], b2002: [0, -4], a112: [2, -1] };   // cerchi fuori asse rispetto alla gomma (vedi wheelConc)
+  static WHEEL_FIX = {};   // cerchi fuori asse rispetto alla gomma (vedi wheelConc): con le ruote disegnate a parte (21/11) non ce ne sono più
   static rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   static shade(hex, k) {
     const n = parseInt(hex.slice(1), 16), f = (c) => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
@@ -141,20 +141,23 @@ class Street2D {
     Street2D.gen = Street2D.gen || {};
     const id = this.carId, D = this.genDef();
     if (Street2D.gen[id]) return Street2D.gen[id];
-    const G = { n: 0, ready: false, wcache: {} }, done = () => { if (++G.n === 3) { G.ready = true; this.spr = {}; } };
-    for (const k of ['img', 'wheel', 'paint']) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
+    const K = D.imgHd ? ['img', 'wheel', 'paint', 'imgHd', 'wheelHd', 'paintHd'] : ['img', 'wheel', 'paint'];
+    const G = { n: 0, ready: false, wcache: {} }, done = () => { if (++G.n === K.length) { G.ready = true; this.spr = {}; } };
+    for (const k of K) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
     return (Street2D.gen[id] = G);
   }
-  genBase() {
+  // m = 1: la misura di sempre (guidatore, danni, vetri); m = 2: il disegno a densità doppia (solo per disegnare la carrozzeria)
+  genBase(m = 1) {
     const D = this.genDef(), G = this.genImgs(), C0 = this.cos || {}, L = this.carLook || {}, hex = this.v40Paint || 'orig';
-    const key = 'genb' + this.carId + hex + (this.cosKey || '') + JSON.stringify(L) + (G.ready ? 1 : 0);
+    const key = 'genb' + m + this.carId + hex + (this.cosKey || '') + JSON.stringify(L) + (G.ready ? 1 : 0);
     if (this.spr[key]) return this.spr[key];
-    const W = D.w, H = D.h, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const W = D.w * m, H = D.h * m, c = document.createElement('canvas'); c.width = W; c.height = H;
     if (!G.ready) return c;
-    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(G.img, 0, 0);
-    if (hex !== 'orig' && G.paint.width) {
+    const img = m > 1 ? G.imgHd : G.img, paint = m > 1 ? G.paintHd : G.paint;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, W, H);
+    if (hex !== 'orig' && paint.width) {
       // vernice: i pixel della maschera prendono il nuovo colore conservando luci e ombre del disegno
-      const m = document.createElement('canvas'); m.width = W; m.height = H; const mx = m.getContext('2d', { willReadFrequently: true }); mx.drawImage(G.paint, 0, 0);
+      const mc = document.createElement('canvas'); mc.width = W; mc.height = H; const mx = mc.getContext('2d', { willReadFrequently: true }); mx.drawImage(paint, 0, 0, W, H);
       const d = x.getImageData(0, 0, W, H), p = d.data, mk = mx.getImageData(0, 0, W, H).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
       const tl = (R + Gc + B) / 3 || 1;
       for (let i = 0; i < p.length; i += 4) {
@@ -166,6 +169,7 @@ class Street2D {
       }
       x.putImageData(d, 0, 0);
     }
+    x.setTransform(m, 0, 0, m, 0, 0);                            // sporco, scarico, scritte e adesivi nelle unità dello sprite
     const ink = this.C.ink, px = (col, a, b, w = 1, h = 1) => { x.fillStyle = col; x.fillRect(Math.round(a), Math.round(b), w, h); };
     if ((C0.dirt || 0) > 0.3) this.dirtLayer(x, W, H, Math.round(D.wy - D.wr * 0.9), Math.round(D.wy + D.wr * 0.6), (C0.dirt - 0.25) * 1.3, D.ax.map((a) => [a, D.wy]));
     const ey = D.ex[1];
@@ -181,6 +185,7 @@ class Street2D {
     const D = this.genDef(), b = this.genBase(), c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);
     c.geo = { w: D.w, ax: D.ax }; c.img = true; c.hd = b;
+    if (D.imgHd && this.genImgs().ready && this.genImgs().imgHd.width) c.hd2 = this.genBase(2);   // la carrozzeria a densità doppia
     return (this.spr[key] = c);
   }
   // Alcune ruote disegnate hanno il cerchio fuori asse rispetto alla gomma (il mozzo sta più in alto o di lato): girando, il mozzo balla.
@@ -212,12 +217,14 @@ class Street2D {
     return (im._conc = c2);
   }
   // ruota del disegno che gira: i vuoti scuri tra le razze diventano trasparenti (dietro c'è il freno), colore cerchi a scelta
-  genWheelImg() {
+  genWheelImg(m = 1) {
     const G = this.genImgs(), D = this.genDef(), col = this.cos && this.cos.rims && this.cos.rims !== 'none' ? this.cos.rims : '';
-    if (!G.ready || !G.wheel.width) return null;
-    if (G.wcache[col]) return G.wcache[col];
-    const S = G.wheel.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(Street2D.wheelConc(G.wheel, this.carId), 0, 0);
-    const d = x.getImageData(0, 0, S, S), p = d.data, R = D.wr, n = col ? parseInt(col.slice(1), 16) : 0;
+    const src = m > 1 ? G.wheelHd : G.wheel;
+    if (!G.ready || !src || !src.width) return null;
+    if (G.wcache[col + m]) return G.wcache[col + m];
+    const S = src.width, c = document.createElement('canvas'); c.width = S; c.height = S; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(m > 1 ? src : Street2D.wheelConc(src, this.carId), 0, 0);
+    if (m > 1) c._hd = m;                                        // già a densità doppia: wheelDraw non la ingrandisce
+    const d = x.getImageData(0, 0, S, S), p = d.data, R = D.wr * m, n = col ? parseInt(col.slice(1), 16) : 0;
     for (let i = 0; i < p.length; i += 4) {
       const xx = (i / 4) % S - S / 2 + 0.5, yy = Math.floor(i / 4 / S) - S / 2 + 0.5, rr = Math.hypot(xx, yy), l = (p[i] + p[i + 1] + p[i + 2]) / 3;
       if (!p[i + 3]) continue;
@@ -225,13 +232,14 @@ class Street2D {
       if (col && rr < R * 0.7 && l > 80 && Math.max(p[i], p[i + 1], p[i + 2]) - Math.min(p[i], p[i + 1], p[i + 2]) < 45) { const k = Math.min(1.4, l / 150); p[i] = Math.min(255, (n >> 16) * k + 18); p[i + 1] = Math.min(255, ((n >> 8) & 255) * k + 18); p[i + 2] = Math.min(255, (n & 255) * k + 18); }
     }
     x.putImageData(d, 0, 0);
-    return (G.wcache[col] = c);
+    return (G.wcache[col + m] = c);
   }
   genWheel(g, cx, cy, k, ang, speed = 0, rear = false) {
     const wi = this.genWheelImg(), D = this.genDef(); if (!wi) return;
     this.brake(g, Math.round(cx), Math.round(cy), k * D.wr / 15, ang, rear);
     const s2 = wi.width * k;
-    if (this.wheelDraw) { this.wheelDraw(g, wi, cx, cy, s2, ang, speed); return; }   // gira liscia (nitido2d.js)
+    const wh = D.wheelHd && this.SS > 1 ? this.genWheelImg(2) : null;   // la ruota disegnata a parte, a densità doppia
+    if (this.wheelDraw) { this.wheelDraw(g, wh || wi, cx, cy, s2, ang, speed); return; }   // gira liscia (nitido2d.js)
     g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));
     if (speed > 9) { for (let i = 0; i < 4; i++) { g.save(); g.globalAlpha = i ? 0.35 : 1; g.rotate(ang + i * Math.PI / 10); g.drawImage(wi, -s2 / 2, -s2 / 2, s2, s2); g.restore(); } }
     else { g.rotate(Math.round(ang / (Math.PI / 20)) * (Math.PI / 20)); g.drawImage(wi, -s2 / 2, -s2 / 2, s2, s2); }
@@ -541,9 +549,9 @@ class Street2D {
   trafImgs(id) {
     Street2D.tg = Street2D.tg || {};
     if (Street2D.tg[id]) return Street2D.tg[id];
-    const D = CARS[id].sprite, G = { n: 0, ready: false };
-    const done = () => { if (++G.n === 3) { G.ready = true; } };
-    for (const k of ['img', 'wheel', 'paint']) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
+    const D = CARS[id].sprite, G = { n: 0, ready: false }, K = D.imgHd ? ['img', 'wheel', 'paint', 'imgHd', 'wheelHd', 'paintHd'] : ['img', 'wheel', 'paint'];
+    const done = () => { if (++G.n === K.length) { G.ready = true; } };
+    for (const k of K) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
     return (Street2D.tg[id] = G);
   }
   trafficSprite(id, hex, k) {
@@ -551,13 +559,15 @@ class Street2D {
     if (this.spr[key]) return this.spr[key];
     const G = this.trafImgs(id), D = CARS[id].sprite;
     if (!G.ready || !G.img.width) return null;
-    const bk = 'trafb' + id + hex; let base = this.spr[bk];
-    if (!base) {
-      base = document.createElement('canvas'); base.width = D.w; base.height = D.h;
-      const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(G.img, 0, 0);
-      if (G.paint.width && hex !== 'orig') {
-        const m = document.createElement('canvas'); m.width = D.w; m.height = D.h; const mx = m.getContext('2d', { willReadFrequently: true }); mx.drawImage(G.paint, 0, 0);
-        const d = x.getImageData(0, 0, D.w, D.h), p = d.data, mk = mx.getImageData(0, 0, D.w, D.h).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
+    // base ridipinta: m = 1 la misura di sempre, m = 2 il disegno a densità doppia
+    const mkBase = (m) => {
+      const bk = 'trafb' + m + id + hex; if (this.spr[bk]) return this.spr[bk];
+      const img = m > 1 ? G.imgHd : G.img, paint = m > 1 ? G.paintHd : G.paint, W = D.w * m, H = D.h * m;
+      const base = document.createElement('canvas'); base.width = W; base.height = H;
+      const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, W, H);
+      if (paint.width && hex !== 'orig') {
+        const m2 = document.createElement('canvas'); m2.width = W; m2.height = H; const mx = m2.getContext('2d', { willReadFrequently: true }); mx.drawImage(paint, 0, 0, W, H);
+        const d = x.getImageData(0, 0, W, H), p = d.data, mk = mx.getImageData(0, 0, W, H).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
         for (let i = 0; i < p.length; i += 4) {
           if (mk[i + 3] < 128 || !p[i + 3]) continue;
           const kk = Math.max(0.15, Math.min(1.9, ((p[i] + p[i + 1] + p[i + 2]) / 3) / D.refL)), lift = kk > 1 ? (kk - 1) * 0.6 : 0;
@@ -565,11 +575,13 @@ class Street2D {
         }
         x.putImageData(d, 0, 0);
       }
-      this.spr[bk] = base;
-    }
+      return (this.spr[bk] = base);
+    };
+    const base = mkBase(1);
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const cx = c.getContext('2d', { willReadFrequently: true }); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
     c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
+    if (D.imgHd && G.imgHd && G.imgHd.width) { c.hd2 = mkBase(2); if (G.wheelHd && G.wheelHd.width) { G.wheelHd._hd = 2; c.wheelHd = G.wheelHd; } }   // densità doppia
     return (this.spr[key] = c);
   }
 
@@ -726,7 +738,8 @@ class Street2D {
   tf(g, a, b, c, d, e, f) { const S = this.SS || 1; g.setTransform(a * S, b * S, c * S, d * S, e * S, f * S); }
   // carrozzeria: con la densità doppia si pesca dal disegno a grandezza piena invece che dalla copia rimpicciolita
   body(g, spr, x, y) {
-    if (spr.hd && this.SS > 1) { const q = g.imageSmoothingQuality; g.imageSmoothingEnabled = !!Street2D.hdSmooth; g.imageSmoothingQuality = 'high'; g.drawImage(spr.hd, 0, 0, spr.hd.width, spr.hd.height, x, y, spr.width, spr.height); g.imageSmoothingEnabled = false; g.imageSmoothingQuality = q; }
+    if (spr.hd2 && this.SS > 1) { const q = g.imageSmoothingQuality; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(spr.hd2, 0, 0, spr.hd2.width, spr.hd2.height, x, y, spr.width, spr.height); g.imageSmoothingEnabled = false; g.imageSmoothingQuality = q; }   // disegno ad alta definizione
+    else if (spr.hd && this.SS > 1) { const q = g.imageSmoothingQuality; g.imageSmoothingEnabled = !!Street2D.hdSmooth; g.imageSmoothingQuality = 'high'; g.drawImage(spr.hd, 0, 0, spr.hd.width, spr.hd.height, x, y, spr.width, spr.height); g.imageSmoothingEnabled = false; g.imageSmoothingQuality = q; }
     else g.drawImage(spr, x, y);
   }
   laneY(z) { return z > 5 ? 226 : 320 - (3.5 - z) / 3.5 * 40; }
@@ -1978,10 +1991,10 @@ class Street2D {
         g.save(); g.globalAlpha = hzA; g.drawImage(this.hazeOf(spr, DM ? DM.haze.map((v) => Math.min(255, v + 40)).join(',') : '110,100,150'), left, sy, w, spr.height); g.restore();
       }
       if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
-      const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0;
+      const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0, wiD = this.SS > 1 && spr.wheelHd ? spr.wheelHd : wi;
       for (const ax of GG.ax) {
         const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
-        if (ws) { if (this.wheelDraw) this.wheelDraw(g, wi, wx2, wy2, ws, ang, 0, Math.PI / 12); else { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
+        if (ws) { if (this.wheelDraw) this.wheelDraw(g, wiD, wx2, wy2, ws, ang, 0, Math.PI / 12); else { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
           if (this.tireFx) { const ri = this.tireRim(wi); this.tireFx(g, wx2, wy2, GG.wr * k + 0.5, Math.round(ang / (Math.PI / 12)) * (Math.PI / 12), e.v || 0, { rim: ri && ri.frac, rgb: ri && ri.rgb }); } }   // gomme (gomme2d.js)
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
