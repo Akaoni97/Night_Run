@@ -67,6 +67,8 @@
   function scegli(id, v) { const el = document.getElementById(id); if (!el) return false; el.value = v; el.dispatchEvent(new Event('change', { bubbles: true })); return el.value === v; }
   // ---- storia: un flag di chat/storia (chatDebug e storiaDebug) e tutte le app del telefono
   function flag(f) { const g = G(); if (!g || !f || !window.chatDebug) return false; window.chatDebug.flag(f); save(); return true; }
+  // «Sblocca Luca Garage»: l'app che ti porta da Luca Tuning, senza aspettare il cartellone (lucagarage.js)
+  function luca() { if (!window.telefono || !window.telefono.install) return false; window.telefono.install('lug'); save(); return true; }
   function appTutte() {
     if (!window.telefono || typeof TEL_APP_OFFERS === 'undefined') return 0;
     let n = 0; for (const o of TEL_APP_OFFERS) { window.telefono.install(o.app); n++; } save(); return n;
@@ -113,6 +115,7 @@
 <p class="hint">Un flag della storia o delle chat (per esempio <code>ev_fase_v</code>) apre le conversazioni che lo aspettano. Le app si installano senza aspettare i cartelloni.</p>
 <div class="dv"><input id="devFlag" type="text" placeholder="flag, es. ev_fase_v" autocapitalize="off" spellcheck="false"><button type="button" id="devFlagGo">Imposta flag</button></div>
 <div class="dv"><button type="button" id="devApp">Installa tutte le app del telefono</button><button type="button" id="devPorta">Vai a L'ultima porta</button></div>
+<div class="dv"><button type="button" id="devLuca">Sblocca Luca Garage</button></div>
 <h3>Polizia</h3>
 <p class="hint">Con la spunta la polizia c'è e si vede, ma non può fermarti, farti multe né inseguirti. Autovelox e Tutor restano sulla strada e non fanno niente; il ricercato si azzera. Si ricorda in questo browser finché non la togli.</p>
 <label class="dvck"><input type="checkbox" id="devPol"><span>Disabilita polizia</span></label>
@@ -138,6 +141,7 @@
     $('devOra').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) say(scegli('clockSel', b.dataset.v) ? 'Ora: ' + b.textContent + '.' : 'Ora non cambiata.'); });
     $('devFlagGo').addEventListener('click', () => { const f = $('devFlag').value.trim(); say(flag(f) ? `Flag «${f}» impostato.` : 'Scrivi un flag.'); });
     $('devApp').addEventListener('click', () => { const n = appTutte(); say(n ? `${n} app installate (aprile dal telefono, tasto 0).` : 'Telefono non pronto.'); });
+    $('devLuca').addEventListener('click', () => say(luca() ? 'Luca Garage sbloccata: aprila dal telefono (tasto 0), ti porta da Luca Tuning.' : 'Telefono non pronto.'));
     $('devPorta').addEventListener('click', () => { const g = G(); if (g && g.vgPorta) { g.vgPorta(); say("L'ultima porta."); } else say('Non disponibile.'); });
     $('devPol').checked = typeof POL !== 'undefined' && !!POL.off;
     $('devPol').addEventListener('change', (e) => { const r = polizia(e.target.checked); e.target.checked = r; say(r ? 'Polizia disabilitata: non ti ferma, non multa, non insegue.' : 'Polizia di nuovo in servizio.'); });
@@ -154,5 +158,5 @@
     setInterval(() => { if (box.offsetParent) upd(); }, 500); upd();
     return box;
   }
-  window.NightDev = { panel, setMoney, addMoney, unlock, unlockAll, polizia, vaiKm, vaiTappa, riempi, ripara, flag, appTutte, dev };
+  window.NightDev = { panel, setMoney, addMoney, unlock, unlockAll, polizia, vaiKm, vaiTappa, riempi, ripara, flag, appTutte, luca, dev };
 })();
