@@ -164,7 +164,7 @@ TDD obbligatorio), valgono le regole di questo file e le skill di Night Run.
    fatto cosa. Su GitHub i test girano da soli a ogni caricamento (`.github/workflows/test.yml`): se arriva l'email
    di test falliti, si sistema prima di tutto il resto.
    **Versione**: ogni intervento (ogni sessione con Claude o altri, o pacchetto di modifiche) alza la versione di un passo in `VERSIONI.md`
-   (v0.63 → v0.64…): la riga nell'elenco, la versione nel titolo della voce di `DIARIO.md` e nel messaggio di commit. Prima di chiudere, non dopo.
+   (v0.64 → v0.65…): la riga nell'elenco, la versione nel titolo della voce di `DIARIO.md` e nel messaggio di commit. Prima di chiudere, non dopo.
 2. Commenti, testi del gioco e messaggi di commit in italiano, nello stile del codice esistente.
 3. Nel repository niente file presi da mod di giochi o senza licenza (suoni, modelli, immagini): l'utente li carica
    in locale nel browser (IndexedDB). Niente copie di grafica, nomi o personaggi di giochi esistenti.
@@ -196,7 +196,7 @@ niente immagini generate entra nel gioco senza che il proprietario lo chieda; gl
 
 ## Come provare
 - Test automatici (dalla radice del repository, Node 22+): `node --test test/motori.test.js test/telefono.test.js test/valigette.test.js test/traguardi.test.js test/ruota.test.js test/concessionario.test.js test/usato.test.js`.
-  Oggi passano tutti i test (`node --test test/*.test.js`: 289 (compresa l'estetica premium, compresa la catena delle missioni, compresa la scelta delle fiamme, compresi i motori di Nico: livelli, pezzi singoli sulla V40, banco, calore e frizione; tolto quello della Montagna col 3D), compresa l'entrata nei locali, compresi la polizia (anche `polizia.js`), le modifiche di Codex, leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
+  Oggi passano tutti i test (`node --test test/*.test.js`: 292 (compresa l'estetica premium, compresa la catena delle missioni, compresa la scelta delle fiamme, compresi i motori di Nico: livelli, pezzi singoli sulla V40, banco, calore e frizione; tolto quello della Montagna col 3D), compresa l'entrata nei locali, compresi la polizia (anche `polizia.js`), le modifiche di Codex, leva, personaggio, traffico, retromarcia, telefono, chat, prologo, valigette, traguardi, ruota, concessionario, usato, sfascio, urti, eredità, garage e documenti). Non peggiorare il conteggio.
 - Con `strumenti/prova.js` le domande iniziali scelgono il cambio automatico: la leva parte in **P**, per guidare `js:nightRun.engineTap()` e `js:nightRun.leva('D')`.
 - Nel browser: dalla radice del repository lancia `python3 -m http.server 8765` e apri
   http://localhost:8765/index.html. Tab apre il menu (officina, bagagliaio, guida, vista...). Comandi: I quadro, Invio avviamento, W gas, S freno, E/Q marce, A/D corsie,

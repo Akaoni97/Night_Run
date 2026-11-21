@@ -1,3 +1,8 @@
+## 21/11/2026 · proprietario · v0.64 (**Luca Garage**)
+- Fatto: app **Luca Garage** nel telefono (`lucagarage.js`): ti lascia davanti al negozio di Luca più vicino (davanti o dietro) per € 150, da fermi e fuori dai locali. Si scarica con un
+  cartellone sulla strada al km 26 (dopo l'app Motel); in Sviluppatori c'è «Sblocca Luca Garage» (`NightDev.luca`). Unita dopo l'officina v0.63.
+- Aperto: «Luca Garage» non esisteva, è un'interpretazione: prezzo e cartellone si ritoccano in `LG` e `TEL_APP_OFFERS`. Il pulsante nel telefono non è stato cliccato col mouse (Shadow DOM), provata la stessa funzione `lgGo`.
+
 ## 21/11/2026 · proprietario · v0.63 (**officina di Luca: pezzi nuovi per la V40 e pallini verde/rosso**)
 - Fatto: sulla V40 (`cars.js`) nuovi pezzi: turbo da **0,5 / 1,0 / 1,5 bar** (oltre ai due che c'erano; ogni turbo ha il suo flusso, la centralina originale tiene a 1 bar),
   **downpipe** (reparto Downpipe e catalizzatore: cat sportivo e decat), **terminale**, **airbox con presa d'aria fredda**, **camme** (sportive e da corsa), **cambio** (ravvicinato e
