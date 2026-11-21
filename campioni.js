@@ -168,7 +168,8 @@ function cmpAuto(slot, x) {
       if (x.exLv === 0) return null;
       const S = { hks: 'scarico/cupo', apexi: 'scarico/scoppiettio', tomei: 'scarico/titanio', blitz: 'scarico/borbottio', straight: 'scarico/pentola' }[x.exId];
       if (S) return S;
-      if (x.exLv >= 2) return 'scarico/scoppiettio';
+      if (['centrale', 'race', 'turboback'].includes(x.exId)) return 'scarico/scoppiettio';   // scarichi aperti (senza centrale, da gara, turboback)
+      if (!['terminale', 'catback'].includes(x.exId) && x.exLv >= 2) return 'scarico/scoppiettio';   // terminale e catback hanno la voce della famiglia (cinque livelli di scarico dalla v0.80)
       return x.cyl >= 6 ? 'scarico/gorgoglio' : x.cyl === 5 ? 'scarico/cupo' : 'scarico/borbottio';
     }
     case 'mappa': return x.ecuPops ? 'mappa/crackle' : null;
