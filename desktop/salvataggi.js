@@ -53,6 +53,20 @@ class Salvataggi {
     fs.renameSync(temporaneo, file);
   }
 
+  // Copia a parte dello stato corrente, per il passaggio a una versione nuova. Non è il backup (che si riscrive
+  // a ogni salvataggio): ne restano gli ultimi tre, mai ripristinati da soli.
+  checkpoint(etichetta) {
+    const lettura = this.leggi(this.file);
+    if (lettura.stato !== 'valido') throw new Error('Salvataggio corrente non leggibile, checkpoint non creato');
+    const nome = 'checkpoint-' + String(etichetta || 'senza-versione').replace(/[^0-9A-Za-z.-]/g, '_') + '.json';
+    const destinazione = path.join(this.cartella, nome);
+    this.atomico(destinazione, JSON.stringify(lettura.dati));
+    const vecchi = fs.readdirSync(this.cartella).filter((f) => /^checkpoint-.*\.json$/.test(f))
+      .map((f) => ({ f, t: fs.statSync(path.join(this.cartella, f)).mtimeMs })).sort((a, b) => b.t - a.t).slice(3);
+    for (const v of vecchi) fs.rmSync(path.join(this.cartella, v.f), { force: true });
+    return destinazione;
+  }
+
   scrivi(dati) {
     const testo = valida(dati);
     if (testo === this.ultimo && fs.existsSync(this.file) && fs.existsSync(this.backup)) return;

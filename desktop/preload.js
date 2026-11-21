@@ -1,5 +1,5 @@
 'use strict';
-const { ipcRenderer } = require('electron');
+const { ipcRenderer, contextBridge } = require('electron');
 
 // Il preload isolato prepara lo storage prima degli script HTML. Nessuna API Node viene esposta al gioco.
 if (window.top === window && location.origin === 'app://night-run') {
@@ -38,6 +38,16 @@ if (window.top === window && location.origin === 'app://night-run') {
     window.addEventListener('beforeunload', salva);
     // Registrato dopo gli script del gioco: il suo pagehide salva prima l'ultimo stato della partita.
     window.addEventListener('DOMContentLoaded', () => window.addEventListener('pagehide', salva), { once: true });
+    // Aggiornamenti: il gioco può solo chiedere queste cinque operazioni, nessun IPC generico.
+    contextBridge.exposeInMainWorld('nightUpdate', {
+      stato: () => ipcRenderer.invoke('nr:agg:stato'),
+      controlla: () => ipcRenderer.invoke('nr:agg:controlla'),
+      scarica: () => ipcRenderer.invoke('nr:agg:scarica'),
+      // Fotografia fresca dello stato: il processo principale la scrive su file e solo se riesce installa.
+      installa: () => ipcRenderer.invoke('nr:agg:installa', fotografia()),
+      apriPagina: () => ipcRenderer.invoke('nr:agg:pagina'),
+      onStato: (cb) => { ipcRenderer.on('nr:agg:stato', (_e, s) => cb(s)); }
+    });
   } catch (e) {
     // Il processo principale segnala l'errore; non si sostituisce un file inaccessibile con una partita vuota.
     console.error('Ripristino dei salvataggi non riuscito:', e.message);

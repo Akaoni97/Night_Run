@@ -2,50 +2,42 @@
 
 Lista viva: al **controllo della sera** (quando qualcuno chiede «il check») Claude la legge e la riporta nel rapporto,
 poi la aggiorna con chi c'è (toglie quello che è fatto, aggiunge quello che salta fuori). In cima le cose più urgenti.
-Formato: `- [area] cosa · perché conta · (da chi / chi decide)`.
+Formato: `N. [area] cosa · perché conta · (da chi / chi decide)`.
 
-Aggiornata il 20/11/2026 notte (briefing col proprietario e il cognato).
+**REGOLA (21/11/2026, da Luca, il cognato): ogni sospeso si riporta SEMPRE come elenco numerato, un punto per voce, con la
+numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio questo, punto 5 voglio quello». Nel
+rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
+Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
+
+Aggiornata il 21/11/2026 sera (proprietario, con Claude).
+
+## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
+1. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
+   (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco, € 28.000 guadagnati (70 % dalle missioni),
+   € 16.700 in tasca al km 200; benzina, cibo e motel non pesano quasi niente. (tutti e due)
+2. [missioni] **Il signore della valigetta va alla Sosta 24 dopo: 38 km**, a meno di 120 e senza frenate forti; in tutte e
+   due le prove ha pagato il 30 %. Meta più vicina? In sospeso. (proprietario)
+3. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta (spesa più grossa
+   della prova, € 8.400), gomme bucate ogni ~30 km. Troppo? In sospeso. (tutti e due)
 
 ## Da decidere insieme
-- [grafica] **Pedoni in alta definizione**: dopo marciapiede, lampioni e auto nitide (`nitido2d.js`), gli omini del marciapiede
-  (`districtPeople` in `quartieri2d.js`) sono la cosa più a blocchi della strada. Si possono disegnare come il protagonista
-  (`pgStanding`) con aspetti a caso per quartiere (cappucci, caschi, gilet, completi da rifare). Lo facciamo? (proprietario)
-- [grafica] **Dispositivi lenti**: se il disegno resta sopra i 30 ms per tre secondi il gioco torna alla densità semplice e tutta la
-  grafica nitida si spegne (`slow` in `street2d.js`). Se sul PC sembra «sgranato» come prima, è questo: si guarda insieme. (tutti e due)
-- [economia] **Prova dei primi 200 km** (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco,
-  € 28.000 guadagnati (70 % dalle missioni, 29 consegne da ~€ 200), € 16.700 in tasca al km 200. Una Panda nuova
-  verso il km 180, la Supra (€ 65.000) non prima del km ~450. Benzina (€ 156), cibo (€ 80) e motel (€ 180) non pesano
-  quasi niente: i bisogni costano tempo, non soldi. Va bene così o li facciamo pesare? (tutti e due)
-- [missioni] **Il signore della valigetta va alla Sosta 24 dopo: 38 km** (la seconda Sosta 24 del giro è diventata lo
-  sfascio), a meno di 120 e senza frenate forti; in tutte e due le prove ha pagato il 30 %. Meta più vicina? (proprietario)
-- [guida] **Danni**: anche con l'AUTO 1 qualche tamponamento (4 in 94 km), e il carrozziere costa fino a € 2.600 a
-  volta: nella prova è stata la spesa più grossa (€ 8.400). Gomme bucate ogni ~30 km (7 in 200 km). Troppo? (tutti e due)
-- [interni] **Gli interni nuovi** (tutti e nove in `interni_hd.js`): da guardare sul PC. Le persone usano la pixel art
-  del protagonista, più grossa del resto della scena: rifarle più fini è un lavoro a parte. Nico da Luca: lo disegna il
-  cognato quando decide com'è. (proprietario, cognato per Nico)
-- [motori] **Vendere la V40 coi pezzi di Nico montati**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o
-  alzano il valore dell'auto all'Autosalone e allo sfascio? (cognato)
-- [motori] **Estendere i pezzi singoli alle altre auto** (oggi solo la V40, `MOT_SERIE` in `pistone/motori.js`). Per
-  ogni auto serve il suo motore di serie descritto coi pezzi di Nico. La Supra resta col suo catalogo. Quando? (cognato)
-- [motori] **Il vecchio Pistone**: facciata, interno con Nico e pannello del progetto sono ancora in
-  `pistone/motori2d.js` ma non si usano più. Cancellarli o riusarli per la scena di Nico da Luca? (cognato)
-- [personaggi] **Nico**: storia stasera. Non ha ancora un disegno nell'interno di Luca (c'è solo Luca); nel vecchio
-  Pistone era Ottone (vecchio coi baffi bianchi). Aspetto, carattere, come si sblocca. (cognato)
-- [personaggi] **Mario** al posto di Niko (officina dei tagliandi): nome cambiato in tutti i testi, lettera O sulla
-  mappa, M sulla tuta. Va bene al proprietario? (proprietario)
-- [menu] **Il resto delle idee sul menu** (proposte il 20/11, fatte solo Impostazioni e meteo): pausa a due livelli
-  (Riprendi, Mappa, Garage, Officina, Impostazioni, Esci), sfondo vivo dietro il menu, controller e menu da tastiera,
-  garage vero con le auto in fila, diario di viaggio con mappa e foto, confronto prima/dopo sui pezzi, salvataggi a
-  tre slot. Quali e in che ordine? (proprietario)
-- [meteo] **Il vento spinge davvero?** Oggi le raffiche fanno sbandare l'auto solo nel disegno (corsie, urti e
-  traffico non cambiano). Se deve spingere davvero, serve tenere il volante. (proprietario)
-- [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» in città non arriva niente (restano pioggia e neon);
-  scelte a mano dal menu ci sono dappertutto. (tutti e due)
-- [storia] **Testi segnaposto ancora nel gioco**: pensieri del protagonista (`pensieri.js`), testi del prologo
-  (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D (`STORIA_EPI` in `storia.js`, scritti da Claude). Chi li riscrive e
-  quando? (cognato, la storia è sua)
+4. [grafica] **Pedoni in alta definizione**: Luca ha detto «è per Nico», cioè decide il proprietario (Nico). Da riportare a lui. (proprietario)
+5. [grafica] **Dispositivi lenti**: si vede man mano che il gioco si sviluppa, con ottimizzazioni e scelte su cosa lasciare o ridurre (21/11). Se la grafica sembra «sgranata» sul PC è `slow` in `street2d.js`. (tutti e due)
+6. [motori] **Vendere la V40 coi pezzi di Nico montati**: da vedere (21/11). Oggi i pezzi se ne vanno con l'auto. (cognato)
+7. [motori] **Vecchio Pistone**: è il codice del vecchio negozio di Nico (facciata, interno, pannello del progetto in `pistone/motori2d.js`), che non si usa più dopo l'officina semplice. Si può cancellare o tenere per la scena di Nico da Luca. Da decidere. (cognato)
+8. [personaggi] **Nico**: nessun disegno nell'interno di Luca; aspetto, carattere, come si sblocca. (cognato)
+9. [personaggi] **Mario** al posto di Niko: va bene al proprietario? (proprietario)
+10. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
+    tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi, tre slot di salvataggio. Quali e in
+    che ordine? (proprietario)
+11. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
+12. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
+13. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
+    (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
+14. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti): i pezzi nuovi della V40 (v0.63) coprono già parte di quello che faceva Nico. (tutti e due)
 
 ## Da provare giocando (sul PC)
+- [windows] **Aggiornamenti dal programma** (v0.65): dopo la prima release `v0.2.1` installarla a mano, farne uscire una seconda e provare Cerca, Scarica, Installa e riavvia con una partita di prova (copia della cartella `%APPDATA%\\night-run` prima). Controllare anche senza rete, «Più tardi» e il portatile. Le impostazioni di GitHub Actions (permessi di scrittura ai workflow) vanno verificate alla prima esecuzione. (cognato, Luca)
 - [motori] **Prezzi**: livelli di Nico € 300 / 900 / 2.400 con km e pezzi montati; una V40 sui 200 CV costa circa
   € 7.000. Troppo, poco? (tutti e due)
 - [motori] **Suono** della V40 col turbo di Nico e dei motori costruiti montati in strada: va ascoltato. (proprietario)
@@ -57,24 +49,28 @@ Aggiornata il 20/11/2026 notte (briefing col proprietario e il cognato).
 - [locali] **Entrata coi posti auto e la camminata** (5-6 s in tutto, U la salta): troppo lunga? (tutti e due)
 - [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
   soldi una volta sola (avviso di Luca). Controllare che il messaggio arrivi e i conti tornino. (tutti e due)
+15. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
+16. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
+17. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
+    motore, guida lunga, installazione e disinstallazione. (proprietario)
+18. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. (tutti e due)
+19. [telefono] **Luca Garage** (v0.64): app che ti porta da Luca per € 150, cartellone al km 26. «Luca Garage» è un'interpretazione: prezzo e cartellone in `LG` e `TEL_APP_OFFERS`; il pulsante non è stato cliccato col mouse. Va bene così? (proprietario)
+20. [motori] **Prezzi** dei livelli di Nico e **suono**/**calore** dei motori costruiti: contano solo se Nico torna acceso. (cognato)
+21. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+22. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
+23. [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
+    soldi una volta sola. Controllare messaggio e conti. (tutti e due)
 
 ## Da sistemare
-- [telefono] **Al telefono in verticale** il riquadro dei traguardi esce sopra «Gira il telefono». Il proprietario ha detto che va
-  bene così (il gioco è per il PC): si lascia. (nessuno)
-- [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ», non il motore di Nico (quelle prove sono in
-  `test/motori-costruiti.test.js`). Rinominarlo vuol dire toccare due skill (ramo `skill`). (chi ha voglia)
-- [pulizia] **Codice morto delle vecchie gare** e dei vecchi pezzi di storia: la coupé «rival» in 3D (il 3D non c'è più), `s.rep`
-  (la reputazione di strada, che veniva dalle sfide al semaforo), i blocchi cambio e pedali nascosti nella scheda Guida, le app
-  strane del telefono (Ultima Uscita, Segreteria, 03:07) e `TEL_ATTI`, la tabella dei momenti della vecchia storia. Non si vede in
-  gioco: è roba che non fa più niente e confonde chi legge il codice. Toglierla è sicuro con i test; da fare quando c'è tempo. (Claude)
-- [disegni] **Camion** (traffico lento, lavori pesanti): la logica c'è, il proprietario manda i disegni. (proprietario)
-- [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, scritte delle insegne**: si fa tra poco. (proprietario, Claude)
+24. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
+    scheda Guida, app strane del telefono, `TEL_ATTI`). Sicuro con i test. (Claude, quando c'è tempo)
+25. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
+26. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
+27. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
+28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 20/11 (dal briefing): **AUTO 1 si inserisce dopo 5 s**; la leva ha la **S** (sport, giri più alti); i tasti **1-4 solo per mangiare e bere** (le
-  marce non stanno più sui numeri); pannello di Nico **a schede**; **tetto di 100 pezzi** in magazzino; **niente turbo** nelle valigette;
-  maschera della vernice rifatta per Golf GTI e 205 GTI; test di officina e 0-100 già a posto (Supra di serie 5,83 s, 400 m in 13,9 s).
-- Il cognato ha letto gli avvisi del 3D tolto e dell'app installabile: tolti da `AVVISI.md`.
-- Check completo del 20/11 sera: tutte le tappe, telefono, paesaggi, suono (V40 e Supra misurati), salvataggio vecchio
-  col 3D ricaricato: nessun errore. Corretto il vento che velava di polvere anche la città (ora solo nel deserto).
-- `AVVISI.md` aggiornato: niente più «Il Pistone tappa al km 14,6» né «il proprietario lavora sul 3D».
+- 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati da Luca: belli.
+- 21/11: Luca Garage (v0.64), pezzi nuovi V40 con pallini (v0.63), officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
+- 20/11: AUTO 1 dopo 5 s, leva con la S, tasti 1-4 solo per mangiare e bere, niente turbo nelle valigette, check completo
+  del 20/11 sera senza errori.

@@ -13,14 +13,14 @@
 //  Parte grafica: NightOfficina.panel(body, I, ctx), chiamata da openPlace (index.html) per Da Luca Tuning.
 // ============================================================================
 const OFF_GRUPPI = [
-  { id: 'motore', nome: 'Motore', cats: ['intake', 'cams', 'ecu', 'limiter'], hint: 'Aspirazione, camme, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
+  { id: 'motore', nome: 'Motore', cats: ['intake', 'cams', 'special', 'ecu', 'limiter'], hint: 'Aspirazione, camme, il reparto speciale dell\'auto, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
   { id: 'turbo', nome: 'Turbo', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: pressione e fischio.' },
   { id: 'scarico', nome: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e catalizzatore: voce, fiamme e qualche cavallo.' },
   { id: 'trasm', nome: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
   { id: 'telaio', nome: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza e frenata.' },
 ];
 // i reparti che appartengono al MOTORE (con lo swap diventano quelli del donatore); il limitatore è comune a tutte le auto
-const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'cams', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
+const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'cams', 'special', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
 // campi della fisica e del suono che vengono dal motore (il resto dell'auto è quello dell'auto che ospita)
 const OFF_SIM = ['turbo', 'pw', 'limiter', 'sparkCut', 'ecuLaunch', 'ecuPops', 'idle', 'camLow', 'camHigh', 'lope', 'ic', 'valve', 'boostK', 'limType', 'flatShift'];
 const OFF_DSP = ['cyl', 'tb', 'bov', 'intake', 'scream', 'lope', 'spark', 'voice', 'ex', 'cat'];
@@ -255,6 +255,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
   function draw(box, ctx) {
     const g = ctx.game, carId = g.car, career = g.mode === 'career', money = g.s.money, dId = offSwapOf(g, carId);
     let h = summary(ctx);
+    const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
+    if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
     h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button></div>`;
     h += tab === 'mod' ? drawMod(ctx, career, money) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
