@@ -1,5 +1,5 @@
 // ============================================================================
-//  Night Run · Il Viaggio in 2D: bar, autogrill "Sosta 24", Motel Ovunque, autostoppisti, cippi chilometrici,
+//  Night Run · Il Viaggio in 2D: bar, autogrill "Sosta 24", Motel 4Ever, autostoppisti, cippi chilometrici,
 //  cartelli strani, rimorchio, colpi di sonno. Aggiunge metodi a Street2D (caricato dopo street2d.js).
 // ============================================================================
 (function () {
@@ -40,7 +40,7 @@
       this.placeTag(g, x, top - 18, 'AUTOGRILL', '#ff7a3a', near);
       return true;
     }
-    // Motel Ovunque: fila di stanze su due piani, la 7 sempre accesa, insegna rosa col braccio che lampeggia
+    // Motel 4Ever: fila di stanze su due piani, la 7 sempre accesa, insegna rosa col braccio che lampeggia
     const L = x - 140, R = x + 140, top = 118;
     g.fillStyle = C.ink; g.fillRect(L - 2, top - 2, R - L + 4, 218 - top);
     g.fillStyle = '#3a2c3c'; g.fillRect(L, top, R - L, 216 - top);
@@ -54,7 +54,7 @@
     g.fillStyle = C.ink; g.fillRect(R + 14, 40, 6, 176);
     g.fillStyle = C.ink; g.fillRect(R - 20, 30, 80, 46); g.fillStyle = '#2a1424'; g.fillRect(R - 18, 32, 76, 42);
     const on = Math.sin(t * 7) > -0.6, blink = Math.floor(t * 2) % 2;
-    this.text(g, 'MOTEL', R - 10, 37, on ? '#ff5fa8' : '#4a1a34', 2); this.text(g, 'OVUNQUE', R - 12, 53, on ? '#2ee6ff' : '#14303a');
+    this.text(g, 'MOTEL', R - 10, 37, on ? '#ff5fa8' : '#4a1a34', 2); this.text(g, '4EVER', R - 12, 53, on ? '#2ee6ff' : '#14303a');
     this.text(g, 'LIBERO', R - 4, 64, blink ? '#3bff7a' : '#103a20');
     if (on) { this.light(g, R + 20, 48, 60, 30, '#ff5fa8', 0.12, 3); this.light(g, R + 20, 58, 50, 14, '#2ee6ff', 0.07, 3); }
     g.fillStyle = C.ink; g.fillRect(L + 6, top - 18, 168, 14); this.text(g, 'LA TUA CASSA TI ASPETTA', L + 10, top - 15, '#ffd23f');

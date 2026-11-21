@@ -5,7 +5,7 @@
 //  bordo), materiali con 3-4 toni per colore (ombre verso il blu-viola, luci verso il giallo), luci vere (lampade con il
 //  cono e la pozza, insegne, frigo, fari delle auto che passano e scorrono sui muri), persone disegnate come il
 //  protagonista (pgStanding di personaggio.js) e piccole animazioni.
-//  Tutti e nove: bar, benzinaio, Sosta 24, motel, Mario, Luca (senza Nico: è del cognato), Neon Kustom, Autosalone, sfascio.
+//  Tutti e nove: bar (Nabir), benzinaio (Rossana), Sosta 24 (Phill Grill), Motel 4Ever (Tito), Officina Nico, Luca, Russian Kùstòm (Jeshka), Autosalone (Rocco Lostallone), sfascio (Massimo Lo Sfascio).
 //  Scritte col carattere 5×7 leggibile (t5, neon5, sign). Le scene vecchie restano in NightInterni.SCENE.<id>_vecchio;
 //  per tornare a una: NightInterni.SCENE.fuel = NightInterni.SCENE.fuel_vecchio (o togliere questo file da index.html).
 // ============================================================================
@@ -61,8 +61,8 @@
   const poster = (g, x, y, w, h, bgc, lines) => { R(g, x - 0.5, y - 0.5, w + 1, h + 1, INK); R(g, x, y, w, h, bgc); for (const [t, c, sc, dy] of lines) text(g, t, x + (w - textW(t, sc)) / 2, y + dy, c, sc); };
 
   // ---------------------------------------------------------------- IL BAR
-  // la barista (stessa pixel art del protagonista): coda, camicia; va dalla macchina del caffè alla vetrinetta e torna
-  const BARISTA = { pelle: 1, capelli: 'coda', capCol: 1, testa: 'niente', testaCol: 0, sopra: 'camicia', sopraCol: 3, barba: 'no', occhiali: 'no' };
+  // Nabir, il barista (stessa pixel art del protagonista): ricci, barba corta, camicia; va dalla macchina del caffè alla vetrinetta e torna
+  const BARISTA = { pelle: 3, capelli: 'ricci', capCol: 0, testa: 'niente', testaCol: 0, sopra: 'camicia', sopraCol: 3, barba: 'corta', occhiali: 'no' };
   const STAZ = [{ x: 248, s: 4.5, cosa: 'caffe' }, { x: 380, s: 3 }, { x: 512, s: 3.5, cosa: 'brioche' }, { x: 380, s: 2.5 }];
   const WALK = 46;                                          // unità al secondo
   function baristaAt(t) {
@@ -154,7 +154,7 @@
       for (let k = 0; k < 30; k++) ell(g, mx - 11 + (r() - 0.5) * 9, my + 14 + r() * 7, 1, 0.7, ['#3a1a08', '#5a2a10', '#2a1206'][k % 3]);   // chicchi
       // ---- insegne e quadretti sul muro
       poster(g, 568, 66, 44, 30, '#e8e0c8', [['LOTTERIA', '#c42a1a', 1, 4], ['GRATTA', '#1a1a1a', 1, 13], ['E VINCI', '#1a1a1a', 1, 20]]);
-      // ---- primo piano: si disegna in dyn (dopo la barista), qui solo in cache
+      // ---- primo piano: si disegna in dyn (dopo il barista), qui solo in cache
       S.front = document.createElement('canvas'); S.front.width = W * SS; S.front.height = H * SS;
       const f = S.front.getContext('2d'); f.setTransform(SS, 0, 0, SS, 0, 0); f.imageSmoothingEnabled = false; front(f, rng(77));
     },
@@ -175,7 +175,7 @@
       R(g, 551, 15, 72, 38, '#2a7a3a'); R(g, 551, 33.5, 72, 0.5, '#e8f0e8'); ell(g, 587, 34, 6, 6, 'rgba(232,240,232,.5)'); ell(g, 587, 34, 5.5, 5.5, '#2a7a3a');
       for (let k = 0; k < 8; k++) { const px = 553 + ((k * 13 + t * (k % 2 ? 9 : -7)) % 68 + 68) % 68; R(g, px, 18 + (k * 7) % 31, 1.5, 3, k % 2 ? '#c43a2a' : '#f4f1e6'); }
       R(g, 551, 15, 72, 38, `rgba(255,255,255,${0.03 + 0.03 * Math.sin(t * 20)})`); glow(g, 587, 50, 46, '120,220,140', 0.1);
-      // la barista dietro al banco
+      // Nabir dietro al banco
       const B = baristaAt(t);
       if (typeof pgStanding === 'function') {
         g.save();
@@ -207,7 +207,7 @@
       // falena intorno alla lampada di mezzo
       const ma = t * 3.1; ell(g, 300 + Math.cos(ma) * 9 + Math.sin(ma * 2.3) * 3, 56 + Math.sin(ma * 1.4) * 5, 1, 0.7, '#e8e0c8');
     },
-    hot: [{ x: 198, y: 24, w: 94, h: 90, label: 'Bacheca dei lavori', go: 'Bacheca' }, { x: 0, y: 238, w: 640, h: 30, label: 'Bancone', go: 'Al bancone' }, { x: 186, y: 122, w: 108, h: 62, label: 'Caffè', go: 'Al bancone' }, { x: 14, y: 30, w: 172, h: 136, label: 'La tua auto', go: 'close' }],
+    hot: [{ x: 198, y: 24, w: 94, h: 90, label: 'Bacheca dei lavori', go: 'Bacheca' }, { x: 0, y: 238, w: 640, h: 30, label: 'Nabir · bancone', go: 'Al bancone' }, { x: 186, y: 122, w: 108, h: 62, label: 'Caffè', go: 'Al bancone' }, { x: 14, y: 30, w: 172, h: 136, label: 'La tua auto', go: 'close' }],
   };
   // il primo piano del bar (disegnato una volta): bancone di marmo e legno, vetrinetta delle brioche, oggetti, sgabelli
   function front(g, r) {
@@ -334,14 +334,16 @@
   }
 
   const HD = { bar: BAR };
-  // chi ti serve in ogni locale (stesse scelte dell'editor del personaggio)
+  // chi ti serve in ogni locale (stesse scelte dell'editor del personaggio): Rossana al benzinaio, Phill Grill alla cassa della Sosta 24
+  // (cam: il cameriere che passa), Tito al Motel 4Ever, Nico in officina, Luca, Jeshka a Russian Kùstòm, Rocco Lostallone all'Autosalone,
+  // Massimo Lo Sfascio allo sfascio
   const LOOK = {
-    benz: { pelle: 3, capelli: 'corti', capCol: 0, testa: 'berretto', testaCol: 0, sopra: 'felpa', sopraCol: 3, barba: 'corta', occhiali: 'no' },
-    cass: { pelle: 0, capelli: 'coda', capCol: 2, testa: 'cappellino', testaCol: 0, sopra: 'felpa', sopraCol: 2, barba: 'no', occhiali: 'no' },
+    benz: { pelle: 1, capelli: 'lunghi', capCol: 2, testa: 'niente', testaCol: 0, sopra: 'felpa', sopraCol: 3, barba: 'no', occhiali: 'no' },
+    cass: { pelle: 0, capelli: 'rasati', capCol: 2, testa: 'cappellino', testaCol: 0, sopra: 'felpa', sopraCol: 2, barba: 'corta', occhiali: 'no' },
     cam: { pelle: 3, capelli: 'corti', capCol: 1, testa: 'cappellino', testaCol: 1, sopra: 'camicia', sopraCol: 2, barba: 'piena', occhiali: 'no' },
     port: { pelle: 1, capelli: 'rasati', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 5, barba: 'no', occhiali: 'vista' },
     luca: { pelle: 2, capelli: 'corti', capCol: 0, testa: 'rovescio', testaCol: 5, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'no' },
-    mario: { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'piena', occhiali: 'no' },
+    nico: { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'piena', occhiali: 'no' },
     neon: { pelle: 3, capelli: 'lunghi', capCol: 0, testa: 'niente', testaCol: 0, sopra: 'felpa', sopraCol: 1, barba: 'no', occhiali: 'no' },
     vend: { pelle: 2, capelli: 'corti', capCol: 1, testa: 'niente', testaCol: 0, sopra: 'pelle', sopraCol: 1, barba: 'no', occhiali: 'no' },
     ferro: { pelle: 3, capelli: 'rasati', capCol: 5, testa: 'berretto', testaCol: 2, sopra: 'giubbotto', sopraCol: 3, barba: 'piena', occhiali: 'no' },
@@ -406,7 +408,7 @@
       glow(g, 568, 120, 96, '170,230,255', 0.22, 1.4);
       for (const lx of [120, 330, 520]) tube(g, lx - 40, 2, 80);
     },
-    hot: [{ x: 330, y: 62, w: 160, h: 184, label: 'Cassa', go: 'top' }, { x: 510, y: 24, w: 116, h: 200, label: 'Frigo e market', go: 'top' }, { x: 10, y: 20, w: 290, h: 150, label: 'Pompe', go: 'top' }],
+    hot: [{ x: 330, y: 62, w: 160, h: 184, label: 'Rossana · cassa', go: 'top' }, { x: 510, y: 24, w: 116, h: 200, label: 'Frigo e market', go: 'top' }, { x: 10, y: 20, w: 290, h: 150, label: 'Pompe', go: 'top' }],
   };
 
   // ---------------------------------------------------------------- AUTOGRILL SOSTA 24
@@ -457,10 +459,10 @@
       R(g, 156, 218, 48, 12, '#0a2a1a'); t5(g, (12 + Math.floor(t / 3) % 7) + ',' + (10 + Math.floor(t * 7) % 89), 160, 220, '#7aff9a', 0.9);
       for (const [k, lx] of [[0, 60], [1, 230], [2, 420], [3, 580]]) tube(g, lx - 40, 34, 80, k === 2 ? (Math.sin(t * 31) > 0.3 || Math.sin(t * 3.1) > 0.6 ? 1 : 0.2) : 1, '230,255,240');
     },
-    hot: [{ x: 100, y: 200, w: 120, h: 50, label: 'Cassa', go: 'Servizi' }, { x: 310, y: 196, w: 110, h: 50, label: 'Panini caldi', go: 'Servizi' }, { x: 440, y: 96, w: 190, h: 126, label: 'Market', go: 'Da portare via' }],
+    hot: [{ x: 100, y: 200, w: 120, h: 50, label: 'Phill Grill · cassa', go: 'Servizi' }, { x: 310, y: 196, w: 110, h: 50, label: 'Panini caldi', go: 'Servizi' }, { x: 440, y: 96, w: 190, h: 126, label: 'Market', go: 'Da portare via' }],
   };
 
-  // ---------------------------------------------------------------- MOTEL OVUNQUE: reception di legno, chiavi numerate (manca la 7)
+  // ---------------------------------------------------------------- MOTEL 4EVER: reception di legno, chiavi numerate (manca la 7)
   HD.motel = {
     ss: SS, focus: 300, amb: 'motel', grade: '255,120,190', gradeA: 0.06,
     static(g, r, S) {
@@ -508,10 +510,10 @@
       glow(g, 90, 80, 90, '255,95,168', 0.15);
       NI.kit.clock(g, 500, 160, 13, '#f4f1e6', '#3a2214');
     },
-    hot: [{ x: 210, y: 150, w: 180, h: 100, label: 'Reception', go: 'La stanza 7' }, { x: 470, y: 196, w: 56, h: 46, label: 'La tua cassa', go: 'La tua cassa' }, { x: 24, y: 40, w: 150, h: 120, label: 'Parcheggio', go: 'Parcheggio' }],
+    hot: [{ x: 210, y: 150, w: 180, h: 100, label: 'Tito · reception', go: 'La stanza 7' }, { x: 470, y: 196, w: 56, h: 46, label: 'La tua cassa', go: 'La tua cassa' }, { x: 24, y: 40, w: 150, h: 120, label: 'Parcheggio', go: 'Parcheggio' }],
   };
 
-  // ---------------------------------------------------------------- OFFICINA MARIO: intonaco macchiato, la fossa, il carrello degli attrezzi
+  // ---------------------------------------------------------------- OFFICINA NICO: intonaco macchiato, la fossa, il carrello degli attrezzi
   HD.niko = {
     ss: SS, focus: 250, amb: 'niko', grade: '120,200,255', gradeA: 0.05,
     static(g, r, S) {
@@ -524,7 +526,7 @@
       R(g, 178, 24, 54, 70, INK); R(g, 180, 26, 50, 66, '#f4f1e6'); R(g, 184, 30, 42, 24, '#7a1a1a'); ell(g, 205, 46, 12, 4, '#c8c8c8'); R(g, 196, 38, 18, 6, '#c42a2a');
       t5(g, 'NOVEMBRE', 185, 57, '#2a2a2a', 0.6); for (let k = 0; k < 30; k++) { t5(g, String(k + 1), 184 + (k % 7) * 6, 64 + Math.floor(k / 7) * 6, k === 19 ? '#c42a1a' : '#5a5a5a', 0.3); }
       sign(g, 244, 28, 64, 24, '#1a3a9a', [['OLIO', '#ffd23f', 1.6, 6]], '#c8ccd4'); sign(g, 244, 60, 64, 24, '#c42a1a', [['GOMME', '#ffffff', 1.4, 7]], '#c8ccd4');
-      sign(g, 326, 26, 150, 22, '#e8e2cc', [['OFFICINA MARIO', '#2a4a8a', 1.1, 3], ['TAGLIANDI · REVISIONI', '#5a5a5a', 0.55, 13]], '#5a4a3a');
+      sign(g, 326, 26, 150, 22, '#e8e2cc', [['OFFICINA NICO', '#2a4a8a', 1.1, 3], ['TAGLIANDI · REVISIONI', '#5a5a5a', 0.55, 13]], '#5a4a3a');
       R(g, 328, 100, 144, 4, '#5a4a3a'); R(g, 328, 100, 144, 1, '#7a6a5a');
       R(g, 339.5, 77.5, 43, 23, INK); R(g, 340, 78, 42, 22, '#3a2a1a'); R(g, 344, 82, 18, 14, '#c8a040'); for (let k = 0; k < 4; k++) R(g, 366, 82 + k * 3, 12, 1, '#1a1a1a'); t5(g, 'FM', 346, 84, '#3a2a1a', 0.6);
       for (let k = 0; k < 5; k++) { const c = ['#2a6ad8', '#ffd23f', '#c8ccd4', '#c42a1a', '#2a9a4a'][k]; R(g, 391.5 + k * 15, 83.5, 11, 17, INK); R(g, 392 + k * 15, 84, 10, 16, c); R(g, 392 + k * 15, 84, 10, 2, '#e8e8e8'); R(g, 393 + k * 15, 90, 8, 4, '#f4f1e6'); }
@@ -546,17 +548,17 @@
     dyn(g, t, S) {
       if (S.car) g.drawImage(S.car, 335 - S.car.width / SS / 2, 256 - S.car.height / SS, S.car.width / SS, S.car.height / SS);
       glow(g, 335, 264, 96, '255,230,170', 0.32, 0.3);
-      pg(g, 110, 346, 1.95, LOOK.mario, t, { seed: 4.2, pose: Math.floor(t / 10) % 3 === 2 ? 'pockets' : 'idle' });
+      pg(g, 110, 346, 1.95, LOOK.nico, t, { seed: 4.2, pose: Math.floor(t / 10) % 3 === 2 ? 'pockets' : 'idle' });
       g.drawImage(S.front, 0, 0, W, H);
       if (Math.sin(t * 6) > 0) R(g, 378, 82, 2, 2, '#7aff9a');
       for (const [k, lx] of [[0, 120], [1, 330], [2, 540]]) tube(g, lx - 50, 4, 100, k === 1 ? (Math.sin(t * 23) > -0.2 ? 1 : 0.3) : 1);
       cone(g, 95, 20, 120, 200, 210, '200,220,255', 0.05);
       for (let k = 0; k < 14; k++) P(g, 60 + ((k * 37 + t * 4) % 120), 60 + ((k * 53 + Math.sin(t + k) * 20) % 150), 'rgba(255,255,240,.45)', 0.7);
     },
-    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Mario', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
+    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Nico', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
   };
 
-  // ---------------------------------------------------------------- DA LUCA TUNING (Luca; Nico non c'è ancora: è del cognato)
+  // ---------------------------------------------------------------- DA LUCA TUNING (Luca)
   HD.shop = {
     ss: SS, focus: 300, amb: 'shop', grade: '255,176,0', gradeA: 0.05,
     static(g, r, S) {
@@ -600,7 +602,7 @@
     hot: [{ x: 200, y: 60, w: 260, h: 100, label: 'La tua auto', go: 'top' }, { x: 470, y: 30, w: 150, h: 80, label: 'Banco prova', go: 'top' }, { x: 0, y: 260, w: 230, h: 100, label: 'Pezzi', go: 'top' }],
   };
 
-  // ---------------------------------------------------------------- NEON KUSTOM: cabina di verniciatura, cerchi, vinile, l'artista con l'aerografo
+  // ---------------------------------------------------------------- RUSSIAN KUSTOM: cabina di verniciatura, cerchi, vinile, l'artista con l'aerografo
   HD.style = {
     ss: SS, focus: 420, amb: 'style', grade: '255,46,136', gradeA: 0.07,
     static(g, r, S) {
@@ -634,8 +636,8 @@
       for (const y of [42, 58]) { R(g, 258, y, 194, 3, `rgb(${rgb})`); R(g, 258, y, 194, 1, '#ffffff'); glow(g, 355, y, 160, rgb, 0.28, 0.35); }
       if (S.car) g.drawImage(S.car, 355 - S.car.width / SS / 2, 246 - S.car.height / SS, S.car.width / SS, S.car.height / SS);
       cone(g, 355, 62, 190, 260, 180, rgb, 0.08);
-      const n = Math.min(10, Math.floor(t * 4)), fl = Math.sin(t * 9) * Math.sin(t * 2.7) > 0.85 ? 0.25 : 1;
-      if (n > 0) neon5(g, 'NEON'.slice(0, Math.min(4, n)), 24, 140, '255,46,136', 3.2, fl); if (n > 4) neon5(g, 'KUSTOM'.slice(0, n - 4), 26, 168, '46,230,255', 2.2, 1);
+      const n = Math.min(13, Math.floor(t * 4)), fl = Math.sin(t * 9) * Math.sin(t * 2.7) > 0.85 ? 0.25 : 1;
+      if (n > 0) neon5(g, 'RUSSIAN'.slice(0, Math.min(7, n)), 22, 140, '255,46,136', 2.2, fl); if (n > 7) neon5(g, 'KUSTOM'.slice(0, n - 7), 26, 168, '46,230,255', 2.2, 1);
       pg(g, 524, 330, 1.9, LOOK.neon, t, { left: true, seed: 6.6 });
       // l'aerografo: la nuvola di vernice verso l'auto
       g.save(); g.globalCompositeOperation = 'lighter'; for (let k = 0; k < 18; k++) { const d = ((t * 60 + k * 9) % 46); ell(g, 500 - d, 262 + Math.sin(k * 1.7 + t * 5) * d * 0.25, 1 + d * 0.04, 1 + d * 0.04, `rgba(${rgb},${0.5 * (1 - d / 46)})`); } g.restore();
@@ -647,7 +649,7 @@
     hot: [{ x: 240, y: 30, w: 230, h: 210, label: 'Cabina', go: 'top' }, { x: 470, y: 20, w: 160, h: 110, label: 'Cerchi', go: 'top' }, { x: 10, y: 20, w: 140, h: 100, label: 'Colori', go: 'top' }],
   };
 
-  // ---------------------------------------------------------------- AUTOSALONE NOTTE: vetrata, pedana girevole, faretti, il venditore
+  // ---------------------------------------------------------------- AUTOSALONE NOTTE: vetrata, pedana girevole, faretti, Rocco Lostallone
   HD.dealer = {
     ss: SS, focus: 300, amb: 'dealer', grade: '182,156,255', gradeA: 0.05,
     static(g, r, S) {
@@ -696,7 +698,7 @@
       pg(g, 150, 340, 1.9, LOOK.vend, t, { seed: 8.2, pose: Math.floor(t / 7) % 3 === 2 ? 'phone' : 'idle' });
       for (const lx of [180, 330, 480]) glow(g, lx, 22, 30, '255,250,235', 0.35);
     },
-    hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Il venditore: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
+    hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Rocco: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
   };
 
   // ---------------------------------------------------------------- SFASCIO RUGGINE: piazzale di notte, pile di carcasse, gru, fuoco, cane
@@ -752,7 +754,7 @@
       if ((t % 6) < 2) t5(g, 'Z', 300, 306 - (t % 2) * 6, '#8a8f9e', 0.8);
       glow(g, 69, 50, 26, '255,240,200', 0.4);
     },
-    hot: [{ x: 250, y: 200, w: 240, h: 100, label: 'La carcassa', go: 'La carcassa' }, { x: 100, y: 220, w: 140, h: 100, label: 'Rovista', go: 'Rovista' }, { x: 250, y: 20, w: 240, h: 150, label: 'Pezzi usati', go: 'Pezzi usati' }],
+    hot: [{ x: 250, y: 200, w: 240, h: 100, label: 'La carcassa', go: 'La carcassa' }, { x: 100, y: 220, w: 140, h: 100, label: 'Massimo · rovista', go: 'Rovista' }, { x: 250, y: 20, w: 240, h: 150, label: 'Pezzi usati', go: 'Pezzi usati' }],
   };
 
   // le scene nuove al posto delle vecchie; le vecchie restano come <id>_vecchio (per tornarci: SCENE.fuel = SCENE.fuel_vecchio...)

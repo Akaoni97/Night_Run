@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · «Ti tengo compagnia» (dopo statistiche.js): storia secondaria di Jeshka e Luca
-//  Jeshka, meccanica russa, tiene il banco di Neon Kustom; Luca prepara le auto da Da Luca Tuning. Si cercano da
+//  Jeshka, meccanica russa, tiene il banco di Russian Kùstòm; Luca prepara le auto da Da Luca Tuning. Si cercano da
 //  quando si sono persi per un'ora a un'area di servizio, e alla fine hanno avuto la stessa idea: fermarsi dove l'altro
 //  può trovarli. Non è la storia principale (Rosa, Ottavio, Livia restano come sono): la trova solo chi entra in
 //  quei due negozi e si ferma a guardare. Proposta di Codex, riscritta per il gioco.
@@ -129,7 +129,7 @@ function jlFatto(g, scena, k, I) {
 // chi: '' = racconto, 'TU', o il nome. La scena finisce quando una scelta porta a null: lì si applica jlFatto.
 const JL_SCENE = {
   neon1: { a: { r: [
-    ['', 'Al banco di Neon c\'è una donna coi capelli raccolti in una matita. Non alza la testa dal cablaggio che sta spellando.'],
+    ['', 'Al banco di Russian Kùstòm c\'è una donna coi capelli raccolti in una matita. Non alza la testa dal cablaggio che sta spellando.'],
     ['MECCANICA', 'Spostala.'],
     ['TU', 'Scusa?'],
     ['MECCANICA', 'La macchina. Sei parcheggiato davanti al cassetto dei fusibili. Se mi salta la corrente mentre ci sei tu davanti, la colpa è tua e anche il preventivo.'],
@@ -141,7 +141,7 @@ const JL_SCENE = {
     ['', 'Sul banco di Luca c\'è un quaderno a quadretti aperto: ordini di pezzi, regolazioni, numeri di telefono senza nome.'],
     ['', 'A metà pagina, tra «carburatore Weber da rifare» e «4 candele fredde», una riga scritta più piano delle altre: «Lampada per la signora del furgone. Portalampada nuovo, il suo balla».'],
     ['LUCA', 'Senti una cosa. Sulla strada che hai fatto, hai visto un\'officina col banco girato al contrario? Rivolto verso le macchine che entrano, non verso la strada.'],
-  ], s: [['Sì: Neon Kustom, più indietro', 'b', 'neon', (g) => jlState(g).neon >= 1], ['No, perché?', 'c']] },
+  ], s: [['Sì: Russian Kùstòm, più indietro', 'b', 'neon', (g) => jlState(g).neon >= 1], ['No, perché?', 'c']] },
   b: { r: [
     ['', 'Luca smette di pulirsi le mani. Per un momento sembra uno che ha sentito chiamare il suo nome in un posto affollato.'],
     ['LUCA', 'Chi c\'era al banco?'],
@@ -177,7 +177,7 @@ const JL_SCENE = {
   d: { r: [['JESHKA', 'Lo trovo. Prima o poi entra qualcuno che l\'ha visto. Per questo tengo il banco girato verso l\'ingresso.'], ['', 'Si rialza e torna ai suoi fili come se non avesse detto niente.']], s: [['Va bene', null, 'nome']] } },
 
   luca2: { a: { r: [
-    ['TU', 'Ho conosciuto Jeshka. Da Neon.'],
+    ['TU', 'Ho conosciuto Jeshka. Da Russian Kùstòm.'],
     ['', 'Luca si siede sul paraurti della macchina che ha sul ponte. Si siede proprio, come uno a cui hanno tolto le gambe.'],
     ['LUCA', 'Viaggiavamo con due macchine. A uno svincolo ho visto uno fermo, mi sono accostato. Le ho fatto segno di andare avanti. Lei mi ha aspettato alla prima area di servizio. Ore. Poi ha pensato che fossi rimasto a piedi ed è tornata indietro a cercarmi.'],
     ['LUCA', 'Quando sono arrivato io, la ragazza al banco si ricordava benissimo di lei. Mi ha dato questo.'],
@@ -188,7 +188,7 @@ const JL_SCENE = {
   c: { r: [['LUCA', 'Perché se parto io e lei intanto viene qui, la ragazza al banco mi dà un altro cavo. Portaglielo tu. Lei capisce.'], ['', 'Prima di dartelo ci passa sopra un giro di nastro isolante, dove la guaina si è aperta.']], s: [['Prendi il cavo', null]] } },
 
   neon3: { a: { r: [
-    ['', 'Posi il cavo sul banco di Neon. Jeshka non lo tocca subito.'],
+    ['', 'Posi il cavo sul banco di Russian Kùstòm. Jeshka non lo tocca subito.'],
     ['', 'Poi lo srotola. Si è aperto proprio dove lei lo piegava sempre, e sopra c\'è un giro di nastro nero, messo un po\' storto.'],
     ['JESHKA', 'Ci ha messo il nastro.'],
     ['TU', 'Ha detto che lui resta lì un\'ora in più. Sempre.'],
@@ -204,7 +204,7 @@ const JL_SCENE = {
 
   arrivo: { a: { r: [['', 'Jeshka non si muove dal sedile. Ha il cavo arrotolato intorno al polso.'], ['JESHKA', 'Non hai lampeggiato. Cinque. Me l\'avevi promesso.']], s: [['Esci nel piazzale e lampeggia', null, 'lampeggia'], ['Non ancora', null, 'aspetta']] } },
 
-  biglietto: { a: { r: [['', 'Neon è chiuso. Resta acceso solo il neon sopra la porta. Sul cassetto dei fusibili c\'è un biglietto scritto in stampatello.'], ['', '«TORNO. IL CASSETTO NON TOCCATELO. J.»']], s: [['Va bene', null]] } },
+  biglietto: { a: { r: [['', 'Russian Kùstòm è chiuso. Resta acceso solo il neon sopra la porta. Sul cassetto dei fusibili c\'è un biglietto scritto in stampatello.'], ['', '«TORNO. IL CASSETTO NON TOCCATELO. J.»']], s: [['Va bene', null]] } },
 };
 // le due scene a tutto schermo
 const JL_INCONTRO = [
@@ -215,7 +215,7 @@ const JL_INCONTRO = [
   ['LUCA', 'Io due.'],
   ['JESHKA', 'E la terza dov\'eri?'],
   ['LUCA', 'Qui.'],
-  ['', 'Lei annuisce. Per la prima volta pensa a tutte le sere passate a guardare le macchine entrare da Neon, e al fatto che per lui sono durate uguali.'],
+  ['', 'Lei annuisce. Per la prima volta pensa a tutte le sere passate a guardare le macchine entrare da Russian Kùstòm, e al fatto che per lui sono durate uguali.'],
   ['', 'Luca le si siede accanto, per terra. Restano zitti abbastanza a lungo che pensi di dover uscire.'],
   ['LUCA', 'Comunque, come ti dicevo…'],
   ['', 'Jeshka scoppia a ridere così forte che scivola giù dal sedile e finisce per terra accanto a lui. Ride con la faccia contro la sua spalla, quella che gli fa male.'],

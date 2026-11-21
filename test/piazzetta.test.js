@@ -1,4 +1,4 @@
-// Prove della piazzetta (piazzetta.js): ogni 2 o 3 tappe, due negozi; Luca e Neon Kustom (Jeshka) mai insieme.
+// Prove della piazzetta (piazzetta.js): ogni 2 o 3 tappe, due negozi; Luca e Russian Kùstòm (Jeshka) mai insieme.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,7 +14,7 @@ test('piazzetta: una tappa ogni 2 o 3, dalla quarta, mai nelle prime due (tutori
   assert.ok(p.length > 100);
 });
 
-test('piazzetta: Luca e Neon Kustom non stanno mai insieme, tutte le altre coppie sì', () => {
+test('piazzetta: Luca e Russian Kùstòm non stanno mai insieme, tutte le altre coppie sì', () => {
   const coppie = new Set();
   for (let n = 0; n < 6000; n++) {
     const s = E.VG.stop(n); if (!s.twin) continue;

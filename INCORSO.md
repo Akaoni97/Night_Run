@@ -10,5 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Luca), con Claude | Nomi nuovi: Nico al posto di Mario (tagliandi e carro attrezzi), Russian Kùstòm, Motel 4Ever (Tito), personaggi di Autosalone, Sfascio, bar, benzinaio, autogrill | molti file di testi: `viaggio.js`, `locali2d.js`, `interni*.js`, `index.html`, `soccorso.js`, `usato.js`... | 21/11/2026 sera |
 | cognato (Luca), con Claude (altra sessione) | Campioni audio dei pezzi del motore: scheda «Suoni» nell'officina, una cartella di suoni per componente (valvola, turbo, scarico, centralina, limitatore, cambio...) che si sentono quando monti il pezzo | nuovi: `campioni.js`, `audio/campioni/`, `strumenti/campioni_pezzi.py`, `test/campioni.test.js`; poche righe in `officina.js`, `dsp.js`, `index.html` (solo agganci audio, non i testi) | 21/11/2026 sera |

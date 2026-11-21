@@ -2,7 +2,7 @@
 //  Night Run · La piazzetta (dopo sfascio.js, prima dei file che avvolgono `drawTripPlace` per ultimi)
 //  Ogni 2 o 3 tappe, la tappa è una piazzetta: due negozi affiancati, uno a sinistra e uno a destra della stessa tappa. Ti fermi, premi U e
 //  scegli dove entrare. La tappa resta quella di sempre (stesso `id`, bacheca, lavori e consegne non cambiano): le si aggiunge il secondo
-//  negozio (`VG.stop(n).twin`). Le coppie sono a caso, tutte con la stessa probabilità, **tranne Luca (shop) e Neon Kustom (style): non
+//  negozio (`VG.stop(n).twin`). Le coppie sono a caso, tutte con la stessa probabilità, **tranne Luca (shop) e Russian Kùstòm (style): non
 //  stanno mai nella stessa piazzetta** (tresca tra Luca e Jeshka, `jeshka.js`). Parte pura: `vgPiazzaSet`, `vgTwin`; disegno e scelta qui sotto.
 // ============================================================================
 // prima piazzetta alla tappa 3 (le prime due servono al tutorial), poi ogni 2 o 3. I due negozi stanno affiancati con `spazio` pixel tra le facciate

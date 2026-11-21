@@ -22,7 +22,7 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
 const GAME_LOCS = [
   { id: 'tokyo', name: 'Tokyo · Shinjuku', country: 'Giappone', bg: 'city', lat: 35.6938, lon: 139.7034, traffic: 1.1, places: true,
-    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Mario e il Neon Kustom.' },
+    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Nico e il Russian Kùstòm.' },
   { id: 'wangan', name: 'Wangan · Bayshore Route', country: 'Giappone', bg: 'highway', lat: 35.4614, lon: 139.6800, traffic: 1.6, mix: { truck: 2.6, bus: 0.3, kei: 0.5, taxi: 0.6 },
     note: 'L\'autostrada sopraelevata sulla baia di Tokyo verso Daikoku: barriere antirumore, lampioni al sodio, la città sull\'acqua.' },
   { id: 'hakone', name: 'Hakone Turnpike', country: 'Giappone', bg: 'mountain', lat: 35.2420, lon: 139.1040, traffic: 0.5, mix: { truck: 0.2, bus: 0.2, taxi: 0.2 },
@@ -78,10 +78,10 @@ const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
   { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
-  { id: 'niko', at: 1450, name: 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
-  { id: 'style', at: 1950, name: 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
+  { id: 'niko', at: 1450, name: 'Officina Nico', what: 'meccanico', col: '#5ad1ff' },
+  { id: 'style', at: 1950, name: 'Russian Kùstòm', what: 'estetica', col: '#ff2e88' },
 ];
-// sticker e decalcomanie (Neon Kustom): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
+// sticker e decalcomanie (Russian Kùstòm): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
 const GAME_STICKERS = [
   { id: 'wakaba', name: 'Wakaba', price: 60 }, { id: 'sakura', name: 'Fiore di ciliegio', price: 90 },
   { id: 'jdm', name: 'JDM', price: 80 }, { id: 'oni', name: 'Maschera Oni', price: 200 },
@@ -89,14 +89,14 @@ const GAME_STICKERS = [
   { id: 'flames', name: 'Fiamme', price: 350 },
 ];
 const GAME_STICKER_SLOTS = [['st_door', 'Portiera'], ['st_rear', 'Parafango posteriore'], ['st_glass', 'Vetro posteriore']];
-// manutenzione da Mario: quanto dura ogni cosa (km di gioco) e quanto costa
+// manutenzione da Nico: quanto dura ogni cosa (km di gioco) e quanto costa
 const GAME_SERVICES = [
   { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 120, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
   { id: 'plugs', name: 'Candele nuove', km: 90, price: 140, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
   { id: 'pads', name: 'Pastiglie dei freni', km: 35, price: 180, note: 'Pastiglie finite: frenate lunghe, poi ferro su ferro.' },
   { id: 'wash', name: 'Lavaggio e lucidatura', km: 15, price: 25, note: 'Fango e polvere si accumulano, di più con la pioggia.' },
 ];
-// ricambi estetici: si comprano dal Neon Kustom e si vedono sulla Supra in 2D
+// ricambi estetici: si comprano dal Russian Kùstòm e si vedono sulla Supra in 2D
 const GAME_COSMETICS = {
   glow: { label: 'Neon sottoscocca', items: [
     { id: 'none', name: 'Nessuno', price: 0 },
@@ -363,7 +363,7 @@ class StreetGame {
     const cost = liters * GAME_FUEL_PRICE;
     if (this.mode === 'career' && cost > this.s.money + GAME_FIDO + 0.5) liters = Math.max(0, (this.s.money + GAME_FIDO) / GAME_FUEL_PRICE);
     if (liters < 0.5) return { ok: false, why: `Sei in rosso oltre i € ${GAME_FIDO}: niente più credito, servono soldi` };
-    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: il benzinaio ti fa credito, per stavolta', 'fuel');
+    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: Rossana ti fa credito, per stavolta', 'fuel');
     I.fill = { liters, got: 0, cost: 0 };
     return { ok: true };
   }
@@ -383,7 +383,7 @@ class StreetGame {
     this.say(`${c ? c.label : 'Sticker'}: ${it.name} − € ${it.price}`, 'buy');
     return { ok: true, paid: it.price };
   }
-  // ------------------------------------------------------------ manutenzione (Mario)
+  // ------------------------------------------------------------ manutenzione (Nico)
   maint() { const st = this.carState(); return st.maint || (st.maint = { oil: 1, plugs: 1, pads: 1, dirt: st.clean === false ? 0.8 : 0.2 }); }
   wear(km, braking) {
     const m = this.maint();
@@ -396,7 +396,7 @@ class StreetGame {
     const s = GAME_SERVICES.find((x) => x.id === id), m = this.maint(), c = this.serviceCost(id);
     const level = id === 'wash' ? 1 - m.dirt : m[id];
     if (level > 0.97) return { ok: false, why: 'Non serve: è a posto' };
-    if (c > this.s.money) return { ok: false, why: `Mario vuole € ${c}` };
+    if (c > this.s.money) return { ok: false, why: `Nico vuole € ${c}` };
     this.s.money -= c; if (id === 'wash') m.dirt = 0; else m[id] = 1;
     this.say(`${s.name}${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
   }

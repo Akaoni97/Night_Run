@@ -1,9 +1,9 @@
 // ============================================================================
 //  Night Run · Gli interni dei locali (dopo telefono.js)
-//  Quando entri in un locale (bar, autogrill, motel, benzinaio, Da Luca Tuning, Officina Mario, Neon Kustom) sopra la
+//  Quando entri in un locale (bar, autogrill, motel, benzinaio, Da Luca Tuning, Officina Nico, Russian Kùstòm) sopra la
 //  strada compare la scena dell'interno, in pixel art 640×360: chi ti serve dietro al bancone che si muove e sbatte gli
 //  occhi, le luci (neon che tremano, lampade calde, tubi fluorescenti), le finestre con la notte fuori e il traffico che
-//  passa, la tua auto vera (sul ponte da Luca, sopra la fossa da Mario, in cabina al Neon Kustom, alla pompa del
+//  passa, la tua auto vera (sul ponte da Luca, sopra la fossa da Nico, in cabina al Russian Kùstòm, alla pompa del
 //  benzinaio, fuori dalla vetrina del bar). Gli oggetti importanti si toccano: portano alla sezione giusta del pannello.
 //  Ogni locale ha anche il suo sottofondo (brusio, macchina del caffè, frigoriferi, compressore...), sintetizzato.
 //  Dal resto del gioco: NightInterni.open(place), .close(). Le scene sono in SCENE (una funzione per locale).
@@ -351,7 +351,7 @@
     hot: [{ x: 100, y: 200, w: 120, h: 50, label: 'Cassa', go: 'Servizi' }, { x: 310, y: 196, w: 110, h: 50, label: 'Panini caldi', go: 'Servizi' }, { x: 440, y: 96, w: 190, h: 126, label: 'Market', go: 'Da portare via' }],
   };
 
-  // ---- MOTEL OVUNQUE: reception di legno, portiere coi giornali, chiavi appese (manca la 7), tv con la neve, insegna rosa fuori
+  // ---- MOTEL 4EVER: reception di legno, portiere coi giornali, chiavi appese (manca la 7), tv con la neve, insegna rosa fuori
   SCENE.motel = {
     focus: 300, amb: 'motel', grade: '255,120,190', gradeA: 0.07,
     static(g, r, S) {
@@ -482,7 +482,7 @@
     hot: [{ x: 200, y: 60, w: 260, h: 100, label: 'La tua auto', go: 'top' }, { x: 470, y: 30, w: 150, h: 80, label: 'Banco prova', go: 'top' }, { x: 0, y: 260, w: 230, h: 100, label: 'Pezzi', go: 'top' }],
   };
 
-  // ---- OFFICINA MARIO: officina vecchia, la tua auto sulla fossa, compressore, radio, Mario in tuta con lo straccio
+  // ---- OFFICINA NICO: officina vecchia, la tua auto sulla fossa, compressore, radio, Nico in tuta con lo straccio
   SCENE.niko = {
     focus: 250, amb: 'niko', grade: '120,200,255', gradeA: 0.05,
     static(g, r, S) {
@@ -508,7 +508,7 @@
       if (S.car) g.drawImage(S.car, 335 - S.car.width / 2, 252 - S.car.height + 4);
       // luce da lavoro accesa sotto l'auto (dalla fossa)
       glow(g, 335, 262, 90, '255,230,170', 0.35, 0.3);
-      // Mario: tuta blu, barba grigia, straccio rosso in tasca, si pulisce le mani
+      // Nico: tuta blu, barba grigia, straccio rosso in tasca, si pulisce le mani
       person(g, 110, 330, { skin: '#d8a888', hair: '#9a9a92', hairStyle: 'short', beard: '#a8a8a0', overalls: '#2a4a8a', rag: true, pose: 'wipe', s: 1.35, seed: 4.2, shirt: '#2a4a8a' }, t);
       // la radio suona: lucina che pulsa
       if (Math.sin(t * 6) > 0) R(g, 380, 82, 2, 2, '#7aff9a');
@@ -518,10 +518,10 @@
       cone(g, 95, 20, 120, 200, 200, '200,220,255', 0.05);
       for (let k = 0; k < 10; k++) P(g, 60 + ((k * 37 + t * 4) % 120), 60 + ((k * 53 + Math.sin(t + k) * 20) % 140), 'rgba(255,255,240,.4)');
     },
-    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Mario', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
+    hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Nico', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
   };
 
-  // ---- NEON KUSTOM: cabina di verniciatura con la tua auto sotto le luci viola, muro dei cerchi, rotoli di vinile, l'artista con l'aerografo
+  // ---- RUSSIAN KUSTOM: cabina di verniciatura con la tua auto sotto le luci viola, muro dei cerchi, rotoli di vinile, l'artista con l'aerografo
   SCENE.style = {
     focus: 420, amb: 'style', grade: '255,46,136', gradeA: 0.08,
     static(g, r, S) {
@@ -545,9 +545,9 @@
       for (const y of [44, 60]) { R(g, 260, y, 190, 3, `rgb(${rgb})`); glow(g, 355, y, 160, rgb, 0.28, 0.35); }
       if (S.car) g.drawImage(S.car, 355 - S.car.width / 2, 240 - S.car.height + 6);
       cone(g, 355, 62, 190, 260, 180, rgb, 0.08);
-      // neon NEON KUSTOM che si accende lettera per lettera
-      const n = Math.min(10, Math.floor(t * 4)), fl = Math.sin(t * 9) * Math.sin(t * 2.7) > 0.85 ? 0.25 : 1;   // si accende lettera per lettera, poi ogni tanto trema
-      if (n > 0) neon(g, 'NEON'.slice(0, Math.min(4, n)), 34, 136, '255,46,136', 4, fl); if (n > 4) neon(g, 'KUSTOM'.slice(0, n - 4), 30, 160, '46,230,255', 3, 1);
+      // neon RUSSIAN KUSTOM che si accende lettera per lettera
+      const n = Math.min(13, Math.floor(t * 4)), fl = Math.sin(t * 9) * Math.sin(t * 2.7) > 0.85 ? 0.25 : 1;   // si accende lettera per lettera, poi ogni tanto trema
+      if (n > 0) neon(g, 'RUSSIAN'.slice(0, Math.min(7, n)), 24, 136, '255,46,136', 3, fl); if (n > 7) neon(g, 'KUSTOM'.slice(0, n - 7), 30, 160, '46,230,255', 3, 1);
       // l'artista con l'aerografo e le cuffie
       person(g, 520, 318, { skin: '#c88a62', hair: '#1a1010', hairStyle: 'long', shirt: '#2a2a3a', headphones: true, hpCol: '#2ee6ff', pose: 'spray', sprayRgb: rgb, s: 1.25, seed: 6.6 }, t);
       // casse che pulsano col basso
@@ -628,11 +628,11 @@
       // luci a soffitto
       for (const lx of [180, 330, 480]) glow(g, lx, 20, 30, '255,250,235', 0.35);
     },
-    hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Il venditore: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
+    hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Rocco: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],
   };
 
   // ---- SFASCIO RUGGINE: piazzale di notte, rete, pile di auto schiacciate, la gru col magnete, la carcassa in vendita,
-  // il bidone col fuoco, il ferrovecchio con la smerigliatrice e le scintille, il cane che dorme
+  // il bidone col fuoco, Massimo Lo Sfascio con la smerigliatrice e le scintille, il cane che dorme
   const junkCar = (S) => {
     const g = window.nightRun && window.nightRun.game; if (!g || !g.jkWreck || !g.inside) return;
     const n = Math.round((g.inside.x - VG_STOP0) / VG_STEP), W = g.jkWreck(n), id = W ? W.id : null;
@@ -694,7 +694,7 @@
       for (let k = 0; k < 8; k++) { const f = Math.sin(t * 9 + k * 1.3) * 0.5 + 0.5, h = 8 + f * 14; R(g, 118 + k * 3.4, 270 - h, 3, h, k % 3 === 0 ? '#ffd23f' : k % 2 ? '#ff7a1e' : '#ff4a1a'); }
       glow(g, 131, 262, 70, '255,130,40', 0.32 + 0.08 * Math.sin(t * 7));
       for (let k = 0; k < 6; k++) { const ph = (t * 0.7 + k * 0.37) % 1; P(g, 125 + Math.sin(k * 3 + t) * 10, 262 - ph * 70, `rgba(255,${150 + k * 15},60,${1 - ph})`); }
-      // il ferrovecchio con la smerigliatrice: scintille
+      // Massimo Lo Sfascio con la smerigliatrice: scintille
       person(g, 200, 318, { skin: '#c88a62', hair: '#5a5a5a', hairStyle: 'bald', overalls: '#3a4a2a', cap: '#2a2a2a', beard: '#6a6a6a', pose: 'tool', s: 1.2, seed: 3.3 }, t);
       if (Math.sin(t * 1.3) > -0.2) for (let k = 0; k < 12; k++) { const a2 = -0.6 + Math.random() * 1.2, d = Math.random() * 30; P(g, 237 + Math.cos(a2) * d, 252 + Math.sin(a2) * d * 0.6 + d * 0.2, Math.random() < 0.5 ? '#ffd23f' : '#ffffff'); }
       if (Math.sin(t * 1.3) > -0.2) glow(g, 237, 252, 24, '255,210,120', 0.35);

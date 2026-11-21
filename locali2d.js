@@ -1,6 +1,6 @@
 // ============================================================================
 //  Night Run · Le facciate dei locali del Viaggio (dopo viaggio2d.js)
-//  Bar, benzinaio, autogrill Sosta 24, Motel Ovunque, Officina Mario, Da Luca Tuning, Neon Kustom: edifici a due piani o
+//  Bar, benzinaio, autogrill Sosta 24, Motel 4Ever, Officina Nico, Da Luca Tuning, Russian Kùstòm: edifici a due piani o
 //  capannoni con materiali veri (intonaco, mattoni, lamiera, pannelli), vetrine con l'interno acceso e chi c'è dentro,
 //  insegne al neon che ogni tanto sfarfallano, tende, lampade a muro, piante, tavolini, pompe, e la luce che cade sul
 //  marciapiede. Di giorno le vetrine riflettono il cielo e i neon sono quasi spenti.
@@ -378,7 +378,7 @@
     this.placeTag(g, X + 36, T + band + 2, 'AUTOGRILL', '#ff7a3a', near);
   };
 
-  // ---------------------------------------------------------------- Motel Ovunque: due piani di stanze, ballatoio, scala, distributori, insegna a freccia
+  // ---------------------------------------------------------------- Motel 4Ever: due piani di stanze, ballatoio, scala, distributori, insegna a freccia
   S.lcMotel = function (g, e, X, st, near) {
     const C = this.C, t = st.t, n = 1 - (this.day || 0), s = Math.round(e.x) % 977, ink = C.ink;
     const L = X - 130, W = 260, T = 110, fl = 50;
@@ -431,7 +431,7 @@
       g.fillStyle = lit && n > 0.05 ? '#ffe08a' : '#6a5a3a'; g.fillRect(Math.round(bx) - 1, Math.round(by) - 1, 2, 2);
     }
     this.lcNeon(g, 'MOTEL', px - 32, 47 + oy, '#ff5fa8', 2, t, s + 1);
-    this.lcNeon(g, 'OVUNQUE', px - 32, 62 + oy, '#2ee6ff', 1, t, s + 2);
+    this.lcNeon(g, '4EVER', px - 32, 62 + oy, '#2ee6ff', 1, t, s + 2);
     if (Math.floor(t * 2) % 2) this.lcNeon(g, 'LIBERO', px - 32, 74 + oy, '#3bff7a', 1, t, s + 9); else this.text(g, 'LIBERO', px - 32, 74 + oy, '#103a20');
     // freccia che indica l'ingresso
     const ax = px - 52, ay = 96 + oy; for (let q = 0; q < 6; q++) { const lit = (q + Math.floor(t * 6)) % 6 < 2 && n > 0.05; g.fillStyle = lit ? '#ffd23f' : '#5a4a2a'; g.fillRect(px - q * 7, ay + q * 3, 4, 3); }
@@ -441,7 +441,7 @@
     this.placeTag(g, X, T + fl + 10, 'MOTEL', '#ff5fa8', near);
   };
 
-  // ---------------------------------------------------------------- Officina Mario e Da Luca Tuning: capannone col portone sezionale
+  // ---------------------------------------------------------------- Officina Nico e Da Luca Tuning: capannone col portone sezionale
   S.lcGarage = function (g, e, X, st, near, open) {
     const C = this.C, t = st.t, n = 1 - (this.day || 0), s = Math.round(e.x) % 971, ink = C.ink, niko = e.id === 'niko';
     const L = X - 130, W = 260, T = niko ? 112 : 110, dL = X - 52, dW = 104, dT = 140, dH = GY - dT, oh = Math.round(dH * open);
@@ -464,7 +464,7 @@
     }
     g.fillStyle = ink; g.fillRect(L - 1, T, 1, GY - T); g.fillRect(L + W, T, 1, GY - T);
     // insegna
-    const sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
+    const sign = niko ? 'OFFICINA NICO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000', sw = this.textW(sign, 2), sL = Math.round(X - sw / 2) - 8;
     if (niko) {
       this.lcBox(g, sL, T + 8, sw + 16, 18, '#163a6c'); g.fillStyle = '#2a5a9a'; g.fillRect(sL, T + 8, sw + 16, 1);
       this.text(g, sign, sL + 8, T + 12, '#f4f1e6', 2);
@@ -499,7 +499,7 @@
     this.text(g, niko ? 'GOMME' : 'CERCHI', L + 14, 186, niko ? '#ffb000' : '#ff5fa8');
     this.text(g, niko ? 'REVISIONI' : 'ELABORAZIONI', L + 14, 194, '#e8e6df');
     this.lcLamp(g, L + 37, 145);
-    // a destra: gomme, fusto, compressore (Mario) / ruote in esposizione e bandiere (Luca)
+    // a destra: gomme, fusto, compressore (Nico) / ruote in esposizione e bandiere (Luca)
     if (niko) {
       for (let q = 0; q < 5; q++) { g.fillStyle = ink; g.fillRect(dL + dW + 12, GY - 7 - q * 7, 22, 7); g.fillStyle = '#1b1b20'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 5); g.fillStyle = '#34343c'; g.fillRect(dL + dW + 13, GY - 6 - q * 7, 20, 1); }
       g.fillStyle = ink; g.fillRect(L + W - 22, GY - 22, 16, 22); g.fillStyle = '#c42a1a'; g.fillRect(L + W - 21, GY - 21, 14, 21); g.fillStyle = '#8a1a10'; g.fillRect(L + W - 21, GY - 16, 14, 1); g.fillRect(L + W - 21, GY - 8, 14, 1);
@@ -518,7 +518,7 @@
     this.placeTag(g, X, dT + 4, niko ? 'MECCANICO' : 'TUNING', scol, near);
   };
 
-  // ---------------------------------------------------------------- Neon Kustom: mattoni scuri, murale, neon ovunque
+  // ---------------------------------------------------------------- Russian Kùstòm: mattoni scuri, murale, neon ovunque
   S.lcStyle = function (g, e, X, st, near, open) {
     const C = this.C, t = st.t, n = 1 - (this.day || 0), s = Math.round(e.x) % 967, ink = C.ink;
     const L = X - 130, W = 260, T = 112, ph = Math.floor(t * 2) % 2;
@@ -530,13 +530,14 @@
     const mx = L + 4, my = T + 34, mw = 48, mh = 40;
     for (let q = 0; q < 220; q++) { const u = rnd(s + q), v = rnd(s + q * 1.9), px = mx + Math.floor(u * mw), py = my + Math.floor(v * mh), w = Math.sin(u * 7 + 1) * 8;
       const band = Math.floor((py - my + w) / 9); g.fillStyle = ['#ff2e88', '#b07bff', '#2ee6ff', '#ffd23f', '#ff7a3a'][((band % 5) + 5) % 5]; g.globalAlpha = 0.55; g.fillRect(px, py, 2, 2); }
-    g.globalAlpha = 1; this.text(g, 'NK', mx + 14, my + 14, '#f4f1e6', 2);
+    g.globalAlpha = 1; this.text(g, 'RK', mx + 14, my + 14, '#f4f1e6', 2);
     // insegna al neon grande, con la cornice di tubo
     const nL = X - 78, nW = 156;
     this.lcBox(g, nL, T + 8, nW, 26, '#0e0812');
-    const on1 = this.lcNeon(g, 'NEON', nL + 6, T + 12, '#ff2e88', 3, t, s + 1, this.textW('NEON', 3));
-    this.lcNeon(g, 'KUSTOM', nL + 60, T + 12, ph ? '#2ee6ff' : '#9af6ff', 2, t, s + 2);
-    this.text(g, 'CERCHI - VERNICI - NEON', nL + 60, T + 25, '#f4f1e6');
+    const rw = this.textW('RUSSIAN', 2), kx = nL + Math.round((nW - rw - 6 - this.textW('KUSTOM', 2)) / 2);
+    const on1 = this.lcNeon(g, 'RUSSIAN', kx, T + 12, '#ff2e88', 2, t, s + 1, rw);
+    this.lcNeon(g, 'KUSTOM', kx + rw + 6, T + 12, ph ? '#2ee6ff' : '#9af6ff', 2, t, s + 2);
+    this.text(g, 'CERCHI - VERNICI - NEON', nL + Math.round((nW - this.textW('CERCHI - VERNICI - NEON')) / 2), T + 25, '#f4f1e6');
     g.fillStyle = on1 && n > 0.05 ? '#ff2e88' : '#4a1a30'; g.fillRect(nL - 3, T + 5, nW + 6, 1); g.fillRect(nL - 3, T + 36, nW + 6, 1); g.fillRect(nL - 3, T + 5, 1, 32); g.fillRect(nL + nW + 2, T + 5, 1, 32);
     // vetrina con i cerchi che girano
     this.lcGlass(g, L + 60, 152, 62, 54, { col: '#ff6ab8', frame: '#ff2e88', inside: (g2, x0, y0, w, h) => {

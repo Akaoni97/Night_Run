@@ -1,4 +1,4 @@
-// Prove dei documenti: scadenze, pagamenti, revisione da Mario, controlli della polizia.
+// Prove dei documenti: scadenze, pagamenti, revisione da Nico, controlli della polizia.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,13 +15,13 @@ test('documenti: l\'auto ereditata ha tutto scaduto, una nuova dall\'Autosalone 
   game.s.money = 100000; game.dlBuy('panda', 'cash'); assert.deepEqual(game.docScaduti('panda'), []);
 });
 
-test('documenti: assicurazione e bollo si pagano ovunque (il bollo arretrato costa di più), la revisione solo da Mario', () => {
+test('documenti: assicurazione e bollo si pagano ovunque (il bollo arretrato costa di più), la revisione solo da Nico', () => {
   const { game } = trip(); game.vgInherit();
   const b = game.docCosto('bollo'), m = game.s.money;
   assert.ok(game.docPaga('ass').ok); assert.ok(game.docPaga('bollo').ok); assert.equal(game.s.money, m - DOC.ass.familiare - b);
   assert.ok(game.docCosto('bollo') < b, 'pagato in tempo costa meno della mora');
   assert.equal(game.docPaga('ass').ok, false, 'già a posto');
-  assert.equal(game.docPaga('rev').ok, false, 'solo da Mario');
+  assert.equal(game.docPaga('rev').ok, false, 'solo da Nico');
   game.inside = { id: 'niko', x: VG.stopX(3) }; assert.ok(game.docPaga('rev').ok);
   assert.deepEqual(game.docScaduti(), []);
   game.inside = null; game.s.dist += (DOC.durata.ass + 1) * 1000; assert.deepEqual(game.docScaduti(), ['ass'], 'dopo 300 km l\'assicurazione scade');
