@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.75**
+**Versione attuale: v0.80**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -96,5 +96,10 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.71 | 21/11 | cognato | Più sprint in accelerazione: le auto potenti non perdono più la spinta quando sgommano (gomma, trasferimento di carico, controllo di trazione, cambiate); 0-100 del Supra 6,1 → 5,8 s, E36 6,6 → 6,1 s |
 | v0.72 | 21/11 | proprietario | Controllo della sera del 21/11 (sospesi senza doppioni, decisioni di Nico) e pedoni in alta definizione leggeri (`quartieri2d.js`: chi cammina è disegnato come il protagonista, pose in memoria) |
 | v0.73 | 21/11 | cognato | Frizione: il kit frizione e volano non slitta più (terzo livello «da corsa» su ogni auto, bidisco della Supra con la sua capacità); quella di serie slitta solo su un motore molto potente |
-| v0.74 | 21/11 | cognato | Scritte da fumetto anime più varie (oltre 60 voci, forme diverse, scintille) e interruttore «Grafiche anime» in Impostazioni → Grafica |
-| v0.75 | 21/11 | cognato | Lo swap motore porta con sé la frizione del donatore (prima restava quella dell'auto e slittava sempre), avviso se la frizione non regge, rapporti del cambio regolabili marcia per marcia da Luca |
+| v0.74 | 21/11 | cognato | Vecchio Pistone di Nico cancellato (peso del motore e rimborso in `officina.js`), Prestazioni nelle impostazioni (`prestazioni.js`: scelte pronte, gradini automatici, tetto ai fotogrammi), le auto elaborate valgono metà di pezzi e swap |
+| v0.75 | 21/11 | cognato | Nomi nuovi: Officina Nico al posto di Mario (anche il carro attrezzi del soccorso è di Nico), Russian Kùstòm, Motel 4Ever con Tito, Nabir, Rossana, Phill Grill, Rocco Lostallone, Massimo Lo Sfascio |
+| v0.76 | 21/11 | cognato | Aspetto dei personaggi: Nico giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo barbone (tratti speciali `L.x` in `personaggio.js`) |
+| v0.77 | 21/11 | cognato | Pulizia del codice morto (scene vecchie degli interni, consegne della città, reputazione, sfide, pedali nascosti, resti del Pistone), Test 1, insegne e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`) |
+| v0.78 | 21/11 | cognato | Campioni audio dei pezzi del motore: scheda Suoni in officina, 42 kit in 10 componenti (valvola, turbo, scarico, centralina, limitatore, cambio...), fatti a codice |
+| v0.79 | 21/11 | cognato | Scritte da fumetto anime più varie (oltre 60 voci, forme diverse, scintille) e interruttore «Grafiche anime» in Impostazioni → Grafica |
+| v0.80 | 21/11 | cognato | Lo swap motore porta con sé la frizione del donatore (prima restava quella dell'auto e slittava sempre), avviso se la frizione non regge, rapporti del cambio regolabili marcia per marcia da Luca |

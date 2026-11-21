@@ -94,7 +94,7 @@ class EngineDSP {
     // ogni scoppio è una voce sua (nota del colpo, durata, schiocco, colore del rumore, colpo sordo): fino a 6 insieme
     this.pops = []; this.popV = []; this.popEnv = 0; this.popB = { f: 1, crack: 1, len: 1, thump: 1, vary: 1, boom: 0, bf: 1, mid: 1 };
     this.bV = []; for (let q = 0; q < 5; q++) this.bV.push({ e: 0, dec: 0, ph: 0, f: 80, ft: 50, fd: 0, n: 0, lc: 0.1, ne: 0, nd: 0 });   // voci del borbottio (gorgoglio al rilascio)
-    this.burG = 0.75;
+    this.burG = 0.75; this.burK = 1;                  // burK: borbottio sintetizzato abbassato quando lo fa un campione (campioni.js)
     this.burLPc = new BQ().set('lp', 1700, 0.7, sr); this.burLPo = new BQ().set('lp', 4200, 0.7, sr); this.burHP = new BQ().set('hp', 40, 0.7, sr);
     for (let q = 0; q < 6; q++) this.popV.push({ e: 0, dec: 0, f: 68, tf: 88, ph: 0, th: 0, n: 0, nc: 1, nk: 1, br: 1, tk: 1, bE: 0, bA: 0, bDec: 0, bF: 50, bT: 50, bPh: 0, bN1: 0, bN2: 0, bLc: 0.05 });
 
@@ -154,7 +154,11 @@ class EngineDSP {
     if (m.p) Object.assign(this.T, m.p);
     if (m.cfg) this.configure(Object.assign(this.cfg, m.cfg));
     if (m.env !== undefined || m.cfg) this.setEnv(m.env !== undefined ? m.env : this.env);
-    const fx = this.cfg.fx || {}; this.fxB = fx.bov ? 0 : 1; this.fxT = fx.turbo ? 0.25 : 1; this.fxS = fx.turbo ? 0 : 1;
+    // fx: suoni registrati che prendono il posto della sintesi. bov/pop/turbo = campioni caricati dall'utente (samples.js);
+    // valv/turb/bur = campioni dei pezzi montati (campioni.js): la valvola la fa il campione (niente sfiato né pompaggio
+    // sintetizzati), il fischio del turbo lo fa un anello (sintesi al 45 %), il borbottio lo fa il campione (sintesi al 35 %)
+    const fx = this.cfg.fx || {};
+    this.fxB = fx.bov || fx.valv ? 0 : 1; this.fxT = fx.turbo ? 0.25 : fx.turb ? 0.45 : 1; this.fxS = fx.turbo || fx.valv ? 0 : 1; this.burK = fx.bur ? 0.35 : 1;
     if (m.ev) for (const e of m.ev) this.event(e);
   }
 
@@ -790,7 +794,7 @@ class EngineDSP {
         + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt + winMotor;
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
-      out = out * M.g + bur * this.burG + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
+      out = out * M.g + bur * this.burG * this.burK + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
       // urti: livello pari in tutti i punti d'ascolto (non passano dal mix del motore), poi riverbero dell'ambiente
       if (this.H) { const H = this.H; if (H.duck > 1e-3) { out *= 1 - H.duck; H.duck *= Math.exp(-1 / (sr * 0.3)); } out += this.hitSample(TAU, this.cfg.view) * 0.32; }
 

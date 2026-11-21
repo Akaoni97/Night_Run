@@ -23,7 +23,7 @@ test('missioni: senza rimorchio l\'obiettivo della cassa pesante dice che serve 
   const { game } = allaCassa();
   const G = game.vgGoal();
   assert.match(G.text, /cassa pesante/i);
-  assert.match(G.note, /rimorchietto.*Motel Ovunque.*2\.200/);
+  assert.match(G.note, /rimorchietto.*Motel 4Ever.*2\.200/);
 });
 
 test('missioni: in bacheca la cassa non si prende, ma si può lasciar perdere e la catena va avanti', () => {

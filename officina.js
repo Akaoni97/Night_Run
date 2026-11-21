@@ -2,9 +2,11 @@
 //  Night Run · Officina semplice (dopo sfascio.js, prima di garage.js)
 //  Da Luca Tuning una schermata sola, compatta, quasi tutta a clic (stile Forza / Gran Turismo):
 //    · MODIFICHE: i pezzi del motore che hai sopra, a livelli (SERIE, LIV. 1, 2, 3...), un clic compra e monta; la «i» spiega cosa fa;
-//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista).
-//  Il vecchio Nico (livelli, magazzino, banco, motori costruiti) non si vede più: resta in `pistone/` ma spento di serie
-//  (interruttore nella scheda Sviluppatori).
+//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista);
+//    · SUONI: i campioni audio dei pezzi (valvola, turbo, scarico, centralina...), da campioni.js (NightCampioni.html/click).
+//  Il vecchio negozio di Nico (cartella `pistone/`: livelli, magazzino, banco, motori costruiti) è stato cancellato il 21/11
+//  sera: di suo serviva solo il peso del motore per lo swap (`offKgSerie`, qui sotto). Chi aveva speso da Nico riceve i soldi
+//  indietro una volta sola (`offPistoneRimborso`).
 //  Regole: i livelli 1 e 2 sono già sbloccati (si compra e si monta subito), dal 3 in su servono i chilometri (`game.partKm`).
 //  Swap: `game.s.swap[autoId] = donatore`. Il motore del donatore (curva di coppia, giri, turbo, cilindri, voce, peso) va sull'auto,
 //  il resto (cambio, differenziale, gomme, assetto, frizione, carrozzeria) resta suo. I pezzi del motore (scarico, aspirazione, turbo,
@@ -36,6 +38,34 @@ function offGearAdj(gears, fd, adj) {
   const g = base.map((r, i) => (i > 0 && r ? r * (1 - cl((adj.g || [])[i]) / 100) : r));
   for (let i = 2; i < g.length; i++) if (g[i] > g[i - 1] * 0.98) g[i] = g[i - 1] * 0.98;
   return { gears: g.map((r) => (r ? r3(r) : r)), fd: r3(fd * (1 - cl(adj.fd) / 100)) };
+}
+
+// peso del motore di serie di un'auto (per lo swap): dai cilindri e dal tipo (era motKgSerie del vecchio Pistone)
+function offKgSerie(carId) {
+  const c = typeof CARS !== 'undefined' && CARS[carId]; if (!c) return 150;
+  const cyl = carId === 'supra' ? 6 : c.cyl || ((c.tag || '').includes('cinque') ? 5 : 4), diesel = c.P && c.P.limiter < 5200;
+  return (cyl >= 6 ? (carId === 'supra' ? 230 : 200) : cyl === 5 ? 165 : 130) + (diesel ? 25 : 0);
+}
+// il vecchio negozio di Nico non c'è più: quello che ci avevi speso torna in soldi, una volta sola (livelli imparati, pezzi
+// comprati, motori costruiti a prezzo pieno). Prezzi dei pezzi copiati dal suo catalogo prima di cancellarlo.
+const OFF_PIS_PEZZI = {"blocco:b4_16":900,"blocco:b4_20":1400,"blocco:b5_23":2600,"blocco:b6_25":3200,"blocco:b6_30":4800,"blocco:b4_20cd":4200,"blocco:b6_30cd":7500,"albero:fuso":400,"albero:forg":1300,"albero:stroker":1900,"albero:billet":2900,"bielle:fuse":300,"bielle:h":900,"bielle:harp":1400,"bielle:ti":2200,"pistoni:std":350,"pistoni:ipe":600,"pistoni:low":1000,"pistoni:high":1100,"pistoni:g2618":2200,"olio:serie":120,"olio:hv":450,"olio:hvr":1100,"olio:secco":3800,"testata:v2":600,"testata:v4":1500,"testata:v4p":2600,"testata:v4r":4300,"camme:serie":250,"camme:sport":700,"camme:gara":1300,"camme:vvt":2600,"sovra:tp":2200,"sovra:sc":3000,"sovra:tm":3600,"sovra:tg":5200,"sovra:tgs":7400,"intercooler:fms":700,"intercooler:fmg":1500,"intercooler:aa":3200,"iniettori:i250":200,"iniettori:i440":600,"iniettori:i750":1100,"iniettori:i1000":1700,"benzina:serie":150,"benzina:p255":450,"benzina:dop":1100,"benzina:mecc":2400,"centralina:serie":300,"centralina:rimap":700,"centralina:prog":1600,"centralina:gara":3400,"radiatore:serie":150,"radiatore:all2":550,"radiatore:all3":1200,"radiatore:gara":2600,"frizione:org":250,"frizione:rinf":600,"frizione:cer":1100,"frizione:bid":2600};
+const OFF_PIS_LIV = [0, 0, 300, 900, 2400];
+function offPistoneRimborso(game) {
+  const v = game && game.s && game.s.vg, M = v && v.mot;
+  if (!M) { if (game && game.s) delete game.s.vgMot; return 0; }
+  let euro = 0;
+  if (game.mode === 'career') {
+    for (const e of M.list || []) euro += e.prezzo || 0;
+    for (const p of M.pz || []) euro += OFF_PIS_PEZZI[p.cat + ':' + p.id] || 0;
+    for (const k in M.liv || {}) for (let l = 2; l <= Math.min(4, M.liv[k] || 1); l++) euro += OFF_PIS_LIV[l];
+  }
+  delete v.mot; delete game.s.vgMot;
+  if (euro) { game.s.money += euro; if (game.say) game.say(`Luca: «Nico ha chiuso il banco dei motori. Quello che ci avevi speso te lo ridiamo: € ${euro.toLocaleString('it-IT')}»`, 'money'); }
+  return euro;
+}
+if (typeof StreetGame !== 'undefined') {                       // al primo passo della partita (anche caricata da un salvataggio)
+  const up = StreetGame.prototype.update;
+  StreetGame.prototype.update = function (dt) { if (!this._pisRim && this.s) { this._pisRim = true; offPistoneRimborso(this); } return up.call(this, dt); };
 }
 
 // parametri di un'auto (la Supra non ha `params` nel suo record)
@@ -77,7 +107,7 @@ function offEstimate(id) {
     s.setCar(id === 'supra' ? null : Object.assign({}, CARS[id].P)); s.setTune(D.sim);
     const e = s.estimatePeak(); r = { cv: Math.round(e.cv / 5) * 5, nm: Math.round(e.nm / 5) * 5, rpm: Math.round(e.rpmCv / 100) * 100 };
   } catch (err) { r = { cv: 150, nm: 200, rpm: 6000 }; }
-  r.kg = typeof motKgSerie === 'function' ? motKgSerie(id) : 150;
+  r.kg = offKgSerie(id);
   r.lim = offPOf(id).limiter; r.turbo = !!(offParamsOf(id, offStockSel(offCatalogOf(id))).sim.turbo || {}).max;
   r.cyl = id === 'supra' ? 6 : ((CARS[id] && CARS[id].cyl) || 4);
   return (_offEst[id] = r);
@@ -117,8 +147,7 @@ function offSwapApply(game, carId, TP, sim, sel) {
   if (TP.dsp.cyl === undefined) TP.dsp.cyl = offEstimate(dId).cyl;
   if (D.look) { TP.look = TP.look || {}; TP.look.badge = D.look.badge || ''; }
   sim.P.tq = Dp.tq; sim.P.idle = TP.sim.idle != null ? TP.sim.idle : Dp.idle;
-  const kg = (id) => (typeof motKgSerie === 'function' ? motKgSerie(id) : 150);
-  TP.sim.dm = (TP.sim.dm || 0) + kg(dId) - kg(carId);              // il peso del motore in più (o in meno): lo somma game.applyMass
+  TP.sim.dm = (TP.sim.dm || 0) + offKgSerie(dId) - offKgSerie(carId);              // il peso del motore in più (o in meno): lo somma game.applyMass
   TP.sim.boostK = D.sim.boostK !== undefined ? D.sim.boostK : 1;       // come il donatore (la Supra a piena efficienza, non quella dell'auto che ospita)
   // la frizione dell'auto è fatta per il suo motore: col motore di un altro il livello montato (serie, sport, corsa) vale quanto
   // quello stesso livello della frizione del donatore, mai meno di quello che l'auto aveva (senza, il motore scappa al limitatore)
@@ -161,7 +190,7 @@ function offSwapDo(game, S, carId, donorId) {
   return { ok: true };
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offPreview, offSwapApply, offCatalog, offSwapDo, offEngineName });
+if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offPreview, offSwapApply, offCatalog, offSwapDo, offEngineName, offKgSerie, offPistoneRimborso });
 
 // ---------------------------------------------------------------- la schermata
 (function officina() {
@@ -225,6 +254,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
+      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i]');            // scheda Suoni (campioni.js)
+      if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
       const c = e.target.closest('[data-k]');
       if (c && !c.classList.contains('cur')) {
         if (c.classList.contains('buy') && ctx.buy) ctx.buy(c.dataset.k, c.dataset.id);            // pallino rosso: si compra (va nel magazzino), poi si monta
@@ -243,6 +274,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     box.addEventListener('input', (e) => {
       const gr = e.target.closest('[data-gear]');
       if (gr) { const l = box.querySelector('[data-gl="' + gr.dataset.gear + '"]'); if (l) l.textContent = gearLab(+gr.value); return; }
+      if (e.target.closest('[data-cmp-vol]') && window.NightCampioni) { NightCampioni.input(e.target); return; }   // volume dei campioni
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
@@ -285,8 +317,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
     { const est = ctx.sim.estimatePeak(), cl = ctx.sim.P.clutchMax;      // frizione più debole del motore: slitta e il motore sale al limitatore senza spingere
       if (est.nm > cl * 0.97) h += `<p class="of-warn" style="margin:6px 2px 2px;padding:6px 8px;border:1px solid #ff453a;border-radius:8px;color:#ffb3ad;font-size:12px;line-height:1.35">⚠ La frizione regge ${fmt(Math.round(cl))} Nm e il motore ne fa ${fmt(Math.round(est.nm / 5) * 5)}: slitta e i giri vanno al limitatore senza spingere. Vai in <b>Trasmissione</b> e monta una frizione più forte.</p>`; }
-    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button></div>`;
-    h += tab === 'mod' ? drawMod(ctx, career, money) : drawSwap(ctx, carId, dId, career, money);
+    const suoni = !!window.NightCampioni;                                            // campioni audio dei pezzi (campioni.js)
+    if (tab === 'suoni' && !suoni) tab = 'mod';
+    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
+      + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '') + '</div>';
+    h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
   }
 

@@ -22,7 +22,7 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
 const GAME_LOCS = [
   { id: 'tokyo', name: 'Tokyo · Shinjuku', country: 'Giappone', bg: 'city', lat: 35.6938, lon: 139.7034, traffic: 1.1, places: true,
-    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Mario e il Neon Kustom.' },
+    note: 'Insegne, izakaya e il treno sopraelevato. Qui ci sono il benzinaio, Luca, Nico e il Russian Kùstòm.' },
   { id: 'wangan', name: 'Wangan · Bayshore Route', country: 'Giappone', bg: 'highway', lat: 35.4614, lon: 139.6800, traffic: 1.6, mix: { truck: 2.6, bus: 0.3, kei: 0.5, taxi: 0.6 },
     note: 'L\'autostrada sopraelevata sulla baia di Tokyo verso Daikoku: barriere antirumore, lampioni al sodio, la città sull\'acqua.' },
   { id: 'hakone', name: 'Hakone Turnpike', country: 'Giappone', bg: 'mountain', lat: 35.2420, lon: 139.1040, traffic: 0.5, mix: { truck: 0.2, bus: 0.2, taxi: 0.2 },
@@ -78,10 +78,10 @@ const GAME_REV_MAX = 5;                  // velocità massima in retromarcia, m/
 const GAME_PLACES = [
   { id: 'fuel', at: 420, name: 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
   { id: 'shop', at: 950, name: 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
-  { id: 'niko', at: 1450, name: 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
-  { id: 'style', at: 1950, name: 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
+  { id: 'niko', at: 1450, name: 'Officina Nico', what: 'meccanico', col: '#5ad1ff' },
+  { id: 'style', at: 1950, name: 'Russian Kùstòm', what: 'estetica', col: '#ff2e88' },
 ];
-// sticker e decalcomanie (Neon Kustom): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
+// sticker e decalcomanie (Russian Kùstòm): disegnati nel gioco; quelli del giocatore si aggiungono da img/stickers/manifest.json
 const GAME_STICKERS = [
   { id: 'wakaba', name: 'Wakaba', price: 60 }, { id: 'sakura', name: 'Fiore di ciliegio', price: 90 },
   { id: 'jdm', name: 'JDM', price: 80 }, { id: 'oni', name: 'Maschera Oni', price: 200 },
@@ -89,14 +89,14 @@ const GAME_STICKERS = [
   { id: 'flames', name: 'Fiamme', price: 350 },
 ];
 const GAME_STICKER_SLOTS = [['st_door', 'Portiera'], ['st_rear', 'Parafango posteriore'], ['st_glass', 'Vetro posteriore']];
-// manutenzione da Mario: quanto dura ogni cosa (km di gioco) e quanto costa
+// manutenzione da Nico: quanto dura ogni cosa (km di gioco) e quanto costa
 const GAME_SERVICES = [
   { id: 'oil', name: 'Tagliando: olio e filtro', km: 40, price: 120, note: 'Olio vecchio: la pressione cala e il motore perde fino al 6 %.' },
   { id: 'plugs', name: 'Candele nuove', km: 90, price: 140, note: 'Candele consumate: accensioni perse a scatti sotto carico.' },
   { id: 'pads', name: 'Pastiglie dei freni', km: 35, price: 180, note: 'Pastiglie finite: frenate lunghe, poi ferro su ferro.' },
   { id: 'wash', name: 'Lavaggio e lucidatura', km: 15, price: 25, note: 'Fango e polvere si accumulano, di più con la pioggia.' },
 ];
-// ricambi estetici: si comprano dal Neon Kustom e si vedono sulla Supra in 2D
+// ricambi estetici: si comprano dal Russian Kùstòm e si vedono sulla Supra in 2D
 const GAME_COSMETICS = {
   glow: { label: 'Neon sottoscocca', items: [
     { id: 'none', name: 'Nessuno', price: 0 },
@@ -151,14 +151,13 @@ class StreetGame {
     this.sim = sim;
     this.rnd = rnd;
     this.mode = 'career';                 // 'career' | 'free'
-    this.s = { money: 3000, rep: 0, heat: 0, dist: 0, owned: {}, fines: 0, jobs: 0,
+    this.s = { money: 3000, heat: 0, dist: 0, owned: {}, fines: 0, jobs: 0,
       trunk: [{ kind: 'scorta', kg: 14 }, { kind: 'kit', kg: 7, uses: 3 }, { kind: 'tanica', kg: 9 }] };
     this.ents = [];
     this.trip = 0;
     this.s.carId = 'supra'; this.s.cars = { supra: { km: 0, perks: [] }, v40: { km: 0, perks: [], up: 0, fuel: 0.55 } }; this.s.perks = [];
     this.prompt = null;
     this.ap = null;                        // pilota automatico (fermate)
-    this.job = null;
     this.out = [];                         // messaggi per l'interfaccia
     this.lane = 1; this.laneZ = GAME_LANE_Z[1]; this.laneT = 0;
     this.nextSpawn = 250; this.id = 1;
@@ -363,7 +362,7 @@ class StreetGame {
     const cost = liters * GAME_FUEL_PRICE;
     if (this.mode === 'career' && cost > this.s.money + GAME_FIDO + 0.5) liters = Math.max(0, (this.s.money + GAME_FIDO) / GAME_FUEL_PRICE);
     if (liters < 0.5) return { ok: false, why: `Sei in rosso oltre i € ${GAME_FIDO}: niente più credito, servono soldi` };
-    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: il benzinaio ti fa credito, per stavolta', 'fuel');
+    if (this.mode === 'career' && cost > this.s.money + 0.5) this.say('Sei in rosso: Rossana ti fa credito, per stavolta', 'fuel');
     I.fill = { liters, got: 0, cost: 0 };
     return { ok: true };
   }
@@ -383,7 +382,7 @@ class StreetGame {
     this.say(`${c ? c.label : 'Sticker'}: ${it.name} − € ${it.price}`, 'buy');
     return { ok: true, paid: it.price };
   }
-  // ------------------------------------------------------------ manutenzione (Mario)
+  // ------------------------------------------------------------ manutenzione (Nico)
   maint() { const st = this.carState(); return st.maint || (st.maint = { oil: 1, plugs: 1, pads: 1, dirt: st.clean === false ? 0.8 : 0.2 }); }
   wear(km, braking) {
     const m = this.maint();
@@ -396,7 +395,7 @@ class StreetGame {
     const s = GAME_SERVICES.find((x) => x.id === id), m = this.maint(), c = this.serviceCost(id);
     const level = id === 'wash' ? 1 - m.dirt : m[id];
     if (level > 0.97) return { ok: false, why: 'Non serve: è a posto' };
-    if (c > this.s.money) return { ok: false, why: `Mario vuole € ${c}` };
+    if (c > this.s.money) return { ok: false, why: `Nico vuole € ${c}` };
     this.s.money -= c; if (id === 'wash') m.dirt = 0; else m[id] = 1;
     this.say(`${s.name}${c ? `: − € ${c}` : ''}`, 'buy'); return { ok: true };
   }
@@ -490,7 +489,6 @@ class StreetGame {
   }
   dropItem(i) {
     const it = this.s.trunk[i]; if (!it) return { ok: false };
-    if (it.kind === 'pacco' && this.job) return { ok: false, why: 'Se butti il pacco perdi la consegna: portalo a destinazione' };
     this.s.trunk.splice(i, 1); this.applyMass(); this.say(`${this.itemName(it)} lasciato sul marciapiede`); return { ok: true };
   }
 
@@ -545,7 +543,7 @@ class StreetGame {
   setLoc(id) {
     const L = GAME_LOCS.find((l) => l.id === id); if (!L) return false;
     this.loc = L; this.s.loc = L.id;
-    this.ents = this.ents.filter((e) => e.kind === 'drop');
+    this.ents = [];
     this.nextTraffic = 0; this.inside = null; this.prompt = null;
     return true;
   }
@@ -566,7 +564,6 @@ class StreetGame {
     const sim = this.sim, d = this.s.dist, r = this.rnd;
     const w = [
       ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
-      ['job', !this.job ? 10 : 0],
     ];
     let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
     for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }
@@ -578,7 +575,7 @@ class StreetGame {
       this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 1 + (r() < 0.5 ? 1 : 0), x: d + (parked ? 380 : 260), v: parked ? 0 : (80 + r() * 20) / 3.6 });   // in giro: 80-100 km/h, si supera
     } else if (kind === 'station') {
       if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
-    } else if (kind === 'job') this.offerJob();
+    }
   }
 
   // un veicolo del traffico (tipo a caso secondo il luogo), in una corsia libera
@@ -604,27 +601,6 @@ class StreetGame {
       else if (b) b.drv = undefined;
     }
     return e;
-  }
-
-  offerJob() {
-    const r = this.rnd, km = 2 + Math.round(r() * 30) / 10, pay = Math.round((90 + km * 45 + r() * 60) / 10) * 10;
-    const goods = [['un pacco per un\'officina', 8], ['dei cerchi in lega', 36], ['una centralina riprogrammata', 3], ['dei pezzi di ricambio', 22], ['una cassa di olio motore', 28]];
-    const [what, kg] = goods[Math.floor(r() * goods.length)];
-    if (!this.trunkFits(kg)) { this.say(`Un lavoretto da ${kg} kg, ma il bagagliaio non ce la fa`, 'job'); return; }
-    this.ask({
-      kind: 'job', title: 'Lavoretto',
-      text: `Porta ${what} (${kg} kg nel bagagliaio) a ${km.toLocaleString('it-IT')} km da qui. Paga € ${pay}, + 30% se arrivi entro ${Math.ceil(km / 0.95)} minuti.`,
-      options: [
-        { label: 'Lo faccio', act: () => {
-          const to = this.s.dist + km * 1000;
-          this.job = { to, pay, km, deadline: km / 0.95 * 60, t: 0 };
-          this.addItem('pacco', { kg, name: what.replace(/^(un |una |dei |delle )/, '').replace(/^./, (c) => c.toUpperCase()) });
-          this.ents.push({ id: this.id++, kind: 'drop', lane: 1, x: to, v: 0 });
-          this.say(`Consegna accettata: ${km.toLocaleString('it-IT')} km`, 'job');
-        } },
-        { label: 'No grazie' },
-      ],
-    });
   }
 
   // tempo previsto sui 400 m con la formula di Hale (+ partenza da strada)
@@ -845,16 +821,8 @@ class StreetGame {
           ],
         });
       }
-      if (e.kind === 'drop' && this.job && rel <= 0) {
-        const j = this.job, bonus = j.t <= j.deadline ? Math.round(j.pay * 0.3) : 0;
-        this.s.money += j.pay + bonus; this.s.jobs++; this.s.rep += 3;
-        this.say(`Consegna fatta: + € ${j.pay}${bonus ? ` e € ${bonus} di bonus puntualità` : ''}`, 'money');
-        this.job = null; e.done = true;
-        const pi = this.s.trunk.findIndex((it) => it.kind === 'pacco'); if (pi >= 0) { this.s.trunk.splice(pi, 1); this.applyMass(); }
-      }
     }
-    if (this.job) this.job.t += dt;
-    this.ents = this.ents.filter((e) => !e.done && (e.chase || e.racing || e.kind === 'drop' || (e.x - d > -220 && e.x - d < 1500)));
+    this.ents = this.ents.filter((e) => !e.done && (e.chase || (e.x - d > -220 && e.x - d < 1500)));
 
     // sorpasso automatico: resta a destra; se davanti c'è qualcuno più lento guarda la corsia accanto (prima a sinistra,
     // poi a destra) tenendo conto delle velocità: davanti deve esserci spazio per sorpassare, dietro nessuno che arriva forte

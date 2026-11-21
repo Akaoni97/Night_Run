@@ -4,7 +4,7 @@
 //    RIMORCHIO  aggancia / sgancia (se hai comprato il gancio; lo sgancio controlla slot e chili rimasti in auto)
 //    TURBO      pressione vera della turbina (cambia bar, coppia, fischio e calore): ECO 60 % · NORMALE · FORTE 120 % (solo con un turbo montato)
 //    SCARICO    valvola di scarico: APERTO (rumore pieno e forte, scoppi e fiammate) o SILENZIO (niente fiamme, rumore più basso, scoppi rarissimi e smorzati) (dopo un po' di potenziamento)
-//    NEON       accende e spegne il neon sotto l'auto (se l'hai montato da Neon Kustom)
+//    NEON       accende e spegne il neon sotto l'auto (se l'hai montato da Russian Kùstòm)
 //  Lo stato sta in `game.s.cmd` e si salva con la partita. Funzioni pure provate in test/comandi.test.js.
 // ============================================================================
 const CMD_BOOST = [{ id: 'eco', label: 'ECO', k: 0.6 }, { id: 'norm', label: 'NORMALE', k: 1 }, { id: 'forte', label: 'FORTE', k: 1.2 }];
@@ -50,7 +50,7 @@ function cmdApply(game, sim, view2d) {
     // lo stesso comando anche nella scheda Guida del menu, dove prima c'erano cambio e pedali (tolti: da lì non si potevano usare)
     const deck = document.querySelector('section.deck .panel.drive');
     if (deck) {
-      pan = document.createElement('div'); pan.className = 'panel'; pan.innerHTML = '<h2>Comandi dell\'auto <em id="cmInfo"></em></h2><div class="keyrow" id="cmPanRow"></div><p class="hint">Compaiono quando l\'auto li ha: rimorchio dopo il gancio, turbo dopo un turbo, scarico dopo un po\' di potenza, neon dopo Neon Kustom. Sono anche sulla strada, sotto AUTO e TC.</p>';
+      pan = document.createElement('div'); pan.className = 'panel'; pan.innerHTML = '<h2>Comandi dell\'auto <em id="cmInfo"></em></h2><div class="keyrow" id="cmPanRow"></div><p class="hint">Compaiono quando l\'auto li ha: rimorchio dopo il gancio, turbo dopo un turbo, scarico dopo un po\' di potenza, neon dopo Russian Kùstòm. Sono anche sulla strada, sotto AUTO e TC.</p>';
       deck.parentNode.insertBefore(pan, deck.nextSibling);
       for (const id of Object.keys(btn)) { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.addEventListener('click', () => btn[id].click()); pan.querySelector('#cmPanRow').appendChild(b); pbtn[id] = b; }
     }

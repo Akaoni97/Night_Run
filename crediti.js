@@ -12,6 +12,7 @@ const CREDITI = [
   ]],
   ['Suoni', [
     ['Suono registrato del motore', '"Import car revs on chassis dyno with turbo" di editboy23 (Freesound), CC0'],
+    ['Campioni dei pezzi', 'valvole, turbo, scarichi e botti fatti a codice per Night Run (opera originale)'],
   ]],
   ['Programmi e caratteri', [
     ['Caratteri', 'Russo One, Barlow Semi Condensed, Share Tech Mono, Saira Stencil One, Bangers, Black Ops One (SIL OFL); Permanent Marker (Apache 2.0)'],

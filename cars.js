@@ -4,7 +4,7 @@
 //    tuning   catalogo prestazioni (categorie → tendine; ogni pezzo: prezzo, km per sbloccarlo, nota)
 //    presets  preparazioni pronte
 //    params   selezione → parametri di fisica, suono e aspetto
-//    body     estetica propria dell'auto (oltre a quella comune del Neon Kustom)
+//    body     estetica propria dell'auto (oltre a quella comune del Russian Kùstòm)
 //  Per aggiungere un'auto basta un'altra voce con questi campi.
 // ============================================================================
 /* global TUNING_SUPRA, SUPRA_PRESETS, supraParams, tuningItemOf */
@@ -437,7 +437,7 @@ const CARS = {
         [4000, 236], [4500, 238], [5000, 238], [5500, 236], [6000, 233], [6500, 220], [7000, 200], [7500, 180]],
     },
     tuning: TUNING_V40, presets: V40_PRESETS, params: v40Params,
-    // estetica propria (al Neon Kustom, oltre a vernice, neon, pinze, vetri e sticker comuni)
+    // estetica propria (al Russian Kùstòm, oltre a vernice, neon, pinze, vetri e sticker comuni)
     body: {
       wheels: { label: 'Cerchi', items: [
         { id: 'none', name: 'Copricerchi di serie', price: 0 },

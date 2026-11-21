@@ -92,11 +92,11 @@ const POL_SCUSE = [
     '«Facciamo a metà: io mi fido metà, lei paga metà.»',
     '«Anche il computer è in posta? Perché dice scaduta.»',
     '«Ieri era domenica. Si aggiunge la fantasia al verbale.»'] },
-  { t: '«Sto andando da Mario, il meccanico: è per questo che corro.»', p: [0.1, 0.2, 0.5, 0.2], r: [
-    '«Mario? Gli dica che la mia la ritiro lunedì. Vada.»',
-    '«Conosco Mario. Metà multa, e che non mi faccia più pagare il bullone a parte.»',
-    '«Anche io vado da Mario. A cinquanta all\'ora.»',
-    '«Mario mi ha venduto una frizione rotta. Lei paga per tutti e due.»'] },
+  { t: '«Sto andando da Nico, il meccanico: è per questo che corro.»', p: [0.1, 0.2, 0.5, 0.2], r: [
+    '«Nico? Gli dica che la mia la ritiro lunedì. Vada.»',
+    '«Conosco Nico. Metà multa, e che non mi faccia più pagare il bullone a parte.»',
+    '«Anche io vado da Nico. A cinquanta all\'ora.»',
+    '«Nico mi ha venduto una frizione rotta. Lei paga per tutti e due.»'] },
   // le assurde (raro): escono solo ogni tanto tra le tre proposte, ma sono talmente fuori di testa che spesso passano
   { t: '«Ho appena visto un UFO e lo stavo seguendo.»', raro: true, p: [0.5, 0.1, 0.25, 0.15], r: [
     '«Anche lei? Quello con le luci verdi? ...Vada. E non ne parli con nessuno, intesi?»',
@@ -537,7 +537,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     this.s.money -= tot; this.s.fines = (this.s.fines || 0) + tot; this.s.heat = Math.min(5, heat + 1);
     if (this.statAdd) this.statAdd('verbali');
     if (e) e.fined = true;
-    this.say(`Posto di controllo: ${voci.join(' · ')}. Passi e ti multano: − € ${fmt(tot)}.${sc.length ? ' Mettiti in regola dall\'app Libretto' + (sc.includes('rev') ? ' e da Mario' : '') : ''}`, 'police');
+    this.say(`Posto di controllo: ${voci.join(' · ')}. Passi e ti multano: − € ${fmt(tot)}.${sc.length ? ' Mettiti in regola dall\'app Libretto' + (sc.includes('rev') ? ' e da Nico' : '') : ''}`, 'police');
     return true;
   };
   // la volante ferma ti ferma per velocità: con tutto il resto (documenti, contesta, scappa)
