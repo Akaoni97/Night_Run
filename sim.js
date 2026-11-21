@@ -217,7 +217,7 @@ class SupraSim {
         const s = this.shiftSeq; s.t += h;
         // 3-step (flat shift): in salita col gas a fondo non si alza il piede, la centralina taglia l'accensione
         if (s.flat === undefined) s.flat = !!tn.flatShift && !s.down && I.thr > 0.8 && this.running;
-        const f = (s.fast ? 0.55 : s.quick ? 0.75 : 1) * (s.flat ? 0.7 : 1) * (P.shiftK || 1);   // cambiata perfetta: frizione aperta per meno tempo
+        const f = (s.fast ? 0.55 : s.quick ? 0.75 : 1) * (s.flat ? 0.7 : 1) * (P.shiftK || 1) * 0.8;   // cambiata perfetta: frizione aperta per meno tempo
         if (s.t < 0.07 * f) { this.clutch = Math.min(1, this.clutch + h / (0.045 * f)); if (!s.down && !s.flat) thrCmd = 0; }
         else {
           if (!s.done) { s.done = true; this.gear = s.target; this.lock = false; if (s.target !== 0) this.events.push({ type: 'clunk' }); }
@@ -257,7 +257,7 @@ class SupraSim {
 
     // ---- controllo di trazione (TRC): oltre il picco della gomma toglie gas finché le ruote riprendono ----
     const tcOn = cfg.tc && this.gear > 0 && this.running && Math.abs(this.v) > 0.3 && !this.shiftSeq;
-    const over = tcOn && (this.slipNow || 0) > 0.16 ? 1 : 0;
+    const over = tcOn && (this.slipNow || 0) > 0.12 ? 1 : 0;
     this.tcCut = (this.tcCut || 0) + (over - (this.tcCut || 0)) * Math.min(1, h / (over ? 0.03 : 0.12));
     this.tcAct = this.tcCut > 0.15;
     if (this.tcCut > 0.01) thrCmd *= 1 - 0.8 * this.tcCut;
@@ -371,7 +371,7 @@ class SupraSim {
     // gomme: carico (con trasferimento in accelerazione), sensibilità al carico, temperatura e usura
     // carico sull'asse motore: in accelerazione il peso va dietro (aiuta la trazione posteriore, toglie a quella anteriore)
     // la cassa è una massa sulle molle: il trasferimento di carico segue il beccheggio (si siede, sorpassa un po' e si assesta)
-    const pk = (tn.susp || {}).pitch || 1, wn = 2 * Math.PI * (1.25 / Math.sqrt(pk)), zeta = 0.42 + 0.28 * (1 - Math.min(1, pk));
+    const pk = (tn.susp || {}).pitch || 1, wn = 2 * Math.PI * (1.8 / Math.sqrt(pk)), zeta = 0.42 + 0.28 * (1 - Math.min(1, pk));
     this.pzV = (this.pzV || 0) + h * (wn * wn * (this.acc - (this.pz || 0)) - 2 * zeta * wn * (this.pzV || 0));
     this.pz = (this.pz || 0) + h * this.pzV;
     // saltellamento dell'assale (wheel hop): gomma che aggrappa e molla oltre il picco, a bassa velocità e con tanta coppia
@@ -391,13 +391,16 @@ class SupraSim {
     const launchK = 1 + (((tn.susp || {}).launch || 1) - 1) * (1 - SIM_SS(4, 22, Math.abs(this.v)));
     this.bumpU = Math.max(0, (this.bumpU || 0) - h * 3.2);          // assetto duro o radente: dopo una buca la gomma molla per un attimo
     this.scrapeT = Math.max(0, (this.scrapeT || 0) - h);
-    const Fmax = P.mu * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK * (1 - this.bumpU);
+    const Fmax = P.mu * (P.tr ?? 1.08) * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK * (1 - this.bumpU);
     // gomma: lo slittamento "visto" dal battistrada segue quello reale con un ritardo (lunghezza di rilassamento ~0,3 m),
     // poi curva di Pacejka della mescola: picco, e oltre la forza cala più o meno in fretta
     const ty = tn.tyre || { B: 20, C: 1.42, E: 0.1 };
     this.kap = (this.kap || 0) + (slip - (this.kap || 0)) * Math.min(1, h * (Math.abs(this.v) + 3) / 0.3);
     const bk = ty.B * this.kap;
-    const Ft = Fmax * Math.sin(ty.C * Math.atan(bk - ty.E * (bk - Math.atan(bk))));
+    let fr = Math.sin(ty.C * Math.atan(bk - ty.E * (bk - Math.atan(bk))));
+    const kpk = Math.tan(Math.PI / (2 * Math.max(1.05, ty.C))) / ty.B;      // slittamento del picco
+    if (Math.abs(this.kap) > kpk) fr = 1 - (1 - fr) * (ty.fall ?? 0.6);     // quanto della caduta dopo il picco resta (1 = come prima)
+    const Ft = Fmax * fr;
     this.slipNow = slip;
     this.slipPow = Math.abs(Ft * (vw - this.v));                          // potenza dissipata nello slittamento (W)
     const Tloss = (6 + 0.35 * Math.abs(this.ww)) * Math.tanh(this.ww * 4);
