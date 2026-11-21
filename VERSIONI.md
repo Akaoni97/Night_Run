@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.62**
+**Versione attuale: v0.63**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -85,3 +85,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.60 | 20/11 | proprietario | La piazzetta: ogni 2-3 tappe due negozi affiancati (mai Luca e Neon Kustom insieme) |
 | v0.61 | 21/11 | proprietario | Assetto a livelli: altezza e rigidità regolabili da Luca (cursori nella nuova officina), fisica e disegno che seguono |
 | v0.62 | 21/11 | proprietario | Night Run per Windows (Electron, da Codex): gioco senza rete, caratteri locali, salvataggi su file con backup |
+| v0.63 | 21/11 | proprietario | Sospesi numerati (regola), economia, valigetta e danni in pausa fino alla fine |

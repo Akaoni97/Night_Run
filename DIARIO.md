@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.63 (**sospesi numerati**)
+- Fatto: `SOSPESI.md` riscritto con punti numerati (regola: sempre elenco numerato, numerazione continua). Economia, missione della valigetta e danni sono in pausa fino alla fine (punti 1-3). Aggiunti il 16 (cosa riportare di Nico) e il 17 (provare la versione Windows).
+- Aperto: decisioni sui punti 4-16; nessuna richiesta all'altro.
+
 ## 21/11/2026 · proprietario · v0.62 (**Night Run per Windows, da Codex**)
 - Fatto: unito il lavoro di Codex (Electron). `desktop/` (finestra del gioco con sandbox, protocollo `app://`, salvataggi in `%APPDATA%\night-run\salvataggi` con backup, build per
   installatore e portatile), `vendor/fonts/` (30 caratteri locali con le licenze al posto di Google Fonts), `sw.js` col nuovo `VERSIONE`. Guida in `desktop/LEGGIMI.md`.
