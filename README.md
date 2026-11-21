@@ -354,6 +354,12 @@ Qui il suono è **sintetizzato fisicamente**, come fanno i simulatori di motore 
    pompa benzina, rotolamento, vento, stridio delle gomme, fischio della retromarcia.
 6. Tre punti d'ascolto: abitacolo, esterno posteriore, vano motore.
 
+**Campioni dei pezzi** (v0.78). Sopra la sintesi, ogni pezzo montato da Luca porta la sua voce: valvole pop-off (pssh,
+trombetta, doppio pistone, i vari «stu-tu-tu»), fischio del turbo per taglia, compressori, urlo della wastegate, risucchio
+dell'aspirazione, borbottio in rilascio, botti della centralina pop & bang e dell'anti-lag, 2-step e fucilata in cambiata,
+fischio del cambio a denti dritti, spurgo del nitro. Anche questi sono **fatti a codice** (`strumenti/campioni_pezzi.py`):
+nessuna registrazione presa da altri. Si ascoltano, si comprano e si montano nella scheda **Suoni** dell'officina.
+
 ## Fluttuazioni del motore
 
 - Giri interpolati campione per campione, senza gradini tra un aggiornamento e l'altro.

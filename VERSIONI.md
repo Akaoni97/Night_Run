@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.77**
+**Versione attuale: v0.81**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -100,3 +100,7 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.75 | 21/11 | cognato | Nomi nuovi: Officina Nico al posto di Mario (anche il carro attrezzi del soccorso è di Nico), Russian Kùstòm, Motel 4Ever con Tito, Nabir, Rossana, Phill Grill, Rocco Lostallone, Massimo Lo Sfascio |
 | v0.76 | 21/11 | cognato | Aspetto dei personaggi: Nico giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo barbone (tratti speciali `L.x` in `personaggio.js`) |
 | v0.77 | 21/11 | cognato | Pulizia del codice morto (scene vecchie degli interni, consegne della città, reputazione, sfide, pedali nascosti, resti del Pistone), Test 1, insegne e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`) |
+| v0.78 | 21/11 | cognato | Campioni audio dei pezzi del motore: scheda Suoni in officina, 42 kit in 10 componenti (valvola, turbo, scarico, centralina, limitatore, cambio...), fatti a codice |
+| v0.79 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
+| v0.80 | 21/11 | cognato | Scarichi a cinque livelli per ogni auto (terminale, catback, senza centrale, da gara) e collettore/cat da 200 celle che alza il tono e rende il suono più cattivo (`cat.len/tone/bark/edge/rasp/jet`) |
+| v0.81 | 21/11 | cognato | Chicche dell'officina (idee di Codex): scheda del pezzo al tocco con un solo pulsante, carattere dei pezzi dai dati, giri a 130 km/h, decimali sui piccoli guadagni, il FORTE non supera la centralina |

@@ -9,7 +9,10 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
-Aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codice morto), il 17 (Test 1) e il 19 (alta definizione leggera); il 20 si lascia così. **Numeri cambiati**: il 18 (camion) ora è il 16, il 21 (aspetto dei personaggi) è il 17.
+**Numeri cambiati dopo la v0.81**: nuovo il 7 (idee di Codex non fatte), nuovi il 18 (scheda del pezzo al tocco) e il 19 (suoni); da lì in poi tutto è scalato di uno o due (il camion ora è il 20, l'aspetto dei personaggi il 21).
+
+Aggiornata il 21/11/2026 notte (v0.78, Luca con Claude): nuovo punto 16, i campioni dei pezzi da ascoltare. **Numeri cambiati**: il camion (16 nella v0.77) ora è il 17, l'aspetto dei personaggi (17) è il 18.
+Prima: aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codice morto), il 17 (Test 1) e il 19 (alta definizione leggera); il 20 si lascia così. **Numeri cambiati**: il 18 (camion) ora è il 16, il 21 (aspetto dei personaggi) è il 17.
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 1. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
@@ -27,30 +30,36 @@ Aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codice mort
 6. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
    (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
 
+7. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
+
 ## Da provare giocando (sul PC)
-7. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
-8. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
-9. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
+8. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
+9. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
+10. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
     motore, guida lunga, installazione e disinstallazione. (proprietario)
-10. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. **Vendita**: un'auto elaborata vale metà di quello speso in pezzi e swap (v0.74, `DL.modPezzi`, `DL.modSwap`): giusto? (tutti e due)
-11. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
-12. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
-13. [officina] **Rimborso di Nico**: chi aveva speso dal vecchio Nico (livelli, pezzi, motori costruiti) riceve i soldi una
+11. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. **Vendita**: un'auto elaborata vale metà di quello speso in pezzi e swap (v0.74, `DL.modPezzi`, `DL.modSwap`): giusto? (tutti e due)
+12. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+13. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
+14. [officina] **Rimborso di Nico**: chi aveva speso dal vecchio Nico (livelli, pezzi, motori costruiti) riceve i soldi una
     volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
-14. [windows] **Aggiornamenti dal programma** (v0.65): dopo la prima release `v0.2.1` installarla a mano, farne uscire una seconda e provare Cerca, Scarica, Installa e riavvia con una partita di prova (copia della cartella `%APPDATA%\\night-run` prima). Controllare anche senza rete, «Più tardi» e il portatile. Le impostazioni di GitHub Actions (permessi di scrittura ai workflow) vanno verificate alla prima esecuzione. (cognato, Luca)
-15. [grafica] **Scatti, fluidità e Prestazioni** (v0.74): Impostazioni → Grafica → **Prestazioni** (Automatica, Massima,
+15. [windows] **Aggiornamenti dal programma** (v0.65): dopo la prima release `v0.2.1` installarla a mano, farne uscire una seconda e provare Cerca, Scarica, Installa e riavvia con una partita di prova (copia della cartella `%APPDATA%\\night-run` prima). Controllare anche senza rete, «Più tardi» e il portatile. Le impostazioni di GitHub Actions (permessi di scrittura ai workflow) vanno verificate alla prima esecuzione. (cognato, Luca)
+16. [grafica] **Scatti, fluidità e Prestazioni** (v0.74): Impostazioni → Grafica → **Prestazioni** (Automatica, Massima,
     Equilibrata, Fluida, Minima o voce per voce, tetto a 30/60 fotogrammi). «Automatica» scende un gradino alla volta se il
     disegno è lento (prima il bagliore, poi vita e passanti, la densità per ultima) e lo dice nel riquadro; «Riprova al
     massimo» lo azzera. Da provare sul PC guidando in città: se scende senza motivo, si alza `PREST.ms` (24 ms). (tutti e due)
 
+17. [suono] **Campioni dei pezzi** (v0.78, scheda Suoni da Luca, `campioni.js`): 42 kit fatti a codice, misurati ma **non ascoltati** da Claude. Da sentire sul PC in cuffia: valvole (soprattutto gli stu-tu-tu), borbottii, botti della centralina, 2-step e fucilata, fischi di turbo e compressore. Se qualcosa è troppo forte o finto si tara `CMP.g` o si rifà la ricetta in `strumenti/campioni_pezzi.py`; prezzi dei kit a occhio. (cognato, Luca)
+18. [officina] **Scheda del pezzo al tocco** (v0.81): tocchi un pezzo e vedi nome, carattere e cosa cambia, poi il pulsante compra e monta (toccare non spende). Da provare al telefono e sul PC: i nomi brevi nelle scelte, i decimali sui piccoli guadagni, i giri a 130 km/h nel rapporto finale e nel cambio, i pulsanti dell'assetto. Il FORTE ora non supera la centralina: controllare che non sembri «rotto» con i turbo grossi. (tutti e due)
+19. [suono] **Suoni diversi per ogni auto, scarichi a cinque livelli e collettore** (v0.79-v0.80, `suoni.js`): famiglie città, berlina, sportiva, tricilindrico, turbo, cinque cilindri, diesel, autobus; scarichi originale / terminale / catback / senza centrale / da gara; cat a 400, 200 e 100 celle e decat che alzano il tono e rendono il suono più cattivo. Misurati ma **non ascoltati**: da sentire sul PC auto per auto (passi tra un livello e l'altro, «cattivo» del tubolare e del decat, volumi). Manca il fischio del turbo sulle auto col turbo di serie. (tutti e due)
+
 ## Da sistemare
-16. [disegni] **Camion**: la logica c'è, i disegni del proprietario arrivano tra poco. (proprietario)
-17. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
+20. [disegni] **Camion**: la logica c'è, i disegni del proprietario arrivano tra poco. (proprietario)
+21. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 21/11 notte (v0.78, Luca): campioni audio dei pezzi del motore, scheda Suoni nell'officina (42 kit, 10 componenti, fatti a codice); build di Windows di nuovo in piedi (`desktop/copia-gioco.js` cercava ancora `pistone/`).
 - 21/11 sera (v0.77, Luca): codice morto tolto (scene vecchie degli interni, vecchie consegne della città e reputazione, sfide, traguardo ARRIVO, pedali e cambio nascosti nella scheda Guida, calore e motore rotto del Pistone); `test/motori.test.js` → `test/test1.test.js` («Test 1»); insegne grandi e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`). Il riquadro dei traguardi in verticale si lascia così.
 - 21/11 sera (v0.76, Luca): aspetto dei personaggi (Nico giovane e tatuato, Tito pazzo, Rocco fisicato, Massimo barbone).
-- In corso in un'altra sessione (Luca): campioni audio dei pezzi del motore (`INCORSO.md`).
 - 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.
 - 21/11 sera (v0.74, Luca): missione del signore della valigetta a 38 km resta così; vecchio Pistone cancellato (`pistone/`, il
   peso del motore per lo swap ora è in `officina.js`, rimborso una volta sola); sezione Prestazioni; auto elaborate valgono di più.

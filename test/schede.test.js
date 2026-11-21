@@ -65,7 +65,7 @@ test('ogni auto ha pezzi suoi: nessuna copia dello stesso elenco', () => {
       assert.equal(T.ecu.items[2].sim.spark, false, `${id}: un diesel non fa scoppi`);
       assert.ok(T.ecu.items[1].sim.pw > 1.05, `${id}: la rimappatura di un diesel rende di più`);
     } else {
-      assert.ok(T.cat && T.cams && T.cat.items.length === 3 && T.cams.items.length === 3, `${id}: mancano downpipe o camme`);
+      assert.ok(T.cat && T.cams && T.cat.items.length === 4 && T.cams.items.length === 3, `${id}: mancano downpipe o camme`);
     }
   }
   assert.equal(firme.size, gen.length);

@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'cars.js'].map((f) => readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'suoni.js', 'cars.js'].map((f) => readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 const { EngineDSP, SupraSim, CARS } = new Function(src + ';return { EngineDSP, SupraSim, CARS };')();
 
 const [id = 'v40', copione = 'allungo', out = 'ascolto.wav', vista = '0', amb = '0'] = process.argv.slice(2);

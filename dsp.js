@@ -59,7 +59,7 @@ class EngineDSP {
     this.muf = [new BQ(), new BQ(), new BQ(), new BQ()]; this.mufG = 1;
     this.jetBP = new BQ(); this.jetG = 0.2;
     this.radPrev = 0; this.dc1x = 0; this.dc1y = 0;
-    this.viewLP = new BQ(); this.viewLP2 = new BQ(); this.barkPK = new BQ().set('peak', 1100, 0.9, sr, 0); this.opHP = new BQ().set('hp', 650, 0.7, sr); this.opHP2 = new BQ().set('hp', 650, 0.7, sr); this.opLP = new BQ().set('lp', 6000, 0.6, sr); this.open = 0; this.openG = 1;
+    this.viewLP = new BQ(); this.viewLP2 = new BQ(); this.barkPK = new BQ().set('peak', 1100, 0.9, sr, 0); this.edHP = new BQ().set('hp', 360, 0.7, sr); this.edgeK = 0; this.opHP = new BQ().set('hp', 650, 0.7, sr); this.opHP2 = new BQ().set('hp', 650, 0.7, sr); this.opLP = new BQ().set('lp', 6000, 0.6, sr); this.open = 0; this.openG = 1;
     this.boomBP = new BQ().set('bp', 78, 1.6, sr);
     this.howlBP = new BQ(); this.howlBP2 = new BQ(); this.metBP = new BQ(); this.metBP2 = new BQ(); this.metK = 0; this.howlK = 0;
     this.crackHP = new BQ().set('hp', 700, 0.7, sr);
@@ -94,7 +94,7 @@ class EngineDSP {
     // ogni scoppio è una voce sua (nota del colpo, durata, schiocco, colore del rumore, colpo sordo): fino a 6 insieme
     this.pops = []; this.popV = []; this.popEnv = 0; this.popB = { f: 1, crack: 1, len: 1, thump: 1, vary: 1, boom: 0, bf: 1, mid: 1 };
     this.bV = []; for (let q = 0; q < 5; q++) this.bV.push({ e: 0, dec: 0, ph: 0, f: 80, ft: 50, fd: 0, n: 0, lc: 0.1, ne: 0, nd: 0 });   // voci del borbottio (gorgoglio al rilascio)
-    this.burG = 0.75;
+    this.burG = 0.75; this.burK = 1;                  // burK: borbottio sintetizzato abbassato quando lo fa un campione (campioni.js)
     this.burLPc = new BQ().set('lp', 1700, 0.7, sr); this.burLPo = new BQ().set('lp', 4200, 0.7, sr); this.burHP = new BQ().set('hp', 40, 0.7, sr);
     for (let q = 0; q < 6; q++) this.popV.push({ e: 0, dec: 0, f: 68, tf: 88, ph: 0, th: 0, n: 0, nc: 1, nk: 1, br: 1, tk: 1, bE: 0, bA: 0, bDec: 0, bF: 50, bT: 50, bPh: 0, bN1: 0, bN2: 0, bLc: 0.05 });
 
@@ -154,7 +154,11 @@ class EngineDSP {
     if (m.p) Object.assign(this.T, m.p);
     if (m.cfg) this.configure(Object.assign(this.cfg, m.cfg));
     if (m.env !== undefined || m.cfg) this.setEnv(m.env !== undefined ? m.env : this.env);
-    const fx = this.cfg.fx || {}; this.fxB = fx.bov ? 0 : 1; this.fxT = fx.turbo ? 0.25 : 1; this.fxS = fx.turbo ? 0 : 1;
+    // fx: suoni registrati che prendono il posto della sintesi. bov/pop/turbo = campioni caricati dall'utente (samples.js);
+    // valv/turb/bur = campioni dei pezzi montati (campioni.js): la valvola la fa il campione (niente sfiato né pompaggio
+    // sintetizzati), il fischio del turbo lo fa un anello (sintesi al 45 %), il borbottio lo fa il campione (sintesi al 35 %)
+    const fx = this.cfg.fx || {};
+    this.fxB = fx.bov || fx.valv ? 0 : 1; this.fxT = fx.turbo ? 0.25 : fx.turb ? 0.45 : 1; this.fxS = fx.turbo || fx.valv ? 0 : 1; this.burK = fx.bur ? 0.35 : 1;
     if (m.ev) for (const e of m.ev) this.event(e);
   }
 
@@ -193,10 +197,13 @@ class EngineDSP {
     this.catG = t.cat.g;
     // tubo e silenziatore
     const ex = t.ex;
-    this.pD = Math.min(8000, Math.round(ex.L / 495 * sr));
+    // collettore/catalizzatore (cat.len, cat.rasp, cat.jet; senza, tutto come prima): più corto = colonna d'aria che risuona più in alto (il tono sale), più rasp e getto = più cattivo e ruggente
+    const ctn = t.cat || {};
+    this.edgeK = ctn.edge || 0; this.edHP.set('hp', 360 * (ctn.tone || 1), 0.7, sr);   // cat.edge: mordente dopo il silenziatore (armoniche dai medi in su, il tono sale e si fa cattivo)
+    this.pD = Math.min(8000, Math.max(8, Math.round(ex.L * (ctn.len || 1) / 495 * sr)));
     this.pR = ex.r;
-    ex.m.forEach((m, i) => this.muf[i].set(m[0], m[1], m[2], sr, m[3]));
-    this.mufG = ex.g; this.jetG = ex.jet; this.rasp = ex.rasp;
+    ex.m.forEach((m, i) => this.muf[i].set(m[0], m[0] === 'peak' ? m[1] * (ctn.tone || 1) : m[1], m[2], sr, m[3]));   // cat.tone sposta in alto i picchi del silenziatore: il suono sale di tono
+    this.mufG = ex.g; this.jetG = ex.jet + (ctn.jet || 0); this.rasp = Math.min(1.2, ex.rasp + (ctn.rasp || 0));
     this.jetBP.set('bp', 3200, 0.6, sr);
     // doppia uscita: il secondo terminale arriva 0,4 ms dopo e con un timbro leggermente diverso
     this.tipD = ex.tips > 1 ? Math.round(0.00042 * sr) : 0;
@@ -485,7 +492,9 @@ class EngineDSP {
     const lpW = M.lp * (this.cfg.view === 0 ? 1 + 2.4 * (this.winS || 0) : 1);   // in abitacolo col finestrino giù lo scarico arriva diretto
     this.viewLP.set('lp', Math.min(15000, lpW * (0.55 + 1.75 * o)), 0.6, this.sr);
     this.viewLP2.set('lp', Math.min(16000, lpW * (0.9 + 2.2 * o)), 0.6, this.sr);
-    this.barkPK.set('peak', 900 + 900 * o, 0.9, this.sr, 7.5 * o);
+    // cat.bark: presenza che il collettore sportivo aggiunge nei medi alti (il suono «abbaia»), e cat.tone la sposta in su
+    const ctk = this.tn.cat || {};
+    this.barkPK.set('peak', (900 + 900 * o) * (ctk.tone || 1), 0.9, this.sr, 7.5 * o + (ctk.bark || 0) * (0.55 + 0.45 * o));
     if (this.bov.env > 0) {
       const pr = Math.min(1, this.bov.t / this.bov.len);
       const b = this.tn.bov;
@@ -621,6 +630,7 @@ class EngineDSP {
       let met = 0;
       if (this.metK > 1e-3) { const q = this.metBP.p(ex) * 30; met = (Math.tanh(q) * 0.7 + this.metBP2.p(Math.tanh(q * 2)) * 0.25) * 0.13 * this.metK * this.openG; }
       let exh = this.barkPK.p(this.viewLP2.p(this.viewLP.p(ex + crack + met)));
+      if (this.edgeK > 0) { const eh = this.edHP.p(exh); exh += this.edgeK * Math.tanh(eh * 3) / 3; }
       { const k = 0.9 + 2.6 * this.open; exh = Math.tanh(exh * k) / k * this.openG; }   // si sporca quando si apre (picchi smussati, non più forte)
       // voce aperta: gli armonici alti degli impulsi (ruvidi, saturati) che il silenziatore lascia passare solo a gas spalancato
       if (this.open > 0.02) {
@@ -790,7 +800,7 @@ class EngineDSP {
         + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt + winMotor;
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
-      out = out * M.g + bur * this.burG + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
+      out = out * M.g + bur * this.burG * this.burK + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
       // urti: livello pari in tutti i punti d'ascolto (non passano dal mix del motore), poi riverbero dell'ambiente
       if (this.H) { const H = this.H; if (H.duck > 1e-3) { out *= 1 - H.duck; H.duck *= Math.exp(-1 / (sr * 0.3)); } out += this.hitSample(TAU, this.cfg.view) * 0.32; }
 

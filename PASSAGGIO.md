@@ -237,6 +237,11 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   (commit prima della v0.74). Da Luca resta l'officina semplice (`officina.js`), che ne ha preso il peso del motore per lo swap
   (`offKgSerie`) e rimborsa una volta sola chi aveva speso da Nico (`offPistoneRimborso`). Nico, il personaggio, cerca un'altra
   mansione (`SOSPESI.md`).
+- **Campioni audio dei pezzi** (`campioni.js`, v0.78): da Luca Tuning la scheda **Suoni** dell'officina. Ogni pezzo montato non di
+  serie porta la sua voce sopra la sintesi (`cmpAuto`): valvola, turbo, compressore, wastegate, aspirazione, borbottio dello scarico,
+  centralina pop & bang, limitatore/launch/cambiate, cambio, spurgo nitro. 42 kit, 180 file in `audio/campioni/` fatti a codice da
+  `strumenti/campioni_pezzi.py` (guida in `audio/campioni/LEGGIMI.md`); gli altri kit si comprano una volta per tutte le auto. In
+  `dsp.js` i flag `valv`/`turb`/`bur` evitano i doppioni con la sintesi. Per sentirli fuori dal gioco: `strumenti/ascolta_campioni.js`.
 
 ## Lavori aperti e idee in sospeso
 

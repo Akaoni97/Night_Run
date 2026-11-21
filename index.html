@@ -1226,6 +1226,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="sim.js"></script>
 <script src="tuning.js"></script>
 <script src="schede.js"></script>
+<script src="suoni.js"></script>
 <script src="cars.js"></script>
 <script src="samples.js"></script>
 <script src="street2d.js"></script>
@@ -1352,8 +1353,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
+    const cmp = window.NightCampioni ? NightCampioni.sync(game, TP, S.tune) : {};   // campioni dei pezzi montati (campioni.js): cosa suona e cosa abbassare nella sintesi
     return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
-      fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
+      fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine'), valv: cmp.valv | 0, turb: cmp.turb | 0, bur: cmp.bur | 0 } };
   }
   function ensureAudio() {
     if (audio.ctx) { if (audio.ctx.state !== 'running') audio.ctx.resume(); return audio.starting; }
@@ -1365,6 +1367,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.12;
     comp.connect(ctx.destination);
     player = new SamplePlayer(ctx, comp);
+    if (window.NightCampioni) NightCampioni.attach(ctx, comp);       // campioni dei pezzi (campioni.js): stessa uscita del motore
     if (game.car === 'supra') loadSupraSamples();   // le registrazioni (1,9 MB) servono solo alla Supra: con le altre auto non si scaricano
     restoreUserSamples();
     const fallback = () => {
@@ -2692,7 +2695,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
-      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca i pezzi: li monto subito. La i dice cosa fanno.');
+      note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca un pezzo: ti dico cosa cambia. Lo monto quando premi il pulsante.');
       if (window.NightOfficina) {                                       // officina semplice (officina.js): Modifiche e Swap motore
         const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
@@ -3326,7 +3329,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   } catch (e) { /* niente: il gioco va lo stesso */ }
   window.nightRun = { exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT, tier: flameTier(sim, TP.dsp.cat.pop || 0) }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
-    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); },
+    audioOn: () => ensureAudio(), get tp() { return TP; }, get sel() { return S.tune; } };   // per i campioni dei pezzi (campioni.js): accendere l'audio dall'officina, parti montate
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.pausa = (on) => on ? pausaOn() : pausaOff(); Object.defineProperty(window.nightRun, 'inPausa', { get: () => pausaF, configurable: true });   // pausa a mano (prove)
@@ -3398,6 +3402,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (wasRunning && !sim.running && sim.stalled) flash('Motore spento: stallo. Folle e riavvia', 3);
     wasRunning = sim.running;
     if (audio.ready) audio.send({ p: sim.audioParams(), ev });
+    if (audio.ready && window.NightCampioni) NightCampioni.tick(sim, ev, dt, { view: viewNow(), env: envNow(), vol: S.muted ? 0 : S.vol / 100, exh: exhClosed() ? 0.72 : exhValve() ? 1.25 : 1 });
     if (audio.ready) {
       const vn = viewNow(), en = envNow();
       if (vn !== sentView) { sentView = vn; audio.send({ cfg: dspCfg() }); }
@@ -3696,6 +3701,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="piazzetta.js"></script>
 <script src="obiettivo.js"></script>
 <script src="officina.js"></script>
+<script src="campioni.js"></script>   <!-- campioni audio dei pezzi del motore: scheda Suoni dell'officina -->
 <script src="garage.js"></script>
 <script src="lucagarage.js"></script>
 <script src="soccorso.js"></script>

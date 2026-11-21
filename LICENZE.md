@@ -13,6 +13,7 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Marchi reali dei ricambi | **Rischio** | HKS, Apexi, Blitz, Garrett, Toyo Proxes, Bridgestone Potenza, Michelin Energy, Bilstein B14, Motronic. |
 | Musica (13 canzoni) | **Quasi a posto** | Fatte dal proprietario con Gemini, piano a pagamento Google AI Pro, novembre 2026. Prima di vendere: conferma dei termini di Google sull'uso commerciale. |
 | Suono registrato del motore | Va bene | CC0 (Freesound). |
+| Campioni dei pezzi (`audio/campioni/`) | Va bene | Fatti a codice nel progetto (`strumenti/campioni_pezzi.py`, v0.78): nessuna registrazione di altri. |
 | Caratteri (Google Fonts) | Va bene | OFL / Apache; ma caricarli dai server di Google è un problema di privacy in UE: metterli nel repository. |
 | Disegni delle auto, grafica, codice, storia | Va bene | Fatti dal proprietario, dal cognato e con Claude per loro. |
 | Skill in `.claude/skills/` | Va bene | Apache 2.0 con NOTICE (strumenti di sviluppo, non vanno nel gioco). |
@@ -104,5 +105,6 @@ da decidere insieme. Le cose di questa pagina (nome, marchi, musica, crediti) va
 
 ## Crediti da mostrare nel gioco
 - Suono del motore: editboy23 (Freesound), CC0.
+- Campioni dei pezzi (valvole, turbo, scarichi...): fatti a codice per Night Run, opera originale.
 - Caratteri: Russo One, Barlow Semi Condensed, Share Tech Mono, Saira Stencil One, Bangers, Black Ops One (OFL);
   Permanent Marker (Apache 2.0).

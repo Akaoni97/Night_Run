@@ -2,7 +2,8 @@
 //  Night Run · Officina semplice (dopo sfascio.js, prima di garage.js)
 //  Da Luca Tuning una schermata sola, compatta, quasi tutta a clic (stile Forza / Gran Turismo):
 //    · MODIFICHE: i pezzi del motore che hai sopra, a livelli (SERIE, LIV. 1, 2, 3...), un clic compra e monta; la «i» spiega cosa fa;
-//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista).
+//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista);
+//    · SUONI: i campioni audio dei pezzi (valvola, turbo, scarico, centralina...), da campioni.js (NightCampioni.html/click).
 //  Il vecchio negozio di Nico (cartella `pistone/`: livelli, magazzino, banco, motori costruiti) è stato cancellato il 21/11
 //  sera: di suo serviva solo il peso del motore per lo swap (`offKgSerie`, qui sotto). Chi aveva speso da Nico riceve i soldi
 //  indietro una volta sola (`offPistoneRimborso`).
@@ -169,7 +170,31 @@ function offSwapDo(game, S, carId, donorId) {
   return { ok: true };
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offPreview, offSwapApply, offCatalog, offSwapDo, offEngineName, offKgSerie, offPistoneRimborso });
+// Il carattere di un pezzo, scritto dai dati veri (niente stelline messe a mano). o = { lim, r, gears, gears0, fd }.
+// Dà una frase corta («Pronto: risponde presto · entra tra 2.000 e 3.000 giri...») o '' se non c'è niente di più da dire oltre alla nota.
+function offCarattere(k, it, o) {
+  o = o || {}; it = it || {};
+  const n = (x) => Math.round(x).toLocaleString('it-IT'), bar = (x) => x.toFixed(1).replace('.', ','), s = it.sim || {}, out = [];
+  const giri130 = (gears, fd) => (gears && gears.length > 1 && o.r > 0 && fd > 0 ? Math.round(130 / 3.6 / o.r * gears[gears.length - 1] * fd * 60 / (2 * Math.PI)) : 0);
+  if (k === 'turbo') {
+    const T = s.turbo;
+    if (!T) out.push(it.brand && it.brand !== '—' ? 'Turbo di serie: la sua spinta è già nella curva' : 'Aspirato: spinta lineare, nessun ritardo');
+    else {
+      const x = o.lim ? T.a / o.lim : 0.4;
+      out.push(x < 0.34 ? 'Pronto: risponde presto, ripresa facile' : x < 0.46 ? 'Stradale: spinta ampia, compromesso fra risposta e allungo' : 'Allungo: sale più tardi e spinge forte in alto',
+        `entra tra ${n(T.a)} e ${n(T.b)} giri`, `fino a ${bar(T.max)} bar`);
+    }
+  } else if (k === 'final' || k === 'gearbox') {
+    const gears = k === 'gearbox' ? (s.gears || o.gears0 || o.gears) : o.gears, fd = k === 'final' && s.fd ? s.fd : o.fd, ora = giri130(o.gears, o.fd), poi = giri130(gears, fd);
+    if (poi) out.push(`A 130 km/h: ${n(poi)} giri in ${gears.length - 1}ª` + (ora && ora !== poi ? ` (adesso ${n(ora)})` : ''));
+  } else if (k === 'weight') {
+    const dm = s.dm || 0;
+    out.push(dm < 0 ? `${n(-dm)} kg in meno` : 'Peso di serie');
+  }
+  return out.join(' · ');
+}
+
+if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offCarattere, OFF_MOTORE, offMerge, offEstimate, offSwapPrice, offSwapKm, offSwapOf, offPreview, offSwapApply, offCatalog, offSwapDo, offEngineName, offKgSerie, offPistoneRimborso });
 
 // ---------------------------------------------------------------- la schermata
 (function officina() {
@@ -207,6 +232,14 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-chip.lock { opacity: .55; cursor: not-allowed; } .of-chip.poor { border-color: #7a3a3a; } .of-chip.poor small { color: #ff8a7a; }
 .of-info { margin-top: 8px; padding: 8px 10px; background: #0f0d15; border-radius: 8px; color: #cfc8b8; font-size: 12.5px; }
 .of-info p { margin: 3px 0; } .of-info b { color: #ffd27a; }
+.of-chip.sel { outline: 2px solid #38bdf8; outline-offset: 1px; }
+.of-lv { max-width: 150px; white-space: normal; line-height: 1.2; }
+.of-card { margin-top: 8px; padding: 9px 11px; background: #0f1a22; border: 1px solid #38bdf8; border-radius: 10px; font-size: 13px; }
+.of-card b.ttl { display: block; color: #ffd27a; font-size: 14px; } .of-card p { margin: 4px 0; color: #cfc8b8; }
+.of-card .car { color: #8fd8ff; }
+.of-dl { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; } .of-dl span { padding: 3px 8px; border-radius: 7px; background: #1b1826; font: 700 12px/1.2 ui-monospace, monospace; color: #a9a396; } .of-dl .su { color: #8fe0a0; } .of-dl .giu { color: #ff8a7a; }
+.of-card .of-go { width: 100%; margin-top: 6px; padding: 10px 12px; font-size: 13px; }
+.of-sbtn { display: flex; gap: 6px; margin-top: 2px; } .of-sbtn button { padding: 5px 10px; border: 1px solid #4a4458; border-radius: 8px; background: #17141f; color: #b8b0a0; font: 600 12px/1 var(--f-data, sans-serif); cursor: pointer; }
 .of-hint { color: #9a9486; font-size: 12.5px; margin: 6px 2px; }
 .of-cur { margin: 8px 0; padding: 8px 10px; border: 1px solid #38bdf8; border-radius: 10px; background: #0f1a22; font-size: 13px; }
 .of-swaps { max-height: 360px; overflow: auto; padding-right: 2px; }
@@ -221,7 +254,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-go { padding: 7px 12px; border: 1px solid #ffb347; border-radius: 8px; background: #ffb347; color: #1a1206; font: 700 12px/1 var(--f-data, monospace); cursor: pointer; }
 .of-go:disabled { background: #2a2636; color: #8a8478; border-color: #4a4458; cursor: not-allowed; }
 @media (max-width: 520px) { .of-sum { grid-template-columns: repeat(2, 1fr); } }`;
-  let tab = 'mod', grp = 'motore', open = {};
+  let tab = 'mod', grp = 'motore', open = {}, pick = null;   // pick = il pezzo toccato: si guarda prima, si compra dopo
 
   function panel(body, I, ctx) {
     if (!document.getElementById('ofCss')) { const st = document.createElement('style'); st.id = 'ofCss'; st.textContent = css; document.head.appendChild(st); }
@@ -231,12 +264,22 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
-      const c = e.target.closest('[data-k]');
-      if (c && !c.classList.contains('cur')) {
-        if (c.classList.contains('buy') && ctx.buy) ctx.buy(c.dataset.k, c.dataset.id);            // pallino rosso: si compra (va nel magazzino), poi si monta
-        else ctx.mount(c.dataset.k, c.dataset.id);
+      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i]');            // scheda Suoni (campioni.js)
+      if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
+      const go = e.target.closest('[data-go]');
+      if (go) {                                                    // pulsante della scheda: monta (e, se serve, compra)
+        const k = go.dataset.go, id = go.dataset.id;
+        ctx.mount(k, id);
+        if (ctx.S.tune[k] === id) pick = null;                      // montato: la scheda si chiude (se non si è potuto, resta aperta col motivo)
         ctx.after && ctx.after(); render(); return;
       }
+      const sres = e.target.closest('[data-sres]');
+      if (sres && ctx.setAdj && ctx.adj) {                         // assetto: «Come di serie» o «Consigliato» dal kit
+        const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj());
+        ctx.setAdj(sres.dataset.sres === 'serie' ? { h: 0, k: 1 } : { h: st.h0, k: st.k0 }, () => render()); ctx.after && ctx.after(); render(); return;
+      }
+      const c = e.target.closest('[data-k]');
+      if (c) { pick = pick && pick.k === c.dataset.k && pick.id === c.dataset.id ? null : { k: c.dataset.k, id: c.dataset.id }; render(); return; }   // toccare un pezzo lo mostra, non spende niente
       const s = e.target.closest('[data-swap]');
       if (s) {
         const r = offSwapDo(ctx.game, ctx.S, ctx.game.car, s.dataset.swap === '-' ? null : s.dataset.swap);
@@ -247,6 +290,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     });
     // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
     box.addEventListener('input', (e) => {
+      if (e.target.closest('[data-cmp-vol]') && window.NightCampioni) { NightCampioni.input(e.target); return; }   // volume dei campioni
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
@@ -276,7 +320,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     const sim = ctx.sim, g = ctx.game, est = sim.estimatePeak(), et = g.etEstimate(), kgcv = (sim.P.mass + 75) / est.cv;
     const dl = (v, dec, unit, buonoSeNeg) => { if (!d || Math.abs(v) < Math.pow(10, -dec) / 2) return d ? '<i class="of-d">=</i>' : ''; const ok = buonoSeNeg ? v < 0 : v > 0; return `<i class="of-d ${ok ? 'su' : 'giu'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(dec).replace('.', ',')}${unit}</i>`; };
     const kgcv2 = d ? (sim.P.mass + 75) / Math.max(10, est.cv + d.dcv) - kgcv : 0;
-    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small>${d ? dl(d.dcv, 0, ' CV', false) : ''}</div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small>${d ? dl(d.dnm, 0, ' Nm', false) : ''}</div>`
+    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small>${d ? dl(d.dcv, Math.abs(d.dcv) < 5 ? 1 : 0, ' CV', false) : ''}</div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small>${d ? dl(d.dnm, Math.abs(d.dnm) < 5 ? 1 : 0, ' Nm', false) : ''}</div>`
       + `<div><b>${kgcv.toFixed(1).replace('.', ',')}</b><small>kg per CV</small>${d ? dl(kgcv2, 2, '', true) : ''}</div><div><b>${et.toFixed(1).replace('.', ',')} s</b><small>400 m stimati</small>${d ? dl(d.det, 2, ' s', true) : ''}</div></div>`;
   }
 
@@ -285,8 +329,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     let h = summary(ctx);
     const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
-    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button></div>`;
-    h += tab === 'mod' ? drawMod(ctx, career, money) : drawSwap(ctx, carId, dId, career, money);
+    const suoni = !!window.NightCampioni;                                            // campioni audio dei pezzi (campioni.js)
+    if (tab === 'suoni' && !suoni) tab = 'mod';
+    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
+      + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '') + '</div>';
+    h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
   }
 
@@ -307,16 +354,47 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const chips = cat.items.map((it, i) => {
         const isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id);
         const st = isCur ? 'montato' : owned ? 'MONTA' : lock ? `🔒 ${fmt(g.partKm(k, it.id))} km` : `COMPRA € ${fmt(price)}`;
-        const buy = !isCur && !owned && !lock, cls = ['of-chip', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', buy ? 'buy' : '', buy && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');   // pallino verde = ce l'hai (si monta), rosso = da comprare o ancora bloccato
-        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}><span class="of-lv"><i class="of-dot ${isCur || owned ? 'on' : 'off'}"></i>${i === 0 ? 'SERIE' : 'LIV. ' + i}</span><small>${E(st)}</small></button>`;
+        const buy = !isCur && !owned && !lock, sel = pick && pick.k === k && pick.id === it.id, cls = ['of-chip', sel ? 'sel' : '', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', buy ? 'buy' : '', buy && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');   // pallino verde = ce l'hai (si monta), rosso = da comprare o ancora bloccato
+        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}><span class="of-lv"><i class="of-dot ${isCur || owned ? 'on' : 'off'}"></i>${E(shortName(it, i))}</span><small>${E(st)}</small></button>`;
       }).join('');
       const c = cat.items[ci];
       let info = '';
       if (open[k]) info = '<div class="of-info">' + cat.items.map((it, i) => `<p><b>${i === 0 ? 'Serie' : 'Liv. ' + i}${i === ci ? ' · montato' : ''}</b> · ${E(it.brand && !['Su misura', '—', 'Integrata'].includes(it.brand) ? it.brand + ' ' : '')}${E(it.name)} — ${E(it.note || '')}</p>`).join('') + '</div>';
-      h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${info}</div>`;
+      const pi = pick && pick.k === k ? cat.items.findIndex((x) => x.id === pick.id) : -1;
+      const card = pi >= 0 ? pezzoCard(ctx, k, cat.items[pi], pi, ci, career, money) : '';
+      h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${card}${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
     }
-    return h + '<p class="of-hint"><b style="color:#2fd16a">●</b> verde: ce l\'hai nel magazzino, un clic lo <b>monta</b>. <b style="color:#ff453a">●</b> rosso: non ce l\'hai, un clic lo <b>compra</b> (poi lo monti); con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
+    return h + '<p class="of-hint"><b>Tocca un pezzo</b> per vedere cosa cambia: non spendi niente finché non premi il pulsante. <b style="color:#2fd16a">●</b> verde: ce l\'hai, lo monti gratis. <b style="color:#ff453a">●</b> rosso: da comprare. Con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
+  }
+
+  // nome corto per la scelta: «Filtro a fungo» invece di «LIV. 1» (il nome completo sta nella scheda e nel suggerimento)
+  function shortName(it, i) {
+    if (i === 0) return 'Serie';
+    const n = String(it.name || '').replace(/\s*\(.*?\)\s*/g, ' ').trim();
+    return n.length > 30 ? n.slice(0, 29).trim() + '…' : n;
+  }
+  // la scheda del pezzo toccato: cosa fa, che carattere ha, cosa cambia (calcolato sulla tua auto) e UN pulsante che dice cosa succede
+  function pezzoCard(ctx, k, it, i, ci, career, money) {
+    const g = ctx.game, isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id), sim = ctx.sim, P = sim.P;
+    const car = offCarattere(k, it, { lim: P.limiter, r: P.r, gears: P.gears, gears0: typeof CARS !== 'undefined' && CARS[g.car] && CARS[g.car].P ? CARS[g.car].P.gears : null, fd: P.fd });
+    let dl = '', solo = '';
+    if (!isCur) {
+      const d = offPreview(g, ctx.S.tune, k, it.id);
+      if (d) {
+        const f = (v, dec, u, buonoSeNeg) => { if (Math.abs(v) < Math.pow(10, -dec) / 2) return `<span>${u.trim()} =</span>`; const ok = buonoSeNeg ? v < 0 : v > 0; return `<span class="${ok ? 'su' : 'giu'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(dec).replace('.', ',')}${u}</span>`; };
+        dl = `<div class="of-dl">${f(d.dcv, Math.abs(d.dcv) < 5 ? 1 : 0, ' CV', false)}${f(d.dnm, Math.abs(d.dnm) < 5 ? 1 : 0, ' Nm', false)}${f(d.det, 2, ' s sui 400 m', true)}</div>`;
+        if (['exhaust', 'cat', 'bov'].includes(k) && Math.abs(d.dcv) < 0.05 && Math.abs(d.dnm) < 0.05) solo = '<p class="car">Suono diverso · potenza invariata</p>';
+      }
+    }
+    const brand = it.brand && !['Su misura', '—', 'Integrata'].includes(it.brand) ? it.brand + ' ' : '';
+    let label, dis = false;
+    if (isCur) { label = 'Montato adesso'; dis = true; }
+    else if (owned) label = 'Monta';
+    else if (lock) { label = `Si sblocca a ${fmt(g.partKm(k, it.id))} km`; dis = true; }
+    else if (career && price > money) { label = `Mancano € ${fmt(price - money)}`; dis = true; }
+    else label = `Compra e monta · € ${fmt(price)}`;
+    return `<div class="of-card"><b class="ttl">${E(brand + (it.name || ''))}</b>${car ? `<p class="car">${E(car)}</p>` : ''}${it.note ? `<p>${E(it.note)}</p>` : ''}${solo}${dl}<button type="button" class="of-go" data-go="${k}" data-id="${E(it.id)}" ${dis ? 'disabled' : ''}>${E(label)}</button></div>`;
   }
 
   // altezza da terra e rigidità delle molle (assetto a livelli, tuning.js): gratis, da fermi e da Luca; il livello 0 non si regola
@@ -326,7 +404,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
   function suspBlock(ctx, item) {
     const st = suspState(item, ctx.adj()), L = suspLab(st, st.h, st.k);
     return `<div class="of-susp${st.adjustable ? '' : ' off'}"><div class="of-sr"><span>Altezza</span><b id="ofSuspHv">${E(L.h)}</b><input type="range" data-susp="h" min="${st.hMin}" max="${st.hMax}" step="5" value="${st.h}" ${st.adjustable ? '' : 'disabled'} aria-label="Altezza da terra"></div>`
-      + `<div class="of-sr"><span>Rigidità</span><b id="ofSuspKv">${E(L.k)}</b><input type="range" data-susp="k" min="${st.kMin}" max="${st.kMax}" step="0.1" value="${st.k}" ${st.adjustable ? '' : 'disabled'} aria-label="Rigidità delle molle"></div></div>`;
+      + `<div class="of-sr"><span>Rigidità</span><b id="ofSuspKv">${E(L.k)}</b><input type="range" data-susp="k" min="${st.kMin}" max="${st.kMax}" step="0.1" value="${st.k}" ${st.adjustable ? '' : 'disabled'} aria-label="Rigidità delle molle"></div>`
+      + (st.adjustable ? '<div class="of-sbtn"><button type="button" data-sres="serie">Come di serie</button><button type="button" data-sres="kit">Consigliato dal kit</button></div>' : '') + '</div>';
   }
 
   function drawSwap(ctx, carId, dId, career, money) {
