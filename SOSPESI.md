@@ -9,7 +9,7 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
-Aggiornata il 21/11/2026 (proprietario, con Claude).
+Aggiornata il 21/11/2026 sera (proprietario, con Claude).
 
 ## In pausa fino alla fine (deciso dal proprietario il 21/11: non si tocca ora)
 1. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
@@ -21,28 +21,24 @@ Aggiornata il 21/11/2026 (proprietario, con Claude).
    della prova, € 8.400), gomme bucate ogni ~30 km. Troppo? In sospeso. (tutti e due)
 
 ## Da decidere insieme
-4. [grafica] **Pedoni in alta definizione**: gli omini del marciapiede (`districtPeople` in `quartieri2d.js`) sono la cosa
-   più a blocchi della strada. Rifarli come il protagonista (`pgStanding`) con aspetti a caso per quartiere? (proprietario)
-5. [grafica] **Dispositivi lenti**: se il disegno resta sopra i 30 ms per tre secondi la grafica nitida si spegne (`slow` in
-   `street2d.js`). Se sul PC sembra «sgranato», è questo: si guarda insieme. (tutti e due)
-6. [interni] **Interni nuovi** (`interni_hd.js`): da guardare sul PC; le persone sono più grosse del resto della scena. (proprietario)
-7. [motori] **Vendere la V40 coi pezzi di Nico**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o alzano il
-   valore? (cognato; Nico è spento di serie dopo l'officina nuova del 21/11, da rivedere se ha ancora senso)
-8. [officina] **Pezzi nuovi solo sulla V40** (v0.63: turbo 0,5/1,0/1,5 bar, downpipe, terminale, airbox, camme, cambio, gomme da drag, frizione da corsia): le altre auto hanno ancora i cataloghi corti. Estenderli? Quando? (cognato, proprietario)
-9. [motori] **Vecchio Pistone**: facciata, interno e pannello in `pistone/motori2d.js` non si usano più. Cancellare o
-   riusare? (cognato)
-10. [personaggi] **Nico**: nessun disegno nell'interno di Luca; aspetto, carattere, come si sblocca. (cognato)
-11. [personaggi] **Mario** al posto di Niko: va bene al proprietario? (proprietario)
-12. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
+4. [grafica] **Pedoni in alta definizione**: il proprietario ha risposto «il punto 4 è per Nico»: non è chiaro cosa intenda (Nico è il motorista, i pedoni sono del marciapiede). Da chiarire. (proprietario)
+5. [grafica] **Dispositivi lenti**: si vede man mano che il gioco si sviluppa, con ottimizzazioni e scelte su cosa lasciare o ridurre (21/11). Se la grafica sembra «sgranata» sul PC è `slow` in `street2d.js`. (tutti e due)
+6. [motori] **Vendere la V40 coi pezzi di Nico montati**: da vedere (21/11). Oggi i pezzi se ne vanno con l'auto. (cognato)
+7. [motori] **Vecchio Pistone**: è il codice del vecchio negozio di Nico (facciata, interno, pannello del progetto in `pistone/motori2d.js`), che non si usa più dopo l'officina semplice. Si può cancellare o tenere per la scena di Nico da Luca. Da decidere. (cognato)
+8. [personaggi] **Nico**: nessun disegno nell'interno di Luca; aspetto, carattere, come si sblocca. (cognato)
+9. [personaggi] **Mario** al posto di Niko: va bene al proprietario? (proprietario)
+10. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
     tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi, tre slot di salvataggio. Quali e in
     che ordine? (proprietario)
-13. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
-14. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
-15. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
+11. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
+12. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
+13. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
     (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
-16. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti): i pezzi nuovi della V40 (v0.63) coprono già parte di quello che faceva Nico. (tutti e due)
+14. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti): i pezzi nuovi della V40 (v0.63) coprono già parte di quello che faceva Nico. (tutti e due)
 
 ## Da provare giocando (sul PC)
+15. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
+16. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
 17. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
     motore, guida lunga, installazione e disinstallazione. (proprietario)
 18. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. (tutti e due)
@@ -62,6 +58,7 @@ Aggiornata il 21/11/2026 (proprietario, con Claude).
 28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati dal proprietario: belli.
 - 21/11: Luca Garage (v0.64), pezzi nuovi V40 con pallini (v0.63), officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
 - 20/11: AUTO 1 dopo 5 s, leva con la S, tasti 1-4 solo per mangiare e bere, niente turbo nelle valigette, check completo
   del 20/11 sera senza errori.

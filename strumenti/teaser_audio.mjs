@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js'].map((f) => readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'cars.js'].map((f) => readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 const { EngineDSP, CARS } = new Function(src + ';return { EngineDSP, CARS };')();
 const [dir, id = 'v40', vista = '1'] = process.argv.slice(2);
 if (!dir) { console.error('uso: node strumenti/teaser_audio.mjs CARTELLA_RIPRESE [auto] [vista]'); process.exit(1); }

@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.66 (**schede tecniche delle auto e pezzi con personalità**)
+- Fatto: `schede.js` con la scheda vera di ogni auto (cilindrata, cilindri, valvole, alimentazione, benzina/diesel, CV, Nm, cambio, trazione) e i pezzi suoi: marchi e nomi propri per scarico, filtro, camme, downpipe, centralina, gomme e un reparto speciale a due livelli; nuovi reparti Downpipe e Camme sui benzina (sui diesel lo scarico ha il FAP, rimappatura più generosa, niente scoppi). Polo, Clio e 308 ora sono a **tre cilindri** (`dsp.js`: uno scoppio ogni 240°, voce ruvida). Il turbo di serie di A3, 308, Clio, 850 R e dei diesel è dichiarato. La scheda compare nell'officina (`officina.js`). Tolto il carattere audio «Codex · deciso» (menu, `dsp.js`, `index.html`, `ascolta.mjs`). Test: `test/schede.test.js`, 297 passati.
+- Aperto: provata a vista solo la V40; prezzi, km e rese dei pezzi nuovi tarati a occhio; le modifiche vere (pezzi nuovi) si aggiungono man mano a `mods` di ogni auto. Vedi punti 15-16 di `SOSPESI.md`.
+
 ## 21/11/2026 · proprietario · v0.65 (**sospesi numerati**)
 - Fatto: `SOSPESI.md` riscritto con punti numerati (regola: sempre elenco numerato, numerazione continua). Economia, missione della valigetta e danni sono in pausa fino alla fine (punti 1-3). Aggiunti il 16 (cosa riportare di Nico) e il 17 (provare la versione Windows).
 - Aperto: decisioni sui punti 4-16; nessuna richiesta all'altro.

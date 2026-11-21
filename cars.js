@@ -185,33 +185,34 @@ const GEN_EX = {
 };
 // catalogo con le stesse categorie per ogni auto (nomi, prezzi e chilometri dalla scheda dell'auto)
 function genCatalog(c) {
-  const n = c.names || {}, $ = (base) => Math.round(base * (c.priceK || 1) / 10) * 10, kk = (base) => Math.round(base * (c.kmK || 1));
+  const M = c.mods || {}, dz = !!(c.voice && c.voice.diesel), n = c.names || {}, $ = (base) => Math.round(base * (c.priceK || 1) * (M.pk || 1) / 10) * 10, kk = (base) => Math.round(base * (c.kmK || 1) * (M.kk || 1));   // M = la personalità di quest'auto (schede.js)
   const T = c.turbo;                                // turbo di serie (o null se aspirata)
   const tb = [];
   if (T) tb.push({ id: 'stock', price: 0, km: 0, brand: T.brand, name: T.name, note: T.note, sim: { turbo: T.sim }, dsp: { tb: T.dsp } });
+  else if (M.turboSerie) tb.push({ id: 'none', price: 0, km: 0, brand: M.turboSerie[0], name: M.turboSerie[1], note: M.turboSerie[2] + ' La sua spinta è già nella curva di coppia.', sim: { turbo: null } });
   else tb.push({ id: 'none', price: 0, km: 0, brand: '—', name: 'Aspirato', note: c.naNote || 'Nessuna sovralimentazione.', sim: { turbo: null } });
   for (const u of c.boost) tb.push({ id: u.id, price: $(u.price), km: kk(u.km), brand: u.brand, name: u.name, note: u.note, sim: { turbo: u.sim }, dsp: { tb: u.dsp }, look: u.look || {} });
   const cat = {
     exhaust: { label: 'Scarico', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originale', note: n.exOem || 'Silenziatori di serie.', sim: { pw: 1 }, dsp: c.exStock },
-      { id: 'catback', price: $(800), km: kk(8), brand: n.exBrand || 'Supersprint', name: 'Catback in inox', note: 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.cyl >= 5 ? 'sport6' : 'sport4', look: { tip: 1 } },
-      { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: 'race', look: { tip: 2 } } ] },
+      { id: 'catback', price: $(800), km: kk(8), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex ? M.ex[1] : 'Catback in inox', note: (M.ex_nota ? M.ex_nota + ' ' : '') + 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.cyl >= 5 ? 'sport6' : 'sport4', look: { tip: 1 } },
+      { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: M.ex ? M.ex[2] : 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: 'race', look: { tip: 2 } } ] },
     intake: { label: 'Aspirazione', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: n.inOem || 'Airbox originale', note: 'Chiusa e silenziosa.', sim: { pw: 1 }, dsp: c.inStock || { in: 1, roar: 1, wh: 1 } },
-      { id: 'pf', price: $(300), km: kk(4), brand: 'K&N', name: 'Filtro a fungo', note: 'Risucchio forte ai bassi, fischio del turbo più presente. +2 %.', sim: { pw: 1.02 }, dsp: { in: 2.2, roar: 2.4, wh: 1.7 } } ] },
+      { id: 'pf', price: $(300), km: kk(4), brand: M.in ? M.in[0] : 'K&N', name: M.in ? M.in[1] : 'Filtro a fungo', note: 'Risucchio forte ai bassi, fischio del turbo più presente. +2 %.', sim: { pw: 1.02 }, dsp: { in: 2.2, roar: 2.4, wh: 1.7 } } ] },
     ecu: { label: 'Centralina', items: [
-      { id: 'oem', price: 0, km: 0, brand: c.ecuBrand || 'Bosch', name: 'Originale', note: `Limitatore a ${c.P.limiter}, taglio d'iniezione morbido.`, sim: { lim: c.P.limiter, pw: 1, spark: false, maxBoost: c.ecuMax || 1.0 } },
-      { id: 'remap', price: $(500), km: kk(6), brand: 'Su misura', name: 'Rimappatura', note: `Anticipo e benzina rivisti, limitatore a ${c.P.limiter + 300}: +4 %.`, sim: { lim: c.P.limiter + 300, pw: 1.04, spark: false, maxBoost: (c.ecuMax || 1.0) + 0.3 } },
-      { id: 'standalone', price: $(2000), km: kk(30), brand: 'MoTeC', name: 'M84 stand-alone', note: `Taglio d'accensione a ${c.P.limiter + 500}, launch control, pop & bang.`, sim: { lim: c.P.limiter + 500, pw: 1.05, spark: true, maxBoost: (c.ecuMax || 1.0) + 0.8 } } ] },
+      { id: 'oem', price: 0, km: 0, brand: c.ecuBrand || 'Bosch', name: M.ecu ? M.ecu[0] : 'Originale', note: `Limitatore a ${c.P.limiter}, taglio d'iniezione morbido.`, sim: { lim: c.P.limiter, pw: 1, spark: false, maxBoost: c.ecuMax || 1.0 } },
+      { id: 'remap', price: $(500), km: kk(6), brand: 'Su misura', name: M.ecu ? M.ecu[1] : 'Rimappatura', note: dz ? `Gasolio e pressione rivisti, limitatore a ${c.P.limiter + 300}: +10 %.` : `Anticipo e benzina rivisti, limitatore a ${c.P.limiter + 300}: +4 %.`, sim: { lim: c.P.limiter + 300, pw: dz ? 1.1 : 1.04, spark: false, maxBoost: (c.ecuMax || 1.0) + 0.3 } },
+      { id: 'standalone', price: $(2000), km: kk(30), brand: dz ? 'Su misura' : 'MoTeC', name: M.ecu ? M.ecu[2] : (dz ? 'Gestione completa' : 'M84 stand-alone'), note: dz ? `Mappe complete di pressione e gasolio, limitatore a ${c.P.limiter + 500}: +12 %. Niente scoppi: è un diesel.` : `Taglio d'accensione a ${c.P.limiter + 500}, launch control, pop & bang.`, sim: { lim: c.P.limiter + 500, pw: dz ? 1.12 : 1.05, spark: !dz, maxBoost: (c.ecuMax || 1.0) + 0.8 } } ] },
     limiter: LIMITER_CAT,
     turbo: { label: T ? 'Turbo' : 'Sovralimentazione', items: tb },
     intercooler: { label: 'Intercooler', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: T ? 'Originale' : 'Del kit', note: 'Piccolo: tirando le marce l\'aria scalda e si perde fino al 10 %.', sim: { ic: { heat: T ? (T.icHeat || 1.2) : 1.4 } } },
       { id: 'fmic', price: $(1000), km: kk(30), brand: 'Wagner', name: 'Frontale maggiorato', note: 'Aria fresca anche ad alta pressione: la potenza non cala più.', sim: { ic: { heat: 0.4, lag: 1.05 } } } ] },
     tires: { label: c.fwd ? 'Gomme anteriori' : 'Gomme posteriori', items: [
-      { id: 'oem', price: 0, km: 0, brand: n.tyreBrand || 'Michelin', name: n.tyreOem || 'Originali', note: 'Stradali: presa onesta, lavorano bene da fredde.', sim: { mu: c.mu || 1.05, tyre: { B: 19, C: 1.42, E: 0.1, opt: 80, win: 70, crr: 0.012 } } },
-      { id: 'sport', price: $(800), km: kk(3), brand: 'Toyo', name: 'Proxes R1R', note: 'Sportive: +6 % di presa, sterzo più pronto, ideali a 85 °C.', sim: { mu: (c.mu || 1.05) * 1.06, tyre: { B: 20, C: 1.45, E: 0.2, opt: 85, win: 60, crr: 0.012 } } },
-      { id: 'semislick', price: $(1200), km: kk(25), brand: 'Toyo', name: 'Proxes R888R', note: 'Semi-slick: +20 % di presa calde, scivolose da fredde.', sim: { mu: (c.mu || 1.05) * 1.2, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } } } ] },
+      { id: 'oem', price: 0, km: 0, brand: M.ty ? M.ty[0] : (n.tyreBrand || 'Michelin'), name: n.tyreOem || 'Originali', note: 'Stradali: presa onesta, lavorano bene da fredde.', sim: { mu: c.mu || 1.05, tyre: { B: 19, C: 1.42, E: 0.1, opt: 80, win: 70, crr: 0.012 } } },
+      { id: 'sport', price: $(800), km: kk(3), brand: M.ty ? 'Gomme' : 'Toyo', name: M.ty ? M.ty[1] : 'Proxes R1R', note: 'Sportive: +6 % di presa, sterzo più pronto, ideali a 85 °C.', sim: { mu: (c.mu || 1.05) * 1.06, tyre: { B: 20, C: 1.45, E: 0.2, opt: 85, win: 60, crr: 0.012 } } },
+      { id: 'semislick', price: $(1200), km: kk(25), brand: M.ty ? 'Gomme' : 'Toyo', name: M.ty ? M.ty[2] : 'Proxes R888R', note: 'Semi-slick: +20 % di presa calde, scivolose da fredde.', sim: { mu: (c.mu || 1.05) * 1.2, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } } } ] },
     suspension: suspCat({ make: c.make, ids: ['oem', 'springs', 'dampers', 'coilover', 'race', 'pro'], pitch: c.pitch || 1, fwd: c.fwd, price: $, km: kk,
       note0: (c.suspNote || 'Comodo: la cassa si muove parecchio.') + ' Nessuna regolazione.' }),
     final: { label: 'Differenziale e finale', items: [
@@ -225,18 +226,29 @@ function genCatalog(c) {
       { id: 's1', price: $(600), km: kk(10), brand: '—', name: 'Sedili racing, via insonorizzanti', note: `−${Math.round(c.mass * 0.045)} kg.`, sim: { dm: -Math.round(c.mass * 0.045), cabin: 1.15 } },
       { id: 's2', price: $(2600), km: kk(35), brand: 'Su misura', name: 'Cofano e portellone in fibra, vetri in policarbonato', note: `−${Math.round(c.mass * 0.09)} kg: rimbomba tutto.`, sim: { dm: -Math.round(c.mass * 0.09), cabin: 1.35 } } ] },
   };
+  // reparti che dipendono dal motore: downpipe/cat e camme solo sui benzina (sui diesel lo scarico ha già il FAP), più il reparto SUO dell'auto
+  if (!dz && M.ct) cat.cat = { label: 'Downpipe e catalizzatore', items: [
+    { id: 'oem', price: 0, km: 0, pw: 1, pwTurbo: 1, brand: c.make, name: 'Catalizzatore originale', note: 'Ceramico di serie: pulito ma strozza un po\'.', dsp: { lp: 0, g: 1, pop: 1 } },
+    { id: 'sport', price: $(650), km: kk(10), pw: 1.02, pwTurbo: 1.06, brand: M.ct[0], name: M.ct[1], note: 'Meno strozzatura: da aspirato +2 %, col turbo +6 % e spool più pronto.', dsp: { lp: 5200, g: 1.0, pop: 1.25 } },
+    { id: 'decat', price: $(250), km: kk(15), pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: M.ct[2], note: 'Nessun filtro: suono aperto e scoppi forti, col turbo +9 %. Non è omologato.', dsp: { lp: 0, g: 1.15, pop: 1.7 } } ] };
+  if (!dz && M.cm) cat.cams = { label: 'Alberi a camme', items: [
+    { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originali', note: 'Minimo regolare e coppia piena ai bassi.', sim: { idle: c.P.idle, low: 1, high: 1, lope: 0 }, dsp: { lope: 0 } },
+    { id: 'sport', price: $(900), km: kk(14), brand: M.cm[0], name: M.cm[1], note: `Un filo di irregolarità al minimo, un po' meno coppia in basso e più potenza in alto (+${Math.round((M.cm[3] - 1) * 100)} %).`, sim: { idle: c.P.idle + 50, low: 0.97, high: M.cm[3], lope: 0.3 }, dsp: { lope: 0.3 } },
+    { id: 'race', price: $(1900), km: kk(32), brand: M.cm[0], name: M.cm[2], note: `Minimo zoppo e ballerino, sotto i 3000 giri è pigra: in alto +${Math.round((M.cm[3] * 2 - 1.05 - 1) * 100)} %.`, sim: { idle: c.P.idle + 200, low: 0.9, high: Math.round((M.cm[3] * 2 - 1.05) * 100) / 100, lope: 0.9 }, dsp: { lope: 0.9 } } ] };
+  if (M.sp) cat.special = { label: M.sp.label, items: [{ id: 'oem', price: 0, km: 0, brand: c.make, name: 'Di serie', note: 'Come esce dalla fabbrica.', pw: 1 }].concat(M.sp.items.map((s, i) => ({ id: 'sp' + (i + 1), brand: s[0], name: s[1], note: s[2], pw: s[3], price: $(s[4]), km: kk(s[5]) }))) };
   if (c.gearbox) cat.gearbox = { label: 'Cambio', items: [{ id: 'oem', price: 0, km: 0, brand: c.gearbox.brand0, name: c.gearbox.name0, note: c.gearbox.note0, sim: { gears: null } }].concat(c.gearbox.items.map((g) => Object.assign({ km: kk(g.km), price: $(g.price) }, g, { sim: { gears: g.gears } }))) };
   return cat;
 }
 function genPresets(c) {
   const base = { exhaust: 'oem', intake: 'oem', ecu: 'oem', turbo: c.turbo ? 'stock' : 'none', intercooler: 'oem', tires: 'oem', suspension: 'oem', final: 'oem', clutch: 'oem', weight: 'oem' };
   if (c.gearbox) base.gearbox = 'oem';
-  const b1 = c.boost[0], b2 = c.boost[c.boost.length - 1];
+  const b1 = c.boost[0], b2 = c.boost[c.boost.length - 1], T = c.tuning, ext = (o) => Object.assign({}, T.cat ? { cat: o.cat } : {}, T.cams ? { cams: o.cams } : {}, T.special && o.sp ? { special: o.sp } : {});
+  if (T.cat) base.cat = 'oem'; if (T.cams) base.cams = 'oem'; if (T.special) base.special = 'oem';
   return [
     { id: 'stock', name: 'Di serie', sel: base },
-    { id: 'street', name: 'Street', sel: Object.assign({}, base, { exhaust: 'catback', intake: 'pf', ecu: 'remap', tires: 'sport', suspension: 'springs' }) },
-    { id: 'boost', name: c.turbo ? 'Più pressione' : 'Sovralimentata', sel: Object.assign({}, base, { exhaust: 'catback', ecu: 'remap', turbo: b1.id, intercooler: 'fmic', tires: 'sport', suspension: 'springs', final: 'lsd' }) },
-    { id: 'full', name: 'Da gara', sel: Object.assign({}, base, { exhaust: 'race', intake: 'pf', ecu: 'standalone', turbo: b2.id, intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'lsd', clutch: 'sport', weight: 's2' }, c.gearbox ? { gearbox: c.gearbox.items[0].id } : {}) },
+    { id: 'street', name: 'Street', sel: Object.assign({}, base, { exhaust: 'catback', intake: 'pf', ecu: 'remap', tires: 'sport', suspension: 'springs' }, ext({ cat: 'sport', cams: 'sport' })) },
+    { id: 'boost', name: c.turbo ? 'Più pressione' : 'Sovralimentata', sel: Object.assign({}, base, { exhaust: 'catback', ecu: 'remap', turbo: b1.id, intercooler: 'fmic', tires: 'sport', suspension: 'springs', final: 'lsd' }, ext({ cat: 'sport', cams: 'sport', sp: 'sp1' })) },
+    { id: 'full', name: 'Da gara', sel: Object.assign({}, base, { exhaust: 'race', intake: 'pf', ecu: 'standalone', turbo: b2.id, intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'lsd', clutch: 'sport', weight: 's2' }, ext({ cat: 'decat', cams: 'race', sp: 'sp2' }), c.gearbox ? { gearbox: c.gearbox.items[0].id } : {}) },
   ];
 }
 function genParams(c) {
@@ -247,26 +259,27 @@ function genParamsBase(c) {
   return (sel, adj) => {
     const g = (k) => tuningItemOf(c.tuning, k, (sel || {})[k]);
     const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = suspResolve(g('suspension'), adj), fin = g('final'), cl = g('clutch'), wt = g('weight');
+    const ct = c.tuning.cat ? g('cat') : null, cm = c.tuning.cams ? g('cams') : null, sp = c.tuning.special ? g('special') : null;   // reparti dell'auto (schede.js)
     const hasT = !!tb.sim.turbo;
     const turbo = hasT ? Object.assign({}, tb.sim.turbo, { max: Math.min(tb.sim.turbo.max, ecu.sim.maxBoost) }) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false };
     if (hasT && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
-    const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * g('intake').sim.pw * ecu.sim.pw;
+    const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * (ct ? (hasT ? (ct.pwTurbo || ct.pw || 1) : (ct.pw || 1)) : 1) * (sp ? sp.pw || 1 : 1) * g('intake').sim.pw * ecu.sim.pw;
     const pops = ecu.sim.spark && hasT;
     const exd = typeof ex.dsp === 'string' ? GEN_EX[ex.dsp] : ex.dsp;
     const vo = c.voice || {};
     return {
       sim: {
         turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
-        idle: c.P.idle, camLow: 1, camHigh: 1, lope: (vo.lope || 0) * 0.6, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
+        idle: cm ? cm.sim.idle : c.P.idle, camLow: cm ? cm.sim.low : 1, camHigh: cm ? cm.sim.high : 1, lope: (vo.lope || 0) * 0.6 + (cm ? cm.sim.lope : 0), Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
         mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
         diff: fin.sim.diff, fd: fin.sim.fd, gears: c.tuning.gearbox ? g('gearbox').sim.gears : null, dm: wt.sim.dm, rearOff: 0.6,
         valve: hasT ? 'bov' : 'recirc', boostK: c.boostK || (c.turbo ? 0.9 : 0.72),   // kit su aspirate: rapporto di compressione alto, si spinge meno
       },
       dsp: {
-        cyl: c.cyl, ex: exd, cat: { lp: ex.id === 'oem' ? 2600 : 4200, g: 0.95, pop: pops ? 1.4 : hasT ? 0.7 : 0.3 },
+        cyl: c.cyl, ex: exd, cat: { lp: (ct && ct.dsp.lp) || (ex.id === 'oem' ? 2600 : 4200), g: ct && ct.dsp.g > 1 ? 0.95 * ct.dsp.g : 0.95, pop: (pops ? 1.4 : hasT ? 0.7 : 0.3) * (ct ? ct.dsp.pop || 1 : 1) },
         tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
         bov: hasT ? Object.assign({ v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.75, chirp: 0.25 }, vo.bov) : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
-        intake: g('intake').dsp, scream: 0, lope: vo.lope || 0, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
+        intake: g('intake').dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
         voice: vo,
       },
       look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, badge: (tb.look || {}).badge || '' },
@@ -278,6 +291,11 @@ function genCar(c) {
   c.P.shiftK = c.shiftK || 1; c.P.hesK = c.hesK ?? 0.3;       // tempo di cambiata ed esitazione in apertura di gas
   c.P.tq = d.tq; c.sprite = Object.assign({ img: `img/${c.id}.png`, wheel: `img/${c.id}_wheel.png`, paint: `img/${c.id}_paint.png` }, d.sprite);
   if (!d.sprite.fixed) c.sprite.wy = Math.round((d.sprite.wy + d.sprite.wr) * 10) / 10;   // dati vecchi: "wy" era il bordo alto della gomma (strumenti/ripara_ruote.py li porta al centro)
+  const S = (typeof SCHEDE !== 'undefined' && SCHEDE[c.id]) || null;      // scheda tecnica e personalità dei pezzi (schede.js)
+  if (S) {
+    c.scheda = S; c.mods = Object.assign({}, S.mods || {}, S.turboSerie ? { turboSerie: S.turboSerie } : {});
+    if (c.mods.boost) c.boost = c.mods.boost.map((u) => u.kind === 'sc' ? KIT_SC(u.id, u.brand, u.name, u.bar, u.price, u.km, u.note) : KIT_T(u.id, u.brand, u.name, u.bar, u.a, u.b, u.price, u.km, u.note, u.badge));
+  }
   c.tuning = genCatalog(c); c.presets = genPresets(c); c.params = genParams(c); c.body = c.body || {}; c.paint0 = 'orig';
   return c;
 }
@@ -361,12 +379,12 @@ const GEN_NEW = [
   ['corsa', 'Opel Corsa 1.2', 'Corsa', 'Opel', '1.2 16V', 1100, true, 4, 70, 5600, 115, 4000, 6400, 800, G5, 3.9, 0.29, 0.33, 2.1, 15500, 0],
   ['p205', 'Peugeot 205 GTI 1.9', '205 GTI', 'Peugeot', '1.9 GTI', 880, true, 4, 130, 6000, 164, 4750, 6900, 850, G5, 4.06, 0.28, 0.35, 1.75, 19000, 120],
   ['p206', 'Peugeot 206 GTI 2.0', '206 GTI', 'Peugeot', '2.0 16V', 1100, true, 4, 136, 6000, 190, 4100, 6800, 800, G5, 4.0, 0.30, 0.33, 2.0, 6500, 40],
-  ['p308', 'Peugeot 308 1.2 PureTech', '308', 'Peugeot', '1.2 PureTech turbo', 1200, true, 4, 130, 5500, 230, 1750, 6000, 750, G6, 3.6, 0.31, 0.29, 2.2, 25000, 60],
-  ['clio', 'Renault Clio 0.9 TCe', 'Clio', 'Renault', '0.9 TCe turbo', 1050, true, 4, 90, 5250, 140, 2500, 6200, 780, G5, 4.0, 0.30, 0.32, 2.1, 17000, 20],
+  ['p308', 'Peugeot 308 1.2 PureTech', '308', 'Peugeot', '1.2 PureTech turbo (3 cilindri)', 1200, true, 3, 130, 5500, 230, 1750, 6000, 750, G6, 3.6, 0.31, 0.29, 2.2, 25000, 60],
+  ['clio', 'Renault Clio 0.9 TCe', 'Clio', 'Renault', '0.9 TCe turbo (3 cilindri)', 1050, true, 3, 90, 5250, 140, 2500, 6200, 780, G5, 4.0, 0.30, 0.32, 2.1, 17000, 20],
   ['williams', 'Renault Clio Williams', 'Williams', 'Renault', '2.0 16V F7R', 990, true, 4, 150, 6100, 175, 4500, 6800, 850, G5, 4.07, 0.29, 0.34, 1.9, 25000, 150],
   ['taxi', 'Taxi 2.0 diesel', 'Taxi', 'Taxi', '2.0 turbodiesel', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.29, 2.2, 9000, 30, 1],
   ['v850', 'Volvo 850 R', '850 R', 'Volvo', '2.3 cinque cilindri turbo', 1520, true, 5, 250, 5400, 350, 2500, 6500, 800, G5, 3.6, 0.31, 0.33, 2.1, 16000, 120],
-  ['polo', 'Volkswagen Polo 1.0', 'Polo', 'Volkswagen', '1.0 MPI', 1080, true, 4, 75, 6200, 95, 3000, 6500, 800, G5, 3.9, 0.29, 0.32, 2.1, 17500, 0],
+  ['polo', 'Volkswagen Polo 1.0', 'Polo', 'Volkswagen', '1.0 MPI (3 cilindri)', 1080, true, 3, 75, 6200, 95, 3000, 6500, 800, G5, 3.9, 0.29, 0.32, 2.1, 17500, 0],
   ['van', 'Furgone 1.5 dCi', 'Furgone', 'Furgone', '1.5 dCi', 1400, true, 4, 90, 4000, 200, 1750, 4600, 780, G5, 4.0, 0.31, 0.36, 3.0, 24000, 60, 1],
   ['ambulanza', 'Ambulanza 2.1 CDI', 'Ambulanza', 'Ambulanza', '2.1 CDI', 2900, false, 4, 163, 3800, 360, 1400, 4500, 750, G6, 3.9, 0.35, 0.40, 4.5, 25000, 200, 1],
   ['polizia', 'Auto della polizia (dismessa)', 'Ex polizia', 'Polizia', '2.0 TDI', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.31, 2.2, 11000, 150, 1],
@@ -380,6 +398,7 @@ for (const q of GEN_NEW) {
   // scoppi dello scarico: le piccole acute e secche, le grosse più cupe e lunghe, i diesel quasi niente schiocco
   voice.pop = diesel ? { f: 0.7, crack: 0.5, len: 0.8 } : cyl === 6 ? { f: 0.9, crack: 1.0, len: 1.15, thump: 1.15 }
     : hp < 80 ? { f: 1.4, crack: 1.3, len: 0.75 } : hp < 120 ? { f: 1.2, crack: 1.15, len: 0.9 } : { f: 1.08, crack: 1.1, len: 1.0 };
+  if (cyl === 3) { voice.rough = Math.max(voice.rough || 0, 0.38); voice.lope = 0.12; voice.pulse = (voice.pulse || 1) * 1.25; voice.rf = -0.3; voice.pop = Object.assign({}, voice.pop, { f: 1.05, crack: 1.2, len: 0.9, vary: 1.5 }); }   // un colpo ogni 240°: «brrr» ruvido e irregolare
   if (make === 'Volvo') voice.pop = Object.assign({}, VOLVO_POP, { f: 0.72, bf: 0.92, len: 1.5, boom: 0.65 });   // 850 R: ancora più cupa
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
