@@ -62,7 +62,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
   const part = (pick) => (g) => {
     if (typeof TUNING === 'undefined' || g.mode !== 'career') return null;
     const cand = [];
-    for (const cat in TUNING) if (cat !== 'turbo' && !(typeof tuningNascosto === 'function' && tuningNascosto(g.car, cat))) for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });   // [PISTONE] i pezzi motore della V40 li fa Nico
+    for (const cat in TUNING) if (cat !== 'turbo') for (const it of TUNING[cat].items || []) if (it.price > 0 && !g.owns(cat, it.id)) cand.push({ cat, it });
     const list = pick(cand); if (!list.length) return null;
     const c = list[Math.floor(Math.random() * list.length)];
     g.s.owned[g.ownKey(c.cat + ':' + c.it.id)] = true;

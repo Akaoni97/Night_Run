@@ -25,7 +25,7 @@
   };
   // da chiamare con g in 'lighter'
   const glow = (g, x, y, r, rgb, a) => { const h = halo(rgb); if (!h || a < 0.01) return; g.globalAlpha = Math.min(1, a); g.drawImage(h, x - r, y - r, r * 2, r * 2); g.globalAlpha = 1; };
-  const off = (v) => v.quality === 'bassa';
+  const off = (v) => v.quality === 'bassa' || v.noVita;   // noVita: Prestazioni (prestazioni.js)
 
   // ---------------------------------------------------------------- cielo
   const R0 = (v, e) => v * (1 - Math.exp(-2.4 * e)), drop0 = (e) => 9 * e * e;

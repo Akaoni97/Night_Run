@@ -428,7 +428,7 @@
       const Y = (v) => top + v * s;
       const lg = o.walk ? Math.floor(t * 7 + X * 0.1) % 2 : 0;
       px('rgba(4,5,12,.4)', X - 3, 229.5, 10 * s, 2);                                          // ombra
-      const spr = SS > 1 && o.walk && !o.small && pedLooks().length ? pedSprite(pedLook(o), Math.floor(((t * 1.6 + (o.seed || 0) * 8) % 1) * 8), t) : null;
+      const spr = SS > 1 && !this.noPedHD && o.walk && !o.small && pedLooks().length ? pedSprite(pedLook(o), Math.floor(((t * 1.6 + (o.seed || 0) * 8) % 1) * 8), t) : null;
       if (spr) {
         const k = 0.3 * s, cx = X + 2.5, w = PG_SW * k, h = PG_SH * k;          // alto come l'omino di prima (circa 25 unità)
         g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';

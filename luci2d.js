@@ -26,7 +26,7 @@
 
   S.lightPass = function (g, W, night, rain) {
     const L = this._ls || []; this._ls = [];
-    if (night < 0.05 || this.quality === 'bassa') return;
+    if (night < 0.05 || this.quality === 'bassa' || this.noLuci) return;   // noLuci: Prestazioni (prestazioni.js)
     const H = 360 - Y0, c = this._lm || (this._lm = document.createElement('canvas'));
     if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
     const x = c.getContext('2d');
@@ -48,7 +48,7 @@
 
   // cono del lampione nell'aria (x = palo, testa a y 126); col = colore della lampada
   S.lampCone = function (g, x, col, t, rain) {
-    if (this.quality === 'bassa') return;
+    if (this.quality === 'bassa' || this.noLuci) return;
     const night = 1 - (this.day || 0); if (night < 0.2) return;
     const hx = x + 19, top = 128, bot = 300, a = (rain ? 0.14 : 0.085) * night, rgb = Street2D.rgb(col);
     const gr = g.createLinearGradient(0, top, 0, bot); gr.addColorStop(0, `rgba(${rgb},${a})`); gr.addColorStop(0.7, `rgba(${rgb},${a * 0.35})`); gr.addColorStop(1, `rgba(${rgb},0)`);

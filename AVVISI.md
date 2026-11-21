@@ -9,17 +9,13 @@ questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
 
-## 20/11/2026 sera · per tutti e due · dal check completo · **COSA È CAMBIATO OGGI (da collaudare stasera)**
-- **Menu**: c'è la scheda **Impostazioni** (Grafica, Audio, Comandi, Guida) con tutte le regolazioni. Le schede Vista ed
-  Extra non ci sono più: colore, mappa, foto, replay e «Come si gioca» stanno in **Partita**.
-- **Meteo nuovo**: nebbia, neve e vento (menu Impostazioni → Grafica → Meteo, o tasto **K**, che ora ha 6 scelte). La
-  neve fa scivolare più della pioggia. In «dinamico» arrivano secondo il paesaggio, mai in città.
-- **Entrare nei locali**: ogni locale ha il suo posto auto con le strisce; l'auto parcheggia, il protagonista scende ed
-  entra a piedi (U salta la camminata). Accostando, il passaggio alla corsia di destra ora è deciso: niente più tamponi.
-- **Motori**: li gestisce il cognato. Da Luca c'è Nico coi pezzi a livelli; l'officina dei tagliandi è di **Mario**.
-- Check: nessun errore in tutte le tappe, 211 test passati. Le cose da decidere sono in `SOSPESI.md`.
-
 ## 21/11/2026 · per il cognato · dal proprietario (con Claude) · **Officina da Luca rifatta, Nico spento di serie**
-- Il proprietario ha chiesto un'officina **semplice** (una schermata, due schede: **Modifiche** e **Swap motore**, `officina.js`): troppe cose da scorrere. Da Luca non si vede più il vecchio Nico (livelli, magazzino, banco, motori costruiti): il codice e i test restano in `pistone/`, ma **di serie è spento** (interruttore nella scheda Sviluppatori, acceso torna il vecchio negozio).
-- Lo swap è ora tra i motori delle auto del gioco (monti il motore della Supra sulla V40). I livelli 1 e 2 dei pezzi sono sempre sbloccati, i km servono dal 3 in su. Da decidere insieme: cosa riportare di Nico nell'officina semplice (interni della V40, banco, motori costruiti).
+- Il proprietario ha chiesto un'officina **semplice** (una schermata, due schede: **Modifiche** e **Swap motore**, `officina.js`): troppe cose da scorrere. Da Luca non si vede più il vecchio Nico (livelli, magazzino, banco, motori costruiti). *Aggiornamento del 21/11 sera: la cartella `pistone/` è stata cancellata (v0.74).*
+- Lo swap è ora tra i motori delle auto del gioco (monti il motore della Supra sulla V40). I livelli 1 e 2 dei pezzi sono sempre sbloccati, i km servono dal 3 in su. 
 - In più: **Tutor ogni 10-15 km, lungo 500 m-1 km** (`polizia.js`).
+
+## 21/11/2026 sera · per il proprietario · dal cognato (con Claude) · **Pistone cancellato, Prestazioni, auto elaborate** (v0.74)
+- Il vecchio banco dei motori di Nico (cartella `pistone/`) **non c'è più**: Luca ha deciso di cancellarlo. Da Luca resta l'officina semplice; chi aveva speso da Nico riceve i soldi indietro una volta sola. Nico, il personaggio, cerca un'altra mansione (punto 3 di `SOSPESI.md`).
+- Nuovo: **Impostazioni → Grafica → Prestazioni**. Se il gioco scatta, scegli «Fluida». «Automatica» spegne da sola una cosa alla volta se il computer non ce la fa, e lo scrive nel riquadro.
+- Un'auto elaborata, venduta all'Autosalone, vale **metà di quello speso in pezzi e swap** (prima un terzo, e lo swap non contava).
+- Missione del signore della valigetta: resta a 38 km. Danni: si tarano giocando.

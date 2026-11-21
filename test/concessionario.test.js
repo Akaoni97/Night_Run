@@ -76,7 +76,11 @@ test('concessionario: i pezzi montati alzano la valutazione', () => {
   const v0 = game.dlValue('e30'), T = game.s.owned;
   const C = new Function(src + ';return CARS')().e30.tuning, k = Object.keys(C).find((c) => C[c].items && C[c].items.some((i) => i.price > 1000));
   const it = C[k].items.find((i) => i.price > 1000); T['e30|' + k + ':' + it.id] = true;
-  assert.ok(game.dlValue('e30') >= v0 + Math.floor(it.price * 0.3), 'un terzo del pezzo');
+  assert.ok(game.dlValue('e30') >= v0 + Math.floor(it.price * 0.5) - 50, 'metà del pezzo');
+  assert.equal(game.dlMods('e30'), Math.round(it.price * 0.5 / 50) * 50);
+  game.s.swapOwn = { 'e30|supra': 1 }; global.offSwapPrice = () => 6000;
+  assert.equal(game.dlMods('e30'), Math.round((it.price * 0.5 + 3000) / 50) * 50, 'anche metà dello swap');
+  delete global.offSwapPrice;
 });
 
 test('concessionario: giro di prova di 3 km, poi ti fermi e si riprendono l\'auto (e i km in più si pagano)', () => {

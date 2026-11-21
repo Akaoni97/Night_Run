@@ -1287,6 +1287,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="locali2d.js"></script>
 <script src="entrata2d.js"></script>
 <script src="nitido2d.js"></script>
+<script src="prestazioni.js"></script>   <!-- Impostazioni → Grafica → Prestazioni -->
 <script src="hudpro.js"></script>
 <script src="icone.js"></script>
 <script src="radio.js"></script>
@@ -1294,7 +1295,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="viaggio.js"></script>
 <script src="strada.js"></script>
 <script src="missioni.js"></script>
-<script src="pistone/motori.js"></script>   <!-- [PISTONE] progetto in prova: pistone/LEGGIMI.md -->
 <script src="pensieri.js"></script>
 <script src="suggerimenti.js"></script>
 <script>
@@ -1390,7 +1390,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   let sentView = -1, sentEnv = -1;
   function dspCfg() {
-    const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) /* [PISTONE] */ ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
+    const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
     return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
@@ -1467,8 +1467,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (typeof offCatalog === 'function') offCatalog(game, carId);   // officina.js: con uno swap il catalogo ha i pezzi del motore montato
     TP = tuningParams(S.tune, adjOf());
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
-    let MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
-    if (!MOTE && typeof offSwapApply === 'function') MOTE = offSwapApply(game, carId, TP, sim, S.tune);   // officina.js: swap con il motore di un'altra auto
+    const MOTE = typeof offSwapApply === 'function' ? offSwapApply(game, carId, TP, sim, S.tune) : null;   // officina.js: swap con il motore di un'altra auto
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
@@ -2186,7 +2185,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function renderTuning() {
     renderGears(); $('carUps').hidden = true;
     const grid = $('tgrid');
-    $('presets').hidden = typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, 'turbo');   // [PISTONE] niente preparazioni pronte: i pezzi del motore uno per uno da Nico
     if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; grid.dataset.h = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
     if (!$('presets').childElementCount) {
       const pr = $('presets');
@@ -2336,7 +2334,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         const o = e.target.closest('[data-k]'); if (o && !o.classList.contains('cur')) mountPart(o.dataset.k, o.dataset.id, null);
       });
     }
-    const visible = (k) => TUNING[k] && !(typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k));   // [PISTONE] questi pezzi li fa Nico
+    const visible = (k) => TUNING[k];
     const groups = TUNE_GROUPS.map((g) => Object.assign({}, g, { cats: g.cats.filter(visible) }));
     const known = new Set(TUNE_GROUPS.flatMap((g) => g.cats)), rest = Object.keys(TUNING).filter((k) => !known.has(k) && visible(k));
     if (rest.length) groups.push({ id: 'altro', name: 'Altro', cats: rest, hint: '' });
@@ -2371,7 +2369,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const revert = () => { if (selEl) selEl.value = S.tune[k]; };
     if (!game.canMount()) { revert(); flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
     if (game.needsShop()) { revert(); flash('I pezzi li monta Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
-    if (typeof tuningNascosto === 'function' && tuningNascosto(game.car, k)) { revert(); flash('Questo lo fa Nico, coi pezzi a livelli (più sotto)', 2.6); return; }   // [PISTONE]
     if (!game.owns(k, id)) {
       const r = game.buy(k, id);
       if (!r.ok) { revert(); flash(r.why, 2.4); return; }
@@ -2663,7 +2660,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
   function cosView(c) { return Object.assign({}, c || S.cos, { dirt: Math.round(game.maint().dirt * 10) / 10 }); }
-  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'O', style: 'E', dealer: 'A', junk: 'S', motori: 'M' };   // motori: // [PISTONE]
+  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'O', style: 'E', dealer: 'A', junk: 'S' };
   let mmT = 0, placeOpen = null, cosPrev = null;
   const moved = [];
   const fmtDist = (m) => (m < 1000 ? Math.max(0, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km');
@@ -2765,24 +2762,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       vgPlace(I, body, note);
     } else if (I.id === 'dealer') {                                  // Autosalone Notte (concessionario.js)
       if (window.NightDealer) NightDealer.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
-    } else if (I.id === 'motori') {                                  // [PISTONE] Il Pistone: motori costruiti a pezzi (pistone/)
-      if (window.NightMotori) NightMotori.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca i pezzi: li monto subito. La i dice cosa fanno.');
-      if (window.NightOfficina && !(typeof PISTONE !== 'undefined' && PISTONE.on)) {      // officina semplice (officina.js): Modifiche e Swap motore (con l'interruttore del Pistone acceso resta il vecchio negozio)
+      if (window.NightOfficina) {                                       // officina semplice (officina.js): Modifiche e Swap motore
         const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
-      } else {                                                           // [PISTONE] interruttore acceso: il vecchio negozio di Luca e Nico
-        if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto sono ancora miei.»`);
-        move(document.querySelector('section.panel.tuning'));
-        renderTuning(); renderServices();
-        if (window.NightMotori) {
-          const nb = document.createElement('div'); body.appendChild(nb);
-          const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
-          NightMotori.panel(nb, I, nc);
-        }
       }
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
@@ -3435,9 +3421,14 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   // ---------------------------------------------------------------- ciclo principale
-  let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
+  let fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
     if (pausaF) { last = now; requestAnimationFrame(frame); return; }
+    if (window.NR_PREST && NR_PREST.fps) {                        // tetto ai fotogrammi (prestazioni.js)
+      const iv = 1000 / NR_PREST.fps;
+      if (now < fpsNext - 1) { requestAnimationFrame(frame); return; }
+      fpsNext = now > fpsNext + iv ? now + iv : fpsNext + iv;
+    }
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now; fpsTick(dt);
     if (rp.on) { playReplay(dt); requestAnimationFrame(frame); return; }
     readPad(); updateInputs(dt);
@@ -3568,7 +3559,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver(() => { if (Math.abs(cv.clientWidth - W) > 1) layout(); }).observe(cv);
   if (game.mode === 'career') for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
-  if (typeof motLucaMigra === 'function' && motLucaMigra(game, S)) { applySettings(); saveGame(); }   // [PISTONE] pezzi motore di Luca della V40 → Nico (rimborso)
   // ---------------------------------------------------------------- pioggia: vista 2D e 3D, aderenza, rumore
   const rainSnd = { g: null };
   function rainSound(on) {
@@ -3783,7 +3773,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="piazzetta.js"></script>
 <script src="obiettivo.js"></script>
 <script src="officina.js"></script>
-<script src="pistone/motori2d.js"></script>   <!-- [PISTONE] -->
 <script src="garage.js"></script>
 <script src="lucagarage.js"></script>
 <script src="soccorso.js"></script>

@@ -44,7 +44,7 @@
   // gli effetti sopra una ruota già disegnata. R = raggio esterno della gomma (unità del disegno a 360 righe)
   // o: { rim (frazione del raggio), rgb (colore medio del cerchio), press (bar), wear (0..1) }
   S.tireFx = function (g, cx, cy, R, ang, speed, o = {}) {
-    if (this.quality === 'bassa' || !(R > 3)) return;
+    if (this.quality === 'bassa' || this.noGomme || !(R > 3)) return;   // noGomme: Prestazioni (prestazioni.js)
     const u = 1 / (this.SS || 1), night = 1 - (this.day || 0), rimR = R * (o.rim || 0.62), mid = (rimR + R) / 2;
     const blur = clamp((Math.abs(speed || 0) - 6) / 16, 0, 1), wear = o.wear || 0;
     const def = clamp((2.3 - (o.press ?? 2.3)) / 1.9, 0, 1);              // 0 gonfia, 1 a terra

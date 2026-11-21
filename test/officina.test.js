@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'pistone/motori.js', 'officina.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offPreview, offSwapApply, offSwapDo, offSwapOf, offCatalog, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'officina.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offPreview, offSwapApply, offSwapDo, offSwapOf, offCatalog, offKgSerie, offPistoneRimborso, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
 
 const nuovo = (car = 'v40') => {
   E.setActiveCar(car);
@@ -89,4 +89,19 @@ test('officina: l\'anteprima di un pezzo dice quanto cambia senza montarlo', () 
   assert.ok(d, 'l\'anteprima c\'è');
   assert.ok(Number.isFinite(d.dcv) && Number.isFinite(d.dnm) && Number.isFinite(d.det));
   assert.equal(stock[k], cat[k].items[0].id, 'non cambia la selezione passata');
+});
+
+test('officina: il peso del motore per lo swap (era del vecchio Pistone) resta giusto', () => {
+  assert.equal(E.offKgSerie('supra'), 230); assert.equal(E.offKgSerie('v40'), 130); assert.equal(E.offKgSerie('nessuna'), 150);
+  assert.equal(E.offEstimate('supra').kg, 230);
+});
+
+test('officina: chi aveva speso dal vecchio Nico riceve i soldi indietro, una volta sola', () => {
+  const { game } = nuovo('v40'), m0 = game.s.money;
+  game.s.vg.mot = { list: [{ id: 'm1', prezzo: 9000, sel: {} }], pz: [{ u: 'p1', cat: 'sovra', id: 'tp', dove: 'mag' }, { u: 'p2', cat: 'nessuno', id: 'x', dove: 'v40' }], liv: { blocco: 3, albero: 1 }, on: { v40: 'm1' } };
+  assert.equal(E.offPistoneRimborso(game), 9000 + 2200 + 300 + 900);
+  assert.equal(game.s.money, m0 + 12400); assert.equal(game.s.vg.mot, undefined);
+  assert.equal(E.offPistoneRimborso(game), 0, 'una volta sola');
+  const { game: g2 } = nuovo('v40'), m2 = g2.s.money; g2.s.vg.mot = { list: [{ prezzo: 5000 }] }; g2.update(1 / 60);
+  assert.equal(g2.s.money >= m2 + 5000 - 1, true, 'parte da sola al primo passo della partita');
 });
