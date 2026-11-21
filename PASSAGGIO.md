@@ -149,6 +149,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   ereditata è malconcia (`vgInherit`, `VG_EREDITA` in `viaggio.js`: gomme a 1,45-1,7 bar e consumate, olio, candele e
   pastiglie da cambiare, sporca, un po' ammaccata, 22 % di benzina). Nel garage del prologo le altre cinque auto sono
   Panda, Audi 80, Grande Punto, Corsa e Polo (le più vecchie ed economiche). Il giocatore sceglie una delle sei: diventa la sola auto nel garage del Viaggio, malconcia (`onPick` del prologo → `eredita` in `index.html`); saltando il prologo resta la V40.
+- **Luca Garage** (21/11/2026, `lucagarage.js`): app del telefono che porta davanti a Da Luca Tuning più vicino (davanti o dietro) per € 150, da fermi e fuori dai locali. Nel gioco normale si scarica con un cartellone al km 26 (`FERRO CHE NON BASTA?`); nella scheda Sviluppatori il pulsante «Sblocca Luca Garage» (`NightDev.luca`) la installa subito (e «Installa tutte le app» la include). Test in `test/lucagarage.test.js`.
 - **Assetto a livelli** (20/11/2026, `tuning.js` + `sim.js` + pannello di Luca in `index.html`): in ogni auto l'Assetto ha 6 livelli
   (0 originale, poi molle, molle e ammortizzatori, coilover, coilover da pista, competizione; id `oem, springs, dampers,
   coilover|tein, race, pro`). Livello 0: niente da regolare. Dal livello 1 il pezzo parte più basso e rigido
