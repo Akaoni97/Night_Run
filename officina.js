@@ -2,7 +2,8 @@
 //  Night Run · Officina semplice (dopo sfascio.js, prima di garage.js)
 //  Da Luca Tuning una schermata sola, compatta, quasi tutta a clic (stile Forza / Gran Turismo):
 //    · MODIFICHE: i pezzi del motore che hai sopra, a livelli (SERIE, LIV. 1, 2, 3...), un clic compra e monta; la «i» spiega cosa fa;
-//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista).
+//    · SWAP MOTORE: metti sull'auto il motore di un'altra auto del gioco (CV, Nm, peso e prezzo sempre in vista);
+//    · SUONI: i campioni audio dei pezzi (valvola, turbo, scarico, centralina...), da campioni.js (NightCampioni.html/click).
 //  Il vecchio negozio di Nico (cartella `pistone/`: livelli, magazzino, banco, motori costruiti) è stato cancellato il 21/11
 //  sera: di suo serviva solo il peso del motore per lo swap (`offKgSerie`, qui sotto). Chi aveva speso da Nico riceve i soldi
 //  indietro una volta sola (`offPistoneRimborso`).
@@ -231,6 +232,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
+      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i]');            // scheda Suoni (campioni.js)
+      if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
       const c = e.target.closest('[data-k]');
       if (c && !c.classList.contains('cur')) {
         if (c.classList.contains('buy') && ctx.buy) ctx.buy(c.dataset.k, c.dataset.id);            // pallino rosso: si compra (va nel magazzino), poi si monta
@@ -247,6 +250,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     });
     // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
     box.addEventListener('input', (e) => {
+      if (e.target.closest('[data-cmp-vol]') && window.NightCampioni) { NightCampioni.input(e.target); return; }   // volume dei campioni
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
@@ -285,8 +289,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     let h = summary(ctx);
     const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
-    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button></div>`;
-    h += tab === 'mod' ? drawMod(ctx, career, money) : drawSwap(ctx, carId, dId, career, money);
+    const suoni = !!window.NightCampioni;                                            // campioni audio dei pezzi (campioni.js)
+    if (tab === 'suoni' && !suoni) tab = 'mod';
+    h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
+      + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '') + '</div>';
+    h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
   }
 

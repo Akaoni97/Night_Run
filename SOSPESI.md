@@ -9,7 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
-Aggiornata il 21/11/2026 sera (v0.75: deciso il vecchio punto 3, Nico; **dal 4 in poi ogni numero scende di uno**, il 4 ora è il 3 e così via).
+Aggiornata il 21/11/2026 notte (v0.78: nuovo punto 16, i campioni dei pezzi da ascoltare; **dal vecchio 16 in poi ogni numero sale di uno**, il 16 ora è il 17 e così via).
+Prima: aggiornata il 21/11/2026 sera (v0.75: deciso il vecchio punto 3, Nico; dal 4 in poi ogni numero era sceso di uno).
 Prima: aggiornata il 21/11/2026 sera (Luca, il cognato, con Claude: decisi i vecchi punti 2, 3, 4, 5, 6 e 12; **numeri cambiati**:
 il 3 ora è il 2, il 7 è il 3, dall'8 all'11 sono diventati 4-7, dal 13 al 16 sono 8-11, dal 18 al 22 sono 12-16, dal 23 al 27 sono 17-21).
 
@@ -45,17 +46,20 @@ il 3 ora è il 2, il 7 è il 3, dall'8 all'11 sono diventati 4-7, dal 13 al 16 s
     disegno è lento (prima il bagliore, poi vita e passanti, la densità per ultima) e lo dice nel riquadro; «Riprova al
     massimo» lo azzera. Da provare sul PC guidando in città: se scende senza motivo, si alza `PREST.ms` (24 ms). (tutti e due)
 
+16. [suono] **Campioni dei pezzi** (v0.78, scheda Suoni da Luca, `campioni.js`): 42 kit fatti a codice, misurati ma **non ascoltati** da Claude. Da sentire sul PC in cuffia: valvole (soprattutto gli stu-tu-tu), borbottii, botti della centralina, 2-step e fucilata, fischi di turbo e compressore. Se qualcosa è troppo forte o finto si tara `CMP.g` o si rifà la ricetta in `strumenti/campioni_pezzi.py`; prezzi dei kit a occhio. (cognato, Luca)
+
 ## Da sistemare
-16. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
+17. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
     scheda Guida, app strane del telefono, `TEL_ATTI`), e quello rimasto dal motore costruito di Nico: motore rotto in
     `soccorso.js` e `diario.js` (`motOf`), bilancio di calore `tune.cool` in `sim.js`. Sicuro con i test. (Claude, quando c'è tempo)
-17. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
-18. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
-19. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
-20. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
-21. [personaggi] **Aspetto dei personaggi nuovi** (v0.75): Nico ha il disegno che era di Mario (capelli grigi, barba piena, giubbotto) anche sul furgone del soccorso; Nabir (ricci, barba corta, camicia), Rossana (capelli lunghi, felpa) e Phill Grill (cappellino rosso, barba corta) sono fatti con l'editor del personaggio. Tito, Rocco e Massimo tengono l'aspetto di prima. Vanno bene così? (tutti e due)
+18. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
+19. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
+20. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
+21. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
+22. [personaggi] **Aspetto dei personaggi nuovi** (v0.75): Nico ha il disegno che era di Mario (capelli grigi, barba piena, giubbotto) anche sul furgone del soccorso; Nabir (ricci, barba corta, camicia), Rossana (capelli lunghi, felpa) e Phill Grill (cappellino rosso, barba corta) sono fatti con l'editor del personaggio. Tito, Rocco e Massimo tengono l'aspetto di prima. Vanno bene così? (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 21/11 notte (v0.78, Luca): campioni audio dei pezzi del motore, scheda Suoni nell'officina (42 kit, 10 componenti, fatti a codice).
 - 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.
 - 21/11 sera (v0.74, Luca): missione del signore della valigetta a 38 km resta così; vecchio Pistone cancellato (`pistone/`, il
   peso del motore per lo swap ora è in `officina.js`, rimborso una volta sola); sezione Prestazioni; auto elaborate valgono di più.
