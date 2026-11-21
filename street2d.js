@@ -1402,6 +1402,7 @@ class Street2D {
     if (this.comics.length > 6) this.comics.shift();
     this.comics.push({ text, x, y, col, size, burst, t: 0, life: 1.0, j: Math.random() * 6 });
   }
+  comicEv(tipo, x, y) { this.comic(String(tipo).toUpperCase() + '!', x, y, '#ffffff', 3); }   // riserva: la versione vera è in fumetti2d.js
   drawComics(g, dt) {
     const ink = this.C.ink;
     for (const c of this.comics) {
@@ -2015,8 +2016,8 @@ class Street2D {
         this.light(g, left + 4, sy + tY + 4 * k, 12, 7, '#ffa020', 0.35, 3); this.light(g, left + w - 4, sy + hY + k, 12, 7, '#ffa020', 0.35, 3);
       }
       if (e.sig > 0 && Math.floor(st.t * 3) % 2 === 0) { g.fillStyle = '#ffa020'; g.fillRect(left + 2, sy + tY + Math.round(3 * k), 4, 3); g.fillRect(left + w - 6, sy + hY, 4, 3); this.light(g, left + 4, sy + tY + 4 * k, 9, 6, '#ffa020', 0.3, 3); }
-      if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comic(Math.random() < 0.5 ? 'BEEEP!' : 'HONK!', left + w * 0.3, sy - 8, '#ffe14d', 2);
-      if (e.skidT > 0.85 && !(this.cool['skid' + e.id] > st.t) && (this.cool['skid' + e.id] = st.t + 2.5)) this.comic('SCREEECH!', left + w * 0.1, sy - 10, '#f4f1e6', 2);
+      if (e.honk > 3.5 && !(this.cool['honk' + e.id] > st.t) && (this.cool['honk' + e.id] = st.t + 3)) this.comicEv('clacson', left + w * 0.3, sy - 8);
+      if (e.skidT > 0.85 && !(this.cool['skid' + e.id] > st.t) && (this.cool['skid' + e.id] = st.t + 2.5)) this.comicEv('frenata', left + w * 0.1, sy - 10);
       if (e.kind === 'police') {
         const on = e.chase || e.v > 0 || e.busy || Math.abs(e.x - dist) < 120, ph = Math.floor(st.t * 8) % 2;
         const lx = Math.round(left + w * 0.42), ly = sy + Math.round(2 * k);
@@ -2221,13 +2222,13 @@ class Street2D {
     const cd = (k2, sec) => { const ok = !(this.cool[k2] > st.t); if (ok) this.cool[k2] = st.t + sec; return ok; };
     const carTop = y0 - 60 * k;
     for (const e of s.events || []) {
-      if (e.type === 'bov' && cd('bov', 0.6)) this.comic(['PSSSH!', 'PSHHH!', 'TSSS!'][Math.floor(Math.random() * 3)], left + SW * 0.75, carTop - 10, '#2ee6ff', 3);
-      if (e.type === 'grind' && cd('grind', 0.8)) this.comic('GRRRK!', carX, carTop - 14, '#ffb000', 3);
+      if (e.type === 'bov' && cd('bov', 0.6)) this.comicEv('sfiato', left + SW * 0.75, carTop - 10);
+      if (e.type === 'grind' && cd('grind', 0.8)) this.comicEv('cambio', carX, carTop - 14);
     }
-    if (game) for (const f of game.fx) { if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); this.comic(f.kind === 'rear' ? 'BANG!' : 'CRASH!', f.kind === 'rear' ? Math.max(8, left - 40) : left + SW + 6, carTop, '#ff2e4d', 5, '#ffd23f'); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comic('SCRAAAPE!', left + SW * 0.4, carTop - 6, '#ffb000', 3); } } }
-    if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comic('VROOOM!', carX - 20, carTop - 20, '#ffd23f', 4);
-    if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) { const w = ['BANG!', 'POP!', 'BRAP!', 'PAH!', 'CRACK!'][Math.floor(Math.random() * 5)]; this.comic(w, rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame > 1 ? '#ffd23f' : '#ff5a1a', st.flame > 1 ? 4 : 3, st.flame > 1 ? '#ff2e1a' : '#ffd23f'); }
-    if (s.spin > 0.55 && cd('screech', 1.6)) this.comic('SCREEECH!', left + 40 * k, y0 - 46 * k, '#f4f1e6', 2);
+    if (game) for (const f of game.fx) { if (f.k === 'missionDone') this.comic('€ ' + Math.round(f.pay || 10000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '!', carX + 30, carTop - 34, '#b8ff3a', 5, '#163a8c'); else if (f.k === 'mission') this.comic('PACCO A BORDO!', carX + 20, carTop - 30, '#ffd23f', 3, '#163a8c'); if (f.k === 'crash') { st.trauma = Math.min(1, (st.trauma || 0) + 0.45 + 0.4 * Math.min(1, f.I || 0.8)); st.crashJolt = Math.min(1.5, 0.6 + 0.6 * (f.I || 0.8)); const I = f.I || 0.8, rear = f.kind === 'rear', bx = rear ? Math.max(8, left - 40) : left + SW + 6; this.comicEv(I < 0.45 ? 'colpoLieve' : rear ? 'colpoDietro' : 'colpo', bx, carTop, I * 1.4); } else if (f.k === 'scrape') { st.trauma = Math.min(1, (st.trauma || 0) + (f.I ? 0.3 : 0.05)); if (!(this.cool.scrapeTxt > st.t)) { this.cool.scrapeTxt = st.t + 0.8; this.comicEv('strisciata', left + SW * 0.4, carTop - 6); } } else if (f.k === 'pass' && f.near && f.dv > 8 && cd('sfiora', 3)) this.comicEv('sfiora', carX + 40, carTop + 6, f.dv / 20); }
+    if ((st.prevV || 0) < 0.6 && s.v >= 0.6 && s.thr > 0.6 && cd('vroom', 3)) this.comicEv('partenza', carX - 20, carTop - 20);
+    if (st.flame > 0.55 && st.flame > (st.prevFlame || 0) + 0.3 && cd('bang', 0.5)) this.comicEv(st.flame > 1 ? 'scoppioF' : 'scoppioL', rx - 40 - Math.random() * 14, exY - 34 - Math.random() * 12, st.flame);
+    if (s.spin > 0.55 && cd('screech', 1.6)) this.comicEv('frenata', left + 40 * k, y0 - 46 * k);
     if (game && game.siren && !st.prevSiren) this.comic('ALT! POLIZIA', carX + 40, carTop - 30, '#4f7bff', 3);
     st.prevV = s.v; st.prevFlame = st.flame; st.prevSiren = !!(game && game.siren);
     // ---- marciapiede vicino con oggetti in primo piano (fuori città: barriera, guardrail, roccia, erba o sabbia)
