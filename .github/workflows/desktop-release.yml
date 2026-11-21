@@ -1,0 +1,104 @@
+# Night Run per Windows: da un caricamento su main a una versione installabile, in automatico.
+# Test -> build Windows sullo stesso commit -> release su GitHub (prima bozza, poi pubblicata a file completi).
+# Il programma installato la trova con il pulsante «Cerca aggiornamenti» (Partita). Vedi desktop/LEGGIMI.md.
+# Se i test o la build falliscono non esce nessuna release: chi ha il gioco continua con la versione di prima.
+name: Windows release
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'materiale_chat/**'
+      - 'strumenti/**'
+      - '.claude/**'
+  workflow_dispatch:
+# Una release alla volta, nell'ordine in cui arrivano: niente versioni pubblicate fuori ordine.
+concurrency:
+  group: windows-release
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test del gioco
+        run: node --test test/*.test.js
+      - name: Test del guscio desktop
+        working-directory: desktop
+        run: |
+          npm ci
+          npm test
+
+  build:
+    needs: test
+    # Solo da main (anche a mano): le prove di rami e pull request non finiscono mai nel canale di aggiornamento.
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Numero di versione (0.2.N, sempre crescente)
+        id: ver
+        run: |
+          # N = ultimo numero già usato (release, bozze e tag) + 1: non dipende dal contatore del workflow.
+          ultimo=$( { gh release list --limit 300 --json tagName --jq '.[].tagName'; git tag --list 'v0.2.*'; } | sed -n 's/^v0\.2\.\([0-9][0-9]*\)$/\1/p' | sort -n | tail -1 )
+          n=$(( ${ultimo:-0} + 1 ))
+          echo "versione=0.2.$n" >> "$GITHUB_OUTPUT"
+          echo "Versione: 0.2.$n"
+      - name: Dipendenze desktop
+        working-directory: desktop
+        run: npm ci
+      - name: Prova del guscio
+        working-directory: desktop
+        run: npm test
+      - name: Copia del gioco e informazioni di build
+        working-directory: desktop
+        run: |
+          node copia-gioco.js
+          node info-build.js
+      - name: Installatore e portatile
+        working-directory: desktop
+        run: npx electron-builder --win --x64 --publish never -c.extraMetadata.version=${{ steps.ver.outputs.versione }}
+      - name: Controllo dei file prodotti
+        working-directory: desktop/dist
+        run: |
+          ls -l
+          test -f latest.yml
+          grep -q "version: ${{ steps.ver.outputs.versione }}" latest.yml
+          ls Night-Run-${{ steps.ver.outputs.versione }}-Installazione.exe Night-Run-${{ steps.ver.outputs.versione }}-Installazione.exe.blockmap
+      - name: Release (bozza, poi pubblicata a file completi)
+        env:
+          V: ${{ steps.ver.outputs.versione }}
+        run: |
+          tag="v$V"
+          # Bozza rimasta da una build interrotta con lo stesso numero: si toglie.
+          if gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null | grep -q true; then gh release delete "$tag" --yes; fi
+          git rev-parse --short HEAD > /tmp/corto
+          cat > /tmp/note.md <<NOTE
+          Night Run per Windows $V, dal commit $(cat /tmp/corto).
+          Si installa dal programma già installato: Partita, Aggiornamenti, Cerca aggiornamenti.
+          NOTE
+          gh release create "$tag" --draft --target "${{ github.sha }}" --title "Night Run $V" --notes-file /tmp/note.md --latest=false
+          cd desktop/dist
+          gh release upload "$tag" "Night-Run-$V-Installazione.exe" "Night-Run-$V-Installazione.exe.blockmap" "Night-Run-$V-Portatile.exe" latest.yml
+          # Solo adesso, con tutti i file caricati, la release diventa visibile e «ultima».
+          gh release edit "$tag" --draft=false --latest

@@ -1,19 +1,20 @@
 {
   "name": "night-run",
   "productName": "Night Run: The Last Highway",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Night Run: The Last Highway per Windows, giocabile senza rete",
   "author": "Akaoni97",
   "license": "UNLICENSED",
   "main": "main.js",
   "scripts": {
-    "prestart": "node copia-gioco.js",
+    "prestart": "node copia-gioco.js && node info-build.js",
     "start": "electron .",
     "test": "node --test test/*.test.js",
     "test:integrazione": "node test/integrazione.cjs",
-    "predist": "node copia-gioco.js",
-    "dist": "electron-builder --win --x64"
+    "predist": "node copia-gioco.js && node info-build.js",
+    "dist": "electron-builder --win --x64",
+    "info-build": "node info-build.js"
   },
   "devDependencies": {
     "electron": "45.4.1",
@@ -24,11 +25,25 @@
     "appId": "it.akaoni97.nightrun",
     "productName": "Night Run The Last Highway",
     "asar": true,
-    "directories": { "output": "dist", "buildResources": "risorse" },
-    "files": ["main.js", "preload.js", "salvataggi.js", "app/**/*", "LEGGIMI.md"],
+    "directories": {
+      "output": "dist",
+      "buildResources": "risorse"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "salvataggi.js",
+      "aggiorna.js",
+      "info-build.json",
+      "app/**/*",
+      "LEGGIMI.md"
+    ],
     "win": {
       "icon": "app/img/app/icona-512.png",
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "signAndEditExecutable": true
     },
     "nsis": {
@@ -38,6 +53,17 @@
       "deleteAppDataOnUninstall": false,
       "artifactName": "Night-Run-${version}-Installazione.${ext}"
     },
-    "portable": { "artifactName": "Night-Run-${version}-Portatile.${ext}" }
+    "portable": {
+      "artifactName": "Night-Run-${version}-Portatile.${ext}"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Akaoni97",
+      "repo": "Night_Run",
+      "releaseType": "release"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "6.8.12"
   }
 }

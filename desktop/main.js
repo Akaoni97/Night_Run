@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { Salvataggi } = require('./salvataggi');
+const { Aggiornatore, PAGINA_RELEASE } = require('./aggiorna');
 
 const ORIGINE = 'app://night-run';
 const DEV = process.argv.includes('--dev');
@@ -71,6 +72,26 @@ if (!app.requestSingleInstanceLock()) {
         segnala(err);
       }
     });
+    // Aggiornamenti: solo da clic del giocatore (aggiorna.js). Nel programma non impacchettato l'updater non parte.
+    let info = { versione: app.getVersion(), commit: null, data: null };
+    try { info = { ...info, ...JSON.parse(fs.readFileSync(path.join(__dirname, 'info-build.json'), 'utf8')), versione: app.getVersion() }; } catch { /* sviluppo: nessuna info di build */ }
+    const impacchettato = app.isPackaged;
+    const portatile = !!process.env.PORTABLE_EXECUTABLE_DIR;
+    let autoUpdater = null;
+    if (impacchettato && !portatile) autoUpdater = require('electron-updater').autoUpdater;
+    const aggiorna = new Aggiornatore({
+      updater: autoUpdater, info, avvio: { impacchettato, portatile },
+      salvaPrima: (dati) => archivio.scrivi(dati),
+      checkpoint: (versione) => archivio.checkpoint(versione),
+      installa: () => autoUpdater.quitAndInstall(true, true),
+      notifica: (stato) => { if (finestra && !finestra.isDestroyed()) finestra.webContents.send('nr:agg:stato', stato); }
+    });
+    ipcMain.handle('nr:agg:stato', (e) => { if (!autorizzato(e)) throw new Error('Non autorizzato'); return aggiorna.stato(); });
+    ipcMain.handle('nr:agg:controlla', (e) => { if (!autorizzato(e)) throw new Error('Non autorizzato'); return aggiorna.controlla(); });
+    ipcMain.handle('nr:agg:scarica', (e) => { if (!autorizzato(e)) throw new Error('Non autorizzato'); return aggiorna.scarica(); });
+    ipcMain.handle('nr:agg:installa', (e, dati) => { if (!autorizzato(e)) throw new Error('Non autorizzato'); return aggiorna.installa(dati); });
+    // Solo la pagina fissa delle release, mai un indirizzo scelto dal gioco.
+    ipcMain.handle('nr:agg:pagina', (e) => { if (!autorizzato(e)) throw new Error('Non autorizzato'); return require('electron').shell.openExternal(PAGINA_RELEASE); });
     protocol.handle('app', async (req) => {
       const url = new URL(req.url);
       if (url.host !== 'night-run' || !['GET', 'HEAD'].includes(req.method)) return new Response('', { status: 403 });
