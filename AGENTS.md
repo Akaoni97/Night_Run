@@ -11,6 +11,18 @@ cognato). Repository `Akaoni97/Night_Run` (solo il gioco, alla radice); si gioca
 https://akaoni97.github.io/Night_Run/ (pubblicato dal ramo `main`). Fino al 16/11/2026 il gioco stava in
 `Akaoni97/RandomEgg-s`, cartella `motori/`: lì non si lavora più.
 
+## Chi è chi (parte per gli assistenti: i giocatori non la vedono)
+I due sviluppatori sono anche due personaggi del gioco, con lo stesso nome: **non confonderli mai**.
+| Persona vera | Ruolo nel repository | Personaggio nel gioco |
+| --- | --- | --- |
+| **Nico** | il **proprietario** (repository `Akaoni97/Night_Run`) | **Nico**, il motorista (il vecchio negozio Pistone, oggi spento di serie) |
+| **Luca** | il **cognato** | **Luca**, il meccanico di Da Luca Tuning (pezzi, scarico, assetto) |
+- Chi ti parla di solito è **Luca** (il cognato). Se dice «questa è per Nico» o «la decide Nico» intende **il proprietario**, non il personaggio; se dice «è per me» è Luca. Il dubbio si scioglie in questo modo, non chiedendo «chi è Nico?».
+- Nei file `proprietario` = Nico, `cognato` = Luca. Il trailer dei commit `Per: proprietario` / `Per: cognato` dice **chi ha chiesto il lavoro** (la persona che parla in quella sessione), non chi ha l'account.
+- Quando una frase parla di «Nico» o «Luca» nel gioco (testi, storia, interni, negozi) sono i personaggi; quando parla di decisioni, sospesi, avvisi o «per Nico / per Luca» sono le persone.
+- I motori sono di Luca (il cognato) come lavoro di sviluppo; il personaggio che li vende nel gioco è Nico il motorista. Anche qui: persona e personaggio sono cose diverse.
+- Non scrivere nel repository indirizzi email o dati personali di nessuno dei due.
+
 ## Com'è fatto
 HTML + JavaScript puro: niente build, niente npm, niente framework. **Solo 2D**: il 3D (three.js, `car3d.js`,
 `street3d.js`, `viaggio3d.js`, `models/`, la modalità Montagna e la vetrina) è stato tolto il 20/11/2026 per scelta del

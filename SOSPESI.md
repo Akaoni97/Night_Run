@@ -4,14 +4,14 @@ Lista viva: al **controllo della sera** (quando qualcuno chiede «il check») Cl
 poi la aggiorna con chi c'è (toglie quello che è fatto, aggiunge quello che salta fuori). In cima le cose più urgenti.
 Formato: `N. [area] cosa · perché conta · (da chi / chi decide)`.
 
-**REGOLA (21/11/2026, dal proprietario): ogni sospeso si riporta SEMPRE come elenco numerato, un punto per voce, con la
+**REGOLA (21/11/2026, da Luca, il cognato): ogni sospeso si riporta SEMPRE come elenco numerato, un punto per voce, con la
 numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio questo, punto 5 voglio quello». Nel
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 Aggiornata il 21/11/2026 sera (proprietario, con Claude).
 
-## In pausa fino alla fine (deciso dal proprietario il 21/11: non si tocca ora)
+## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 1. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
    (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco, € 28.000 guadagnati (70 % dalle missioni),
    € 16.700 in tasca al km 200; benzina, cibo e motel non pesano quasi niente. (tutti e due)
@@ -21,7 +21,7 @@ Aggiornata il 21/11/2026 sera (proprietario, con Claude).
    della prova, € 8.400), gomme bucate ogni ~30 km. Troppo? In sospeso. (tutti e due)
 
 ## Da decidere insieme
-4. [grafica] **Pedoni in alta definizione**: il proprietario ha risposto «il punto 4 è per Nico»: non è chiaro cosa intenda (Nico è il motorista, i pedoni sono del marciapiede). Da chiarire. (proprietario)
+4. [grafica] **Pedoni in alta definizione**: Luca ha detto «è per Nico», cioè decide il proprietario (Nico). Da riportare a lui. (proprietario)
 5. [grafica] **Dispositivi lenti**: si vede man mano che il gioco si sviluppa, con ottimizzazioni e scelte su cosa lasciare o ridurre (21/11). Se la grafica sembra «sgranata» sul PC è `slow` in `street2d.js`. (tutti e due)
 6. [motori] **Vendere la V40 coi pezzi di Nico montati**: da vedere (21/11). Oggi i pezzi se ne vanno con l'auto. (cognato)
 7. [motori] **Vecchio Pistone**: è il codice del vecchio negozio di Nico (facciata, interno, pannello del progetto in `pistone/motori2d.js`), che non si usa più dopo l'officina semplice. Si può cancellare o tenere per la scena di Nico da Luca. Da decidere. (cognato)
@@ -58,7 +58,7 @@ Aggiornata il 21/11/2026 sera (proprietario, con Claude).
 28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati dal proprietario: belli.
+- 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati da Luca: belli.
 - 21/11: Luca Garage (v0.64), pezzi nuovi V40 con pallini (v0.63), officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
 - 20/11: AUTO 1 dopo 5 s, leva con la S, tasti 1-4 solo per mangiare e bere, niente turbo nelle valigette, check completo
   del 20/11 sera senza errori.

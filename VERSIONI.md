@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.66**
+**Versione attuale: v0.67**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -87,5 +87,6 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.62 | 21/11 | proprietario | Night Run per Windows (Electron, da Codex): gioco senza rete, caratteri locali, salvataggi su file con backup |
 | v0.63 | 21/11 | proprietario | Officina di Luca: V40 con turbo da 0,5/1,0/1,5 bar, downpipe, terminale, camme, cambio, gomme da drag (oltre 450 CV); pallino verde (monta) e rosso (compra) |
 | v0.64 | 21/11 | proprietario | Luca Garage: app del telefono che ti porta da Luca Tuning per € 150, sbloccabile da Sviluppatori |
-| v0.65 | 21/11 | proprietario | Sospesi numerati (regola), economia, valigetta e danni in pausa fino alla fine |
-| v0.66 | 21/11 | proprietario | Schede tecniche e pezzi con personalità per ogni auto (`schede.js`), tricilindrici veri (Polo, Clio, 308), tolto il carattere audio «Codex · deciso» |
+| v0.65 | 21/11 | cognato | Sospesi numerati (regola), economia, valigetta e danni in pausa fino alla fine |
+| v0.66 | 21/11 | cognato | Schede tecniche e pezzi con personalità per ogni auto (`schede.js`), tricilindrici veri (Polo, Clio, 308), tolto il carattere audio «Codex · deciso» |
+| v0.67 | 21/11 | cognato | Sezione «Chi è chi» in AGENTS.md (Nico e Luca sono sviluppatori e personaggi), attribuzioni corrette nei documenti |
