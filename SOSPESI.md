@@ -35,26 +35,27 @@ Aggiornata il 21/11/2026 sera (controllo della sera, proprietario con Claude).
 12. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti): i pezzi nuovi della V40 (v0.63) coprono già parte di quello che faceva Nico. (tutti e due)
 
 ## Da provare giocando (sul PC)
-13. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
-14. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
-15. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
+13. [suono] **Suoni diversi per ogni auto** (v0.73, `suoni.js`): famiglie città, berlina, sportiva, tricilindrico, turbo, cinque cilindri, diesel, autobus; misurate ma non ascoltate. Da sentire sul PC auto per auto: timbro, volume, cambio di scarico (catback e da gara della stessa famiglia), quanto in fretta salgono e scendono i giri. Manca il fischio del turbo sulle auto col turbo di serie. (tutti e due)
+14. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
+15. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
+16. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
     motore, guida lunga, installazione e disinstallazione. (proprietario)
-16. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. (tutti e due)
-17. [motori] **Prezzi** dei livelli di Nico e **suono**/**calore** dei motori costruiti: contano solo se Nico torna acceso. (cognato)
-18. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
-19. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
-20. [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
+17. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. (tutti e due)
+18. [motori] **Prezzi** dei livelli di Nico e **suono**/**calore** dei motori costruiti: contano solo se Nico torna acceso. (cognato)
+19. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+20. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
+21. [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
     soldi una volta sola. Controllare messaggio e conti. (tutti e due)
-21. [windows] **Aggiornamenti dal programma** (v0.65): dopo la prima release `v0.2.1` installarla a mano, farne uscire una seconda e provare Cerca, Scarica, Installa e riavvia con una partita di prova (copia della cartella `%APPDATA%\\night-run` prima). Controllare anche senza rete, «Più tardi» e il portatile. Le impostazioni di GitHub Actions (permessi di scrittura ai workflow) vanno verificate alla prima esecuzione. (cognato, Luca)
-22. [grafica] **Scatti e fluidità** (20/11 notte, Claude): tele da rileggere nate nel processore, palazzi ad alta definizione preparati prima di entrare nello schermo, meno lavoro col menu chiuso. Nel browser di prova non si sente: va provato guidando in città sul PC. (proprietario)
+22. [windows] **Aggiornamenti dal programma** (v0.65): dopo la prima release `v0.2.1` installarla a mano, farne uscire una seconda e provare Cerca, Scarica, Installa e riavvia con una partita di prova (copia della cartella `%APPDATA%\\night-run` prima). Controllare anche senza rete, «Più tardi» e il portatile. Le impostazioni di GitHub Actions (permessi di scrittura ai workflow) vanno verificate alla prima esecuzione. (cognato, Luca)
+23. [grafica] **Scatti e fluidità** (20/11 notte, Claude): tele da rileggere nate nel processore, palazzi ad alta definizione preparati prima di entrare nello schermo, meno lavoro col menu chiuso. Nel browser di prova non si sente: va provato guidando in città sul PC. (proprietario)
 
 ## Da sistemare
-23. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
+24. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
     scheda Guida, app strane del telefono, `TEL_ATTI`). Sicuro con i test. (Claude, quando c'è tempo)
-24. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
-25. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
-26. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
-27. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
+25. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
+26. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
+27. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
+28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
 - 21/11: pedoni in alta definizione, leggeri (come il protagonista, 34 aspetti, pose in memoria, 2 nuove al massimo per fotogramma).

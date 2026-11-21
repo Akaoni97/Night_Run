@@ -195,8 +195,8 @@ function genCatalog(c) {
   const cat = {
     exhaust: { label: 'Scarico', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originale', note: n.exOem || 'Silenziatori di serie.', sim: { pw: 1 }, dsp: c.exStock },
-      { id: 'catback', price: $(800), km: kk(8), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex ? M.ex[1] : 'Catback in inox', note: (M.ex_nota ? M.ex_nota + ' ' : '') + 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.cyl >= 5 ? 'sport6' : 'sport4', look: { tip: 1 } },
-      { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: M.ex ? M.ex[2] : 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: 'race', look: { tip: 2 } } ] },
+      { id: 'catback', price: $(800), km: kk(8), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex ? M.ex[1] : 'Catback in inox', note: (M.ex_nota ? M.ex_nota + ' ' : '') + 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.exCat || (c.cyl >= 5 ? 'sport6' : 'sport4'), look: { tip: 1 } },
+      { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: M.ex ? M.ex[2] : 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: c.exRace || 'race', look: { tip: 2 } } ] },
     intake: { label: 'Aspirazione', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: n.inOem || 'Airbox originale', note: 'Chiusa e silenziosa.', sim: { pw: 1 }, dsp: c.inStock || { in: 1, roar: 1, wh: 1 } },
       { id: 'pf', price: $(300), km: kk(4), brand: M.in ? M.in[0] : 'K&N', name: M.in ? M.in[1] : 'Filtro a fungo', note: 'Risucchio forte ai bassi, fischio del turbo più presente. +2 %.', sim: { pw: 1.02 }, dsp: { in: 2.2, roar: 2.4, wh: 1.7 } } ] },
@@ -393,18 +393,21 @@ for (const q of GEN_NEW) {
   const [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
   GEN_DATA[id].tq = genTq(hp, rH, nm, rN, lim);
   const heavy = mass > 5000;
-  const voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
+  let voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
     : { pulse: hp > 120 ? 0.85 : 1.05, rough: hp < 80 ? 0.2 : 0.1, metal: hp > 120 ? 0.35 : 0, boomRpm: lim * 0.5, hiRpm: lim };
   // scoppi dello scarico: le piccole acute e secche, le grosse più cupe e lunghe, i diesel quasi niente schiocco
   voice.pop = diesel ? { f: 0.7, crack: 0.5, len: 0.8 } : cyl === 6 ? { f: 0.9, crack: 1.0, len: 1.15, thump: 1.15 }
     : hp < 80 ? { f: 1.4, crack: 1.3, len: 0.75 } : hp < 120 ? { f: 1.2, crack: 1.15, len: 0.9 } : { f: 1.08, crack: 1.1, len: 1.0 };
   if (cyl === 3) { voice.rough = Math.max(voice.rough || 0, 0.38); voice.lope = 0.12; voice.pulse = (voice.pulse || 1) * 1.25; voice.rf = -0.3; voice.pop = Object.assign({}, voice.pop, { f: 1.05, crack: 1.2, len: 0.9, vary: 1.5 }); }   // un colpo ogni 240°: «brrr» ruvido e irregolare
+  // il suono vero del motore dalla sua scheda (suoni.js): famiglia, voce, scarico, aspirazione, inerzia
+  const SU = (typeof suonoDi === 'function' && typeof SCHEDE !== 'undefined') ? suonoDi(id, SCHEDE[id], { cyl, lim, hp }) : null;
+  if (SU) voice = Object.assign(voice, SU.voice);
   if (make === 'Volvo') voice.pop = Object.assign({}, VOLVO_POP, { f: 0.72, bf: 0.92, len: 1.5, boom: 0.65 });   // 850 R: ancora più cupa
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
-    shiftK: heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: diesel ? 0.15 : 0.3, voice, buy: { price, km },
-    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
-    P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : 0.14 + mass / 12000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
+    shiftK: SU ? SU.shiftK : heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: SU ? SU.hesK : diesel ? 0.15 : 0.3, voice, sound: SU ? SU.fam : null, exCat: SU && SU.exCat, exRace: SU && SU.exRace, inStock: SU && SU.inStock, buy: { price, km },
+    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: SU ? SU.ex : diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
+    P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : Math.round((0.14 + mass / 12000) * (SU ? SU.ieK : 1) * 1000) / 1000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
       heavy ? { Iw: 36, Ks: 240000, vmax: 90 } : {}),
     turbo: null,
     boost: [KIT_SC('sc', 'Rotrex', 'Compressore volumetrico (0,5 bar)', 0.5, Math.round(2500 + price * 0.1), 30, 'Più spinta coi giri: +35 %.'),
