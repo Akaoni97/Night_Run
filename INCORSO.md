@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Claude) | Pedoni in alta definizione, leggeri (sospeso 23) | quartieri2d.js | 21/11 |

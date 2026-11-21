@@ -49,15 +49,15 @@ Aggiornata il 21/11/2026 sera (controllo della sera, proprietario con Claude).
 22. [grafica] **Scatti e fluidità** (20/11 notte, Claude): tele da rileggere nate nel processore, palazzi ad alta definizione preparati prima di entrare nello schermo, meno lavoro col menu chiuso. Nel browser di prova non si sente: va provato guidando in città sul PC. (proprietario)
 
 ## Da sistemare
-23. [grafica] **Pedoni in alta definizione**: deciso da Nico il 21/11, sì purché **leggeri** (niente che pesi sui fotogrammi: disegno in cache, come il protagonista). Da fare. (Claude)
-24. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
+23. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
     scheda Guida, app strane del telefono, `TEL_ATTI`). Sicuro con i test. (Claude, quando c'è tempo)
-25. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
-26. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
-27. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
-28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
+24. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
+25. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
+26. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
+27. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 21/11: pedoni in alta definizione, leggeri (come il protagonista, 34 aspetti, pose in memoria, 2 nuove al massimo per fotogramma).
 - 21/11 decisioni di Nico: Mario al posto di Niko va bene; Luca Garage a € 150 va bene; pedoni in alta definizione sì, purché leggeri.
 - 20/11 notte: estetica premium (icone disegnate, pannelli a vetro, banner; interruttore Premium/Classico), meno scatti e più fluidità. Controllo del 21/11: nessun errore nelle tappe, 299 test.
 - 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati da Luca: belli.

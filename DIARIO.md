@@ -1,3 +1,9 @@
+## 21/11/2026 · proprietario (**pedoni in alta definizione, leggeri**)
+- Fatto: a densità doppia i passanti che camminano sul marciapiede (`quartieri2d.js`, `fig`) sono disegnati come il protagonista: pixel art vera
+  con giacca, capelli, passo. 34 aspetti fissi (24 qualunque, incappucciati, operai col caschetto, giacca scura), 8 pose ciascuno in memoria; al
+  massimo 2 pose nuove per fotogramma (0,36 ms l'una), intanto resta l'omino di prima. Misurato: 168 pose in un minuto, 60 ms in tutto.
+- Aperto: fermi (fumatore, seduto), bambini e muletto restano a blocchi; con qualità bassa o leggera tutto come prima.
+
 ## 21/11/2026 · proprietario · v0.70 (**editor della storia**)
 - Fatto: pagina personale `strumenti/editor_storia.html` (fuori dal gioco): conversazioni per persona e fase, mappa a bivi con frecce, a destra testo originale e «come lo vorrei» (messaggi, varianti, risposte). Bozza salvata nel browser; «Copia modifiche» / «Scarica file» dà il JSON. Si assorbe con `node strumenti/assorbi_modifiche.mjs <file>`, che lo unisce in `chat_modifiche.js` (caricato dopo `chat_dati.js`, quindi sopravvive alla rigenerazione). Cambia solo le parole, non bivi, condizioni, effetti.
 - Poi: lista **in sequenza di gioco** (scheda Sequenza: capitali, fasi, km) e striscia in alto con una corsia per persona e un pallino per ogni conversazione che parte (clic = ci va). I km sono quelli segnaposto di `CHAT_START`; le conversazioni con flag `luogo_*` o `ev_*` si posano sull'arrivo della capitale. Senza km: quelle a confidenza e quelle che partono da scelte o regia.
