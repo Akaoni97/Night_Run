@@ -85,9 +85,10 @@ const TUNING_SUPRA = {
   cat: {
     label: 'Downpipe e catalizzatore',
     items: [
-      { id: 'oem', price: 0, pw: 1, brand: 'Toyota', name: 'Catalizzatore originale', note: 'Ceramico ad alta densità: smussa le alte frequenze.', dsp: { lp: 2600, g: 0.85, pop: 1 } },
-      { id: 'sport', price: 650, pw: 1.02, brand: 'Su misura', name: 'Downpipe 3,5" con cat 200 celle', note: 'Metallico ad alto flusso: più presenza, scoppiettii più vivi.', dsp: { lp: 5200, g: 1.0, pop: 1.25 } },
-      { id: 'decat', price: 250, pw: 1.03, brand: 'Su misura', name: 'Decat (solo pista)', note: 'Nessun filtro: suono aperto, afterfire forti.', dsp: { lp: 0, g: 1.15, pop: 1.7 } },
+      { id: 'oem', price: 0, pw: 1, brand: 'Toyota', name: 'Catalizzatore originale a 400 celle', note: 'Ceramico ad alta densità: smussa le alte frequenze, il tono resta cupo e chiuso.', dsp: { lp: 2600, g: 0.85, pop: 1 } },
+      { id: 'sport', price: 650, pw: 1.02, brand: 'Su misura', name: 'Downpipe 3,5" con cat 200 celle', note: 'Metallico ad alto flusso: il tono sale un po\', il suono si fa più duro e ruvido, scoppiettii più vivi.', dsp: { lp: 5200, g: 1.0, pop: 1.25, len: 0.92, tone: 1.15, bark: 3, edge: 0.5, rasp: 0.12, jet: 0.1 } },
+      { id: 'tubolare', price: 1400, pw: 1.03, brand: 'Su misura', name: 'Collettore tubolare con downpipe e cat a 100 celle', note: 'Tubi di lunghezza uguale e filtro quasi aperto: tono ancora più alto, cattivo e ruggente, scoppi forti.', dsp: { lp: 6500, g: 1.12, pop: 1.4, len: 0.82, tone: 1.35, bark: 6, edge: 0.95, rasp: 0.26, jet: 0.22 } },
+      { id: 'decat', price: 250, pw: 1.03, brand: 'Su misura', name: 'Decat (solo pista)', note: 'Nessun filtro: tono altissimo, suono crudo e ruggente, afterfire fortissimi.', dsp: { lp: 0, g: 1.3, pop: 1.7, len: 0.72, tone: 1.6, bark: 9, edge: 1.5, rasp: 0.45, jet: 0.38 } },
     ],
   },
   turbo: {

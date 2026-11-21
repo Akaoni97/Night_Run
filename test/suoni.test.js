@@ -68,11 +68,52 @@ test('il comportamento cambia con la famiglia: i diesel sono più lenti a salire
   assert.ok(CARS.doblo.P.shiftK > CARS.p205.P.shiftK, 'il diesel cambia più piano');
 });
 
-test('gli scarichi sportivi restano della famiglia: più corti e più aperti di quello di serie', () => {
+test('cinque scarichi, quattro ampliamenti: ogni livello è più corto, più aperto e più forte del precedente', () => {
   for (const id of gen) {
-    const ex = CARS[id].tuning.exhaust.items, st = ex[0].dsp, cb = ex[1].dsp, rc = ex[2].dsp;
-    assert.ok(typeof st === 'object' && cb.L < st.L && rc.L < cb.L, `${id}: lunghezze ${st.L} / ${cb.L} / ${rc.L}`);
-    assert.ok(rc.m[0][1] > cb.m[0][1] && cb.m[0][1] > st.m[0][1], `${id}: il filtro si apre`);
+    const it = CARS[id].tuning.exhaust.items;
+    assert.deepEqual(it.map((x) => x.id), ['oem', 'terminale', 'catback', 'centrale', 'race'], id);
+    const d = it.map((x) => x.dsp);
+    for (let i = 1; i < d.length; i++) {
+      assert.ok(typeof d[i] === 'object' && d[i].L < d[i - 1].L, `${id}: livello ${i} non più corto (${d[i].L} / ${d[i - 1].L})`);
+      assert.ok(d[i].m[0][1] > d[i - 1].m[0][1], `${id}: il filtro non si apre al livello ${i}`);
+      assert.ok(d[i].g > d[i - 1].g, `${id}: il livello ${i} non è più forte`);
+      assert.ok(d[i].rasp >= d[i - 1].rasp && d[i].jet >= d[i - 1].jet, `${id}: il livello ${i} non è più cattivo`);
+    }
+  }
+});
+
+test('gli scarichi si sentono: il suono cresce di livello in livello (media su tre regimi)', () => {
+  for (const id of ['panda', 'p205', 'a3', 'v40']) {
+    const c = CARS[id], lim = c.P.limiter, ids = c.tuning.exhaust.items.map((x) => x.id);
+    const m = ids.map((e) => { let r = 0; for (const f of [0.3, 0.5, 0.7]) { seed = 71; const d = new EngineDSP(SR); d.msg({ cfg: { tune: c.params(Object.assign({}, c.presets[0].sel, { exhaust: e })).dsp, view: 1, vol: 1, fx: {} }, p: { rpm: lim * f, thr: 0.5, charge: 0.5, air: 0.5, running: 1 } }); const L = new Float32Array(SR * 2), R = new Float32Array(SR * 2); d.render(L, R, L.length); d.render(L, R, L.length); r += rms(L); } return r / 3; });
+    assert.ok(m[m.length - 1] > m[0] * 1.5, `${id}: lo scarico da gara dovrebbe suonare molto più forte dell'originale (${m.map((x) => x.toFixed(3))})`);
+    for (let i = 1; i < m.length; i++) assert.ok(m[i] > m[i - 1] * 0.97, `${id}: il livello ${ids[i]} suona meno del precedente (${m.map((x) => x.toFixed(3))})`);
+  }
+});
+
+test('il collettore sportivo alza il tono e lo rende più cattivo: tono, mordente e grinta crescono coi livelli', () => {
+  const mis = (id, cat) => {
+    const c = CARS[id], lim = c.P.limiter; let r = 0, cen = 0;
+    for (const f of [0.3, 0.5, 0.7]) {
+      seed = 71; const d = new EngineDSP(SR);
+      d.msg({ cfg: { tune: c.params(Object.assign({}, c.presets[0].sel, { cat })).dsp, view: 1, vol: 1, fx: {} }, p: { rpm: lim * f, thr: 0.5, charge: 0.5, air: 0.5, running: 1 } });
+      const L = new Float32Array(SR * 2), R = new Float32Array(SR * 2); d.render(L, R, L.length); d.render(L, R, L.length);
+      r += rms(L); cen += bright(L);
+    }
+    return { r: r / 3, b: cen / 3 };
+  };
+  for (const id of ['panda', 'a3', 'v40']) {
+    const ids = CARS[id].tuning.cat.items.map((x) => x.id);
+    assert.deepEqual(ids, ['oem', 'sport', 'tubolare', 'decat'], id);
+    const d = CARS[id].tuning.cat.items.map((x) => x.dsp);
+    for (let i = 1; i < d.length; i++) for (const k of ['len', 'tone', 'bark', 'edge', 'rasp', 'jet']) {
+      if (k === 'len') assert.ok(d[i].len < (d[i - 1].len || 1), `${id}: ${ids[i]} non accorcia il tubo`);
+      else assert.ok(d[i][k] > (d[i - 1][k] || 0), `${id}: ${ids[i]} non aumenta ${k}`);
+    }
+    const m = ids.map((c) => mis(id, c));
+    assert.ok(m[3].b > m[0].b * 1.12, `${id}: il suono non sale di tono (${m.map((x) => x.b.toFixed(3))})`);
+    assert.ok(m[3].r > m[0].r * 1.05, `${id}: il collettore aperto non ruggisce di più (${m.map((x) => x.r.toFixed(3))})`);
+    for (let i = 1; i < m.length; i++) assert.ok(m[i].b > m[i - 1].b * 0.98, `${id}: ${ids[i]} è meno acuto del livello prima (${m.map((x) => x.b.toFixed(3))})`);
   }
 });
 

@@ -20,7 +20,7 @@ const TUNING_V40 = {
     label: 'Scarico',
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Originale', note: 'Silenziatore centrale e terminale chiusi: voce sorda e educata.', sim: { pw: 1 }, dsp: 'stock' },
-      { id: 'terminale', price: 350, km: 3, brand: 'Simons', name: 'Terminale sportivo in inox', note: 'Solo il silenziatore finale al posto di quello originale: voce un po\' più piena, qualche cavallo (+2 %).', sim: { pw: 1.02 }, dsp: 'sport', look: { tip: 1 } },
+      { id: 'terminale', price: 350, km: 3, brand: 'Simons', name: 'Terminale sportivo in inox', note: 'Solo il silenziatore finale al posto di quello originale: voce un po\' più piena, qualche cavallo (+2 %).', sim: { pw: 1.02 }, dsp: 'ter', look: { tip: 1 } },
       { id: 'catback', price: 700, km: 8, brand: 'Simons', name: 'Catback in inox da 63 mm', note: 'Terminale ovale grande: voce piena e ruvida, rimbombo verso i 3000. Sull\'aspirato vale un +3 %.', sim: { pw: 1.03 }, dsp: 'sport', look: { tip: 1 } },
       { id: 'turboback', price: 1300, km: 30, brand: 'Ferrita', name: 'Turboback 76 mm senza silenziatore centrale', note: 'Tutto lo scarico dal turbo in giù: col turbo +6 % e spool più pronto, da aspirata solo rumore (+3 %).', sim: { pw: 1.03, pwTurbo: 1.06, spool: 0.92 }, dsp: 'race', look: { tip: 2 } },
     ],
@@ -37,8 +37,9 @@ const TUNING_V40 = {
     label: 'Downpipe e catalizzatore',
     items: [
       { id: 'oem', price: 0, km: 0, pw: 1, pwTurbo: 1, brand: 'Volvo', name: 'Catalizzatore originale', note: 'Ceramico stretto vicino al collettore: pulito ma strozza un po\'.', dsp: { lp: 0, g: 1, pop: 1 } },
-      { id: 'sport', price: 650, km: 10, pw: 1.02, pwTurbo: 1.06, brand: 'Ferrita', name: 'Downpipe da 76 mm con cat sportivo', note: 'Senza il collo di bottiglia dopo la turbina: col turbo +6 % e spool più pronto, da aspirata +2 %.', dsp: { lp: 5200, g: 1.0, pop: 1.25 } },
-      { id: 'decat', price: 250, km: 15, pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: 'Downpipe senza catalizzatore (solo pista)', note: 'Nessun filtro: col turbo +9 %, suono aperto e scoppi forti. Non è omologato.', dsp: { lp: 0, g: 1.15, pop: 1.7 } },
+      { id: 'sport', price: 650, km: 10, pw: 1.02, pwTurbo: 1.06, brand: 'Ferrita', name: 'Downpipe da 76 mm con cat sportivo a 200 celle', note: 'Senza il collo di bottiglia dopo la turbina: col turbo +6 % e spool più pronto, da aspirata +2 %. Il tono sale un po\' e si fa più duro.', dsp: { lp: 5200, g: 1.0, pop: 1.25, len: 0.92, tone: 1.15, bark: 3, edge: 0.5, rasp: 0.12, jet: 0.1 } },
+      { id: 'tubolare', price: 900, km: 18, pw: 1.025, pwTurbo: 1.075, brand: 'Ferrita', name: 'Collettore tubolare con downpipe e cat a 100 celle', note: 'Tubi di lunghezza uguale e filtro quasi aperto: tono più alto, cattivo e ruggente. Col turbo +7 %.', dsp: { lp: 6500, g: 1.12, pop: 1.4, len: 0.82, tone: 1.35, bark: 6, edge: 0.95, rasp: 0.26, jet: 0.22 } },
+      { id: 'decat', price: 250, km: 15, pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: 'Downpipe senza catalizzatore (solo pista)', note: 'Nessun filtro: col turbo +9 %, tono altissimo, suono crudo e scoppi forti. Non è omologato.', dsp: { lp: 0, g: 1.3, pop: 1.7, len: 0.72, tone: 1.6, bark: 9, edge: 1.5, rasp: 0.45, jet: 0.38 } },
     ],
   },
   cams: {
@@ -132,6 +133,7 @@ const V40_PRESETS = [
 const VOLVO_POP = { f: 0.8, crack: 0.45, len: 1.3, thump: 1.2, boom: 0.85, bf: 1, mid: 0.6 };
 const V40_EX = {
   stock: { L: 3.6, r: -0.4, m: [['lp', 900, 0.6], ['lp', 1600, 0.5], ['peak', 130, 1.0, 3], ['peak', 480, 2, -4]], g: 1.5, jet: 0.1, rasp: 0.05, tips: 1 },
+  ter: { L: 3.5, r: -0.5, m: [['lp', 1700, 0.6], ['peak', 150, 1.0, 3.5], ['peak', 900, 1.4, 4], ['peak', 2800, 2, 0]], g: 1.85, jet: 0.35, rasp: 0.25, tips: 1 },   // terminale: già più pieno e ruvido dell'originale
   sport: { L: 3.4, r: -0.6, m: [['lp', 2600, 0.6], ['peak', 170, 1.0, 4], ['peak', 1100, 1.4, 5], ['peak', 3200, 2, 1]], g: 2.2, jet: 0.6, rasp: 0.5, tips: 1 },
   race: { L: 3.1, r: -0.66, m: [['lp', 4600, 0.55], ['peak', 190, 0.9, 3], ['peak', 1500, 1.4, 6], ['peak', 3600, 2, 2]], g: 2.5, jet: 0.9, rasp: 0.75, tips: 1 },
 };
@@ -157,7 +159,7 @@ function v40ParamsBase(sel, adj) {
     },
     dsp: {
       voice: { pop: VOLVO_POP },
-      cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ct.dsp.lp || (ex.dsp === 'stock' ? 2400 : 3800), g: ct.dsp.g > 1 ? 0.9 * ct.dsp.g : 0.9, pop: (pops ? 1.4 : hasT ? 0.7 : 0.25) * (ct.dsp.pop || 1) },
+      cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ct.dsp.lp || (ex.dsp === 'stock' ? 2400 : 3800), g: ct.dsp.g > 1 ? 0.9 * ct.dsp.g : 0.9, pop: (pops ? 1.4 : hasT ? 0.7 : 0.25) * (ct.dsp.pop || 1), len: ct.dsp.len, tone: ct.dsp.tone, bark: ct.dsp.bark, edge: ct.dsp.edge, rasp: ct.dsp.rasp, jet: ct.dsp.jet },
       tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
       bov: hasT ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
       intake: g('intake').dsp, scream: 0, lope: cm.dsp.lope, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
@@ -195,7 +197,9 @@ function genCatalog(c) {
   const cat = {
     exhaust: { label: 'Scarico', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originale', note: n.exOem || 'Silenziatori di serie.', sim: { pw: 1 }, dsp: c.exStock },
+      { id: 'terminale', price: $(350), km: kk(3), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex && M.ex[3] ? M.ex[3] : 'Terminale sportivo in inox', note: 'Solo il silenziatore finale: la voce si fa un po\' più piena e ruvida, ma resta educata. +1,5 %.', sim: { pw: 1.015, pwTurbo: 1.025 }, dsp: c.exTer || c.exStock, look: { tip: 1 } },
       { id: 'catback', price: $(800), km: kk(8), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex ? M.ex[1] : 'Catback in inox', note: (M.ex_nota ? M.ex_nota + ' ' : '') + 'Terminali più grandi: voce piena e ruvida. +3 % sull\'aspirato, +5 % col turbo.', sim: { pw: 1.03, pwTurbo: 1.05 }, dsp: c.exCat || (c.cyl >= 5 ? 'sport6' : 'sport4'), look: { tip: 1 } },
+      { id: 'centrale', price: $(1100), km: kk(14), brand: M.ex ? M.ex[0] : (n.exBrand || 'Supersprint'), name: M.ex && M.ex[4] ? M.ex[4] : 'Scarico sportivo senza silenziatore centrale', note: 'Solo un silenziatore piccolo in fondo: voce alta, ruvida e aggressiva, molto più forte del catback. +4 % (col turbo +6,5 %).', sim: { pw: 1.04, pwTurbo: 1.065 }, dsp: c.exCen || c.exCat || (c.cyl >= 5 ? 'sport6' : 'sport4'), look: { tip: 2 } },
       { id: 'race', price: $(1500), km: kk(25), brand: 'Su misura', name: M.ex ? M.ex[2] : 'Scarico diretto da gara', note: 'Collettore tubolare e niente silenziatori: +5 % (col turbo +8 % e spool più pronto). Fortissimo.', sim: { pw: 1.05, pwTurbo: 1.08, spool: 0.9 }, dsp: c.exRace || 'race', look: { tip: 2 } } ] },
     intake: { label: 'Aspirazione', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: n.inOem || 'Airbox originale', note: 'Chiusa e silenziosa.', sim: { pw: 1 }, dsp: c.inStock || { in: 1, roar: 1, wh: 1 } },
@@ -228,10 +232,11 @@ function genCatalog(c) {
       { id: 's2', price: $(2600), km: kk(35), brand: 'Su misura', name: 'Cofano e portellone in fibra, vetri in policarbonato', note: `−${Math.round(c.mass * 0.09)} kg: rimbomba tutto.`, sim: { dm: -Math.round(c.mass * 0.09), cabin: 1.35 } } ] },
   };
   // reparti che dipendono dal motore: downpipe/cat e camme solo sui benzina (sui diesel lo scarico ha già il FAP), più il reparto SUO dell'auto
-  if (!dz && M.ct) cat.cat = { label: 'Downpipe e catalizzatore', items: [
-    { id: 'oem', price: 0, km: 0, pw: 1, pwTurbo: 1, brand: c.make, name: 'Catalizzatore originale', note: 'Ceramico di serie: pulito ma strozza un po\'.', dsp: { lp: 0, g: 1, pop: 1 } },
-    { id: 'sport', price: $(650), km: kk(10), pw: 1.02, pwTurbo: 1.06, brand: M.ct[0], name: M.ct[1], note: 'Meno strozzatura: da aspirato +2 %, col turbo +6 % e spool più pronto.', dsp: { lp: 5200, g: 1.0, pop: 1.25 } },
-    { id: 'decat', price: $(250), km: kk(15), pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: M.ct[2], note: 'Nessun filtro: suono aperto e scoppi forti, col turbo +9 %. Non è omologato.', dsp: { lp: 0, g: 1.15, pop: 1.7 } } ] };
+  if (!dz && M.ct) cat.cat = { label: 'Collettore, downpipe e catalizzatore', items: [
+    { id: 'oem', price: 0, km: 0, pw: 1, pwTurbo: 1, brand: c.make, name: 'Catalizzatore originale a 400 celle', note: 'Ceramico di serie: pulito ma strozza un po\'. Il tono resta cupo e chiuso.', dsp: { lp: 0, g: 1, pop: 1 } },
+    { id: 'sport', price: $(650), km: kk(10), pw: 1.02, pwTurbo: 1.06, brand: M.ct[0], name: M.ct[1], note: 'Cat metallico a 200 celle: meno strozzatura (+2 %, col turbo +6 %). Il tono sale un po\', il suono si fa più duro e ruvido.', dsp: { lp: 5200, g: 1.0, pop: 1.25, len: 0.92, tone: 1.15, bark: 3, edge: 0.5, rasp: 0.12, jet: 0.1 } },
+    { id: 'tubolare', price: $(950), km: kk(18), pw: 1.025, pwTurbo: 1.075, brand: M.ct[0], name: 'Collettore tubolare con cat a 100 celle', note: 'Tubi di lunghezza uguale e filtro quasi aperto: tono ancora più alto, cattivo e ruggente (+2,5 %, col turbo +7,5 %).', dsp: { lp: 6500, g: 1.12, pop: 1.4, len: 0.82, tone: 1.35, bark: 6, edge: 0.95, rasp: 0.26, jet: 0.22 } },
+    { id: 'decat', price: $(250), km: kk(15), pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: M.ct[2], note: 'Nessun filtro: tono altissimo, suono crudo e ruggente, scoppi forti, col turbo +9 %. Non è omologato.', dsp: { lp: 0, g: 1.3, pop: 1.7, len: 0.72, tone: 1.6, bark: 9, edge: 1.5, rasp: 0.45, jet: 0.38 } } ] };
   if (!dz && M.cm) cat.cams = { label: 'Alberi a camme', items: [
     { id: 'oem', price: 0, km: 0, brand: c.make, name: 'Originali', note: 'Minimo regolare e coppia piena ai bassi.', sim: { idle: c.P.idle, low: 1, high: 1, lope: 0 }, dsp: { lope: 0 } },
     { id: 'sport', price: $(900), km: kk(14), brand: M.cm[0], name: M.cm[1], note: `Un filo di irregolarità al minimo, un po' meno coppia in basso e più potenza in alto (+${Math.round((M.cm[3] - 1) * 100)} %).`, sim: { idle: c.P.idle + 50, low: 0.97, high: M.cm[3], lope: 0.3 }, dsp: { lope: 0.3 } },
@@ -277,7 +282,7 @@ function genParamsBase(c) {
         valve: hasT ? 'bov' : 'recirc', boostK: c.boostK || (c.turbo ? 0.9 : 0.72),   // kit su aspirate: rapporto di compressione alto, si spinge meno
       },
       dsp: {
-        cyl: c.cyl, ex: exd, cat: { lp: (ct && ct.dsp.lp) || (ex.id === 'oem' ? 2600 : 4200), g: ct && ct.dsp.g > 1 ? 0.95 * ct.dsp.g : 0.95, pop: (pops ? 1.4 : hasT ? 0.7 : 0.3) * (ct ? ct.dsp.pop || 1 : 1) },
+        cyl: c.cyl, ex: exd, cat: { lp: (ct && ct.dsp.lp) || (ex.id === 'oem' ? 2600 : 4200), g: ct && ct.dsp.g > 1 ? 0.95 * ct.dsp.g : 0.95, pop: (pops ? 1.4 : hasT ? 0.7 : 0.3) * (ct ? ct.dsp.pop || 1 : 1), len: ct ? ct.dsp.len : undefined, tone: ct ? ct.dsp.tone : undefined, bark: ct ? ct.dsp.bark : undefined, edge: ct ? ct.dsp.edge : undefined, rasp: ct ? ct.dsp.rasp : undefined, jet: ct ? ct.dsp.jet : undefined },
         tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
         bov: hasT ? Object.assign({ v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.75, chirp: 0.25 }, vo.bov) : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
         intake: g('intake').dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
@@ -292,6 +297,11 @@ function genCar(c) {
   c.P.shiftK = c.shiftK || 1; c.P.hesK = c.hesK ?? 0.3;       // tempo di cambiata ed esitazione in apertura di gas
   c.P.tq = d.tq; c.sprite = Object.assign({ img: `img/${c.id}.png`, wheel: `img/${c.id}_wheel.png`, paint: `img/${c.id}_paint.png` }, d.sprite);
   if (!d.sprite.fixed) c.sprite.wy = Math.round((d.sprite.wy + d.sprite.wr) * 10) / 10;   // dati vecchi: "wy" era il bordo alto della gomma (strumenti/ripara_ruote.py li porta al centro)
+  // auto fatte a mano: restano il loro scarico di serie, il catback e quello da gara, e in mezzo ci sono il terminale e lo scarico senza centrale
+  if (!c.exTer && typeof suonoMix === 'function' && c.exStock) {
+    const cb = GEN_EX[c.cyl >= 5 ? 'sport6' : 'sport4'];
+    c.exTer = suonoMix(c.exStock, cb, 0.5); c.exCen = suonoMix(cb, GEN_EX.race, 0.5);
+  }
   const S = (typeof SCHEDE !== 'undefined' && SCHEDE[c.id]) || null;      // scheda tecnica e personalità dei pezzi (schede.js)
   if (S) {
     c.scheda = S; c.mods = Object.assign({}, S.mods || {}, S.turboSerie ? { turboSerie: S.turboSerie } : {});
@@ -406,7 +416,7 @@ for (const q of GEN_NEW) {
   if (make === 'Volvo') voice.pop = Object.assign({}, VOLVO_POP, { f: 0.72, bf: 0.92, len: 1.5, boom: 0.65 });   // 850 R: ancora più cupa
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
-    shiftK: SU ? SU.shiftK : heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: SU ? SU.hesK : diesel ? 0.15 : 0.3, voice, sound: SU ? SU.fam : null, exCat: SU && SU.exCat, exRace: SU && SU.exRace, inStock: SU && SU.inStock, buy: { price, km },
+    shiftK: SU ? SU.shiftK : heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: SU ? SU.hesK : diesel ? 0.15 : 0.3, voice, sound: SU ? SU.fam : null, exTer: SU && SU.exTer, exCat: SU && SU.exCat, exCen: SU && SU.exCen, exRace: SU && SU.exRace, inStock: SU && SU.inStock, buy: { price, km },
     engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: SU ? SU.ex : diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
     P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : Math.round((0.14 + mass / 12000) * (SU ? SU.ieK : 1) * 1000) / 1000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
       heavy ? { Iw: 36, Ks: 240000, vmax: 90 } : {}),

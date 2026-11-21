@@ -98,8 +98,14 @@ function suonoFamiglia(S) {
 
 const _ex = (e, k) => ({ L: e.L * k.L, r: e.r, m: e.m.map((x, i) => (i === 0 ? ['lp', Math.min(9000, Math.round(x[1] * k.lp)), x[2]] : x.slice())), g: e.g * k.g, jet: Math.min(1.2, e.jet + k.jet), rasp: Math.min(1, e.rasp + k.rasp), tips: e.tips });
 
+// un gradino a metà strada tra due scarichi (per le auto fatte a mano, che hanno già lo scarico di serie, il catback e quello da gara)
+function suonoMix(a, b, x) {
+  const li = (p, q) => p + (q - p) * x;
+  return { L: li(a.L, b.L), r: li(a.r, b.r), m: a.m.map((m, i) => (i === 0 ? ['lp', Math.round(li(m[1], b.m[0][1])), m[2]] : m.slice())), g: li(a.g, b.g), jet: li(a.jet, b.jet), rasp: li(a.rasp, b.rasp), tips: 1 };
+}
+
 /* Costruisce il suono di un'auto da disegno.
-   d = { cyl, lim (giri massimi), hp }. Restituisce { fam, voice, ex, exCat, exRace, inStock, ieK, shiftK, hesK }. */
+   d = { cyl, lim (giri massimi), hp }. Restituisce { fam, voice, ex, exTer, exCat, exCen, exRace, inStock, ieK, shiftK, hesK }. */
 function suonoDi(id, S, d) {
   if (!S) return null;
   const fam = suonoFamiglia(S), F = SUONI_FAM[fam], f = suonoFirma(id, 8);
@@ -127,11 +133,15 @@ function suonoDi(id, S, d) {
   const tx = T.ex || {};
   const k = { L: (0.92 + 0.1 * big + 0.03 * f[0]) * (tx.L || 1), lp: (1.06 - 0.12 * big + 0.04 * f[1]) * (tx.lp || 1), g: (1 + 0.03 * f[2]) * (tx.g || 1), jet: tx.jet || 0, rasp: tx.rasp || 0 };
   const ex = _ex(F.ex, k);
-  // scarichi sportivi della stessa famiglia: stesso carattere, più corti, più aperti e più urlanti
+  // quattro scarichi sportivi della stessa famiglia, ognuno un gradino più in là dell'altro: stesso carattere, più corti, più aperti,
+  // più forti e più ruvidi (terminale → catback → senza centrale → scarico da gara). I diesel salgono più piano: restano diesel.
   const dz = fam === 'diesel' || fam === 'bus';
-  const exCat = _ex(F.ex, { L: k.L * 0.86, lp: k.lp * (dz ? 1.5 : 2.0), g: k.g * 1.12, jet: dz ? 0.12 : 0.25, rasp: dz ? 0.15 : 0.22 });
-  const exRace = _ex(F.ex, { L: k.L * 0.7, lp: k.lp * (dz ? 2.2 : 3.4), g: k.g * 1.28, jet: dz ? 0.3 : 0.5, rasp: dz ? 0.3 : 0.4 });
-  exCat.tips = 1; exRace.tips = 1;
-  return { fam, nome: F.nome, voice, ex, exCat, exRace, inStock: Object.assign({}, F.in), ieK: F.ieK * (0.95 + 0.1 * (cc / 1600)) * (T.ieK || 1), shiftK: F.shiftK, hesK: F.hesK };
+  const gr = (L, lp, g, jet, rasp) => _ex(F.ex, { L: k.L * L, lp: k.lp * lp, g: k.g * g, jet: (dz ? jet * 0.5 : jet) + (tx.jet || 0), rasp: (dz ? rasp * 0.5 : rasp) + (tx.rasp || 0) });
+  const exTer = gr(0.95, dz ? 1.2 : 1.35, dz ? 1.08 : 1.12, 0.08, 0.08);
+  const exCat = gr(0.86, dz ? 1.5 : 2.0, dz ? 1.18 : 1.25, 0.25, 0.22);
+  const exCen = gr(0.77, dz ? 2.0 : 2.8, dz ? 1.3 : 1.38, 0.38, 0.33);
+  const exRace = gr(0.68, dz ? 2.6 : 3.8, dz ? 1.45 : 1.75, 0.55, 0.45);
+  for (const e of [exTer, exCat, exCen, exRace]) e.tips = 1;
+  return { fam, nome: F.nome, voice, ex, exTer, exCat, exCen, exRace, inStock: Object.assign({}, F.in), ieK: F.ieK * (0.95 + 0.1 * (cc / 1600)) * (T.ieK || 1), shiftK: F.shiftK, hesK: F.hesK };
 }
-if (typeof window !== 'undefined') Object.assign(window, { SUONI_FAM, suonoFamiglia, suonoDi });
+if (typeof window !== 'undefined') Object.assign(window, { SUONI_FAM, suonoFamiglia, suonoDi, suonoMix });

@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.74**
+**Versione attuale: v0.75**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -97,3 +97,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.72 | 21/11 | proprietario | Controllo della sera del 21/11 (sospesi senza doppioni, decisioni di Nico) e pedoni in alta definizione leggeri (`quartieri2d.js`: chi cammina è disegnato come il protagonista, pose in memoria) |
 | v0.73 | 21/11 | cognato | Frizione: il kit frizione e volano non slitta più (terzo livello «da corsa» su ogni auto, bidisco della Supra con la sua capacità); quella di serie slitta solo su un motore molto potente |
 | v0.74 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
+| v0.75 | 21/11 | cognato | Scarichi a cinque livelli per ogni auto (terminale, catback, senza centrale, da gara) e collettore/cat da 200 celle che alza il tono e rende il suono più cattivo (`cat.len/tone/bark/edge/rasp/jet`) |
