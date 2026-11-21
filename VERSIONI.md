@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.70**
+**Versione attuale: v0.71**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -93,3 +93,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.68 | 21/11 | cognato | Aggiornamenti del programma Windows: pulsante nel menu (Cerca, Scarica, Installa e riavvia), release automatiche su GitHub a ogni caricamento su main |
 | v0.69 | 21/11 | cognato | L'installatore Windows si chiama «installatore Luca» (file `Night-Run-Luca-<versione>-...`, release «Night Run Luca»), per distinguerlo da quello di Nico |
 | v0.70 | 21/11 | proprietario | Editor della storia (`strumenti/editor_storia.html`): mappa a bivi delle chat, testo originale e nuovo affiancati, file di modifiche che Claude assorbe in `chat_modifiche.js` |
+| v0.71 | 21/11 | cognato | Più sprint in accelerazione: le auto potenti non perdono più la spinta quando sgommano (gomma, trasferimento di carico, controllo di trazione, cambiate); 0-100 del Supra 6,1 → 5,8 s, E36 6,6 → 6,1 s |
