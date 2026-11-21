@@ -15,10 +15,20 @@ button{font:inherit;color:var(--t);background:var(--p2);border:1px solid var(--l
 button:hover{border-color:var(--m)}button.pri{background:var(--a);color:#1a1200;border-color:var(--a);font-weight:600}
 input,textarea{font:inherit;color:var(--t);background:#0b0d11;border:1px solid var(--l);border-radius:7px;padding:7px 9px;width:100%}
 textarea{resize:vertical;line-height:1.5}textarea:focus,input:focus{outline:2px solid var(--a);outline-offset:-1px}
-#app{display:grid;grid-template-rows:auto 1fr;height:100%}
+#app{display:grid;grid-template-rows:auto auto 1fr;height:100%}
 header{display:flex;gap:10px;align-items:center;padding:9px 14px;background:var(--p);border-bottom:1px solid var(--l);flex-wrap:wrap}
 header h1{font-size:15px;margin:0 8px 0 0}header .sp{flex:1}
 #cnt{color:var(--m)}#cnt b{color:var(--a)}
+#tl{background:var(--p);border-bottom:1px solid var(--l);padding:6px 14px 8px}
+#tlin{position:relative;height:138px;margin-left:78px}
+.fb{position:absolute;top:0;bottom:14px}.fb span{position:absolute;bottom:-14px;left:4px;font-size:10px;color:var(--m);letter-spacing:.08em}
+.cp{position:absolute;top:0;bottom:14px;border-left:1px solid #3a4152}.cp b{position:absolute;top:-1px;left:3px;font-size:10px;font-weight:500;color:#aab1c2;white-space:nowrap}
+.ln{position:absolute;left:-78px;font-size:11px;width:72px;text-align:right}
+.pt{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;cursor:pointer;border:0;padding:0}
+.pt:hover{transform:scale(1.6)}.pt.sel{outline:2px solid #fff;outline-offset:2px;transform:scale(1.5);z-index:3}.pt.mod{box-shadow:0 0 0 2px var(--a)}
+#tlnow{font-size:12px;color:var(--m);margin:2px 0 0 78px;min-height:18px}#tlnow b{color:var(--t)}
+.cap{margin:12px 0 4px;padding:3px 8px;border-radius:6px;background:#232838;color:#c9cfdd;font-size:11px;letter-spacing:.04em}
+.cond{display:block;font-size:11px;color:var(--m);line-height:1.3}
 main{display:grid;grid-template-columns:270px 1fr 440px;min-height:0}
 aside,section{min-height:0;overflow:auto}
 #side{background:var(--p);border-right:1px solid var(--l);padding:10px}
@@ -67,12 +77,13 @@ aside,section{min-height:0;overflow:auto}
   <button id="bCopia" class="pri">Copia modifiche</button>
   <input id="fileIn" type="file" accept=".json,application/json" hidden>
 </header>
+<div id="tl"><div id="tlin"></div><div id="tlnow"></div></div>
 <main>
   <aside id="side">
     <input id="q" placeholder="Cerca un ID o una frase…">
     <div class="chips" id="chPers"></div>
     <div class="chips" id="chFase"></div>
-    <div class="tabs"><button id="tConv" class="on">Conversazioni</button><button id="tMod">Modificate</button></div>
+    <div class="tabs"><button id="tSeq" class="on">Sequenza</button><button id="tConv">Per persona</button><button id="tMod">Modificate</button></div>
     <div id="list"></div>
   </aside>
   <section id="map"><div id="inner"><svg id="edges"></svg></div></section>
@@ -101,7 +112,30 @@ CHAT_LIST.forEach((n) => { const g = groupOf(n.id); (GROUPS[g] || (GROUPS[g] = {
 const STARTS = {}; (typeof CHAT_START !== 'undefined' ? CHAT_START : []).forEach((s) => (STARTS[s.node] = s));
 const UNL = {}; Object.entries(typeof CHAT_UNLOCK !== 'undefined' ? CHAT_UNLOCK : {}).forEach(([who, o]) => Object.entries(o).forEach(([sg, ids]) => ids.forEach((i) => (UNL[i] = `${who} · confidenza ${sg}`))));
 
-let S = { draft: {}, group: null, node: null, tab: 'conv', pers: null, fase: null, q: '' };
+// ---- la sequenza nel gioco. Capitali: km di arrivo dal giro di VG_ROUTE (viaggio.js); fasi da STORIA_FASE (storia.js).
+const ROUTE = [['tokyo', 12], ['wangan', 30], ['roma', 12], ['sangimignano', 30], ['parigi', 12], ['bassa', 30], ['londra', 12], ['hakone', 30], ['stoccolma', 12], ['bassa', 30], ['berlino', 12], ['sangimignano', 30], ['praga', 12], ['hakone', 30], ['vienna', 12], ['positano', 30], ['madrid', 12], ['positano', 30], ['lisbona', 12], ['sangimignano', 30], ['atene', 12], ['route66', 30], ['washington', 12], ['route66', 30]];
+const FASE_CAP = { tokyo: 'I', roma: 'I', parigi: 'II', londra: 'III', stoccolma: 'III', berlino: 'III', praga: 'III', vienna: 'III', madrid: 'IV', lisbona: 'IV', atene: 'V', washington: 'V' };
+const BEAT_CAP = { ev_distanza_impossibile: 'parigi', ev_indizio_sangue: 'stoccolma', ev_foto_originale: 'praga', ev_imitazione_dario: 'lisbona', ev_presenza_scoperta: 'madrid', ev_fase_v: 'atene' };
+const NOME = (id) => id.charAt(0).toUpperCase() + id.slice(1);
+const CAPKM = {}; let _k = 0; ROUTE.forEach(([id, l]) => { if (FASE_CAP[id] && CAPKM[id] == null) CAPKM[id] = _k; _k += l; });
+const LANES = ['Elena', 'Rosa', 'Livia', 'Sconosciuto', 'Dario'], MAXKM = 690;
+const reqs = (r) => (r ? (Array.isArray(r) ? r : [r]) : []);
+function effKm(st) {
+  for (const r of reqs(st.req)) { let m;
+    if ((m = /^flag:luogo_(\w+)$/.exec(r)) && CAPKM[m[1]] != null) return { km: CAPKM[m[1]] + 1, how: `appena arrivi a ${NOME(m[1])}` };
+    if ((m = /^flag:(ev_\w+)$/.exec(r)) && BEAT_CAP[m[1]]) return { km: CAPKM[BEAT_CAP[m[1]]] + 8, how: `dopo l'evento di ${NOME(BEAT_CAP[m[1]])}` }; }
+  return { km: st.km, how: '' };
+}
+const condTxt = (r) => reqs(r).map((x) => x.replace(/^fatto:/, 'dopo ').replace(/^flag:/, 'se ').replace(/^!flag:/, 'se NON ')).join(' · ');
+const TL = []; // ingressi in ordine: { km, group, node, who, how, cond }
+(typeof CHAT_START !== 'undefined' ? CHAT_START : []).forEach((st, i) => { if (!NODES[st.node]) return; const e = effKm(st); TL.push({ km: e.km, i, group: groupOf(st.node), node: st.node, who: st.th, how: e.how, cond: condTxt(st.req) }); });
+TL.sort((a, b) => a.km - b.km || a.i - b.i);
+const PLACED = new Set(TL.map((t) => t.group));
+const CONF = []; Object.entries(typeof CHAT_UNLOCK !== 'undefined' ? CHAT_UNLOCK : {}).forEach(([who, o]) => Object.entries(o).forEach(([sg, ids]) => ids.forEach((id) => { if (NODES[id] && !PLACED.has(groupOf(id))) { CONF.push({ who, sg: +sg, group: groupOf(id), node: id }); } })));
+const CONFG = new Set(CONF.map((c) => c.group));
+const ALTRE = Object.keys(GROUPS).filter((g) => !PLACED.has(g) && !CONFG.has(g));
+
+let S = { draft: {}, group: null, node: null, tab: 'seq', pers: null, fase: null, q: '' };
 try { S.draft = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S.draft)); } catch (e) {} };
 
@@ -143,7 +177,18 @@ function matches(g) {
 }
 function renderList() {
   let h = '';
-  if (S.tab === 'mod') {
+  if (S.tab === 'seq') {
+    const vis = TL.filter((t) => matches(GROUPS[t.group])); let lastCap = null; const caps = Object.entries(CAPKM).sort((a, b) => a[1] - b[1]);
+    vis.forEach((t) => {
+      let c = null; caps.forEach(([id, km]) => { if (km <= t.km) c = id; });
+      if (c !== lastCap) { lastCap = c; h += `<div class="cap">${c ? `da ${NOME(c)} · km ${CAPKM[c]} · fase ${FASE_CAP[c]}` : 'prima di Tokyo'}</div>`; }
+      h += `<div class="conv ${S.group === t.group ? 'sel' : ''}" data-g="${esc(t.group)}" data-n="${esc(t.node)}"><i class="dot" style="background:${COL[t.who] || '#999'}"></i><span>${esc(t.group)}<span class="cond">km ${Math.round(t.km)}${t.how ? ' · ' + esc(t.how) : ''}${t.cond ? ' · ' + esc(t.cond) : ''}</span></span>${GROUPS[t.group].nodes.some((n) => isMod(n.id)) ? '<small style="color:var(--a)">●</small>' : ''}</div>`;
+    });
+    const sez = (tit, list) => { const l = list.filter((x) => matches(GROUPS[x.group])); if (!l.length) return ''; return `<div class="cap">${tit} · ${l.length}</div>` + l.map((x) => `<div class="conv ${S.group === x.group ? 'sel' : ''}" data-g="${esc(x.group)}" data-n="${esc(x.node || '')}"><i class="dot" style="background:${COL[x.who || GROUPS[x.group].who] || '#999'}"></i><span>${esc(x.group)}${x.sg ? `<span class="cond">${esc(x.who)} · confidenza ${x.sg}</span>` : ''}</span></div>`).join(''); };
+    h += sez('Si aprono con la confidenza (senza km)', CONF.sort((a, b) => a.sg - b.sg));
+    h += sez('Partono da altre scelte o dalla regia', ALTRE.map((g) => ({ group: g, node: GROUPS[g].nodes[0].id })));
+    if (!h) h = '<div class="vuoto">Nessun risultato.</div>';
+  } else if (S.tab === 'mod') {
     const ids = Object.keys(exportMod());
     h = ids.length ? ids.map((id) => `<div class="conv ${S.node === id ? 'sel' : ''}" data-n="${esc(id)}"><span class="dot"></span>${esc(id)}</div>`).join('') : '<div class="vuoto">Ancora niente.</div>';
   } else {
@@ -219,8 +264,22 @@ function renderEd() {
 
 // ---- azioni
 function pickGroup(id, node) { S.group = id; S.node = node || GROUPS[id].nodes[0].id; renderAll(); }
-function pickNode(id) { S.node = id; const g = groupOf(id); if (S.group !== g) { S.group = g; renderAll(); } else { document.querySelectorAll('.card').forEach((c) => c.classList.toggle('sel', c.dataset.id === id)); renderEd(); drawEdges(); renderList(); } }
-function renderAll() { chips(); renderList(); renderMap(); renderEd(); refreshCount(); }
+function pickNode(id) { S.node = id; const g = groupOf(id); if (S.group !== g) { S.group = g; renderAll(); } else { document.querySelectorAll('.card').forEach((c) => c.classList.toggle('sel', c.dataset.id === id)); renderEd(); drawEdges(); renderList(); renderTl(); } }
+function renderTl() {
+  const box = $('#tlin'); if (!box) return; const pc = (km) => (Math.min(km, MAXKM) / MAXKM * 100).toFixed(2) + '%';
+  const faseKm = {}; Object.entries(CAPKM).forEach(([id, km]) => { const f = FASE_CAP[id]; if (faseKm[f] == null || km < faseKm[f]) faseKm[f] = km; });
+  let h = '';
+  FASI.forEach((f, i) => { const a = faseKm[f] || 0, b = faseKm[FASI[i + 1]] != null ? faseKm[FASI[i + 1]] : MAXKM; h += `<div class="fb" style="left:${pc(a)};width:${((b - a) / MAXKM * 100).toFixed(2)}%;background:${i % 2 ? '#ffffff08' : '#ffffff12'}"><span>FASE ${f}</span></div>`; });
+  Object.entries(CAPKM).forEach(([id, km]) => { h += `<div class="cp" style="left:${pc(km)}"><b>${NOME(id)}</b></div>`; });
+  LANES.forEach((w, i) => { h += `<div class="ln" style="top:${22 + i * 20 - 6}px;color:${COL[w]}">${w}</div>`; });
+  const seen = {};
+  TL.forEach((t) => { const lane = LANES.indexOf(t.who); if (lane < 0) return; const key = lane + ':' + Math.round(t.km); const j = seen[key] = (seen[key] || 0) + 1; const g = GROUPS[t.group];
+    h += `<button class="pt ${S.group === t.group ? 'sel' : ''} ${g.nodes.some((n) => isMod(n.id)) ? 'mod' : ''}" data-g="${esc(t.group)}" data-n="${esc(t.node)}" title="${esc(t.group)} · km ${Math.round(t.km)}${t.how ? ' · ' + esc(t.how) : ''}" style="left:calc(${pc(t.km)} + ${(j - 1) * 8}px);top:${22 + lane * 20}px;background:${COL[t.who]}"></button>`; });
+  box.innerHTML = h;
+  const cur = TL.find((t) => t.group === S.group);
+  $('#tlnow').innerHTML = !S.group ? '' : cur ? `Adesso: <b>${esc(cur.group)}</b> · ${esc(cur.who)} · km ${Math.round(cur.km)} · fase ${esc(NODES[cur.node].fase)}${cur.how ? ' · ' + esc(cur.how) : ''}${cur.cond ? ' · ' + esc(cur.cond) : ''} <span style="color:var(--m)">(i km sono indicativi)</span>` : `Adesso: <b>${esc(S.group)}</b> · non ha un km: ${CONFG.has(S.group) ? 'si apre con la confidenza' : 'parte da altre scelte o dalla regia'}`;
+}
+function renderAll() { chips(); renderList(); renderMap(); renderEd(); refreshCount(); renderTl(); }
 function toast(t) { const x = $('#toast'); x.textContent = t; x.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(() => (x.style.display = 'none'), 2200); }
 async function copia() {
   const k = Object.keys(exportMod()).length; if (!k) return toast('Non hai modificato niente');
@@ -251,20 +310,21 @@ function carica(file) {
 document.addEventListener('click', (ev) => {
   const t = ev.target;
   const go = t.closest('[data-go]'); if (go) { ev.preventDefault(); if (NODES[go.dataset.go]) pickNode(go.dataset.go); return; }
-  const cv = t.closest('.conv'); if (cv) { if (cv.dataset.g) pickGroup(cv.dataset.g); else if (cv.dataset.n) pickNode(cv.dataset.n); return; }
+  const pt = t.closest('.pt'); if (pt) { pickGroup(pt.dataset.g, pt.dataset.n); return; }
+  const cv = t.closest('.conv'); if (cv) { if (cv.dataset.g) pickGroup(cv.dataset.g, cv.dataset.n || null); else if (cv.dataset.n) pickNode(cv.dataset.n); return; }
   const cd = t.closest('.card'); if (cd) { pickNode(cd.dataset.id); return; }
   const cp = t.closest('[data-p]'); if (cp) { S.pers = S.pers === cp.dataset.p ? null : cp.dataset.p; chips(); renderList(); return; }
   const cf = t.closest('[data-f]'); if (cf) { S.fase = S.fase === cf.dataset.f ? null : cf.dataset.f; chips(); renderList(); return; }
 });
 $('#q').addEventListener('input', (e) => { S.q = e.target.value; renderList(); });
-$('#tConv').onclick = () => { S.tab = 'conv'; $('#tConv').classList.add('on'); $('#tMod').classList.remove('on'); renderList(); };
-$('#tMod').onclick = () => { S.tab = 'mod'; $('#tMod').classList.add('on'); $('#tConv').classList.remove('on'); renderList(); };
+const tabBtn = { seq: '#tSeq', conv: '#tConv', mod: '#tMod' };
+Object.entries(tabBtn).forEach(([k, id]) => { $(id).onclick = () => { S.tab = k; Object.values(tabBtn).forEach((x) => $(x).classList.toggle('on', x === id)); renderList(); }; });
 $('#ed').addEventListener('input', (ev) => {
   const ta = ev.target.closest('textarea'); if (!ta) return;
   setField(NODES[S.node], ta.dataset.k, ta.dataset.i, ta.value);
   const c = document.querySelector(`.card[data-id="${CSS.escape(S.node)}"]`), e = eff(NODES[S.node]);
   if (c) { c.classList.toggle('mod', isMod(S.node)); c.querySelector('.tx').textContent = e.text.split('\n').join(' ¶ '); c.querySelectorAll('.opt').forEach((o, i) => { const s = o.querySelector('span'); if (e.opts[i] != null) s.textContent = e.opts[i]; }); }
-  $('#bRip').disabled = !isMod(S.node); refreshCount(); drawEdges();
+  $('#bRip').disabled = !isMod(S.node); refreshCount(); drawEdges(); renderTl();
 });
 $('#ed').addEventListener('click', (ev) => { if (ev.target.id === 'bRip') { delete S.draft[S.node]; save(); renderAll(); } });
 $('#bCopia').onclick = copia; $('#bScarica').onclick = scarica;

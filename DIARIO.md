@@ -1,5 +1,6 @@
 ## 21/11/2026 · proprietario · v0.65 (**editor della storia**)
 - Fatto: pagina personale `strumenti/editor_storia.html` (fuori dal gioco): conversazioni per persona e fase, mappa a bivi con frecce, a destra testo originale e «come lo vorrei» (messaggi, varianti, risposte). Bozza salvata nel browser; «Copia modifiche» / «Scarica file» dà il JSON. Si assorbe con `node strumenti/assorbi_modifiche.mjs <file>`, che lo unisce in `chat_modifiche.js` (caricato dopo `chat_dati.js`, quindi sopravvive alla rigenerazione). Cambia solo le parole, non bivi, condizioni, effetti.
+- Poi: lista **in sequenza di gioco** (scheda Sequenza: capitali, fasi, km) e striscia in alto con una corsia per persona e un pallino per ogni conversazione che parte (clic = ci va). I km sono quelli segnaposto di `CHAT_START`; le conversazioni con flag `luogo_*` o `ev_*` si posano sull'arrivo della capitale. Senza km: quelle a confidenza e quelle che partono da scelte o regia.
 - Aperto: la storia secondaria di Jeshka e Luca sta in `jeshka.js` (`JL_SCENE`), non nelle chat: non è nell'editor. Non provato il tasto Copia negli appunti (nel browser di prova); Scarica file sì come logica.
 
 ## 21/11/2026 · proprietario · v0.64 (**Luca Garage**)
