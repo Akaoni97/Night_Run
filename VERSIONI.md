@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.65**
+**Versione attuale: v0.66**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -88,3 +88,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.63 | 21/11 | proprietario | Officina di Luca: V40 con turbo da 0,5/1,0/1,5 bar, downpipe, terminale, camme, cambio, gomme da drag (oltre 450 CV); pallino verde (monta) e rosso (compra) |
 | v0.64 | 21/11 | proprietario | Luca Garage: app del telefono che ti porta da Luca Tuning per € 150, sbloccabile da Sviluppatori |
 | v0.65 | 21/11 | proprietario | Aggiornamenti del programma Windows: pulsante nel menu (Cerca, Scarica, Installa e riavvia), release automatiche su GitHub a ogni caricamento su main |
+| v0.66 | 21/11 | proprietario | L'installatore Windows si chiama «installatore Luca» (file `Night-Run-Luca-<versione>-...`, release «Night Run Luca»), per distinguerlo da quello di Nico |

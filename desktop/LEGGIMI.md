@@ -60,6 +60,8 @@ incompleto o manomesso). Prima di installare viene scritto un **checkpoint** `ch
 ultimi tre, non si ripristinano da soli). Se l'installazione non riesce, riscarica l'installatore dalla pagina delle release e installalo sopra: i salvataggi restano.
 Senza firma digitale Windows può mostrare SmartScreen anche per l'aggiornamento: non si aggira, si sceglie «Esegui comunque».
 
+**Nome dell'installatore:** questo è l'**installatore Luca** (`Night-Run-Luca-<versione>-Installazione.exe` e `...-Portatile.exe`), per distinguerlo da quello di Nico. Se un domani si cambia o si aggiunge un installatore, **prima si chiede quale sovrascrivere**: non si decide da soli. Attenzione: programma installato, `appId` e cartella dei salvataggi (`%APPDATA%\\night-run`) sono ancora quelli di sempre, quindi un installatore di Nico con gli stessi valori installato sullo stesso PC prende il posto di questo.
+
 **Per chi sviluppa:** `desktop/aggiorna.js` (logica, provata in `test/aggiorna.test.js` senza Electron), `main.js` (IPC solo da `app://night-run/index.html`),
 `preload.js` (ponte `window.nightUpdate`: stato, controlla, scarica, installa, apriPagina, onStato), `aggiorna_ui.js` nella radice (il riquadro, assente nel browser),
 `info-build.js` (scrive `info-build.json` con commit e data). Libreria: `electron-updater` 6.8.12 (provider GitHub, non l'`autoUpdater` interno di Electron).

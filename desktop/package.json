@@ -51,10 +51,10 @@
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "deleteAppDataOnUninstall": false,
-      "artifactName": "Night-Run-${version}-Installazione.${ext}"
+      "artifactName": "Night-Run-Luca-${version}-Installazione.${ext}"
     },
     "portable": {
-      "artifactName": "Night-Run-${version}-Portatile.${ext}"
+      "artifactName": "Night-Run-Luca-${version}-Portatile.${ext}"
     },
     "publish": {
       "provider": "github",

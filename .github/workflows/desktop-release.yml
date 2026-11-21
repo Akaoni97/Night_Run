@@ -84,7 +84,7 @@ jobs:
           ls -l
           test -f latest.yml
           grep -q "version: ${{ steps.ver.outputs.versione }}" latest.yml
-          ls Night-Run-${{ steps.ver.outputs.versione }}-Installazione.exe Night-Run-${{ steps.ver.outputs.versione }}-Installazione.exe.blockmap
+          ls Night-Run-Luca-${{ steps.ver.outputs.versione }}-Installazione.exe Night-Run-Luca-${{ steps.ver.outputs.versione }}-Installazione.exe.blockmap
       - name: Release (bozza, poi pubblicata a file completi)
         env:
           V: ${{ steps.ver.outputs.versione }}
@@ -94,11 +94,11 @@ jobs:
           if gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null | grep -q true; then gh release delete "$tag" --yes; fi
           git rev-parse --short HEAD > /tmp/corto
           cat > /tmp/note.md <<NOTE
-          Night Run per Windows $V, dal commit $(cat /tmp/corto).
+          Night Run Luca (Windows) $V, dal commit $(cat /tmp/corto).
           Si installa dal programma già installato: Partita, Aggiornamenti, Cerca aggiornamenti.
           NOTE
-          gh release create "$tag" --draft --target "${{ github.sha }}" --title "Night Run $V" --notes-file /tmp/note.md --latest=false
+          gh release create "$tag" --draft --target "${{ github.sha }}" --title "Night Run Luca $V" --notes-file /tmp/note.md --latest=false
           cd desktop/dist
-          gh release upload "$tag" "Night-Run-$V-Installazione.exe" "Night-Run-$V-Installazione.exe.blockmap" "Night-Run-$V-Portatile.exe" latest.yml
+          gh release upload "$tag" "Night-Run-Luca-$V-Installazione.exe" "Night-Run-Luca-$V-Installazione.exe.blockmap" "Night-Run-Luca-$V-Portatile.exe" latest.yml
           # Solo adesso, con tutti i file caricati, la release diventa visibile e «ultima».
           gh release edit "$tag" --draft=false --latest
