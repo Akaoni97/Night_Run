@@ -27,7 +27,7 @@ const SOC = {
 };
 const SOC_NOMI = { fuel: 'Rifornimento', body: 'Carrozzeria', tyres: 'Gonfia e ripara le gomme', newtyres: 'Gomme nuove', maint: 'Manutenzione', traino: 'Traino' };
 // l'aspetto di Nico, il meccanico del furgone (lo stesso dell'interno dell'Officina Nico, LOOK.nico in interni_hd.js)
-const SOC_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'piena', occhiali: 'no' };
+const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 2, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'sole', x: { canotta: true, tatuaggi: true, catena: true } };
 
 (function socLogica() {
   if (typeof StreetGame === 'undefined') return;

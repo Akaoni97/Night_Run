@@ -53,7 +53,7 @@ il 3 ora è il 2, il 7 è il 3, dall'8 all'11 sono diventati 4-7, dal 13 al 16 s
 18. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
 19. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
 20. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
-21. [personaggi] **Aspetto dei personaggi nuovi** (v0.75): Nico ha il disegno che era di Mario (capelli grigi, barba piena, giubbotto) anche sul furgone del soccorso; Nabir (ricci, barba corta, camicia), Rossana (capelli lunghi, felpa) e Phill Grill (cappellino rosso, barba corta) sono fatti con l'editor del personaggio. Tito, Rocco e Massimo tengono l'aspetto di prima. Vanno bene così? (tutti e due)
+21. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
 - 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.

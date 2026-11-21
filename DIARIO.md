@@ -1,3 +1,7 @@
+## 21/11/2026 sera · cognato (Luca) · v0.76 (**aspetto dei personaggi**)
+- Fatto: in `personaggio.js` i tratti speciali `L.x` (canotta, tatuaggi, muscoli, catena, pazzo, barbone), solo per i personaggi del gioco: l'editor del protagonista e i passanti non cambiano. Nico giovane e swag (cappellino, occhiali da sole, canotta nera, braccia tatuate, catenina) anche sul furgone del soccorso; Tito vecchio e pazzo; Rocco fisicato in canotta e un po' più grande; Massimo barbone con la bottiglia. Test 293, foto di tutti e quattro.
+- Aperto: guardarli sul PC (punto 21 dei sospesi).
+
 ## 21/11/2026 sera · cognato (Luca) · v0.75 (**nomi nuovi di negozi e personaggi**)
 - Fatto: Mario tolto, al suo posto Nico (Officina Nico; il furgone e il carro attrezzi del soccorso sono suoi, `SOC_LOOK` = il suo aspetto; il traino porta sempre all'Officina Nico). Neon Kustom → Russian Kùstòm (insegne a pixel RUSSIAN KUSTOM, il font a pixel ora toglie gli accenti invece di saltare la lettera), Motel Ovunque → Motel 4Ever (insegna 4EVER) con Tito. Personaggi con nome nei pannelli, negli interni e nelle missioni: Nabir (bar, ora un uomo), Rossana (benzinaio, ora una donna), Phill Grill (cassa della Sosta 24), Rocco Lostallone (Autosalone), Massimo Lo Sfascio (sfascio). Gli id delle tappe restano quelli di prima (`niko`, `style`, `motel`...): i salvataggi vanno. Test 292, foto di tutti gli interni senza errori.
 - Aperto: aspetto dei personaggi (punto 21 dei sospesi). Le scene vecchie degli interni (`SCENE.<id>_vecchio`) hanno ancora la barista e la cassiera di prima: non si usano.

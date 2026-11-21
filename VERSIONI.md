@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.75**
+**Versione attuale: v0.76**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -98,3 +98,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.73 | 21/11 | cognato | Frizione: il kit frizione e volano non slitta più (terzo livello «da corsa» su ogni auto, bidisco della Supra con la sua capacità); quella di serie slitta solo su un motore molto potente |
 | v0.74 | 21/11 | cognato | Vecchio Pistone di Nico cancellato (peso del motore e rimborso in `officina.js`), Prestazioni nelle impostazioni (`prestazioni.js`: scelte pronte, gradini automatici, tetto ai fotogrammi), le auto elaborate valgono metà di pezzi e swap |
 | v0.75 | 21/11 | cognato | Nomi nuovi: Officina Nico al posto di Mario (anche il carro attrezzi del soccorso è di Nico), Russian Kùstòm, Motel 4Ever con Tito, Nabir, Rossana, Phill Grill, Rocco Lostallone, Massimo Lo Sfascio |
+| v0.76 | 21/11 | cognato | Aspetto dei personaggi: Nico giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo barbone (tratti speciali `L.x` in `personaggio.js`) |

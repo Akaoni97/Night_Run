@@ -341,12 +341,12 @@
     benz: { pelle: 1, capelli: 'lunghi', capCol: 2, testa: 'niente', testaCol: 0, sopra: 'felpa', sopraCol: 3, barba: 'no', occhiali: 'no' },
     cass: { pelle: 0, capelli: 'rasati', capCol: 2, testa: 'cappellino', testaCol: 0, sopra: 'felpa', sopraCol: 2, barba: 'corta', occhiali: 'no' },
     cam: { pelle: 3, capelli: 'corti', capCol: 1, testa: 'cappellino', testaCol: 1, sopra: 'camicia', sopraCol: 2, barba: 'piena', occhiali: 'no' },
-    port: { pelle: 1, capelli: 'rasati', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 5, barba: 'no', occhiali: 'vista' },
+    port: { pelle: 1, capelli: 'ricci', capCol: 4, testa: 'niente', testaCol: 0, sopra: 'camicia', sopraCol: 5, barba: 'corta', occhiali: 'vista', x: { pazzo: true } },   // Tito: vecchio e pazzo
     luca: { pelle: 2, capelli: 'corti', capCol: 0, testa: 'rovescio', testaCol: 5, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'no' },
-    nico: { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'piena', occhiali: 'no' },
+    nico: { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 2, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'sole', x: { canotta: true, tatuaggi: true, catena: true } },   // Nico: giovane, canotta, braccia tatuate, catenina e occhiali da sole
     neon: { pelle: 3, capelli: 'lunghi', capCol: 0, testa: 'niente', testaCol: 0, sopra: 'felpa', sopraCol: 1, barba: 'no', occhiali: 'no' },
-    vend: { pelle: 2, capelli: 'corti', capCol: 1, testa: 'niente', testaCol: 0, sopra: 'pelle', sopraCol: 1, barba: 'no', occhiali: 'no' },
-    ferro: { pelle: 3, capelli: 'rasati', capCol: 5, testa: 'berretto', testaCol: 2, sopra: 'giubbotto', sopraCol: 3, barba: 'piena', occhiali: 'no' },
+    vend: { pelle: 3, capelli: 'rasati', capCol: 0, testa: 'niente', testaCol: 0, sopra: 'pelle', sopraCol: 4, barba: 'corta', occhiali: 'sole', x: { muscoli: true, canotta: true, catena: true } },   // Rocco Lostallone: fisicato, canotta attillata
+    ferro: { pelle: 3, capelli: 'lunghi', capCol: 5, testa: 'berretto', testaCol: 2, sopra: 'giubbotto', sopraCol: 5, barba: 'piena', occhiali: 'no', x: { barbone: true } },   // Massimo Lo Sfascio: barbone
   };
   const frontCache = (S, fn) => { S.front = document.createElement('canvas'); S.front.width = W * SS; S.front.height = H * SS; const f = S.front.getContext('2d'); f.setTransform(SS, 0, 0, SS, 0, 0); f.imageSmoothingEnabled = false; fn(f, rng(91)); };
   // pompa di benzina (vista da dentro, oltre la vetrata)
@@ -695,7 +695,7 @@
       neon5(g, 'AUTOSALONE', 331 - tw5('AUTOSALONE', 1.3) / 2, 30, '182,156,255', 1.3, fl); neon5(g, 'NOTTE', 331 - tw5('NOTTE', 2.6) / 2, 50, '255,210,63', 2.6, 1);
       R(g, 582, 224, 44, 30, '#1a2a44'); t5(g, 'RATE', 585, 226, '#9ec4ff', 0.45); for (let k = 0; k < 4; k++) { const yy = 233 + ((k * 5 + Math.floor(t * 4)) % 20); R(g, 585, yy, 16 + (k * 7) % 18, 1, '#9ec4ff'); R(g, 610, yy, 10, 1, '#b8ff3a'); }
       glow(g, 604, 238, 30, '160,200,255', 0.18);
-      pg(g, 150, 340, 1.9, LOOK.vend, t, { seed: 8.2, pose: Math.floor(t / 7) % 3 === 2 ? 'phone' : 'idle' });
+      pg(g, 150, 340, 2.05, LOOK.vend, t, { seed: 8.2, pose: Math.floor(t / 7) % 3 === 2 ? 'phone' : 'idle' });
       for (const lx of [180, 330, 480]) glow(g, lx, 22, 30, '255,250,235', 0.35);
     },
     hot: [{ x: 200, y: 110, w: 270, h: 200, label: 'In vetrina', go: () => window.NightDealer && NightDealer.tab(0) }, { x: 100, y: 180, w: 100, h: 140, label: 'Rocco: rate', go: () => window.NightDealer && NightDealer.tab(2) }, { x: 500, y: 200, w: 140, h: 120, label: 'Le tue auto', go: () => window.NightDealer && NightDealer.tab(1) }],

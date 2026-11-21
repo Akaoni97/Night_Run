@@ -29,6 +29,7 @@ const PG_OPZ = [
   { k: 'occhiali', nome: 'Occhiali', v: [['no', 'No'], ['vista', 'Da vista'], ['sole', 'Da sole']] },
 ];
 // il protagonista di sempre: cappellino rosso, giubbotto blu, capelli corti scuri
+const PG_X = ['canotta', 'tatuaggi', 'muscoli', 'catena', 'pazzo', 'barbone'];
 const PG_DEF = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'no', occhiali: 'no' };
 
 // un aspetto sempre valido (valori sconosciuti o mancanti tornano quelli di partenza)
@@ -38,6 +39,8 @@ function pgNorm(L) {
     const v = L[q.k];
     if (q.col ? Number.isInteger(v) && v >= 0 && v < q.col.length : q.v.some((x) => x[0] === v)) o[q.k] = v;
   }
+  // tratti speciali dei personaggi del gioco (non nell'editor): L.x = { canotta, tatuaggi, muscoli, catena, pazzo, barbone }
+  if (L && L.x && typeof L.x === 'object') { const x = {}; for (const k of PG_X) if (L.x[k]) x[k] = true; if (Object.keys(x).length) o.x = x; }
   return o;
 }
 function pgRandom(rnd = Math.random) {
@@ -207,24 +210,41 @@ function pgPaint(g, L, pose, f, blink) {
     limb(X, hipY, kx, ky, 8, jeansSh); limb(kx, ky, ax, ay, 7, jeansSh); limb(X, hipY, kx, ky, 6, col); limb(kx, ky, ax, ay, 5, col); limb(X + 2, hipY + 1, kx + 2, ky, 1, hi);
     rect(ax - 3, ay, 9, 3, shoe); rect(ax - 3, ay + 2, 9, 1, sole); rect(ax + 3, ay - 1, 3, 1, shoe);
   };
-  const arm = (a, e, col, hand) => {
+  const Xs = L.x || {}, mu = Xs.muscoli ? 2 : 0;                    // tratti speciali (pgNorm): muscoli = braccia e spalle più grosse
+  const arm = (a, e, col, hand, sh = C.jacketSh, back = false) => {
+    if (Xs.canotta) { col = back ? C.skinSh : C.skin; sh = back ? pgShade(C.skinSh, -0.25) : C.skinSh; }   // braccia nude
     const ex = X + Math.sin(a) * 11, ey = shY + 2 + Math.cos(a) * 11, fa = a + e, hx = ex + Math.sin(fa) * 10, hy = ey + Math.cos(fa) * 10;
-    limb(X, shY + 2, ex, ey, 6, C.jacketSh); limb(ex, ey, hx, hy, 5, C.jacketSh); limb(X, shY + 2, ex, ey, 4, col); limb(ex, ey, hx, hy, 3, col);   // bordo scuro: il braccio si stacca dal busto
+    limb(X, shY + 2, ex, ey, 6 + mu, sh); limb(ex, ey, hx, hy, 5 + mu, sh); limb(X, shY + 2, ex, ey, 4 + mu, col); limb(ex, ey, hx, hy, 3 + mu, col);   // bordo scuro: il braccio si stacca dal busto
+    if (Xs.tatuaggi && !back) {                                       // tatuaggi su tutto il braccio, a macchie d'inchiostro
+      const ink = ['#24345a', '#2a2a3a', '#6a2434'];
+      [[0.25, 0], [0.45, 1], [0.6, -1], [0.8, 0]].forEach(([k, o], i) => rect(X + (ex - X) * k + o, shY + 2 + (ey - shY - 2) * k, 2, 1, ink[i % 3]));
+      [[0.2, 0], [0.45, 1], [0.7, 0]].forEach(([k, o], i) => rect(ex + (hx - ex) * k + o - 0.5, ey + (hy - ey) * k, 2, 1, ink[(i + 1) % 3]));
+      px(ex, ey + 1, ink[2]);
+    }
     rect(hx - 1.5, hy - 1, 4, 4, hand); px(hx + 1.5, hy - 1, pgShade(hand, 0.15)); return [hx, hy];
   };
   // dietro: capelli lunghi, gamba e braccio lontani (più scuri)
   if (L.capelli === 'lunghi') rect(X - 9, 6 + B, 6, 26, C.hair);
   if (L.sopra === 'felpa') rect(X - 9, shY - 6, 8, 8, C.jacketSh);                                  // il cappuccio dietro il collo
   leg(P.rA, P.rK, jeansSh, jeansSh);
-  if (!P.pockets) arm(P.bArm, P.bEl, C.jacketSh, C.skinSh); else limb(X - 1, shY + 2, X - 3, shY + 14, 5, C.jacketSh);
+  if (!P.pockets) arm(P.bArm, P.bEl, C.jacketSh, C.skinSh, C.jacketSh, true); else limb(X - 1, shY + 2, X - 3, shY + 14, 5, C.jacketSh);
   // busto
-  const rows = [[-4, 4], [-6, 6], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6]];
+  let rows = [[-4, 4], [-6, 6], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6]];
+  if (mu) rows = rows.map(([a, b], i) => (i < 12 ? [a - 2, b + 2] : i < 18 ? [a - 1, b + 1] : [a, b]));   // spalle larghe, vita stretta
   rows.forEach(([a, b], i) => { const y = shY + i; rect(X + a, y, b - a + 1, 1, C.jacket); rect(X + a, y, 2, 1, C.jacketSh); rect(X + b - 1, y, 2, 1, C.jacketHi); });
   const tb = shY + rows.length;                                                                     // fondo del busto
-  if (L.sopra === 'camicia') { for (let y = shY + 1; y < tb; y++) for (let x = X - 6; x <= X + 5; x++) { if ((x - X) % 3 === 0) px(x, y, C.check); else if ((y - shY) % 3 === 0) px(x, y, C.jacketSh); } rect(X + 1, shY, 4, 3, '#e8e2d4'); for (let y = shY + 4; y < tb; y += 4) px(X + 4, y, '#e8e2d4'); }
+  if (Xs.canotta) {                                                                                 // canotta: spalle e scollo di pelle, due spalline
+    rows.slice(0, 6).forEach(([a, b], i) => { rect(X + a, shY + i, 3, 1, C.skin); rect(X + b - 2, shY + i, 3, 1, C.skinSh); });
+    rect(X - 2, shY, 6, 4, C.skin); rect(X - 1, shY + 4, 4, 1, C.skin);
+  } else if (L.sopra === 'camicia') { for (let y = shY + 1; y < tb; y++) for (let x = X - 6; x <= X + 5; x++) { if ((x - X) % 3 === 0) px(x, y, C.check); else if ((y - shY) % 3 === 0) px(x, y, C.jacketSh); } rect(X + 1, shY, 4, 3, '#e8e2d4'); for (let y = shY + 4; y < tb; y += 4) px(X + 4, y, '#e8e2d4'); }
   else if (L.sopra === 'felpa') { rect(X - 1, shY + 13, 7, 6, C.jacketSh); rect(X, shY + 13, 5, 1, C.jacket); px(X + 3, shY + 2, C.check); px(X + 3, shY + 3, C.check); px(X + 4, shY + 4, C.check); px(X + 4, shY + 5, C.check); }
   else if (L.sopra === 'pelle') { rect(X + 1, shY, 1, rows.length, '#9a9aa4'); rect(X - 1, shY, 6, 3, C.jacketHi); rect(X + 3, shY + 3, 2, 4, C.jacketHi); rect(X + 5, shY + 6, 1, 10, '#5a5662'); }
   else { rect(X + 2, shY + 1, 1, rows.length - 2, C.jacketSh); rect(X - 3, shY - 2, 7, 3, C.jacket); rect(X - 3, shY - 2, 2, 3, C.jacketSh); rect(X + 4, shY + 12, 2, 1, C.jacketSh); }   // zip, colletto alzato, taschino
+  if (mu) { rect(X - 4, shY + 7, 9, 1, C.jacketSh); px(X + 1, shY + 8, C.jacketSh); }               // pettorali
+  if (Xs.barbone) {                                                                                 // toppe, strappi e sporco
+    rect(X - 5, shY + 8, 3, 3, '#6a5a3a'); px(X - 5, shY + 8, '#3a2e1e'); rect(X + 2, shY + 17, 3, 2, '#4a5a3a'); rect(X - 2, shY + 13, 1, 2, '#141018');
+    for (let x = X - 7; x <= X + 6; x += 2) rect(x, tb, 1, 1 + ((x * 7) % 3), C.jacketSh);
+  }
   rect(X - 7, tb - 2, 14, 2, C.jacketSh);                                                           // orlo
   rect(X - 6, tb, 12, 2, '#1a1a20'); px(X + 3, tb, '#c8b070');                                     // cintura e fibbia
   // gamba e braccio vicini
@@ -232,10 +252,13 @@ function pgPaint(g, L, pose, f, blink) {
   let hand = null;
   if (P.pockets) { limb(X + 1, shY + 2, X + 4, shY + 13, 5, C.jacket); rect(X + 2, shY + 13, 5, 3, C.jacketSh); }
   else hand = arm(P.fArm, P.fEl, C.jacket, C.skin);
+  if (Xs.barbone) { px(X + 1, hipY + 8, '#5a4a32'); rect(X - 2, hipY + 16, 2, 1, '#5a4a32'); px(X + 4, hipY + 22, '#4a3a28'); }   // jeans sporchi
+  if (Xs.barbone && hand && !P.phone) { rect(hand[0] + 1, hand[1] - 6, 2, 7, '#2e4a24'); rect(hand[0] + 1, hand[1] - 8, 2, 2, '#1e3018'); px(hand[0] + 2, hand[1] - 5, '#7aa060'); }   // la bottiglia
   if (P.phone && hand) { rect(hand[0] + 1, hand[1] - 4, 2, 5, '#1a1a22'); rect(hand[0] + 2, hand[1] - 3, 1, 3, '#7fd8ff'); }   // il telefono acceso
   // collo e testa (profilo verso destra)
   const hy = 4 + B + P.head, hx = X + (P.head > 0 ? 1 : 0);
   rect(hx - 2, hy + 16, 5, 6, C.skinSh); rect(hx + 1, hy + 16, 2, 5, C.skin);
+  if (Xs.catena) { rect(hx - 2, hy + 21, 7, 1, '#e8c040'); px(hx + 2, hy + 22, '#ffe27a'); px(hx + 2, hy + 23, '#c89a20'); }   // catenina d'oro
   const head = [[-4, 3], [-6, 5], [-7, 6], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 8], [-7, 8], [-7, 9], [-6, 9], [-6, 8], [-6, 8], [-5, 8], [-4, 7], [-3, 5]];
   if (P.head < 0) {                                                                                  // si guarda indietro: si vede la nuca, niente viso
     head.forEach(([a], i) => rect(hx + a, hy + i, 13 - (i > 13 ? 3 : 0), 1, C.skinSh));
@@ -246,9 +269,11 @@ function pgPaint(g, L, pose, f, blink) {
   if (P.head >= 0) {
     const ey = hy + 8 + P.eyeDown;
     rect(hx + 3, hy + 7, 4, 1, C.hair);                                                              // sopracciglio
-    if (blink) rect(hx + 4, ey, 2, 1, C.skinSh); else { rect(hx + 4, ey, 2, 1, '#f4efe6'); px(hx + 5, ey, '#1a1414'); }
+    if (Xs.pazzo) { rect(hx + 3, hy + 5, 4, 1, C.hair); px(hx + 7, hy + 4, C.hair); rect(hx + 3, ey - 1, 4, 3, '#f4efe6'); px(hx + 4 + (Math.floor(f / 6) % 2), ey, '#1a1414'); }   // occhi sbarrati, sopracciglio per aria
+    else if (blink) rect(hx + 4, ey, 2, 1, C.skinSh); else { rect(hx + 4, ey, 2, 1, '#f4efe6'); px(hx + 5, ey, '#1a1414'); }
     px(hx + 9, hy + 11, C.skinSh); px(hx + 8, hy + 12, C.skinSh);                                    // narice
-    if (P.mouth) rect(hx + 5, hy + 13, 3, 2, '#5a2226'); else rect(hx + 5, hy + 13, 3, 1, pgShade(C.skin, -0.3));
+    if (Xs.pazzo) { rect(hx + 4, hy + 13, 5, 2, '#5a2226'); rect(hx + 5, hy + 13, 3, 1, '#e8e0c8'); }   // sorriso storto coi denti
+    else if (P.mouth) rect(hx + 5, hy + 13, 3, 2, '#5a2226'); else rect(hx + 5, hy + 13, 3, 1, pgShade(C.skin, -0.3));
     rect(hx - 1, hy + 7, 3, 4, C.skinSh); px(hx, hy + 8, pgShade(C.skinSh, -0.25));                 // orecchio
     rect(hx + 1, hy + 15, 6, 1, pgShade(C.skin, -0.12));                                             // mascella
     if (L.barba !== 'no') {
@@ -258,6 +283,7 @@ function pgPaint(g, L, pose, f, blink) {
         if (L.barba === 'piena' || (x + y) % 2 === 0) px(x, y, L.barba === 'piena' ? C.hair : pgShade(C.hair, 0.15));
       }
       if (L.barba === 'piena') rect(hx + 5, hy + 12, 4, 1, C.hair);
+      if (Xs.barbone) for (let y = hy + 16; y <= hy + 21; y++) for (let x = hx; x <= hx + 7 - (y - hy - 16); x++) if ((x * 3 + y) % 4) px(x, y, (x + y) % 3 ? C.hair : pgShade(C.hair, 0.2));   // barbone: barba lunga e incolta
     }
     if (L.occhiali !== 'no') {
       if (L.occhiali === 'sole') { rect(hx + 3, ey - 1, 5, 3, '#08080c'); px(hx + 6, ey - 1, '#6a8ab8'); }
@@ -286,6 +312,7 @@ function pgPaint(g, L, pose, f, blink) {
     if (L.testa === 'rovescio') { rect(hx - 14, hy + 3, 8, 2, C.capSh); rect(hx + 3, hy + 3, 4, 1, hcol); }
     else { rect(hx + 6, hy + 3, 7, 2, C.capSh); rect(hx + 6, hy + 3, 7, 1, C.cap); }
   }
+  if (Xs.pazzo) for (const [a, b] of [[-10, 1], [-11, 6], [-10, 11], [-8, -3], [-5, -5], [-1, -6], [3, -5], [6, -3], [8, 0]]) { rect(hx + a, hy + b, 3, 2, C.hair); px(hx + a + 1, hy + b, C.hairHi); }   // capelli sparati in aria
 }
 function pgStanding(g, x, y, s, ph, walking, look, light = 0, t = 0, pose) {
   const P = walking ? 'walk' : pose || 'idle';

@@ -19,3 +19,4 @@ Formato: `## data · per chi · da chi` e due o tre righe.
 - **Mario non c'è più**: la sua officina è l'**Officina Nico** (tagliandi, carrozzeria, gomme, revisione) e Nico fa anche il **soccorso col carro attrezzi** (è lui che arriva col furgone).
 - **Neon Kustom → Russian Kùstòm** (Jeshka resta lì). **Motel Ovunque → Motel 4Ever**, gestito da **Tito**.
 - Personaggi nuovi: **Nabir** al bar, **Rossana** al benzinaio, **Phill Grill** alla cassa della Sosta 24, **Rocco Lostallone** all'Autosalone, **Massimo Lo Sfascio** allo sfascio. Luca Tuning come prima.
+- *Aggiornamento v0.76*: Nico è giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo un barbone.
