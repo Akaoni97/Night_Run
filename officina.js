@@ -26,6 +26,18 @@ const OFF_SIM = ['turbo', 'pw', 'limiter', 'sparkCut', 'ecuLaunch', 'ecuPops', '
 const OFF_DSP = ['cyl', 'tb', 'bov', 'intake', 'scream', 'lope', 'spark', 'voice', 'ex', 'cat'];
 const OFF = { liberoCv: 200, kmPerCv: 0.5, kmMax: 150, euroPerCv: 14, base: 500 };       // swap: fino a 200 CV sempre disponibile, oltre servono km; prezzo = base + CV × euroPerCv
 
+// rapporti regolati da Luca: adj = { fd, g: [_, p1, p2...] } in % da -15 a +15, positivo = più lungo (rapporto più basso).
+// Dà i rapporti nuovi e il finale nuovo; ogni marcia resta più lunga della precedente (almeno del 2 %). Senza adj, tutto com'era.
+const OFF_RAP = { min: -15, max: 15 };
+function offGearAdj(gears, fd, adj) {
+  const base = Array.isArray(gears) ? gears.slice() : gears;
+  if (!adj || !Array.isArray(base)) return { gears: base, fd };
+  const cl = (v) => Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +v || 0)), r3 = (x) => Math.round(x * 1000) / 1000;
+  const g = base.map((r, i) => (i > 0 && r ? r * (1 - cl((adj.g || [])[i]) / 100) : r));
+  for (let i = 2; i < g.length; i++) if (g[i] > g[i - 1] * 0.98) g[i] = g[i - 1] * 0.98;
+  return { gears: g.map((r) => (r ? r3(r) : r)), fd: r3(fd * (1 - cl(adj.fd) / 100)) };
+}
+
 // parametri di un'auto (la Supra non ha `params` nel suo record)
 function offParamsOf(id, sel) {
   const c = typeof CARS !== 'undefined' && CARS[id];
@@ -108,6 +120,14 @@ function offSwapApply(game, carId, TP, sim, sel) {
   const kg = (id) => (typeof motKgSerie === 'function' ? motKgSerie(id) : 150);
   TP.sim.dm = (TP.sim.dm || 0) + kg(dId) - kg(carId);              // il peso del motore in più (o in meno): lo somma game.applyMass
   TP.sim.boostK = D.sim.boostK !== undefined ? D.sim.boostK : 1;       // come il donatore (la Supra a piena efficienza, non quella dell'auto che ospita)
+  // la frizione dell'auto è fatta per il suo motore: col motore di un altro il livello montato (serie, sport, corsa) vale quanto
+  // quello stesso livello della frizione del donatore, mai meno di quello che l'auto aveva (senza, il motore scappa al limitatore)
+  const hc = offCatalogOf(carId), dc = offCatalogOf(dId);
+  if (hc && hc.clutch && dc && dc.clutch) {
+    const i = Math.max(0, hc.clutch.items.findIndex((it) => it.id === (sel || {}).clutch));
+    const d = dc.clutch.items[Math.min(i, dc.clutch.items.length - 1)];
+    if (d && d.sim && d.sim.clutch > (TP.sim.clutchMax || 0)) TP.sim.clutchMax = d.sim.clutch;
+  }
   const e = offEstimate(dId);
   return { tipo: offEngineName(dId), hp: e.cv };
 }
@@ -182,6 +202,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
 .of-hint { color: #9a9486; font-size: 12.5px; margin: 6px 2px; }
 .of-cur { margin: 8px 0; padding: 8px 10px; border: 1px solid #38bdf8; border-radius: 10px; background: #0f1a22; font-size: 13px; }
 .of-swaps { max-height: 360px; overflow: auto; padding-right: 2px; }
+.of-gear { display: grid; gap: 4px; padding: 8px 2px 2px; border-top: 1px dashed #3a3548; margin-top: 6px; } .of-gear.off { opacity: .45; } .of-gear h5 { margin: 0 0 2px; font: 700 12px/1.2 var(--f-data, monospace); color: #ffd27a; } .of-gear .of-gz { justify-self: start; margin-top: 4px; padding: 5px 10px; border: 1px solid #4a4458; border-radius: 8px; background: transparent; color: #cfc8b8; font: 700 11px/1 var(--f-data, monospace); cursor: pointer; }
 .of-susp { display: grid; gap: 6px; padding: 6px 2px 2px; } .of-susp.off { opacity: .45; }
 .of-sr { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; align-items: center; }
 .of-sr span { font: 400 11px/1 var(--f-data, monospace); letter-spacing: .1em; text-transform: uppercase; color: #9a9486; }
@@ -200,6 +221,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     const box = document.createElement('div'); box.className = 'of'; body.appendChild(box);
     const render = () => draw(box, ctx);
     box.addEventListener('click', (e) => {
+      if (e.target.closest('[data-gzero]')) { if (ctx.setGearAdj) { ctx.setGearAdj({ reset: true }, () => render()); ctx.after && ctx.after(); } render(); return; }
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
@@ -219,11 +241,15 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     });
     // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
     box.addEventListener('input', (e) => {
+      const gr = e.target.closest('[data-gear]');
+      if (gr) { const l = box.querySelector('[data-gl="' + gr.dataset.gear + '"]'); if (l) l.textContent = gearLab(+gr.value); return; }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
     });
     box.addEventListener('change', (e) => {
+      const gr = e.target.closest('[data-gear]');
+      if (gr) { if (ctx.setGearAdj) { ctx.setGearAdj(gr.dataset.gear === 'fd' ? { fd: +gr.value } : { g: [+gr.dataset.gear, +gr.value] }, () => render()); ctx.after && ctx.after(); } render(); return; }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.setAdj) return;
       ctx.setAdj(r.dataset.susp === 'h' ? { h: +r.value } : { k: +r.value }, () => render()); ctx.after && ctx.after(); render();
     });
@@ -257,6 +283,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     let h = summary(ctx);
     const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
+    { const est = ctx.sim.estimatePeak(), cl = ctx.sim.P.clutchMax;      // frizione più debole del motore: slitta e il motore sale al limitatore senza spingere
+      if (est.nm > cl * 0.97) h += `<p class="of-warn" style="margin:6px 2px 2px;padding:6px 8px;border:1px solid #ff453a;border-radius:8px;color:#ffb3ad;font-size:12px;line-height:1.35">⚠ La frizione regge ${fmt(Math.round(cl))} Nm e il motore ne fa ${fmt(Math.round(est.nm / 5) * 5)}: slitta e i giri vanno al limitatore senza spingere. Vai in <b>Trasmissione</b> e monta una frizione più forte.</p>`; }
     h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button></div>`;
     h += tab === 'mod' ? drawMod(ctx, career, money) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
@@ -288,6 +316,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
     }
+    if (G.id === 'trasm' && ctx.gearAdj) h += gearBlock(ctx);
     return h + '<p class="of-hint"><b style="color:#2fd16a">●</b> verde: ce l\'hai nel magazzino, un clic lo <b>monta</b>. <b style="color:#ff453a">●</b> rosso: non ce l\'hai, un clic lo <b>compra</b> (poi lo monti); con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
   }
 
@@ -299,6 +328,24 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
     const st = suspState(item, ctx.adj()), L = suspLab(st, st.h, st.k);
     return `<div class="of-susp${st.adjustable ? '' : ' off'}"><div class="of-sr"><span>Altezza</span><b id="ofSuspHv">${E(L.h)}</b><input type="range" data-susp="h" min="${st.hMin}" max="${st.hMax}" step="5" value="${st.h}" ${st.adjustable ? '' : 'disabled'} aria-label="Altezza da terra"></div>`
       + `<div class="of-sr"><span>Rigidità</span><b id="ofSuspKv">${E(L.k)}</b><input type="range" data-susp="k" min="${st.kMin}" max="${st.kMax}" step="0.1" value="${st.k}" ${st.adjustable ? '' : 'disabled'} aria-label="Rigidità delle molle"></div></div>`;
+  }
+
+  // rapporti: una barra per marcia e una per il finale, da -15 % (più corta) a +15 % (più lunga); a destra la velocità al limitatore
+  function gearLab(v) { return v === 0 ? 'di serie' : (v > 0 ? '+' : '−') + Math.abs(v) + ' %' + (v > 0 ? ' · più lunga' : ' · più corta'); }
+  const rap = (x) => x.toFixed(3).replace('.', ',');
+  function gearBlock(ctx) {
+    const P = ctx.sim.P, a = ctx.gearAdj() || { fd: 0, g: [] }, n = P.gears.length - 1, lim = P.limiter;
+    const vAt = (i) => Math.round(lim / 60 / (P.gears[i] * P.fd) * 2 * Math.PI * P.r * 3.6);
+    let h = '<div class="of-gear"><h5>Rapporti del cambio</h5>';
+    for (let i = 1; i <= n; i++) {
+      const v = Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +(a.g || [])[i] || 0));
+      h += `<div class="of-sr"><span>${i}ª</span><b data-gl="${i}">${E(gearLab(v))}</b><input type="range" data-gear="${i}" min="${OFF_RAP.min}" max="${OFF_RAP.max}" step="1" value="${v}" aria-label="Rapporto della ${i}ª marcia"><small style="color:#8a8478;grid-column:2;text-align:right">${rap(P.gears[i])} · ${vAt(i)} km/h</small></div>`;
+    }
+    const f = Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +a.fd || 0));
+    h += `<div class="of-sr"><span>Finale</span><b data-gl="fd">${E(gearLab(f))}</b><input type="range" data-gear="fd" min="${OFF_RAP.min}" max="${OFF_RAP.max}" step="1" value="${f}" aria-label="Rapporto finale"><small style="color:#8a8478;grid-column:2;text-align:right">${rap(P.fd)}</small></div>`;
+    h += '<p class="of-hint" style="margin:2px 0 0">Più lunga = giri più bassi e più velocità in quella marcia, meno spinta. Più corta = più spinta, meno velocità. Il finale cambia tutte le marce insieme. Si regola da fermi, gratis. A destra: rapporto e velocità al limitatore.</p>'
+      + `<button type="button" class="of-gz" data-gzero="1">Rapporti di serie</button></div>`;
+    return h;
   }
 
   function drawSwap(ctx, carId, dId, career, money) {
@@ -314,12 +361,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, OFF_
       return `<div class="of-row"><div class="of-sw"><span class="nm"><b>${E(name)}</b><small>${E(sub)} · ${fmt(e.cv)} CV · ${fmt(e.nm)} Nm · ${e.kg} kg</small></span>`
         + `<span class="st">${E(st)}</span><button type="button" class="of-go" data-swap="${orig ? '-' : id}" ${cur || lock || poor ? 'disabled' : ''}>${cur ? 'Montato' : 'Monta'}</button></div>`
         + `<div class="of-head" style="margin-top:4px"><small style="color:#8a8478">${E(info)}</small><button type="button" class="of-i" data-i="sw:${id}" aria-expanded="${!!open['sw:' + id]}" title="Cosa cambia">i</button></div>`
-        + (open['sw:' + id] ? `<div class="of-info"><p>${orig ? 'Rimonta il motore originale: i pezzi del motore tornano quelli di questa auto.' : `Monti il motore della ${E(CARS[id].name)} sulla tua auto: curva di coppia, giri, turbo, voce e peso del motore cambiano; cambio, differenziale, gomme, assetto e frizione restano quelli dell'auto. La frizione può slittare se il motore è troppo forte. I pezzi del motore diventano quelli di questo motore (di serie all'inizio).`}</p></div>` : '') + '</div>';
+        + (open['sw:' + id] ? `<div class="of-info"><p>${orig ? 'Rimonta il motore originale: i pezzi del motore tornano quelli di questa auto.' : `Monti il motore della ${E(CARS[id].name)} sulla tua auto: curva di coppia, giri, turbo, voce e peso del motore cambiano; cambio, differenziale, gomme e assetto restano quelli dell'auto; la frizione tiene la coppia del motore nuovo (stesso livello: serie, sport o corsa). I pezzi del motore diventano quelli di questo motore (di serie all'inizio).`}</p></div>` : '') + '</div>';
     };
     const cur = dId ? `<div class="of-cur">Motore montato: <b>${E(offEngineName(dId))}</b> (dalla ${E(CARS[dId].short || CARS[dId].name)}).</div>` : '';
     return cur + '<p class="of-hint">Metti sulla tua auto il motore di un\'altra auto del gioco. Il prezzo comprende la manodopera. Fino a 200 CV si monta subito, i più forti si sbloccano coi chilometri. Una volta pagato un motore, rimontarlo è gratis.</p>'
       + '<div class="of-swaps">' + row(carId, true) + list.map((id) => row(id, false)).join('') + '</div>';
   }
 
-  window.NightOfficina = { panel, OFF_GRUPPI };
+  window.NightOfficina = { panel, OFF_GRUPPI, gearLab };
 })();
