@@ -2,7 +2,7 @@
 //  Night Run · Lo sfasciacarrozze: Sfascio Ruggine (dopo usato.js)
 //  Tappa nuova: prende il posto del secondo autogrill di ogni giro (VG_PATTERN[9], primo al km 30,6).
 //  Dentro: pezzi usati per l'auto che guidi a meno della metà (Luca te li monta gratis), la carcassa da rimettere in
-//  strada (si paga poco, ha tutti i difetti: con Mario, carrozziere e gomme torna a valere all'Autosalone),
+//  strada (si paga poco, ha tutti i difetti: con Nico, carrozziere e gomme torna a valere all'Autosalone),
 //  rottamare un'auto tua, e rovistare tra le carcasse (€ 20, una volta per tappa: scegli quale e vedi cosa trovi).
 //  Stato in game.s.vg.sfascio.
 // ============================================================================
@@ -74,7 +74,7 @@ if (typeof VG_PLACE !== 'undefined') {
     if (this.s.money < W.price) return { ok: false, why: `Costa € ${fmt(W.price)}` };
     this.s.money -= W.price; this.jk().wreck[n] = W.id;
     this.usGive(W.id, W.km, W.defects, { damage: W.damage }, W.price);
-    this.say(`Carcassa della ${CARS[W.id].name} (− € ${fmt(W.price)}): è nel tuo garage. Mario e il carrozziere ti aspettano.`, 'buy');
+    this.say(`Carcassa della ${CARS[W.id].name} (− € ${fmt(W.price)}): è nel tuo garage. Nico e il carrozziere ti aspettano.`, 'buy');
     return { ok: true, price: W.price };
   };
 
@@ -147,7 +147,7 @@ if (typeof VG_PLACE !== 'undefined') {
     const h = (t) => { const e = document.createElement('h4'); e.className = 'jk-h'; e.textContent = t; wrap.appendChild(e); };
     const p = (t) => { const e = document.createElement('p'); e.className = 'hint'; e.style.margin = '0'; e.textContent = t; wrap.appendChild(e); };
     const done = (r) => { if (r && r.ok === false) { if (r.why) ctx.flash(r.why, 2.4); } else ctx.save(); ctx.refresh(); };
-    p('Il ferrovecchio: «Qui niente garanzia, ma i prezzi sono questi. Il cane non morde.»');
+    p('Massimo Lo Sfascio: «Qui niente garanzia, ma i prezzi sono questi. Il cane non morde.»');
     // rovistare
     h(`Rovista tra le carcasse · € ${JK.dig}`);
     const dug = J.dug[n], grid = document.createElement('div'); grid.className = 'jk-dig';
@@ -168,7 +168,7 @@ if (typeof VG_PLACE !== 'undefined') {
       const d = document.createElement('div'); d.className = 'jk-wreck';
       d.innerHTML = `<div style="display:grid;place-items:center"><img alt="" src="${pic(W.id, ctx.refresh)}"></div><b style="font:400 18px/1.1 var(--f-display)">${esc(CARS[W.id].name)} · € ${fmt(W.price)}</b>`
         + `<small style="color:var(--muted)">${fmt(W.km)} km · carrozzeria al ${Math.round(W.damage * 100)} % · motore stanco, freni e gomme finiti, tagliando da fare</small>`
-        + `<div class="jk-est"><span>Carrozziere</span><b>€ ${fmt(R.body)}</b><span>Revisione del motore (Mario)</span><b>€ ${fmt(R.rev)}</b><span>Gomme nuove</span><b>€ ${fmt(R.tyres)}</b><span>Tagliando, candele, pastiglie</span><b>€ ${fmt(R.svc)}</b>`
+        + `<div class="jk-est"><span>Carrozziere</span><b>€ ${fmt(R.body)}</b><span>Revisione del motore (Nico)</span><b>€ ${fmt(R.rev)}</b><span>Gomme nuove</span><b>€ ${fmt(R.tyres)}</b><span>Tagliando, candele, pastiglie</span><b>€ ${fmt(R.svc)}</b>`
         + `<span class="tot">Dopo, all'Autosalone vale circa</span><b class="tot" style="color:var(--lime)">€ ${fmt(R.after)}</b><span>Ci guadagni (o ci perdi)</span><b style="color:${R.profit >= 0 ? 'var(--lime)' : 'var(--crit)'}">${R.profit >= 0 ? '+' : '−'} € ${fmt(Math.abs(R.profit))}</b></div>`;
       const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = `Comprala · € ${fmt(W.price)}`; b.disabled = g.s.money < W.price;
       b.addEventListener('click', () => done(g.jkBuyWreck())); d.appendChild(b); wrap.appendChild(d);

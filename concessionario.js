@@ -4,7 +4,7 @@
 //  Dentro: il salone con le auto in vendita (quelle di VG_SHOP, sbloccate coi km), schede tecniche vere (cavalli, coppia
 //  e peso calcolati dal modello del motore), l'occasione della tappa (−15 %), l'acquisto in contanti o a rate,
 //  la vendita delle tue auto (valutazione da km, danni e pezzi montati), il giro di prova di 3 km.
-//  Le auto si comprano solo qui; il Motel Ovunque resta il parcheggio dove si cambia mezzo (e vende il rimorchio).
+//  Le auto si comprano solo qui; il Motel 4Ever resta il parcheggio dove si cambia mezzo (e vende il rimorchio).
 //  Stato in game.s.vg: fin (finanziamenti), test (giro di prova in corso).
 // ============================================================================
 const DL = {
@@ -159,7 +159,7 @@ if (typeof VG_PLACE !== 'undefined') {
     return { ok: true, due };
   };
 
-  // giro di prova: l'auto è tua per 3 km, poi quando ti fermi il venditore viene a riprendersela
+  // giro di prova: l'auto è tua per 3 km, poi quando ti fermi Rocco Lostallone viene a riprendersela
   P.dlTestStart = function (id) {
     const v = V(this), it = VG_SHOP.find((q) => q.id === id && q.car);
     if (!it) return { ok: false };
@@ -206,7 +206,7 @@ if (typeof VG_PLACE !== 'undefined') {
       if (this.car !== T.id && !here(this)) {                        // cambiata al motel: la riportano loro
         v.garage = v.garage.filter((g) => g !== T.id); delete this.s.cars[T.id]; v.test = null; out.push({ k: 'testGone' });
       } else if (this.car === T.id && d > DL.testKm) {
-        if (!T.warned) { T.warned = true; this.say(`Giro di prova finito: fermati, il venditore viene a riprendersi la ${CARS[T.id].short || CARS[T.id].name}`, 'buy'); out.push({ k: 'testWarn' }); }
+        if (!T.warned) { T.warned = true; this.say(`Giro di prova finito: fermati, Rocco viene a riprendersi la ${CARS[T.id].short || CARS[T.id].name}`, 'buy'); out.push({ k: 'testWarn' }); }
         if (stopped) {
           const over = Math.max(0, d - DL.testKm - 0.5), dmg = Math.max(0, this.sim.damage - (T.dmg0 || 0));
           const it = VG_SHOP.find((q) => q.id === T.id), cost = Math.round(over * DL.testOver + dmg * (it ? it.price : 10000) * 0.25);
@@ -214,7 +214,7 @@ if (typeof VG_PLACE !== 'undefined') {
           if (prev && swap(prev) !== false && this.car === prev) {
             v.garage = v.garage.filter((g) => g !== T.id); delete this.s.cars[T.id]; v.test = null;
             if (cost > 0) this.s.money -= cost;
-            this.say(cost > 0 ? `Il venditore si riprende l'auto: − € ${fmt(cost)} (${over > 0 ? fmt(over * 10 / 10) + ' km in più' : ''}${over > 0 && dmg > 0 ? ', ' : ''}${dmg > 0 ? 'danni' : ''})` : 'Il venditore si riprende l\'auto. «Allora, ti è piaciuta?»', cost > 0 ? 'lose' : 'buy');
+            this.say(cost > 0 ? `Rocco si riprende l'auto: − € ${fmt(cost)} (${over > 0 ? fmt(over * 10 / 10) + ' km in più' : ''}${over > 0 && dmg > 0 ? ', ' : ''}${dmg > 0 ? 'danni' : ''})` : 'Rocco si riprende l\'auto. «Allora, ti è piaciuta?»', cost > 0 ? 'lose' : 'buy');
             out.push({ k: 'testEnd', cost });
           }
         }
@@ -308,8 +308,8 @@ if (typeof VG_PLACE !== 'undefined') {
     const act = (fn) => (e) => { const r = fn(); if (r && r.ok === false && r.why) ctx.flash(r.why, 2.4); else if (r && r.ok) { ctx.save(); } redraw(); };
     const wrap = document.createElement('div'); wrap.style.cssText = 'display:grid;gap:12px';
     const note = (t) => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = t; wrap.appendChild(p); };
-    note(v.test ? 'Il venditore: «Allora? Com\'è andata? Se ti piace, la firmi e te la tieni.»' : deal ? 'Il venditore: «Guarda pure, le chiavi sono tutte in bacheca. Quella sulla pedana oggi te la faccio a meno.»' : 'Il venditore: «Hai già tutto quello che vendo. Torna quando hai qualcosa da darmi in cambio.»');
-    if (v.test) { const d = document.createElement('div'); d.className = 'dl-test'; d.innerHTML = `Giro di prova in corso: <b>${esc(CARS[v.test.id].name)}</b> · mancano ${fmt(g.dlTestLeft(), 1)} km. Poi fermati e il venditore viene a riprendersela.`; wrap.appendChild(d); }
+    note(v.test ? 'Rocco Lostallone: «Allora? Com\'è andata? Se ti piace, la firmi e te la tieni.»' : deal ? 'Rocco Lostallone: «Guarda pure, le chiavi sono tutte in bacheca. Quella sulla pedana oggi te la faccio a meno.»' : 'Rocco Lostallone: «Hai già tutto quello che vendo. Torna quando hai qualcosa da darmi in cambio.»');
+    if (v.test) { const d = document.createElement('div'); d.className = 'dl-test'; d.innerHTML = `Giro di prova in corso: <b>${esc(CARS[v.test.id].name)}</b> · mancano ${fmt(g.dlTestLeft(), 1)} km. Poi fermati e Rocco viene a riprendersela.`; wrap.appendChild(d); }
     const tabs = document.createElement('div'); tabs.className = 'dl-tabs';
     const F = (v.fin || []);
     [['Salone', 0], ['Le tue auto', 1], [`Rate${F.length ? ' (' + F.length + ')' : ''}`, 2]].forEach(([t, i]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.setAttribute('aria-pressed', String(UI.tab === i)); b.addEventListener('click', () => { UI.tab = i; redraw(); }); tabs.appendChild(b); });
@@ -358,7 +358,7 @@ if (typeof VG_PLACE !== 'undefined') {
       }
     } else if (UI.tab === 1) {
       h4('Le tue auto');
-      const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Il venditore te la valuta: conta il prezzo a nuovo, i chilometri, i danni e le modifiche: metà di quello che hai speso in pezzi e nello swap del motore. Qui puoi anche cambiare auto, come al parcheggio del motel.'; wrap.appendChild(p);
+      const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Rocco te la valuta: conta il prezzo a nuovo, i chilometri, i danni e le modifiche: metà di quello che hai speso in pezzi e nello swap del motore. Qui puoi anche cambiare auto, come al parcheggio del motel.'; wrap.appendChild(p);
       for (const id of v.garage) {
         const st = (g.s.cars || {})[id] || {}, val = g.dlValue(id), can = g.dlCanSell(id), fin = F.find((f) => f.id === id), testing = v.test && v.test.id === id;
         const r = document.createElement('div'); r.className = 'dl-row';
@@ -464,7 +464,7 @@ if (typeof VG_PLACE !== 'undefined') {
     // montanti della vetrata e riflessi del vetro
     for (let q = L; q <= pL; q += 52) { g.fillStyle = ink; g.fillRect(q - 1, gT, 3, gH); g.fillStyle = '#5a5a70'; g.fillRect(q, gT, 1, gH); }
     g.save(); g.globalAlpha = 0.06 + 0.06 * (1 - n); g.fillStyle = '#fff'; for (let q = 0; q < 5; q++) { const sx = L + ((q * 83 + t * 6) % (pL - L)); g.beginPath(); g.moveTo(sx, gT); g.lineTo(sx + 14, gT); g.lineTo(sx - 20, gy); g.lineTo(sx - 34, gy); g.fill(); } g.restore();
-    // a destra del portale: ufficio vendite con la scrivania e il venditore
+    // a destra del portale: ufficio vendite con la scrivania e Rocco Lostallone
     const oL = pL + pW + 2;
     g.fillStyle = mixc('#3a4050', '#2c2848', n); g.fillRect(oL, gT, Rr - oL, gH);
     g.fillStyle = 'rgba(20,16,30,.8)'; g.fillRect(oL + 6, gy - 22, 26, 3); g.fillRect(oL + 8, gy - 19, 2, 13); g.fillRect(oL + 28, gy - 19, 2, 13);

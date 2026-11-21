@@ -65,7 +65,7 @@ class Street2D {
   text(g, str, x, y, color, sc = 1) {
     let cx = Math.round(x);
     g.fillStyle = color;
-    for (const ch of String(str).toUpperCase()) {
+    for (const ch of String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()) {   // le lettere accentate (Kùstòm) senza accento
       const m = PX_FONT[ch] || PX_FONT[' '];
       for (let i = 0; i < 15; i++) if (m[i] === '1') g.fillRect(cx + (i % 3) * sc, Math.round(y) + Math.floor(i / 3) * sc, sc, sc);
       cx += 4 * sc;
@@ -1464,7 +1464,7 @@ class Street2D {
     g.fillStyle = '#23263a'; g.fillRect(x - 56, 216, 112, 16); g.fillStyle = '#4a5070'; g.fillRect(x - 56, 216, 112, 1);
     for (let k = -50; k < 50; k += 10) { g.fillStyle = '#2f3450'; g.fillRect(x + k, 224, 6, 1); }
     if (e.id === 'shop' || e.id === 'niko') {
-      const niko = e.id === 'niko', sign = niko ? 'OFFICINA MARIO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
+      const niko = e.id === 'niko', sign = niko ? 'OFFICINA NICO' : 'DA LUCA TUNING', scol = niko ? '#5ad1ff' : '#ffb000';
       g.fillStyle = C.ink; g.fillRect(L - 2, top - 2, R - L + 4, 216 - top + 2);
       g.fillStyle = niko ? '#33302a' : '#2b2f3e'; g.fillRect(L, top, R - L, 216 - top);
       for (let yy = top + 6; yy < 216; yy += 6) { g.fillStyle = '#252836'; g.fillRect(L, yy, R - L, 1); for (let xx = L + ((yy / 6) % 2 ? 0 : 6); xx < R; xx += 12) g.fillRect(xx, yy - 6, 1, 6); }   // mattoni
@@ -1500,7 +1500,7 @@ class Street2D {
       // insegna al neon
       this.light(g, x, top + 12, 120, 22, '#ff2e88', 0.09, 3);
       g.fillStyle = C.ink; g.fillRect(x - 70, top + 2, 140, 22);
-      this.text(g, 'NEON', x - 64, top + 6, '#ff2e88', 3); this.text(g, 'KUSTOM', x - 8, top + 6, ph ? '#2ee6ff' : '#9af6ff', 2);
+      this.text(g, 'RUSSIAN', x - 64, top + 6, '#ff2e88', 2); this.text(g, 'KUSTOM', x - 64 + this.textW('RUSSIAN', 2) + 6, top + 6, ph ? '#2ee6ff' : '#9af6ff', 2);
       this.text(g, 'CERCHI - VERNICI - NEON', x - 46, top + 18, '#f4f1e6');
       // vetrina con i cerchi
       const vL = L + 8, vT = 136;
@@ -1520,7 +1520,7 @@ class Street2D {
       this.placeTag(g, x, top - 16, 'ESTETICA', '#ff2e88', near);
     }
   }
-  // personaggi: Mario (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
+  // personaggi: Nico (tuta blu, cappello rosso, baffi, chiave inglese che lavora) e Luca (felpa nera, cappello al contrario, tablet)
   // primo piano fuori città: sotto la carreggiata (y 339–360)
   drawNearSide(g, bg, dist, PPM, visFrom, visTo, wx, t) {
     const W = this.LW, rnd = Street2D.rnd;
@@ -1599,7 +1599,7 @@ class Street2D {
       p('#16306e', 1, 12, 4, 14); p('#16306e', 7, 12, 4, 14); p('#1a1a1a', 0, 2, 5, 2); p('#1a1a1a', 7, 2, 5, 2);  // gambe e scarpe
       p(skin, 2, 36 + bob, 8, 7); p('#5a3a22', 3, 33 + bob, 6, 1); p(ink, 4, 35 + bob, 1, 1); p(ink, 8, 35 + bob, 1, 1);   // faccia e baffi
       p('#c42a1a', 1, 40 + bob, 10, 3); p('#c42a1a', 9, 38 + bob, 4, 1);                                          // cappello
-      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'M', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');   // M di Mario sulla tuta
+      p('#f4f1e6', 2, 22 + bob, 3, 2); this.text(g, 'M', x + 3 * S2, gy - 25 * S2 + bob * S2, '#f4f1e6');   // M di Nico sulla tuta
       const sw = Math.sin(t * 6) * 0.6; g.save(); g.translate(x + 12 * S2, gy - (24 + bob) * S2); g.rotate(-0.6 + sw);
       g.fillStyle = '#9aa3b2'; g.fillRect(0, -2, 16, 4); g.fillStyle = '#c9ced6'; g.fillRect(14, -4, 5, 8); g.restore();   // chiave inglese
       p(skin, 11, 26 + bob, 3, 3);
@@ -1633,7 +1633,7 @@ class Street2D {
       for (let xx = 0; xx < W; xx += 48) { g.fillStyle = '#252937'; g.fillRect(xx, 40, 46, 200); g.fillStyle = '#181a24'; g.fillRect(xx + 46, 40, 2, 200); }
       // neon e tubi fluorescenti
       for (let xx = 30; xx < W; xx += 110) { g.fillStyle = C.ink; g.fillRect(xx, 18, 70, 6); g.fillStyle = '#eef6ff'; g.fillRect(xx + 2, 19, 66, 3); this.light(g, xx + 35, 24, 90, 40, '#dfeaff', 0.06, 3); }
-      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'MARIO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', Math.max(W - 150, W - 218 + this.textW(niko ? 'MARIO' : 'LUCA', 3) + 8), 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
+      g.fillStyle = C.ink; g.fillRect(W - 230, 54, 200, 30); this.text(g, niko ? 'NICO' : 'LUCA', W - 218, 60, niko ? '#5ad1ff' : '#ffb000', 3); this.text(g, niko ? 'OFFICINA' : 'TUNING', Math.max(W - 150, W - 218 + this.textW(niko ? 'NICO' : 'LUCA', 3) + 8), 62, '#f4f1e6', 2); this.light(g, W - 130, 70, 120, 30, niko ? '#5ad1ff' : '#ffb000', 0.08, 3);
       if (!niko) for (let q = 0; q < 3; q++) { g.fillStyle = ['#ff2e88', '#2ee6ff', '#b07bff'][q]; g.fillRect(0, 96 + q * 3, W, 1); this.light(g, W / 2, 97 + q * 3, W * 0.5, 6, ['#ff2e88', '#2ee6ff', '#b07bff'][q], 0.05, 2); }
       // pannello forato con attrezzi
       g.fillStyle = '#3b3326'; g.fillRect(24, 70, 150, 90);
@@ -1656,7 +1656,7 @@ class Street2D {
       g.fillStyle = '#0d0818'; g.fillRect(0, 0, W, 360);
       const ph = Math.floor(t * 2) % 2;
       for (let yy = 30; yy < 230; yy += 50) { g.fillStyle = yy % 100 ? '#ff2e88' : '#2ee6ff'; g.fillRect(0, yy, W, 2); this.light(g, W / 2, yy, W * 0.6, 8, yy % 100 ? '#ff2e88' : '#2ee6ff', 0.05, 2); }
-      g.fillStyle = C.ink; g.fillRect(W - 250, 46, 220, 36); this.text(g, 'NEON', W - 238, 54, '#ff2e88', 4); this.text(g, 'KUSTOM', W - 166, 58, ph ? '#2ee6ff' : '#9af6ff', 3);
+      g.fillStyle = C.ink; g.fillRect(W - 250, 46, 220, 36); this.text(g, 'RUSSIAN', W - 238, 56, '#ff2e88', 3); this.text(g, 'KUSTOM', W - 238 + this.textW('RUSSIAN', 3) + 6, 58, ph ? '#2ee6ff' : '#9af6ff', 2);
       // espositore di cerchi
       const rc = ['#d9a82e', '#1c1d22', '#9a6a3a', '#ff2e88', '#c9ced6'];
       for (let q = 0; q < 5; q++) { const rx = 40 + q * 44, ry = 120 + (q % 2) * 26; g.fillStyle = '#050407'; this.span(g, rx, ry, 18, 18); g.fillStyle = rc[q]; this.span(g, rx, ry, 11, 11); g.fillStyle = '#050407'; this.span(g, rx, ry, 3, 3); for (let a = 0; a < 5; a++) { g.fillStyle = '#050407'; g.fillRect(Math.round(rx + Math.cos(a * 1.257 + t * 0.4) * 7), Math.round(ry + Math.sin(a * 1.257 + t * 0.4) * 7), 2, 2); } }

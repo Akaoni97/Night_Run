@@ -14,3 +14,8 @@ Formato: `## data · per chi · da chi` e due o tre righe.
 - Nuovo: **Impostazioni → Grafica → Prestazioni**. Se il gioco scatta, scegli «Fluida». «Automatica» spegne da sola una cosa alla volta se il computer non ce la fa, e lo scrive nel riquadro.
 - Un'auto elaborata, venduta all'Autosalone, vale **metà di quello speso in pezzi e swap** (prima un terzo, e lo swap non contava).
 - Missione del signore della valigetta: resta a 38 km. Danni: si tarano giocando.
+
+## 21/11/2026 sera · per il proprietario · dal cognato (con Claude) · **Nomi nuovi di negozi e personaggi** (v0.75)
+- **Mario non c'è più**: la sua officina è l'**Officina Nico** (tagliandi, carrozzeria, gomme, revisione) e Nico fa anche il **soccorso col carro attrezzi** (è lui che arriva col furgone).
+- **Neon Kustom → Russian Kùstòm** (Jeshka resta lì). **Motel Ovunque → Motel 4Ever**, gestito da **Tito**.
+- Personaggi nuovi: **Nabir** al bar, **Rossana** al benzinaio, **Phill Grill** alla cassa della Sosta 24, **Rocco Lostallone** all'Autosalone, **Massimo Lo Sfascio** allo sfascio. Luca Tuning come prima.

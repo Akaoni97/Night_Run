@@ -63,8 +63,8 @@ const PENS_ANIMO = [
 // com'è messa l'auto e la situazione: `on` dice se vale adesso; parla quando comincia (e lo ripete dopo PENS_RIPETI)
 const PENS_STATO = {
   luci: { on: (g) => (g.sim.damage || 0) > 0.35, frasi: ['I fari vanno e vengono. Qualche botta di troppo, e si vede.', 'Si è accesa la spia delle luci. Con questi fari a singhiozzo di notte è un terno al lotto.'] },
-  motore: { on: (g) => (g.sim.damage || 0) > 0.6 || !!(g.carState && g.carState().tired), frasi: ['La spia del motore è accesa. Finché tira, tiro avanti. Poi si vedrà.', 'Spia gialla sul quadro. Da Mario prima che diventi rossa.'] },
-  gomma: { on: (g) => g.tyres && Math.min(...g.tyres().p) < 1.9, frasi: ['Il volante tira da una parte. Una gomma è giù.', 'Spia delle gomme. Al prossimo benzinaio le gonfio, o da Mario se perde.'] },
+  motore: { on: (g) => (g.sim.damage || 0) > 0.6 || !!(g.carState && g.carState().tired), frasi: ['La spia del motore è accesa. Finché tira, tiro avanti. Poi si vedrà.', 'Spia gialla sul quadro. Da Nico prima che diventi rossa.'] },
+  gomma: { on: (g) => g.tyres && Math.min(...g.tyres().p) < 1.9, frasi: ['Il volante tira da una parte. Una gomma è giù.', 'Spia delle gomme. Al prossimo benzinaio le gonfio, o da Nico se perde.'] },
   pioggia: { on: (g) => (g.sim.wet || 0) > 0.5, frasi: ['Con quest\'acqua l\'auto galleggia. Piede leggero.', 'Pioggia. Le frenate si allungano, meglio tenere le distanze.'] },
   rosso: { on: (g) => g.s.money < 0, frasi: ['Sono in rosso. Il prossimo lavoro lo prendo senza fare storie.', 'Conto in negativo. Per la benzina mi fanno ancora credito, ma non durerà.'] },
   ricercato: { on: (g) => !!(g.s.pol && g.s.pol.fuga), frasi: ['Tutte le volanti hanno la mia targa. Devo sparire in un parcheggio.', 'Sirene in giro. Il primo locale che trovo, mi ci infilo.'] },

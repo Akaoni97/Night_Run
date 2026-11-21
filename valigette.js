@@ -3,7 +3,7 @@
 //  Valigette da aprire con dentro premi di sei rarità: comune, non comune, raro, epico, mitico, leggendario.
 //  - Si comprano nell'app Valigette del telefono (bronzo, argento, oro: cambiano le probabilità, non i premi) e si
 //    guadagnano coi lavori (catena di missioni, primo lavoro, consegne).
-//  - Premi: soldi, oggetti, ticket (tagliando gratis da Mario, modifica gratuita da Luca), potenziamenti del motore
+//  - Premi: soldi, oggetti, ticket (tagliando gratis da Nico, modifica gratuita da Luca), potenziamenti del motore
 //    a tempo (finiscono dopo un tot di km) fino all'epico e permanenti dal mitico, pezzi veri del catalogo (mai il turbo),
 //    e nel leggendario un'auto in regalo.
 //  - Solo soldi del gioco. Garanzia: almeno un raro ogni 10 valigette, almeno un epico ogni 40. Doppioni → soldi.
@@ -73,7 +73,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
   const ticket = (k) => (g) => {
     g.cases().tickets[k]++;
     return k === 'svc'
-      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Mario: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
+      ? { icon: 'ticket_svc', name: 'Ticket tagliando gratis', text: 'Da Nico: un servizio a scelta (olio, candele, pastiglie, lavaggio) senza pagare.' }
       : { icon: 'ticket_mod', name: 'Ticket modifica gratuita', text: `Da Luca: un pezzo fino a € ${fmt(CASE_MOD_MAX)} senza pagare. Si usa da solo al prossimo acquisto.` };
   };
   const car = (g) => {
@@ -82,7 +82,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     if (!cand.length) return null;
     const c = cand[Math.floor(Math.random() * cand.length)];
     v.garage.push(c.id); v.owned[c.id] = true; g.carState(c.id);
-    return { icon: 'auto', car: c.id, name: CARS[c.id].name, text: 'Le chiavi erano sotto l\'imbottitura. Ti aspetta nel parcheggio del Motel Ovunque.' };
+    return { icon: 'auto', car: c.id, name: CARS[c.id].name, text: 'Le chiavi erano sotto l\'imbottitura. Ti aspetta nel parcheggio del Motel 4Ever.' };
   };
   const perm = (g) => {
     const C = g.cases(); C.perm[g.car] = Math.round(((C.perm[g.car] || 0) + 0.03) * 1000) / 1000;
@@ -130,12 +130,12 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     return (1 + temp) * (1 + (C.perm[this.car] || 0));
   };
 
-  // ticket: il tagliando di Mario e la modifica di Luca diventano gratis finché ce n'è uno
+  // ticket: il tagliando di Nico e la modifica di Luca diventano gratis finché ce n'è uno
   const sc = P.serviceCost, sv = P.service, pr = P.price, by = P.buy;
   P.serviceCost = function (id) { const c = sc.call(this, id); return c > 0 && this.s && this.cases().tickets.svc > 0 ? 0 : c; };
   P.service = function (id) {
     const C = this.cases(), had = C.tickets.svc > 0 && sc.call(this, id) > 0;
-    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Mario non ti chiede niente', 'buy'); }
+    const r = sv.call(this, id); if (r.ok && had) { C.tickets.svc--; this.say('Ticket tagliando usato: Nico non ti chiede niente', 'buy'); }
     return r;
   };
   const modFree = (g, cat, id) => { const p = pr.call(g, cat, id); return p > 0 && p <= CASE_MOD_MAX && g.s && g.cases().tickets.mod > 0; };

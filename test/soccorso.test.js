@@ -91,7 +91,7 @@ test('soccorso: la carrozzeria assicurata costa la franchigia e fa un sinistro',
   assert.equal(sim.damage, 0); assert.equal(game.docSinistri(), 1);
 });
 
-test('traino: auto distrutta = da Mario, motore rotto = da Luca; si arriva davanti all\'officina, si paga e il furgone riparte', () => {
+test('carro attrezzi di Nico: auto distrutta = all\'Officina Nico; si arriva davanti all\'officina, si paga e il furgone riparte', () => {
   const { sim, game } = trip2(); sim.damage = 0.9;
   const tw = game.socServizi().find((s) => s.id === 'traino'); assert.ok(tw.ok); assert.equal(tw.dest, 'niko'); assert.ok(tw.st.x > game.s.dist);
   assert.equal(game.socTotale(['traino', 'body', 'fuel']).sv.length, 1, 'il traino sostituisce tutto');
@@ -99,7 +99,7 @@ test('traino: auto distrutta = da Mario, motore rotto = da Luca; si arriva davan
   assert.ok(game.socCall(['traino']).ok); assert.ok(giro(game, 120, () => !game.soc), 'finisce');
   assert.equal(Math.round(soldi - game.s.money), prezzo, 'solo il traino, niente uscita');
   assert.ok(Math.abs(game.s.dist - (x0 - 22)) < 1, 'davanti all\'officina'); assert.equal(game.ap, null);
-  assert.ok(game.dia().some((e) => e.tipo === 'soc' && /Trainato/.test(e.txt)));
+  assert.ok(game.dia().some((e) => e.tipo === 'soc' && /carro attrezzi di Nico/.test(e.txt)));
   const b = trip2(); b.sim.damage = 0.1; assert.ok(!b.game.socServizi().find((s) => s.id === 'traino').ok, 'l\'auto cammina: niente traino');
 });
 
