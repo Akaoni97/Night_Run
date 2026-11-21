@@ -87,3 +87,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.62 | 21/11 | proprietario | Night Run per Windows (Electron, da Codex): gioco senza rete, caratteri locali, salvataggi su file con backup |
 | v0.63 | 21/11 | proprietario | Officina di Luca: V40 con turbo da 0,5/1,0/1,5 bar, downpipe, terminale, camme, cambio, gomme da drag (oltre 450 CV); pallino verde (monta) e rosso (compra) |
 | v0.64 | 21/11 | proprietario | Luca Garage: app del telefono che ti porta da Luca Tuning per € 150, sbloccabile da Sviluppatori |
+| v0.65 | 21/11 | proprietario | Editor della storia (`strumenti/editor_storia.html`): mappa a bivi delle chat, testo originale e nuovo affiancati, file di modifiche che Claude assorbe in `chat_modifiche.js` |

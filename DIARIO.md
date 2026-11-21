@@ -1,3 +1,7 @@
+## 21/11/2026 · proprietario · v0.65 (**editor della storia**)
+- Fatto: pagina personale `strumenti/editor_storia.html` (fuori dal gioco): conversazioni per persona e fase, mappa a bivi con frecce, a destra testo originale e «come lo vorrei» (messaggi, varianti, risposte). Bozza salvata nel browser; «Copia modifiche» / «Scarica file» dà il JSON. Si assorbe con `node strumenti/assorbi_modifiche.mjs <file>`, che lo unisce in `chat_modifiche.js` (caricato dopo `chat_dati.js`, quindi sopravvive alla rigenerazione). Cambia solo le parole, non bivi, condizioni, effetti.
+- Aperto: la storia secondaria di Jeshka e Luca sta in `jeshka.js` (`JL_SCENE`), non nelle chat: non è nell'editor. Non provato il tasto Copia negli appunti (nel browser di prova); Scarica file sì come logica.
+
 ## 21/11/2026 · proprietario · v0.64 (**Luca Garage**)
 - Fatto: app **Luca Garage** nel telefono (`lucagarage.js`): ti lascia davanti al negozio di Luca più vicino (davanti o dietro) per € 150, da fermi e fuori dai locali. Si scarica con un
   cartellone sulla strada al km 26 (dopo l'app Motel); in Sviluppatori c'è «Sblocca Luca Garage» (`NightDev.luca`). Unita dopo l'officina v0.63.
