@@ -192,8 +192,8 @@ const TUNING_SUPRA = {
   clutch: {
     label: 'Frizione e volano',
     items: [
-      { id: 'oem', price: 0, brand: 'Toyota', name: 'Monodisco originale', note: 'Volano pesante: salite di giri morbide.', sim: { Ie: 0.21 }, dsp: { rattle: 0 } },
-      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Bidisco con volano alleggerito', note: 'Giri che salgono e scendono di scatto, tipico tintinnio in folle al minimo.', sim: { Ie: 0.16 }, dsp: { rattle: 1 } },
+      { id: 'oem', price: 0, brand: 'Toyota', name: 'Monodisco originale', note: 'Volano pesante: salite di giri morbide.', sim: { Ie: 0.21, clutch: 820 }, dsp: { rattle: 0 } },
+      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Bidisco con volano alleggerito', note: 'Regge fino a 1.300 Nm: niente slittamenti nemmeno col biturbo al massimo. Giri che salgono e scendono di scatto, tipico tintinnio in folle al minimo.', sim: { Ie: 0.16, clutch: 1300 }, dsp: { rattle: 1 } },
     ],
   },
 };
@@ -259,7 +259,7 @@ function supraParamsBase(sel, g, adj) {
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.launch, ecuPops: ecu.sim.pops,
-      idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: cl.sim.Ie,
+      idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
       mu: g('tires').sim.mu * su.susp.grip, tyre: g('tires').sim.tyre,
       ic: g('intercooler').sim.ic, susp: su.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: g('gearbox').sim.gears,
       valve: g('bov').dsp.v === 2 ? 'flutter' : g('bov').dsp.v === 1 ? 'bov' : 'recirc',

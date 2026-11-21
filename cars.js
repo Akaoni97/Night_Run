@@ -220,7 +220,8 @@ function genCatalog(c) {
       { id: 'lsd', price: $(1600), km: kk(30), brand: 'Drexler', name: `Autobloccante al 40 %, finale ${(c.P.fd * 1.12).toFixed(2).replace('.', ',')}`, note: 'Blocca la ruota che slitta e accorcia le marce: partenze piantate, meno velocità massima.', sim: { fd: Math.round(c.P.fd * 1.12 * 100) / 100, diff: 'lsd' } } ] },
     clutch: { label: 'Frizione e volano', items: [
       { id: 'oem', price: 0, km: 0, brand: 'Sachs', name: 'Originale', note: 'Morbida; con molta coppia slitta.', sim: { Ie: c.P.Ie, clutch: c.P.clutchMax }, dsp: { rattle: 0 } },
-      { id: 'sport', price: $(1000), km: kk(15), brand: 'Sachs', name: 'Rinforzata con volano alleggerito', note: 'Giri che salgono di scatto, tintinnio in folle.', sim: { Ie: Math.round(c.P.Ie * 0.75 * 100) / 100, clutch: Math.round(c.P.clutchMax * 1.5) }, dsp: { rattle: 1 } } ] },
+      { id: 'sport', price: $(1000), km: kk(15), brand: 'Sachs', name: 'Rinforzata con volano alleggerito', note: 'Giri che salgono di scatto, tintinnio in folle.', sim: { Ie: Math.round(c.P.Ie * 0.75 * 100) / 100, clutch: Math.round(c.P.clutchMax * 1.5) }, dsp: { rattle: 1 } },
+      { id: 'race', price: $(2600), km: kk(40), brand: 'Sachs', name: 'Bidisco da corsa con volano in acciaio leggero', note: 'Regge tutta la coppia che il motore può dare: niente slittamenti. Pedale duro, giri che salgono di scatto, tintinnio in folle.', sim: { Ie: Math.round(c.P.Ie * 0.6 * 100) / 100, clutch: Math.round(c.P.clutchMax * 3) }, dsp: { rattle: 1 } } ] },
     weight: { label: 'Alleggerimento', items: [
       { id: 'oem', price: 0, km: 0, brand: '—', name: 'Di serie', note: `${c.mass} kg.`, sim: { dm: 0, cabin: 1 } },
       { id: 's1', price: $(600), km: kk(10), brand: '—', name: 'Sedili racing, via insonorizzanti', note: `−${Math.round(c.mass * 0.045)} kg.`, sim: { dm: -Math.round(c.mass * 0.045), cabin: 1.15 } },
@@ -248,7 +249,7 @@ function genPresets(c) {
     { id: 'stock', name: 'Di serie', sel: base },
     { id: 'street', name: 'Street', sel: Object.assign({}, base, { exhaust: 'catback', intake: 'pf', ecu: 'remap', tires: 'sport', suspension: 'springs' }, ext({ cat: 'sport', cams: 'sport' })) },
     { id: 'boost', name: c.turbo ? 'Più pressione' : 'Sovralimentata', sel: Object.assign({}, base, { exhaust: 'catback', ecu: 'remap', turbo: b1.id, intercooler: 'fmic', tires: 'sport', suspension: 'springs', final: 'lsd' }, ext({ cat: 'sport', cams: 'sport', sp: 'sp1' })) },
-    { id: 'full', name: 'Da gara', sel: Object.assign({}, base, { exhaust: 'race', intake: 'pf', ecu: 'standalone', turbo: b2.id, intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'lsd', clutch: 'sport', weight: 's2' }, ext({ cat: 'decat', cams: 'race', sp: 'sp2' }), c.gearbox ? { gearbox: c.gearbox.items[0].id } : {}) },
+    { id: 'full', name: 'Da gara', sel: Object.assign({}, base, { exhaust: 'race', intake: 'pf', ecu: 'standalone', turbo: b2.id, intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'lsd', clutch: 'race', weight: 's2' }, ext({ cat: 'decat', cams: 'race', sp: 'sp2' }), c.gearbox ? { gearbox: c.gearbox.items[0].id } : {}) },
   ];
 }
 function genParams(c) {
