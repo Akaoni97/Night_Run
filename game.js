@@ -151,14 +151,13 @@ class StreetGame {
     this.sim = sim;
     this.rnd = rnd;
     this.mode = 'career';                 // 'career' | 'free'
-    this.s = { money: 3000, rep: 0, heat: 0, dist: 0, owned: {}, fines: 0, jobs: 0,
+    this.s = { money: 3000, heat: 0, dist: 0, owned: {}, fines: 0, jobs: 0,
       trunk: [{ kind: 'scorta', kg: 14 }, { kind: 'kit', kg: 7, uses: 3 }, { kind: 'tanica', kg: 9 }] };
     this.ents = [];
     this.trip = 0;
     this.s.carId = 'supra'; this.s.cars = { supra: { km: 0, perks: [] }, v40: { km: 0, perks: [], up: 0, fuel: 0.55 } }; this.s.perks = [];
     this.prompt = null;
     this.ap = null;                        // pilota automatico (fermate)
-    this.job = null;
     this.out = [];                         // messaggi per l'interfaccia
     this.lane = 1; this.laneZ = GAME_LANE_Z[1]; this.laneT = 0;
     this.nextSpawn = 250; this.id = 1;
@@ -490,7 +489,6 @@ class StreetGame {
   }
   dropItem(i) {
     const it = this.s.trunk[i]; if (!it) return { ok: false };
-    if (it.kind === 'pacco' && this.job) return { ok: false, why: 'Se butti il pacco perdi la consegna: portalo a destinazione' };
     this.s.trunk.splice(i, 1); this.applyMass(); this.say(`${this.itemName(it)} lasciato sul marciapiede`); return { ok: true };
   }
 
@@ -545,7 +543,7 @@ class StreetGame {
   setLoc(id) {
     const L = GAME_LOCS.find((l) => l.id === id); if (!L) return false;
     this.loc = L; this.s.loc = L.id;
-    this.ents = this.ents.filter((e) => e.kind === 'drop');
+    this.ents = [];
     this.nextTraffic = 0; this.inside = null; this.prompt = null;
     return true;
   }
@@ -566,7 +564,6 @@ class StreetGame {
     const sim = this.sim, d = this.s.dist, r = this.rnd;
     const w = [
       ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
-      ['job', !this.job ? 10 : 0],
     ];
     let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
     for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }
@@ -578,7 +575,7 @@ class StreetGame {
       this.ents.push({ id: this.id++, kind: 'police', lane: parked ? 0 : 1 + (r() < 0.5 ? 1 : 0), x: d + (parked ? 380 : 260), v: parked ? 0 : (80 + r() * 20) / 3.6 });   // in giro: 80-100 km/h, si supera
     } else if (kind === 'station') {
       if (!this.ents.some((e) => e.kind === 'station')) this.ents.push({ id: this.id++, kind: 'station', lane: 0, x: d + 760, v: 0 });
-    } else if (kind === 'job') this.offerJob();
+    }
   }
 
   // un veicolo del traffico (tipo a caso secondo il luogo), in una corsia libera
@@ -604,27 +601,6 @@ class StreetGame {
       else if (b) b.drv = undefined;
     }
     return e;
-  }
-
-  offerJob() {
-    const r = this.rnd, km = 2 + Math.round(r() * 30) / 10, pay = Math.round((90 + km * 45 + r() * 60) / 10) * 10;
-    const goods = [['un pacco per un\'officina', 8], ['dei cerchi in lega', 36], ['una centralina riprogrammata', 3], ['dei pezzi di ricambio', 22], ['una cassa di olio motore', 28]];
-    const [what, kg] = goods[Math.floor(r() * goods.length)];
-    if (!this.trunkFits(kg)) { this.say(`Un lavoretto da ${kg} kg, ma il bagagliaio non ce la fa`, 'job'); return; }
-    this.ask({
-      kind: 'job', title: 'Lavoretto',
-      text: `Porta ${what} (${kg} kg nel bagagliaio) a ${km.toLocaleString('it-IT')} km da qui. Paga € ${pay}, + 30% se arrivi entro ${Math.ceil(km / 0.95)} minuti.`,
-      options: [
-        { label: 'Lo faccio', act: () => {
-          const to = this.s.dist + km * 1000;
-          this.job = { to, pay, km, deadline: km / 0.95 * 60, t: 0 };
-          this.addItem('pacco', { kg, name: what.replace(/^(un |una |dei |delle )/, '').replace(/^./, (c) => c.toUpperCase()) });
-          this.ents.push({ id: this.id++, kind: 'drop', lane: 1, x: to, v: 0 });
-          this.say(`Consegna accettata: ${km.toLocaleString('it-IT')} km`, 'job');
-        } },
-        { label: 'No grazie' },
-      ],
-    });
   }
 
   // tempo previsto sui 400 m con la formula di Hale (+ partenza da strada)
@@ -845,16 +821,8 @@ class StreetGame {
           ],
         });
       }
-      if (e.kind === 'drop' && this.job && rel <= 0) {
-        const j = this.job, bonus = j.t <= j.deadline ? Math.round(j.pay * 0.3) : 0;
-        this.s.money += j.pay + bonus; this.s.jobs++; this.s.rep += 3;
-        this.say(`Consegna fatta: + € ${j.pay}${bonus ? ` e € ${bonus} di bonus puntualità` : ''}`, 'money');
-        this.job = null; e.done = true;
-        const pi = this.s.trunk.findIndex((it) => it.kind === 'pacco'); if (pi >= 0) { this.s.trunk.splice(pi, 1); this.applyMass(); }
-      }
     }
-    if (this.job) this.job.t += dt;
-    this.ents = this.ents.filter((e) => !e.done && (e.chase || e.racing || e.kind === 'drop' || (e.x - d > -220 && e.x - d < 1500)));
+    this.ents = this.ents.filter((e) => !e.done && (e.chase || (e.x - d > -220 && e.x - d < 1500)));
 
     // sorpasso automatico: resta a destra; se davanti c'è qualcuno più lento guarda la corsia accanto (prima a sinistra,
     // poi a destra) tenendo conto delle velocità: davanti deve esserci spazio per sorpassare, dietro nessuno che arriva forte

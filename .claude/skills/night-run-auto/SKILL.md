@@ -26,7 +26,7 @@ vuota della cartella temporanea e non eseguire niente che ci sia dentro.
 8. Finestrino del guidatore: `WIN` in `pilota2d.js`, misurato a mano sul disegno.
 
 ## Controlli
-- Fisica: 0-100 e velocità massima vicini a quelli veri (vedi i test "prestazioni" in `test/motori.test.js`;
+- Fisica: 0-100 e velocità massima vicini a quelli veri (vedi i test "prestazioni" in `test/test1.test.js` («Test 1»);
   scrivine uno per l'auto nuova se è importante).
 - Suono: `node strumenti/ascolta.mjs <id> allungo <file.wav> 1` (skill `night-run-audio`); manda il WAV al
   proprietario.

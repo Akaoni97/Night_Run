@@ -27,7 +27,7 @@ const SOC = {
 };
 const SOC_NOMI = { fuel: 'Rifornimento', body: 'Carrozzeria', tyres: 'Gonfia e ripara le gomme', newtyres: 'Gomme nuove', maint: 'Manutenzione', traino: 'Traino' };
 // l'aspetto di Nico, il meccanico del furgone (lo stesso dell'interno dell'Officina Nico, LOOK.nico in interni_hd.js)
-const SOC_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'piena', occhiali: 'no' };
+const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 2, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'sole', x: { canotta: true, tatuaggi: true, catena: true } };
 
 (function socLogica() {
   if (typeof StreetGame === 'undefined') return;
@@ -88,7 +88,6 @@ const SOC_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testa
     if (this.inside) return 'Il furgone si chiama dalla strada, non da dentro un locale';
     if (this.prompt) return 'Prima rispondi alla domanda';
     if (this.ap) return 'Aspetta: l\'auto sta finendo una manovra';
-    if (this.race) return 'Non adesso';
     if (this.sim.v < -0.5) return 'Fermati prima di chiamare';
     return null;
   };
@@ -212,7 +211,7 @@ const SOC_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testa
         const sv = S.sv.find((x) => x.id === 'traino'), tgt = sv.st.x - 22;
         this.socPaga(sv);
         this.s.dist = tgt; this.s.far = Math.max(this.s.far || 0, tgt); this.nextTraffic = 0;
-        this.ents = this.ents.filter((x) => x === e || x.kind === 'drop'); e.x = tgt + SOC.dist; e.v = 0;
+        this.ents = this.ents.filter((x) => x === e); e.x = tgt + SOC.dist; e.v = 0;
         this.say('Nico ti ha lasciato davanti all\'officina: premi U per entrare', 'info');
         if (this.diaAdd) this.diaAdd('soc', 'Col carro attrezzi di Nico fino all\'Officina Nico', true);
         S.ph = 'arrivo'; S.t = 0;
@@ -229,15 +228,15 @@ const SOC_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente', testa
   };
   const up = P.update;
   P.update = function (dt) { up.call(this, dt); if (this.soc) this.socStep(dt * (this.soc.fast || 1)); else this.socGuasto(); };
-  // da fermo con un guasto che non ti fa ripartire (motore rotto, gomma a terra) il gioco ti ricorda il soccorso, una volta per guasto
+  // da fermo con una gomma a terra il gioco ti ricorda il soccorso, una volta per guasto
   P.socGuasto = function () {
     if (this.mode !== 'career' || !this.s.vg || this.prompt || this.inside || this.ap || Math.abs(this.sim.v) > 0.5) return;
     const T = this.tyres(), key = Math.min(...T.p) < 0.5 ? 'gomma' : null;
     if (!key) { this._socAsk = null; return; }
     if (this._socAsk === key) return; this._socAsk = key;
-    this.ask({ kind: 'soccorso', title: key === 'motore' ? 'Motore rotto' : 'Gomma a terra', time: 30,
-      text: key === 'motore' ? '' : 'Una gomma è a terra. Nico arriva col furgone e te la sistema sul posto.',
-      options: [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(key === 'motore' ? ['traino'] : ['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }],
+    this.ask({ kind: 'soccorso', title: 'Gomma a terra', time: 30,
+      text: 'Una gomma è a terra. Nico arriva col furgone e te la sistema sul posto.',
+      options: [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }],
       onTimeout: () => {} });
   };
 })();

@@ -1,4 +1,4 @@
-// Prove del Banco Suono 2JZ: fisica (motore, cambio, prestazioni) e sintesi audio.
+// Test 1 (era il vecchio «Banco Suono 2JZ», test/motori.test.js): fisica (motore, cambio, prestazioni), sintesi audio, bagagliaio.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -286,7 +286,7 @@ test('gomme: si scaldano pattinando, la presa ha un ottimo e si consumano', () =
   assert.ok(sim.tireWear > 0.001);
 });
 
-test('bagagliaio: peso sull\'auto, tanica, kit, consegne', () => {
+test('bagagliaio: peso sull\'auto, tanica, kit', () => {
   const { sim, game } = career();
   assert.equal(sim.P.mass, 1570 + 30, 'ruota di scorta, kit e tanica pesano 30 kg');
   const et0 = game.etEstimate();
@@ -301,9 +301,7 @@ test('bagagliaio: peso sull\'auto, tanica, kit, consegne', () => {
   const ki = game.s.trunk.findIndex((it) => it.kind === 'kit');
   assert.ok(game.useItem(ki).ok); assert.ok(Math.abs(sim.damage - 0.15) < 1e-9);
   while (game.s.trunk.some((it) => it.kind === 'zavorra')) game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'zavorra'));
-  game.offerJob(); game.answer(0);
-  assert.ok(game.s.trunk.some((it) => it.kind === 'pacco'), 'il pacco va nel bagagliaio');
-  assert.equal(game.dropItem(game.s.trunk.findIndex((it) => it.kind === 'pacco')).ok, false);
+  assert.ok(sim.P.mass < 1570 + 30, 'buttata la zavorra (e usate tanica e kit) l\'auto pesa meno di prima');
 });
 
 test('viaggio: primo lavoro, il pacco dal primo locale al successivo paga € 3.000', () => {

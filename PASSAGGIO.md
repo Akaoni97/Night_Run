@@ -272,7 +272,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Skill del progetto** in `.claude/skills/` (elenco in `AGENTS.md`): prova a copione nel browser
   (`strumenti/prova.js`), ascolto del motore fuori dal browser (`strumenti/ascolta.mjs`), funzioni nuove, disegno,
   auto dai disegni, pubblicazione, storia, controllo del gioco.
-- **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
+- **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/test1.test.js`.
 - **Nel browser**: dalla radice del repository lancia `python3 -m http.server 8765`; con Playwright (già installato) apri
   `http://localhost:8765/index.html`, clicca `#goBtn`, rispondi al primo capitolo con
   `window.nightRun.game.answer(0)`, I per il quadro, Invio tenuto per l'avviamento, E per la prima, W per il gas.

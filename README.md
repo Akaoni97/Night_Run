@@ -25,7 +25,7 @@ l'auto. Ma più chilometri fai, più la strada smette di tornare.
 - [`AGENTS.md`](AGENTS.md): com'è fatto il codice, le regole, come provare. Da leggere per primo.
 - [`PASSAGGIO.md`](PASSAGGIO.md): stato del gioco, lavori aperti, come pubblicare.
 - [`docs/storia/STORIA.md`](docs/storia/STORIA.md): la nuova storia del Viaggio (in costruzione): cosa è deciso e cosa manca.
-- Prove automatiche: `node --test test/motori.test.js` (Node 22 o più recente).
+- Prove automatiche: `node --test test/test1.test.js` (Node 22 o più recente).
 - Si prova in locale con `python3 -m http.server 8765` dalla cartella del repository.
 
 ---
@@ -429,7 +429,7 @@ con modello di aderenza, resistenza aerodinamica e frenata. Con la configurazion
 | `street2d.js` | Strada in pixel art cartoonesca vista di lato (vista predefinita) |
 | `street3d.js` | Strada notturna in 3D: città, arredo urbano, traffico, polizia, distributore |
 | `game.js` | Carriera: soldi, eventi, polizia, consegne, pilota automatico per le fermate |
-| `../test/motori.test.js` | Prove con `npm test` |
+| `../test/test1.test.js` | Prove con `npm test` |
 
 ## Limitatore, quadri originali, traffico, fisica e mappa del mondo
 
