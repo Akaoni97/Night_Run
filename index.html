@@ -1116,13 +1116,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         </div>
         <p class="hint" id="viewHint"></p>
       </div>
-      <div class="field"><span>Carattere del motore</span>
-        <div class="seg" data-k="character" role="group" aria-label="Carattere del motore">
-          <button type="button" data-v="originale">Originale</button>
-          <button type="button" data-v="codex">Codex · deciso</button>
-        </div>
-        <p class="hint">Più corpo e attacco quando acceleri (proposta di Codex). Cambia solo il motore sintetizzato: radio, campioni e potenza restano uguali.</p>
-      </div>
       <div class="toggles">
         <label class="tg"><input type="checkbox" id="tBox">Cambio automatico (cambia marcia da solo)</label>
         <label class="tg"><input type="checkbox" id="tAuto">Frizione automatica</label>
@@ -1274,6 +1267,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="dsp.js"></script>
 <script src="sim.js"></script>
 <script src="tuning.js"></script>
+<script src="schede.js"></script>
 <script src="cars.js"></script>
 <script src="samples.js"></script>
 <script src="street2d.js"></script>
@@ -1318,7 +1312,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   let themeReady = false;
   try { const g = localStorage.getItem('nightrun'); if (g) { game.load(g); if (typeof game.s.fuel === 'number') sim.fuel = game.s.fuel; if (game.s.car) { sim.damage = game.s.car.damage || 0; sim.tireWear = game.s.car.tireWear || 0; } } } catch (e) { /* storage non disponibile */ }
   const saveGame = () => { if (window.__nrRiavvia) return; game.s.fuel = sim.fuel; game.s.car = { damage: sim.damage, tireWear: sim.tireWear }; try { localStorage.setItem(game.s.vg ? 'nightrun-viaggio' : 'nightrun', game.save()); } catch (e) { /* ignora */ } };
-  const S = { tune: Object.assign({}, TUNING_PRESETS[0].sel), pops: false, launch: false, autoClutch: true, revMatch: true, view: 3, vol: 80, muted: false, mix: 70, paint: '#c81d11', look: '2d', character: 'originale' };
+  const S = { tune: Object.assign({}, TUNING_PRESETS[0].sel), pops: false, launch: false, autoClutch: true, revMatch: true, view: 3, vol: 80, muted: false, mix: 70, paint: '#c81d11', look: '2d' };
   try {
     const saved = JSON.parse(localStorage.getItem('banco2jz') || '{}');
     delete saved.turbo; delete saved.exhaust; delete saved.valve;   // impostazioni della versione precedente
@@ -1399,7 +1393,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) /* [PISTONE] */ ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
-    return { tune: TP.dsp, character: S.character, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
+    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
   }
   function ensureAudio() {

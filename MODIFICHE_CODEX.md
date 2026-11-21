@@ -52,6 +52,8 @@ git revert 3c2c10c
 toglie solo l'audio: 850 R di nuovo a sei cilindri, niente «Carattere del motore». Una partita salvata con «Codex · deciso»
 torna da sola a Originale.
 
+**21/11/2026: il carattere «Codex · deciso» è stato tolto del tutto** (su richiesta del proprietario: non cambiava niente di udibile). Via il menu in Impostazioni → Audio, il percorso in `dsp.js` (`codexBody`, `codexEdge`, `codexLoad`, `mixT.character`), `character` in `index.html` e la variabile `CARATTERE` di `strumenti/ascolta.mjs`; di `test/codex-audio.test.js` restano i due test dei cinque cilindri e dell'audio valido. I cinque cilindri della 850 R restano.
+
 ```bash
 git revert f85064a
 ```

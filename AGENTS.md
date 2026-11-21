@@ -11,6 +11,18 @@ cognato). Repository `Akaoni97/Night_Run` (solo il gioco, alla radice); si gioca
 https://akaoni97.github.io/Night_Run/ (pubblicato dal ramo `main`). Fino al 16/11/2026 il gioco stava in
 `Akaoni97/RandomEgg-s`, cartella `motori/`: lì non si lavora più.
 
+## Chi è chi (parte per gli assistenti: i giocatori non la vedono)
+I due sviluppatori sono anche due personaggi del gioco, con lo stesso nome: **non confonderli mai**.
+| Persona vera | Ruolo nel repository | Personaggio nel gioco |
+| --- | --- | --- |
+| **Nico** | il **proprietario** (repository `Akaoni97/Night_Run`) | **Nico**, il motorista (il vecchio negozio Pistone, oggi spento di serie) |
+| **Luca** | il **cognato** | **Luca**, il meccanico di Da Luca Tuning (pezzi, scarico, assetto) |
+- Chi ti parla di solito è **Luca** (il cognato). Se dice «questa è per Nico» o «la decide Nico» intende **il proprietario**, non il personaggio; se dice «è per me» è Luca. Il dubbio si scioglie in questo modo, non chiedendo «chi è Nico?».
+- Nei file `proprietario` = Nico, `cognato` = Luca. Il trailer dei commit `Per: proprietario` / `Per: cognato` dice **chi ha chiesto il lavoro** (la persona che parla in quella sessione), non chi ha l'account.
+- Quando una frase parla di «Nico» o «Luca» nel gioco (testi, storia, interni, negozi) sono i personaggi; quando parla di decisioni, sospesi, avvisi o «per Nico / per Luca» sono le persone.
+- I motori sono di Luca (il cognato) come lavoro di sviluppo; il personaggio che li vende nel gioco è Nico il motorista. Anche qui: persona e personaggio sono cose diverse.
+- Non scrivere nel repository indirizzi email o dati personali di nessuno dei due.
+
 ## Com'è fatto
 HTML + JavaScript puro: niente build, niente npm, niente framework. **Solo 2D**: il 3D (three.js, `car3d.js`,
 `street3d.js`, `viaggio3d.js`, `models/`, la modalità Montagna e la vetrina) è stato tolto il 20/11/2026 per scelta del
@@ -23,10 +35,11 @@ solo guidando la Supra.
 
 | File | Cosa contiene |
 | --- | --- |
-| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri (4, 5 o 6: la 850 R ha i cinque, modifica Codex), carattere «Codex · deciso» opzionale (`cfg.character`, menu Guida, di serie Originale = suono di prima), collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Scoppi dello scarico a voci (fino a 6 insieme, ognuno un po' diverso: altezza, crepitio, durata, doppi «pa-pam», sgranate); carattere per auto in `voice.pop` (`f` altezza, `crack`, `len`, `thump`, `vary`, `boom` boato basso che scende di nota, `bf` sua altezza, `mid` quanto passa dal silenziatore; le Volvo usano `VOLVO_POP` col boato, Supra di serie). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. Borbottio al rilascio: `addBurble` e voci `bV`, con un livello suo nel mix (`burG`) perché a gas mollato lo scarico normale è quasi muto; copione `rilascio` in `strumenti/ascolta.mjs`. |
+| `dsp.js` | Motore audio sintetizzato (classe `EngineDSP`, gira in un AudioWorklet): cilindri (3, 4, 5 o 6: la 850 R ha i cinque, modifica Codex; Polo, Clio e 308 i tre, uno scoppio ogni 240°; il carattere «Codex · deciso» è stato tolto il 21/11), collettori, scarico, turbo, valvola, aspirazione, carattere per auto (`voice`). Scoppi dello scarico a voci (fino a 6 insieme, ognuno un po' diverso: altezza, crepitio, durata, doppi «pa-pam», sgranate); carattere per auto in `voice.pop` (`f` altezza, `crack`, `len`, `thump`, `vary`, `boom` boato basso che scende di nota, `bf` sua altezza, `mid` quanto passa dal silenziatore; le Volvo usano `VOLVO_POP` col boato, Supra di serie). Urti (`hit`/`hitSample`): botta, lamiera a scatti, pannelli, vetri, detriti, strisciata; evento `{ type: 'crash', I, kind: 'front'|'rear'|'side' }`, il motore si abbassa per un attimo. Borbottio al rilascio: `addBurble` e voci `bV`, con un livello suo nel mix (`burG`) perché a gas mollato lo scarico normale è quasi muto; copione `rilascio` in `strumenti/ascolta.mjs`. |
 | `sim.js` | Fisica (classe `SupraSim`, passo 1/4000 s): motore, turbo, frizione, cambio, gomme Pacejka, differenziale, beccheggio, wheel hop, TRC, ABS, tipi di limitatore. `sim.park` (spento di serie): cambio bloccato in folle, ruote ferme (leva in P). `sim.revMax` (m/s, spento di serie): limitatore della retromarcia, lo accende il gioco. |
 | `tuning.js` | Catalogo pezzi della Supra, reparto Limitatore comune (`LIMITER_CAT`, `applyLimiter`), Assetto a 6 livelli comune a tutte le auto (`SUSP_LV`, `suspCat`, `suspState`, `suspResolve`: altezza in mm e rigidità regolabili da Luca, stato in `S.adj[auto]`), `tuningParams(sel, adj)`. |
-| `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`. Quadri strumenti in `CLUSTERS`. |
+| `schede.js` | **Schede tecniche e personalità dei pezzi** (prima di `cars.js`; senza di lui `cars.js` usa i cataloghi comuni): per ogni auto `SCHEDE[id]` con i dati veri del motore (cilindrata, cilindri, valvole, alimentazione, benzina o diesel, CV e Nm, cambio, trazione; Polo, Clio e 308 sono tricilindrici, la 850 R ha i cinque) e `mods` (marchi e nomi dei pezzi suoi: scarico, filtro, camme, downpipe, centralina, gomme, un reparto speciale `special` con due livelli e, dove serve, i suoi turbo; `turboSerie` per chi ha già il turbo di serie). `schedaTesto(id)` dà la riga mostrata in officina. Sui diesel niente camme né downpipe (c'è già il FAP), rimappatura più generosa e niente scoppi. Prezzi e km scalano con `mods.pk` e `mods.kk`. Test in `test/schede.test.js` (scheda contro curva di coppia vera, cilindri e trazione contro il gioco, nessun catalogo copiato). Per una nuova auto: aggiungere la voce qui. |
+| `cars.js` | Tutte le auto. V40 col suo catalogo; le auto da disegno con il costruttore comune `GEN_CARS` + `GEN_DATA` + `genCar()`; `genCatalog` costruisce i pezzi di ogni auto dalla sua scheda (`schede.js`: reparti Downpipe, Camme e il reparto speciale oltre ai comuni). Quadri strumenti in `CLUSTERS`. |
 | `samples.js` | Lettore di campioni audio caricati dall'utente (solo Supra). |
 | `street2d.js` | Tutta la grafica 2D in pixel art (classe `Street2D`), sfondi dei luoghi (`drawScenery`, `drawNearSide`), traffico, radar delle corsie. |
 | `quartieri2d.js` | Quartieri della città (dopo `street2d.js`): elenco `Street2D.DISTRICTS` (tipi di palazzo, colori, insegne, foschia, lampioni, tinta), `districtAt`/`districtMix`, palazzi nuovi (`kindExtra`), punti di riferimento lontani (`landmark`), degrado (`decayTile`), cartello col nome (`districtBanner`). |
@@ -138,7 +151,7 @@ una riga nella tabella qui sopra, poi uniscile su `main` (direttamente, come il 
 Strumenti: `node strumenti/prova.js [--mob] [--vista 1920x1080] [--out cartella] passo...` (per esempio
 `tappa:junk entra foto:dentro stato`; elenco dei passi in testa al file) e
 `node strumenti/ascolta.mjs <auto> <minimo|sgasate|allungo|crociera|limitatore|urti|scoppi> <file.wav> [vista] [ambiente]`
-(variabili `PRESET=<id>` per la preparazione, `POPS=1` per accendere gli scoppi, `CARATTERE=codex` per il carattere deciso).
+(variabili `PRESET=<id>` per la preparazione, `POPS=1` per accendere gli scoppi).
 Partita intera a tempo accelerato: `node strumenti/giocatore.js --km 200 --out cartella` (un giocatore automatico prudente:
 lavori, missioni, benzina, cibo, motel, Mario, documenti; non compra auto né pezzi; diario in `diario.json`, ~25 minuti veri
 per 200 km). Serve a misurare ritmo ed economia dopo un cambio di prezzi o paghe.

@@ -43,7 +43,7 @@
     const joyP = document.createElement('p'); joyP.className = 'hint'; joyP.textContent = 'Un pad Xbox funziona da solo. Volante, pedali, cambio a H e joystick strani si assegnano qui.';
     const SUBS = [
       ['grafica', 'Grafica', [panel('Qualità, ora, meteo e prestazioni', [labelOf('q3d'), labelOf('clockSel'), labelOf('meteoSel'), labelOf('pausaSel'), labelOf('fpsSel')], 'gm-row'), q('section.uiprefs')]],
-      ['audio', 'Audio', [panel('Volumi e ascolto', [fieldOf('vol'), fieldOf('radioVol'), q('.seg[data-k="view"]') && q('.seg[data-k="view"]').closest('.field'), q('.seg[data-k="character"]') && q('.seg[data-k="character"]').closest('.field')]), q('section.extras .samples')]],
+      ['audio', 'Audio', [panel('Volumi e ascolto', [fieldOf('vol'), fieldOf('radioVol'), q('.seg[data-k="view"]') && q('.seg[data-k="view"]').closest('.field')]), q('section.extras .samples')]],
       ['comandi', 'Comandi', [panel('Tasti', [tasti, tastiP]), panel('Joystick e volante', [joy, joyP]), keysPanel]],
       ['guida', 'Guida', [panel('Aiuti alla guida', [q('section.deck .setup .toggles'), labelOf('suggSel')])]],
     ];
