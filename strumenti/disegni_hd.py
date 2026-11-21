@@ -3,7 +3,10 @@
 # (88 pixel per metro: img/<id>_hd.png, _wheel_hd.png, _paint_hd.png), con le stesse misure in unità dello sprite.
 # Uso: python3 -I disegni_hd.py <cartella img> <cartella anteprime> <ruote.json> <cartella disegni> <cartella ruote> <elenco.json>
 #   ruote.json: { "<file>_bianco.png": { rw:[x,y], fw:[x,y], Rs:[R dietro, R davanti] } } (trova_ruote.py + affina_ruote.py)
-#   elenco.json: { id: [file del disegno, file della ruota, passo vero in metri, suffisso dei file (vuoto o "_tuning")] }
+#   elenco.json: { id: [file del disegno, file della ruota, passo vero in metri, suffisso dei file (vuoto o "_tuning"),
+#                     fascia dei finestrini [y0, y1] o null, id della versione normale per allineare la tuning] }
+#   La versione tuning (con id_base) si allinea alla normale: stesso asse posteriore e stessa altezza delle ruote nello
+#   sprite, più un margine P uguale a sinistra e in alto per labbro, spoiler e diffusore; nella meta c'è off = [P, P].
 from PIL import Image, ImageDraw
 import numpy as np, json, sys, os, colorsys
 OUT, PREV, RJ, SRC, WH, LIST = sys.argv[1:7]
@@ -76,6 +79,7 @@ def paint_mask(body, wcy, Rs, band=None):
 meta = {}
 for cid, ent in L.items():
     fn, wfn, wb, suf = ent[:4]; band1 = ent[4] if len(ent) > 4 else None   # band1: fascia dei finestrini nello sprite (misura di sempre)
+    base = meta.get(ent[5]) if len(ent) > 5 and ent[5] else None
     key = os.path.splitext(fn)[0] + '_bianco.png'; wd = W[key]
     src = Image.open(os.path.join(SRC, fn)).convert('RGBA'); A = np.asarray(src)
     rx, ry = wd['rw']; fx, fy = wd['fw']; Rr, Rf = wd.get('Rs', [wd['R'], wd['R']])
@@ -95,6 +99,12 @@ for cid, ent in L.items():
     A[long_, 3] = 0; src = Image.fromarray(A, 'RGBA')
     ys, xs = np.where(A[..., 3] > 0); left, right, top = xs.min() - 2, xs.max() + 3, ys.min() - 2
     bot = cy + R + 2
+    P = 0
+    if base:   # allineata alla versione normale: (rx, cy) va in (ax0 + P, wy + P) dello sprite
+        needL = (rx - left) * s1 - base['ax'][0]; needT = (cy - top) * s1 - base['wy']
+        P = int(np.ceil(max(0, needL, needT))) + 1
+        left = int(round(rx - (base['ax'][0] + P) / s1)); top = int(round(cy - (base['wy'] + P) / s1))
+        if band1: band1 = [band1[0] + P, band1[1] + P]
     for mult, tag in ((1, ''), (2, '_hd')):
         s = s1 * mult
         w = int(round((right - left) * s)); h = int(round((bot - top) * s))
@@ -128,6 +138,8 @@ for cid, ent in L.items():
                      hx=int(wx0 + (wx1 - wx0) * 0.62), hy=int(wy0 - 9), refL=round(rL, 1),
                      slots=dict(st_door=[int(w * 0.55), int(wcy - Rs * 0.9), int(w * 0.15), int(Rs * 0.8)], st_rear=[int(rcx), int(wcy - Rs * 1.55), int(Rs * 1.4), int(Rs * 0.7)], st_glass=[int(wx0 + (wx1 - wx0) * 0.25), int(wy0 + 5), int(Rs * 1.4), int(Rs * 0.45)]),
                      ws=S, fixed=1, hd=2)
+            if base:   # guidatore e adesivi dalla versione normale, spostati del margine
+                G.update(off=[P, P], hx=base['hx'] + P, hy=base['hy'] + P, slots={k: [v[0] + P, v[1] + P, v[2], v[3]] for k, v in base['slots'].items()})
             meta[name] = G
             # anteprima: corpo con le ruote montate e i punti
             big = Image.fromarray(body, 'RGBA').resize((w * 4, h * 4), Image.NEAREST); pv = Image.new('RGBA', big.size, (40, 40, 60, 255)); pv.alpha_composite(big)

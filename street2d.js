@@ -136,10 +136,11 @@ class Street2D {
   }
   wheelFn() { return (this.carId === 'v40' ? this.v40Wheel : this.genDef() ? this.genWheel : this.supraWheel).bind(this); }
   // ---------------------------------------------------------------- auto da immagine (cars.js → sprite): corpo, ruota, maschera vernice
-  genDef() { const c = typeof CARS !== 'undefined' && this.carId !== 'supra' && this.carId !== 'v40' && CARS[this.carId]; return (c && c.sprite) || null; }
+  genDef() { const c = typeof CARS !== 'undefined' && this.carId !== 'supra' && this.carId !== 'v40' && CARS[this.carId]; if (!c) return null; return (c.spriteT && this.cos && this.cos.kit === 'tuning' ? c.spriteT : c.sprite) || null; }   // col kit carrozzeria: il disegno tuning
+  genKey() { const D = this.genDef(), c = CARS[this.carId]; return this.carId + (D && c && D === c.spriteT ? '_tuning' : ''); }
   genImgs() {
     Street2D.gen = Street2D.gen || {};
-    const id = this.carId, D = this.genDef();
+    const id = this.genKey(), D = this.genDef();
     if (Street2D.gen[id]) return Street2D.gen[id];
     const K = D.imgHd ? ['img', 'wheel', 'paint', 'imgHd', 'wheelHd', 'paintHd'] : ['img', 'wheel', 'paint'];
     const G = { n: 0, ready: false, wcache: {} }, done = () => { if (++G.n === K.length) { G.ready = true; this.spr = {}; } };
@@ -149,7 +150,7 @@ class Street2D {
   // m = 1: la misura di sempre (guidatore, danni, vetri); m = 2: il disegno a densità doppia (solo per disegnare la carrozzeria)
   genBase(m = 1) {
     const D = this.genDef(), G = this.genImgs(), C0 = this.cos || {}, L = this.carLook || {}, hex = this.v40Paint || 'orig';
-    const key = 'genb' + m + this.carId + hex + (this.cosKey || '') + JSON.stringify(L) + (G.ready ? 1 : 0);
+    const key = 'genb' + m + this.genKey() + hex + (this.cosKey || '') + JSON.stringify(L) + (G.ready ? 1 : 0);
     if (this.spr[key]) return this.spr[key];
     const W = D.w * m, H = D.h * m, c = document.createElement('canvas'); c.width = W; c.height = H;
     if (!G.ready) return c;
@@ -180,7 +181,7 @@ class Street2D {
     return (this.spr[key] = c);
   }
   genSprite(k) {
-    const key = 'gens' + k + this.carId + (this.carKey || '') + (this.cosKey || '') + ((this.genImgs().ready) ? 1 : 0);
+    const key = 'gens' + k + this.genKey() + (this.carKey || '') + (this.cosKey || '') + ((this.genImgs().ready) ? 1 : 0);
     if (this.spr[key]) return this.spr[key];
     const D = this.genDef(), b = this.genBase(), c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(b, 0, 0, c.width, c.height);

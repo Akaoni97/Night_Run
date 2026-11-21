@@ -24,9 +24,10 @@
     ambulanza: [166, 196, 34, 62], polizia: [85, 118, 14, 30],
   };
   S.WIN2D = WIN;
-  const paintOf = (id) => {
+  const paintOf = function (id) {
     if (id === 'v40') { if (!Street2D._v40p) { Street2D._v40p = new Image(); Street2D._v40p.src = 'img/v40_paint.png'; } return Street2D._v40p; }
-    return Street2D.gen && Street2D.gen[id] ? Street2D.gen[id].paint : null;
+    const k = this && this.genKey ? this.genKey() : id;   // col kit carrozzeria la maschera del disegno tuning
+    return Street2D.gen && Street2D.gen[k] ? Street2D.gen[k].paint : null;
   };
   // maschera dal riquadro misurato (null finché la maschera della vernice non è caricata)
   const rectMasks = (hd, R, paint) => {
@@ -52,9 +53,10 @@
   // glass: i pixel di vetro (azzurrini, chiari); win: vetro più gli spazi stretti tra vetri (dettagli, maniglie, cuciture)
   S.glassMasks = function (hd, G) {
     if (hd._gm) return hd._gm;
-    const R = WIN[this.carId];
+    const D0 = this.genDef && this.genDef(), off = (D0 && D0.off) || [0, 0], W0 = WIN[this.carId];
+    const R = W0 && [W0[0] + off[0], W0[1] + off[0], W0[2] + off[1], W0[3] + off[1]];   // disegno tuning: spostato del margine
     if (R) {
-      const pi = paintOf(this.carId), ready = pi && pi.complete && pi.naturalWidth > 0;
+      const pi = paintOf.call(this, this.carId), ready = pi && pi.complete && pi.naturalWidth > 0;
       const M = rectMasks(hd, R, ready ? pi : null);
       if (ready) hd._gm = M;                                       // senza maschera della vernice si ricalcola al prossimo giro
       return M;
