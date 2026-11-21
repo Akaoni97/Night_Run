@@ -2,7 +2,7 @@
 - Fatto: misurato 0-60 e 0-100 di tutte le auto con il cambio automatico del gioco, col controllo di trazione acceso e spento. Le piccole erano a posto; le potenti perdevano troppo sgommando: con il TRC spento la E34 faceva 0-100 in 9,1 s contro 6,6 con il TRC (gomma che dopo il picco perdeva il 21 % della forza, spinta di aderenza sfruttata male, carico che passava dietro in ~0,8 s). In `sim.js`: `P.tr` 1,08, `tyre.fall` 0,6, trasferimento di carico più rapido, TRC al 12 %, cambiate ×0,8. Ora (cambio automatico, TRC acceso): Supra 6,1 → 5,8 s, E36 6,6 → 6,1, E34 6,6 → 6,2, V850 7,6 → 7,2, V40 9,5 → 9,2; Panda e Polo quasi uguali. TRC spento: E34 9,1 → 6,3. Test nuovi in `test/accelerazione.test.js` (302).
 - Aperto: il Supra resta ~0,5 s più lento dei tempi da rivista (5,0-5,3): la potenza e il peso di serie sono giusti, il resto lo fanno la turbina che sale piano e le due cambiate. Da sentire sul PC; se serve ancora più scatto si tocca `P.tr` (aderenza) o `shiftK`, non la potenza. Non provato nel browser con l'audio (solo fisica).
 
-## 21/11/2026 · proprietario (**pedoni in alta definizione, leggeri**)
+## 21/11/2026 · proprietario · v0.72 (**pedoni in alta definizione, leggeri**)
 - Fatto: a densità doppia i passanti che camminano sul marciapiede (`quartieri2d.js`, `fig`) sono disegnati come il protagonista: pixel art vera
   con giacca, capelli, passo. 34 aspetti fissi (24 qualunque, incappucciati, operai col caschetto, giacca scura), 8 pose ciascuno in memoria; al
   massimo 2 pose nuove per fotogramma (0,36 ms l'una), intanto resta l'omino di prima. Misurato: 168 pose in un minuto, 60 ms in tutto.
