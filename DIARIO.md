@@ -1,3 +1,11 @@
+## 21/11/2026 · proprietario · v0.63 (**officina di Luca: pezzi nuovi per la V40 e pallini verde/rosso**)
+- Fatto: sulla V40 (`cars.js`) nuovi pezzi: turbo da **0,5 / 1,0 / 1,5 bar** (oltre ai due che c'erano; ogni turbo ha il suo flusso, la centralina originale tiene a 1 bar),
+  **downpipe** (reparto Downpipe e catalizzatore: cat sportivo e decat), **terminale**, **airbox con presa d'aria fredda**, **camme** (sportive e da corsa), **cambio** (ravvicinato e
+  corto da drag), **gomme da drag** (livello 3), **frizione da corsa**. La preparazione «Drag 450» (`V40_PRESETS`) arriva a ~520 CV, 620 Nm. Nell'officina (`officina.js`) ogni livello ha un
+  **pallino**: verde = ce l'hai (un clic **monta**), rosso = non ce l'hai (un clic **compra**, poi lo monti), col lucchetto servono i km.
+- Aperto: solo la V40 ha i pezzi nuovi (le altre auto hanno ancora i loro cataloghi più corti, `genCatalog` e `TUNING_SUPRA`). I pezzi di Nico (`pistone/`, magazzino) restano spenti: non sono
+  nell'officina semplice. Le cifre (CV, prezzi, km) sono tarate a occhio.
+
 ## 21/11/2026 · proprietario · v0.62 (**Night Run per Windows, da Codex**)
 - Fatto: unito il lavoro di Codex (Electron). `desktop/` (finestra del gioco con sandbox, protocollo `app://`, salvataggi in `%APPDATA%\night-run\salvataggi` con backup, build per
   installatore e portatile), `vendor/fonts/` (30 caratteri locali con le licenze al posto di Google Fonts), `sw.js` col nuovo `VERSIONE`. Guida in `desktop/LEGGIMI.md`.

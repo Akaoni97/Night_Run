@@ -2778,7 +2778,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca i pezzi: li monto subito. La i dice cosa fanno.');
       if (window.NightOfficina && !(typeof PISTONE !== 'undefined' && PISTONE.on)) {      // officina semplice (officina.js): Modifiche e Swap motore (con l'interruttore del Pistone acceso resta il vecchio negozio)
-        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
+        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
       } else {                                                           // [PISTONE] interruttore acceso: il vecchio negozio di Luca e Nico
         if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto sono ancora miei.»`);

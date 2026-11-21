@@ -20,6 +20,7 @@ const TUNING_V40 = {
     label: 'Scarico',
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Originale', note: 'Silenziatore centrale e terminale chiusi: voce sorda e educata.', sim: { pw: 1 }, dsp: 'stock' },
+      { id: 'terminale', price: 350, km: 3, brand: 'Simons', name: 'Terminale sportivo in inox', note: 'Solo il silenziatore finale al posto di quello originale: voce un po\' più piena, qualche cavallo (+2 %).', sim: { pw: 1.02 }, dsp: 'sport', look: { tip: 1 } },
       { id: 'catback', price: 700, km: 8, brand: 'Simons', name: 'Catback in inox da 63 mm', note: 'Terminale ovale grande: voce piena e ruvida, rimbombo verso i 3000. Sull\'aspirato vale un +3 %.', sim: { pw: 1.03 }, dsp: 'sport', look: { tip: 1 } },
       { id: 'turboback', price: 1300, km: 30, brand: 'Ferrita', name: 'Turboback 76 mm senza silenziatore centrale', note: 'Tutto lo scarico dal turbo in giù: col turbo +6 % e spool più pronto, da aspirata solo rumore (+3 %).', sim: { pw: 1.03, pwTurbo: 1.06, spool: 0.92 }, dsp: 'race', look: { tip: 2 } },
     ],
@@ -29,6 +30,23 @@ const TUNING_V40 = {
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Airbox originale', note: 'Chiusa e silenziosa.', sim: { pw: 1 }, dsp: { in: 1, roar: 1, wh: 1 } },
       { id: 'pf', price: 250, km: 4, brand: 'K&N', name: 'Filtro a fungo', note: 'Risucchio forte ai bassi, col turbo il fischio si sente il doppio. +2 % (aria più calda nel vano: niente miracoli).', sim: { pw: 1.02 }, dsp: { in: 2.2, roar: 2.4, wh: 1.7 } },
+      { id: 'ram', price: 600, km: 12, brand: 'Forge', name: 'Airbox sportivo con presa d\'aria fredda', note: 'Pesca l\'aria da dietro il faro, lontano dal calore del motore: +4 % e un risucchio pieno senza rumore da fungo.', sim: { pw: 1.04 }, dsp: { in: 1.7, roar: 1.8, wh: 1.4 } },
+    ],
+  },
+  cat: {
+    label: 'Downpipe e catalizzatore',
+    items: [
+      { id: 'oem', price: 0, km: 0, pw: 1, pwTurbo: 1, brand: 'Volvo', name: 'Catalizzatore originale', note: 'Ceramico stretto vicino al collettore: pulito ma strozza un po\'.', dsp: { lp: 0, g: 1, pop: 1 } },
+      { id: 'sport', price: 650, km: 10, pw: 1.02, pwTurbo: 1.06, brand: 'Ferrita', name: 'Downpipe da 76 mm con cat sportivo', note: 'Senza il collo di bottiglia dopo la turbina: col turbo +6 % e spool più pronto, da aspirata +2 %.', dsp: { lp: 5200, g: 1.0, pop: 1.25 } },
+      { id: 'decat', price: 250, km: 15, pw: 1.03, pwTurbo: 1.09, brand: 'Su misura', name: 'Downpipe senza catalizzatore (solo pista)', note: 'Nessun filtro: col turbo +9 %, suono aperto e scoppi forti. Non è omologato.', dsp: { lp: 0, g: 1.15, pop: 1.7 } },
+    ],
+  },
+  cams: {
+    label: 'Alberi a camme',
+    items: [
+      { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Originali', note: 'Minimo regolare e coppia piena ai bassi.', sim: { idle: 800, low: 1, high: 1, lope: 0 }, dsp: { lope: 0 } },
+      { id: 'sport', price: 900, km: 14, brand: 'Kelford', name: 'Fase sportiva (252°)', note: 'Un filo di irregolarità al minimo, un po\' meno coppia in basso e più potenza in alto (+6 %).', sim: { idle: 850, low: 0.97, high: 1.06, lope: 0.3 }, dsp: { lope: 0.3 } },
+      { id: 'race', price: 1900, km: 32, brand: 'Kelford', name: 'Fase da corsa (272°)', note: 'Minimo zoppo e ballerino, sotto i 3000 giri è pigra: in alto +14 %.', sim: { idle: 1000, low: 0.9, high: 1.14, lope: 0.9 }, dsp: { lope: 0.9 } },
     ],
   },
   ecu: {
@@ -45,8 +63,11 @@ const TUNING_V40 = {
     label: 'Turbo',
     items: [
       { id: 'none', price: 0, km: 0, brand: '—', name: 'Aspirato', note: '140 CV a 6000 giri, coppia piatta ma modesta.', sim: { turbo: null } },
-      { id: 'td04', price: 3800, km: 28, brand: 'Mitsubishi', name: 'Kit TD04HL della V40 T4 (0,7 bar)', note: 'Collettore, turbo, iniettori da 400 cc e pistoni bassi della T4: circa 210 CV, spinta da 2500. Fischio e valvola a ricircolo.', sim: { turbo: { max: 0.7, a: 2000, b: 3000, up: 0.3, down: 0.75, twin: false } }, dsp: { tb: { f0: 2600, f1: 8800, w: 0.04, wh: 0.06, damp: 2000, twin: 0, mani: 1 } }, look: { badge: 'T4' } },
-      { id: 'td04_19t', price: 5500, km: 45, brand: 'Mitsubishi', name: 'TD04HL-19T (fino a 1,5 bar)', note: 'La turbina più grande della famiglia: arriva a 3000, poi spinge forte fino al limitatore. Serve una centralina per sfruttarlo e un intercooler serio.', sim: { turbo: { max: 1.5, a: 2800, b: 4000, up: 0.42, down: 0.85, twin: false } }, dsp: { tb: { f0: 2100, f1: 7600, w: 0.05, wh: 0.08, damp: 2200, twin: 0, mani: 1 } }, look: { badge: 'T5' } },
+      { id: 'mini05', price: 2200, km: 12, brand: 'Garrett', name: 'Turbo piccolo da 0,5 bar', note: 'Il più dolce: spinta pronta da 1800 giri, circa 185 CV. Regge con la centralina originale. Fischio e valvola a ricircolo.', sim: { turbo: { max: 0.5, a: 1800, b: 2600, up: 0.25, down: 0.7, twin: false }, flow: 1 }, dsp: { tb: { f0: 2700, f1: 9000, w: 0.03, wh: 0.05, damp: 1900, twin: 0, mani: 1 } }, look: { badge: 'T' } },
+      { id: 'td04', price: 3800, km: 28, brand: 'Mitsubishi', name: 'Kit TD04HL della V40 T4 (0,7 bar)', note: 'Collettore, turbo, iniettori da 400 cc e pistoni bassi della T4: circa 210 CV, spinta da 2500. Fischio e valvola a ricircolo.', sim: { turbo: { max: 0.7, a: 2000, b: 3000, up: 0.3, down: 0.75, twin: false }, flow: 1 }, dsp: { tb: { f0: 2600, f1: 8800, w: 0.04, wh: 0.06, damp: 2000, twin: 0, mani: 1 } }, look: { badge: 'T4' } },
+      { id: 'bar10', price: 4600, km: 36, brand: 'Garrett', name: 'Turbo medio da 1,0 bar (GT2860)', note: 'Un bar di pressione, arriva pieno a 2600: forte e ancora guidabile. La centralina originale lo tiene a 1 bar, la rimappata a 1,2.', sim: { turbo: { max: 1.0, a: 2600, b: 3600, up: 0.36, down: 0.8, twin: false }, flow: 1.2 }, dsp: { tb: { f0: 2300, f1: 8200, w: 0.045, wh: 0.07, damp: 2100, twin: 0, mani: 1 } }, look: { badge: 'T10' } },
+      { id: 'td04_19t', price: 5500, km: 45, brand: 'Mitsubishi', name: 'TD04HL-19T (fino a 1,5 bar)', note: 'La turbina più grande della famiglia: arriva a 3000, poi spinge forte fino al limitatore. Serve una centralina per sfruttarlo e un intercooler serio.', sim: { turbo: { max: 1.5, a: 2800, b: 4000, up: 0.42, down: 0.85, twin: false }, flow: 1.3 }, dsp: { tb: { f0: 2100, f1: 7600, w: 0.05, wh: 0.08, damp: 2200, twin: 0, mani: 1 } }, look: { badge: 'T5' } },
+      { id: 'big15', price: 8200, km: 60, brand: 'Garrett', name: 'Turbo grosso da 1,5 bar (GT3582)', note: 'Pigro sotto i 3500 e poi un calcio: 1,5 bar con una turbina da 450 CV. Vuole centralina stand-alone, intercooler frontale, scarico libero e un po\' di coraggio.', sim: { turbo: { max: 1.5, a: 3400, b: 4600, up: 0.5, down: 0.9, twin: false }, flow: 1.85 }, dsp: { tb: { f0: 1900, f1: 7000, w: 0.055, wh: 0.09, damp: 2300, twin: 0, mani: 1 } }, look: { badge: 'T15' } },
     ],
   },
   intercooler: {
@@ -62,6 +83,7 @@ const TUNING_V40 = {
       { id: 'oem', price: 0, km: 0, brand: 'Michelin', name: 'Energy 195/55 R15', note: 'Da turismo: lavorano bene da fredde, ma oltre il 15 % di slittamento la presa cala e il muso allarga.', sim: { mu: 1.0, tyre: { B: 17, C: 1.4, E: 0.05, opt: 70, win: 75, crr: 0.011, brake: 0.95 } } },
       { id: 'sport', price: 650, km: 2, brand: 'Toyo', name: 'Proxes T1-R 205/45 R16', note: 'Sportive su cerchio da 16: +5 % di presa, sterzo più pronto, si scaldano a 85 °C.', sim: { mu: 1.05, tyre: { B: 20, C: 1.45, E: 0.2, opt: 85, win: 60, crr: 0.012 } } },
       { id: 'semislick', price: 1100, km: 25, brand: 'Toyo', name: 'Proxes R888R 205/45 R16', note: 'Semi-slick: +20 % di presa calde, scivolose da fredde. Con la trazione anteriore fanno la differenza in partenza.', sim: { mu: 1.2, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } } },
+      { id: 'drag', price: 1800, km: 38, brand: 'Mickey Thompson', name: 'ET Street R 225/50 R15 (drag)', note: 'Radiali da drag: fianco morbido, picco largo e calo minimo, +55 % di presa da tiepide (70 °C). In curva e in frenata sono le peggiori: servono per partire.', sim: { mu: 1.55, tyre: { B: 15, C: 1.3, E: -0.3, opt: 70, win: 55, crr: 0.016, brake: 0.88 } } },
     ],
   },
   suspension: suspCat({ make: 'Volvo', ids: ['oem', 'springs', 'dampers', 'coilover', 'race', 'pro'], pitch: 1.1, fwd: true,
@@ -74,11 +96,20 @@ const TUNING_V40 = {
       { id: 'quaife', price: 1800, km: 40, brand: 'Quaife', name: 'Autobloccante ATB e finale 4,45', note: 'Tiene giù la ruota scarica e accorcia tutte le marce: partenze piantate, 10 % in meno di velocità massima.', sim: { fd: 4.45, diff: 'lsd' } },
     ],
   },
+  gearbox: {
+    label: 'Cambio',
+    items: [
+      { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'M56 a 5 marce originale', note: 'Rapporti di serie: prima lunga e comoda, quinta di riposo.', sim: { gears: null } },
+      { id: 'close', price: 3200, km: 24, brand: 'Quaife', name: 'Ravvicinato a 5 marce', note: 'Marce più vicine: a ogni cambiata i giri calano poco e il turbo resta in pressione. Perdi un po\' di comodità.', sim: { gears: [0, 3.25, 2.18, 1.62, 1.28, 1.0] } },
+      { id: 'drag', price: 4800, km: 44, brand: 'Su misura', name: 'Corto da drag a 5 marce', note: 'Prima cortissima e rapporti ravvicinati: partenza violenta, ma a 180 km/h sei già al limitatore.', sim: { gears: [0, 3.9, 2.55, 1.85, 1.4, 1.1] } },
+    ],
+  },
   clutch: {
     label: 'Frizione e volano',
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Sachs', name: 'Originale a doppia massa', note: 'Morbida e silenziosa; con il turbo grosso slitta.', sim: { Ie: 0.16, clutch: 420 }, dsp: { rattle: 0 } },
       { id: 'sport', price: 900, km: 20, brand: 'Sachs', name: 'Rinforzata con volano alleggerito', note: 'Giri che salgono di scatto e tintinnio in folle: regge 450 Nm.', sim: { Ie: 0.12, clutch: 620 }, dsp: { rattle: 1 } },
+      { id: 'race', price: 2400, km: 40, brand: 'Sachs', name: 'Bidisco da corsa', note: 'Due dischi in ceramica: regge 900 Nm, pedale duro e rumoroso, giri che salgono di scatto. Serve con i turbo grossi.', sim: { Ie: 0.1, clutch: 920 }, dsp: { rattle: 1 } },
     ],
   },
   weight: {
@@ -91,10 +122,11 @@ const TUNING_V40 = {
   },
 };
 const V40_PRESETS = [
-  { id: 'stock', name: 'Di serie', sel: { exhaust: 'oem', intake: 'oem', ecu: 'oem', turbo: 'none', intercooler: 'oem', tires: 'oem', suspension: 'oem', final: 'oem', clutch: 'oem', weight: 'oem' } },
-  { id: 'street', name: 'Street aspirata', sel: { exhaust: 'catback', intake: 'pf', ecu: 'remap', turbo: 'none', intercooler: 'oem', tires: 'sport', suspension: 'springs', final: 'oem', clutch: 'oem', weight: 'oem' } },
-  { id: 'sleeper', name: 'Sleeper T4', sel: { exhaust: 'oem', intake: 'oem', ecu: 'remap', turbo: 'td04', intercooler: 'oem', tires: 'sport', suspension: 'oem', final: 'quaife', clutch: 'sport', weight: 'oem' } },
-  { id: 'full', name: 'Familiare cattiva', sel: { exhaust: 'turboback', intake: 'pf', ecu: 'standalone', turbo: 'td04_19t', intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'quaife', clutch: 'sport', weight: 's2' } },
+  { id: 'stock', name: 'Di serie', sel: { exhaust: 'oem', cat: 'oem', intake: 'oem', cams: 'oem', ecu: 'oem', turbo: 'none', intercooler: 'oem', tires: 'oem', suspension: 'oem', final: 'oem', gearbox: 'oem', clutch: 'oem', weight: 'oem' } },
+  { id: 'street', name: 'Street aspirata', sel: { exhaust: 'catback', cat: 'oem', cams: 'oem', gearbox: 'oem', intake: 'pf', ecu: 'remap', turbo: 'none', intercooler: 'oem', tires: 'sport', suspension: 'springs', final: 'oem', clutch: 'oem', weight: 'oem' } },
+  { id: 'sleeper', name: 'Sleeper T4', sel: { exhaust: 'oem', cat: 'oem', cams: 'oem', gearbox: 'oem', intake: 'oem', ecu: 'remap', turbo: 'td04', intercooler: 'oem', tires: 'sport', suspension: 'oem', final: 'quaife', clutch: 'sport', weight: 'oem' } },
+  { id: 'full', name: 'Familiare cattiva', sel: { exhaust: 'turboback', cat: 'sport', intake: 'pf', cams: 'sport', ecu: 'standalone', turbo: 'td04_19t', intercooler: 'fmic', tires: 'semislick', suspension: 'coilover', final: 'quaife', gearbox: 'close', clutch: 'sport', weight: 's2' } },
+  { id: 'drag', name: 'Drag 450', sel: { exhaust: 'turboback', cat: 'decat', intake: 'ram', cams: 'race', ecu: 'standalone', turbo: 'big15', intercooler: 'fmic', tires: 'drag', suspension: 'race', final: 'quaife', gearbox: 'drag', clutch: 'race', weight: 's2' } },
 ];
 // scoppi delle Volvo: boato basso (boom), poco schiocco e poco passaggio dal silenziatore, così non sembrano petardi
 const VOLVO_POP = { f: 0.8, crack: 0.45, len: 1.3, thump: 1.2, boom: 0.85, bf: 1, mid: 0.6 };
@@ -109,30 +141,30 @@ function v40Params(sel, adj) {
 }
 function v40ParamsBase(sel, adj) {
   const g = (k) => tuningItemOf(TUNING_V40, k, (sel || {})[k]);
-  const ex = g('exhaust'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = suspResolve(g('suspension'), adj), fin = g('final'), cl = g('clutch'), wt = g('weight');
+  const ex = g('exhaust'), ct = g('cat'), cm = g('cams'), gb = g('gearbox'), ecu = g('ecu'), tb = g('turbo'), ic = g('intercooler'), ty = g('tires'), su = suspResolve(g('suspension'), adj), fin = g('final'), cl = g('clutch'), wt = g('weight');
   const turbo = tb.sim.turbo ? Object.assign({}, tb.sim.turbo, { max: Math.min(tb.sim.turbo.max, ecu.sim.maxBoost) }) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false };
   if (tb.sim.turbo && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
   const hasT = !!tb.sim.turbo;
-  const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * g('intake').sim.pw * ecu.sim.pw;
+  const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * (hasT ? (ct.pwTurbo || ct.pw || 1) : (ct.pw || 1)) * g('intake').sim.pw * ecu.sim.pw;
   const pops = ecu.sim.spark && hasT;
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
-      idle: 800, camLow: 1, camHigh: 1, lope: 0, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
+      idle: cm.sim.idle, camLow: cm.sim.low, camHigh: cm.sim.high, lope: cm.sim.lope, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
       mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
-      diff: fin.sim.diff, fd: fin.sim.fd, gears: null, dm: wt.sim.dm, rearOff: wt.sim.rearOff || 1,
-      valve: hasT ? 'bov' : 'recirc', boostK: 0.42,     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
+      diff: fin.sim.diff, fd: fin.sim.fd, gears: gb.sim.gears, dm: wt.sim.dm, rearOff: wt.sim.rearOff || 1,
+      valve: hasT ? 'bov' : 'recirc', boostK: 0.42 * ((tb.sim.flow) || 1),     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
     },
     dsp: {
       voice: { pop: VOLVO_POP },
-      cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ex.dsp === 'stock' ? 2400 : 3800, g: 0.9, pop: pops ? 1.4 : hasT ? 0.7 : 0.25 },
+      cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ct.dsp.lp || (ex.dsp === 'stock' ? 2400 : 3800), g: ct.dsp.g > 1 ? 0.9 * ct.dsp.g : 0.9, pop: (pops ? 1.4 : hasT ? 0.7 : 0.25) * (ct.dsp.pop || 1) },
       tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
       bov: hasT ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
-      intake: g('intake').dsp, scream: 0, lope: 0, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
+      intake: g('intake').dsp, scream: 0, lope: cm.dsp.lope, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
     },
     look: {
       low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0,
-      turbo: hasT, turbo2: tb.id === 'td04_19t', badge: (tb.look || {}).badge || '', fmic: hasT && !!(ic.look || {}).fmic,
+      turbo: hasT, turbo2: tb.id === 'td04_19t' || tb.id === 'big15', badge: (tb.look || {}).badge || '', fmic: hasT && !!(ic.look || {}).fmic,
     },
   };
 }
