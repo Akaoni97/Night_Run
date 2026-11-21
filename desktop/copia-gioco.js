@@ -15,7 +15,8 @@ function copiaGioco() {
       fs.copyFileSync(path.join(ROOT, ent.name), path.join(DEST, ent.name));
     }
   }
-  for (const dir of ['audio', 'img', 'pistone', 'vendor']) {
+  for (const dir of ['audio', 'img', 'vendor']) {                 // pistone/ è stato cancellato nella v0.74: cercarlo fermava la build
+    if (!fs.existsSync(path.join(ROOT, dir))) continue;            // una cartella che non c'è più non ferma la build di Windows
     fs.cpSync(path.join(ROOT, dir), path.join(DEST, dir), {
       recursive: true,
       filter: (src) => fs.statSync(src).isDirectory() || !/\.md$/i.test(src)

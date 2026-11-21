@@ -232,16 +232,16 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
-- **Nico e il motore** (dal 20/11 sera da Luca Tuning, negozio unico; pezzi singoli a livelli, magazzino, banco di lavoro, per ora sul motore di serie della sola V40; guida aggiornata in `pistone/LEGGIMI.md`) (cartella `pistone/`: `motori.js`, `motori2d.js`, guida `LEGGIMI.md`): motori costruiti a pezzi, 14 reparti in ordine di montaggio
-  (blocco, albero, bielle, pistoni, pompa dell'olio, testata, camme, sovralimentazione, intercooler, iniettori, pompa
-  della benzina, centralina, radiatore, frizione), ognuno coi livelli 1-4 (`lv` sui pezzi). I livelli li insegna Nico
-  (`motNext`/`motUnlock`, prezzi e requisiti in `MOT_LIV`, legami tra reparti in `dip`): si parte tutti dal livello 1.
-  I pezzi devono andare d'accordo: robustezza (`reg`, CV per cilindro), benzina (iniettori e pompa), aria
-  (intercooler contro i bar del turbo), olio (giri della pompa), frizione (Nm), calore (radiatore contro i kW che il
-  motore butta nell'acqua). In strada `sim.js` fa il bilancio di calore vero solo per i motori costruiti
-  (`tune.cool`): l'acqua sale, oltre `prot` la centralina taglia la potenza (`sim.hotK`), oltre `prot + 8` per
-  `MOT.cottura` secondi salta la guarnizione (`motCalore`). L'officina dei tagliandi ora è di **Mario** (id interno
-  sempre `niko`, per i salvataggi); Ottone è diventato Nico.
+- **Nico e il motore**: il vecchio banco dei motori di Nico (cartella `pistone/`: livelli, magazzino, banco di lavoro, motori
+  costruiti a pezzi) è stato **cancellato il 21/11 sera** su decisione di Luca (il cognato); se servisse, è nella storia di git
+  (commit prima della v0.74). Da Luca resta l'officina semplice (`officina.js`), che ne ha preso il peso del motore per lo swap
+  (`offKgSerie`) e rimborsa una volta sola chi aveva speso da Nico (`offPistoneRimborso`). Nico, il personaggio, cerca un'altra
+  mansione (`SOSPESI.md`).
+- **Campioni audio dei pezzi** (`campioni.js`, v0.78): da Luca Tuning la scheda **Suoni** dell'officina. Ogni pezzo montato non di
+  serie porta la sua voce sopra la sintesi (`cmpAuto`): valvola, turbo, compressore, wastegate, aspirazione, borbottio dello scarico,
+  centralina pop & bang, limitatore/launch/cambiate, cambio, spurgo nitro. 42 kit, 180 file in `audio/campioni/` fatti a codice da
+  `strumenti/campioni_pezzi.py` (guida in `audio/campioni/LEGGIMI.md`); gli altri kit si comprano una volta per tutte le auto. In
+  `dsp.js` i flag `valv`/`turb`/`bur` evitano i doppioni con la sintesi. Per sentirli fuori dal gioco: `strumenti/ascolta_campioni.js`.
 
 ## Lavori aperti e idee in sospeso
 
@@ -272,7 +272,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Skill del progetto** in `.claude/skills/` (elenco in `AGENTS.md`): prova a copione nel browser
   (`strumenti/prova.js`), ascolto del motore fuori dal browser (`strumenti/ascolta.mjs`), funzioni nuove, disegno,
   auto dai disegni, pubblicazione, storia, controllo del gioco.
-- **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/motori.test.js`.
+- **Prove automatiche** (dalla radice del repository, Node 22+): `node --test test/test1.test.js`.
 - **Nel browser**: dalla radice del repository lancia `python3 -m http.server 8765`; con Playwright (già installato) apri
   `http://localhost:8765/index.html`, clicca `#goBtn`, rispondi al primo capitolo con
   `window.nightRun.game.answer(0)`, I per il quadro, Invio tenuto per l'avviamento, E per la prima, W per il gas.

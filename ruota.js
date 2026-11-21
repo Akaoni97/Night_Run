@@ -50,7 +50,7 @@ const RUOTA_PREV = (day) => { const [y, m, d] = day.split('-').map(Number); retu
       if (!cand.length) return cash(RUOTA_CAR_CASH, 'Le leggendarie della ruota le hai già tutte: il premio arriva in contanti.');
       const id = cand[Math.floor(Math.random() * cand.length)];
       v.garage.push(id); v.owned[id] = true; this.carState(id);
-      return { icon: 'auto', car: id, name: CARS[id].name, text: 'Le chiavi sono tue: ti aspetta nel parcheggio del Motel Ovunque.' };
+      return { icon: 'auto', car: id, name: CARS[id].name, text: 'Le chiavi sono tue: ti aspetta nel parcheggio del Motel 4Ever.' };
     }
     return cash(500, 'Contanti, subito in tasca.');
   };

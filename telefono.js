@@ -16,12 +16,12 @@ const TEL_SMS = [
   { from: 'Studio Ferri', km: 0, text: 'Buonasera, siamo lo studio Ferri. L\'eredità di suo zio Claudio è pronta.' },
   { from: 'Studio Ferri', km: 0, text: 'Domani alle 9, via dei Cantieri 12. Porti un documento.' },
   { from: 'Studio Ferri', km: 0, dir: 'o', text: 'Arrivo.' },
-  { from: 'Officina Mario', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
-  { from: 'Motel Ovunque', km: 14, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
+  { from: 'Officina Nico', km: 7, text: 'Il tagliando te lo faccio a metà prezzo se passi stasera.' },
+  { from: 'Motel 4Ever', km: 14, text: 'Camera 7 libera. La cassa la trovi già dentro.' },
 ];
 // rubrica: nome, ruolo, atto da cui compare
-const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Mario', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
-  ['Benzina 24H', 'Benzinaio', 0], ['Motel Ovunque', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
+const TEL_RUBRICA = [['Studio Ferri', 'Notaio', 0], ['Zio Claudio', 'Parente', 0], ['Officina Nico', 'Meccanico', 0], ['Da Luca Tuning', 'Pezzi e tuning', 0],
+  ['Benzina 24H', 'Benzinaio', 0], ['Motel 4Ever', 'Camere', 0], ['Sconosciuto', 'Numero nascosto', 1], ['Io', 'Il tuo numero', 2]];
 // app da scaricare: all'inizio il telefono ha solo le cose normali. Sulla strada compaiono cartelloni con una sola domanda
 // (niente «scarica»: lo dice il telefono quando lo superi). Funzionano a pixel: solo maiuscole, ? e !, due righe a capo con |.
 // km = dove compare il cartellone (a ~2 km al minuto di guida: 3-5 minuti tra uno e l'altro, il gioco deve respirare); quando lo superi spunta l'icona da scaricare (il download è finto). Una per volta, in quest'ordine.
@@ -34,7 +34,7 @@ const TEL_APP_OFFERS = [
 const telNextOffer = (km, apps) => { for (const o of TEL_APP_OFFERS) { if (apps && apps[o.app]) continue; return km >= o.km ? o : null; } return null; };
 const telAtto = (km) => { let a = 0; for (let i = 0; i < TEL_ATTI.length; i++) if (km >= TEL_ATTI[i]) a = i; return a; };
 const telRecenti = (a) => {
-  const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Mario', 'Persa', 'lun', 1]];
+  const r = [['Studio Ferri', 'Chiamata in uscita · 2:14', 'ieri', 0], ['Officina Nico', 'Persa', 'lun', 1]];
   if (a >= 1) r.unshift(['Zio Claudio', 'Chiamata in arrivo · 0:00', '01:12', 2]);
   if (a >= 2) r.unshift(['Io', 'Chiamata in arrivo · 0:41', '03:07', 2], ['Sconosciuto', '14 chiamate perse', '03:07', 1]);
   return r;
@@ -200,7 +200,7 @@ const telThreads = (km) => {
       const g = G(); if (!g) return ''; const d = g.s.dist, n0 = VG.stopIndex(d), list = [];
       for (let n = Math.max(0, n0 - 1); n < n0 + 40 && list.length < 3; n++) { const p = VG.stop(n); if (p.id === 'motel' && p.x >= d - 200) list.push(p); }
       const cassa = g.s.vg && g.s.vg.cassa ? g.s.vg.cassa.length : 0;
-      return `<div class="view app">${nav('Motel Ovunque')}<div class="body"><div class="card"><div class="meta"><span>La tua cassa</span></div><h4 style="font-size:20px">${cassa ? cassa + (cassa === 1 ? ' oggetto' : ' oggetti') : 'Vuota'}</h4><div class="meta"><span>Ti aspetta in camera</span></div></div>${list.map((p) => `<div class="card"><h4>${esc(p.name)}</h4><div class="meta"><span>km ${fmt(p.x / 1000, 1)}</span><span>${p.x >= d ? 'tra ' + fmt((p.x - d) / 1000, 1) + ' km' : 'qui dietro'}</span></div><div class="pay">€ 45 a notte</div></div>`).join('') || '<p class="cen">Nessun motel in vista.</p>'}</div></div>`;
+      return `<div class="view app">${nav('Motel 4Ever')}<div class="body"><div class="card"><div class="meta"><span>La tua cassa</span></div><h4 style="font-size:20px">${cassa ? cassa + (cassa === 1 ? ' oggetto' : ' oggetti') : 'Vuota'}</h4><div class="meta"><span>Ti aspetta in camera</span></div></div>${list.map((p) => `<div class="card"><h4>${esc(p.name)}</h4><div class="meta"><span>km ${fmt(p.x / 1000, 1)}</span><span>${p.x >= d ? 'tra ' + fmt((p.x - d) / 1000, 1) + ' km' : 'qui dietro'}</span></div><div class="pay">€ 45 a notte</div></div>`).join('') || '<p class="cen">Nessun motel in vista.</p>'}</div></div>`;
     },
     pax() {
       const g = G(), n = g && g.s.vg ? g.s.vg.pax.length : 0, a = atto(), seats = g && g.vgSeats ? g.vgSeats() : 0;

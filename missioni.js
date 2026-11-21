@@ -10,23 +10,23 @@
 const VG_BOARDS = ['bar', 'grill', 'motel'];               // locali con la bacheca
 const VG_MISSIONS = [
   { id: 'cristalli', kind: 'fragile', title: 'Bicchieri di cristallo', what: 'una cassetta di bicchieri', to: 'motel', kg: 8, pay: 2000,
-    give: 'La barista ti indica una cassetta piena di paglia: bicchieri di cristallo per il Motel Ovunque. Guida dolce: ogni botta e ogni frenata brusca si sentono.',
-    end: 'Il portiere apre la cassetta e conta i bicchieri uno per uno alla luce dell\'insegna. Tutto a posto.' },
+    give: 'Nabir, il barista, ti indica una cassetta piena di paglia: bicchieri di cristallo per il Motel 4Ever. Guida dolce: ogni botta e ogni frenata brusca si sentono.',
+    end: 'Tito, il gestore del motel, apre la cassetta e conta i bicchieri uno per uno alla luce dell\'insegna. Tutto a posto.' },
   { id: 'medicine', kind: 'tempo', title: 'Le medicine', what: 'le medicine', to: 'fuel', kg: 1, pay: 2800,
-    give: '«Il benzinaio qui avanti aspetta delle medicine. Corri: ha poco tempo.» Un sacchetto bianco, leggero, sul sedile accanto.',
-    end: 'Il benzinaio prende il sacchetto, ti mette i soldi in mano e ti stringe la spalla.',
-    late: 'Il benzinaio ti aspetta sulla porta. «In ritardo.» Prende il sacchetto e ti paga lo stesso, ma meno.' },
+    give: '«Rossana, al benzinaio qui avanti, aspetta delle medicine. Corri: ha poco tempo.» Un sacchetto bianco, leggero, sul sedile accanto.',
+    end: 'Rossana prende il sacchetto, ti mette i soldi in mano e ti stringe la spalla.',
+    late: 'Rossana ti aspetta sulla porta. «In ritardo.» Prende il sacchetto e ti paga lo stesso, ma meno.' },
   { id: 'signore', kind: 'calmo', pax: 'Il signore della valigetta', title: 'Il signore della valigetta', to: 'grill', kg: 0, pay: 3000, max: 120,
     give: 'Un signore in giacca, con una valigetta stretta al petto, sale dietro: «Sosta 24, prego. E piano, ho il cuore delicato: sopra i 120 mi viene l\'ansia.»',
     end: 'Il signore scende, si sistema la giacca e conta le banconote due volte.' },
   { id: 'cassa', kind: 'pesante', title: 'La cassa pesante', what: 'una cassa da 240 kg', to: 'shop', kg: 240, pay: 4500,
-    give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (si compra al Motel Ovunque, € 2.200) o un furgone.',
+    give: 'Una cassa di legno da 240 kg per Da Luca Tuning: dentro c\'è un motore intero. Serve il rimorchietto (si compra al Motel 4Ever, € 2.200) o un furgone.',
     end: 'Luca apre la cassa con un piede di porco e guarda il motore per un minuto buono. Poi ride.' },
   { id: 'busta', kind: 'pacco', title: 'La busta', what: 'una busta chiusa', to: 'style', kg: 0.2, pay: 4000,
-    give: 'Dalla bacheca: una busta chiusa da portare a Neon Kustom.',
-    end: 'Quelli di Neon Kustom aprono la busta, annuiscono e ti pagano.' },
+    give: 'Dalla bacheca: una busta chiusa da portare a Russian Kùstòm.',
+    end: 'Quelli di Russian Kùstòm aprono la busta, annuiscono e ti pagano.' },
   { id: 'chiave', kind: 'pacco', title: 'La chiave del motel', what: 'una chiave col portachiavi di legno', to: 'motel', kg: 0.1, pay: 6500,
-    give: 'Il barista ti dà una chiave con un portachiavi di legno: «Portala al Motel Ovunque, la stanno aspettando.»',
+    give: 'Nabir, il barista, ti dà una chiave con un portachiavi di legno: «Portala al Motel 4Ever, la stanno aspettando.»',
     end: 'Alla reception guardano la chiave e ti danno una busta coi soldi.' },
 ];
 // lavori senza fine dopo la catena: titoli e frasi a rotazione
@@ -70,8 +70,8 @@ const VG_MIS_MORE = {
   const misNeed = (g, M) => {
     const v = g.s.vg, T = typeof VG_SHOP !== 'undefined' && VG_SHOP.find((q) => q.id === 'trailer'), cap = g.vgCap();
     if (cap.kg >= M.kg) return `${fmtEur(M.kg)} kg: fai spazio nel bagagliaio`;
-    if (!v.trailer) return `${fmtEur(M.kg)} kg: serve il rimorchietto, al Motel Ovunque${T ? ` (€ ${fmtEur(T.price)})` : ''}`;
-    if (!v.trailerOn) return `${fmtEur(M.kg)} kg: attacca il rimorchio (al Motel Ovunque)`;
+    if (!v.trailer) return `${fmtEur(M.kg)} kg: serve il rimorchietto, al Motel 4Ever${T ? ` (€ ${fmtEur(T.price)})` : ''}`;
+    if (!v.trailerOn) return `${fmtEur(M.kg)} kg: attacca il rimorchio (al Motel 4Ever)`;
     return `${fmtEur(M.kg)} kg: non ci sta, serve un furgone`;
   };
 

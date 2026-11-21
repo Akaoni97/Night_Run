@@ -31,19 +31,19 @@ test('usato: annunci sempre uguali per la stessa tappa, mai all\'Autosalone o al
   assert.ok(game.usList().length > 0 && game.usList().length <= US.ahead);
 });
 
-test('usato: guardarla, provarla e Mario scoprono i difetti; trattare è più facile se ne hai trovati', () => {
+test('usato: guardarla, provarla e Nico scoprono i difetti; trattare è più facile se ne hai trovati', () => {
   const { game } = trip(), L = find(game, (x) => x.defects.includes('olio') && x.defects.length === 2); at(game, L);
   const p0 = game.usChance(L.n, 1);
   assert.equal(game.usLook(9999).ok, false, 'l\'auto è da un\'altra parte');
   const m = game.s.money, r = game.usNiko(L.n); assert.ok(r.ok); assert.equal(game.s.money, m - US.niko);
-  assert.deepEqual(game.usInsp(L.n).rev.slice().sort(), L.defects.slice().sort(), 'Mario trova tutto');
+  assert.deepEqual(game.usInsp(L.n).rev.slice().sort(), L.defects.slice().sort(), 'Nico trova tutto');
   assert.ok(game.usChance(L.n, 1) > p0);
   assert.equal(game.usNiko(L.n).ok, false, 'una volta sola');
   const n = game.usNego(L.n, 1, () => 0); assert.ok(n.won); assert.equal(game.usPrice(L), Math.round(L.price * 0.8 / 50) * 50);
   assert.equal(game.usNego(L.n, 2, () => 0).ok, false, 'si tratta una volta');
 });
 
-test('usato: comprata, porta con sé i difetti; il motore stanco toglie il 15 %, Mario lo revisiona', () => {
+test('usato: comprata, porta con sé i difetti; il motore stanco toglie il 15 %, Nico lo revisiona', () => {
   const { game } = trip(), L = find(game, (x) => x.defects.includes('motore') && !game.s.vg.garage.includes(x.id)); at(game, L);
   const price = game.usPrice(L), m = game.s.money;
   assert.ok(game.usBuy(L.n).ok); assert.equal(game.s.money, m - price);

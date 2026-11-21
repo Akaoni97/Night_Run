@@ -421,23 +421,12 @@ body.fs .hud { padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-a
 .kbtn.lit { background: linear-gradient(180deg, #423a2e, #27221b); color: var(--amber); }
 .start { background: linear-gradient(180deg, #3a0d1c, #1d0610); color: #ffc2d0; }
 .start.on { background: linear-gradient(180deg, #ff2e63, #a8002c); color: #fff; box-shadow: 0 0 18px rgba(255,46,99,.5); }
-.pedals { display: grid; grid-template-columns: 0.9fr 1.1fr 1fr; gap: 10px; align-items: end; }
-.pedal {
   position: relative; height: 150px; border: 1px solid var(--line);
   background: repeating-linear-gradient(0deg, transparent 0 9px, rgba(255,179,71,.06) 9px 11px), #0e0d0b;
   overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;
 }
-.pedal.gas { height: 170px; }
-.pedal .fill { position: absolute; left: 0; right: 0; bottom: 0; height: 0; background: linear-gradient(0deg, rgba(201,221,90,.9), rgba(255,179,71,.5)); }
-.pedal.brake .fill { background: linear-gradient(0deg, rgba(255,90,58,.9), rgba(255,90,58,.35)); }
-.pedal.clutch .fill { background: linear-gradient(0deg, color-mix(in srgb, var(--muted) 85%, transparent), color-mix(in srgb, var(--muted) 30%, transparent)); }
-.pedal label { position: absolute; left: 0; right: 0; top: 8px; text-align: center; font: 400 13px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; pointer-events: none; }
-.pedal output { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: 400 14px/1 var(--f-data); pointer-events: none; }
-.pedal kbd { position: absolute; left: 50%; transform: translateX(-50%); top: 27px; pointer-events: none; }
-.pedal.disabled { opacity: .45; }
 kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var(--line); border-bottom-width: 2px; padding: 2px 5px; background: #0e0d0b; }
 .hint { margin: 0; color: var(--muted); font-size: 14px; }
-.gate-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .g { border: 1px solid var(--line); background: #15120e; padding: 12px 0; font: 400 22px/1 var(--f-display); text-align: center; touch-action: manipulation; color: var(--fg); }
 .g:hover { border-color: #4a4234; }
 .g.cur { background: var(--amber); color: #1a1206; border-color: var(--amber); box-shadow: 0 0 16px rgba(255,179,71,.45); }
@@ -445,10 +434,6 @@ kbd { font: 400 11px/1 var(--f-data); color: var(--muted); border: 1px solid var
 .g.r { color: var(--crit); }
 .g.r.cur { color: #fff; background: var(--crit); border-color: var(--crit); }
 .g.blank { visibility: hidden; }
-.seq { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.seq .kbtn { font-size: 18px; padding: 12px 8px; }
-.ratio { font: 400 13.5px/1.4 var(--f-data); color: var(--muted); }
-.ratio b { color: var(--fg); font-weight: 400; }
 .field { display: grid; gap: 6px; }
 .field > span { font: 400 11px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .seg { display: flex; flex-wrap: wrap; gap: 4px; background: #0e0d0b; border: 1px solid var(--line); padding: 3px; }
@@ -952,7 +937,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     </div>
     <div class="career" id="career">
       <div class="chip money" id="chipMoney"><b>Contanti</b><span id="hudMoney">€ 3.000</span></div>
-      <div class="chip"><b>Reputazione</b><span id="hudRep">0</span></div>
       <div class="chip"><b>Ricercato</b><div class="heat" id="hudHeat"><i></i><i></i><i></i><i></i><i></i></div></div>
       <label class="carsel"><b>Auto</b><select id="carSw" aria-label="Auto in garage (si cambia da fermi)"></select></label>
       <div class="modesw" id="modeSw" role="group" aria-label="Modalità">
@@ -1077,32 +1061,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <button class="kbtn start" id="btnStart" type="button">Avviamento<small>tieni premuto · Invio</small></button>
         <button class="kbtn" id="btnOff" type="button">Spegni<small>tasto O</small></button>
       </div>
-      <div class="pedals" hidden>
-        <div class="pedal clutch" id="pedClutch" data-p="clutch"><label>Frizione</label><kbd>Spazio</kbd><div class="fill"></div><output>0%</output></div>
-        <div class="pedal brake" id="pedBrake" data-p="brake"><label>Freno</label><kbd>S ↓</kbd><div class="fill"></div><output>0%</output></div>
-        <div class="pedal gas" id="pedGas" data-p="thr"><label>Gas</label><kbd>W ↑</kbd><div class="fill"></div><output>0%</output></div>
-      </div>
-      <p class="hint" id="pedHint" hidden>Tocca e trascina un pedale per dosarlo. Più in alto premi, più affondi.</p>
-    </div>
-
-    <div class="panel gearbox" hidden>
-      <h2>Cambio <em id="gearName">folle</em></h2>
-      <div class="gate-grid" id="gateGrid">
-        <button class="g r" data-g="-1" type="button" aria-label="Retromarcia">R</button>
-        <button class="g" data-g="1" type="button">1</button>
-        <button class="g" data-g="3" type="button">3</button>
-        <button class="g" data-g="5" type="button">5</button>
-        <button class="g n" data-g="0" type="button">FOLLE</button>
-        <span class="g blank"></span>
-        <button class="g" data-g="2" type="button">2</button>
-        <button class="g" data-g="4" type="button">4</button>
-        <button class="g" data-g="6" type="button">6</button>
-      </div>
-      <div class="seq">
-        <button class="kbtn" id="btnDown" type="button">− Scala<small>Q · ←</small></button>
-        <button class="kbtn" id="btnUp" type="button">+ Sali<small>E · →</small></button>
-      </div>
-      <div class="ratio" id="ratio">Rapporti: 3,827 · 2,360 · 1,685 · 1,312 · 1,000 · 0,793 · finale 3,133</div>
     </div>
 
     <div class="panel setup">
@@ -1211,10 +1169,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <div class="panel">
       <h2>Come si gioca</h2>
       <ul>
-        <li>Sei in viaggio sull'autostrada, di notte, con l'auto che hai ereditato. Lungo la strada ci sono le tappe: bar, benzinaio, autogrill, Motel Ovunque, officine, Autosalone, Sfascio. Rallenta, fermati davanti e premi <kbd>U</kbd> per entrare.</li>
+        <li>Sei in viaggio sull'autostrada, di notte, con l'auto che hai ereditato. Lungo la strada ci sono le tappe: bar, benzinaio, autogrill, Motel 4Ever, officine, Autosalone, Sfascio. Rallenta, fermati davanti e premi <kbd>U</kbd> per entrare.</li>
         <li>Al bar e all'autogrill c'è la bacheca: prendi un lavoro e porta il carico alla tappa giusta. Il primo è obbligatorio; dopo, se salti l'uscita, la consegna salta.</li>
-        <li>Fame, sete, sonno e igiene calano guidando: mangia, bevi e lavati nelle tappe. Si dorme al Motel Ovunque, ed è lì che il viaggio si salva.</li>
-        <li>Benzina, gomme e danni si consumano davvero. Assicurazione e bollo si pagano dal telefono (app Libretto), la revisione da Mario.</li>
+        <li>Fame, sete, sonno e igiene calano guidando: mangia, bevi e lavati nelle tappe. Si dorme al Motel 4Ever, ed è lì che il viaggio si salva.</li>
+        <li>Benzina, gomme e danni si consumano davvero. Assicurazione e bollo si pagano dal telefono (app Libretto), la revisione da Nico.</li>
         <li>Polizia: il limite è 130 km/h; se passi accanto a una volante oltre i 136 ti ferma (paga, contesta o scappa). Autovelox (V) e Tutor (T) sono segnati sulla mappa in basso; un bar su cinque ha l'etilometro fuori. Ogni multa alza il livello di ricercato e le prossime costano di più.</li>
         <li>Cambio automatico: la leva parte in P, <kbd>E</kbd> la porta verso D, <kbd>Q</kbd> verso P. Superato un locale, in retro puoi tornare indietro di qualche decina di metri.</li>
         <li>Lungo la strada arrivano domande: rispondi con i pulsanti o con <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>. Il telefono (<kbd>0</kbd>) ha messaggi, mappa e app; il menu (<kbd>Tab</kbd>) officina, bagagliaio e impostazioni.</li>
@@ -1256,7 +1214,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     <ul>
       <li><i aria-hidden="true">🏠</i><span>Si parte dal km 0 con la Volvo di tuo zio e € 450 in tasca. L'autostrada va solo avanti.</span></li>
       <li><i aria-hidden="true">📦</i><span>Al bar del km 1,8 ti aspetta il primo lavoro: un pacco da portare al benzinaio. Paga € 3.000.</span></li>
-      <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel Ovunque. E tieni d'occhio il telefono (tasto 0).</span></li>
+      <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel 4Ever. E tieni d'occhio il telefono (tasto 0).</span></li>
     </ul>
     <div class="keys"><span><kbd>I</kbd> quadro</span><span><kbd>Invio</kbd> tenuto: avvia</span><span><kbd>E</kbd> marcia</span><span><kbd>W</kbd> gas</span><span><kbd>A</kbd><kbd>D</kbd> corsie</span><span><kbd>U</kbd> entra</span><span><kbd>Tab</kbd> menu</span></div>
     <button class="go" id="goBtn" type="button">Accendi e parti</button>
@@ -1288,6 +1246,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="locali2d.js"></script>
 <script src="entrata2d.js"></script>
 <script src="nitido2d.js"></script>
+<script src="insegne2d.js"></script>   <!-- alta definizione leggera di insegne e oggetti -->
+<script src="prestazioni.js"></script>   <!-- Impostazioni → Grafica → Prestazioni -->
 <script src="hudpro.js"></script>
 <script src="icone.js"></script>
 <script src="radio.js"></script>
@@ -1295,7 +1255,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="viaggio.js"></script>
 <script src="strada.js"></script>
 <script src="missioni.js"></script>
-<script src="pistone/motori.js"></script>   <!-- [PISTONE] progetto in prova: pistone/LEGGIMI.md -->
 <script src="pensieri.js"></script>
 <script src="suggerimenti.js"></script>
 <script>
@@ -1391,11 +1350,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   let sentView = -1, sentEnv = -1;
   function dspCfg() {
-    const eng = player && game.car === 'supra' && !(game.motOf && game.motOf('supra')) /* [PISTONE] */ ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
+    const eng = player && game.car === 'supra' ? player.items.filter((i) => !i.fx && !i.mute).length : 0;
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
+    const cmp = window.NightCampioni ? NightCampioni.sync(game, TP, S.tune) : {};   // campioni dei pezzi montati (campioni.js): cosa suona e cosa abbassare nella sintesi
     return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
-      fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine') } };
+      fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine'), valv: cmp.valv | 0, turb: cmp.turb | 0, bur: cmp.bur | 0 } };
   }
   function ensureAudio() {
     if (audio.ctx) { if (audio.ctx.state !== 'running') audio.ctx.resume(); return audio.starting; }
@@ -1407,6 +1367,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.12;
     comp.connect(ctx.destination);
     player = new SamplePlayer(ctx, comp);
+    if (window.NightCampioni) NightCampioni.attach(ctx, comp);       // campioni dei pezzi (campioni.js): stessa uscita del motore
     if (game.car === 'supra') loadSupraSamples();   // le registrazioni (1,9 MB) servono solo alla Supra: con le altre auto non si scaricano
     restoreUserSamples();
     const fallback = () => {
@@ -1468,12 +1429,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (typeof offCatalog === 'function') offCatalog(game, carId);   // officina.js: con uno swap il catalogo ha i pezzi del motore montato
     TP = tuningParams(S.tune, adjOf());
     sim.setCar(carId === 'supra' ? null : Object.assign({}, CARS[carId].P));
-    let MOTE = typeof motApply === 'function' ? motApply(game, carId, TP, sim) : null;   // [PISTONE] motore costruito al Pistone (pistone/motori.js)
-    if (!MOTE && typeof offSwapApply === 'function') MOTE = offSwapApply(game, carId, TP, sim, S.tune);   // officina.js: swap con il motore di un'altra auto
+    const MOTE = typeof offSwapApply === 'function' ? offSwapApply(game, carId, TP, sim, S.tune) : null;   // officina.js: swap con il motore di un'altra auto
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
-    TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Mario)
+    TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Nico)
     game.applyMass(TP.sim.dm || 0, TP.sim.rearOff);
     $('carTag').textContent = CARS[carId].tag + (MOTE ? ` · motore: ${MOTE.tipo} da ${MOTE.hp} CV (swap)` : '');
     if (!$('carSw').options.length) for (const id of CAR_IDS) { const o = document.createElement('option'); o.value = id; o.textContent = CARS[id].name; $('carSw').appendChild(o); }
@@ -1520,10 +1480,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = S.pops; $('tLaunch').checked = S.launch;
     $('tRev').disabled = !S.autoClutch;
     $('vol').value = S.vol; $('volOut').textContent = S.muted ? 'muto' : S.vol;
-    $('pedClutch').classList.toggle('disabled', S.autoClutch);
-    $('pedHint').textContent = S.autoClutch
-      ? 'Frizione automatica: cambia con E/Q. Tocca e trascina un pedale per dosarlo.'
-      : 'Frizione manuale: tienila giù (Spazio) per cambiare e per partire, poi rilasciala dando gas.';
     const pre = TUNING_PRESETS.find((p) => Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k]));
     $('cfgName').textContent = pre ? pre.name.toLowerCase() : 'su misura';
     if (radio) radio.setMaster(S.vol / 100, S.muted);
@@ -1563,7 +1519,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- comandi
   const keys = new Set();
   const inp = { thr: 0, brake: 0, clutch: 0, touch: { thr: null, brake: null, clutch: null }, pad: { thr: 0, brake: 0, clutch: 0 } };
-  const GEAR_NAMES = { '-1': 'retromarcia', 0: 'folle', 1: 'prima', 2: 'seconda', 3: 'terza', 4: 'quarta', 5: 'quinta', 6: 'sesta' };
 
   function shiftTo(g) {
     ensureAudio();
@@ -1612,19 +1567,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((t) => bs.addEventListener(t, startOff));
   bs.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); startOn(); } });
   bs.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.stopPropagation(); startOff(); } });
-  $('btnUp').addEventListener('click', shiftUp);
-  $('btnDown').addEventListener('click', shiftDown);
-  $('gateGrid').addEventListener('click', (e) => { const b = e.target.closest('[data-g]'); if (b) shiftTo(+b.dataset.g); });
-
-  document.querySelectorAll('.pedal').forEach((el) => {
-    const p = el.dataset.p;
-    const set = (e) => { const r = el.getBoundingClientRect(); inp.touch[p] = clamp(1 - (e.clientY - r.top - 18) / (r.height - 36), 0, 1); };
-    el.addEventListener('pointerdown', (e) => { if (p === 'clutch' && S.autoClutch) return; ensureAudio(); el.setPointerCapture(e.pointerId); set(e); });
-    el.addEventListener('pointermove', (e) => { if (inp.touch[p] !== null) set(e); });
-    const up = () => { inp.touch[p] = null; };
-    el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); el.addEventListener('lostpointercapture', up);
-  });
-
   const KEYMAP = { arrowup: 'w', arrowdown: 's', arrowright: 'e', arrowleft: 'q' };
   window.addEventListener('keydown', (e) => {
     if (e.target.closest && e.target.closest('input, textarea')) return;
@@ -2067,9 +2009,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const sl = $('shiftlights');
   for (let i = 0; i < 10; i++) { const el = document.createElement('i'); el.className = i < 4 ? 'lg' : i < 7 ? 'ly' : 'lr'; sl.appendChild(el); leds.push(el); }
   const lamp = {}; document.querySelectorAll('.lamp').forEach((l) => { lamp[l.dataset.l] = l; });
-  const pedEls = { clutch: $('pedClutch'), brake: $('pedBrake'), thr: $('pedGas') };
-  const gateBtns = Array.from(document.querySelectorAll('#gateGrid [data-g]'));
-  let peakTq = 0, peakPw = 0, blink = 0, textT = 0, lastGear = null;
+  let peakTq = 0, peakPw = 0, blink = 0, textT = 0;
 
   function setPod(id, bar, txt, frac, color) {
     $(id).innerHTML = txt; const b = $(bar); b.style.width = (clamp(frac, 0, 1) * 100).toFixed(1) + '%'; b.style.background = color || '';
@@ -2094,21 +2034,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (audio.ready && sigBlink !== lastBlink) audio.send({ ev: [{ type: 'click' }] });   // relè delle frecce
     lastBlink = sigBlink;
     $('cluster').classList.toggle('off', !lit);
-    // pedali, quadro grande e telemetria stanno nel menu: col menu chiuso non si riscrivono (meno lavoro a ogni fotogramma)
+    // quadro grande e telemetria stanno nel menu: col menu chiuso non si riscrivono (meno lavoro a ogni fotogramma)
     const menuOpen = !window.gameMenu || window.gameMenu.isOpen;
-    if (menuOpen) for (const p of ['clutch', 'brake', 'thr']) {
-      const v = p === 'clutch' ? (S.autoClutch ? sim.clutch : inp.clutch) : sim.in[p];
-      const el = pedEls[p]; el.querySelector('.fill').style.height = (v * 100).toFixed(1) + '%';
-      el.querySelector('output').textContent = Math.round(v * 100) + '%';
-    }
-    if (sim.gear !== lastGear) {
-      lastGear = sim.gear;
-      gateBtns.forEach((b) => b.classList.toggle('cur', +b.dataset.g === sim.gear));
-      $('gearName').textContent = GEAR_NAMES[sim.gear];
-      const g = sim.gear;
-      $('ratio').innerHTML = g === 0 ? 'Rapporti: 3,827 · 2,360 · 1,685 · 1,312 · 1,000 · 0,793 · finale 3,133'
-        : `<b>${GEAR_NAMES[g]}</b> ${fmt(Math.abs(g < 0 ? sim.P.rev : sim.P.gears[g]), 3)} : 1 × finale 3,133 · ${fmt(1000 / (Math.abs(sim.ratio(g)) / sim.P.r) * 0.10472 * 3.6, 1)} km/h ogni 1000 giri`;
-    }
     $('btnIgn').classList.toggle('lit', sim.ign);
     if (sim.running && sim.starter === false) $('btnStart').classList.remove('on');
     textT += dt;
@@ -2187,7 +2114,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function renderTuning() {
     renderGears(); $('carUps').hidden = true;
     const grid = $('tgrid');
-    $('presets').hidden = typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, 'turbo');   // [PISTONE] niente preparazioni pronte: i pezzi del motore uno per uno da Nico
     if (grid.dataset.car !== ACTIVE_CAR) { grid.innerHTML = ''; grid.dataset.h = ''; $('presets').innerHTML = ''; grid.dataset.car = ACTIVE_CAR; }
     if (!$('presets').childElementCount) {
       const pr = $('presets');
@@ -2242,8 +2168,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const d = document.createElement('div'); d.className = 'svc'; d.dataset.s = s.id;
       d.innerHTML = `<b>${s.name}</b><span></span><div class="bar"><i></i></div><button class="kbtn" type="button">${s.id === 'wash' ? 'Lava' : 'Fai'}</button>`;
       d.querySelector('button').addEventListener('click', () => {
-        if (!game.canMount()) { flash('Da Mario si va da fermi', 2); return; }
-        if (game.needsNiko()) { flash('Questo lo fa Mario: la sua officina è sulla mappa (O)', 2.6); return; }
+        if (!game.canMount()) { flash('Da Nico si va da fermi', 2); return; }
+        if (game.needsNiko()) { flash('Questo lo fa Nico: la sua officina è sulla mappa (O)', 2.6); return; }
         const r = game.service(s.id); if (!r.ok) flash(r.why, 2.2); applySettings(); renderServices(); saveGame();
       });
       box.appendChild(d);
@@ -2257,8 +2183,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (bt.innerHTML !== h) bt.innerHTML = h; bt.disabled = lv > 0.97;
     }
   }
-  $('btnRepair').addEventListener('click', () => { if (!game.canMount()) { flash('Dal carrozziere si va da fermi', 2); return; } if (game.needsNiko()) { flash('Il carrozziere è da Mario: la sua officina è sulla mappa (O)', 2.6); return; } const r = game.repair(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
-  $('btnTires').addEventListener('click', () => { if (!game.canMount()) { flash('Le gomme si cambiano da fermi', 2); return; } if (game.needsNiko()) { flash('Le gomme le cambia Mario: la sua officina è sulla mappa (O)', 2.6); return; } game.tireId = S.tune.tires; const r = game.newTires(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
+  $('btnRepair').addEventListener('click', () => { if (!game.canMount()) { flash('Dal carrozziere si va da fermi', 2); return; } if (game.needsNiko()) { flash('Il carrozziere è da Nico: la sua officina è sulla mappa (O)', 2.6); return; } const r = game.repair(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
+  $('btnTires').addEventListener('click', () => { if (!game.canMount()) { flash('Le gomme si cambiano da fermi', 2); return; } if (game.needsNiko()) { flash('Le gomme le cambia Nico: la sua officina è sulla mappa (O)', 2.6); return; } game.tireId = S.tune.tires; const r = game.newTires(); if (!r.ok) flash(r.why, 2.4); renderServices(); saveGame(); });
   // ---------------------------------------------------------------- bagagliaio
   const ICON_CACHE = {};
   const IC = (k) => (window.NR_ICON_TAG ? window.NR_ICON_TAG(k) : '');   // icona per i pulsanti (icone.js)
@@ -2337,7 +2263,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         const o = e.target.closest('[data-k]'); if (o && !o.classList.contains('cur')) mountPart(o.dataset.k, o.dataset.id, null);
       });
     }
-    const visible = (k) => TUNING[k] && !(typeof tuningNascosto === 'function' && tuningNascosto(ACTIVE_CAR, k));   // [PISTONE] questi pezzi li fa Nico
+    const visible = (k) => TUNING[k];
     const groups = TUNE_GROUPS.map((g) => Object.assign({}, g, { cats: g.cats.filter(visible) }));
     const known = new Set(TUNE_GROUPS.flatMap((g) => g.cats)), rest = Object.keys(TUNING).filter((k) => !known.has(k) && visible(k));
     if (rest.length) groups.push({ id: 'altro', name: 'Altro', cats: rest, hint: '' });
@@ -2372,7 +2298,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const revert = () => { if (selEl) selEl.value = S.tune[k]; };
     if (!game.canMount()) { revert(); flash('Le parti si montano da fermo: accosta e frena', 2.4); return; }
     if (game.needsShop()) { revert(); flash('I pezzi li monta Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
-    if (typeof tuningNascosto === 'function' && tuningNascosto(game.car, k)) { revert(); flash('Questo lo fa Nico, coi pezzi a livelli (più sotto)', 2.6); return; }   // [PISTONE]
     if (!game.owns(k, id)) {
       const r = game.buy(k, id);
       if (!r.ok) { revert(); flash(r.why, 2.4); return; }
@@ -2382,7 +2307,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   // altezza e rigidità dell'assetto: gratis, ma da fermi e da Luca come i pezzi
   function setSuspAdj(patch, revert) {
-    if (!game.canMount()) { revert(); flash(game.race ? 'Non durante una sfida' : 'L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
+    if (!game.canMount()) { revert(); flash('L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
     if (game.needsShop()) { revert(); flash('L\'assetto lo regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
     const st = suspState(tuningItem('suspension', S.tune.suspension), adjOf());
     S.adj[ACTIVE_CAR] = { h: st.h, k: st.k, ...patch };
@@ -2436,7 +2361,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 
   // ---------------------------------------------------------------- luoghi in città (2D): mappa, ingresso, interni
   // Benzinaio, officina e ricambi estetici sono edifici veri lungo la strada: ci si ferma davanti e si entra con la Supra.
-  // estetica mostrata: quella scelta più lo sporco (si accumula coi chilometri, si lava da Mario)
+  // estetica mostrata: quella scelta più lo sporco (si accumula coi chilometri, si lava da Nico)
 
   // ---------------------------------------------------------------- mappa del mondo: punti reali, ognuno con il suo sfondo
   const WM_TYPES = { city: ['Città', '#ff5fa8'], highway: ['Autostrada', '#ffb000'], mountain: ['Montagna', '#7dff9a'], sea: ['Mare', '#2ee6ff'], plain: ['Pianura', '#c9dd5a'], village: ['Paese', '#ff9a5a'], desert: ['Deserto', '#ff6a3a'] };
@@ -2537,7 +2462,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     document.body.classList.add('travel');
     setTimeout(() => {
       game.setLoc(id); toggleWorldMap(false); saveGame();
-      flash(`${L.name} (${L.country}) · ${WM_TYPES[L.bg][0].toLowerCase()}${L.places ? '' : ' · qui niente negozi: Luca e Mario sono a Tokyo'}`, 3);
+      flash(`${L.name} (${L.country}) · ${WM_TYPES[L.bg][0].toLowerCase()}${L.places ? '' : ' · qui niente negozi: Luca e Nico sono a Tokyo'}`, 3);
       setTimeout(() => document.body.classList.remove('travel'), 120);
     }, 380);
   }
@@ -2594,6 +2519,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const group = (title) => { const d = document.createElement('div'); d.className = 'vg-group'; const h = document.createElement('h4'); h.textContent = title; d.appendChild(h); const r = document.createElement('div'); r.className = 'row'; d.appendChild(r); body.appendChild(d); return r; };
     const svc = (eur, what, fx) => () => { const r = game.vgPay(eur, what); if (r.ok) { const N = v.needs; for (const k in fx) N[k] = Math.min(1, N[k] + fx[k]); } return r; };
     if (I.id === 'bar') {
+      note('Nabir, dietro al bancone: «Ciao amico, cosa ti preparo?»');
       note(VG_RUMORS[Math.floor(Math.random() * VG_RUMORS.length)]);
       const r = group('Al bancone');
       r.appendChild(row(IC('tazzina') + 'Caffè <small>€ 1,20</small>', svc(1.2, 'Caffè', { sleep: 0.12, water: 0.05 })));
@@ -2608,20 +2534,20 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         if (game.polBarCheck(n)) note('Dalla vetrina si vede una volante parcheggiata qui davanti. Ogni tanto un agente guarda dentro.');
       }
     } else if (I.id === 'grill') {
-      note('Sosta 24: pasti caldi, docce, un market. Le luci al neon non si spengono mai.');
+      note('Sosta 24: pasti caldi, docce, un market. Alla cassa Phill Grill: «Il caldo è caldo, il caffè è lungo, le docce sono pulite. Più o meno.»');
       const r = group('Servizi');
       r.appendChild(row(IC('pasto') + 'Pasto completo <small>€ 12</small>', svc(12, 'Pasto completo', { food: 1, water: 0.6 })));
       r.appendChild(row(IC('doccia') + 'Doccia <small>€ 6</small>', () => game.vgShower(6)));
       r.appendChild(row(IC('tazzina') + 'Caffè lungo <small>€ 1,80</small>', svc(1.8, 'Caffè lungo', { sleep: 0.14, water: 0.08 })));
     } else if (I.id === 'motel') {
-      note('Motel Ovunque. «La sua cassa è già in camera.» Qui si dorme, ci si lava, si lasciano le cose nella cassa e si cambia mezzo.');
+      note('Motel 4Ever. Tito alza gli occhi dal giornale: «La sua cassa è già in camera.» Qui si dorme, ci si lava, si lasciano le cose nella cassa e si cambia mezzo.');
       const r = group('La stanza 7');
       r.appendChild(row(IC('letto') + 'Dormire <small>€ 60 · salva il viaggio</small>', () => { const q = game.vgSleep(); if (q.ok) { saveGame(); flash('Hai dormito. Il viaggio è salvato.', 2); } return q; }));
       r.appendChild(row(IC('doccia') + 'Doccia <small>compresa</small>', () => game.vgShower(0)));
       r.appendChild(row('Cena <small>€ 9</small>', svc(9, 'Cena del motel', { food: 0.8, water: 0.4 })));
       // la cassa
       const cr = group(`La tua cassa (${v.cassa.length} oggetti)`);
-      if (!v.cassa.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Vuota. Lascia qui quello che non ti serve in viaggio: la ritroverai al prossimo Motel Ovunque.'; cr.appendChild(p); }
+      if (!v.cassa.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Vuota. Lascia qui quello che non ti serve in viaggio: la ritroverai al prossimo Motel 4Ever.'; cr.appendChild(p); }
       v.cassa.forEach((it, i) => cr.appendChild(row(`${IC(it.kind)}↑ ${game.itemName(it)} <small>${fmt(it.kg, 1)} kg</small>`, () => { const q = game.vgFromCassa(i); if (q.ok) openPlace(I); return q; })));
       const tr = group('Dal bagagliaio alla cassa');
       game.s.trunk.forEach((it, i) => { if (it.kind !== 'scatola' && it.kind !== 'bancale') tr.appendChild(row(`${IC(it.kind)}↓ ${game.itemName(it)}`, () => { const q = game.vgToCassa(i); if (q.ok) openPlace(I); return q; })); });
@@ -2664,7 +2590,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
   function cosView(c) { return Object.assign({}, c || S.cos, { dirt: Math.round(game.maint().dirt * 10) / 10 }); }
-  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'O', style: 'E', dealer: 'A', junk: 'S', motori: 'M' };   // motori: // [PISTONE]
+  const PLACE_ICON = { fuel: 'B', shop: 'L', niko: 'O', style: 'E', dealer: 'A', junk: 'S' };
   let mmT = 0, placeOpen = null, cosPrev = null;
   const moved = [];
   const fmtDist = (m) => (m < 1000 ? Math.max(0, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km');
@@ -2766,33 +2692,22 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       vgPlace(I, body, note);
     } else if (I.id === 'dealer') {                                  // Autosalone Notte (concessionario.js)
       if (window.NightDealer) NightDealer.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
-    } else if (I.id === 'motori') {                                  // [PISTONE] Il Pistone: motori costruiti a pezzi (pistone/)
-      if (window.NightMotori) NightMotori.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'junk') {                                    // Sfascio Ruggine (sfascio.js)
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca un pezzo: ti dico cosa cambia. Lo monto quando premi il pulsante.');
-      if (window.NightOfficina && !(typeof PISTONE !== 'undefined' && PISTONE.on)) {      // officina semplice (officina.js): Modifiche e Swap motore (con l'interruttore del Pistone acceso resta il vecchio negozio)
+      if (window.NightOfficina) {                                       // officina semplice (officina.js): Modifiche e Swap motore
         const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
-      } else {                                                           // [PISTONE] interruttore acceso: il vecchio negozio di Luca e Nico
-        if (game.motOf && game.motOf()) note(`Luca: «Qui sotto c'è un motore di Nico (${game.motOf().nome}): turbo, intercooler, centralina, camme e frizione sono i suoi, quelli del mio catalogo non contano finché c'è lui. Scarico, aspirazione, gomme, assetto e il resto sono ancora miei.»`);
-        move(document.querySelector('section.panel.tuning'));
-        renderTuning(); renderServices();
-        if (window.NightMotori) {
-          const nb = document.createElement('div'); body.appendChild(nb);
-          const nc = { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; nb.innerHTML = ''; NightMotori.panel(nb, I, nc); renderTuning(); renderPlaceCash(); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } };
-          NightMotori.panel(nb, I, nc);
-        }
       }
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
       const m = game.maint(), worst = Math.min(m.oil, m.plugs, m.pads);
-      note(sim.damage > 0.2 ? 'Mario: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Mario: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Mario: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Mario: «Tutto in ordine. Controllo veloce e vai.»');
+      note(sim.damage > 0.2 ? 'Nico: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Nico: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Nico: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Nico: «Tutto in ordine. Controllo veloce e vai.»');
       move(document.querySelector('section.panel.tuning .services'));
       renderServices();
       { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Ripara la gomma forata (€ 25)'; b.addEventListener('click', () => { const r = game.repairTyre(); if (!r.ok) flash(r.why, 2); renderTrunk(); renderPlaceCash(); }); body.appendChild(b);
-        const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Mario: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
+        const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Nico: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
     } else if (I.id === 'fuel') {
       const f = document.createElement('div'); f.className = 'fuelbox'; f.id = 'fuelBox';
       f.innerHTML = '<div><b id="fuelL">—</b> <span class="hint" id="fuelSt"></span></div><div class="fuelgauge"><i id="fuelBar"></i></div>'
@@ -2801,7 +2716,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       f.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
         const r = game.startFill(b.dataset.l ? 999 : +b.dataset.e / GAME_FUEL_PRICE); if (!r.ok && r.why) flash(r.why, 2);
       }));
-      note('Nel market: taniche, attrezzi e altro per il bagagliaio.');
+      note('Rossana, dalla cassa: «Pieno o a soldi? Nel market ci sono taniche, attrezzi e il resto per il bagagliaio.»');
       { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Gonfia le gomme (gratis)'; b.addEventListener('click', () => { game.inflate(); flash('Gomme a 2,3 bar', 1.6); }); body.appendChild(b); }
       move($('shop')); renderTrunk();
     } else {
@@ -2809,8 +2724,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       cosPrev = Object.assign({ paint: carPaint() }, S.cos);
       renderCos();
     }
-    // l'annuncio di un privato a questa tappa, e da Mario la revisione del motore (usato.js)
-    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Mario: la revisione (documenti.js)
+    // l'annuncio di un privato a questa tappa, e da Nico la revisione del motore (usato.js)
+    if (window.NightDocs) NightDocs.panel(body, I, { flash, save: () => { renderPlaceCash(); saveGame(); } });   // da Nico: la revisione (documenti.js)
     if (window.NightUsed) NightUsed.panel(body, I, { flash, save: () => { applySettings(); renderServices(); saveGame(); renderPlaceCash(); } });
     // «Ti tengo compagnia»: la storia secondaria di Jeshka (Neon) e Luca (tuning), in cima al pannello (jeshka.js)
     if (window.NightJL && (I.id === 'style' || I.id === 'shop')) NightJL.panel(body, I, { flash, save: () => saveGame(), refresh: () => { if (placeOpen === I) openPlace(I); } });
@@ -3297,7 +3212,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const s = game.s;
     $('hudMoney').textContent = (s.money < 0 ? '− € ' : '€ ') + fmt(Math.abs(Math.floor(s.money)));
     $('chipMoney').classList.toggle('neg', s.money < 0);
-    $('hudRep').textContent = fmt(s.rep);
     heatPips.forEach((p, i) => p.classList.toggle('on', s.heat > i + 0.05));
     $('hudDist').textContent = fmt(s.dist / 1000, 1);
     renderTrip(); game.paintHex = carPaint(); dashBtns();
@@ -3305,9 +3219,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const liters = sim.fuel * sim.P.tank;
     $('hudFuel').textContent = fmt(liters, 1) + ' L' + (sim.fuelRate > 0.0008 ? ` · ${fmt(sim.fuelRate * 3600, 0)} L/h` : '');
     $('hudFuelTag').classList.toggle('fuel-low', sim.fuel < 0.15);
-    const j = game.job, jb = $('hudJob');
-    jb.hidden = !j;
-    if (j) jb.innerHTML = `<b>CONSEGNA</b>${fmt(Math.max(0, j.to - s.dist) / 1000, 1)} km · ${Math.max(0, Math.ceil((j.deadline - j.t) / 60))} min per il bonus`;
     const rd = game.mode === 'career' ? game.radar() : null;
     $('radar').hidden = rd === null;
     if (rd !== null) $('radar').textContent = `POLIZIA ${Math.round(rd / 10) * 10} m${sim.gear === sim.topGear() && sim.gear >= 5 ? ' · SCALA UNA MARCIA' : ''}`;
@@ -3418,7 +3329,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   } catch (e) { /* niente: il gioco va lo stesso */ }
   window.nightRun = { exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT, tier: flameTier(sim, TP.dsp.cat.pop || 0) }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
-    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); } };
+    get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); },
+    audioOn: () => ensureAudio(), get tp() { return TP; }, get sel() { return S.tune; } };   // per i campioni dei pezzi (campioni.js): accendere l'audio dall'officina, parti montate
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.pausa = (on) => on ? pausaOn() : pausaOff(); Object.defineProperty(window.nightRun, 'inPausa', { get: () => pausaF, configurable: true });   // pausa a mano (prove)
@@ -3436,9 +3348,14 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   // ---------------------------------------------------------------- ciclo principale
-  let last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
+  let fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
     if (pausaF) { last = now; requestAnimationFrame(frame); return; }
+    if (window.NR_PREST && NR_PREST.fps) {                        // tetto ai fotogrammi (prestazioni.js)
+      const iv = 1000 / NR_PREST.fps;
+      if (now < fpsNext - 1) { requestAnimationFrame(frame); return; }
+      fpsNext = now > fpsNext + iv ? now + iv : fpsNext + iv;
+    }
     const dt = clamp((now - last) / 1000, 0, 0.1); last = now; fpsTick(dt);
     if (rp.on) { playReplay(dt); requestAnimationFrame(frame); return; }
     readPad(); updateInputs(dt);
@@ -3485,6 +3402,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (wasRunning && !sim.running && sim.stalled) flash('Motore spento: stallo. Folle e riavvia', 3);
     wasRunning = sim.running;
     if (audio.ready) audio.send({ p: sim.audioParams(), ev });
+    if (audio.ready && window.NightCampioni) NightCampioni.tick(sim, ev, dt, { view: viewNow(), env: envNow(), vol: S.muted ? 0 : S.vol / 100, exh: exhClosed() ? 0.72 : exhValve() ? 1.25 : 1 });
     if (audio.ready) {
       const vn = viewNow(), en = envNow();
       if (vn !== sentView) { sentView = vn; audio.send({ cfg: dspCfg() }); }
@@ -3558,7 +3476,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         if (id && CARS[id] && id !== game.car) { game.s.vg.garage = [id]; window.nightRun.swapCar(id); }
         if (game.car === id || !id) game.s.vg.garage = [game.car];
         game.s.vg.eredita = game.car;
-        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Mario`, 7), 1500); }
+        if (game.vgInherit && game.vgInherit()) { applySettings(); renderServices(); saveGame(); setTimeout(() => flash(`${vgTesto(game, '{Auto}')} dello zio è ferma da anni: gomme sgonfie, olio da cambiare, poca benzina, documenti scaduti (app Libretto). Prima tappa: un benzinaio o Nico`, 7), 1500); }
       };
       const prologo = () => NightPrologo.play({ ctx: () => audio.ctx, onPick: eredita, onDone: () => { eredita(null); $('btnIgn').focus(); if (game.prompt) game.prompt.t = game.prompt.time; startRadio(); } });
       // prima del prologo l'editor del personaggio: chi si sceglie qui scende dalla E36, parla col notaio e guida tutto il viaggio
@@ -3569,7 +3487,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver(() => { if (Math.abs(cv.clientWidth - W) > 1) layout(); }).observe(cv);
   if (game.mode === 'career') for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
-  if (typeof motLucaMigra === 'function' && motLucaMigra(game, S)) { applySettings(); saveGame(); }   // [PISTONE] pezzi motore di Luca della V40 → Nico (rimborso)
   // ---------------------------------------------------------------- pioggia: vista 2D e 3D, aderenza, rumore
   const rainSnd = { g: null };
   function rainSound(on) {
@@ -3784,7 +3701,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="piazzetta.js"></script>
 <script src="obiettivo.js"></script>
 <script src="officina.js"></script>
-<script src="pistone/motori2d.js"></script>   <!-- [PISTONE] -->
+<script src="campioni.js"></script>   <!-- campioni audio dei pezzi del motore: scheda Suoni dell'officina -->
 <script src="garage.js"></script>
 <script src="lucagarage.js"></script>
 <script src="soccorso.js"></script>

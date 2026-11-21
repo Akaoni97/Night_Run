@@ -11,7 +11,7 @@
 //   --out   cartella per diario.json e le foto ogni 50 km
 //   --guida 1 = AUTO 1 (guida l'auto, gas e freno compresi, come chi la lascia fare) · 2 = AUTO 2 (corsie sue, gas e freno del giocatore)
 // Cosa fa il giocatore: il primo lavoro (tutorial) e poi le missioni della bacheca, le consegne che ci stanno nel
-// bagagliaio, benzina sotto il 30 %, mangia e beve sotto il 45 %, dorme al motel sotto il 40 % di sonno, da Mario
+// bagagliaio, benzina sotto il 30 %, mangia e beve sotto il 45 %, dorme al motel sotto il 40 % di sonno, da Nico
 // tagliando, candele, pastiglie, gomme e carrozzeria quando servono, documenti appena ha i soldi. Non compra auto né
 // pezzi: il riassunto dice quando avrebbe potuto. Alle domande risponde con la prima scelta (alla polizia: paga).
 'use strict';

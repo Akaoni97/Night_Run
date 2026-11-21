@@ -37,7 +37,7 @@ Il WAV si può mandare all'utente (strumento per inviare file) perché lo ascolt
 ## Regole
 - Parametri nuovi del suono con valori predefiniti che **lasciano Supra e V40 come sono**.
 - `dsp.js` sa fare 4 o 6 cilindri (la Volvo 850 R a 5 cilindri oggi suona da 4 o 6).
-- I test in `test/motori.test.js` controllano già alcune cose del suono: falli girare.
+- I test in `test/test1.test.js` («Test 1») controllano già alcune cose del suono: falli girare.
 - Suoni presi da mod o senza licenza non entrano nel repository: il giocatore li carica in locale (`samples.js`).
 
 ## Gli altri suoni

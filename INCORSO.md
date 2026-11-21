@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Luca), con Claude | Auto nuove dai disegni in alta definizione (25 auto, versioni tuning, camion) | `img/`, `cars.js`, `street2d.js`, `nitido2d.js`, `game.js`, `strumenti/` | 21/11/2026 notte |

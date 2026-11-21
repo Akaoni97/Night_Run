@@ -7,8 +7,8 @@
 //  ferma. Il meccanico scende, fa i lavori uno dopo l'altro (martello, aria, olio, pompa) e intanto lo stato dell'auto
 //  migliora davvero, poco per volta. Alla fine saluta, risale e il furgone riparte. Si paga a lavoro finito (il fido
 //  di `GAME_FIDO` vale). Un riquadro con le barre di avanzamento (con «Accelera») resta sopra la strada.
-//  Traino (`SOC.traino`): con un motore rotto (da Luca, dove Nico lo rifà) o l'auto distrutta (da Mario) il furgone ti aggancia con la catena e ti porta alla prossima
-//  officina di quel tipo (buio e arrivo, premi U per entrare); non se salti una consegna. Con l'assicurazione in regola (documenti.js) la carrozzeria costa la franchigia.
+//  Il furgone e il carro attrezzi sono di Nico (quello dell'Officina Nico, tagliandi e carrozzeria): è lui che scende e lavora (`SOC_LOOK`).
+//  Traino (`SOC.traino`): con l'auto distrutta Nico ti aggancia con la catena e ti porta alla prossima Officina Nico (buio e arrivo, premi U per entrare); non se salti una consegna. Con l'assicurazione in regola (documenti.js) la carrozzeria costa la franchigia.
 //  Stato: `game.soc` (solo mentre dura la chiamata, non si salva). Costanti in `SOC`, scena in `Street2D.socDraw`.
 // ============================================================================
 const SOC = {
@@ -26,8 +26,8 @@ const SOC = {
   traino: { base: 60, perKm: 12, v: 13, dur: 5, danni: 0.6 },   // € di base e al km fino all'officina; m/s e secondi di strada col carro; danni da cui serve
 };
 const SOC_NOMI = { fuel: 'Rifornimento', body: 'Carrozzeria', tyres: 'Gonfia e ripara le gomme', newtyres: 'Gomme nuove', maint: 'Manutenzione', traino: 'Traino' };
-// l'aspetto del meccanico (diverso dal protagonista)
-const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', testaCol: 1, sopra: 'felpa', sopraCol: 3, barba: 'piena', occhiali: 'no' };
+// l'aspetto di Nico, il meccanico del furgone (lo stesso dell'interno dell'Officina Nico, LOOK.nico in interni_hd.js)
+const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 2, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'sole', x: { canotta: true, tatuaggi: true, catena: true } };
 
 (function socLogica() {
   if (typeof StreetGame === 'undefined') return;
@@ -59,23 +59,23 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
     out.push({ id: 'maint', name: SOC_NOMI.maint, ok: need.length > 0, price: c ? need.reduce((a, k) => a + this.serviceCost(k), 0) : 0, keys: need,
       info: need.length ? need.map((k) => `${NM[k]} ${Math.round(m[k] * 100)} %`).join(' · ') : 'Olio, candele e freni sono a posto' });
     const tw = this.socTraino();
-    out.push({ id: 'traino', name: tw.dest === 'shop' ? 'Traino da Luca (c\'è Nico)' : 'Traino da Mario', ok: tw.ok, price: c ? tw.price : 0, info: tw.info, dest: tw.dest, st: tw.st });
+    out.push({ id: 'traino', name: 'Carro attrezzi di Nico', ok: tw.ok, price: c ? tw.price : 0, info: tw.info, dest: tw.dest, st: tw.st });
     return out;
   };
-  // il traino: motore rotto = da Luca (Nico lo rifà), carrozzeria distrutta = da Mario; il furgone ti porta alla prossima officina di quel tipo
+  // il carro attrezzi di Nico: con la carrozzeria distrutta ti porta alla prossima Officina Nico
   P.socTraino = function () {
     const no = (info) => ({ ok: false, info, price: 0 });
     if (typeof VG === 'undefined' || !this.s.vg) return no('Il traino serve solo nel Viaggio');
-    const sim = this.sim, e = this.motOf && this.motOf(), rotto = !!(e && e.rotto), dm = sim.damage || 0;
-    if (!rotto && dm < SOC.traino.danni) return no('L\'auto cammina ancora: il traino serve per un motore rotto o una carrozzeria distrutta');
-    const dest = rotto ? 'shop' : 'niko', d = this.s.dist, n0 = Math.max(0, VG.stopIndex(d)); let st = null;
+    const dm = this.sim.damage || 0;
+    if (dm < SOC.traino.danni) return no('L\'auto cammina ancora: il carro attrezzi serve con la carrozzeria distrutta');
+    const dest = 'niko', d = this.s.dist, n0 = Math.max(0, VG.stopIndex(d)); let st = null;
     for (let n = n0; n < n0 + 40; n++) { const q = VG.stop(n); if (q.x > d + 60 && q.id === dest) { st = q; break; } }
     if (!st) return no('Nessuna officina davanti');
-    const km = (st.x - d) / 1000, nome = rotto ? 'Da Luca Tuning (c\'è Nico)' : 'da Mario';
+    const km = (st.x - d) / 1000, nome = 'all\'Officina Nico';
     const price = Math.round((SOC.traino.base + SOC.traino.perKm * km) / 5) * 5, gl = this.vgGoal && this.vgGoal();
     const carico = this.s.trunk.some((it) => (it.to !== undefined && it.pay !== undefined) || it.kind === 'missione' || it.first);   // solo se hai una consegna in corso (andare a una bacheca non si perde)
     if (carico && gl && gl.x != null && gl.x > d && gl.x < st.x) return no(`Hai una consegna prima di arrivare ${nome}: col traino la salteresti`);
-    return { ok: true, dest, st, price, info: `${rotto ? 'Motore rotto' : 'Auto distrutta'}: ti porta ${nome}, a ${km.toFixed(1).replace('.', ',')} km. Poi scegli tu` };
+    return { ok: true, dest, st, price, info: `Auto distrutta: Nico ti porta ${nome}, a ${km.toFixed(1).replace('.', ',')} km. Poi scegli tu` };
   };
   P.socTotale = function (ids) {
     if (ids.includes('traino')) ids = ['traino'];                                // il traino sostituisce tutto: i lavori si fanno in officina
@@ -88,7 +88,6 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
     if (this.inside) return 'Il furgone si chiama dalla strada, non da dentro un locale';
     if (this.prompt) return 'Prima rispondi alla domanda';
     if (this.ap) return 'Aspetta: l\'auto sta finendo una manovra';
-    if (this.race) return 'Non adesso';
     if (this.sim.v < -0.5) return 'Fermati prima di chiamare';
     return null;
   };
@@ -104,7 +103,7 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
     this.lane = 3; this.manualT = 0;                                                       // si accosta nella corsia più a destra, la più vicina ai bordi: dà meno fastidio al traffico
     this.stopAt(null, () => { if (this.soc) this.soc.stopped = true; });
     this.ap.enter = true;                                                                 // cambio di corsia deciso, come davanti a un locale
-    this.say(Math.abs(this.sim.v) > 0.5 ? 'Soccorso chiamato: accosto e aspetto il furgone' : 'Soccorso chiamato: il furgone sta arrivando', 'info');
+    this.say(Math.abs(this.sim.v) > 0.5 ? 'Hai chiamato Nico: accosto e aspetto il furgone' : 'Hai chiamato Nico: il furgone sta arrivando', 'info');
     return { ok: true, total: T.total };
   };
   P.socAnnulla = function (testo) {
@@ -188,7 +187,7 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
       if (rem < 45) e.hazard = true;
       if (S.pt > 0.7) {
         const sett = e._z === undefined || Math.abs(e._z - GAME_LANE_Z[S.L]) < 0.3;
-        if (sett || S.pt > 3) { e.lane = S.L; e.hazard = true; this.say('Il furgone del soccorso è arrivato', 'info'); if (this.diaAdd && !S.sv.some((x) => x.id === 'traino')) this.diaAdd('soc', 'Soccorso stradale: il furgone ti raggiunge', true); this.socPlan(); }
+        if (sett || S.pt > 3) { e.lane = S.L; e.hazard = true; this.say('Il furgone di Nico è arrivato', 'info'); if (this.diaAdd && !S.sv.some((x) => x.id === 'traino')) this.diaAdd('soc', 'Soccorso stradale: il furgone ti raggiunge', true); this.socPlan(); }
       }
     } else if (S.ph === 'work') {
       S.mt += dt;
@@ -212,10 +211,9 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
         const sv = S.sv.find((x) => x.id === 'traino'), tgt = sv.st.x - 22;
         this.socPaga(sv);
         this.s.dist = tgt; this.s.far = Math.max(this.s.far || 0, tgt); this.nextTraffic = 0;
-        this.ents = this.ents.filter((x) => x === e || x.kind === 'drop'); e.x = tgt + SOC.dist; e.v = 0;
-        const nome = sv.dest === 'shop' ? 'Da Luca Tuning' : 'da Mario';
-        this.say(`Ti hanno lasciato davanti ${nome}: premi U per entrare`, 'info');
-        if (this.diaAdd) this.diaAdd('soc', `Trainato fino ${sv.dest === 'shop' ? 'da Luca Tuning' : 'da Mario'}`, true);
+        this.ents = this.ents.filter((x) => x === e); e.x = tgt + SOC.dist; e.v = 0;
+        this.say('Nico ti ha lasciato davanti all\'officina: premi U per entrare', 'info');
+        if (this.diaAdd) this.diaAdd('soc', 'Col carro attrezzi di Nico fino all\'Officina Nico', true);
         S.ph = 'arrivo'; S.t = 0;
       }
     } else if (S.ph === 'arrivo') {
@@ -230,15 +228,15 @@ const SOC_LOOK = { pelle: 1, capelli: 'rasati', capCol: 1, testa: 'berretto', te
   };
   const up = P.update;
   P.update = function (dt) { up.call(this, dt); if (this.soc) this.socStep(dt * (this.soc.fast || 1)); else this.socGuasto(); };
-  // da fermo con un guasto che non ti fa ripartire (motore rotto, gomma a terra) il gioco ti ricorda il soccorso, una volta per guasto
+  // da fermo con una gomma a terra il gioco ti ricorda il soccorso, una volta per guasto
   P.socGuasto = function () {
     if (this.mode !== 'career' || !this.s.vg || this.prompt || this.inside || this.ap || Math.abs(this.sim.v) > 0.5) return;
-    const e = this.motOf && this.motOf(), T = this.tyres(), key = e && e.rotto ? 'motore' : Math.min(...T.p) < 0.5 ? 'gomma' : null;
+    const T = this.tyres(), key = Math.min(...T.p) < 0.5 ? 'gomma' : null;
     if (!key) { this._socAsk = null; return; }
     if (this._socAsk === key) return; this._socAsk = key;
-    this.ask({ kind: 'soccorso', title: key === 'motore' ? 'Motore rotto' : 'Gomma a terra', time: 30,
-      text: key === 'motore' ? 'Il motore non riparte. Il furgone del soccorso ti traina da Luca, dove Nico lo rifà.' : 'Una gomma è a terra. Il furgone del soccorso arriva e te la sistema sul posto.',
-      options: [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(key === 'motore' ? ['traino'] : ['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }],
+    this.ask({ kind: 'soccorso', title: 'Gomma a terra', time: 30,
+      text: 'Una gomma è a terra. Nico arriva col furgone e te la sistema sul posto.',
+      options: [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }],
       onTimeout: () => {} });
   };
 })();
@@ -357,7 +355,7 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
 #socBox button{font:800 11px system-ui;border:0;border-radius:9px;padding:5px 10px;background:#ffb020;color:#2a1600;cursor:pointer}#socBox button.x{background:#ffffff22;color:#fff}`;
   document.head.appendChild(css);
   let box = null, last = '';
-  const STATO = { brake: 'Accosto e mi fermo…', come: 'Il furgone sta arrivando…', work: 'Il meccanico sta lavorando', tow: 'Il furgone ti porta via…', arrivo: 'Arrivati', leave: 'Fatto: il furgone riparte' };
+  const STATO = { brake: 'Accosto e mi fermo…', come: 'Il furgone di Nico sta arrivando…', work: 'Nico sta lavorando', tow: 'Il carro attrezzi di Nico ti porta via…', arrivo: 'Arrivati', leave: 'Fatto: il furgone riparte' };
   function paint() {
     const g = G(), S = g && g.soc;
     if (!box) { const host = document.getElementById('roadStage') || document.body; box = document.createElement('div'); box.id = 'socBox'; host.appendChild(box); box.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const gg = G(); if (gg && gg.soc) { gg.soc.fast = gg.soc.fast > 1 ? 1 : 4; last = ''; paint(); } }); }

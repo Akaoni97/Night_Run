@@ -4,7 +4,7 @@
 //  Dentro: il salone con le auto in vendita (quelle di VG_SHOP, sbloccate coi km), schede tecniche vere (cavalli, coppia
 //  e peso calcolati dal modello del motore), l'occasione della tappa (−15 %), l'acquisto in contanti o a rate,
 //  la vendita delle tue auto (valutazione da km, danni e pezzi montati), il giro di prova di 3 km.
-//  Le auto si comprano solo qui; il Motel Ovunque resta il parcheggio dove si cambia mezzo (e vende il rimorchio).
+//  Le auto si comprano solo qui; il Motel 4Ever resta il parcheggio dove si cambia mezzo (e vende il rimorchio).
 //  Stato in game.s.vg: fin (finanziamenti), test (giro di prova in corso).
 // ============================================================================
 const DL = {
@@ -16,6 +16,8 @@ const DL = {
   repo: 3,              // rate saltate di fila prima che si riprendano l'auto
   maxFin: 2,            // finanziamenti aperti al massimo
   payoff: 0.05,         // sconto se chiudi prima
+  modPezzi: 0.5,        // vendendo: quanto vale ogni euro speso in pezzi montati o comprati per quell'auto
+  modSwap: 0.5,         // vendendo: quanto vale ogni euro speso per lo swap del motore
   testKm: 3,            // giro di prova
   testOver: 250,        // € per km oltre il giro di prova (dopo 0,5 km di tolleranza)
   deal: 0.15,           // sconto dell'occasione
@@ -100,22 +102,32 @@ if (typeof VG_PLACE !== 'undefined') {
     return { ok: true, price };
   };
 
-  // valutazione di un'auto tua: prezzo a nuovo, chilometri, danni, più un terzo dei pezzi montati
+  // valutazione di un'auto tua: prezzo a nuovo, chilometri, danni, più le modifiche fatte (dlMods). Un'auto elaborata vale di più:
+  // metà di quello che hai speso in pezzi (anche quelli del motore di uno swap) e metà dello swap pagato da Luca. L'estetica no.
   P.dlParts = function (id) {
     const T = CARS[id] && CARS[id].tuning; if (!T) return 0;
     const pre = id === 'supra' ? '' : id + '|'; let sum = 0;
     for (const k in this.s.owned || {}) {
       if (!this.s.owned[k] || (pre ? !k.startsWith(pre) : k.includes('|'))) continue;
-      const [cat, it] = k.slice(pre.length).split(':'); if (cat === 'cos' || !T[cat]) continue;
-      const item = (T[cat].items || []).find((q) => q.id === it); if (item) sum += item.price || 0;
+      const rest = k.slice(pre.length), c = rest.indexOf(':'), cat = rest.slice(0, c), full = rest.slice(c + 1);
+      if (c < 0 || cat === 'cos') continue;
+      const d = full.indexOf(':'), donor = d > 0 ? full.slice(0, d) : null;   // pezzo del motore di uno swap: «donatore:pezzo»
+      const C = donor ? (CARS[donor] && CARS[donor].tuning) || (donor === 'supra' && typeof TUNING_SUPRA !== 'undefined' ? TUNING_SUPRA : null) : T;
+      const item = C && C[cat] && (C[cat].items || []).find((q) => q.id === (donor ? full.slice(d + 1) : full)); if (item) sum += item.price || 0;
     }
     return sum;
   };
+  P.dlSwapSpent = function (id) {
+    const own = this.s.swapOwn || {}; let sum = 0;
+    for (const k in own) if (own[k] && k.startsWith(id + '|') && typeof offSwapPrice === 'function') sum += offSwapPrice(null, k.slice(id.length + 1));
+    return sum;
+  };
+  P.dlMods = function (id) { return r50(this.dlParts(id) * DL.modPezzi + this.dlSwapSpent(id) * DL.modSwap); };
   P.dlValue = function (id) {
     const it = VG_SHOP.find((q) => q.id === id), base = it ? it.price : DL.v40;
     const st = (this.s.cars || {})[id] || {}, dmg = id === this.car ? this.sim.damage : st.damage || 0;
     const dep = Math.max(0.35, 0.75 - (st.km || 0) / 1000 * 0.3);
-    return Math.max(200, r50(base * dep * (1 - 0.6 * dmg) + this.dlParts(id) * 0.33));
+    return Math.max(200, r50(base * dep * (1 - 0.6 * dmg) + this.dlMods(id)));
   };
   P.dlCanSell = function (id) {
     const v = V(this);
@@ -131,6 +143,8 @@ if (typeof VG_PLACE !== 'undefined') {
     const v = V(this), val = this.dlValue(id), pre = id === 'supra' ? '' : id + '|';
     this.s.money += val; v.garage = v.garage.filter((g) => g !== id); delete v.owned[id]; delete this.s.cars[id];
     for (const k in this.s.owned || {}) if (pre ? k.startsWith(pre) : !k.includes('|')) delete this.s.owned[k];
+    if (this.s.swap) delete this.s.swap[id];
+    for (const k in this.s.swapOwn || {}) if (k.startsWith(id + '|')) delete this.s.swapOwn[k];
     this.say(`${CARS[id].name} venduta: + € ${fmt(val)}`, 'money');
     return { ok: true, val };
   };
@@ -145,7 +159,7 @@ if (typeof VG_PLACE !== 'undefined') {
     return { ok: true, due };
   };
 
-  // giro di prova: l'auto è tua per 3 km, poi quando ti fermi il venditore viene a riprendersela
+  // giro di prova: l'auto è tua per 3 km, poi quando ti fermi Rocco Lostallone viene a riprendersela
   P.dlTestStart = function (id) {
     const v = V(this), it = VG_SHOP.find((q) => q.id === id && q.car);
     if (!it) return { ok: false };
@@ -192,7 +206,7 @@ if (typeof VG_PLACE !== 'undefined') {
       if (this.car !== T.id && !here(this)) {                        // cambiata al motel: la riportano loro
         v.garage = v.garage.filter((g) => g !== T.id); delete this.s.cars[T.id]; v.test = null; out.push({ k: 'testGone' });
       } else if (this.car === T.id && d > DL.testKm) {
-        if (!T.warned) { T.warned = true; this.say(`Giro di prova finito: fermati, il venditore viene a riprendersi la ${CARS[T.id].short || CARS[T.id].name}`, 'buy'); out.push({ k: 'testWarn' }); }
+        if (!T.warned) { T.warned = true; this.say(`Giro di prova finito: fermati, Rocco viene a riprendersi la ${CARS[T.id].short || CARS[T.id].name}`, 'buy'); out.push({ k: 'testWarn' }); }
         if (stopped) {
           const over = Math.max(0, d - DL.testKm - 0.5), dmg = Math.max(0, this.sim.damage - (T.dmg0 || 0));
           const it = VG_SHOP.find((q) => q.id === T.id), cost = Math.round(over * DL.testOver + dmg * (it ? it.price : 10000) * 0.25);
@@ -200,7 +214,7 @@ if (typeof VG_PLACE !== 'undefined') {
           if (prev && swap(prev) !== false && this.car === prev) {
             v.garage = v.garage.filter((g) => g !== T.id); delete this.s.cars[T.id]; v.test = null;
             if (cost > 0) this.s.money -= cost;
-            this.say(cost > 0 ? `Il venditore si riprende l'auto: − € ${fmt(cost)} (${over > 0 ? fmt(over * 10 / 10) + ' km in più' : ''}${over > 0 && dmg > 0 ? ', ' : ''}${dmg > 0 ? 'danni' : ''})` : 'Il venditore si riprende l\'auto. «Allora, ti è piaciuta?»', cost > 0 ? 'lose' : 'buy');
+            this.say(cost > 0 ? `Rocco si riprende l'auto: − € ${fmt(cost)} (${over > 0 ? fmt(over * 10 / 10) + ' km in più' : ''}${over > 0 && dmg > 0 ? ', ' : ''}${dmg > 0 ? 'danni' : ''})` : 'Rocco si riprende l\'auto. «Allora, ti è piaciuta?»', cost > 0 ? 'lose' : 'buy');
             out.push({ k: 'testEnd', cost });
           }
         }
@@ -294,8 +308,8 @@ if (typeof VG_PLACE !== 'undefined') {
     const act = (fn) => (e) => { const r = fn(); if (r && r.ok === false && r.why) ctx.flash(r.why, 2.4); else if (r && r.ok) { ctx.save(); } redraw(); };
     const wrap = document.createElement('div'); wrap.style.cssText = 'display:grid;gap:12px';
     const note = (t) => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = t; wrap.appendChild(p); };
-    note(v.test ? 'Il venditore: «Allora? Com\'è andata? Se ti piace, la firmi e te la tieni.»' : deal ? 'Il venditore: «Guarda pure, le chiavi sono tutte in bacheca. Quella sulla pedana oggi te la faccio a meno.»' : 'Il venditore: «Hai già tutto quello che vendo. Torna quando hai qualcosa da darmi in cambio.»');
-    if (v.test) { const d = document.createElement('div'); d.className = 'dl-test'; d.innerHTML = `Giro di prova in corso: <b>${esc(CARS[v.test.id].name)}</b> · mancano ${fmt(g.dlTestLeft(), 1)} km. Poi fermati e il venditore viene a riprendersela.`; wrap.appendChild(d); }
+    note(v.test ? 'Rocco Lostallone: «Allora? Com\'è andata? Se ti piace, la firmi e te la tieni.»' : deal ? 'Rocco Lostallone: «Guarda pure, le chiavi sono tutte in bacheca. Quella sulla pedana oggi te la faccio a meno.»' : 'Rocco Lostallone: «Hai già tutto quello che vendo. Torna quando hai qualcosa da darmi in cambio.»');
+    if (v.test) { const d = document.createElement('div'); d.className = 'dl-test'; d.innerHTML = `Giro di prova in corso: <b>${esc(CARS[v.test.id].name)}</b> · mancano ${fmt(g.dlTestLeft(), 1)} km. Poi fermati e Rocco viene a riprendersela.`; wrap.appendChild(d); }
     const tabs = document.createElement('div'); tabs.className = 'dl-tabs';
     const F = (v.fin || []);
     [['Salone', 0], ['Le tue auto', 1], [`Rate${F.length ? ' (' + F.length + ')' : ''}`, 2]].forEach(([t, i]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = t; b.setAttribute('aria-pressed', String(UI.tab === i)); b.addEventListener('click', () => { UI.tab = i; redraw(); }); tabs.appendChild(b); });
@@ -344,12 +358,12 @@ if (typeof VG_PLACE !== 'undefined') {
       }
     } else if (UI.tab === 1) {
       h4('Le tue auto');
-      const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Il venditore te la valuta: conta il prezzo a nuovo, i chilometri, i danni e un terzo dei pezzi che ci hai montato. Qui puoi anche cambiare auto, come al parcheggio del motel.'; wrap.appendChild(p);
+      const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Rocco te la valuta: conta il prezzo a nuovo, i chilometri, i danni e le modifiche: metà di quello che hai speso in pezzi e nello swap del motore. Qui puoi anche cambiare auto, come al parcheggio del motel.'; wrap.appendChild(p);
       for (const id of v.garage) {
         const st = (g.s.cars || {})[id] || {}, val = g.dlValue(id), can = g.dlCanSell(id), fin = F.find((f) => f.id === id), testing = v.test && v.test.id === id;
         const r = document.createElement('div'); r.className = 'dl-row';
         const dmg = id === g.car ? g.sim.damage : st.damage || 0;
-        r.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(id, redraw)}"></div><div><b>${id === g.car ? '● ' : ''}${esc(CARS[id].name)}</b><small>${fmt(st.km || 0)} km${dmg > 0.02 ? ` · carrozzeria al ${Math.round(dmg * 100)} %` : ''}${fin ? ' · in finanziamento' : ''}${testing ? ' · in prova' : ''}</small>${testing ? '' : `<small>Te la valuta <b style="color:var(--lime)">€ ${fmt(val)}</b></small>`}</div>`;
+        r.innerHTML = `<div class="dl-pic"><img alt="" src="${pic(id, redraw)}"></div><div><b>${id === g.car ? '● ' : ''}${esc(CARS[id].name)}</b><small>${fmt(st.km || 0)} km${dmg > 0.02 ? ` · carrozzeria al ${Math.round(dmg * 100)} %` : ''}${fin ? ' · in finanziamento' : ''}${testing ? ' · in prova' : ''}</small>${testing ? '' : `<small>Te la valuta <b style="color:var(--lime)">€ ${fmt(val)}</b>${g.dlMods(id) > 0 ? ` · di cui € ${fmt(g.dlMods(id))} per le modifiche` : ''}</small>`}</div>`;
         const a = document.createElement('div'); a.className = 'dl-acts';
         if (!testing) a.appendChild(btn(`Vendi · € ${fmt(val)}`, 'buy', () => g.dlSell(id), !can.ok));
         if (id !== g.car && !testing) a.appendChild(btn('Guida questa', '', () => (window.nightRun.swapCar(id) ? { ok: true } : { ok: false, why: 'Non si può cambiare adesso' })));
@@ -450,7 +464,7 @@ if (typeof VG_PLACE !== 'undefined') {
     // montanti della vetrata e riflessi del vetro
     for (let q = L; q <= pL; q += 52) { g.fillStyle = ink; g.fillRect(q - 1, gT, 3, gH); g.fillStyle = '#5a5a70'; g.fillRect(q, gT, 1, gH); }
     g.save(); g.globalAlpha = 0.06 + 0.06 * (1 - n); g.fillStyle = '#fff'; for (let q = 0; q < 5; q++) { const sx = L + ((q * 83 + t * 6) % (pL - L)); g.beginPath(); g.moveTo(sx, gT); g.lineTo(sx + 14, gT); g.lineTo(sx - 20, gy); g.lineTo(sx - 34, gy); g.fill(); } g.restore();
-    // a destra del portale: ufficio vendite con la scrivania e il venditore
+    // a destra del portale: ufficio vendite con la scrivania e Rocco Lostallone
     const oL = pL + pW + 2;
     g.fillStyle = mixc('#3a4050', '#2c2848', n); g.fillRect(oL, gT, Rr - oL, gH);
     g.fillStyle = 'rgba(20,16,30,.8)'; g.fillRect(oL + 6, gy - 22, 26, 3); g.fillRect(oL + 8, gy - 19, 2, 13); g.fillRect(oL + 28, gy - 19, 2, 13);

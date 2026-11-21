@@ -1,7 +1,7 @@
 // ============================================================================
 //  Night Run · Il Viaggio
 //  L'autostrada che va solo avanti: si parte dal km 0 sotto casa con un'auto di serie.
-//  Bisogni del guidatore, soste (bar, autogrill, benzina, officine, Motel Ovunque con la cassa che ti segue),
+//  Bisogni del guidatore, soste (bar, autogrill, benzina, officine, Motel 4Ever con la cassa che ti segue),
 //  lavori (passaggi, pacchi, rimorchio, furgone, camion, autobus), autostoppisti, capitoli della storia
 //  e qualcosa che ogni tanto non torna.
 //  Si appoggia a game.js (StreetGame): aggiunge lo stato in game.s.vg e si aggancia ai suoi metodi.
@@ -28,11 +28,11 @@ const VG_BARS = ['Bar Sport', 'Bar della Curva', 'Caffè del Ponte', 'Bar Stella
 const VG_PLACE = {
   bar: { name: (n) => VG_BARS[n % VG_BARS.length], what: 'bar', col: '#ffd23f' },
   grill: { name: () => 'Sosta 24', what: 'autogrill', col: '#ff7a3a' },
-  motel: { name: () => 'Motel Ovunque', what: 'motel', col: '#ff5fa8' },
+  motel: { name: () => 'Motel 4Ever', what: 'motel', col: '#ff5fa8' },
   fuel: { name: () => 'Benzina 24H', what: 'benzinaio', col: '#2ee6ff' },
-  niko: { name: () => 'Officina Mario', what: 'meccanico', col: '#5ad1ff' },
+  niko: { name: () => 'Officina Nico', what: 'meccanico', col: '#5ad1ff' },
   shop: { name: () => 'Da Luca Tuning', what: 'tuning', col: '#ffb000' },
-  style: { name: () => 'Neon Kustom', what: 'estetica', col: '#ff2e88' },
+  style: { name: () => 'Russian Kùstòm', what: 'estetica', col: '#ff2e88' },
 };
 // il paesaggio cambia lungo la strada: da casa (città) alla pianura, al borgo, al mare, ai monti, alla baia, al deserto… e poi ancora
 // il giro delle dodici capitali (capitali.js) con in mezzo i paesaggi di sempre; dopo Washington si torna al Wangan e il giro riparte da Roma
@@ -68,11 +68,11 @@ Object.assign(INV, {
   scatola: { name: 'Scatola da consegnare', kg: 20, price: 0, note: 'Va lasciata al locale scritto sull\'etichetta.' },
   bancale: { name: 'Bancale', kg: 1000, price: 0, note: 'Merce su bancale per il camion.' },
   bomboletta: { name: 'Bomboletta gonfia e ripara', kg: 0.5, price: 18, note: 'Rigonfia la gomma bucata a 1,9 bar e tappa quasi tutto il buco. Arrivi al prossimo gommista.' },
-  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Mario te la ripara e torna a essere la ruota di scorta.' },
+  forata: { name: 'Gomma forata', kg: 12, price: 0, note: 'Nico te la ripara e torna a essere la ruota di scorta.' },
 });
 const VG_FOODS = ['panino', 'acqua', 'caffe', 'energetico', 'salviette', 'bomboletta', 'scorta'];
 
-// ---------------------------------------------------------------- mezzi: posti, carico, prezzi (concessionaria del Motel Ovunque)
+// ---------------------------------------------------------------- mezzi: posti, carico, prezzi (concessionaria del Motel 4Ever)
 const VG_SEATS = { v40: 4, supra: 1, r5: 1, b2002: 3, e30: 3, e36: 3, e34: 4, van: 2, truck: 1, bus: 40 };
 const VG_CARGO = { van: { kg: 900, slots: 24 }, truck: { kg: 9000, slots: 18 }, bus: { kg: 300, slots: 16 } };
 const VG_TRAILER = { kg: 300, slots: 10, mass: 320 };
@@ -103,7 +103,7 @@ const VG_SMALLTALK = [
 const VG_RUMORS = [
   '«Dicono che più avanti la strada si allarga e diventa a dieci corsie. Io non ci credo.»',
   '«Il caffè del Sosta 24 è il migliore della tratta. Chiedi la miscela della casa.»',
-  '«Ai Motel Ovunque la cassa arriva sempre prima di te. Sono organizzati, quelli.»',
+  '«Ai Motel 4Ever la cassa arriva sempre prima di te. Sono organizzati, quelli.»',
   '«Se hai fame fermati al prossimo autogrill: dopo c\'è un lungo tratto senza niente.»',
 ];
 
@@ -185,8 +185,8 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.switchCar = function (id) {
     if (vgOn(this)) {
       const v = this.s.vg;
-      if (!v.garage.includes(id)) return { ok: false, why: typeof DL !== 'undefined' ? 'Non è tua: le auto si comprano all\'Autosalone Notte' : 'Non è tua: le auto e i mezzi si comprano al parcheggio del Motel Ovunque' };
-      if (!(this.inside && this.inside.id === 'motel')) return { ok: false, why: 'I mezzi si cambiano nel parcheggio del Motel Ovunque' };
+      if (!v.garage.includes(id)) return { ok: false, why: typeof DL !== 'undefined' ? 'Non è tua: le auto si comprano all\'Autosalone Notte' : 'Non è tua: le auto e i mezzi si comprano al parcheggio del Motel 4Ever' };
+      if (!(this.inside && this.inside.id === 'motel')) return { ok: false, why: 'I mezzi si cambiano nel parcheggio del Motel 4Ever' };
       if (v.pax.length) return { ok: false, why: 'Hai ancora passeggeri a bordo' };
       if ((this.s.trunk || []).some((it) => it.kind === 'scatola' || it.kind === 'bancale' || it.kind === 'pacco')) return { ok: false, why: 'Prima consegna la merce che hai a bordo' };
     }
@@ -242,12 +242,6 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (r && vgOn(this)) { const v = this.s.vg; v.pendingPlace = { id: p.id, n: VG.stopIndex(p.x), name: p.name }; }
     return r;
   };
-  // gli eventi casuali della carriera: nel viaggio niente consegne della carriera (ci sono i lavori)
-  const sp = P.spawn;
-  P.spawn = function () {
-    if (vgOn(this)) { const j = this.job; this.job = this.job || { fake: true }; sp.call(this); if (this.job && this.job.fake) this.job = j; return; }
-    sp.call(this);
-  };
   const up = P.update;
   P.update = function (dt) { const d0 = this.s.dist; up.call(this, dt); this.tyreUpdate(dt, Math.abs(this.s.dist - d0) / 1000); if (vgOn(this)) this.vgUpdate(dt); };
 
@@ -299,7 +293,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (ap.t > 14 && this.ap === ap) {
         T.p[i] = TYRE_P; T.leak[i] = 0; this.ap = null;
         if (!this.addItem('forata')) this.say('La gomma forata non ci sta nel bagagliaio: la lasci sul ciglio della strada');
-        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Mario.`, 'buy');
+        this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Nico.`, 'buy');
       }
     };
     return { ok: true };
@@ -319,7 +313,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.repairTyre = function () {
     const i = this.s.trunk.findIndex((it) => it.kind === 'forata'); if (i < 0) return { ok: false, why: 'Non hai gomme forate da riparare' };
     if (this.s.money < 25) return { ok: false, why: 'Costa € 25' };
-    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Mario ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
+    this.s.money -= 25; this.s.trunk[i] = { kind: 'scorta', kg: 14 }; this.applyMass(); this.say('Nico ripara la gomma: è di nuovo la ruota di scorta (− € 25)', 'buy'); return { ok: true };
   };
 
   // ------------------------------------------------------------ ciclo del viaggio
@@ -329,7 +323,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (this.mode !== 'career') return;
     // paesaggio della strada
     const lid = VG.locAt(km);
-    if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap && !this.race) {
+    if ((!this.loc || this.loc.id !== lid) && !this.inside && !this.prompt && !this.ap) {
       const was = this.loc && this.loc.id; this.setLoc(lid);
       if (was && was !== lid && !this.loc.cap) this.say(`${this.loc.name}. Non ricordi di aver passato un confine.`, 'info');
     }
@@ -359,14 +353,14 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // sonno: colpi di sonno sempre più frequenti; a zero ti addormenti
     v.blackout = Math.max(0, v.blackout - dt * 1.4);
     if (Math.abs(sim.v) > 3 && N.sleep < 0.22 && !v.blackout && Math.random() < dt * (0.22 - N.sleep) * 0.9) {
-      v.blackout = 1; if (Math.random() < 0.5 && !this.race && !this.ap) { this.lane = Math.max(1, Math.min(3, this.lane + (Math.random() < 0.5 ? 1 : -1))); this.manualT = 2; }
+      v.blackout = 1; if (Math.random() < 0.5 && !this.ap) { this.lane = Math.max(1, Math.min(3, this.lane + (Math.random() < 0.5 ? 1 : -1))); this.manualT = 2; }
       this.say('Colpo di sonno!', 'bad');
     }
     // fame e sete a zero: le mani non rispondono bene (il gas va e viene)
     v.weak = low < 0.08 ? 1 : 0;
     // rimorchio sopra i 110 km/h: sbanda
     v.sway = v.trailerOn && !VG_CARGO[this.car] ? Math.max(0, (Math.abs(sim.v) * 3.6 - 110) / 30) : 0;
-    if (v.sway > 0.6 && Math.random() < dt * v.sway * 0.4 && !this.race) { this.say('Il rimorchio sbanda: rallenta!', 'bad'); sim.v *= 0.985; }
+    if (v.sway > 0.6 && Math.random() < dt * v.sway * 0.4) { this.say('Il rimorchio sbanda: rallenta!', 'bad'); sim.v *= 0.985; }
     // capitoli
     for (const c of VG_CHAPTERS) if (km >= c.km && !v.chapters[c.km]) { if (!this.prompt) this.vgChapter(c.km); break; }
     // locale appena raggiunto (si gestisce quando si è dentro)
@@ -378,7 +372,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // linea dell'autobus: fermate lungo la strada
     // quello che non torna
     v.glitch = Math.max(0, v.glitch - dt);
-    if (km > v.nextOdd && !this.prompt && !this.inside && !this.race && !this.ap) this.vgOdd('road', km);
+    if (km > v.nextOdd && !this.prompt && !this.inside && !this.ap) this.vgOdd('road', km);
     // cippi chilometrici: cartelli speciali piazzati poco avanti
     this.ents = this.ents.filter((e) => !(e.kind === 'vgsign' || e.kind === 'parked') || e.x - this.s.dist > -150);
   };
@@ -395,7 +389,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgSeats = function () { return VG_SEATS[this.car] || 3; };
   P.vgHitch = function (dt, km) {
     const v = this.s.vg, d = this.s.dist;
-    if (this.car === 'bus' || this.race) return;
+    if (this.car === 'bus') return;
     // compare al bordo strada più avanti
     if (km > v.nextHitch && !this.ents.some((e) => e.kind === 'hitch')) {
       v.nextHitch = km + 2.5 + Math.random() * 4.5;
@@ -446,7 +440,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
       if (st && st.mirror) v.mirror = 1;
       // chi non scende: sparisce a metà strada
       if (st && st.vanish && km > p.from + 3 && !p.gone) { p.gone = true; }
-      if (km >= p.to - 0.05 && !p.leaving && !this.ap && !this.race) {
+      if (km >= p.to - 0.05 && !p.leaving && !this.ap) {
         p.leaving = true;
         const stopX = Math.max(this.s.dist + 40, p.to * 1000);
         this.stopAt(stopX, () => { this.vgDrop(p); const ap = this.ap; if (ap) ap.tick = () => { if (ap.t > 1.4 && this.ap === ap) this.ap = null; }; });   // scende, saluta, si riparte
@@ -472,7 +466,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // consegne: la merce con questa tappa come destinazione
     let got = 0, n = 0, first = false;
     this.s.trunk = this.s.trunk.filter((it) => { if ((it.kind === 'scatola' || it.kind === 'bancale') && it.to === pl.n) { got += it.pay || 0; n++; if (it.first) first = true; return false; } return true; });
-    if (first) { v.firstDone = true; this.fx.push({ k: 'missionDone', pay: VG_FIRST.pay }); this.say(`Primo lavoro fatto! Il benzinaio firma senza guardarti in faccia e ti conta i soldi sul cofano: + € ${VG_FIRST.pay.toLocaleString('it-IT')}. Adesso puoi comprare pezzi, benzina, un'altra auto.`, 'money'); }
+    if (first) { v.firstDone = true; this.fx.push({ k: 'missionDone', pay: VG_FIRST.pay }); this.say(`Primo lavoro fatto! Rossana, la benzinaia, firma senza guardarti in faccia e ti conta i soldi sul cofano: + € ${VG_FIRST.pay.toLocaleString('it-IT')}. Adesso puoi comprare pezzi, benzina, un'altra auto.`, 'money'); }
     if (n) { this.applyMass(); this.s.money += got; v.earned += got; v.jobs += n; this.say(`Consegnato: ${n} ${n === 1 ? 'collo' : 'colli'} a ${pl.name}, + € ${got}`, 'money'); }
     // linea dell'autobus: alla fermata scendono e salgono
     if (this.car === 'bus' && v.line) this.vgBusStop(pl);
@@ -515,7 +509,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     v.taken[key] = true;
     this.s.trunk.push({ kind: o.kind, kg: o.kg, to: o.to, pay: o.pay, first: !!o.first, name: o.first ? `Il pacco sigillato per ${o.toName} (km ${o.kmTo})` : `${INV[o.kind].name} per ${o.toName} (km ${o.kmTo})` });
     this.applyMass();
-    if (o.first) { this.say(`Il barista ti dà un pacco sigillato, pesante il giusto. «Portalo a ${o.toName}, al km ${o.kmTo}. Ti pagano lì.»`, 'job'); this.fx.push({ k: 'mission' }); }
+    if (o.first) { this.say(`Nabir, il barista, ti dà un pacco sigillato, pesante il giusto. «Portalo a ${o.toName}, al km ${o.kmTo}. Ti pagano lì.»`, 'job'); this.fx.push({ k: 'mission' }); }
     else this.say(`Carico ${o.kg} kg per ${o.toName}, km ${o.kmTo}: € ${o.pay} alla consegna`, 'job');
     return { ok: true };
   };
@@ -555,7 +549,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.vgShower = function (eur) { const r = this.vgPay(eur, 'Doccia'); if (r.ok) this.s.vg.needs.wash = 1; return r; };
   P.vgSleep = function () {
     const v = this.s.vg, km = vgKm(this), n = this.inside ? VG.stopIndex(this.inside.x) : -1;
-    const r = this.vgPay(60, 'Notte al Motel Ovunque'); if (!r.ok) return r;
+    const r = this.vgPay(60, 'Notte al Motel 4Ever'); if (!r.ok) return r;
     v.needs.sleep = 1; v.needs.wash = Math.min(1, v.needs.wash + 0.2); v.needs.food = Math.max(0, v.needs.food - 0.15); v.needs.water = Math.max(0, v.needs.water - 0.2);
     v.lastMotel = n; v.sleepAt = km;
     return r;

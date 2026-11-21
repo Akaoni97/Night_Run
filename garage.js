@@ -60,7 +60,7 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
     const re = () => window.telefono.render();
     const items = list.map((s) => {
       const c = CARS[s.id] || {}, spec = g.dlSpec ? g.dlSpec(s.id) : null, warn = [];
-      if (s.damage > 0.3) warn.push('carrozzeria da sistemare'); if (s.wear > 0.6) warn.push('gomme da cambiare'); if (s.oil < 0.3) warn.push('tagliando da fare'); if (s.tired) warn.push('motore stanco (revisione da Mario)');
+      if (s.damage > 0.3) warn.push('carrozzeria da sistemare'); if (s.wear > 0.6) warn.push('gomme da cambiare'); if (s.oil < 0.3) warn.push('tagliando da fare'); if (s.tired) warn.push('motore stanco (revisione da Nico)');
       return `<div class="gr-it"><div class="gr-top"><img alt="" src="${pic(s.id, re)}"><div><b>${esc(c.name || s.id)}</b>
         <small>${fmt(s.km)} km${spec ? ` · ${fmt(spec.cv)} CV · ${fmt(spec.kg)} kg` : ''}</small>
         <span class="gr-tag ${s.cur ? 'cur' : ''}">${s.cur ? 'La guidi ora' : 'In garage'}</span> <span class="gr-tag">${esc(typeof ST_CAT_ONE !== 'undefined' ? ST_CAT_ONE[s.cat] || '' : '')}</span>${s.test ? ' <span class="gr-tag t">Giro di prova</span>' : ''}
@@ -69,7 +69,7 @@ const GAR_NOMARCA = ['Taxi', 'Furgone', 'Autobus', 'Auto', 'Ambulanza'];    // m
         ${warn.length ? `<div class="gr-warn">${esc(warn.join(' · '))}</div>` : ''}</div>`;
     }).join('');
     return `<div class="view app"><div class="nav"><h3>Garage</h3></div><div class="body">
-      <div class="gr-hd"><b>${list.length} auto · valore € ${fmt(tot)}</b>Le auto si cambiano al Motel Ovunque e all'Autosalone Notte; si comprano lì o dai privati (app Annunci).</div>
+      <div class="gr-hd"><b>${list.length} auto · valore € ${fmt(tot)}</b>Le auto si cambiano al Motel 4Ever e all'Autosalone Notte; si comprano lì o dai privati (app Annunci).</div>
       ${items || '<p class="cen">Nessuna auto.</p>'}
     </div></div>`;
   }
