@@ -28,7 +28,7 @@ Aggiornata il 21/11/2026 (proprietario, con Claude).
 6. [interni] **Interni nuovi** (`interni_hd.js`): da guardare sul PC; le persone sono più grosse del resto della scena. (proprietario)
 7. [motori] **Vendere la V40 coi pezzi di Nico**: oggi i pezzi se ne vanno con l'auto. Tornano in magazzino o alzano il
    valore? (cognato; Nico è spento di serie dopo l'officina nuova del 21/11, da rivedere se ha ancora senso)
-8. [motori] **Pezzi singoli sulle altre auto** (oggi solo V40, `MOT_SERIE`). Quando? (cognato; stessa nota del 7)
+8. [officina] **Pezzi nuovi solo sulla V40** (v0.63: turbo 0,5/1,0/1,5 bar, downpipe, terminale, airbox, camme, cambio, gomme da drag, frizione da corsia): le altre auto hanno ancora i cataloghi corti. Estenderli? Quando? (cognato, proprietario)
 9. [motori] **Vecchio Pistone**: facciata, interno e pannello in `pistone/motori2d.js` non si usano più. Cancellare o
    riusare? (cognato)
 10. [personaggi] **Nico**: nessun disegno nell'interno di Luca; aspetto, carattere, come si sblocca. (cognato)
@@ -40,27 +40,28 @@ Aggiornata il 21/11/2026 (proprietario, con Claude).
 14. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
 15. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
     (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
-16. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti). (tutti e due)
+16. [officina] **Cosa riportare di Nico nell'officina semplice** (interni della V40, banco, motori costruiti): i pezzi nuovi della V40 (v0.63) coprono già parte di quello che faceva Nico. (tutti e due)
 
 ## Da provare giocando (sul PC)
 17. [windows] **Night Run per Windows (Codex, v0.62)**: installatore e portatile non provati. Controllare ascolto del
     motore, guida lunga, installazione e disinstallazione. (proprietario)
-18. [officina] **Officina nuova** (Modifiche e Swap motore) e **assetto a livelli**: valori tarati a occhio. (tutti e due)
-19. [motori] **Prezzi** dei livelli di Nico e **suono**/**calore** dei motori costruiti: contano solo se Nico torna acceso. (cognato)
-20. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
-21. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
-22. [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
+18. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. (tutti e due)
+19. [telefono] **Luca Garage** (v0.64): app che ti porta da Luca per € 150, cartellone al km 26. «Luca Garage» è un'interpretazione: prezzo e cartellone in `LG` e `TEL_APP_OFFERS`; il pulsante non è stato cliccato col mouse. Va bene così? (proprietario)
+20. [motori] **Prezzi** dei livelli di Nico e **suono**/**calore** dei motori costruiti: contano solo se Nico torna acceso. (cognato)
+21. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+22. [locali] **Entrata coi posti auto**: camminata di 5-6 s (U la salta), troppo lunga? (tutti e due)
+23. [motori] **Salvataggi vecchi**: chi aveva turbo, centralina, intercooler o frizione di Luca sulla V40 li riceve in
     soldi una volta sola. Controllare messaggio e conti. (tutti e due)
 
 ## Da sistemare
-23. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
+24. [pulizia] **Codice morto** delle vecchie gare e della vecchia storia (coupé «rival», `s.rep`, blocchi nascosti nella
     scheda Guida, app strane del telefono, `TEL_ATTI`). Sicuro con i test. (Claude, quando c'è tempo)
-24. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
-25. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
-26. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
-27. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
+25. [test] `test/motori.test.js` è il vecchio «Banco Suono 2JZ»: rinominarlo tocca due skill. (chi ha voglia)
+26. [disegni] **Camion**: la logica c'è, il proprietario manda i disegni. (proprietario)
+27. [grafica] **Alta definizione di marciapiedi, pedoni, oggetti, insegne**: si fa tra poco. (proprietario, Claude)
+28. [telefono] Riquadro dei traguardi sopra «Gira il telefono» in verticale: si lascia. (nessuno)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 21/11: officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
+- 21/11: Luca Garage (v0.64), pezzi nuovi V40 con pallini (v0.63), officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
 - 20/11: AUTO 1 dopo 5 s, leva con la S, tasti 1-4 solo per mangiare e bere, niente turbo nelle valigette, check completo
   del 20/11 sera senza errori.
