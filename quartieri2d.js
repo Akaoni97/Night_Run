@@ -386,6 +386,37 @@
     porto: ['worker', 'worker', 'forklift', 'worker'], lanterne: ['festive', 'festive', 'plain', 'couple'],
   };
   const PROPS = { casa: ['bike', 'bins'], centro: ['scooter', 'bins'], bassi: ['barrel', 'bags', 'cart', 'bags'], ricco: ['planter', 'bollards'], porto: ['pallets', 'drums'], lanterne: ['stall', 'stall'] };
+  // ---------------------------------------------------------------- passanti in alta definizione (leggeri)
+  // A densità doppia chi cammina è disegnato come il protagonista (pgPaint e pgOutline di personaggio.js), in pixel
+  // art vera. Per non pesare: un repertorio fisso di aspetti (PED_LOOKS: 24 qualunque, 4 incappucciati, 3 operai col
+  // caschetto, 3 in giacca scura), 8 pose di camminata per aspetto disegnate una volta e tenute in una scorta loro
+  // (PED.spr, non tocca quella del protagonista), al massimo 2 pose nuove per fotogramma: finché la posa non è pronta
+  // resta l'omino di prima. Fermi (fumatore, seduto), bambini e muletto restano come prima.
+  // (personaggio.js si carica dopo questo file: il repertorio si prepara la prima volta che serve)
+  let PED_LOOKS = null;
+  const pedLooks = () => {
+    if (PED_LOOKS) return PED_LOOKS;
+    if (typeof pgNorm !== 'function') return [];
+    let q = 7; const rr = () => rnd(q++ * 1.618);
+    const L = [];
+    for (let i = 0; i < 24; i++) { const o = typeof pgRandom === 'function' ? pgRandom(rr) : pgNorm({}); if (rr() < 0.55) o.testa = 'niente'; if (rr() < 0.7) o.barba = 'no'; if (rr() < 0.75) o.occhiali = 'no'; L.push(pgNorm(o)); }
+    for (let i = 0; i < 4; i++) L.push(pgNorm({ pelle: i % 5, capelli: 'rasati', capCol: 0, testa: 'niente', sopra: 'felpa', sopraCol: [1, 4, 3, 1][i], barba: i % 2 ? 'corta' : 'no', occhiali: 'no' }));
+    for (let i = 0; i < 3; i++) L.push(pgNorm({ pelle: (i * 2) % 5, capelli: 'corti', capCol: i, testa: 'berretto', testaCol: 5, sopra: 'giubbotto', sopraCol: 0, barba: i === 1 ? 'piena' : 'no', occhiali: 'no' }));
+    for (let i = 0; i < 3; i++) L.push(pgNorm({ pelle: (i + 1) % 5, capelli: i === 2 ? 'coda' : 'corti', capCol: [0, 5, 1][i], testa: 'niente', sopra: 'pelle', sopraCol: 1, barba: 'no', occhiali: i === 1 ? 'vista' : 'no' }));
+    return (PED_LOOKS = L);
+  };
+  const PED = { spr: new Map(), t: -1, budget: 0 };
+  const pedSprite = (li, f, t) => {
+    const k = li * 8 + f; let c = PED.spr.get(k); if (c) return c;
+    if (PED.t !== t) { PED.t = t; PED.budget = 2; }
+    if (PED.budget <= 0 || !pedLooks()[li] || typeof pgPaint !== 'function' || typeof document === 'undefined') return null;
+    PED.budget--;
+    c = document.createElement('canvas'); c.width = PG_SW; c.height = PG_SH;
+    const x = c.getContext('2d', { willReadFrequently: true }); pgPaint(x, pedLooks()[li], 'walk', f, false); pgOutline(x, '#0c0a12');
+    PED.spr.set(k, c); return c;
+  };
+  // che aspetto ha un passante: dal tipo (cappuccio, caschetto, giacca) e dal suo seme
+  const pedLook = (o) => { const n = Math.floor((o.seed || 0) * 9973); return o.head === 'hood' ? 24 + n % 4 : o.head === 'helmet' ? 28 + n % 3 : o.suit ? 31 + n % 3 : n % 24; };
   S.districtPeople = function (g, wx, from, to, t) {
     const C = this.C, ink = C.ink, SS = this.SS || 1, u = 1 / SS, night = 1 - (this.day || 0), rain = !!this.rainOn;
     const R = (v) => Math.round(v * SS) / SS;
@@ -397,6 +428,14 @@
       const Y = (v) => top + v * s;
       const lg = o.walk ? Math.floor(t * 7 + X * 0.1) % 2 : 0;
       px('rgba(4,5,12,.4)', X - 3, 229.5, 10 * s, 2);                                          // ombra
+      const spr = SS > 1 && o.walk && !o.small && pedLooks().length ? pedSprite(pedLook(o), Math.floor(((t * 1.6 + (o.seed || 0) * 8) % 1) * 8), t) : null;
+      if (spr) {
+        const k = 0.3 * s, cx = X + 2.5, w = PG_SW * k, h = PG_SH * k;          // alto come l'omino di prima (circa 25 unità)
+        g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+        if (dir < 0) { g.translate(cx * 2, 0); g.scale(-1, 1); }                // va a sinistra: specchiato
+        g.drawImage(spr, R(cx - 20 * k), R(229 - PG_FOOT * k), R(w), R(h));
+        g.restore();
+      } else {
       px(ink, X - 1, Y(-0.5), 7 * s + 0.5, 26 * s);                                              // contorno
       // gambe (o veste lunga)
       if (o.long) { px(o.coat, X, Y(6), 5 * s, 19 * s); px(Street2D.shade(o.coat, -0.3), X + (dir > 0 ? 0 : 4 * s), Y(6), 1 * s, 19 * s); }
@@ -413,6 +452,7 @@
       else if (o.head === 'hat') { px('#14141c', X - 1, Y(0.5), 7 * s, 1 * s); px('#14141c', X, Y(-1.5), 5 * s, 2 * s); }
       else if (o.head === 'bun') { px(hc, X, Y(-0.5), 5 * s, 2 * s); px(hc, X + (dir > 0 ? -1 : 4) * s, Y(-1.5), 2 * s, 2 * s); px(hc, X + (dir > 0 ? 0 : 4) * s, Y(1), 1 * s, 4 * s); }
       else { px(hc, X, Y(-0.5), 5 * s, 2 * s); px(hc, dir > 0 ? X : X + 4 * s, Y(0.5), 1 * s, 3 * s); }
+      }
       // oggetti in mano
       const hx = X + (dir > 0 ? 5.5 : -2.5) * s;
       if (o.item === 'bag') { px(ink, hx, Y(9), 3, 5); px(o.bagCol || '#d9c08a', hx, Y(9.5), 2, 4); }
@@ -496,7 +536,7 @@
           px(C.skin, X + 1, 213, 4, 4); px('#3a2a1a', X + 1, 212, 4, 2); px('#8a7a5a', X + 7, 227, 3, 2);   // tazza per le monete
           continue;
         }
-        const base = { dir, walk: !still };
+        const base = { dir, walk: !still, seed };
         if (kind === 'plain') fig(X, { ...base, coat: pal(['#2a1f4f', '#123049', '#3a1f2e', '#1f3a2e', '#4a2a1a', '#2a2a3a']), hair: pal(['#1a1010', '#3a2010', '#d9c08a', '#0a0a0a', '#7a3a1a', '#c0c0c0']), umbrella, item: seed > 0.8 ? 'bag' : null });
         else if (kind === 'shopper') fig(X, { ...base, coat: pal(['#7a2a4a', '#2a4a6a', '#5a4a2a']), hair: pal(['#3a2010', '#d9c08a', '#1a1010']), head: seed > 0.5 ? 'bun' : 'hair', item: D.id === 'casa' ? 'bag' : 'bags', bagCol: pal(['#ff2e88', '#2ee6ff', '#ffb000', '#f4f1e6']), umbrella });
         else if (kind === 'phone') fig(X, { ...base, coat: pal(['#1a1a2a', '#3a1f4a', '#123049']), hair: pal(['#0a0a0a', '#7a3a1a']), item: 'phone', umbrella });
@@ -504,7 +544,7 @@
           const dx = X + (dir > 0 ? 9 : -9), lg = Math.floor(t * 9) % 2; px(ink, dx - 1, 223, 8, 6); px('#8a5a2a', dx, 224, 6, 3); px('#8a5a2a', dx + (dir > 0 ? 5 : -1), 222, 2, 3);
           px('#5a3a1a', dx + 1 + lg, 227, 1, 2); px('#5a3a1a', dx + 4 - lg, 227, 1, 2); g.strokeStyle = '#1a1a1a'; g.lineWidth = u; g.beginPath(); g.moveTo(R(X + (dir > 0 ? 5 : 0)), 216); g.lineTo(R(dx + (dir > 0 ? 6 : 0)), 223); g.stroke(); }
         else if (kind === 'kid') fig(X, { ...base, small: true, coat: pal(['#d9b02a', '#c4241c', '#2a8ad8']), hair: '#3a2010' });
-        else if (kind === 'couple') { const o2 = { ...base, coat: pal(['#5a1a2a', '#2a3a5a']), hair: '#1a1010', umbrella }; fig(X, o2); fig(X + (dir > 0 ? -7 : 7), { ...o2, coat: pal(['#d9c08a', '#3a5a3a', '#7a2a4a']), hair: pal(['#d9c08a', '#3a2010']), head: 'bun', umbrella: null }); }
+        else if (kind === 'couple') { const o2 = { ...base, coat: pal(['#5a1a2a', '#2a3a5a']), hair: '#1a1010', umbrella }; fig(X, o2); fig(X + (dir > 0 ? -7 : 7), { ...o2, seed: (seed * 7.31 + 0.37) % 1, coat: pal(['#d9c08a', '#3a5a3a', '#7a2a4a']), hair: pal(['#d9c08a', '#3a2010']), head: 'bun', umbrella: null }); }
         else if (kind === 'hood') fig(X, { ...base, coat: pal(['#2a2e34', '#1f2a24', '#3a2e24', '#2a2a3a']), legs: '#2a3a5a', head: 'hood' });
         else if (kind === 'smoker') fig(X, { ...base, coat: pal(['#3a2e24', '#2a2e34']), legs: '#2a2a3a', hair: '#1a1010', item: 'cig' });
         else if (kind === 'suit') fig(X, { ...base, coat: pal(['#14161e', '#1a2030', '#2a2a30']), legs: '#14161e', hair: pal(['#1a1010', '#8a8a8a', '#3a2010']), suit: true, item: seed > 0.6 ? 'phone' : null, umbrella: '#14141c' });
