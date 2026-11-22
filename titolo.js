@@ -1,15 +1,16 @@
 // ============================================================================
 //  Night Run · La schermata iniziale (v1.02, chiesta da Nico: «una facciata da rifare completamente»)
-//  Sfondo: una scena animata alla risoluzione del gioco (tela 1280×720, coordinate 640×360, presentazione ×n netta e
-//  poi morbida), disegnata con gli attrezzi del gioco presi dal prologo (`NightPrologo.arte`: cielo e città, lampioni
-//  e coni di luce di Street2D, auto ad alta definizione con le ruote che girano): l'autostrada di notte, la luna dietro
-//  le nuvole, la città lontana con le antenne, l'insegna «SOLO AVANTI» sul tetto, il portale che passa, il traffico
-//  (anche i camion) e in primo piano **l'auto della partita scelta**, coi fari, i fanali e ogni tanto un botto dallo
-//  scarico. Ogni tanto un lampione si spegne da solo: la storia è horror.
+//  Sfondo (v1.03, dopo la prova di Nico: l'animazione scattava e le ruote sembravano ferme): un quadro fermo, disegnato
+//  una volta sola alla risoluzione del gioco (tela 1280×720, coordinate 640×360, presentazione ×n netta e poi morbida)
+//  con gli attrezzi del prologo (`NightPrologo.arte`): l'autostrada di notte, la luna, la città con l'insegna «SOLO
+//  AVANTI», il cartello «USCITA 18 KM», i lampioni (quello in mezzo spento), le scie del traffico come in una foto a
+//  lunga posa e in primo piano **l'auto della partita scelta** ferma in corsia d'emergenza con le quattro frecce, e il
+//  protagonista appoggiato dietro che guarda il telefono. Si muove solo la «telecamera», piano, con una trasformazione
+//  CSS (fatta dalla scheda video: non ridisegna niente, non può scattare). Si ridisegna solo se cambia la finestra.
 //  Sopra: il logo nuovo (NIGHT RUN · THE LAST HIGHWAY) e il pannello (i tre salvataggi di salvataggi.js, il pulsante
 //  che dice «Continua il viaggio» se la partita è già cominciata, i comandi, Crediti). Stessi id di prima (#gate,
 //  #introMenu, #goBtn): index.html e gli altri file non cambiano. La scena si ferma quando la schermata si chiude.
-//  Prova: NightTitolo.foto(secondo) disegna un momento preciso.
+//  Prova: NightTitolo.foto() ridisegna il quadro.
 // ============================================================================
 (function titolo() {
   if (typeof document === 'undefined' || typeof window === 'undefined') return;
@@ -72,109 +73,80 @@
     const K = A.kit(x); if (!(K.curbHD && K.curbHD(x, 0, 30, W))) R(x, 0, 339, W, 21, '#2b2f45');
   }
 
-  // ------------------------------------------------------------ le auto
-  let mia = null, traf = [], camion = null, pronti = false;
+  // ------------------------------------------------------------ l'auto della partita (ferma: niente ruote che girano)
+  let mia = null;
   async function prepara() {
     const G = window.nightRun && window.nightRun.game, id = (G && G.car) || 'v40';
-    const ids = [id, 'panda', 'punto', 'polo', 'corsa', 'a80', 'golf', 'e30', 'p206'].filter((x, i, a) => a.indexOf(x) === i && typeof CARS !== 'undefined' && CARS[x] && CARS[x].sprite);
-    const cars = await Promise.all(ids.map((x) => A.carOf(x)));
-    mia = cars[0]; traf = cars.slice(1).filter(Boolean);
-    camion = await A.carOf('tir_container') || await A.carOf('tir');
-    pronti = true;
-  }
-  // il traffico: pochi veicoli che sorpassiamo nella corsia di sopra (più lenti) e che ci superano in quella di sotto
-  const VEI = [];
-  function nuovo(t, primo) {
-    const camionK = camion && hash(t * 3.1) < 0.28, C = camionK ? camion : traf[Math.floor(hash(t * 7.7) * traf.length)];
-    if (!C) return;
-    const s = camionK ? 0.44 : 0.82;
-    VEI.push({ C, s, gnd: 280, x: primo ? 300 + hash(t) * 300 : W + 40, v: -(90 + hash(t * 5.3) * 80), ang: 0 });
-  }
-
-  // ------------------------------------------------------------ la scena
-  let T0 = performance.now(), raf = 0, viva = true, lastT = 0, nextVei = 2, pops = [], nextPop = 4;
-  function scena(t, dt) {
-    g.setTransform(SS, 0, 0, SS, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false; A.kit(g);
-    const v = 820;                                                                    // unità al secondo: la strada scorre (≈100 km/h)
-    // cielo fermo, città e colline che scorrono piano
-    paste(layer('cielo', cielo));
-    const off = (t * 6) % W; paste(layer('colline', colline), -off); paste(layer('colline', colline), W - off);
-    // l'insegna sul tetto della città: SOLO AVANTI, rosa, che ogni tanto sfarfalla
-    { const on = hash(Math.floor(t * 8)) > 0.05, x0 = 130 - ((t * 3) % 900); for (const xx of [x0, x0 + 900]) if (xx > -120 && xx < W) { R(g, xx + 8, 150, 1, 10, '#1a1838'); R(g, xx + 70, 150, 1, 10, '#1a1838'); if (V().text) { const col = on ? '#ff5fa8' : '#5a2a48'; V().text(g, 'SOLO AVANTI', xx, 142, col, 1); if (on) light(g, xx + 39, 145, 50, 10, '#ff5fa8', 0.06); } } }
-    paste(layer('strada', strada));
-    // strisce che scorrono, lampioni coi coni di luce (uno ogni tanto si spegne da solo)
-    const px = t * v;
-    for (let k = -((px) % 64) - 64; k < W; k += 64) R(g, k, 286, 32, 2, '#d8d4c6');
-    for (let gx = -((px * 0.9) % 50) - 50; gx < W + 50; gx += 50) R(g, gx, 222, 2, 14, '#3a3e4e');
-    R(g, 0, 224, W, 4, '#5a5e70'); R(g, 0, 224, W, 1, '#8a90a8'); R(g, 0, 228, W, 1, '#2a2c38');
-    const lx0 = -((px * 0.75) % 380) - 40;
-    for (let i = 0; i < 3; i++) {
-      const lx = lx0 + i * 380, idx = Math.floor((px * 0.75) / 380) + i, morto = hash(idx * 1.7) < 0.14, fl = morto ? (hash(Math.floor(t * 14) + idx) > 0.7 ? 1 : 0) : 1;
-      if (V().lampHD) V().lampHD(g, lx, fl > 0, '#ffd9a0', idx);
-      if (fl > 0) { if (V().lampCone) V().lampCone(g, lx, '#ffd9a0', t, false); light(g, lx + 19, 126, 16, 8, '#ffd9a0', 0.12); light(g, lx + 19, 240, 60, 8, '#ffcf8a', 0.04); }
-    }
-    // il portale verde passa ogni tanto
-    { const per = 9, ph = t % per, gx = W + 40 - ph * 300;
-      if (gx > -270 && gx < W + 10) {
-        const uscita = Math.floor(t / per) % 2 === 1, a = uscita ? 'USCITA' : 'AUTOSTRADA', b = uscita ? '18 KM' : 'SOLO AVANTI';
-        R(g, gx - 8, 60, 6, 176, '#2a2c38'); R(g, gx + 236, 60, 6, 176, '#2a2c38'); R(g, gx - 8, 60, 250, 4, '#3a3e4e');
-        R(g, gx - 1, 66, 232, 70, INK); R(g, gx, 67, 230, 68, '#0b5a30'); R(g, gx + 3, 70, 224, 62, '#0e6a38'); R(g, gx + 6, 73, 218, 0.5, '#d8e8d8'); R(g, gx + 6, 128, 218, 0.5, '#d8e8d8');
-        if (V().text) { V().text(g, a, gx + 115 - V().textW(a, 2) / 2, 82, '#f2f2e6', 2); V().text(g, b, gx + 115 - V().textW(b, 2) / 2, 104, '#f2f2e6', 2); }
-        light(g, gx + 115, 100, 130, 40, '#9affc0', 0.025);
-      }
-    }
-    // il traffico della corsia di sopra (lo sorpassiamo)
-    if (pronti) {
-      if (t > nextVei) { nuovo(t, false); nextVei = t + 3 + hash(t * 2.2) * 4; }
-      for (const e of VEI) { e.x += e.v * dt; e.ang += (v + e.v) * dt / (e.C.D.wr * e.s); }
-      for (let i = VEI.length - 1; i >= 0; i--) if (VEI[i].x < -VEI[i].C.D.w * VEI[i].s - 40) VEI.splice(i, 1);
-      for (const e of VEI) {
-        const D = e.C.D, top = e.gnd - (D.wy + D.wr) * e.s;
-        A.shadowUnder(g, e.x, e.gnd, D.w * e.s, 0.5); A.drawCar(g, e.C, e.x, e.gnd, e.ang, e.s);
-        const tl = D.tail; R(g, e.x + tl[0] * e.s, top + tl[1] * e.s, Math.max(2, tl[2] * e.s), Math.max(2, tl[3] * e.s), '#ff3a2a'); light(g, e.x + tl[0] * e.s + 1, top + tl[1] * e.s + 1, 10, 5, '#ff3020', 0.14);
-        A.beam(g, e.x + D.head[0] * e.s, top + D.head[1] * e.s + 1, 120, 0.18, 0.6);
-      }
-    }
-    // la nostra auto: corsia di sotto, un po' a sinistra, che ondeggia appena; fari, fanali, e ogni tanto un botto
-    if (mia) {
-      const D = mia.D, x = 150 + Math.sin(t * 0.6) * 10, gnd = 326 + Math.sin(t * 11) * 0.3, top = gnd - (D.wy + D.wr);
-      A.reflect(g, x + D.head[0], gnd + 2, 16, 10, '#ffe8b0', 0.14, t); A.reflect(g, x + D.tail[0] + 2, gnd + 2, 12, 6, '#ff3a2a', 0.12, t);
-      A.shadowUnder(g, x, gnd, D.w, 0.65);
-      A.beam(g, x + D.head[0], top + D.head[1] + 2, 300, 0.36);
-      A.drawCar(g, mia, x, gnd, px / D.wr, 1);
-      const tl = D.tail; R(g, x + tl[0], top + tl[1], tl[2], tl[3], '#ff3a2a'); light(g, x + tl[0] + 2, top + tl[1] + 2, 16, 8, '#ff3020', 0.16);
-      light(g, x + D.head[0], top + D.head[1], 12, 7, '#fff0c8', 0.28);
-      // scarico: fumo leggero, e ogni tanto un botto con la fiammata
-      if (t > nextPop) { pops.push({ t0: t, x: x + D.ex[0], y: top + D.ex[1] }); nextPop = t + 5 + hash(t) * 7; }
-      for (const p of pops) {
-        const a = t - p.t0; if (a > 0.35) continue;
-        const k = 1 - a / 0.35, len = 10 + 14 * k;
-        g.save(); g.globalCompositeOperation = 'lighter';
-        g.fillStyle = `rgba(255,140,40,${0.8 * k})`; g.beginPath(); g.moveTo(p.x, p.y - 2); g.lineTo(p.x - len, p.y); g.lineTo(p.x, p.y + 2); g.fill();
-        g.fillStyle = `rgba(255,230,140,${0.9 * k})`; g.beginPath(); g.moveTo(p.x, p.y - 1); g.lineTo(p.x - len * 0.5, p.y); g.lineTo(p.x, p.y + 1); g.fill();
-        g.restore(); light(g, p.x - 6, p.y, 18, 10, '#ff8a2a', 0.2 * k);
-      }
-      pops = pops.filter((p) => t - p.t0 < 0.4);
-    }
-    // velo per leggere il logo (in alto a sinistra) e il pannello (a destra), e l'ombra ai bordi
-    const vl = g.createLinearGradient(0, 0, 0, 150); vl.addColorStop(0, 'rgba(6,5,16,.55)'); vl.addColorStop(1, 'rgba(6,5,16,0)'); g.fillStyle = vl; g.fillRect(0, 0, W, 150);
-    A.vignette(g, 0.5);
+    mia = (typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite) ? await A.carOf(id) : null;
+    if (!mia) mia = await A.carOf('v40');
   }
   const V = () => A.kit(g);
 
-  function frame(now) {
-    if (!viva) return;
-    raf = requestAnimationFrame(frame);
-    if (gate.hidden || gate.classList.contains('out')) { if (gate.hidden) { viva = false; cancelAnimationFrame(raf); } return; }
-    const t = (now - T0) / 1000, dt = Math.min(0.05, Math.max(0, t - lastT)); lastT = t;
-    try { scena(t, dt); present(); } catch (e) { console.warn('titolo', e); viva = false; }
+  // le scie del traffico come in una foto a lunga posa: fari bianchi e fanali rossi che attraversano tutta la strada
+  function scie(y, col, a, n, seed) {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < n; i++) {
+      const yy = y + (hash(seed + i) - 0.5) * 3, x0 = -20 + hash(seed + i * 3) * 120, x1 = W - hash(seed + i * 5) * 140, aa = a * (0.4 + hash(seed + i * 7) * 0.6);
+      const gr = g.createLinearGradient(x0, 0, x1, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.15, `rgba(${col},${aa})`); gr.addColorStop(0.85, `rgba(${col},${aa})`); gr.addColorStop(1, `rgba(${col},0)`);
+      g.fillStyle = gr; g.fillRect(x0, yy, x1 - x0, 0.5 + hash(seed + i * 11)); 
+      g.fillStyle = `rgba(${col},${aa * 0.25})`; g.fillRect(x0, yy - 1, x1 - x0, 3);   // l'alone
+    }
+    g.restore();
   }
+
+  // ------------------------------------------------------------ il quadro: si disegna una volta sola (e a ogni cambio di misura)
+  function quadro() {
+    g.setTransform(SS, 0, 0, SS, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false; A.kit(g);
+    const t = 3.2;                                                                     // un istante fisso (coni, riflessi, pulviscolo)
+    paste(layer('cielo', cielo)); paste(layer('colline', colline));
+    // l'insegna SOLO AVANTI sul tetto della città, rosa
+    { const xx = 120; R(g, xx + 8, 150, 1, 10, '#1a1838'); R(g, xx + 70, 150, 1, 10, '#1a1838'); if (V().text) { V().text(g, 'SOLO AVANTI', xx, 142, '#ff5fa8', 1); light(g, xx + 39, 145, 50, 10, '#ff5fa8', 0.07); } }
+    paste(layer('strada', strada));
+    for (let k = 4; k < W; k += 64) R(g, k, 286, 32, 2, '#d8d4c6');                                                    // tratteggio
+    for (let gx = 6; gx < W + 50; gx += 50) R(g, gx, 222, 2, 14, '#3a3e4e');                                           // guardrail
+    R(g, 0, 224, W, 4, '#5a5e70'); R(g, 0, 224, W, 1, '#8a90a8'); R(g, 0, 228, W, 1, '#2a2c38');
+    // il cartello verde a bordo strada: USCITA 18 KM (quello che non cambia mai)
+    { const sx = 206; R(g, sx + 6, 170, 3, 56, '#2a2c38'); R(g, sx + 58, 170, 3, 56, '#2a2c38'); R(g, sx - 1, 139, 70, 33, INK); R(g, sx, 140, 68, 31, '#0b5a30'); R(g, sx + 2, 142, 64, 27, '#0e6a38'); R(g, sx + 4, 144, 60, 0.5, '#d8e8d8');
+      if (V().text) { V().text(g, 'USCITA', sx + 34 - V().textW('USCITA', 1) / 2, 148, '#f2f2e6', 1); V().text(g, '18 KM', sx + 34 - V().textW('18 KM', 2) / 2, 156, '#f2f2e6', 2); } light(g, sx + 34, 156, 40, 18, '#9affc0', 0.03); }
+    // i lampioni: due accesi, quello in mezzo spento
+    for (const [lx, acceso] of [[70, true], [330, false], [530, true]]) {
+      if (V().lampHD) V().lampHD(g, lx, acceso, '#ffd9a0', lx);
+      if (acceso) { if (V().lampCone) V().lampCone(g, lx, '#ffd9a0', t, false); light(g, lx + 19, 126, 18, 9, '#ffd9a0', 0.14); light(g, lx + 19, 300, 90, 16, '#ffcf8a', 0.05); A.reflect(g, lx + 19, 240, 60, 10, '#ffd9a0', 0.12, t); }
+    }
+    // le scie del traffico nelle due corsie di sopra: chi va avanti (fanali rossi) e il riflesso sull'asfalto bagnato
+    scie(262, '255,60,40', 0.55, 5, 11); scie(268, '255,236,190', 0.45, 4, 23); scie(304, '255,60,40', 0.45, 4, 37); scie(310, '255,236,190', 0.4, 3, 41);
+    scie(252, '255,170,60', 0.35, 2, 53);                                                                               // le luci di ingombro di un camion
+    // la nostra auto ferma in corsia d'emergenza, con le quattro frecce e i fari accesi
+    if (mia) {
+      const D = mia.D, x = 196, gnd = 332, top = gnd - (D.wy + D.wr);
+      A.reflect(g, x + D.head[0], gnd + 2, 18, 12, '#ffe8b0', 0.16, t); A.reflect(g, x + D.tail[0] + 2, gnd + 2, 14, 7, '#ff3a2a', 0.14, t);
+      A.shadowUnder(g, x, gnd, D.w, 0.7);
+      A.beam(g, x + D.head[0], top + D.head[1] + 2, 300, 0.36);
+      A.drawCar(g, mia, x, gnd, 0, 1);
+      const tl = D.tail; R(g, x + tl[0], top + tl[1], tl[2], tl[3], '#ff3a2a'); light(g, x + tl[0] + 2, top + tl[1] + 2, 16, 8, '#ff3020', 0.18);
+      light(g, x + D.head[0], top + D.head[1], 12, 7, '#fff0c8', 0.3);
+      for (const [fx, fy] of [[tl[0] + 1, tl[1] - 3], [D.head[0] - 4, D.head[1] + 3]]) { R(g, x + fx, top + fy, 3, 2, '#ffae2a'); light(g, x + fx + 1, top + fy + 1, 14, 8, '#ffae2a', 0.22); }   // le quattro frecce
+      // lui, appoggiato dietro l'auto, che guarda il telefono acceso
+      if (typeof pgStanding === 'function') {
+        const px = x - 22, py = gnd + 4, look = window.NightPG ? NightPG.now() : null;
+        g.save(); pgStanding(g, px, py, 0.82, 0, false, look, 0.15, 1.3, 'phone'); g.restore();
+        light(g, px + 6, py - 50, 12, 10, '#7fd8ff', 0.2);
+      }
+    }
+    // velo per leggere il logo e il pannello, ombra ai bordi
+    const vl = g.createLinearGradient(0, 0, 0, 150); vl.addColorStop(0, 'rgba(6,5,16,.55)'); vl.addColorStop(1, 'rgba(6,5,16,0)'); g.fillStyle = vl; g.fillRect(0, 0, W, 150);
+    A.vignette(g, 0.5);
+  }
+  let giro = 0;
+  const ridisegna = () => { clearTimeout(giro); giro = setTimeout(() => { try { present(); } catch (e) { /* niente */ } }, 120); };
 
   // ------------------------------------------------------------ il pannello: logo, salvataggi, pulsante giusto
   const CSS = `
 .gate.intro.nt{background:#05040c}
 .gate.intro.nt::before,.gate.intro.nt::after{display:none!important}
-.gate.nt .nt-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity 1.2s}
+.gate.nt .nt-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:0;transition:opacity 1.2s;transform-origin:62% 70%;will-change:transform}
+.gate.nt.nt-on .nt-bg{animation:ntCam 46s ease-in-out infinite alternate}
+@keyframes ntCam{from{transform:scale(1.02) translate(0,0)}to{transform:scale(1.09) translate(-1.6%,-.6%)}}
 .gate.nt.nt-on .nt-bg{opacity:1}
 .gate.nt .intro-title{z-index:1;left:max(28px,4vw);top:max(26px,6vh);transform:none!important;justify-items:start;text-align:left;opacity:1}
 .gate.nt .intro-title .t1{font-size:clamp(46px,7.4vw,112px);text-shadow:0 0 30px rgba(255,95,168,.35),0 6px 0 rgba(0,0,0,.5)}
@@ -191,7 +163,7 @@
 @media (max-height:600px){.gate.nt .intro-title{top:14px}.gate.nt .intro-title .t1{font-size:clamp(34px,9vh,64px)}.gate.nt .intro-title .t3,.gate.nt .intro-title::after{display:none}}
 @media (max-height:520px){.gate.nt .intro-menu{bottom:8px;top:auto;max-height:calc(100% - 16px);overflow:auto;padding:12px 14px;gap:8px}.gate.nt .intro-menu ul,.gate.nt.nt-nuova .intro-menu ul,.gate.nt .intro-menu .keys{display:none!important}.gate.nt .intro-menu h2{font-size:18px}.gate.nt .nr-slots{margin:4px 0 0}}
 @media (max-height:520px) and (max-width:900px){.gate.nt .intro-title{display:none}}
-@media (prefers-reduced-motion:reduce){.gate.nt .nt-bg{transition:none}}`;
+@media (prefers-reduced-motion:reduce){.gate.nt .nt-bg{transition:none}.gate.nt.nt-on .nt-bg{animation:none}}`;
   const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
   gate.classList.add('nt');
   const cont = document.createElement('p'); cont.className = 'nt-cont'; const ul = menu.querySelector('ul'); if (ul) ul.after(cont);
@@ -209,11 +181,10 @@
 
   function avvia() {
     pannello();
-    prepara().then(() => { gate.classList.add('nt-on'); }).catch(() => {});
-    T0 = performance.now(); lastT = 0; raf = requestAnimationFrame(frame);
+    prepara().then(() => { quadro(); present(); gate.classList.add('nt-on'); window.addEventListener('resize', () => { if (!gate.hidden) ridisegna(); }); }).catch(() => {});
   }
   if (document.readyState === 'complete') setTimeout(avvia, 0); else window.addEventListener('load', avvia);
 
-  // per le prove: disegna il secondo t (senza aspettare) e lo porta sullo schermo
-  window.NightTitolo = { foto: (t) => { scena(t, 0.016); present(); }, pannello };
+  // per le prove: ridisegna il quadro subito
+  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello };
 })();
