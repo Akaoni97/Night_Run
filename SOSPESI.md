@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**22/11 sera, decisioni (Nico)**: 1-4 si provano stasera giocando; 5 sì come l'ha proposto Luca; 6 da provare; media dopo; bassa decisa (vedi 14-16). Numeri invariati.
+
 **22/11 sera, check (Nico)**: nuovi il 5 (anomalie, decidi tu) e il 6 (la notte); dal vecchio 5 in poi tutto scala di due (il 5 ora è il 7... il 17 è il 19).
 
 **22/11 notte (Nico)**: nuovo il 3 (fisica e trazione vere, v0.86); dal vecchio 3 in poi tutto scala di uno (il 3 ora è il 4... il 16 è il 17).
@@ -31,7 +33,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
     volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
 
 ### Notte e storia
-5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). È storia: **decidi tu** sì/no e se coi loro testi o coi tuoi. (proprietario)
+5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). **Deciso da Nico (22/11): sì, così come l'ha proposto Luca**, coi loro testi: da scrivere in `VG_ODD`. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; nel titolo della radio i caratteri del fruscio (▒) escono come spazi vuoti. Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
 
 ## Priorità media · decisioni e tarature
@@ -54,9 +56,9 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 ## Priorità bassa · rifiniture
 
 ### Meteo
-14. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
-15. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
-16. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+14. [meteo] **Il vento spinge davvero?** Deciso da Nico (22/11): sì, il vento incide nella fisica. (in lavoro)
+15. [meteo] **Neve e nebbia anche in città?** Deciso da Nico (22/11): sì; il meteo dinamico va anche secondo l'ora. (in lavoro)
+16. [meteo] **Nebbia di notte** e fruscio del vento. Deciso da Nico (22/11): nebbia di notte sì, nei momenti horror e ogni tanto; fruscio del vento sì ma non fastidioso. (in lavoro)
 
 ## Da guardare · arrivati il 22/11
 
