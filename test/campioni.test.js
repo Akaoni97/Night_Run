@@ -181,6 +181,9 @@ const simFinta = (o = {}) => Object.assign({ running: true, rpm: 3000, thr: 0, c
 const passi = (P, sim, sec, fn, ev = () => []) => { const dt = 1 / 60; for (let t = 0; t < sec; t += dt) { if (fn) fn(sim, t); P.pl.tick(sim, ev(t), dt, { view: 1, env: 0, vol: 0.8, exh: 1 }); P.ctx.currentTime += dt; } };
 
 test('campioni: valvola sul pssh della fisica, borbottio quando molli, botti della mappa, limitatore, aspirazione, spurgo, cambio', () => {
+  // il caso del lettore (botti a caso nel rilascio) con un seme fisso: la prova dà sempre lo stesso risultato (prima 1 volta su ~30 zero botti)
+  const rnd0 = Math.random; let seme = 12345; Math.random = () => ((seme = (seme * 1103515245 + 12345) % 2147483648) / 2147483648);
+  try {
   const res = { valvola: 'valvola/stututu', scarico: 'scarico/borbottio', mappa: 'mappa/pop_bang', limitatore: 'limitatore/colpi', aspirazione: 'aspirazione/fungo', spurgo: 'spurgo/classico', cambio: 'cambio/sequenziale', wastegate: 'wastegate/screamer', turbo: 'turbo/sibilo' };
   const P = player(res, { spark: true });
   const s = simFinta();
@@ -223,6 +226,7 @@ test('campioni: valvola sul pssh della fisica, borbottio quando molli, botti del
   s.gear = 0; passi(P, s, 0.3); assert.ok(!P.pl.loops.cambio || P.pl.loops.cambio.g.gain.value < 0.01);
   // tolto il kit l'anello si ferma
   P.pl.setKits(Object.assign({}, res, { turbo: null }), { spark: true }); passi(P, s, 0.1); assert.equal(P.pl.loops.turbo, undefined);
+  } finally { Math.random = rnd0; }
 });
 
 test('campioni: l\'anti-lag spara al rilascio col turbo lanciato e a ogni cambiata', () => {
