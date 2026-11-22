@@ -125,7 +125,7 @@ function cmpInfo(T, sel, TP, carId) {
     exLv: lv('exhaust'), exId: bare(it('exhaust')), decat: T.cat ? bare(it('cat')) === 'decat' : false,
     diesel: !!voice.diesel, cyl: dsp.cyl || (carId === 'supra' ? 6 : 4),
     ecuPops: !!sim.ecuPops, spark: !!sim.sparkCut, launch: !!sim.ecuLaunch,
-    limId: T.limiter ? bare(it('limiter')) : 'oem', gbLv: lv('gearbox'), finLv: lv('final'),
+    limId: T.limiter ? bare(it('limiter')) : 'oem', gbLv: lv('gearbox'), gbId: T.gearbox ? bare(it('gearbox')) : 'oem', finLv: lv('final'),
   };
 }
 // cosa serve montato perché un componente (o un kit) suoni: null se c'è tutto, altrimenti il perché
@@ -158,12 +158,14 @@ function cmpAuto(slot, x) {
       if (x.turboLv === 0) return null;
       if (x.turboId === 't51r') return 'turbo/sirena';
       if (x.turboId === 'efr9180') return 'turbo/fischio';
+      { const N = { tb_basso: 'turbo/fischio', tb_vgt: 'turbo/sibilo', tb_twin: 'turbo/ululato', tb_alto: 'turbo/ululato', tb_drag: 'turbo/sirena' }[x.turboId]; if (N) return N; }   // turbo comuni (v0.91)
       return x.bar <= 0.8 ? 'turbo/fischio' : x.bar <= 1.3 ? 'turbo/sibilo' : 'turbo/ululato';
     case 'compressore': return x.scVol ? 'compressore/volumetrico' : 'compressore/centrifugo';
     case 'wastegate': return x.wgLibera ? 'wastegate/screamer' : null;
     case 'aspirazione':
       if (x.intakeLv === 0) return null;
-      return x.itb ? 'aspirazione/cornetti' : x.intakeId === 'ram' ? 'aspirazione/airbox' : 'aspirazione/fungo';
+      if (x.itb || x.intakeId === 'cornetti') return 'aspirazione/cornetti';
+      return ['ram', 'airbox', 'pannello'].includes(x.intakeId) ? 'aspirazione/airbox' : 'aspirazione/fungo';   // scatola chiusa: boccata piena; cono e fungo: risucchio
     case 'scarico': {
       if (x.exLv === 0) return null;
       const S = { hks: 'scarico/cupo', apexi: 'scarico/scoppiettio', tomei: 'scarico/titanio', blitz: 'scarico/borbottio', straight: 'scarico/pentola' }[x.exId];
@@ -174,7 +176,10 @@ function cmpAuto(slot, x) {
     }
     case 'mappa': return x.ecuPops ? 'mappa/crackle' : null;
     case 'limitatore': return { msd: 'limitatore/colpi', '2step': 'limitatore/due_step', '3step': 'limitatore/fucilata', stutter: 'limitatore/stutter' }[x.limId] || null;
-    case 'cambio': return x.gbLv >= 2 ? 'cambio/sequenziale' : x.gbLv === 1 ? 'cambio/denti_dritti' : null;
+    case 'cambio':
+      if (x.gbId === 'race') return 'cambio/sequenziale';           // cambio da corsa a innesti frontali (v0.91)
+      if (x.gbId === 'sport') return 'cambio/denti_dritti';
+      return x.gbLv >= 2 ? 'cambio/sequenziale' : x.gbLv === 1 ? 'cambio/denti_dritti' : null;
     default: return null;                  // spurgo: nessun pezzo lo porta, si sceglie a mano
   }
 }

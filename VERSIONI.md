@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.89**
+**Versione attuale: v0.91**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -113,3 +113,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.88 | 22/11 | proprietario | Rapporti veri del cambio per tutte le auto da disegno (ricerca di Codex in `docs/fisica/RAPPORTO_CODEX_CAMBI.md`): Panda, Panda 141, Polo, Twingo, 206, 308, A3, Audi 80, A112, Doblò, 850 R (M56H della T-5R); corretti i finali di AX, Clio, Corsa, Sandero e Punto; raggio delle ruote dalla misura vera delle gomme di serie (`genRaggio`) |
 | v0.89 | 22/11 | cognato | La notte: di notte meno volanti e più cose strane, radio che disturba ripetendo avvisi già sentiti, scena «Quella dietro» al benzinaio, interfaccia Essenziale/Meccanico, buio giocabile nelle incursioni, prova dei finali |
 | v0.90 | 22/11 | proprietario | Meteo deciso da Nico: il vento entra nella fisica (`sim.windV` contro/a favore, `sim.windX` di traverso, di serie 0), neve e nebbia anche in città, tempo dinamico secondo paesaggio e ora (`meteoPesi`), di notte nebbia solo ogni tanto e nei momenti horror (incursioni, cose strane), fruscio del vento più basso e morbido; test `test/meteo.test.js` |
+| v0.91 | 22/11 | cognato | Luca Tuning rifatto da meccanico (auto da disegno e V40): aspirazione a scelta (pannello, cono, fungo, airbox con presa fredda, corpi farfallati coi cornetti che ululano), cilindrata con la maggiorazione +300 cc come ultimo passo, cinque turbo nuovi (piccolo che tira dal basso, grosso che tira in alto, biturbo sequenziale, geometria variabile, drag a 2 bar), reparto Benzina e iniettori (quanta pressione regge il motore), cambio sport con un rapporto regolabile per tutte le marce e da corsa regolabile marcia per marcia (cursori in officina, cambiate più rapide), slick da drag anche su Supra e V40, voci dei campioni per i pezzi nuovi; test `test/lucatuning.test.js` |
