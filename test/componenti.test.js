@@ -1,5 +1,5 @@
-// Le illustrazioni dei componenti (componenti.js): ogni pezzo della Supra ha il suo disegno, le altre auto prendono
-// quello dello stesso reparto a un livello simile; i premi «pezzo» delle valigette portano l'illustrazione.
+// Le illustrazioni dei componenti (componenti.js): una libreria comune a tutte le auto (la Supra è come le altre), stesse
+// regole per ognuna (nome del pezzo, poi livello nel suo catalogo); i premi «pezzo» delle valigette portano l'illustrazione.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
@@ -17,11 +17,20 @@ test('i file dello zip ci sono e il catalogo combacia col foglio', () => {
   }
 });
 
-test('ogni pezzo della Supra ha il suo disegno esatto', () => {
-  for (const cat of Object.keys(E.COMP_POS)) for (const it of E.TUNING[cat] ? E.TUNING[cat].items : []) {
-    const p = E.compPos(cat, it.id, E.TUNING[cat].items);
-    if (E.COMP_POS[cat].some((r) => r[0] === it.id)) assert.ok(p, `${cat}:${it.id}`);
+test('stesse regole per tutte le auto: il primo pezzo è quello di serie, il nome conta, poi il livello', () => {
+  const nm = (cat, p) => (p ? E.COMP_POS[cat].find((t) => t[1] === p.x && t[2] === p.y)[0] : null);
+  for (const id of E.CAR_IDS) {
+    const t = id === 'supra' ? E.TUNING : E.CARS[id].tuning; if (!t) continue;
+    for (const cat of ['exhaust', 'suspension', 'tires', 'intake', 'cat']) if (t[cat] && t[cat].items.length > 1) {
+      assert.equal(nm(cat, E.compPos(cat, t[cat].items[0].id, t[cat].items)), E.COMP_POS[cat][0][0], `${id} ${cat}: di serie`);
+    }
+    if (t.tires) for (const it of t.tires.items) if (/drag|^slick/.test(it.id)) assert.equal(nm('tires', E.compPos('tires', it.id, t.tires.items)), 'etstreet', `${id} ${it.id}`);
+    if (t.turbo) for (const it of t.turbo.items) if (/twin/.test(it.id)) assert.equal(nm('turbo', E.compPos('turbo', it.id, t.turbo.items)), 'ct12b', `${id} biturbo`);
   }
+  // un catalogo inventato, senza nessun nome della libreria: dal più semplice al più spinto
+  const items = ['oem', 'a', 'b', 'c', 'd'], liv = items.slice(1).map((x) => E.compPos('exhaust', x, items).x);
+  assert.deepEqual(liv, [...liv].sort((p, q) => p - q), 'livelli in ordine');
+  assert.ok(liv[liv.length - 1] > liv[0]);
 });
 
 test('le altre auto: stesso reparto, livello simile; di serie = di serie, il più spinto = il più spinto', () => {

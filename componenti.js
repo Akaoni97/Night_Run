@@ -1,10 +1,12 @@
 // ============================================================================
 //  Night Run · Le illustrazioni dei componenti (22/11, dallo zip del proprietario «Night-Run-Sprite-Componenti»)
-//  Un foglio con tutti i pezzi della Supra (img/componenti/atlas.png 128×96 per pezzo, atlas_hd.png 256×192) e sei
-//  cornici per le rarità delle valigette (img/componenti/rarita/*.png). Provenienza in img/componenti/catalogo.json.
-//  - compPos(cat, id, items): la casella del foglio per un pezzo. La Supra ha i suoi disegni esatti; le altre auto
-//    prendono il pezzo dello stesso reparto a un livello simile (primo = di serie, ultimo = il più spinto), con qualche
-//    abbinamento per nome (gomme da drag → ET Street, cambio da corsa → ravvicinato...). Reparti senza disegno: null.
+//  Una libreria di componenti COMUNE A TUTTE LE AUTO (la Supra è un'auto come le altre): un foglio con un disegno per
+//  tipo e livello di pezzo (img/componenti/atlas.png 128×96 per disegno, atlas_hd.png 256×192) e sei cornici per le
+//  rarità delle valigette (img/componenti/rarita/*.png). Provenienza in img/componenti/catalogo.json.
+//  - compPos(cat, id, items): il disegno per un pezzo, con le stesse regole per ogni auto. Prima il nome (gomme da drag
+//    → disegno delle slick, biturbo → disegno coi due turbo, nessun turbo → niente; un id uguale al nome di un disegno
+//    lo prende), poi il livello nel catalogo di quell'auto: il primo pezzo (di serie) → il disegno di serie, gli altri
+//    distribuiti dal più semplice al più spinto sui disegni rimasti del reparto. Reparti senza disegno: null.
 //  - compHTML(cat, id): un riquadro HTML con l'illustrazione (scheda del pezzo nell'officina, officina.js).
 //  - compImg(cb) carica il foglio HD e la funzione compDraw(g, pos, x, y, w, h) lo disegna su una tela (valigette.js).
 //  Funzioni pure provate in test/componenti.test.js.
@@ -13,7 +15,7 @@ const COMP = {
   atlas: 'img/componenti/atlas.png', atlasHd: 'img/componenti/atlas_hd.png', cell: [128, 96], cellHd: [256, 192], cols: 6, rows: 14,
   rarita: ['comune', 'noncomune', 'raro', 'epico', 'mitico', 'leggendario'].map((r) => 'img/componenti/rarita/' + r + '.png'),
 };
-// [id, colonna, riga] in ordine di livello, come nel catalogo dello zip
+// i disegni del foglio per reparto, dal livello di serie al più spinto: [nome del disegno, colonna, riga]
 const COMP_POS = {
   turbo: [['ct12b', 0, 0], ['gtx3582', 1, 0], ['pte6466', 2, 0], ['efr9180', 3, 0], ['t51r', 4, 0]],
   exhaust: [['oem', 0, 1], ['hks', 1, 1], ['apexi', 2, 1], ['tomei', 3, 1], ['blitz', 4, 1], ['straight', 5, 1]],
@@ -30,29 +32,40 @@ const COMP_POS = {
   tires: [['oem', 0, 12], ['r888r', 1, 12], ['etstreet', 2, 12]],
   final: [['oem', 0, 13], ['f3769', 1, 13], ['osg4083', 2, 13]],
 };
-// abbinamenti per nome dei pezzi delle altre auto (id → id del foglio), prima del livello
+// regole per nome, uguali per tutte le auto: il tipo di pezzo dice il disegno (null = niente disegno)
 const COMP_NOMI = {
-  tires: { sport: 'r888r', semislick: 'r888r', slick: 'etstreet', drag: 'etstreet' },
-  suspension: { coilover: 'tein' },
-  gearbox: { sport: 'close', race: 'close', drag: 'close', g245: 'close' },
-  clutch: { sport: 'osgiken', race: 'osgiken' },
-  final: { quaife: 'osg4083', lsd: 'osg4083' },
-  intercooler: { fmic: 'hks' },
-  turbo: { none: null },
-  bov: { none: null },
+  turbo: (id) => (/^(none|sc|compressore)/.test(id) ? null : /twin|biturbo|ct12/.test(id) ? 'ct12b' : undefined),
+  bov: (id) => (id === 'none' ? null : undefined),
+  tires: (id) => (/drag|slick(?!s)|etstreet/.test(id) && !/semi/.test(id) ? 'etstreet' : /sport|semi|r888/.test(id) ? 'r888r' : undefined),
+  suspension: (id) => (/coil/.test(id) ? 'tein' : undefined),
+  gearbox: (id) => (id !== 'oem' && id !== 'stock' ? 'close' : undefined),
+  clutch: (id) => (id !== 'oem' && id !== 'stock' ? 'osgiken' : undefined),
+  final: (id) => (/lsd|quaife|auto/.test(id) ? 'osg4083' : undefined),
+  intercooler: (id) => (/fmic|front|grande/.test(id) ? 'hks' : undefined),
+  cat: (id) => (/decat|pista/.test(id) ? 'decat' : undefined),
+  exhaust: (id) => (/race|gara|straight|dritto/.test(id) ? 'straight' : undefined),
 };
+// i disegni di un reparto che fanno da «scala» per i pezzi senza regola di nome (il disegno coi due turbo resta ai
+// biturbo, lo scarico dritto a quelli da gara)
+const COMP_SCALA = { turbo: (t) => t.filter((r) => r[0] !== 'ct12b'), exhaust: (t) => t.slice(1).filter((r) => r[0] !== 'straight') };
 
-// la casella { x, y } (in celle) per il pezzo id del reparto cat; items = i pezzi di quel reparto sull'auto (per il livello)
+// il disegno { x, y } (in celle) per il pezzo id del reparto cat; items = i pezzi di quel reparto sull'auto
 function compPos(cat, id, items) {
   const tab = COMP_POS[cat]; if (!tab) return null;
-  const nomi = COMP_NOMI[cat] || {};
-  if (Object.prototype.hasOwnProperty.call(nomi, id)) { const n = nomi[id]; if (n === null) return null; const e = tab.find((r) => r[0] === n); return e ? { x: e[1], y: e[2] } : null; }
-  const ex = tab.find((r) => r[0] === id);
-  if (ex) return { x: ex[1], y: ex[2] };
-  const lista = (items || []).map((it) => (typeof it === 'string' ? it : it.id)).filter((x) => !(Object.prototype.hasOwnProperty.call(nomi, x) && nomi[x] === null));
-  const i = lista.indexOf(id); if (i < 0) return null;
-  const lv = lista.length <= 1 ? 0 : Math.round(i / (lista.length - 1) * (tab.length - 1));
-  const e = tab[Math.max(0, Math.min(tab.length - 1, lv))];
+  const regola = COMP_NOMI[cat] || (() => undefined);
+  const nome = (x) => { const r = regola(x); if (r !== undefined) return r; return tab.some((t) => t[0] === x) ? x : undefined; };
+  const cella = (n) => { const e = tab.find((t) => t[0] === n); return e ? { x: e[1], y: e[2] } : null; };
+  const n = nome(id);
+  if (n === null) return null;
+  if (n !== undefined) return cella(n);
+  const lista = (items || []).map((it) => (typeof it === 'string' ? it : it.id));
+  if (!lista.includes(id)) return null;
+  if (lista[0] === id && cat !== 'turbo') return { x: tab[0][1], y: tab[0][2] };     // il primo del catalogo è quello di serie
+  const resto = lista.filter((x, i) => nome(x) === undefined && !(i === 0 && cat !== 'turbo'));
+  const scala = COMP_SCALA[cat] ? COMP_SCALA[cat](tab) : tab.slice(1);
+  if (!scala.length) return null;
+  const i = resto.indexOf(id), lv = resto.length <= 1 ? 0 : Math.round(i / (resto.length - 1) * (scala.length - 1));
+  const e = scala[Math.max(0, Math.min(scala.length - 1, lv))];
   return { x: e[1], y: e[2] };
 }
 // i pezzi del reparto sull'auto in uso (TUNING di tuning.js/cars.js)
