@@ -16,13 +16,13 @@
 //  Parte pura (provata in test/campioni.test.js): cmpInfo, cmpServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo,
 //  cmpCompra, cmpMonta, cmpFiles, cmpIndiceI. Parte audio: CampioniPlayer (Web Audio). Parte grafica: NightCampioni.html.
 // ============================================================================
-const CMP_VER = 3;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
+const CMP_VER = 4;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
 const CMP_DIR = 'audio/campioni/';
 const CMP = {
   k: 1.1,                                  // livello generale dei campioni sopra il motore sintetizzato (misurato con strumenti/ascolta_campioni.js)
   voci: 14,                                // colpi insieme al massimo
   // livello di ogni componente (i file sono normalizzati a -1 dB sul più forte del kit)
-  g: { valvola: 0.7, turbo: 0.38, compressore: 0.36, wastegate: 0.42, aspirazione: 0.45, scarico: 0.55, mappa: 0.6, limitatore: 0.65, cambio: 0.24, spurgo: 0.5,
+  g: { valvola: 1.1, turbo: 0.5,  compressore: 0.36, wastegate: 0.42, aspirazione: 0.45, scarico: 0.55, mappa: 0.6, limitatore: 0.65, cambio: 0.24, spurgo: 0.5,
     chatter: 0.33, innesto: 0.4, aria: 0.22 },
   bus: { valvola: 'motore', turbo: 'motore', compressore: 'motore', wastegate: 'scarico', aspirazione: 'motore', scarico: 'scarico', mappa: 'scarico', limitatore: 'scarico', cambio: 'trasm', spurgo: 'motore' },
   rilascioRpm: 2200,                       // il borbottio parte solo se molli sopra questi giri
@@ -31,7 +31,7 @@ const CMP = {
 // per punto d'ascolto (0 abitacolo, 1 fuori, 2 cofano aperto): quanto arriva ogni gruppo e quanto è filtrato
 const CMP_VISTA = {
   scarico: { g: [0.55, 1.0, 0.4], lp: [1700, 16000, 2600] },
-  motore: { g: [0.45, 0.7, 1.0], lp: [3200, 12000, 16000] },
+  motore: { g: [0.6, 0.7, 1.0], lp: [5500, 12000, 16000] },     // v0.106: in abitacolo valvola e fischio si sentono, ovattati (prima 0,45 e 3.200 Hz: sparivano)
   trasm: { g: [1.0, 0.3, 0.5], lp: [7000, 4500, 7000] },
 };
 const CMP_ENV = [{ len: 0.35, wet: 0.07 }, { len: 0.9, wet: 0.2 }, { len: 2.6, wet: 0.5 }];   // strada aperta, città, galleria

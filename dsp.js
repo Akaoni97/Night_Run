@@ -77,6 +77,10 @@ class EngineDSP {
     // turbo naturale: banda d'aria risonante alla frequenza della girante, deriva lenta di intonazione e volume
     this.wBP = new BQ().set('bp', 4000, 18, sr); this.wBP2 = new BQ().set('bp', 6000, 12, sr); this.wLP = new BQ().set('lp', 6500, 0.6, sr);
     this.wDrift = 0; this.wAmp = 0; this.wN = 0;
+    // soffio dell'aria nel compressore (v0.106): due bande che salgono con la girante, sibilo d'aspirazione, soffio della wastegate
+    this.whA = new BQ().set('bp', 1600, 0.9, sr); this.whB = new BQ().set('bp', 3000, 1.1, sr); this.whHP = new BQ().set('hp', 5200, 0.7, sr);
+    this.wgBP = new BQ().set('bp', 2300, 1.3, sr); this.tLift = 0; this.tThr = 0;
+    this.bovLP = new BQ().set('lp', 2600, 0.7, sr);
     // valvola: strati con filtri propri, scatto d'apertura, tremolio dell'aria
     this.bovAir = new BQ().set('hp', 3200, 0.6, sr); this.bovLow = new BQ().set('bp', 650, 1.1, sr); this.bovWob = 0; this.bovClick = new BQ().set('hp', 1800, 0.7, sr);
     this.flAmp = 1; this.fxB = 1; this.fxT = 1; this.fxS = 1; this.flOn = 0; this.flPulse = 0; this.sgPh = 0; this.sgPh2 = 0; this.sgN = 0;
@@ -498,7 +502,7 @@ class EngineDSP {
     if (this.bov.env > 0) {
       const pr = Math.min(1, this.bov.t / this.bov.len);
       const b = this.tn.bov;
-      this.bovBP.set('bp', b.f0 - b.sw * pr, b.q, this.sr);
+      this.bovBP.set('bp', b.f0 * (1.25 - 0.25 * pr) - b.sw * pr, b.q, this.sr);   // parte alto e cala con la pressione
       this.bov.rate = 24 - 12 * pr;
     }
   }
@@ -667,20 +671,32 @@ class EngineDSP {
         this.tph2 += ft * 0.87 / sr; if (this.tph2 > 1) this.tph2 -= 1;
         whistle += S.sec * 0.8 * Math.sin(TAU * this.tph2);
       }
-      const tAmp = Math.pow(S.turbo, 1.7) * (0.22 + 0.78 * S.thr) * tb.w * (0.6 + 0.4 * tn.intake.wh);
-      let turbo = this.wLP.p(whistle * tAmp) + this.whooshBP.p(nz3) * S.turbo * S.air * tb.wh * tn.intake.wh;
+      // rilascio: la girante gira ancora a vuoto (valvola aperta), il fischio resta e cala con lei invece di sparire
+      if (S.thr < this.tThr - 0.35 && S.turbo > 0.3) this.tLift = 0.85;
+      this.tThr = S.thr; this.tLift *= this.tLiftDec || (this.tLiftDec = Math.exp(-1 / (sr * 0.9)));
+      const load = Math.max(0.22 + 0.78 * S.thr, this.tLift);
+      const tAmp = Math.pow(S.turbo, 1.7) * load * tb.w * (0.6 + 0.4 * tn.intake.wh) * 1.8;
+      // soffio: l'aria che passa davvero nel compressore (girante, farfalla, pressione); bande che salgono con la girante
+      const fl = S.turbo * (0.2 + 0.8 * S.air) * (1 + 0.5 * Math.min(2, Math.max(0, S.boost)));
+      if (this.wN === 16) { this.whA.set('bp', 1400 + 1200 * S.turbo, 0.9, sr); this.whB.set('bp', 2600 + 1900 * S.turbo, 1.1, sr); }
+      const whK = Math.max(0.035, tb.wh) * tn.intake.wh * 6.5;
+      let turbo = this.wLP.p(whistle * tAmp);
+      // il soffio è aria, non il fischio: resta pieno anche quando il fischio lo fa il campione registrato (fxT lo abbassa)
+      let air = (this.whA.p(nz3) + this.whB.p(nz2) * 0.75) * fl * whK + this.whHP.p(nz) * fl * fl * whK * 0.5;
+      // wastegate che apre sotto carico: soffio di gas dal lato scarico, segue il tremolio della regolazione
+      if (S.wg > 0.01) air += this.wgBP.p(nz2) * S.wg * S.thr * whK * 0.55;
 
       let bov = 0; this.flOn = 0; this.flPulse = 0;
       if (this.bov.env > 0) {
         const B = this.bov; B.t += 1 / sr;
-        const att = 0.004;
+        const att = 0.0015;                                                   // attacco netto: la valvola si apre di scatto
         const env = B.t < att ? B.t / att : Math.exp(-(B.t - att) / (B.len * 0.38));
         this.bovWob += (nz3 - this.bovWob) * 0.004;                          // turbolenza: il getto non è mai liscio
-        const wob = 1 + this.bovWob * 1.8;
+        const wob = 1 + this.bovWob * (this.tn.bov.v === 2 ? 1.8 : 0.45);     // getto pulito: poca turbolenza (il flutter resta sporco)
         const nb = this.bovHP.p(this.bovBP.p(nz));
-        const air = this.bovAir.p(nz2) * Math.exp(-B.t / (B.len * 0.18));    // sibilo alto, si spegne per primo
+        const air = this.bovAir.p(nz2) * Math.exp(-B.t / (B.len * 0.3));     // sibilo alto e nitido del getto
         const low = this.bovLow.p(nz3) * Math.exp(-B.t / (B.len * 0.55));    // "pff" grave, dura di più
-        const click = B.t < 0.003 ? this.bovClick.p(nz) * (1 - B.t / 0.003) * 1.6 : 0;   // scatto della valvola che si apre
+        const click = B.t < 0.0015 ? this.bovClick.p(nz) * (1 - B.t / 0.0015) * 2.2 : 0;   // scatto della valvola che si apre
         const bv = tn.bov;
         if (bv.v === 2) {
           this.flPh += B.rate / sr;
@@ -689,7 +705,9 @@ class EngineDSP {
           this.flOn = chop * env * B.I; this.flPulse = chop;
           bov = (nb * 0.5 + this.flBP.p(nz2) * 1.5 + low * 0.95 + Math.sin(TAU * this.tph) * 0.1) * chop * env * wob * B.I * bv.g * 1.35 + click * bv.g * B.I * 0.5;
         } else {
-          bov = (nb * 0.62 + air * 0.32 + low * 0.45) * env * wob * B.I * bv.g + click * bv.g * B.I;
+          // in atmosfera: getto brillante che cala di tono con la pressione, poco grave; a ricircolo resta un soffio ovattato
+          bov = (nb * 0.7 + air * 0.55 + low * 0.18) * env * wob * B.I * bv.g * 2.2 + click * bv.g * B.I * 1.4;
+          if (bv.v === 0) bov = this.bovLP.p(bov) * 0.75;
           // sibilo tonale iniziale (tipo "trombetta") che scende di frequenza
           if (bv.chirp > 0 && B.t < 0.25) {
             this.chirpPh += (3400 - 5200 * B.t) / sr; if (this.chirpPh > 1) this.chirpPh -= 1;
@@ -796,7 +814,7 @@ class EngineDSP {
       // ---- mix per punto d'ascolto ---------------------------------------------------------
       const side = exhR * M.exh - exh * M.exh;   // differenza tra i terminali → immagine stereo
       const cabK = this.cfg.view === 0 ? (tn.cabin || 1) : 1;   // abitacolo alleggerito: rimbomba di più
-      let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech * (1 + 5 * this.vc.diesel) + turbo * M.turbo * this.fxT + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
+      let out = exh * M.exh * cabK + boom * M.boom * cabK + intake * M.intake + mech * M.mech * (1 + 5 * this.vc.diesel) + (turbo * this.fxT + air) * M.turbo + surge * (M.turbo + M.bov) * this.fxS + bov * M.bov * this.fxB
         + road * M.road + wind * M.wind + tire * M.tire + gear * M.gear + starter * M.starter + pump * M.pump + belt * M.belt + winMotor;
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;

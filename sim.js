@@ -5,6 +5,11 @@
 const SIM_CLAMP = (x, a, b) => (x < a ? a : x > b ? b : x);
 const SIM_SS = (a, b, x) => { const t = SIM_CLAMP((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
+// turbo (v0.106): fb = quanto la pressione aumenta il flusso allo scarico, over = quanto il compressore potrebbe
+// superare il target, crack = da che frazione del target comincia ad aprire la wastegate, wgLag = ritardo della capsula (s),
+// wgBypass = quanto gas toglie alla turbina tutta aperta, fill = tempo di riempimento del collettore (s), rip = tremolio
+const SIM_TB = { fb: 0.3, over: 1.35, crack: 0.95, wgLag: 0.12, wgBypass: 0.85, fill: 0.06, rip: 0.02 };
+
 class SupraSim {
   constructor() {
     this.P = {
@@ -329,30 +334,50 @@ class SupraSim {
     if (this.running && this.fuel <= 0) { this.running = false; this.stalled = true; this.dry = true; }
     const burning = this.running && this.cut === 0;
 
-    // ---- turbo ---------------------------------------------------------------------------
+    // ---- turbo (v0.106) -------------------------------------------------------------------
+    // La girante la muove l'energia dei gas di scarico, non i giri: il flusso cresce con giri, aria e pressione stessa
+    // (più pressione = più gas = turbina più forte: il «calcio» quando entra). Il compressore potrebbe dare più del target
+    // (SIM_TB.over): la wastegate comincia ad aprire poco prima (SIM_TB.crack) e la sua capsula risponde in ritardo
+    // (SIM_TB.wgLag), quindi la pressione sale, sfora un attimo e si assesta, con un filo di tremolio intorno al target.
+    // A gas chiuso la valvola sfiata, la girante continua a girare per inerzia e nel collettore c'è depressione (mapB).
+    const TB = SIM_TB, B = tc.max > 0 ? this.boostTop(tc) : 0;
+    const flow = rpm * (1 + TB.fb * Math.max(0, this.pipeP));                // scarico in «giri equivalenti»
     let frac;
     if (tc.twin) {
       const secT = rpm > 4000 && this.air > 0.55 ? 1 : rpm < 3700 || this.air < 0.35 ? 0 : this.sec;
       this.sec += (secT - this.sec) * Math.min(1, h / 0.25);
-      frac = SIM_SS(tc.a, tc.b, rpm) * 0.6 + 0.4 * this.sec * SIM_SS(3800, 4400, rpm);
+      frac = SIM_SS(tc.a, tc.b, flow) * 0.6 + 0.4 * this.sec * SIM_SS(3800, 4400, rpm);
     } else {
-      frac = Math.pow(SIM_SS(tc.a, tc.b, rpm), 1.3); this.sec = 0;
+      frac = Math.pow(SIM_SS(tc.a, tc.b, flow), 1.3); this.sec = 0;
     }
     let drive = frac * Math.pow(this.air, 1.3) * 1.18;
     if (this.cut === 3) drive += (this.flatCut ? 0.8 : 0.45) * SIM_SS(3000, 4300, rpm);      // anti-lag del 2-step; nel flat shift la pressione resta
     else if (!burning) drive *= 0.15;
     const closed = this.thr < 0.12 && !this.flatCut;
-    const tgtT = Math.min(1, Math.sqrt(SIM_CLAMP(drive, 0, 1))) * 0.92 + 0.08 * Math.min(1, rpm / 7000) * (0.3 + this.air);
-    this.wg = SIM_CLAMP((drive - 1) * 3, 0, 1);
+    // wastegate: si apre tra crack·B e un filo sopra B; la capsula segue in ritardo e toglie gas alla turbina
+    const wgCmd = B > 0 ? SIM_SS(B * TB.crack, B * 1.03, this.pipeP) : 0;
+    this.wg += (wgCmd - this.wg) * Math.min(1, h / TB.wgLag);
+    drive *= 1 - TB.wgBypass * this.wg;
+    const tgtT = Math.min(1.05, Math.sqrt(SIM_CLAMP(drive, 0, 1.1))) * 0.92 + 0.08 * Math.min(1, rpm / 7000) * (0.3 + this.air);
     const tau = tgtT > this.tur ? tc.up * ((tn.ic && tn.ic.lag) || 1) : (closed && cfg.valve === 'flutter' ? 0.5 : tc.down * (closed ? 1.6 : 1));
     this.tur += (tgtT - this.tur) * Math.min(1, h / tau);
-    if (!closed) this.pipeP += (this.boostTop(tc) * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
+    if (!closed) {
+      // quanto può spingere il compressore a questa velocità, la farfalla parzializza; il collettore si riempie in ~60 ms
+      const cap = B * TB.over * this.tur * this.tur * SIM_SS(0.1, 0.8, this.thr);
+      this.pipeP += (cap - this.pipeP) * Math.min(1, h / TB.fill);
+      // tremolio: la capsula della wastegate «cerca» il target, un paio di centesimi di bar
+      if (this.wg > 0.05 && B > 0) { this.tbRip = (this.tbRip || 0) * (1 - h * 9) + (Math.random() - 0.5) * h * 9; this.pipeP += this.tbRip * B * TB.rip * this.wg * h * 60; }
+    }
     else this.pipeP += (0 - this.pipeP) * Math.min(1, h / (cfg.valve === 'flutter' ? 0.45 : 0.07));
+    if (this.pipeP < 0) this.pipeP = 0;
     if (closed && !this.bovLatch && this.pipeP > (cfg.valve === 'flutter' ? 0.1 : 0.2)) {
       this.bovLatch = true;
       this.events.push({ type: 'bov', I: SIM_CLAMP(this.pipeP / tc.max * 1.1, 0.35, 1.25) });
     }
     if (this.thr > 0.3) this.bovLatch = false;
+    // manometro: in pressione la sovralimentazione, a farfalla chiusa la depressione del collettore (fino a −0,7 bar)
+    const vac = this.running ? -0.72 * Math.max(0, 1 - this.air * 1.6) * Math.min(1, rpm / 700) : 0;
+    this.mapB = (this.mapB || 0) + ((this.pipeP > 0.01 ? this.pipeP : vac) - (this.mapB || 0)) * Math.min(1, h / 0.05);
     this.charge = this.air * (1 + this.pipeP);
 
     // ---- coppia motore -------------------------------------------------------------------

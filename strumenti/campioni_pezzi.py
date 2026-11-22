@@ -198,7 +198,7 @@ def bov(I, seed, p):
     n = nlen(dur + 0.3)
     t = ts(n)
     tau = p['tau'] * (0.65 + 0.35 * I) * (0.92 + 0.16 * r.random())
-    t0 = 0.004
+    t0 = p.get('t0', 0.0015)                           # v0.106: la valvola si apre di scatto (prima 4 ms, un po' molle)
     P = np.where(t < t0, t / t0, np.exp(-(t - t0) / tau))
     if p.get('two'):                                   # doppio pistone: un colpo corto, un attimo di vuoto, poi il getto pieno
         t2 = p['two'] * (0.85 + 0.3 * r.random())
@@ -219,8 +219,11 @@ def bov(I, seed, p):
     x = norm(painted(n, shape, seed))
     x *= 1 + p['turb'] * smooth(n, 22, seed + 1)       # turbolenza: il getto non è mai liscio
     y = x
-    click = hp(r.standard_normal(n), 1800) * np.exp(-t / 0.0009)
+    click = hp(r.standard_normal(n), p.get('clickf', 3000)) * np.exp(-t / p.get('clickt', 0.0006))   # scatto secco e chiaro
     y = y + p['click'] * norm(click)
+    if p.get('burst'):                                 # v0.106: lo «schiaffo» d'aria dei primi millisecondi, quando la valvola si apre
+        bu = hp(r.standard_normal(n), 1600) * np.exp(-t / 0.008) * np.minimum(1, t / 0.0005)
+        y = y + p['burst'] * norm(bu) * (0.7 + 0.3 * I)
     if p.get('ring'):                                  # pistone di metallo che batte
         ring = reson(r.standard_normal(n) * np.exp(-t / 0.001), p['ring'], 16) * np.exp(-t / 0.025)
         y = y + 0.45 * p['click'] * norm(ring)
@@ -234,8 +237,10 @@ def bov(I, seed, p):
         nota = 0.35 * (tone(fch) + 0.18 * tone(2 * fch)) + breath(fch, 45 + 25 * r.random(), r)   # fischio soffiato, non un seno
         y = y + p['chirp'] * (0.6 + 0.4 * I) * ech * nota
     if p.get('spool'):                                 # la turbina ancora lanciata che rallenta
-        fs = p['spool'] * (0.55 + 0.45 * np.exp(-t / 0.6))
-        y = y + p.get('spool_g', 0.04) * np.exp(-t / 0.35) * np.minimum(1, t / 0.02) * tone(fs)
+        # «fiuuu»: la girante, scarica, cala di giri per quasi un secondo; tono pulito con un filo d'aria intorno
+        fs = p['spool'] * (0.5 + 0.5 * np.exp(-t / p.get('spool_t', 0.6)))
+        env = np.exp(-t / p.get('spool_d', 0.35)) * np.minimum(1, t / 0.02)
+        y = y + p.get('spool_g', 0.04) * env * (tone(fs) + 0.12 * tone(2 * fs) + 0.35 * breath(fs, 60, r))
     if p.get('lp'):
         y = lp(y, p['lp'], 2)
     return fade(trim(y), 0.0004, 0.06) * (0.5 + 0.5 * I)
@@ -627,11 +632,12 @@ def purge(seed, p):
 I4 = [0.45, 0.7, 0.95, 1.2]
 
 BOVP = {
-    'ricircolo': dict(len=0.6, tau=0.16, fhi=1500, flo=300, w=0.9, hissf=3200, hiss=0.12, lowf=450, low=0.55, turb=0.28, click=0.05, lp=2400),
-    'pssh': dict(len=1.0, tau=0.3, fhi=3600, flo=900, w=0.75, hissf=7000, hiss=0.55, lowf=650, low=0.3, turb=0.2, click=0.35, spool=6800, spool_g=0.02),
-    'pssh_grossa': dict(len=1.4, tau=0.45, fhi=2800, flo=600, w=0.95, hissf=6000, hiss=0.45, lowf=380, low=0.7, turb=0.28, click=0.5, spool=5600, spool_g=0.025, eb=0.9),
-    'trombetta': dict(len=0.9, tau=0.24, fhi=4200, flo=1100, w=0.6, hissf=8000, hiss=0.5, lowf=700, low=0.2, turb=0.18, click=0.3, chirp=0.5, cf0=3900, cf1=1700, ct=0.11, spool=7200, spool_g=0.02),
-    'doppio_pistone': dict(len=0.85, tau=0.22, fhi=4000, flo=1000, w=0.7, hissf=7500, hiss=0.6, lowf=700, low=0.25, turb=0.2, click=0.6, ring=5200, two=0.05),
+    # v0.106: getti più puliti e nitidi (meno turbolenza e meno grave, sibilo più presente) e la coda della turbina che rallenta
+    'ricircolo': dict(len=0.6, burst=0.15,  tau=0.16, fhi=1700, flo=350, w=0.85, hissf=3400, hiss=0.22, lowf=450, low=0.35, turb=0.14, click=0.08, lp=2600, spool=6000, spool_g=0.03, spool_d=0.5),
+    'pssh': dict(len=1.0, burst=0.75,  tau=0.3, fhi=4200, flo=1000, w=0.7, hissf=7500, hiss=0.85, eh=1.3, lowf=650, low=0.12, turb=0.08, click=0.45, spool=6800, spool_g=0.06, spool_d=0.6, spool_t=0.7),
+    'pssh_grossa': dict(len=1.4, burst=0.7,  tau=0.45, fhi=3200, flo=650, w=0.9, hissf=6500, hiss=0.7, eh=1.4, lowf=380, low=0.4, turb=0.12, click=0.55, spool=5600, spool_g=0.06, spool_d=0.7, spool_t=0.8, eb=0.9),
+    'trombetta': dict(len=0.9, burst=0.55,  tau=0.24, fhi=4600, flo=1200, w=0.6, hissf=8200, hiss=0.7, eh=1.4, lowf=700, low=0.1, turb=0.08, click=0.4, chirp=0.5, cf0=3900, cf1=1700, ct=0.11, spool=7200, spool_g=0.05, spool_d=0.55),
+    'doppio_pistone': dict(len=0.85, burst=0.6,  tau=0.22, fhi=4300, flo=1050, w=0.7, hissf=7800, hiss=0.8, eh=1.4, lowf=700, low=0.12, turb=0.1, click=0.6, ring=5200, two=0.05, spool=7000, spool_g=0.045, spool_d=0.5),
     'sbuffo': dict(len=1.15, tau=0.36, fhi=1900, flo=450, w=0.9, hissf=4500, hiss=0.25, lowf=320, low=0.8, turb=0.3, click=0.25),
 }
 FLUP = {

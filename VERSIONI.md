@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.105**
+**Versione attuale: v0.106**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -128,3 +128,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.103 | 22/11 | proprietario | Schermata iniziale: al posto dell'animazione (scattava e le ruote sembravano ferme) un quadro fermo disegnato una volta sola: la tua auto in corsia d'emergenza con le quattro frecce, il protagonista col telefono acceso, le scie del traffico a lunga posa, il cartello USCITA 18 KM, un lampione spento; si muove solo la telecamera, piano, con un effetto della pagina che non può scattare |
 | v0.104 | 22/11 | cognato | Gomme che sgommavano da sole passando da in movimento a fermi: oltre il picco la gomma, con lo slittamento all'indietro (freno motore, scalata, ruote lanciate su un'auto fermata), spingeva in avanti invece di frenare (errore dalla v0.71); `sim.ferma()` per quando il gioco ferma l'auto di colpo (Luca Garage, tutorial, «Vai a», fondo della retro); controllo della fisica e dei motori di tutte le auto; volume per ogni componente nei Suoni di Luca Tuning (0-200 %). |
 | v0.105 | 22/11 | cognato | Da Luca Tuning: il pop & bang non è più una spunta del menu di pausa ma una mappa in più sulla centralina più potente (ultimo livello, niente sui diesel, chi l'aveva accesa la ritrova montata); il volano è un reparto suo, separato dalla frizione, con quattro livelli (originale, pesante, alleggerito, superleggero: salita e discesa dei giri, minimo, tintinnio; chi aveva la frizione rinforzata o da corsa ritrova l'alleggerito); antistallo della frizione automatica sul minimo vero (con volano superleggero le partenze si spegnevano); nelle anomalie non resta più scritto «{Auto}»; numerazione tornata su v0 (v1.00-v1.04 → v0.100-v0.104). |
+| v0.106 | 22/11 | cognato | Turbo più vero: la girante la muove l'energia dei gas di scarico (il turbo «entra»), wastegate che apre poco prima del target e in ritardo (picco e assestamento, un filo di tremolio), meno pressione a gas parziale, depressione sul manometro a gas chiuso; suono: soffio dell'aria nel compressore udibile, fischio che resta e cala in rilascio, valvola nitida (sintesi e campioni rifatti), turbo e valvola udibili anche in abitacolo. |

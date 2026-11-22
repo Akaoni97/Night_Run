@@ -243,6 +243,8 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   `strumenti/campioni_pezzi.py` (guida in `audio/campioni/LEGGIMI.md`); gli altri kit si comprano una volta per tutte le auto. In
   `dsp.js` i flag `valv`/`turb`/`bur` evitano i doppioni con la sintesi. Per sentirli fuori dal gioco: `strumenti/ascolta_campioni.js`.
   Ogni componente che suona ha il suo cursore VOLUME (0-200 %, v0.104), sopra quello generale.
+- **Turbo** (v0.106): girante mossa dai gas di scarico, wastegate con picco e assestamento, depressione sul manometro
+  (`SIM_TB` in `sim.js`); soffio dell'aria e valvola nitida in `dsp.js`, valvole dei campioni rifatte.
 - **Volano e pop & bang** (v0.105): il volano è un reparto suo da Luca Tuning (originale, pesante, alleggerito, superleggero:
   `volanoCat` in `tuning.js`); la mappa pop & bang è l'ultimo livello della centralina, non più una spunta del menu.
 - **Ruote che si fermano** (`sim.js`, v0.104): la gomma oltre il picco tiene il segno anche con lo slittamento all'indietro (prima

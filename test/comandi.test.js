@@ -56,5 +56,6 @@ test('comandi: ECO, NORMALE e FORTE cambiano la pressione in tubo e la potenza',
   assert.ok(eco.bar < norm.bar * 0.8, `ECO ${eco.bar.toFixed(2)} bar contro NORMALE ${norm.bar.toFixed(2)}`);
   assert.ok(forte.bar > norm.bar * 1.1, `FORTE ${forte.bar.toFixed(2)} bar contro NORMALE ${norm.bar.toFixed(2)}`);
   assert.ok(eco.cv < norm.cv && norm.cv < forte.cv, `CV ${eco.cv.toFixed(0)} < ${norm.cv.toFixed(0)} < ${forte.cv.toFixed(0)}`);
-  assert.ok(forte.bar <= 0.9 * 1.2 + 1e-6, 'mai oltre il massimo della mappa FORTE');
+  // v0.106: la wastegate fa un picco di un attimo sopra il target, come sulle auto vere (ritardo della capsula), poi si assesta
+  assert.ok(forte.bar <= 0.9 * 1.2 * 1.18, `FORTE: il picco della wastegate resta contenuto (${forte.bar.toFixed(2)} bar)`);
 });
