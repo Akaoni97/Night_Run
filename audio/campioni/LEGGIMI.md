@@ -6,7 +6,7 @@ montano dalla scheda **Suoni** dell'officina.
 
 Sono **fatti a codice** da `strumenti/campioni_pezzi.py` (sintesi: rumore dipinto nello spettro, toni che scendono, modi del
 tubo, saturazione): nessuna registrazione di altri, nessun file preso da mod. Si possono usare come si vuole.
-Dal 22/11 (v0.83) senza toni puri dove nella realtà c'è aria: botti che risuonano nel tubo, fischi soffiati che ondeggiano, «tu» a sbuffi.
+Dal 22/11 (v0.84) i botti risuonano nel tubo (rumore, non seni) con un tonfo d'aria cupo e i «tu» della valvola sono sbuffi; i fischi di turbo, compressore e cambio sono quelli di prima.
 
 ## Come sono fatti i nomi
 - `1.wav`, `2.wav`... colpi singoli. Nella valvola e nell'aspirazione vanno dal più leggero al più forte: il gioco

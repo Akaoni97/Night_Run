@@ -171,12 +171,6 @@ def breath(f, bw, r, n=None):
     return y / (np.std(y) * 1.4 + 1e-12)
 
 
-def pslow(N, fc, seed):
-    """rumore lento periodico (media zero, circa tra -1 e 1): per far ondeggiare a caso gli anelli senza giunte"""
-    y = pnoise(N, lambda F: (F > 0) * np.exp(-0.5 * (F / fc) ** 2), seed)
-    return y / 2.5
-
-
 def spazio(x, seed, rt=0.08, g=0.16, lpf=3800):
     """un po' di spazio intorno: asfalto, carrozzeria e muri vicini (riflessi radi, poi una coda fitta e cupa).
     Corto apposta: il riverbero dell'ambiente (strada, città, galleria) lo mette già il gioco"""
@@ -241,8 +235,7 @@ def bov(I, seed, p):
         y = y + p['chirp'] * (0.6 + 0.4 * I) * ech * nota
     if p.get('spool'):                                 # la turbina ancora lanciata che rallenta
         fs = p['spool'] * (0.55 + 0.45 * np.exp(-t / 0.6))
-        fs = fs * (1 + 0.004 * smooth(n, 9, seed + 5))
-        y = y + p.get('spool_g', 0.04) * np.exp(-t / 0.35) * np.minimum(1, t / 0.02) * (0.4 * tone(fs) + breath(fs, 70, r))
+        y = y + p.get('spool_g', 0.04) * np.exp(-t / 0.35) * np.minimum(1, t / 0.02) * tone(fs)
     if p.get('lp'):
         y = lp(y, p['lp'], 2)
     return fade(trim(y), 0.0004, 0.06) * (0.5 + 0.5 * I)
@@ -279,7 +272,7 @@ def flutter(I, seed, p):
         colpo = r.standard_normal(L) * np.exp(-tt / (pd * 0.35))
         tu = 0.3 * tone(ftu) * np.exp(-tt / (pd * 0.8)) + norm(reson(colpo, ftu[0], 5.5)) * np.exp(-tt / (pd * 0.9))
         fw = fw0 * (1 - 0.32 * tk / dur) * (1 + 0.07 * e)
-        fischio = 0.3 * tone(fw) + breath(fw, 80, r)
+        fischio = tone(fw)
         seg = a * e * (p['gp'] * puff + p['gt'] * tu) + a * p['gw'] * e * fischio
         add(out, seg, i0)
     if p.get('s'):                                     # la "s" iniziale: un soffio corto prima dei colpi
@@ -310,50 +303,39 @@ def _f(f):
     return round(f * LOOP) / LOOP
 
 
-def _wander(N, fb, seed, dev, fc=3.0):
-    """fase di una nota che ondeggia a caso intorno a fb (dev: quanto, in frazione della nota). Il rumore lento ha media zero:
-    in fondo all'anello la fase torna dov'era, niente giunte"""
-    d = pslow(N, fc, seed)
-    d -= np.mean(d)
-    return TAU * np.cumsum(fb * dev * d) / SR
-
-
 def turbo_loop(seed, p):
-    """fischio della girante: la nota (con le sue parziali) che ondeggia un po' a caso come l'aria che la fa, una banda
-    d'aria stretta intorno, soffio largo. Prima la nota era un seno con un vibrato regolare: suonava da sintetizzatore"""
+    """fischio della girante: tono con le sue parziali, banda d'aria intonata, soffio largo"""
     N = nlen(LOOP)
     t = ts(N)
     fb = _f(p['f'])
-    w = _wander(N, fb, seed + 2, p.get('dev', 0.006))
-    x = np.sin(TAU * fb * t + w)
+    pm = p.get('vib', 0.6) * np.sin(TAU * 3.0 * t + 1.3) + 0.3 * np.sin(TAU * 7.5 * t)
+    x = np.sin(TAU * fb * t + pm)
     for k, g in p.get('parz', []):
-        x += g * np.sin(TAU * _f(fb * k) * t + k * w + 0.7 * k)
+        x += g * np.sin(TAU * _f(fb * k) * t + k * pm + 0.7 * k)
     air = pnoise(N, lambda F: lbump(F, fb, p.get('aw', 0.06)), seed)
     whoosh = pnoise(N, lambda F: lbump(F, p.get('wf', fb * 0.4), 1.0), seed + 1)
-    am = 1 + 0.12 * pslow(N, 5.0, seed + 3)
-    y = (p.get('tone', 1.0) * 0.6 * x * (1 + 0.15 * pslow(N, 14.0, seed + 4)) + p.get('air', 0.25) * 2.2 * air + p.get('whoosh', 0.1) * whoosh) * am
+    am = 1 + 0.05 * np.sin(TAU * 1.5 * t) + 0.04 * np.sin(TAU * 4.0 * t + 2)
+    y = (p.get('tone', 1.0) * x + p.get('air', 0.25) * air + p.get('whoosh', 0.1) * whoosh) * am
     return norm(y, 0.7)
 
 
 def sc_loop(seed, p):
-    """compressore: il fischio dei rotori (ricco di armoniche, legato ai giri) più aria e sibilo; la nota ondeggia un filo"""
+    """compressore: il fischio dei rotori (ricco di armoniche, legato ai giri) più aria e sibilo"""
     N = nlen(LOOP)
     t = ts(N)
     f0 = _f(p['f'])
-    w = _wander(N, f0, seed + 2, p.get('dev', 0.004))
     x = np.zeros(N)
     for h, g in enumerate(p['harm'], start=1):
         if f0 * h > SR * 0.45:
             break
-        x += g * np.sin(TAU * f0 * h * t + h * 0.9 + h * w)
+        x += g * np.sin(TAU * f0 * h * t + h * 0.9)
     if p.get('siren'):
-        x += p['siren'] * np.sin(TAU * _f(f0 * 1.5) * t + 0.4 + 1.5 * w)
+        x += p['siren'] * np.sin(TAU * _f(f0 * 1.5) * t + 0.4)
     if p.get('am'):
         x *= 1 + p['am'] * np.sin(TAU * _f(p['am_f']) * t)
-    x *= 1 + 0.1 * pslow(N, 6.0, seed + 3)
-    air = pnoise(N, lambda F: lbump(F, f0, 0.1) + 0.4 * lbump(F, f0, 0.3), seed)
+    air = pnoise(N, lambda F: lbump(F, f0, 0.25), seed)
     hiss = pnoise(N, lambda F: lbump(F, p.get('hf', 6000), 0.8), seed + 1)
-    y = 0.8 * x + p.get('air', 0.3) * 2.0 * air + p.get('hiss', 0.1) * hiss
+    y = x + p.get('air', 0.3) * air + p.get('hiss', 0.1) * hiss
     return norm(y, 0.7)
 
 
@@ -376,19 +358,15 @@ def scream_loop(seed, p):
 
 
 def gear_loop(seed, p):
-    """denti dritti: fischio dell'ingranamento con le armoniche e le bande laterali dell'albero; i denti non sono mai tutti
-    uguali (la nota ondeggia e batte un po' a caso) e la scatola ci mette il suo ronzio"""
+    """denti dritti: fischio dell'ingranamento con le armoniche e le bande laterali dell'albero"""
     N = nlen(LOOP)
     t = ts(N)
     fm, fs = _f(p['f']), _f(p['fs'])
-    w = _wander(N, fm, seed + 2, 0.003, 4.0)
-    x = np.sin(TAU * fm * t + w) + p.get('h2', 0.35) * np.sin(TAU * 2 * fm * t + 0.5 + 2 * w) + p.get('h3', 0.12) * np.sin(TAU * 3 * fm * t + 1.1 + 3 * w)
-    x *= 1 + p.get('am', 0.25) * np.sin(TAU * fs * t) + 0.12 * pslow(N, 30.0, seed + 3)
+    x = np.sin(TAU * fm * t) + p.get('h2', 0.35) * np.sin(TAU * 2 * fm * t + 0.5) + p.get('h3', 0.12) * np.sin(TAU * 3 * fm * t + 1.1)
+    x *= 1 + p.get('am', 0.25) * np.sin(TAU * fs * t)
     if p.get('am2'):
         x *= 1 + p['am2'] * np.sin(TAU * 2 * fs * t + 0.8)
-    rumore = pnoise(N, lambda F: lbump(F, fm, 0.15) + 0.5 * lbump(F, 2 * fm, 0.12), seed)
-    scatola = pnoise(N, lambda F: lbump(F, 900, 0.9), seed + 1)
-    y = 0.75 * x + p.get('nz', 0.15) * 3.0 * rumore + 0.12 * scatola
+    y = x + p.get('nz', 0.15) * pnoise(N, lambda F: lbump(F, fm, 0.15), seed)
     return norm(y, 0.7)
 
 
@@ -407,14 +385,14 @@ def pop(r, p, a=1.0, big=False):
     # Eccitazione larga e brevissima, il tubo ci mette le sue risonanze; gas più caldo nel botto grosso = tubo un po' più alto
     exc = lp(r.standard_normal(L), min(9000, f1 * 40), 2) * np.exp(-t / (0.0035 * kb)) * np.minimum(1, t / 0.0004)
     body = tube(exc, f1 * (1 + 0.06 * r.standard_normal()), p.get('bt', 0.05) * kb * 0.6, bright=0.35 + 0.3 * r.random())
-    body = norm(lp(body, min(8000, f1 * 30), 2))           # il silenziatore e la lana di roccia si mangiano gli alti della coda
+    body = norm(lp(body, min(8000, f1 * 12), 3))           # il silenziatore e la lana di roccia si mangiano gli alti della coda
     # il colpo sordo: aria spostata (rumore cupo con una risonanza larga che scende un po'), non un seno da cassa
     tf = p.get('tf', 55) * (0.92 + 0.16 * r.random())
     tenv = np.exp(-t / (p.get('tt', 0.05) * kb)) * np.minimum(1, t / 0.0015)
     th1 = norm(lp(r.standard_normal(L), tf * 2.6, 4)) * tenv
     th2 = norm(reson(r.standard_normal(L) * np.exp(-t / 0.004), tf * 1.15, 2.2)) * tenv
     thump = norm(th1 + 0.8 * th2)
-    y = bark + p.get('gb', 0.7) * 0.75 * body + p.get('gt', 0.6) * 0.9 * thump
+    y = bark + p.get('gb', 0.7) * 0.8 * body + p.get('gt', 0.6) * 1.6 * thump
     if p.get('metal'):                                            # titanio, tubi sottili: un tintinnio sopra
         for f, q, g in p['metal']:
             y += g * norm(reson(r.standard_normal(L) * np.exp(-t / 0.0008), f * (0.96 + 0.08 * r.random()), q)) * np.exp(-t / 0.03)
@@ -689,12 +667,13 @@ KITS = {}
 
 # (22/11) correzione di livello in dB per kit, dopo il rifacimento «meno robotico»: un colpo d'aria si sente più forte di un
 # seno basso con lo stesso picco, quindi qui si riporta ogni kit alla sonorità (pesata A) di prima, così i volumi tarati in
-# campioni.js (CMP.g) restano giusti. Solo in giù per i colpi (sono già al picco), anche in su per gli anelli.
+# campioni.js (CMP.g) restano giusti. In su i colpi sono già al picco: si alzano con una saturazione morbida (il picco resta
+# quello, sale il resto del colpo, come un microfono vicino).
 LIVELLO = {
-    'aspirazione/airbox': -3.1, 'limitatore/due_step': -1.7, 'mappa/antilag': -1.3, 'mappa/mitraglia': -2.3,
-    'mappa/petardi': -1.5, 'scarico/borbottio': -2.2, 'scarico/cupo': -5.6, 'scarico/gorgoglio': -3.3,
-    'scarico/pentola': -1.8, 'scarico/scoppiettio': -1.3,
-    'compressore/centrifugo': 1.3, 'compressore/vite': 1.3, 'turbo/fischio': 1.6,
+    'aspirazione/airbox': -3.1, 'scarico/borbottio': -2.0, 'scarico/cupo': -5.4, 'scarico/gorgoglio': -0.9,
+    'scarico/scoppiettio': -1.1, 'valvola/stututu': -1.1,
+    'limitatore/colpi': 3.2, 'limitatore/stutter': 2.4, 'mappa/crackle': 1.3, 'mappa/pop_bang': 2.5,
+    'scarico/titanio': 1.6, 'valvola/gufo': 1.3,
 }
 
 
@@ -808,7 +787,11 @@ def fai(kid, gdir=None):
     out = []
     kg = 10 ** (LIVELLO.get(kid, 0.0) / 20)
     for name, x in files:
-        x = np.asarray(x, dtype=float) * kg
+        x = np.asarray(x, dtype=float)
+        if kg > 1:
+            x = 0.89 * np.tanh(kg * x / 0.89) / np.tanh(kg)
+        else:
+            x = x * kg
         p = os.path.join(d, name + '.wav')
         save(p, x, sr)
         out.append((name, len(x) / SR, float(np.max(np.abs(x)))))
