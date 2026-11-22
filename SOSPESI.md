@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+Controllo del 22/11 (Nico con Claude): nessun numero cambiato.
+
 **Numeri cambiati dopo la v0.81**: nuovo il 7 (idee di Codex non fatte), nuovi il 18 (scheda del pezzo al tocco) e il 19 (suoni); da lì in poi tutto è scalato di uno o due (il camion ora è il 20, l'aspetto dei personaggi il 21).
 
 Aggiornata il 21/11/2026 notte (v0.78, Luca con Claude): nuovo punto 16, i campioni dei pezzi da ascoltare. **Numeri cambiati**: il camion (16 nella v0.77) ora è il 17, l'aspetto dei personaggi (17) è il 18.
@@ -57,16 +59,11 @@ Prima: aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codi
 21. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 22/11 controllo della sera (Nico con Claude): 318 test passano, prova di fumo senza errori in tutte le tappe, foto di strada, Autosalone, Officina Nico e Russian Kùstòm a posto. Nessun numero cambiato.
+- 21/11 notte (v0.79-v0.81, Luca): suoni diversi per ogni auto, scarichi a cinque livelli e collettore; scheda del pezzo al tocco; 25 auto rifatte dai disegni in alta definizione con le versioni tuning.
 - 21/11 notte (v0.78, Luca): campioni audio dei pezzi del motore, scheda Suoni nell'officina (42 kit, 10 componenti, fatti a codice); build di Windows di nuovo in piedi (`desktop/copia-gioco.js` cercava ancora `pistone/`).
 - 21/11 sera (v0.77, Luca): codice morto tolto (scene vecchie degli interni, vecchie consegne della città e reputazione, sfide, traguardo ARRIVO, pedali e cambio nascosti nella scheda Guida, calore e motore rotto del Pistone); `test/motori.test.js` → `test/test1.test.js` («Test 1»); insegne grandi e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`). Il riquadro dei traguardi in verticale si lascia così.
 - 21/11 sera (v0.76, Luca): aspetto dei personaggi (Nico giovane e tatuato, Tito pazzo, Rocco fisicato, Massimo barbone).
 - 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.
 - 21/11 sera (v0.74, Luca): missione del signore della valigetta a 38 km resta così; vecchio Pistone cancellato (`pistone/`, il
   peso del motore per lo swap ora è in `officina.js`, rimborso una volta sola); sezione Prestazioni; auto elaborate valgono di più.
-- 21/11: pedoni in alta definizione, leggeri (come il protagonista, 34 aspetti, pose in memoria, 2 nuove al massimo per fotogramma).
-- 21/11 decisioni di Nico: Mario al posto di Niko va bene; Luca Garage a € 150 va bene; pedoni in alta definizione sì, purché leggeri.
-- 20/11 notte: estetica premium (icone disegnate, pannelli a vetro, banner; interruttore Premium/Classico), meno scatti e più fluidità. Controllo del 21/11: nessun errore nelle tappe, 299 test.
-- 21/11 sera (v0.66): schede tecniche e pezzi con personalità per tutte le auto, tricilindrici veri (Polo, Clio, 308), carattere audio «Codex · deciso» tolto. Interni nuovi guardati da Luca: belli.
-- 21/11: Luca Garage (v0.64), pezzi nuovi V40 con pallini (v0.63), officina semplice di Luca (`officina.js`), assetto a livelli, Tutor ogni 10-15 km, Night Run per Windows (v0.62).
-- 20/11: AUTO 1 dopo 5 s, leva con la S, tasti 1-4 solo per mangiare e bere, niente turbo nelle valigette, check completo
-  del 20/11 sera senza errori.
