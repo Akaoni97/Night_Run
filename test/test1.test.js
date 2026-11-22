@@ -263,11 +263,11 @@ test('sterzo libero: si va dove si vuole, si resta lì, cordolo come limite', ()
   assert.equal(game.lane, 1);
 });
 
-test('pioggia: sul bagnato le gomme tengono circa un quarto in meno', () => {
+test('pioggia: sul bagnato le gomme tengono circa un quinto in meno', () => {
   const { sim } = career();
   sim.tireT = 90; const dry = sim.tireGrip();
   sim.wet = 1; const wet = sim.tireGrip();
-  assert.ok(wet < dry * 0.78 && wet > dry * 0.68, `asciutto ${dry.toFixed(2)}, bagnato ${wet.toFixed(2)}`);
+  assert.ok(wet < dry * 0.84 && wet > dry * 0.76, `asciutto ${dry.toFixed(2)}, bagnato ${wet.toFixed(2)}`);
 });
 
 
