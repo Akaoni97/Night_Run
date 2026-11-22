@@ -141,6 +141,55 @@ def onsets(rate, phase0=0.97):
     return np.nonzero(np.diff(np.floor(ph)) > 0)[0] + 1
 
 
+# ---------------------------------------------------------------------------------------------------- attrezzi per il «vero»
+# (22/11) Prima i corpi dei botti, i fischi e i «tu» erano seni puri: all'orecchio suonavano da sintetizzatore. Qui sotto
+# gli attrezzi per fare le stesse cose con l'aria: un tubo che risuona su un colpo di rumore, un fischio che è rumore
+# stretto intorno a una nota (e la nota che ondeggia a caso), un po' di spazio intorno.
+def tube(x, f1, decay, bright=0.5):
+    """tubo di scarico: il colpo rimbalza tra uscita e silenziatore (ritardo con ritorno invertito, risonanze sulle armoniche
+    dispari di f1); a ogni giro perde un po' di alti (media di due campioni, più o meno forte con bright)"""
+    D = max(2, int(round(SR / (2.0 * f1))))
+    g = np.exp(-1.0 / (2.0 * f1 * max(1e-3, decay)))
+    a = np.zeros(D + 2)
+    a[0] = 1.0
+    a[D] = g * bright
+    a[D + 1] = g * (1.0 - bright)
+    return sg.lfilter([1.0], a, x)
+
+
+def breath(f, bw, r, n=None):
+    """«fischio d'aria»: rumore stretto (largo circa 2·bw Hz) intorno alla frequenza f, che può cambiare nel tempo.
+    Rumore lento moltiplicato per un seno e un coseno (in quadratura: niente battimenti), cioè una nota soffiata"""
+    f = np.asarray(f, dtype=float)
+    n = len(f) if f.ndim else n
+    if not f.ndim:
+        f = np.full(n, float(f))
+    ph = TAU * np.cumsum(f) / SR
+    a = lp(r.standard_normal(n + 2000), bw, 2)[2000:]
+    b = lp(r.standard_normal(n + 2000), bw, 2)[2000:]
+    y = a * np.sin(ph) + b * np.cos(ph)
+    return y / (np.std(y) * 1.4 + 1e-12)
+
+
+def spazio(x, seed, rt=0.08, g=0.16, lpf=3800):
+    """un po' di spazio intorno: asfalto, carrozzeria e muri vicini (riflessi radi, poi una coda fitta e cupa).
+    Corto apposta: il riverbero dell'ambiente (strada, città, galleria) lo mette già il gioco"""
+    r = R(seed)
+    L = nlen(rt * 1.6)
+    t = ts(L)
+    ir = r.standard_normal(L) * np.exp(-t * 6.9 / rt) * np.minimum(1, t / 0.006)
+    for ms, a in ((3.1, 0.5), (5.3, 0.35), (8.9, 0.28), (13.7, 0.2)):
+        i = nlen(ms / 1000)
+        if i < L:
+            ir[i] += a * (1 if r.random() < 0.5 else -1) * np.sqrt(L / 400)
+    ir = lp(ir, lpf, 2)
+    ir /= np.sqrt(np.sum(ir ** 2)) + 1e-12
+    c = sg.fftconvolve(x, ir)
+    y = np.concatenate([x, np.zeros(len(c) - len(x))])
+    y += g * c
+    return y
+
+
 # ---------------------------------------------------------------------------------------------------- valvola: sfiato
 def bov(I, seed, p):
     """valvola che sfiata in aria: scatto, getto che si spegne con la pressione, sibilo, fischio della turbina che rallenta"""
@@ -182,7 +231,8 @@ def bov(I, seed, p):
         fch = p['cf1'] + (p['cf0'] - p['cf1']) * np.exp(-t / p['ct'])
         fch = fch * (1 + 0.012 * smooth(n, 30, seed + 2))
         ech = np.minimum(1, t / 0.008) * np.exp(-t / (p['ct'] * 1.4))
-        y = y + p['chirp'] * (0.6 + 0.4 * I) * ech * (tone(fch) + 0.18 * tone(2 * fch))
+        nota = 0.35 * (tone(fch) + 0.18 * tone(2 * fch)) + breath(fch, 45 + 25 * r.random(), r)   # fischio soffiato, non un seno
+        y = y + p['chirp'] * (0.6 + 0.4 * I) * ech * nota
     if p.get('spool'):                                 # la turbina ancora lanciata che rallenta
         fs = p['spool'] * (0.55 + 0.45 * np.exp(-t / 0.6))
         y = y + p.get('spool_g', 0.04) * np.exp(-t / 0.35) * np.minimum(1, t / 0.02) * tone(fs)
@@ -218,10 +268,12 @@ def flutter(I, seed, p):
         pd = p['pd'] * (0.85 + 0.3 * r.random())
         e = np.minimum(1, tt / 0.0025) * np.exp(-tt / pd)
         puff = norm(reson(r.standard_normal(L), p['fp'] * (0.9 + 0.2 * r.random()) * (1 - 0.25 * tk / dur), p.get('fq', 1.4)))
-        ftu = p['tu'] * (1 - 0.2 * tk / dur) * (1 - 0.18 * np.minimum(1, tt / pd))
-        tu = tone(ftu) * np.exp(-tt / (pd * 0.8))
+        ftu = p['tu'] * (1 - 0.2 * tk / dur) * (1 - 0.18 * np.minimum(1, tt / pd)) * (0.96 + 0.08 * r.random())
+        colpo = r.standard_normal(L) * np.exp(-tt / (pd * 0.35))
+        tu = 0.3 * tone(ftu) * np.exp(-tt / (pd * 0.8)) + norm(reson(colpo, ftu[0], 5.5)) * np.exp(-tt / (pd * 0.9))
         fw = fw0 * (1 - 0.32 * tk / dur) * (1 + 0.07 * e)
-        seg = a * e * (p['gp'] * puff + p['gt'] * tu) + a * p['gw'] * e * tone(fw)
+        fischio = tone(fw)
+        seg = a * e * (p['gp'] * puff + p['gt'] * tu) + a * p['gw'] * e * fischio
         add(out, seg, i0)
     if p.get('s'):                                     # la "s" iniziale: un soffio corto prima dei colpi
         s = hp(r.standard_normal(n), 2500) * np.exp(-t / 0.03) * np.minimum(1, t / 0.003)
@@ -329,12 +381,18 @@ def pop(r, p, a=1.0, big=False):
     mid = norm(reson(r.standard_normal(L), p.get('mf', 600) * (0.85 + 0.3 * r.random()), 1.2)) * np.exp(-t / (p.get('mt', 0.02) * kb))
     bark = sat((p.get('gc', 0.8) * crack + p.get('gm', 0.5) * mid) * p.get('drive', 1.8) * (1.3 if big else 1.0), 1.0)
     f1 = p['f1'] * (0.9 + 0.2 * r.random()) * (0.85 if big else 1)
-    body = np.zeros(L)
-    for k, g in zip([1, 3, 5, 7], [1.0, 0.6, 0.35, 0.2]):
-        fk = f1 * k * (1 + 0.4 * np.exp(-t / 0.008))            # l'onda d'urto parte alta e si assesta
-        body += g * tone(fk) * np.exp(-t / (p.get('bt', 0.05) * kb / (1 + 0.3 * k)))
-    thump = tone(p.get('tf', 55) * (1 + 0.5 * np.exp(-t / 0.01))) * np.exp(-t / (p.get('tt', 0.05) * kb))
-    y = bark + p.get('gb', 0.7) * body / 2 + p.get('gt', 0.6) * thump
+    # il tubo: lo stesso fronte di pressione che rimbalza dentro lo scarico (prima erano quattro seni puri: «da tastiera»).
+    # Eccitazione larga e brevissima, il tubo ci mette le sue risonanze; gas più caldo nel botto grosso = tubo un po' più alto
+    exc = lp(r.standard_normal(L), min(9000, f1 * 40), 2) * np.exp(-t / (0.0035 * kb)) * np.minimum(1, t / 0.0004)
+    body = tube(exc, f1 * (1 + 0.06 * r.standard_normal()), p.get('bt', 0.05) * kb * 0.6, bright=0.35 + 0.3 * r.random())
+    body = norm(lp(body, min(8000, f1 * 12), 3))           # il silenziatore e la lana di roccia si mangiano gli alti della coda
+    # il colpo sordo: aria spostata (rumore cupo con una risonanza larga che scende un po'), non un seno da cassa
+    tf = p.get('tf', 55) * (0.92 + 0.16 * r.random())
+    tenv = np.exp(-t / (p.get('tt', 0.05) * kb)) * np.minimum(1, t / 0.0015)
+    th1 = norm(lp(r.standard_normal(L), tf * 2.6, 4)) * tenv
+    th2 = norm(reson(r.standard_normal(L) * np.exp(-t / 0.004), tf * 1.15, 2.2)) * tenv
+    thump = norm(th1 + 0.8 * th2)
+    y = bark + p.get('gb', 0.7) * 0.8 * body + p.get('gt', 0.6) * 1.6 * thump
     if p.get('metal'):                                            # titanio, tubi sottili: un tintinnio sopra
         for f, q, g in p['metal']:
             y += g * norm(reson(r.standard_normal(L) * np.exp(-t / 0.0008), f * (0.96 + 0.08 * r.random()), q)) * np.exp(-t / 0.03)
@@ -365,6 +423,7 @@ def burble(seed, p):
             add(out, pp, nlen(tt))
             tt += (1 / p['rate']) * (0.6 + 0.8 * r.random())
         t = tt + p.get('gap', 0.06) * (0.3 + 1.4 * r.random())
+    out = spazio(out, seed + 11, rt=0.07, g=0.14)
     out = lp(out, p.get('lp', 2500), 2)
     return fade(trim(out), 0.0005, 0.05)
 
@@ -390,6 +449,7 @@ def bang(seed, p):
             add(out, pop(r, dict(p, f1=p['f1'] * 1.5, crt=0.0015, bt=0.02), a=0.18 + 0.15 * r.random()), nlen(tt))
             tt += 0.018 + 0.03 * r.random()
     out = slap(out, ms=p.get('slap', 11), g=p.get('slapg', 0.28))
+    out = spazio(out, seed + 11, rt=0.1, g=0.18)
     if p.get('lp'):
         out = lp(out, p['lp'], 2)
     return fade(trim(out), 0.0003, 0.04)
@@ -412,6 +472,7 @@ def series(seed, p):
         t += (1 / p['rate']) * (1 - jit + 2 * jit * r.random())
         k += 1
     out = slap(out, ms=p.get('slap', 11), g=p.get('slapg', 0.22))
+    out = spazio(out, seed + 11, rt=0.09, g=0.16)
     if p.get('lp'):
         out = lp(out, p['lp'], 2)
     return fade(trim(out), 0.0003, 0.04)
@@ -437,9 +498,11 @@ def antilag(seed, p):
         return (lbump(f, 3200, 0.8) + 0.6 * lbump(f, 900, 0.9)) * e
 
     air = norm(painted(n, shape, seed + 9)) * (1 + 0.3 * smooth(n, 14, seed + 4))
-    whine = tone(5200 * (0.75 + 0.25 * np.exp(-t / 0.7))) * np.exp(-t / (dur * 0.8)) * np.minimum(1, t / 0.03)
+    fw = 5200 * (0.75 + 0.25 * np.exp(-t / 0.7))
+    whine = (0.35 * tone(fw) + breath(fw, 60, r)) * np.exp(-t / (dur * 0.8)) * np.minimum(1, t / 0.03)
     out = out + 0.22 * air + 0.05 * whine
     out = slap(out, 9, 0.3)
+    out = spazio(out, seed + 11, rt=0.1, g=0.18)
     return fade(trim(out), 0.0003, 0.06)
 
 
@@ -489,7 +552,7 @@ def gulp(I, seed, p):
 
     x = norm(painted(n, shape, seed))
     fh = p['fh'] * (0.75 + 0.25 * np.exp(-t / 0.05))
-    h = tone(fh) * np.minimum(1, t / 0.006) * np.exp(-t / p.get('ht', 0.08))
+    h = (0.35 * tone(fh) + norm(reson(r.standard_normal(n) * np.exp(-t / 0.01), p['fh'] * 0.9, 2.5))) * np.minimum(1, t / 0.006) * np.exp(-t / p.get('ht', 0.08))
     y = p.get('gn', 1.0) * x + p.get('gh', 0.6) * h
     if p.get('honk'):
         fz = p['honk'] * (1 + 0.08 * np.exp(-t / 0.04))
@@ -512,7 +575,7 @@ def clack(I, seed, p):
         tt = ts(L)
         exc = r.standard_normal(L) * np.exp(-tt / 0.0006)
         ring = norm(sum(g * reson(exc, f * (0.95 + 0.1 * r.random()), q) for f, q, g in p['modes']))
-        thunk = tone(np.full(L, p.get('tf', 130.0))) * np.exp(-tt / 0.02) * 0.4
+        thunk = norm(reson(r.standard_normal(L) * np.exp(-tt / 0.002), p.get('tf', 130.0) * (0.93 + 0.14 * r.random()), 3.0)) * np.exp(-tt / 0.02) * 0.45
         add(out, a * (ring + thunk) * np.exp(-tt / p.get('dec', 0.05)), i0)
     return fade(sat(out, 1.3), 0.0002, 0.03) * (0.6 + 0.4 * I)
 
@@ -601,6 +664,17 @@ BANGP = {
 }
 
 KITS = {}
+
+# (22/11) correzione di livello in dB per kit, dopo il rifacimento «meno robotico»: un colpo d'aria si sente più forte di un
+# seno basso con lo stesso picco, quindi qui si riporta ogni kit alla sonorità (pesata A) di prima, così i volumi tarati in
+# campioni.js (CMP.g) restano giusti. In su i colpi sono già al picco: si alzano con una saturazione morbida (il picco resta
+# quello, sale il resto del colpo, come un microfono vicino).
+LIVELLO = {
+    'aspirazione/airbox': -3.1, 'scarico/borbottio': -2.0, 'scarico/cupo': -5.4, 'scarico/gorgoglio': -0.9,
+    'scarico/scoppiettio': -1.1, 'valvola/stututu': -1.1,
+    'limitatore/colpi': 3.2, 'limitatore/stutter': 2.4, 'mappa/crackle': 1.3, 'mappa/pop_bang': 2.5,
+    'scarico/titanio': 1.6, 'valvola/gufo': 1.3,
+}
 
 
 def kit(kid, sr=SR, **groups):
@@ -711,8 +785,13 @@ def fai(kid, gdir=None):
             name = (str(i + 1) if g == 'main' else g + str(i + 1))
             files.append((name, s * (0.89 / pk)))
     out = []
+    kg = 10 ** (LIVELLO.get(kid, 0.0) / 20)
     for name, x in files:
         x = np.asarray(x, dtype=float)
+        if kg > 1:
+            x = 0.89 * np.tanh(kg * x / 0.89) / np.tanh(kg)
+        else:
+            x = x * kg
         p = os.path.join(d, name + '.wav')
         save(p, x, sr)
         out.append((name, len(x) / SR, float(np.max(np.abs(x)))))

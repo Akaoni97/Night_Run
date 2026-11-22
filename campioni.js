@@ -16,7 +16,7 @@
 //  Parte pura (provata in test/campioni.test.js): cmpInfo, cmpServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo,
 //  cmpCompra, cmpMonta, cmpFiles, cmpIndiceI. Parte audio: CampioniPlayer (Web Audio). Parte grafica: NightCampioni.html.
 // ============================================================================
-const CMP_VER = 1;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
+const CMP_VER = 3;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
 const CMP_DIR = 'audio/campioni/';
 const CMP = {
   k: 1.1,                                  // livello generale dei campioni sopra il motore sintetizzato (misurato con strumenti/ascolta_campioni.js)
@@ -168,7 +168,8 @@ function cmpAuto(slot, x) {
       if (x.exLv === 0) return null;
       const S = { hks: 'scarico/cupo', apexi: 'scarico/scoppiettio', tomei: 'scarico/titanio', blitz: 'scarico/borbottio', straight: 'scarico/pentola' }[x.exId];
       if (S) return S;
-      if (x.exLv >= 2) return 'scarico/scoppiettio';
+      if (['centrale', 'race', 'turboback'].includes(x.exId)) return 'scarico/scoppiettio';   // scarichi aperti (senza centrale, da gara, turboback)
+      if (!['terminale', 'catback'].includes(x.exId) && x.exLv >= 2) return 'scarico/scoppiettio';   // terminale e catback hanno la voce della famiglia (cinque livelli di scarico dalla v0.80)
       return x.cyl >= 6 ? 'scarico/gorgoglio' : x.cyl === 5 ? 'scarico/cupo' : 'scarico/borbottio';
     }
     case 'mappa': return x.ecuPops ? 'mappa/crackle' : null;

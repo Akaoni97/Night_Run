@@ -10,4 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Luca), con Claude | Auto nuove dai disegni in alta definizione (25 auto, versioni tuning, camion) | `img/`, `cars.js`, `street2d.js`, `nitido2d.js`, `game.js`, `strumenti/` | 21/11/2026 notte |
+| Luca con Claude | Luca Tuning: pezzi che cambiano davvero l'auto (aspirazione, cilindrata +300 cc, turbo fino a 2 bar e biturbo, benzina e iniettori, cambio sport e da corsa regolabili, slick da drag) | cars.js, tuning.js, officina.js, sim.js, campioni.js, index.html | 22/11 sera |

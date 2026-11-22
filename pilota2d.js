@@ -16,17 +16,19 @@
   // Serve perché sulle vernici argento, bianche e grigie il colore della carrozzeria somiglia a quello del vetro e il
   // riconoscimento automatico sbaglia. Dentro il riquadro il pilota si vede dove non c'è vernice (maschera _paint) né
   // montanti e guarnizioni scure. La Supra (disegno fatto a codice) usa ancora il riconoscimento del vetro.
-  const WIN = {
-    v40: [88, 125, 8, 25], r5: [72, 98, 6, 21], b2002: [76, 107, 4, 20], e30: [77, 115, 7, 23], e36: [74, 111, 4, 19], e34: [92, 118, 2, 20],
-    a80: [95, 129, 13, 25], a3: [90, 121, 8, 21], a112: [56, 84, 8, 23], doblo: [95, 123, 17, 40], panda: [68, 97, 16, 33], punto: [67, 107, 13, 32],
-    golf: [66, 98, 6, 21], corsa: [79, 110, 14, 34], p205: [62, 95, 8, 25], p206: [67, 102, 13, 29], p308: [84, 123, 16, 33], clio: [77, 109, 16, 31],
-    williams: [66, 105, 16, 33], taxi: [93, 115, 11, 25], v850: [105, 134, 10, 25], polo: [80, 116, 16, 33], van: [97, 136, 16, 40],
-    ambulanza: [165, 205, 33, 64], polizia: [88, 128, 12, 29],
+  const WIN = {   // finestrino del guidatore [x0, x1, y0, y1] nello sprite: disegni ad alta definizione del 21/11, misurati a mano
+    v40: [88, 125, 8, 25], r5: [72, 97, 7, 21], b2002: [77, 102, 7, 19], e30: [80, 109, 7, 21], e36: [81, 108, 4, 17], e34: [94, 118, 5, 19],
+    a80: [93, 124, 10, 26], a3: [90, 117, 9, 22], a112: [49, 77, 8, 24], doblo: [98, 127, 19, 42], panda: [71, 99, 17, 34], punto: [66, 100, 13, 29],
+    golf: [67, 93, 6, 20], corsa: [80, 112, 15, 32], p205: [60, 90, 9, 25], p206: [66, 98, 13, 28], p308: [83, 113, 15, 30], clio: [76, 108, 15, 29],
+    williams: [64, 93, 15, 29], taxi: [94, 121, 13, 27], v850: [99, 130, 10, 25], polo: [80, 109, 15, 30], van: [95, 124, 18, 42],
+    ambulanza: [166, 196, 34, 62], polizia: [85, 118, 14, 30],
+    panda141: [58, 95, 9, 25], ax: [59, 96, 7, 22], twingo: [58, 97, 9, 27], sandero: [80, 108, 15, 29], aygo: [70, 99, 8, 24],
   };
   S.WIN2D = WIN;
-  const paintOf = (id) => {
+  const paintOf = function (id) {
     if (id === 'v40') { if (!Street2D._v40p) { Street2D._v40p = new Image(); Street2D._v40p.src = 'img/v40_paint.png'; } return Street2D._v40p; }
-    return Street2D.gen && Street2D.gen[id] ? Street2D.gen[id].paint : null;
+    const k = this && this.genKey ? this.genKey() : id;   // col kit carrozzeria la maschera del disegno tuning
+    return Street2D.gen && Street2D.gen[k] ? Street2D.gen[k].paint : null;
   };
   // maschera dal riquadro misurato (null finché la maschera della vernice non è caricata)
   const rectMasks = (hd, R, paint) => {
@@ -52,9 +54,10 @@
   // glass: i pixel di vetro (azzurrini, chiari); win: vetro più gli spazi stretti tra vetri (dettagli, maniglie, cuciture)
   S.glassMasks = function (hd, G) {
     if (hd._gm) return hd._gm;
-    const R = WIN[this.carId];
+    const D0 = this.genDef && this.genDef(), off = (D0 && D0.off) || [0, 0], W0 = WIN[this.carId];
+    const R = W0 && [W0[0] + off[0], W0[1] + off[0], W0[2] + off[1], W0[3] + off[1]];   // disegno tuning: spostato del margine
     if (R) {
-      const pi = paintOf(this.carId), ready = pi && pi.complete && pi.naturalWidth > 0;
+      const pi = paintOf.call(this, this.carId), ready = pi && pi.complete && pi.naturalWidth > 0;
       const M = rectMasks(hd, R, ready ? pi : null);
       if (ready) hd._gm = M;                                       // senza maschera della vernice si ricalcola al prossimo giro
       return M;

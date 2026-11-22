@@ -125,7 +125,19 @@
     // compagno a grandezza di sprite (maschere di luce, ombra, qualità bassa)
     const c = document.createElement('canvas'); c.width = spr.width; c.height = spr.height;
     const cx2 = c.getContext('2d'); cx2.imageSmoothingEnabled = false; cx2.drawImage(hc, 0, 0, c.width, c.height);
-    c.hd = hc; c.img = spr.img; c.geo = spr.geo; c.wheelImg = spr.wheelImg; c.k = spr.k;
+    c.hd = hc; c.img = spr.img; c.geo = spr.geo; c.wheelImg = spr.wheelImg; c.wheelHd = spr.wheelHd; c.k = spr.k;
+    // disegno ad alta definizione (hd2, densità m): ogni pixel cambiato dal danno cambia il suo quadratino m×m, il resto resta nitido
+    if (spr.hd2) {
+      const H2 = spr.hd2, m = Math.round(H2.width / w), h2 = document.createElement('canvas'); h2.width = H2.width; h2.height = H2.height;
+      const x2c = h2.getContext('2d', { willReadFrequently: true }); x2c.drawImage(H2, 0, 0);
+      const im2 = x2c.getImageData(0, 0, h2.width, h2.height), q = im2.data, W2 = h2.width;
+      for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) {
+        const i = (yy * w + xx) * 4;
+        if (p[i] === o[i] && p[i + 1] === o[i + 1] && p[i + 2] === o[i + 2] && p[i + 3] === o[i + 3]) continue;
+        for (let dy = 0; dy < m; dy++) for (let dx = 0; dx < m; dx++) { const j = ((yy * m + dy) * W2 + xx * m + dx) * 4; q[j] = p[i]; q[j + 1] = p[i + 1]; q[j + 2] = p[i + 2]; q[j + 3] = p[i + 3]; }
+      }
+      x2c.putImageData(im2, 0, 0); c.hd2 = h2;
+    }
     return (spr._dm[lv] = c);
   };
 })();

@@ -17,6 +17,15 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
   { vt: 'golf', len: 3.8, kmh: [105, 130], w: 4 }, { vt: 'p205', len: 3.7, kmh: [110, 135], w: 3 }, { vt: 'williams', len: 3.7, kmh: [110, 135], w: 3 },
   { vt: 'a112', len: 3.2, kmh: [90, 115], w: 3 }, { vt: 'e36', len: 4.4, kmh: [110, 140], w: 4 }, { vt: 'e34', len: 4.7, kmh: [110, 140], w: 3 },
   { vt: 'e30', len: 4.3, kmh: [105, 130], w: 3 }, { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 2 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 2 }, { vt: 'v40', len: 4.5, kmh: [105, 130], w: 4 },
+  { vt: 'panda141', len: 3.4, kmh: [90, 115], w: 5 }, { vt: 'ax', len: 3.5, kmh: [95, 120], w: 3 }, { vt: 'twingo', len: 3.4, kmh: [95, 120], w: 5 },
+  { vt: 'sandero', len: 4.06, kmh: [100, 125], w: 7 }, { vt: 'aygo', len: 3.46, kmh: [100, 125], w: 6 },
+  // mezzi pesanti (CAMION in cars.js): cls = classe per la miscela dei luoghi (mix.truck); a 80-90 km/h in autostrada, sempre a destra
+  { vt: 'tir', cls: 'truck', len: 16, kmh: [82, 90], w: 1.6 }, { vt: 'tir_furgone', cls: 'truck', len: 16, kmh: [82, 90], w: 1.4 },
+  { vt: 'tir_cisterna', cls: 'truck', len: 14.5, kmh: [80, 88], w: 0.9 }, { vt: 'tir_bisarca', cls: 'truck', len: 18.5, kmh: [80, 88], w: 0.7 },
+  { vt: 'tir_container', cls: 'truck', len: 15.5, kmh: [82, 90], w: 0.8 }, { vt: 'tir_ruggine', cls: 'truck', len: 15.5, kmh: [80, 88], w: 0.5 },
+  { vt: 'tir_nightrun', cls: 'truck', len: 15.5, kmh: [82, 90], w: 0.3 }, { vt: 'tir_graffiti', cls: 'truck', len: 15.5, kmh: [82, 90], w: 0.4 },
+  { vt: 'tir_hazard', cls: 'truck', len: 15.5, kmh: [78, 86], w: 0.3 }, { vt: 'tir_mimetica', cls: 'truck', len: 15.5, kmh: [80, 88], w: 0.3 },
+  { vt: 'tir_marittimoblu', cls: 'truck', len: 15.5, kmh: [82, 90], w: 0.4 }, { vt: 'carro', cls: 'truck', len: 10.8, kmh: [85, 100], w: 0.6 },
 ];
 // luoghi della mappa del mondo: posti veri, ognuno con il suo sfondo 2D e il suo traffico
 // bg: tipo di sfondo · lat/lon: coordinate reali · traffic: densità · mix: quanto pesa ogni tipo di veicolo · places: negozi e officine
@@ -261,7 +270,7 @@ class StreetGame {
 
   // urto con un altro veicolo: quantità di moto divisa secondo le masse, danni secondo la differenza di velocità
   crash(e, kind = 'front') {
-    const sim = this.sim, m1 = sim.P.mass, m2 = (typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].mass) || 1400;
+    const sim = this.sim, m1 = sim.P.mass, m2 = (typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].mass) || (typeof CAMION !== 'undefined' && CAMION[e.vt] && CAMION[e.vt].mass) || 1400;
     const dv = Math.abs(sim.v - e.v), I = Math.min(1.5, dv / 10);
     e.hitT = 1.2;
     if (kind === 'side') {
@@ -274,7 +283,7 @@ class StreetGame {
       const sI = Math.min(1.2, 0.45 + dv * 0.05 + sim.v * 0.01);
       sim.events.push({ type: 'crash', I: sI, kind: 'side' }); this.fx.push({ k: 'scrape', I: sI, vt: e.vt });
       if (sI > 0.6) e.dent = 1; e.hazT = Math.max(e.hazT || 0, 4);
-      this.say(`Strisciata contro ${(typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].short) || 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
+      this.say(`Strisciata contro ${(typeof CARS !== 'undefined' && CARS[e.vt] && CARS[e.vt].short) || (typeof CAMION !== 'undefined' && CAMION[e.vt] && CAMION[e.vt].short.toLowerCase()) || 'un\'auto'}: carrozzeria al ${Math.round(sim.damage * 100)} %`, 'police');
       this.s.crashes = (this.s.crashes || 0) + 1; return;
     }
     // urto quasi anelastico (restituzione 0,2)
@@ -563,7 +572,8 @@ class StreetGame {
   spawn() {
     const sim = this.sim, d = this.s.dist, r = this.rnd;
     const w = [
-      ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
+      ['traffic', 40], ['police', 16 * (this.notteK ? this.notteK('police') : 1)],   // di notte meno volanti (notte.js)
+      ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
     ];
     let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
     for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }
@@ -581,10 +591,11 @@ class StreetGame {
   // un veicolo del traffico (tipo a caso secondo il luogo), in una corsia libera
   spawnTraffic(x, lane) {
     const r = this.rnd, mix = (this.loc && this.loc.mix) || {};
-    const tot = GAME_TRAFFIC.reduce((a, t) => a + t.w * (mix[t.vt] ?? 1), 0);
+    const mw = (t) => t.w * (mix[t.vt] ?? (t.cls ? mix[t.cls] : undefined) ?? 1);
+    const tot = GAME_TRAFFIC.reduce((a, t) => a + mw(t), 0);
     let k = r() * tot, T = GAME_TRAFFIC[0];
-    for (const t of GAME_TRAFFIC) { if ((k -= t.w * (mix[t.vt] ?? 1)) < 0) { T = t; break; } }
-    const heavy = T.vt === 'bus';
+    for (const t of GAME_TRAFFIC) { if ((k -= mw(t)) < 0) { T = t; break; } }
+    const heavy = T.len > 8;   // autobus e camion
     lane = lane || (heavy ? (r() < 0.8 ? 1 : 2) : r() < 0.5 ? 1 : r() < 0.6 ? 2 : 3);
     if (this.ents.some((o) => o.kind === 'traffic' && o.lane === lane && Math.abs(o.x - x) < 30 + (o.len || 4.6))) return null;
     const cols = GAME_COLORS;
@@ -597,7 +608,7 @@ class StreetGame {
     // a volte un secondo pesante appena più veloce, dietro al primo: lo sorpassa piano piano in seconda corsia ("gara tra elefanti")
     if (heavy && hw && lane === 1 && !this._pair && r() < 0.35) {
       this._pair = true; const b = this.spawnTraffic(x - 70 - r() * 40, 1); this._pair = false;
-      if (b && b.vt === 'bus') { b.vBase = b.vT = e.vBase + 0.6 + r() * 0.5; b.v = Math.min(b.v, b.vBase); }
+      if (b && b.len > 8) { b.vBase = b.vT = e.vBase + 0.6 + r() * 0.5; b.v = Math.min(b.v, b.vBase); }
       else if (b) b.drv = undefined;
     }
     return e;

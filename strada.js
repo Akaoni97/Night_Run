@@ -7,7 +7,7 @@
 
 // categorie delle auto (le usano il Garage e i documenti: una Panda e una M5 non sono nella stessa classe)
 const ST_CAT = {
-  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112'],
+  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112', 'panda141', 'ax', 'twingo', 'sandero', 'aygo'],
   familiare: ['v40', 'a80', 'a3', 'p308', 'v850', 'taxi'],
   hot: ['golf', 'p205', 'p206', 'williams', 'r5'],
   sportiva: ['e30', 'e36', 'e34', 'b2002', 'supra'],
@@ -38,7 +38,7 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     // mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
     const to = lead.lane > 1 ? lead.lane - 1 : lead.lane + 1;
     lead.to = to; lead.sig = 1.0; lead.yield = 4;
-    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto';
+    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || (typeof CAMION !== 'undefined' && CAMION[lead.vt] && 'Il ' + CAMION[lead.vt].short.toLowerCase()) || 'L\'auto';
     this.say(`${nm} davanti mette la freccia e ti fa passare`, 'info');
     return 'yield';
   };

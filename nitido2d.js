@@ -70,7 +70,7 @@
     const SS = this.SS || 1, key = 'b' + SS;
     spr._hd2 = spr._hd2 || {};
     if (spr._hd2[key]) return spr._hd2[key];
-    const src = x2(spr.hd), W = spr.width * SS, H = spr.height * SS, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const src = spr.hd2 || x2(spr.hd), W = spr.width * SS, H = spr.height * SS, c = document.createElement('canvas'); c.width = W; c.height = H;   // hd2: disegno già ad alta definizione (strumenti/disegni_hd.py)
     const x = c.getContext('2d', { willReadFrequently: true }), exact = src.width === W && src.height === H;
     x.imageSmoothingEnabled = !exact; x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, W, H);
     if (!exact) {   // bordo della sagoma netto: niente aloni mezzi trasparenti attorno all'auto
@@ -87,7 +87,7 @@
   };
   const body0 = S.body;
   S.body = function (g, spr, x, y) {
-    if (!spr.hd || !on(this)) return body0.call(this, g, spr, x, y);
+    if (!(spr.hd || spr.hd2) || !on(this)) return body0.call(this, g, spr, x, y);
     const SS = this.SS, hd = bodyHD.call(this, spr), sm = g.imageSmoothingEnabled, q = g.imageSmoothingQuality;
     g.imageSmoothingEnabled = !axisOk(g, SS); g.imageSmoothingQuality = 'high';
     g.drawImage(hd, 0, 0, hd.width, hd.height, x, y, spr.width, spr.height);
@@ -171,9 +171,9 @@
   // Scale2x e la rotazione morbida il cerchio resta tondo; i raggi a scatti fissi come prima (niente sfarfallio).
   // step = frazione di giro tra uno scatto e l'altro (π/20 per l'auto del giocatore, π/12 per il traffico)
   S.wheelDraw = function (g, img, cx, cy, s2, ang, speed, step = Math.PI / 20) {
-    const hd = on(this) ? x2(img) : img;
+    const hd = img._hd ? img : on(this) ? x2(img) : img;           // _hd: ruota già a densità doppia (disegnata a parte)
     g.save(); g.translate(Math.round(cx), Math.round(cy));
-    g.imageSmoothingEnabled = hd !== img; g.imageSmoothingQuality = 'high';
+    g.imageSmoothingEnabled = hd !== img || !!img._hd; g.imageSmoothingQuality = 'high';
     if (speed > 9) { for (let i = 0; i < 4; i++) { g.save(); g.globalAlpha = i ? 0.35 : 1; g.rotate(ang + i * Math.PI / 10); g.drawImage(hd, -s2 / 2, -s2 / 2, s2, s2); g.restore(); } }
     else { g.rotate(Math.round(ang / step) * step); g.drawImage(hd, -s2 / 2, -s2 / 2, s2, s2); }
     g.restore();

@@ -75,12 +75,14 @@ class SupraSim {
     this.cfg.valve = this.tune.valve;
   }
   // potenza e coppia massime a regime stabilizzato, per la scheda del tuning
+  // pressione massima in tubo: la mappa ECO / NORMALE / FORTE moltiplica quella del turbo, ma non supera il limite della centralina (`tc.cap`, se c'è)
+  boostTop(tc) { const v = tc.max * (this.boostCtl || 1); return tc.cap > 0 ? Math.min(v, Math.max(tc.cap, tc.max)) : v; }
   estimatePeak() {
     const tn = this.tune, tc = tn.turbo, P = this.P;
     let best = { cv: 0, nm: 0, rpmCv: 0, rpmNm: 0 };
     for (let rpm = 1000; rpm <= P.limiter; rpm += 50) {
       const frac = tc.twin ? SIM_SS(tc.a, tc.b, rpm) * 0.6 + 0.4 * SIM_SS(3800, 4400, rpm) : Math.pow(SIM_SS(tc.a, tc.b, rpm), 1.3);
-      const boost = tc.max * (this.boostCtl || 1) * Math.min(1, frac * 1.18);      // la mappa del turbo (ECO / NORMALE / FORTE) cambia la pressione
+      const boost = this.boostTop(tc) * Math.min(1, frac * 1.18);      // la mappa del turbo (ECO / NORMALE / FORTE) cambia la pressione
       const camK = SIM_SS(3000, 5500, rpm), camF = tn.camLow * (1 - camK) + tn.camHigh * camK;
       const T = this.tqAt(rpm) * tn.pw * (this.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm);
       const cv = T * rpm / 7023;
@@ -320,7 +322,7 @@ class SupraSim {
     this.wg = SIM_CLAMP((drive - 1) * 3, 0, 1);
     const tau = tgtT > this.tur ? tc.up * ((tn.ic && tn.ic.lag) || 1) : (closed && cfg.valve === 'flutter' ? 0.5 : tc.down * (closed ? 1.6 : 1));
     this.tur += (tgtT - this.tur) * Math.min(1, h / tau);
-    if (!closed) this.pipeP += (tc.max * (this.boostCtl || 1) * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
+    if (!closed) this.pipeP += (this.boostTop(tc) * Math.min(1, this.tur * this.tur) * SIM_SS(0.12, 0.6, this.thr) - this.pipeP) * Math.min(1, h / 0.08);
     else this.pipeP += (0 - this.pipeP) * Math.min(1, h / (cfg.valve === 'flutter' ? 0.45 : 0.07));
     if (closed && !this.bovLatch && this.pipeP > (cfg.valve === 'flutter' ? 0.1 : 0.2)) {
       this.bovLatch = true;
@@ -388,7 +390,8 @@ class SupraSim {
     const Ft = Fmax * fr;
     this.slipNow = slip;
     this.slipPow = Math.abs(Ft * (vw - this.v));                          // potenza dissipata nello slittamento (W)
-    const Tloss = (6 + 0.35 * Math.abs(this.ww)) * Math.tanh(this.ww * 4);
+    // attriti di trasmissione, cuscinetti e gomme che rotolano; P.lossK li scala per le auto piccole e strette (di serie 1: Supra e V40 come prima)
+    const Tloss = (6 + 0.35 * Math.abs(this.ww)) * Math.tanh(this.ww * 4) * (P.lossK ?? 1);
     const Tload = Ft * P.r + Tloss;
 
     // ---- frizione: coppia trasmessa (aggancio implicito, stabile) ------------------------------
@@ -415,7 +418,10 @@ class SupraSim {
     const v0 = this.v;
     // resistenza dell'aria: in scia a un'auto davanti (draft, 0..1 deciso dal gioco) ne resta meno; il rimorchio ne aggiunge
     const tk = this.trailerKg || 0;
-    const drag = 0.5 * 1.2 * (P.cd * ((tn.susp || {}).cdK || 1) * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v)
+    // vento (meteo2d.js): windV = componente contro la marcia in m/s (negativo = a favore), windX = di traverso. L'aria che
+    // conta è quella relativa all'auto; il vento di traverso aggiunge un po' di resistenza. Di serie 0: tutto come prima
+    const vr = this.v + (this.windV || 0), crossK = 1 + 0.12 * Math.min(1, Math.abs(this.windX || 0) / 15);
+    const drag = 0.5 * 1.2 * (P.cd * ((tn.susp || {}).cdK || 1) * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) * crossK + (tk ? 0.85 : 0)) * vr * Math.abs(vr)
       + (this.scrapeT > 0 ? Math.sign(this.v) * 0.06 * this.massNow() * 9.81 : 0);   // fondo che striscia: frena un po'
     // ---- freni: ogni asse frena fino a quanto tiene la sua gomma, col carico che in frenata va avanti ----------------------
     // ripartizione fissa (P.bf sull'anteriore). Con l'ABS l'asse al limite lavora a impulsi; senza ABS si blocca e striscia

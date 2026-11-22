@@ -457,7 +457,7 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
       if (S.fuga) { S.codaKm = km + 0.5; return; }      // da ricercato la coda non serve: ti inseguono
       if (this.prompt || this.ap || this.pol.ch || this.sim.v < 15) { S.codaKm = km + 0.5; return; }   // non è il momento: riprova tra poco
       S.codaKm = km + between(this, POL.codaKm);
-      if (R(this) >= POL.codaP) return;
+      if (R(this) >= POL.codaP * (this.notteK ? this.notteK('police') : 1)) return;   // di notte meno (notte.js)
       const e = { id: this.id++, kind: 'police', lane: this.lane, x: d - 70, v: this.sim.v, checked: true, tail: true };
       this.ents.push(e); this.pol.tail = { e, gap: 70, left: between(this, POL.codaLen) * 1000, over: 0 };
       this.say('Una volante ti si è messa dietro.', 'info');

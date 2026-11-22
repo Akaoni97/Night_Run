@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.80**
+**Versione attuale: v0.92**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -101,5 +101,17 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.76 | 21/11 | cognato | Aspetto dei personaggi: Nico giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo barbone (tratti speciali `L.x` in `personaggio.js`) |
 | v0.77 | 21/11 | cognato | Pulizia del codice morto (scene vecchie degli interni, consegne della città, reputazione, sfide, pedali nascosti, resti del Pistone), Test 1, insegne e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`) |
 | v0.78 | 21/11 | cognato | Campioni audio dei pezzi del motore: scheda Suoni in officina, 42 kit in 10 componenti (valvola, turbo, scarico, centralina, limitatore, cambio...), fatti a codice |
-| v0.79 | 21/11 | cognato | Scritte da fumetto anime più varie (oltre 60 voci, forme diverse, scintille) e interruttore «Grafiche anime» in Impostazioni → Grafica |
-| v0.80 | 21/11 | cognato | Lo swap motore porta con sé la frizione del donatore (prima restava quella dell'auto e slittava sempre), avviso se la frizione non regge, rapporti del cambio regolabili marcia per marcia da Luca |
+| v0.79 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
+| v0.80 | 21/11 | cognato | Scarichi a cinque livelli per ogni auto (terminale, catback, senza centrale, da gara) e collettore/cat da 200 celle che alza il tono e rende il suono più cattivo (`cat.len/tone/bark/edge/rasp/jet`) |
+| v0.81 | 21/11 | cognato | Chicche dell'officina (idee di Codex): scheda del pezzo al tocco con un solo pulsante, carattere dei pezzi dai dati, giri a 130 km/h, decimali sui piccoli guadagni, il FORTE non supera la centralina |
+| v0.82 | 22/11 | cognato | Auto nuove dai disegni ad alta definizione (25 auto, ruote disegnate a parte, versioni tuning col kit di Russian Kùstòm) e 12 mezzi pesanti nel traffico; il traino di Nico col carro attrezzi vero |
+| v0.83 | 22/11 | proprietario | Campioni dei pezzi meno robotici (chiesto dal cognato): botti col tubo che risuona invece dei seni, fischi di turbo, compressore e cambio come aria che ondeggia, «tu-tu» della valvola a sbuffi, un po' di spazio intorno; volumi percepiti uguali a prima (`LIVELLO`), `CMP_VER` 2 |
+| v0.84 | 22/11 | proprietario | Correzione dei campioni della v0.83 (a Nico sembravano stridii): fischi di turbo, compressori e cambio rimessi come prima, botti di nuovo pieni di bassi (tubo più cupo, tonfo più forte), niente soffio acuto in più nello stu-tu-tu; volumi di nuovo uguali a prima, `CMP_VER` 3 |
+| v0.85 | 22/11 | cognato | Cinque auto «iniziali» dai disegni del proprietario: Fiat Panda 1000 Fire, Citroën AX 1.1, Renault Twingo 1.2 (da km 0), Dacia Sandero 1.2 16V e Toyota Aygo 1.0 (da km 10), con scheda tecnica, pezzi e prezzo |
+| v0.86 | 22/11 | proprietario | Fisica e trazione vere delle auto da disegno (la V40 resta com'è): passo, baricentro, peso sull'asse motore, aderenza delle gomme di serie e peso delle ruote di ogni auto (`GEN_TELAIO` in `cars.js`), attriti di trasmissione in scala per le piccole (`P.lossK` in `sim.js`, di serie 1), finale vero della M3 E30 (3,25: 237 km/h); test `test/telaio.test.js` |
+| v0.87 | 22/11 | proprietario | Rapporti veri del cambio e del finale per dieci auto (Golf GTI, 205 GTI, Clio Williams, 850 R, Aygo, AX, Grande Punto, Sandero, Clio, Corsa: `GEN_CAMBI` in `cars.js`, con le fonti); le altre tengono i cambi comuni finché non si trovano dati sicuri |
+| v0.88 | 22/11 | proprietario | Rapporti veri del cambio per tutte le auto da disegno (ricerca di Codex in `docs/fisica/RAPPORTO_CODEX_CAMBI.md`): Panda, Panda 141, Polo, Twingo, 206, 308, A3, Audi 80, A112, Doblò, 850 R (M56H della T-5R); corretti i finali di AX, Clio, Corsa, Sandero e Punto; raggio delle ruote dalla misura vera delle gomme di serie (`genRaggio`) |
+| v0.89 | 22/11 | cognato | La notte: di notte meno volanti e più cose strane, radio che disturba ripetendo avvisi già sentiti, scena «Quella dietro» al benzinaio, interfaccia Essenziale/Meccanico, buio giocabile nelle incursioni, prova dei finali |
+| v0.90 | 22/11 | proprietario | Meteo deciso da Nico: il vento entra nella fisica (`sim.windV` contro/a favore, `sim.windX` di traverso, di serie 0), neve e nebbia anche in città, tempo dinamico secondo paesaggio e ora (`meteoPesi`), di notte nebbia solo ogni tanto e nei momenti horror (incursioni, cose strane), fruscio del vento più basso e morbido; test `test/meteo.test.js` |
+| v0.91 | 22/11 | cognato | Scritte da fumetto anime più varie (oltre 60 voci, forme diverse, scintille) e interruttore «Grafiche anime» in Impostazioni → Grafica |
+| v0.92 | 22/11 | cognato | Lo swap motore porta con sé la frizione del donatore (prima restava quella dell'auto e slittava sempre), avviso se la frizione non regge, rapporti del cambio regolabili marcia per marcia da Luca |
