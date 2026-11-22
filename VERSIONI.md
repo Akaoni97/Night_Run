@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.99**
+**Versione attuale: v1.04**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -126,3 +126,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v1.01 | 22/11 | proprietario | Tre salvataggi: tre partite del Viaggio separate sullo stesso computer (ognuna con auto, soldi, pezzi montati, personaggio e foto del diario), si scelgono sulla schermata iniziale e nel menu (Partita → Salvataggi); la partita di prima è la Partita 1 |
 | v1.02 | 22/11 | proprietario | Schermata iniziale rifatta: sfondo animato in stile Night Run alla risoluzione del gioco (autostrada di notte, città con la luna, lampioni, portale, traffico e camion, la tua auto in primo piano coi fari e qualche botto), logo nuovo, pannello con «Continua il viaggio» per le partite già cominciate; tornato il link Crediti; i traguardi non spuntano più sopra il titolo |
 | v1.03 | 22/11 | proprietario | Schermata iniziale: al posto dell'animazione (scattava e le ruote sembravano ferme) un quadro fermo disegnato una volta sola: la tua auto in corsia d'emergenza con le quattro frecce, il protagonista col telefono acceso, le scie del traffico a lunga posa, il cartello USCITA 18 KM, un lampione spento; si muove solo la telecamera, piano, con un effetto della pagina che non può scattare |
+| v1.04 | 22/11 | cognato | Gomme che sgommavano da sole passando da in movimento a fermi: oltre il picco la gomma, con lo slittamento all'indietro (freno motore, scalata, ruote lanciate su un'auto fermata), spingeva in avanti invece di frenare (errore dalla v0.71); `sim.ferma()` per quando il gioco ferma l'auto di colpo (Luca Garage, tutorial, «Vai a», fondo della retro); controllo della fisica e dei motori di tutte le auto; volume per ogni componente nei Suoni di Luca Tuning (0-200 %). |

@@ -690,7 +690,7 @@ class StreetGame {
       const far = Math.min(Math.max(this.s.far || 0, d0), d0 + GAME_BACK_MAX), lim = Math.min(d0, Math.max(0, far - GAME_BACK_MAX));
       this.s.dist = Math.max(lim, d0 + sim.v * dt);
       if (this.s.dist <= lim + 1e-6) {     // in fondo: l'auto si ferma davvero (prima la strada si fermava ma la fisica continuava ad andare indietro)
-        sim.v = 0; sim.ww = 0; sim.wo = 0; sim.phi = 0;
+        if (sim.ferma) sim.ferma(); else { sim.v = 0; sim.ww = 0; sim.wo = 0; sim.phi = 0; }
         if (!this.backWall) this.say('Più indietro di così non si torna: l\'autostrada va solo avanti', 'info');
         this.backWall = true;
       }

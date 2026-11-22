@@ -37,7 +37,7 @@
   const TAPPE = [['bar', 'Bar'], ['fuel', 'Benzinaio'], ['grill', 'Autogrill'], ['niko', 'Niko'], ['shop', 'Luca Tuning'], ['style', 'Russian Kùstòm'], ['motel', 'Motel'], ['dealer', 'Autosalone'], ['junk', 'Sfascio']];
   function vaiKm(km) {
     const g = G(); if (!g || !isFinite(km) || km < 0) return false;
-    g.s.dist = km * 1000; g.s.far = Math.max(g.s.far || 0, g.s.dist); g.sim.v = 0; save(); return true;
+    g.s.dist = km * 1000; g.s.far = Math.max(g.s.far || 0, g.s.dist); if (g.sim.ferma) g.sim.ferma(); else g.sim.v = 0; save(); return true;
   }
   function vaiTappa(id) {
     const g = G(); if (!g || typeof VG === 'undefined') return null;

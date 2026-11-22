@@ -252,9 +252,28 @@ function cmpIndiceI(I, n, r) {
   const j = r < 0.25 ? k - 1 : r > 0.75 ? k + 1 : k;
   return Math.max(0, Math.min(n - 1, j)) + 1;
 }
-// volume dei campioni scelto nella scheda Suoni (0..1,5), del computer
-function cmpVol() {
-  try { const v = JSON.parse(localStorage.getItem('nr_campioni') || '{}').vol; return Number.isFinite(v) ? Math.max(0, Math.min(1.5, v)) : 1; } catch (e) { return 1; }
+// volumi scelti nella scheda Suoni, del computer (localStorage nr_campioni = { vol, slot: { turbo: 1.4, ... } }):
+// vol = tutti i campioni (0..1,5), slot = il singolo componente (0..2, di serie 1). Letti una volta e tenuti in memoria
+const CMP_VOL_MAX = 2;
+let cmpVolMem = null;
+function cmpVolLeggi() {
+  if (cmpVolMem) return cmpVolMem;
+  let o = {};
+  try { o = (typeof localStorage !== 'undefined' && JSON.parse(localStorage.getItem('nr_campioni') || '{}')) || {}; } catch (e) { o = {}; }
+  return (cmpVolMem = { vol: Number.isFinite(o.vol) ? o.vol : 1, slot: o.slot && typeof o.slot === 'object' ? o.slot : {} });
+}
+function cmpVolScrivi(o) {
+  cmpVolMem = o;
+  try { localStorage.setItem('nr_campioni', JSON.stringify(o)); } catch (e) { /* ignora */ }
+}
+function cmpVol() { const v = cmpVolLeggi().vol; return Math.max(0, Math.min(1.5, v)); }
+// volume del singolo componente (valvola, turbo, scarico...): moltiplica ogni suo colpo e anello, anche nell'ascolto
+function cmpVolSlot(slot) { const v = cmpVolLeggi().slot[slot]; return Number.isFinite(v) ? Math.max(0, Math.min(CMP_VOL_MAX, v)) : 1; }
+function cmpVolSet(slot, v) {
+  const o = cmpVolLeggi(), n = Math.max(0, Math.min(slot ? CMP_VOL_MAX : 1.5, +v || 0));
+  if (slot) { const sl = Object.assign({}, o.slot); if (Math.abs(n - 1) < 1e-6) delete sl[slot]; else sl[slot] = n; cmpVolScrivi({ vol: o.vol, slot: sl }); }
+  else cmpVolScrivi({ vol: n, slot: o.slot });
+  return n;
 }
 
 // ---------------------------------------------------------------- parte audio
@@ -333,6 +352,7 @@ class CampioniPlayer {
   }
   // un colpo: dà la durata (s) o 0 se non c'è (file non ancora scaricato, troppe voci)
   shot(slot, id, f, gain, o = {}) {
+    gain *= cmpVolSlot(slot);
     const b = this.get(id, f); if (!b || gain <= 0) return 0;
     this.voci = this.voci.filter((v) => v.end > this.now());
     if (this.voci.length >= CMP.voci) return 0;
@@ -370,7 +390,7 @@ class CampioniPlayer {
       src.connect(g); g.connect(this.bus[CMP.bus[slot]].g); src.start(t, Math.random() * b.duration);
       L = this.loops[slot] = { src, g, kit: id };
     }
-    L.g.gain.setTargetAtTime(Math.max(0, gain), t, 0.05);
+    L.g.gain.setTargetAtTime(Math.max(0, gain * cmpVolSlot(slot)), t, 0.05);
     L.src.playbackRate.setTargetAtTime(Math.max(0.05, rate), t, 0.04);
   }
 
@@ -481,7 +501,7 @@ class CampioniPlayer {
     await this.load(id);
     this.stopPreview();
     const ctx = this.ctx, t = ctx.currentTime + 0.02;
-    this.prev.gain.setValueAtTime(Math.max(0.15, this.master || 0.7) * 1.1, ctx.currentTime);
+    this.prev.gain.setValueAtTime(Math.max(0.15, this.master || 0.7) * 1.1 * cmpVolSlot(K.slot), ctx.currentTime);
     const src = [];
     const play = (f, when, g = 0.8, rate = 1) => {
       const b = this.get(id, f); if (!b) return 0;
@@ -498,18 +518,21 @@ class CampioniPlayer {
       s.connect(gg); gg.connect(this.prev); s.start(t); s.stop(t + 3.05); src.push(s);
       let tt = t + 0.4;
       for (const g in K.extra || {}) { tt += 0.5; for (let i = 1; i <= Math.min(2, K.extra[g]); i++) { play(g + (i * 2), tt, 0.7); tt += 0.45; } }
+      this.prevEnd = Math.max(t + 3.05, tt); this.prevBase = Math.max(0.15, this.master || 0.7) * 1.1;
     } else {
       const n = K.n || 1, a = n >= 4 ? [2, n] : [1, n];
       let tt = t;
       for (const i of a) tt += play(String(i), tt) + 0.25;
+      this.prevEnd = tt; this.prevBase = Math.max(0.15, this.master || 0.7) * 1.1;
     }
+    this.prevId = id;
     this.prevSrc = src;
     return true;
   }
   stopPreview() { for (const s of this.prevSrc || []) { try { s.stop(); } catch (e) { /* già fermo */ } } this.prevSrc = []; }
 }
 
-if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KIT, CMP_VER, cmpInfo, cmpServe, cmpKitServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo, cmpCompra, cmpMonta, cmpFiles, cmpIndiceI, CampioniPlayer });
+if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KIT, CMP_VER, CMP_VOL_MAX, cmpVol, cmpVolSlot, cmpVolSet, cmpInfo, cmpServe, cmpKitServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo, cmpCompra, cmpMonta, cmpFiles, cmpIndiceI, CampioniPlayer });
 
 // ---------------------------------------------------------------- aggancio al gioco e scheda Suoni dell'officina
 (function campioni() {
@@ -542,7 +565,11 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
 .cmp-play { width: 30px; border: 1px solid #4a4458; border-right: 0; border-bottom-width: 3px; border-radius: 9px 0 0 9px; background: #1a1724; color: #8fe0a0; font: 700 12px/1 system-ui, sans-serif; cursor: pointer; padding: 0; }
 .cmp-play:hover { background: #24402c; color: #d8ffe0; }
 .cmp-st { font: 600 11px/1.2 var(--f-data, monospace); color: #8fe0a0; margin-left: 6px; } .cmp-st.no { color: #ff8a7a; } .cmp-st.off { color: #8a8478; }
-.cmp-row.no .cmp-kits { opacity: .45; }`;
+.cmp-row.no .cmp-kits { opacity: .45; }
+.cmp-sv { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; margin: 7px 0 0; font: 11px/1.2 var(--f-data, monospace); color: #a9a396; }
+.cmp-sv input { width: 100%; accent-color: #ffb347; } .cmp-sv b { color: #ffd27a; min-width: 40px; text-align: right; }
+.cmp-sv button { border: 1px solid #4a4458; border-radius: 7px; background: #1a1724; color: #a9a396; font: 600 10px/1 system-ui, sans-serif; padding: 4px 7px; cursor: pointer; }
+.cmp-sv button[disabled] { opacity: .35; cursor: default; }`;
 
   let pick = null;                                                   // kit non tuo che stai ascoltando (scheda con Compra e monta)
   function info0(ctx) {
@@ -557,7 +584,7 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
     const g = ctx.game, carId = g.car, x = info0(ctx), res = cmpRisolvi(g, carId, x), m = cmpStato(g).mont[carId] || {}, career = g.mode === 'career';
     const vol = Math.round(cmpVol() * 100);
     let h = '<p class="of-hint">Ogni pezzo montato porta la sua voce, sopra il motore. Qui le ascolti (▶), le cambi con un altro kit dello stesso componente o le spegni. Non cambiano un cavallo: cambiano la faccia della gente quando passi. Il kit che arriva col pezzo è gratis; gli altri si comprano una volta e valgono su tutte le auto.</p>';
-    h += `<div class="cmp-vol"><span>VOLUME CAMPIONI</span><input type="range" data-cmp-vol min="0" max="150" step="5" value="${vol}" aria-label="Volume dei campioni"><b id="cmpVolOut">${vol} %</b></div>`;
+    h += `<div class="cmp-vol"><span>VOLUME CAMPIONI</span><input type="range" data-cmp-vol="" min="0" max="150" step="5" value="${vol}" aria-label="Volume dei campioni"><b id="cmpVolOut">${vol} %</b></div>`;
     for (const S of CMP_SLOT) {
       const why = cmpServe(S.id, x), auto = cmpAuto(S.id, x), now = res[S.id], v = m[S.id] || 'auto';
       const spenta = S.id === 'mappa' && now && !((NR().sim || {}).cfg || {}).pops;                 // la mappa pop & bang si accende in Guida
@@ -579,9 +606,12 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
         const lab = lock ? `🔒 Si sblocca a ${fmt(cmpKm(pick.id))} km` : poor ? `Servono € ${fmt(price)}` : `Compra e monta · € ${fmt(price)}`;
         chips += `<div class="of-card" style="flex-basis:100%"><b class="ttl">${E(K.nome)}</b><p>${E(K.nota)}</p><div style="display:flex;gap:6px;margin-top:6px"><button type="button" class="cmp-play" style="width:auto;padding:0 12px;border-radius:8px;border-right:1px solid #4a4458" data-cmp-play="${E(pick.id)}">▶ Riascolta</button><button type="button" class="of-go" style="flex:1" data-cmp-buy="${E(pick.id)}" ${lock || poor ? 'disabled' : ''}>${E(lab)}</button><button type="button" class="cmp-play" style="width:auto;padding:0 12px;border-radius:8px;border-right:1px solid #4a4458;color:#a9a396" data-cmp-x="1">Lascia stare</button></div></div>`;
       }
+      // volume di questo componente (solo se qualcosa suona: con «spento» o niente in più non c'è niente da regolare)
+      const sv = Math.round(cmpVolSlot(S.id) * 100);
+      const vrow = now && !why ? `<div class="cmp-sv"><span>VOLUME</span><input type="range" data-cmp-vol="${E(S.id)}" min="0" max="${CMP_VOL_MAX * 100}" step="5" value="${sv}" aria-label="Volume di ${E(S.nome)}"><b id="cmpVolOut-${E(S.id)}">${sv} %</b><button type="button" data-cmp-v1="${E(S.id)}" ${sv === 100 ? 'disabled' : ''} title="Torna al 100 %">100 %</button></div>` : '';
       let inf = '';
       if (open[S.id]) inf = '<div class="of-info">' + `<p>${E(S.hint)}</p>` + kits.map((id) => `<p><b>${E(CMP_KIT[id].nome)}</b> — ${E(CMP_KIT[id].nota)}</p>`).join('') + '</div>';
-      h += `<div class="of-row cmp-row${why ? ' no' : ''}${now ? ' mod' : ''}"><div class="of-head"><span><b>${E(S.nome)}</b>${st}</span><button type="button" class="of-i" data-cmp-i="${E(S.id)}" aria-expanded="${!!open[S.id]}" aria-label="Cosa sono" title="Cosa sono">i</button></div><div class="cmp-kits">${chips}</div>${inf}</div>`;
+      h += `<div class="of-row cmp-row${why ? ' no' : ''}${now ? ' mod' : ''}"><div class="of-head"><span><b>${E(S.nome)}</b>${st}</span><button type="button" class="of-i" data-cmp-i="${E(S.id)}" aria-expanded="${!!open[S.id]}" aria-label="Cosa sono" title="Cosa sono">i</button></div><div class="cmp-kits">${chips}</div>${vrow}${inf}</div>`;
     }
     return h + '<p class="of-hint">▶ ascolta il kit da solo, anche a motore spento. In strada il volume segue il punto d\'ascolto (abitacolo, fuori, cofano) e l\'ambiente (città, galleria). I file sono in <code>audio/campioni/</code>: chi vuole ci mette le sue registrazioni con lo stesso nome.</p>';
   }
@@ -590,6 +620,7 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
   function click(el, ctx) {
     if (el.dataset.cmpPlay) { preview(el.dataset.cmpPlay); return false; }
     if (el.dataset.cmpX) { pick = null; return true; }
+    if (el.dataset.cmpV1) { cmpVolSet(el.dataset.cmpV1, 1); return true; }
     if (el.dataset.cmpBuy) { const id = el.dataset.cmpBuy; pick = null; return monta(ctx, CMP_KIT[id].slot, id); }
     if (el.dataset.cmpI) { open[el.dataset.cmpI] = !open[el.dataset.cmpI]; return true; }
     if (el.dataset.cmp && el.getAttribute('aria-disabled') !== 'true') {
@@ -616,10 +647,15 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
     }
     return false;
   }
+  // cursori dei volumi: data-cmp-vol="" = tutti i campioni, data-cmp-vol="<componente>" = solo quello (vale subito, anche mentre suona)
   function input(el) {
-    const v = Math.max(0, Math.min(150, +el.value || 0));
-    try { localStorage.setItem('nr_campioni', JSON.stringify({ vol: v / 100 })); } catch (e) { /* ignora */ }
-    const o = document.getElementById('cmpVolOut'); if (o) o.textContent = v + ' %';
+    const slot = el.dataset.cmpVol || '', v = Math.round(cmpVolSet(slot, (+el.value || 0) / 100) * 100);
+    const o = document.getElementById(slot ? 'cmpVolOut-' + slot : 'cmpVolOut'); if (o) o.textContent = v + ' %';
+    const b = slot && el.parentNode && el.parentNode.querySelector('[data-cmp-v1]'); if (b) b.disabled = v === 100;
+    // si sente subito: se il kit di quel componente sta suonando nell'ascolto il volume cambia dal vivo, se no riparte
+    const id = slot && cur && cur.res[slot]; if (!id) return;
+    if (player && player.prevId === id && player.ctx.currentTime < (player.prevEnd || 0)) player.prev.gain.setTargetAtTime((player.prevBase || 0.77) * cmpVolSlot(slot), player.ctx.currentTime, 0.03);
+    else preview(id);
   }
   async function preview(id) {
     try {

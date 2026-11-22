@@ -242,6 +242,9 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   centralina pop & bang, limitatore/launch/cambiate, cambio, spurgo nitro. 42 kit, 180 file in `audio/campioni/` fatti a codice da
   `strumenti/campioni_pezzi.py` (guida in `audio/campioni/LEGGIMI.md`); gli altri kit si comprano una volta per tutte le auto. In
   `dsp.js` i flag `valv`/`turb`/`bur` evitano i doppioni con la sintesi. Per sentirli fuori dal gioco: `strumenti/ascolta_campioni.js`.
+  Ogni componente che suona ha il suo cursore VOLUME (0-200 %, v1.04), sopra quello generale.
+- **Ruote che si fermano** (`sim.js`, v1.04): la gomma oltre il picco tiene il segno anche con lo slittamento all'indietro (prima
+  spingeva avanti: sgommate infinite passando da in movimento a fermi); quando il gioco ferma l'auto di colpo si usa `sim.ferma()`.
 
 ## Lavori aperti e idee in sospeso
 

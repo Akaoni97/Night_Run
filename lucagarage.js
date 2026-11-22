@@ -36,7 +36,8 @@ const LG = { prezzo: 150, vicino: 60, davanti: 9 };      // costo del passaggio,
     const why = this.lgWhy(); if (why) return { ok: false, why };
     const n = this.lgNear();
     this.s.money -= LG.prezzo;
-    this.s.dist = n.x - LG.davanti; this.s.far = Math.max(this.s.far || 0, this.s.dist); this.sim.v = 0;
+    this.s.dist = n.x - LG.davanti; this.s.far = Math.max(this.s.far || 0, this.s.dist);
+    if (this.sim.ferma) this.sim.ferma(); else this.sim.v = 0;
     return { ok: true, km: n.dd / 1000, name: VG.stop(n.n).name };
   };
 

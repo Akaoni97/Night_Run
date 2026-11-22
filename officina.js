@@ -273,7 +273,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
-      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i], [data-cmp-buy], [data-cmp-x]');            // scheda Suoni (campioni.js)
+      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i], [data-cmp-buy], [data-cmp-x], [data-cmp-v1]');            // scheda Suoni (campioni.js)
       if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
       const go = e.target.closest('[data-go]');
       if (go) {                                                    // pulsante della scheda: monta (e, se serve, compra)

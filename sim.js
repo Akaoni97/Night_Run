@@ -38,6 +38,17 @@ class SupraSim {
     });
   }
 
+  // l'auto si ferma di colpo per decisione del gioco (passaggio di Luca Garage, tutorial, "Vai a", fondo della retro):
+  // insieme alla velocità si fermano ruote, trasmissione e gomma, la frizione si apre e il motore torna al minimo.
+  // Azzerare solo v lasciava le ruote lanciate: gomme che fumavano e auto trascinata appena ripartiva la fisica
+  ferma() {
+    Object.assign(this, { v: 0, ww: 0, wo: 0, phi: 0, kap: 0, acc: 0, pz: 0, pzV: 0, hopE: 0, slipNow: 0, slipPow: 0, skid: 0,
+      tcCut: 0, Tc: 0, lock: false, shiftSeq: null, flatCut: false, lockF: false, lockR: false, locked: false, lockPow: 0 });
+    if (this.cfg && this.cfg.autoClutch) this.clutch = 1;
+    this.we = this.running ? Math.min(this.we, (this.P.idle || 850) / 9.5493) : 0;
+    if (this.run0) this.run0 = null;
+  }
+
   // cambio d'auto: parametri della scocca, del motore e del cambio (null = Supra di serie)
   setCar(over) {
     if (!this.P0) this.P0 = JSON.parse(JSON.stringify(this.P));
@@ -390,7 +401,10 @@ class SupraSim {
     const bk = ty.B * this.kap;
     let fr = Math.sin(ty.C * Math.atan(bk - ty.E * (bk - Math.atan(bk))));
     const kpk = Math.tan(Math.PI / (2 * Math.max(1.05, ty.C))) / ty.B;      // slittamento del picco
-    if (Math.abs(this.kap) > kpk) fr = 1 - (1 - fr) * (ty.fall ?? 0.45);     // quanto della caduta dopo il picco resta (1 = come prima)
+    // quanto della caduta dopo il picco resta (1 = come prima). Col segno: con lo slittamento all'indietro (freno motore,
+    // scalata, ruote lanciate su un'auto fermata) la gomma frena; prima di v1.04 qui diventava una spinta in avanti e la
+    // ruota prendeva a girare all'indietro sempre più forte, sgommando anche a motore spento
+    if (Math.abs(this.kap) > kpk) fr = Math.sign(fr) * (1 - (1 - Math.abs(fr)) * (ty.fall ?? 0.45));
     const Ft = Fmax * fr;
     this.slipNow = slip;
     this.slipPow = Math.abs(Ft * (vw - this.v));                          // potenza dissipata nello slittamento (W)

@@ -211,7 +211,7 @@ const TUT_TESTI = {
       if (!v.tutStart && d > 40) { v.tutStart = true; this.say(TUT_TESTI.start, 'info'); }
       const carried = this.s.trunk.some((it) => it.first), T = VG.stop(carried ? TUT_FIRST.to : TUT_FIRST.from);
       if (!this.inside && d > T.x + TUT_FIRST.over) {                    // oltre il locale: si torna davanti al locale, fermi
-        this.s.dist = T.x - 22; sim.v = 0; this.ents = this.ents.filter((e) => e.kind !== 'traffic');
+        this.s.dist = T.x - 22; if (sim.ferma) sim.ferma(); else sim.v = 0; this.ents = this.ents.filter((e) => e.kind !== 'traffic');
         if (!(v.tutMsgT > (this._tutNow || 0))) { this.say(TUT_TESTI.blocco, 'bad'); }
         v.tutMsgT = (this._tutNow = (this._tutNow || 0) + 1) + 4;
       }

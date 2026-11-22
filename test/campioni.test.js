@@ -8,7 +8,7 @@ const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'officina.js', 'campioni.js']
   .map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
 const E = new Function(src + `;return { EngineDSP, SupraSim, StreetGame, CARS, setActiveCar, tuningParams, offCatalog, offSwapApply, offSwapDo,
-  CMP, CMP_SLOT, CMP_KIT, CMP_DIR, cmpInfo, cmpServe, cmpKitServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo, cmpCompra, cmpMonta, cmpFiles, cmpIndiceI, CampioniPlayer, getT: () => TUNING };`)();
+  CMP, CMP_SLOT, CMP_KIT, CMP_DIR, cmpInfo, cmpServe, cmpKitServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo, cmpCompra, cmpMonta, cmpFiles, cmpIndiceI, CampioniPlayer, cmpVol, cmpVolSlot, cmpVolSet, CMP_VOL_MAX, getT: () => TUNING };`)();
 
 // un'auto con dei pezzi montati: catalogo (anche con lo swap), parametri e cosa c'è sotto il cofano per i campioni
 const auto = (car, pezzi = {}, swap = null) => {
@@ -236,4 +236,28 @@ test('campioni: l\'anti-lag spara al rilascio col turbo lanciato e a ogni cambia
   assert.ok(P.colpi.length >= 2, 'raffiche al rilascio: ' + P.colpi.length);
   P.colpi.length = 0; s.cut = 0; s.thr = 1; passi(P, s, 0.2); s.shiftSeq = { t: 0 }; passi(P, s, 0.05); s.shiftSeq = null; passi(P, s, 0.05);
   assert.equal(P.colpi.length, 1, 'un botto in cambiata');
+});
+
+test('campioni: volume per componente (scheda Suoni) su colpi, anelli e salvataggio', () => {
+  const mem = {}; globalThis.localStorage = { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); } };
+  try {
+    assert.equal(E.cmpVolSlot('turbo'), 1, 'di serie 100 %');
+    E.cmpVolSet('turbo', 1.6); E.cmpVolSet('valvola', 0); E.cmpVolSet('', 1.2);
+    const o = JSON.parse(mem.nr_campioni);
+    assert.equal(o.vol, 1.2); assert.equal(o.slot.turbo, 1.6); assert.equal(o.slot.valvola, 0);
+    assert.equal(E.cmpVolSet('scarico', 9), E.CMP_VOL_MAX, 'tetto al 200 %');
+    E.cmpVolSet('scarico', 1); assert.ok(!('scarico' in JSON.parse(mem.nr_campioni).slot), 'al 100 % non resta scritto');
+    // valvola a zero: il pssh non suona; turbo al 160 %: l'anello è più forte di quello di un turbo al 100 %
+    const res = { valvola: 'valvola/stututu', turbo: 'turbo/sibilo' };
+    const P = player(res, {}), s = simFinta({ tur: 0.8, thr: 1 });
+    passi(P, s, 0.5, null, (t) => (t === 0 ? [{ type: 'bov', I: 1 }] : []));
+    assert.equal(P.colpi.filter((c) => c.slot === 'valvola').length, 0, 'valvola spenta col suo volume');
+    const forte = P.pl.loops.turbo.g.gain.value;
+    E.cmpVolSet('turbo', 1); passi(P, s, 0.1);
+    const normale = P.pl.loops.turbo.g.gain.value;
+    assert.ok(Math.abs(forte / normale - 1.6) < 0.01, `turbo al 160 %: ${forte} contro ${normale}`);
+    E.cmpVolSet('valvola', 1); P.colpi.length = 0;
+    passi(P, s, 0.1, null, (t) => (t === 0 ? [{ type: 'bov', I: 1 }] : []));
+    assert.equal(P.colpi.filter((c) => c.slot === 'valvola').length, 1, 'valvola di nuovo al 100 %');
+  } finally { delete globalThis.localStorage; E.cmpVolSet('turbo', 1); }
 });
