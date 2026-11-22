@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const src = readFileSync(new URL('../prologo.js', import.meta.url), 'utf8');
-const { PRO_LETTERA, PRO_NOTAIO, PRO_AUTO, proShould } = new Function(src + ';return { PRO_LETTERA, PRO_NOTAIO, PRO_AUTO, proShould };')();
+const { PRO_LETTERA, PRO_NOTAIO, PRO_AUTO, PRO_NOTAIO_LOOK, proShould } = new Function(src + ';return { PRO_LETTERA, PRO_NOTAIO, PRO_AUTO, PRO_NOTAIO_LOOK, proShould };')();
+const pgSrc = readFileSync(new URL('../personaggio.js', import.meta.url), 'utf8');
+const PG = new Function('var window, document, localStorage;' + pgSrc + ';return { pgNorm, PG_X };')();
 
 test('prologo: parte solo a inizio di un Viaggio nuovo', () => {
   assert.equal(proShould({ vg: { on: true }, dist: 0 }), true);
@@ -22,4 +24,11 @@ test('prologo: sei auto, tutte si possono scegliere, ognuna una sola volta', () 
 test('prologo: lettera e colloquio hanno testo', () => {
   assert.ok(PRO_LETTERA.join(' ').includes('eredità'));
   assert.ok(PRO_NOTAIO.length >= 3 && PRO_NOTAIO.every((t) => t.length > 10));
+});
+
+test('prologo: il notaio in piedi è un personaggio del gioco, in abito (tratto speciale di personaggio.js)', () => {
+  assert.ok(PG.PG_X.includes('abito'));
+  const L = PG.pgNorm(PRO_NOTAIO_LOOK);
+  assert.equal(L.x && L.x.abito, true, 'il tratto abito resta dopo pgNorm');
+  assert.equal(L.occhiali, 'vista'); assert.equal(L.testa, 'niente');
 });

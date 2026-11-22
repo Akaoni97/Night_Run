@@ -29,7 +29,7 @@ const PG_OPZ = [
   { k: 'occhiali', nome: 'Occhiali', v: [['no', 'No'], ['vista', 'Da vista'], ['sole', 'Da sole']] },
 ];
 // il protagonista di sempre: cappellino rosso, giubbotto blu, capelli corti scuri
-const PG_X = ['canotta', 'tatuaggi', 'muscoli', 'catena', 'pazzo', 'barbone'];
+const PG_X = ['canotta', 'tatuaggi', 'muscoli', 'catena', 'pazzo', 'barbone', 'abito'];
 const PG_DEF = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 0, sopra: 'giubbotto', sopraCol: 0, barba: 'no', occhiali: 'no' };
 
 // un aspetto sempre valido (valori sconosciuti o mancanti tornano quelli di partenza)
@@ -39,7 +39,7 @@ function pgNorm(L) {
     const v = L[q.k];
     if (q.col ? Number.isInteger(v) && v >= 0 && v < q.col.length : q.v.some((x) => x[0] === v)) o[q.k] = v;
   }
-  // tratti speciali dei personaggi del gioco (non nell'editor): L.x = { canotta, tatuaggi, muscoli, catena, pazzo, barbone }
+  // tratti speciali dei personaggi del gioco (non nell'editor): L.x = { canotta, tatuaggi, muscoli, catena, pazzo, barbone, abito }
   if (L && L.x && typeof L.x === 'object') { const x = {}; for (const k of PG_X) if (L.x[k]) x[k] = true; if (Object.keys(x).length) o.x = x; }
   return o;
 }
@@ -192,7 +192,8 @@ function pgPaint(g, L, pose, f, blink) {
   const rect = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
   // un arto: quadratini lungo il segmento (pixel netti)
   const limb = (x0, y0, x1, y1, w, col) => { const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0) * 2) + 1; for (let i = 0; i <= n; i++) { const k = i / n; rect(x0 + (x1 - x0) * k - w / 2, y0 + (y1 - y0) * k - w / 2, w, w, col); } };
-  const jeans = '#2a3556', jeansSh = '#1c2440', jeansHi = '#3d4c78', shoe = '#16141c', sole = '#c8c0b0';
+  const ab = !!(L.x && L.x.abito);                            // abito (il notaio del prologo): pantaloni scuri e scarpe di cuoio
+  const jeans = ab ? '#23232e' : '#2a3556', jeansSh = ab ? '#15151c' : '#1c2440', jeansHi = ab ? '#34344a' : '#3d4c78', shoe = ab ? '#120c0a' : '#16141c', sole = ab ? '#2a1c16' : '#c8c0b0';
   // posa: angoli di gambe e braccia (0 = giù dritto, positivo = in avanti), respiro, testa
   const P = { bob: 0, lA: 0, lK: 0, rA: 0, rK: 0, bArm: 0.08, bEl: 0.25, fArm: -0.05, fEl: 0.3, head: 0, eyeDown: 0, mouth: 0, phone: false, pockets: false, wave: 0 };
   if (pose === 'walk') {
@@ -233,7 +234,12 @@ function pgPaint(g, L, pose, f, blink) {
   if (mu) rows = rows.map(([a, b], i) => (i < 12 ? [a - 2, b + 2] : i < 18 ? [a - 1, b + 1] : [a, b]));   // spalle larghe, vita stretta
   rows.forEach(([a, b], i) => { const y = shY + i; rect(X + a, y, b - a + 1, 1, C.jacket); rect(X + a, y, 2, 1, C.jacketSh); rect(X + b - 1, y, 2, 1, C.jacketHi); });
   const tb = shY + rows.length;                                                                     // fondo del busto
-  if (Xs.canotta) {                                                                                 // canotta: spalle e scollo di pelle, due spalline
+  if (Xs.abito) {                                                                                   // abito: camicia bianca a V, cravatta, revers, bottoni
+    for (let i = 0; i < 11; i++) rect(X + 1 - Math.floor(i / 3), shY + i, 2 + 2 * Math.floor(i / 3) - (i > 8 ? 2 : 0), 1, '#e6e1d6');
+    rect(X + 1, shY + 1, 2, 11, '#7a1c24'); rect(X + 1, shY + 1, 2, 1, '#5a1018'); px(X + 2, shY + 3, '#9a2a34');
+    for (let i = 0; i < 9; i++) { px(X - 1 - Math.floor(i / 3), shY + i, C.jacketHi); px(X + 4 + Math.floor(i / 3), shY + i, C.jacketHi); }
+    px(X + 2, shY + 14, '#5a5a66'); px(X + 2, shY + 19, '#5a5a66'); rect(X - 5, shY + 9, 3, 1, '#e6e1d6');   // bottoni, fazzoletto nel taschino
+  } else if (Xs.canotta) {                                                                          // canotta: spalle e scollo di pelle, due spalline
     rows.slice(0, 6).forEach(([a, b], i) => { rect(X + a, shY + i, 3, 1, C.skin); rect(X + b - 2, shY + i, 3, 1, C.skinSh); });
     rect(X - 2, shY, 6, 4, C.skin); rect(X - 1, shY + 4, 4, 1, C.skin);
   } else if (L.sopra === 'camicia') { for (let y = shY + 1; y < tb; y++) for (let x = X - 6; x <= X + 5; x++) { if ((x - X) % 3 === 0) px(x, y, C.check); else if ((y - shY) % 3 === 0) px(x, y, C.jacketSh); } rect(X + 1, shY, 4, 3, '#e8e2d4'); for (let y = shY + 4; y < tb; y += 4) px(X + 4, y, '#e8e2d4'); }
