@@ -47,6 +47,9 @@ test('i rapporti veri del cambio arrivano all\'auto', () => {
     for (let i = 1; i < c.g.length; i++) assert.ok(c.g[i] < c.g[i - 1], id + ' marce in ordine');
   }
   assert.equal(E.CARS.e30.P.fd, 3.25, 'M3 E30 col finale europeo');
+  // la gomma di serie dà il raggio: 175/65 R14 della Panda = 0,283 m
+  assert.equal(E.CARS.panda.P.r, 0.283, 'raggio dalla gomma');
+  assert.ok(Object.keys(E.GEN_CAMBI).length >= 20, 'quasi tutte le auto da disegno col cambio vero');
 });
 
 test('Supra e V40 restano come prima', () => {

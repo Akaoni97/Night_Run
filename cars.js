@@ -436,17 +436,31 @@ const GEN_TELAIO = {
   sandero: { wb: 2.59, cgH: 0.56, dw: 0.61, mu: 0.97, mw: 14 }, aygo: { wb: 2.34, cgH: 0.55, dw: 0.61, mu: 0.94, mw: 12 },
   polizia: { wb: 2.68, cgH: 0.56, dw: 0.61, mu: 0.98, mw: 17 },
 };
-// (22/11) rapporti veri del cambio e del finale, dove le fonti sono affidabili (le altre auto tengono i cambi comuni G5/G6):
-// golf: prova di Motor Sport del 1983 sulla 1.8 · p205: cambio BE1 della 1.9 fino al 1989 · williams: JC5-014 · v850: M56 del
-// manuale Volvo · aygo: Toyota C551 · ax: cambio MA della AX · punto: Fiat C514 della Punto 1.2 · sandero e clio: Renault JH3 ·
-// corsa: Opel F13 (Corsa 1.4, stesso finale della 1.2 Twinport)
+// (22/11) rapporti veri del cambio, del finale e misura delle gomme di serie (da cui il raggio di rotolamento: 97 % di
+// quello geometrico). Fonti in docs/fisica/RAPPORTO_CODEX_CAMBI.md (ricerca di Codex) e, per golf, p205, williams, aygo,
+// le prove e i manuali citati nel diario della v0.87. Sicurezza: alta salvo dove scritto «media».
 const GEN_CAMBI = {
   golf: { g: [3.48, 2.12, 1.44, 1.13, 0.912], fd: 3.65 }, p205: { g: [2.92, 1.85, 1.36, 1.07, 0.86], fd: 3.69 },
-  williams: { g: [3.091, 1.864, 1.321, 1.029, 0.794], fd: 4.067 }, v850: { g: [3.38, 1.90, 1.19, 0.87, 0.70], fd: 4.0 },
-  aygo: { g: [3.545, 1.913, 1.31, 1.027, 0.85], fd: 3.55 }, ax: { g: [3.416, 1.95, 1.357, 1.054, 0.853], fd: 3.937 },
-  punto: { g: [3.909, 2.158, 1.48, 1.121, 0.921], fd: 4.07 }, sandero: { g: [3.727, 2.048, 1.393, 1.029, 0.795], fd: 4.214 },
-  clio: { g: [3.727, 2.048, 1.393, 1.029, 0.756], fd: 4.5 }, corsa: { g: [3.727, 2.136, 1.414, 1.121, 0.892], fd: 3.94 },
+  williams: { g: [3.091, 1.864, 1.321, 1.029, 0.794], fd: 4.067 }, aygo: { g: [3.545, 1.913, 1.31, 1.027, 0.85], fd: 3.55 },
+  v850: { g: [3.07, 1.77, 1.19, 0.87, 0.70], fd: 4.0, gomma: '205/45 R17' },                    // M56H della T-5R
+  panda: { g: [4.1, 2.158, 1.48, 1.121, 0.897], fd: 3.438, gomma: '175/65 R14' },               // C514
+  panda141: { g: [3.909, 2.056, 1.344, 0.978, 0.837], fd: 3.867, gomma: '135/80 R13' },         // finale 15×58
+  polo: { g: [3.769, 1.955, 1.212, 0.881, 0.74], fd: 4.929, gomma: '185/65 R15' },              // 0DF SND (MQ200), finale 14×69
+  twingo: { g: [3.364, 1.864, 1.321, 0.967, 0.756], fd: 3.733, gomma: '155/70 R13' },           // JB1-132, finale 15×56
+  p206: { g: [3.455, 1.87, 1.36, 1.051, 0.86], fd: 3.789, gomma: '195/55 R15' },                // BE4/5S, finale 19×72 (media)
+  p308: { g: [2.875, 1.92, 1.219, 0.861, 0.702, 0.596], fd: 4.177, gomma: '205/55 R16' },       // MCM/6H (media)
+  a3: { g: [3.778, 2.118, 1.36, 1.029, 0.857, 0.733], fd: 3.647, gomma: '205/55 R16' },         // 02S RMH (MQ250), finale 17×62
+  a80: { g: [3.545, 2.105, 1.429, 1.029, 0.838], fd: 4.111, gomma: '195/65 R15' },              // 012 CCF, finale 9×37
+  a112: { g: [3.909, 2.055, 1.342, 0.963, 0.828], fd: 4.462, gomma: '135/80 R13' },             // finale 13×58
+  doblo: { g: [4.154, 2.118, 1.361, 0.978, 0.756, 0.622], fd: 3.833, gomma: '185/65 R15' },     // Cargo 2013
+  ax: { g: [3.417, 1.95, 1.357, 1.054, 0.854], fd: 3.765, gomma: '155/70 R13' },                // MA5 export, finale 17×64
+  clio: { g: [3.725, 1.956, 1.233, 0.903, 0.66], fd: 4.214, gomma: '185/65 R15' },              // JH3 335 (media)
+  corsa: { g: [3.727, 2.136, 1.414, 1.121, 0.892], fd: 4.294, gomma: '185/70 R14' },            // F13+ CR, finale 17×73 (media)
+  sandero: { g: [3.727, 2.048, 1.393, 1.029, 0.795], fd: 4.5, gomma: '185/65 R15' },            // JH3 090
+  punto: { g: [3.909, 2.158, 1.48, 1.121, 0.921], fd: 4.071, gomma: '175/65 R15' },             // C514.5
 };
+// raggio di rotolamento (m) da una misura come «185/65 R15»
+function genRaggio(m) { const [, w, h, d] = m.match(/(\d+)\/(\d+) R(\d+)/).map(Number); return Math.round((d * 25.4 / 2 + w * h / 100) * 0.97) / 1000; }
 // inerzia delle ruote (kg·m²) da massa e raggio: ruota e gomma come un anello pieno a 0,6, più il disco. Sull'asse motore
 // in più semiassi, differenziale e uscita del cambio
 function genInerzia(T, r) {
@@ -455,7 +469,7 @@ function genInerzia(T, r) {
 }
 for (const q of GEN_NEW) {
   let [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
-  if (GEN_CAMBI[id]) { gears = [0, ...GEN_CAMBI[id].g]; fd = GEN_CAMBI[id].fd; }
+  if (GEN_CAMBI[id]) { gears = [0, ...GEN_CAMBI[id].g]; fd = GEN_CAMBI[id].fd; if (GEN_CAMBI[id].gomma) r = genRaggio(GEN_CAMBI[id].gomma); }
   GEN_DATA[id].tq = genTq(hp, rH, nm, rN, lim);
   const heavy = mass > 5000, T = GEN_TELAIO[id] || {};
   let voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
