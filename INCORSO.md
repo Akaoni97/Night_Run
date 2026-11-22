@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Due errori piccoli (sfascio che apre l'autosalone nella prova, ▒ della radio di notte) e poi le anomalie di Luca in `VG_ODD` | `viaggio.js`, `notte.js`, `strumenti/` | 22/11 |
