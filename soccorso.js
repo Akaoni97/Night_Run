@@ -116,8 +116,10 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
   P.socSpawn = function () {
     const S = this.soc, d = this.s.dist, L = S.L = this.lane || 1;
     const A = L === 2 ? 1 : 2;
-    S.tx = d + SOC.dist;
-    S.van = { id: this.id++, kind: 'traffic', vt: 'van', len: 4.3, lane: A, x: d - 110, v: SOC.vmax, vT: 0, vBase: 0, color: 'orig', still: true, soc: true, hazard: false, rescue: true };
+    const carro = S.sv && S.sv.some((x) => x.id === 'traino') && typeof CAMION !== 'undefined' && CAMION.carro;   // per il traino arriva il carro attrezzi vero di Nico
+    S.dd = SOC.dist + (carro ? 3.4 : 0);                                // il carro è lungo 10,8 m: si ferma un po' più avanti
+    S.tx = d + S.dd;
+    S.van = { id: this.id++, kind: 'traffic', vt: carro ? 'carro' : 'van', len: carro ? 10.8 : 4.3, lane: A, x: d - 110, v: SOC.vmax, vT: 0, vBase: 0, color: 'orig', still: true, soc: true, hazard: false, rescue: true };
     this.ents.push(S.van); S.ph = 'come'; S.t = 0;
   };
 
@@ -206,12 +208,12 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
       }
     } else if (S.ph === 'tow') {                                                          // si va insieme (l'auto viene trainata), poi buio e si arriva
       const e = S.van, tw = SOC.traino, v = tw.v * Math.min(1, S.t / 1.2);
-      e.v = v; this.s.dist += v * dt; e.x = this.s.dist + SOC.dist; S.dark = cl((S.t - tw.dur) / 0.7);
+      e.v = v; this.s.dist += v * dt; e.x = this.s.dist + (S.dd || SOC.dist); S.dark = cl((S.t - tw.dur) / 0.7);
       if (S.t >= tw.dur + 0.7) {
         const sv = S.sv.find((x) => x.id === 'traino'), tgt = sv.st.x - 22;
         this.socPaga(sv);
         this.s.dist = tgt; this.s.far = Math.max(this.s.far || 0, tgt); this.nextTraffic = 0;
-        this.ents = this.ents.filter((x) => x === e); e.x = tgt + SOC.dist; e.v = 0;
+        this.ents = this.ents.filter((x) => x === e); e.x = tgt + (S.dd || SOC.dist); e.v = 0;
         this.say('Nico ti ha lasciato davanti all\'officina: premi U per entrare', 'info');
         if (this.diaAdd) this.diaAdd('soc', 'Col carro attrezzi di Nico fino all\'Officina Nico', true);
         S.ph = 'arrivo'; S.t = 0;

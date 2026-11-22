@@ -287,6 +287,14 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **GitHub Pages** si aggiorna da solo col push sul ramo (qualche minuto).
 
 ## Aggiungere veicoli da un nuovo zip di disegni
+**Disegni ad alta definizione (dal 22/11, v0.82)**: `python3 -I strumenti/sfondo_via.py <uscita> 14 <disegni>` toglie lo sfondo
+(scrive anche `_bianco.png`), `trova_ruote.py` sui `_bianco`, poi `affina_ruote.py <ruote.json> <uscita>` (centro dal cerchione,
+raggio fino a terra; guarda i cerchi ingranditi, per autobus e auto difficili mettili a mano), poi
+`python3 -I strumenti/disegni_hd.py img <anteprime> ruote.json <uscita> <cartella ruote> elenco.json`
+(`elenco.json = { id: [disegno, ruota disegnata a parte, passo in metri, suffisso, [y0, y1] fascia dei finestrini, id normale per le tuning] }`):
+crea le due misure e `meta.json` da copiare in `GEN_DATA` (`sprite`, o `spriteT` per la tuning). Finestrino del guidatore a mano in `WIN`
+di `pilota2d.js`. Camion: `strumenti/camion_hd.py` (motrice + rimorchio, assi trovati sul disegno). Togli dai disegni marchi e stemmi.
+
 Gli strumenti sono in `strumenti/` (Python con Pillow e NumPy):
 1. Estrai lo zip in una cartella vuota (dati non fidati: niente script da dentro lo zip).
 2. `python3 -I trova_ruote.py ruote.json <disegni>/*.png` trova le due ruote in ogni disegno.

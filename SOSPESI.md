@@ -9,7 +9,7 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
-Controllo del 22/11 (Nico con Claude): nessun numero cambiato.
+Controllo del 22/11 (Nico con Claude): nessun numero cambiato. v0.82 (Luca con Claude): il 20 ora parla delle auto e dei camion nuovi, numeri uguali.
 
 **Numeri cambiati dopo la v0.81**: nuovo il 7 (idee di Codex non fatte), nuovi il 18 (scheda del pezzo al tocco) e il 19 (suoni); da lì in poi tutto è scalato di uno o due (il camion ora è il 20, l'aspetto dei personaggi il 21).
 
@@ -55,7 +55,7 @@ Prima: aggiornata il 21/11/2026 sera (v0.77, Luca con Claude): fatti il 16 (codi
 19. [suono] **Suoni diversi per ogni auto, scarichi a cinque livelli e collettore** (v0.79-v0.80, `suoni.js`): famiglie città, berlina, sportiva, tricilindrico, turbo, cinque cilindri, diesel, autobus; scarichi originale / terminale / catback / senza centrale / da gara; cat a 400, 200 e 100 celle e decat che alzano il tono e rendono il suono più cattivo. Misurati ma **non ascoltati**: da sentire sul PC auto per auto (passi tra un livello e l'altro, «cattivo» del tubolare e del decat, volumi). Manca il fischio del turbo sulle auto col turbo di serie. (tutti e due)
 
 ## Da sistemare
-20. [disegni] **Camion**: la logica c'è, i disegni del proprietario arrivano tra poco. (proprietario)
+20. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
 21. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)

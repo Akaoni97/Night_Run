@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.81**
+**Versione attuale: v0.82**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -104,3 +104,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.79 | 21/11 | cognato | Suoni diversi per ogni auto: famiglie di motore (`suoni.js`) dalla scheda vera, scarichi sportivi e inerzia di famiglia |
 | v0.80 | 21/11 | cognato | Scarichi a cinque livelli per ogni auto (terminale, catback, senza centrale, da gara) e collettore/cat da 200 celle che alza il tono e rende il suono più cattivo (`cat.len/tone/bark/edge/rasp/jet`) |
 | v0.81 | 21/11 | cognato | Chicche dell'officina (idee di Codex): scheda del pezzo al tocco con un solo pulsante, carattere dei pezzi dai dati, giri a 130 km/h, decimali sui piccoli guadagni, il FORTE non supera la centralina |
+| v0.82 | 22/11 | cognato | Auto nuove dai disegni ad alta definizione (25 auto, ruote disegnate a parte, versioni tuning col kit di Russian Kùstòm) e 12 mezzi pesanti nel traffico; il traino di Nico col carro attrezzi vero |

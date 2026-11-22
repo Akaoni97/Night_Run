@@ -53,6 +53,8 @@ class Street2D {
 
   // ---------------------------------------------------------------- utilità
   static WHEEL_FIX = {};   // cerchi fuori asse rispetto alla gomma (vedi wheelConc): con le ruote disegnate a parte (21/11) non ce ne sono più
+  // lo sprite di un veicolo del traffico: un'auto (CARS) o un mezzo pesante (CAMION, cars.js)
+  static defOf(id) { return (typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite) || (typeof CAMION !== 'undefined' && CAMION[id] && CAMION[id].sprite) || null; }
   static rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   static shade(hex, k) {
     const n = parseInt(hex.slice(1), 16), f = (c) => Math.max(0, Math.min(255, Math.round(k < 0 ? c * (1 + k) : c + (255 - c) * k)));
@@ -542,7 +544,7 @@ class Street2D {
 
   // traffico, polizia e rivali: solo le auto disegnate dal giocatore (cars.js, img/<auto>.png), riverniciate con la maschera
   otherSprite(kind, color, k, vt) {
-    const id = kind === 'police' ? 'polizia' : (vt && typeof CARS !== 'undefined' && CARS[vt] && CARS[vt].sprite) ? vt : 'panda';
+    const id = kind === 'police' ? 'polizia' : (vt && Street2D.defOf(vt)) ? vt : 'panda';
     // il traffico tiene i colori dei disegni; solo l'auto "gemella" degli eventi strani prende il colore del giocatore
     const hex = color === 'orig' || kind === 'police' || kind === 'traffic' && !color ? 'orig' : '#' + (color || 0x777777).toString(16).padStart(6, '0');
     return this.trafficSprite(id, hex, k);
@@ -550,7 +552,7 @@ class Street2D {
   trafImgs(id) {
     Street2D.tg = Street2D.tg || {};
     if (Street2D.tg[id]) return Street2D.tg[id];
-    const D = CARS[id].sprite, G = { n: 0, ready: false }, K = D.imgHd ? ['img', 'wheel', 'paint', 'imgHd', 'wheelHd', 'paintHd'] : ['img', 'wheel', 'paint'];
+    const D = Street2D.defOf(id), G = { n: 0, ready: false }, K = D.imgHd ? ['img', 'wheel', 'paint', 'imgHd', 'wheelHd', 'paintHd'] : ['img', 'wheel', 'paint'];
     const done = () => { if (++G.n === K.length) { G.ready = true; } };
     for (const k of K) { const im = new Image(); im.onload = done; im.onerror = done; im.src = D[k]; G[k] = im; }
     return (Street2D.tg[id] = G);
@@ -558,7 +560,7 @@ class Street2D {
   trafficSprite(id, hex, k) {
     const key = 'traf' + id + hex + k;
     if (this.spr[key]) return this.spr[key];
-    const G = this.trafImgs(id), D = CARS[id].sprite;
+    const G = this.trafImgs(id), D = Street2D.defOf(id);
     if (!G.ready || !G.img.width) return null;
     // base ridipinta: m = 1 la misura di sempre, m = 2 il disegno a densità doppia
     const mkBase = (m) => {

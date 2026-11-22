@@ -21,3 +21,8 @@ Formato: `## data · per chi · da chi` e due o tre righe.
 - Personaggi nuovi: **Nabir** al bar, **Rossana** al benzinaio, **Phill Grill** alla cassa della Sosta 24, **Rocco Lostallone** all'Autosalone, **Massimo Lo Sfascio** allo sfascio. Luca Tuning come prima.
 - *Aggiornamento v0.76*: Nico è giovane e tatuato, Tito vecchio e pazzo, Rocco fisicato, Massimo un barbone.
 - *Aggiornamento v0.77*: pulito il codice che non si usava più (sparita la «Reputazione» in alto, che restava sempre a 0); insegne grandi e oggetti del marciapiede più definiti; il vecchio test si chiama «Test 1».
+
+## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **Auto nuove e camion** (v0.82)
+- Le 25 auto da disegno sono state **rifatte coi disegni nuovi ad alta definizione** (ruote disegnate a parte che girano). Supra e V40 restano le tue.
+- Da Russian Kùstòm c'è il **Kit completo** (€ 1.600): l'auto diventa la sua versione tuning (labbro, minigonne, diffusore, spoiler).
+- Nel traffico ci sono i **camion** (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi); il traino di Nico arriva col carro attrezzi giallo.

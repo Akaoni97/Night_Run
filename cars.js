@@ -480,6 +480,24 @@ const CARS = {
 CARS.supra.tuning = TUNING_SUPRA; CARS.supra.presets = SUPRA_PRESETS; CARS.supra.params = supraParams;
 for (const c of GEN_CARS) CARS[c.id] = genCar(c);
 const CAR_IDS = Object.keys(CARS);
+// i mezzi pesanti del traffico (camion e carro attrezzi), dai disegni del proprietario: strumenti/camion_hd.py li compone
+// (motrice + rimorchio) e fa le due misure come le auto (_hd). Non si guidano: servono a street2d.js (trafficSprite) e a GAME_TRAFFIC.
+const CAMION = {
+  tir: { short: 'Autoarticolato', mass: 32000, sprite: {"w": 695, "h": 204, "wy": 179.7, "wr": 23.3, "ax": [93.2, 145.9, 198.0, 446.7, 502.6, 631.5], "head": [692, 158], "tail": [1, 147, 5, 5], "ex": [3, 185], "hx": 590, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  carro: { short: 'Carro attrezzi', mass: 11000, sprite: {"w": 473, "h": 155, "wy": 130.8, "wr": 23.3, "ax": [157.1, 400.6], "head": [470, 109], "tail": [1, 98, 5, 5], "ex": [3, 137], "hx": 402, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_furgone: { short: 'Autoarticolato', mass: 32000, sprite: {"w": 700, "h": 176, "wy": 151.9, "wr": 23.3, "ax": [87.7, 135.6, 183.6, 435.2, 492.7, 624.8], "head": [697, 130], "tail": [1, 119, 5, 5], "ex": [3, 158], "hx": 595, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_cisterna: { short: 'Autocisterna', mass: 32000, sprite: {"w": 625, "h": 162, "wy": 138.6, "wr": 23.3, "ax": [52.5, 104.1, 155.5, 360.1, 417.6, 549.6], "head": [622, 117], "tail": [1, 105, 5, 5], "ex": [3, 144], "hx": 531, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_bisarca: { short: 'Bisarca', mass: 32000, sprite: {"w": 820, "h": 203, "wy": 179.3, "wr": 23.3, "ax": [95.8, 146.9, 198.0, 555.0, 612.4, 744.5], "head": [817, 158], "tail": [1, 146, 5, 5], "ex": [3, 185], "hx": 697, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_container: { short: 'Portacontainer', mass: 32000, sprite: {"w": 666, "h": 175, "wy": 151.1, "wr": 23.3, "ax": [60.4, 114.3, 167.6, 401.5, 459.0, 591.1], "head": [663, 130], "tail": [1, 118, 5, 5], "ex": [3, 157], "hx": 566, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_ruggine: { short: 'Portacontainer', mass: 32000, sprite: {"w": 665, "h": 176, "wy": 151.9, "wr": 23.3, "ax": [56.7, 110.6, 163.9, 399.9, 457.3, 589.4], "head": [662, 130], "tail": [1, 119, 5, 5], "ex": [3, 158], "hx": 565, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_nightrun: { short: 'Portacontainer', mass: 32000, sprite: {"w": 665, "h": 175, "wy": 151.1, "wr": 23.3, "ax": [56.7, 110.6, 163.9, 399.7, 457.2, 589.2], "head": [662, 130], "tail": [1, 118, 5, 5], "ex": [3, 157], "hx": 565, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_graffiti: { short: 'Portacontainer', mass: 32000, sprite: {"w": 664, "h": 171, "wy": 147.8, "wr": 23.3, "ax": [56.2, 110.0, 163.3, 399.0, 456.4, 588.5], "head": [661, 126], "tail": [1, 115, 5, 5], "ex": [3, 154], "hx": 564, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_hazard: { short: 'Portacontainer', mass: 32000, sprite: {"w": 664, "h": 171, "wy": 147.5, "wr": 23.3, "ax": [56.2, 110.0, 163.3, 399.1, 456.6, 588.7], "head": [661, 126], "tail": [1, 114, 5, 5], "ex": [3, 153], "hx": 564, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_mimetica: { short: 'Portacontainer', mass: 32000, sprite: {"w": 664, "h": 171, "wy": 147.3, "wr": 23.3, "ax": [55.6, 109.5, 162.8, 399.3, 456.8, 588.9], "head": [661, 126], "tail": [1, 114, 5, 5], "ex": [3, 153], "hx": 564, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+  tir_marittimoblu: { short: 'Portacontainer', mass: 32000, sprite: {"w": 663, "h": 171, "wy": 147.5, "wr": 23.3, "ax": [55.5, 109.3, 162.6, 398.4, 455.9, 587.9], "head": [660, 126], "tail": [1, 114, 5, 5], "ex": [3, 153], "hx": 563, "hy": 0, "refL": 128, "slots": {}, "ws": 25, "fixed": 1, "hd": 2} },
+};
+for (const id in CAMION) { const c = CAMION[id], s = c.sprite; Object.assign(s, { img: `img/${id}.png`, wheel: `img/${id}_wheel.png`, paint: `img/${id}_paint.png`, imgHd: `img/${id}_hd.png`, wheelHd: `img/${id}_wheel_hd.png`, paintHd: `img/${id}_paint_hd.png` }); }
+
 // freni di ogni auto (la Supra ha i suoi in sim.js): abs = c'era di serie · bk = decelerazione massima a pedale pieno (g),
 // con pastiglie fredde e senza limiti di gomma · bf = quota sull'asse anteriore · Iwf = inerzia delle ruote non motrici
 // (kg·m²) · cl = portanza. Le auto degli anni 70-80 senza ABS bloccano le ruote; tamburi e servofreni deboli frenano meno.

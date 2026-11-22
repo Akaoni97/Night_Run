@@ -38,7 +38,7 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
     // mette la freccia e si sposta a destra (o a sinistra se è già tutto a destra) per farti passare
     const to = lead.lane > 1 ? lead.lane - 1 : lead.lane + 1;
     lead.to = to; lead.sig = 1.0; lead.yield = 4;
-    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || 'L\'auto';
+    const nm = (CARS[lead.vt] && CARS[lead.vt].short) || (typeof CAMION !== 'undefined' && CAMION[lead.vt] && 'Il ' + CAMION[lead.vt].short.toLowerCase()) || 'L\'auto';
     this.say(`${nm} davanti mette la freccia e ti fa passare`, 'info');
     return 'yield';
   };
