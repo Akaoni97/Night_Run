@@ -60,3 +60,35 @@ test('le piccole restano com\'erano: niente scatti da supercar', () => {
     assert.ok(r.t100 > a && r.t100 < b, `${id}: 0-100 in ${r.t100.toFixed(2)} s, atteso tra ${a} e ${b}`);
   }
 });
+
+// ---- v0.93: la macchina da 600 CV che sgomma deve comunque spingere (controllo di trazione progressivo, bagnato meno punitivo) ----
+function e36forte(tc, wet, soloMotore) {
+  const s = new E.SupraSim(), c = E.CARS.e36, cat = c.tuning, sel = {};
+  for (const k of Object.keys(cat)) sel[k] = cat[k].items[cat[k].items.length - 1].id;
+  if (soloMotore) for (const k of ['tires', 'suspension', 'final']) sel[k] = cat[k].items[0].id;
+  s.setCar(Object.assign({}, c.P)); s.P.fwd = !!c.fwd; s.P.rearW = c.driveW; s.setTune(c.params(sel).sim);
+  s.cfg.tc = tc; s.wet = wet; s.setIgnition(true); drive(s, 4, (x, t) => x.setStarter(t < 1.2)); s.shift(1);
+  let boxT = 0.5, t100 = 0, t200 = 0;
+  drive(s, 40, (x, t) => {
+    x.in.thr = 1; boxT -= H;
+    if (boxT <= 0 && !x.shiftSeq && x.gear >= 1) {
+      const P = x.P, top = P.gears.length - 1, g = x.gear, rpmAt = (n) => Math.abs(x.wo * x.ratio(n)) * 9.5493, up = P.idle + (P.limiter - P.idle) * 0.91;
+      if (g < top && x.rpm > up && rpmAt(g + 1) > P.idle + 350 && x.shift(g + 1)) boxT = 0.7;
+    }
+    const k = x.v * 3.6; if (!t100 && k >= 100) t100 = t; if (!t200 && k >= 200) t200 = t;
+  });
+  return { t100, t200 };
+}
+
+test('E36 da 600 CV: con il controllo di trazione l\'asciutto è feroce e il bagnato spinge ancora', () => {
+  const a = e36forte(true, 0, false), b = e36forte(true, 1, false), m = e36forte(true, 1, true);
+  assert.ok(a.t100 < 4.9 && a.t200 < 10, `asciutto ${a.t100.toFixed(2)} / ${a.t200.toFixed(1)} s`);
+  assert.ok(b.t100 < 6 && b.t200 < 12, `bagnato ${b.t100.toFixed(2)} / ${b.t200.toFixed(1)} s`);
+  assert.ok(m.t200 > 0 && m.t200 < 15.5, `bagnato, gomme di serie ${m.t100.toFixed(2)} / ${m.t200.toFixed(1)} s`);
+});
+
+test('sgommare a gas pieno non inchioda la macchina: senza controllo di trazione 0-200 resta in tempi giusti', () => {
+  const off = e36forte(false, 1, false), offD = e36forte(false, 0, false);
+  assert.ok(off.t200 > 0 && off.t200 < 15, `bagnato senza TC ${off.t200.toFixed(1)} s`);
+  assert.ok(offD.t200 < 11, `asciutto senza TC ${offD.t200.toFixed(1)} s`);
+});

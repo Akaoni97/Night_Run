@@ -97,10 +97,10 @@ class SupraSim {
   tireGrip() {
     const ty = this.tune.tyre || {}, d = (this.tireT - (ty.opt || 90)) / (ty.win || 65);
     const cooked = this.tireT > 110 ? (this.tireT - 110) * 0.004 : 0;
-    // asfalto bagnato: circa un quarto di aderenza in meno (wet da 0 a 1), e sopra i 130 km/h un velo d'acqua
-    // (aquaplaning) ne toglie fino a un altro 12 % verso i 190
-    const wet = this.wet || 0, aqua = wet ? 0.12 * wet * SIM_CLAMP((Math.abs(this.v) - 36) / 17, 0, 1) : 0;
-    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.27 * wet - aqua) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
+    // asfalto bagnato: un quinto di aderenza in meno (wet da 0 a 1), e sopra i 130 km/h un velo d'acqua
+    // (aquaplaning) ne toglie fino a un altro 7 % verso i 190
+    const wet = this.wet || 0, aqua = wet ? 0.07 * wet * SIM_CLAMP((Math.abs(this.v) - 36) / 17, 0, 1) : 0;
+    return SIM_CLAMP(1.03 - 0.08 * d * d - cooked, 0.7, 1.03) * (1 - 0.3 * this.tireWear) * (1 - 0.2 * wet - aqua) * (this.tyreK ?? 1);   // tyreK: gomme sgonfie
   }
   get rpm() { return Math.max(0, this.we) * 9.5493; }
   get kmh() { return Math.abs(this.v) * 3.6; }
@@ -246,8 +246,10 @@ class SupraSim {
 
     // ---- controllo di trazione (TRC): oltre il picco della gomma toglie gas finché le ruote riprendono ----
     const tcOn = cfg.tc && this.gear > 0 && this.running && Math.abs(this.v) > 0.3 && !this.shiftSeq;
-    const over = tcOn && (this.slipNow || 0) > 0.12 ? 1 : 0;
-    this.tcCut = (this.tcCut || 0) + (over - (this.tcCut || 0)) * Math.min(1, h / (over ? 0.03 : 0.12));
+    // taglio progressivo: sotto il picco della gomma (~0,10) nessun taglio, poi cresce fino al massimo verso lo 0,22 di slittamento;
+    // si riprende in fretta (prima era tutto o niente e restava un 0,3 s di gas tolto dopo ogni piccolo slittamento)
+    const over = tcOn ? SIM_SS(0.10, 0.22, this.slipNow || 0) : 0;
+    this.tcCut = (this.tcCut || 0) + (over - (this.tcCut || 0)) * Math.min(1, h / (over > (this.tcCut || 0) ? 0.03 : 0.07));
     this.tcAct = this.tcCut > 0.15;
     if (this.tcCut > 0.01) thrCmd *= 1 - 0.8 * this.tcCut;
     // ---- launch control (2-step) -------------------------------------------------
@@ -388,7 +390,7 @@ class SupraSim {
     const bk = ty.B * this.kap;
     let fr = Math.sin(ty.C * Math.atan(bk - ty.E * (bk - Math.atan(bk))));
     const kpk = Math.tan(Math.PI / (2 * Math.max(1.05, ty.C))) / ty.B;      // slittamento del picco
-    if (Math.abs(this.kap) > kpk) fr = 1 - (1 - fr) * (ty.fall ?? 0.6);     // quanto della caduta dopo il picco resta (1 = come prima)
+    if (Math.abs(this.kap) > kpk) fr = 1 - (1 - fr) * (ty.fall ?? 0.45);     // quanto della caduta dopo il picco resta (1 = come prima)
     const Ft = Fmax * fr;
     this.slipNow = slip;
     this.slipPow = Math.abs(Ft * (vw - this.v));                          // potenza dissipata nello slittamento (W)

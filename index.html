@@ -1049,6 +1049,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
       <label class="kbtn qsel">Interfaccia <select id="hudModeSel" aria-label="Quanta interfaccia sulla strada"><option value="mecc">meccanico · tutto</option><option value="ess">essenziale</option></select></label>
       <label class="kbtn qsel">Pausa se esci <select id="pausaSel" aria-label="Pausa quando la finestra perde il fuoco"><option value="si">sì</option><option value="no">no</option></select></label>
+      <label class="kbtn qsel">Grafiche anime <select id="animeSel" aria-label="Scritte da fumetto e lampi in stile anime"><option value="si">accese</option><option value="no">spente</option></select></label>
       <label class="kbtn qsel">Contatore FPS <select id="fpsSel" aria-label="Contatore dei fotogrammi al secondo"><option value="no">spento</option><option value="si">acceso</option></select></label>
       <label class="kbtn qsel">Suggerimenti <select id="suggSel" aria-label="Suggerimenti dei primi minuti"><option value="si">accesi</option><option value="no">spenti</option></select></label>
     </div>
@@ -1238,6 +1239,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="luci2d.js"></script>
 <script src="fiamme.js"></script>
 <script src="effetti2d.js"></script>
+<script src="fumetti2d.js"></script>   <!-- scritte da fumetto in stile anime (BANG!, CRASH!...) -->
 <script src="dettagli2d.js"></script>
 <script src="gomme2d.js"></script>
 <script src="paesaggi2d.js"></script>
@@ -2337,7 +2339,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   S.look = '2d';                                              // le partite salvate con la vista 3D tornano al 2D
   if (S.paint === 'model') S.paint = PAINTS[0][0];            // "colore del modello" c'era solo coi modelli 3D
   function applyLook() {
-    garage = street2d || (street2d = new Street2D($('g2d'))); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
+    garage = street2d || (street2d = new Street2D($('g2d'))); street2d.comicsOn = S.anime !== false; street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
     garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint); garage.setTips(TP.dsp.ex.tips);
   }
   applyLook();
@@ -2346,6 +2348,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('pausaSel').addEventListener('change', (e) => { S.pausa = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   $('suggSel').value = S.sugg === false ? 'no' : 'si';
   $('suggSel').addEventListener('change', (e) => { S.sugg = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
+  // grafiche anime: scritte da fumetto (BANG!, CRASH!...) sulla strada e lampi sulle cambiate perfette
+  $('animeSel').value = S.anime === false ? 'no' : 'si';
+  $('animeSel').addEventListener('change', (e) => { S.anime = e.target.value !== 'no'; if (street2d) street2d.comicsOn = S.anime; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } flash(S.anime ? 'Grafiche anime accese' : 'Grafiche anime spente', 1.4); });
   $('fpsSel').value = S.fps ? 'si' : 'no';
   $('fpsSel').addEventListener('change', (e) => { S.fps = e.target.value === 'si'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street2d) { street2d.quality = S.q; if (street2d.slowReset) street2d.slowReset(); } try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
@@ -3070,11 +3075,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (rpm >= z.lo) return 'perfetta';
     return null;
   }
-  const ANIME_SUB = ['シフト完璧!', 'パーフェクト!', 'すごい!', '最高!'];
+  const ANIME_SUB = ['シフト完璧!', 'パーフェクト!', 'すごい!', '最高!', 'いくぞ!', 'キレッキレ!', '加速!', 'ナイス!'];
+  const ANIME_MAIN = ['PERFETTA!', 'CAMBIATA!', 'CHIRURGICA!', 'SCATTO!'];
   function animeShift(kind) {
-    const el = $('animeShift'); if (!el) return;
+    const el = $('animeShift'); if (!el || S.anime === false) return;
     if (kind === 'perfetta') comboN++; else comboN = 0;
-    el.querySelector('.as-main').textContent = kind === 'perfetta' ? (comboN >= 3 ? 'COMBO x' + comboN + '!' : 'PERFETTA!') : 'TROPPO TARDI';
+    el.querySelector('.as-main').textContent = kind === 'perfetta' ? (comboN >= 3 ? 'COMBO x' + comboN + '!' : ANIME_MAIN[comboN % ANIME_MAIN.length]) : 'TROPPO TARDI';
     el.querySelector('.as-sub').textContent = kind === 'perfetta' ? ANIME_SUB[comboN % ANIME_SUB.length] : 'リミッター…';
     el.className = 'anime-shift ' + kind; void el.offsetWidth; el.classList.add('as-go');
     clearTimeout(animeT); animeT = setTimeout(() => el.classList.remove('as-go'), 1100);
@@ -3352,7 +3358,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   // ---------------------------------------------------------------- ciclo principale
-  let fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
+  let slipFrizT = 0, slipFrizMsg = -1e9, fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
     if (pausaF) { last = now; requestAnimationFrame(frame); return; }
     if (window.NR_PREST && NR_PREST.fps) {                        // tetto ai fotogrammi (prestazioni.js)
@@ -3365,6 +3371,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     readPad(); updateInputs(dt);
     if (window.NightBanco && NightBanco.on) { sim.in.thr = NightBanco.thr; sim.in.brake = NightBanco.brake; }   // anche il cambio automatico deve vedere il gas del banco
     autoBox(dt);
+    // frizione che non regge la coppia: se slitta a gas pieno per più di 1,5 s lo dice (al massimo una volta al minuto e mezzo)
+    if (sim.running && sim.gear > 0 && sim.clutch < 0.1 && sim.in.thr > 0.8 && Math.abs(sim.Tc) >= sim.P.clutchMax * 0.97 && sim.rpm - Math.abs(sim.wo * sim.ratio(sim.gear)) * 9.5493 > 150) {
+      slipFrizT += dt;
+      if (slipFrizT > 1.5 && performance.now() - slipFrizMsg > 90000) { slipFrizMsg = performance.now(); flash(`La frizione slitta: regge ${Math.round(sim.P.clutchMax)} Nm e il motore ne dà di più. Da Luca, in Trasmissione, ce n'è una più forte.`, 4); }
+    } else slipFrizT = 0;
     autoDrive(dt);
     const ctl = game.control({ thr: sim.in.thr, brake: sim.in.brake }, dt);
     sim.in.thr = ctl.thr; sim.in.brake = ctl.brake;

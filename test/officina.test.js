@@ -91,6 +91,22 @@ test('officina: l\'anteprima di un pezzo dice quanto cambia senza montarlo', () 
   assert.equal(stock[k], cat[k].items[0].id, 'non cambia la selezione passata');
 });
 
+// ---- frizione che segue il motore dello swap (v0.92) ----
+test('swap: la frizione segue il motore (stesso livello del donatore), mai meno di quella dell\'auto', () => {
+  for (const [car, donor] of [['v40', 'supra'], ['panda', 'supra'], ['golf', 'e36'], ['polo', 'e34']]) {
+    for (const lv of [0, 1, 2]) {
+      const { sim, game, S } = nuovo(car); game.s.carId = car; game.s.cars[car] = Object.assign(game.s.cars[car] || {}, { km: 99999 });
+      assert.ok(E.offSwapDo(game, S, car, donor).ok);
+      E.offCatalog(game, car); const T = E.getT(); for (const k in T) S.tune[k] = T[k].items[0].id;
+      const hostCl = E.CARS[car].tuning.clutch.items, don = (E.CARS[donor] && E.CARS[donor].tuning || E.TUNING_SUPRA).clutch.items;
+      S.tune.clutch = hostCl[Math.min(lv, hostCl.length - 1)].id;
+      const { TP } = applica(game, S, sim);
+      assert.ok(TP.sim.clutchMax >= don[Math.min(lv, don.length - 1)].sim.clutch, `${car}+${donor} liv ${lv}: ${TP.sim.clutchMax} Nm`);
+      assert.ok(TP.sim.clutchMax >= hostCl[Math.min(lv, hostCl.length - 1)].sim.clutch, 'mai meno di quella dell\'auto');
+    }
+  }
+});
+
 test('officina: il peso del motore per lo swap (era del vecchio Pistone) resta giusto', () => {
   assert.equal(E.offKgSerie('supra'), 230); assert.equal(E.offKgSerie('v40'), 130); assert.equal(E.offKgSerie('nessuna'), 150);
   assert.equal(E.offEstimate('supra').kg, 230);

@@ -137,6 +137,14 @@ function offSwapApply(game, carId, TP, sim, sel) {
   sim.P.tq = Dp.tq; sim.P.idle = TP.sim.idle != null ? TP.sim.idle : Dp.idle;
   TP.sim.dm = (TP.sim.dm || 0) + offKgSerie(dId) - offKgSerie(carId);              // il peso del motore in più (o in meno): lo somma game.applyMass
   TP.sim.boostK = D.sim.boostK !== undefined ? D.sim.boostK : 1;       // come il donatore (la Supra a piena efficienza, non quella dell'auto che ospita)
+  // la frizione dell'auto è fatta per il suo motore: col motore di un altro il livello montato (serie, sport, corsa) vale quanto
+  // quello stesso livello della frizione del donatore, mai meno di quello che l'auto aveva (senza, il motore scappa al limitatore)
+  const hc = offCatalogOf(carId), dc = offCatalogOf(dId);
+  if (hc && hc.clutch && dc && dc.clutch) {
+    const i = Math.max(0, hc.clutch.items.findIndex((it) => it.id === (sel || {}).clutch));
+    const d = dc.clutch.items[Math.min(i, dc.clutch.items.length - 1)];
+    if (d && d.sim && d.sim.clutch > (TP.sim.clutchMax || 0)) TP.sim.clutchMax = d.sim.clutch;
+  }
   const e = offEstimate(dId);
   return { tipo: offEngineName(dId), hp: e.cv };
 }
@@ -349,6 +357,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     let h = summary(ctx);
     const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
+    { const est = ctx.sim.estimatePeak(), cl = ctx.sim.P.clutchMax;      // frizione più debole del motore: slitta e il motore sale al limitatore senza spingere
+      if (est.nm > cl * 0.97) h += `<p class="of-warn" style="margin:6px 2px 2px;padding:6px 8px;border:1px solid #ff453a;border-radius:8px;color:#ffb3ad;font-size:12px;line-height:1.35">⚠ La frizione regge ${fmt(Math.round(cl))} Nm e il motore ne fa ${fmt(Math.round(est.nm / 5) * 5)}: slitta e i giri vanno al limitatore senza spingere. Vai in <b>Trasmissione</b> e monta una frizione più forte.</p>`; }
     const suoni = !!window.NightCampioni;                                            // campioni audio dei pezzi (campioni.js)
     if (tab === 'suoni' && !suoni) tab = 'mod';
     h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
@@ -464,7 +474,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       return `<div class="of-row"><div class="of-sw"><span class="nm"><b>${E(name)}</b><small>${E(sub)} · ${fmt(e.cv)} CV · ${fmt(e.nm)} Nm · ${e.kg} kg</small></span>`
         + `<span class="st">${E(st)}</span><button type="button" class="of-go" data-swap="${orig ? '-' : id}" ${cur || lock || poor ? 'disabled' : ''}>${cur ? 'Montato' : 'Monta'}</button></div>`
         + `<div class="of-head" style="margin-top:4px"><small style="color:#8a8478">${E(info)}</small><button type="button" class="of-i" data-i="sw:${id}" aria-expanded="${!!open['sw:' + id]}" title="Cosa cambia">i</button></div>`
-        + (open['sw:' + id] ? `<div class="of-info"><p>${orig ? 'Rimonta il motore originale: i pezzi del motore tornano quelli di questa auto.' : `Monti il motore della ${E(CARS[id].name)} sulla tua auto: curva di coppia, giri, turbo, voce e peso del motore cambiano; cambio, differenziale, gomme, assetto e frizione restano quelli dell'auto. La frizione può slittare se il motore è troppo forte. I pezzi del motore diventano quelli di questo motore (di serie all'inizio).`}</p></div>` : '') + '</div>';
+        + (open['sw:' + id] ? `<div class="of-info"><p>${orig ? 'Rimonta il motore originale: i pezzi del motore tornano quelli di questa auto.' : `Monti il motore della ${E(CARS[id].name)} sulla tua auto: curva di coppia, giri, turbo, voce e peso del motore cambiano; cambio, differenziale, gomme e assetto restano quelli dell'auto; la frizione tiene la coppia del motore nuovo (stesso livello: serie, sport o corsa). I pezzi del motore diventano quelli di questo motore (di serie all'inizio).`}</p></div>` : '') + '</div>';
     };
     const cur = dId ? `<div class="of-cur">Motore montato: <b>${E(offEngineName(dId))}</b> (dalla ${E(CARS[dId].short || CARS[dId].name)}).</div>` : '';
     return cur + '<p class="of-hint">Metti sulla tua auto il motore di un\'altra auto del gioco. Il prezzo comprende la manodopera. Fino a 200 CV si monta subito, i più forti si sbloccano coi chilometri. Una volta pagato un motore, rimontarlo è gratis.</p>'
