@@ -572,7 +572,8 @@ class StreetGame {
   spawn() {
     const sim = this.sim, d = this.s.dist, r = this.rnd;
     const w = [
-      ['traffic', 40], ['police', 16], ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
+      ['traffic', 40], ['police', 16 * (this.notteK ? this.notteK('police') : 1)],   // di notte meno volanti (notte.js)
+      ['station', this.placesOn ? 0 : sim.fuel < 0.35 ? 34 : sim.fuel < 0.6 ? 12 : 4],
     ];
     let k = r() * w.reduce((a, x) => a + x[1], 0), kind = 'traffic';
     for (const [n, p] of w) { if ((k -= p) < 0) { kind = n; break; } }

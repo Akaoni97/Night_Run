@@ -1047,6 +1047,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <label class="kbtn qsel">Ora <select id="clockSel" aria-label="Ora del giorno"><option value="auto">dinamica</option><option value="giorno">giorno</option><option value="tramonto">tramonto</option><option value="notte">notte</option></select></label>
       <label class="kbtn qsel">Meteo <select id="meteoSel" aria-label="Meteo (tasto K)"><option value="auto">dinamico</option><option value="sereno">sereno</option><option value="pioggia">pioggia</option><option value="nebbia">nebbia</option><option value="neve">neve</option><option value="vento">vento</option></select></label>
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
+      <label class="kbtn qsel">Interfaccia <select id="hudModeSel" aria-label="Quanta interfaccia sulla strada"><option value="mecc">meccanico · tutto</option><option value="ess">essenziale</option></select></label>
       <label class="kbtn qsel">Pausa se esci <select id="pausaSel" aria-label="Pausa quando la finestra perde il fuoco"><option value="si">sì</option><option value="no">no</option></select></label>
       <label class="kbtn qsel">Contatore FPS <select id="fpsSel" aria-label="Contatore dei fotogrammi al secondo"><option value="no">spento</option><option value="si">acceso</option></select></label>
       <label class="kbtn qsel">Suggerimenti <select id="suggSel" aria-label="Suggerimenti dei primi minuti"><option value="si">accesi</option><option value="no">spenti</option></select></label>
@@ -3334,6 +3335,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // cambio auto dall'esterno (concessionario: giro di prova, carro attrezzi): passa dalla stessa strada del selettore
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.pausa = (on) => on ? pausaOn() : pausaOff(); Object.defineProperty(window.nightRun, 'inPausa', { get: () => pausaF, configurable: true });   // pausa a mano (prove)
+  Object.defineProperty(window.nightRun, 'radio', { get: () => radio, configurable: true });   // la radio che disturba (notte.js)
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
   window.nightRun.shiftUp = () => { ensureAudio(); shiftUp(); }; window.nightRun.shiftDown = () => { ensureAudio(); shiftDown(); };   // marce dal banco prova
 
@@ -3594,6 +3596,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       }
     }
     if (street2d && street2d.setDaylight) street2d.setDaylight(d, ss);
+    game.dayK = d; game.hour = h;   // giorno e notte contano nel gioco (notte.js: volanti, cose strane, radio)
     if (window.NightMeteo) NightMeteo.tick(dt, { auto: S.meteo === 'auto', rain: !!S.rain, bg: (game.loc && game.loc.bg) || 'city', vol: S.muted ? 0 : S.vol / 100 });
     if ((ATM.txt -= dt) <= 0) {
       ATM.txt = 0.5; const hh = Math.floor(ATM.hour), mm = Math.floor((ATM.hour - hh) * 60);
@@ -3707,6 +3710,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="soccorso.js"></script>
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
+<script src="notte.js"></script>
 <script src="statistiche.js"></script>
 <script src="diario.js"></script>
 <script src="banco.js"></script>

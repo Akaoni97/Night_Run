@@ -582,7 +582,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (where === 'road') v.nextOdd = km + 6 + Math.random() * 10 * Math.max(0.35, 1 - km / 1500);
     const sleepy = v.needs.sleep < 0.3;
     // più raro all'inizio, più frequente coi chilometri e col sonno
-    const chance = where === 'road' ? 0.35 + Math.min(0.4, km / 1500) + (sleepy ? 0.25 : 0) : 0.3 + Math.min(0.45, km / 1200);
+    const chance = (where === 'road' ? 0.35 + Math.min(0.4, km / 1500) + (sleepy ? 0.25 : 0) : 0.3 + Math.min(0.45, km / 1200)) * (this.notteK ? this.notteK('horror') : 1);   // di notte di più (notte.js)
     if (Math.random() > chance) return;
     const pool = VG_ODD.filter((o) => (o.where === where || (where === 'road' && o.where === 'radio')) && km >= o.km && !(o.once && v.seen[o.id]) && (!o.need || v.seen[o.need])
       && (!o.minStops || v.fuelStops >= o.minStops) && (!o.sleepy || sleepy));

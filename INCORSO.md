@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Claude) | Interfaccia essenziale, buio nelle incursioni, giorno/notte (meno polizia, più stranezze), radio che disturba, «Quella dietro», prova dei finali | notte.js (nuovo), index.html, menu.js, game.js, viaggio.js, polizia.js, test | 22/11 15:10 |
