@@ -119,7 +119,7 @@ function cmpInfo(T, sel, TP, carId) {
   const barN = (ts.turbo ? ts.turbo.max : ts.max) || tb.max || 0;          // la taglia del turbo (non la pressione che lascia la centralina)
   return {
     car: carId, boost, sc, turbo: boost && !sc, single: boost && !sc && !tb.twin, bar: barN,
-    turboLv: lv('turbo'), turboId: bare(tbi), scVol: sc && /volumetric/i.test(tbi.name || ''),
+    turboLv: lv('turbo'), turboId: bare(tbi), scVol: sc && /volumetric/i.test((tbi.name || '') + ' ' + (tbi.note || '')),
     bovId: T.bov ? bare(it('bov')) : null, wgLibera: (dsp.scream || 0) > 0,
     intakeLv: lv('intake'), intakeId: bare(it('intake')), itb: (voice.howl || 0) >= 0.5,
     exLv: lv('exhaust'), exId: bare(it('exhaust')), decat: T.cat ? bare(it('cat')) === 'decat' : false,
@@ -544,6 +544,7 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
 .cmp-st { font: 600 11px/1.2 var(--f-data, monospace); color: #8fe0a0; margin-left: 6px; } .cmp-st.no { color: #ff8a7a; } .cmp-st.off { color: #8a8478; }
 .cmp-row.no .cmp-kits { opacity: .45; }`;
 
+  let pick = null;                                                   // kit non tuo che stai ascoltando (scheda con Compra e monta)
   function info0(ctx) {
     if (cur && cur.car === ctx.game.car) return cur.info;
     sync(ctx.game, NR().tp, ctx.S && ctx.S.tune);
@@ -563,13 +564,20 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
       const st = why ? `<span class="cmp-st no">${E(why)}</span>` : now ? `<span class="cmp-st${spenta ? ' no' : ''}">${E(CMP_KIT[now].nome)}${now === auto && v === 'auto' ? ' · col pezzo' : ''}${spenta ? ' · mappa pop & bang spenta (Guida)' : ''}</span>` : `<span class="cmp-st off">${v === 'off' ? 'spento' : 'di serie: niente in più'}</span>`;
       const kits = Object.keys(CMP_KIT).filter((id) => CMP_KIT[id].slot === S.id);
       const chip = (val, label, sub, cls, title) => `<button type="button" class="of-chip ${cls}" data-cmp="${E(S.id)}" data-val="${E(val)}" title="${E(title || label)}" ${why ? 'aria-disabled="true"' : ''}><span class="of-lv">${label}</span><small>${E(sub)}</small></button>`;
-      let chips = chip('auto', '<i class="of-dot on"></i>COL PEZZO', auto ? CMP_KIT[auto].nome : 'niente', v === 'auto' ? 'cur' : 'own', 'La voce del pezzo montato (gratis)');
-      chips += chip('off', '<i class="of-dot off"></i>SPENTO', 'solo il motore', v === 'off' ? 'cur' : '', 'Nessun campione su questo componente');
+      // pallini come in officina: verde = montato, grigio = tuo ma smontato, rosso = non ce l'hai (da comprare o bloccato)
+      let chips = chip('auto', `<i class="of-dot ${v === 'auto' ? 'on' : 'own'}"></i>COL PEZZO`, auto ? CMP_KIT[auto].nome : 'niente', v === 'auto' ? 'cur' : 'own', 'La voce del pezzo montato (gratis)');
+      chips += chip('off', `<i class="of-dot ${v === 'off' ? 'on' : 'own'}"></i>SPENTO`, 'solo il motore', v === 'off' ? 'cur' : 'own', 'Nessun campione su questo componente');
       for (const id of kits) {
         const K = CMP_KIT[id], isCur = v === id, own = cmpOwns(g, id, x), lock = cmpLocked(g, id, x), kwhy = cmpKitServe(id, x), price = cmpPrezzo(g, id, x);
-        const sub = isCur ? 'montato' : kwhy && !why ? 'non va qui' : own ? (id === auto ? 'col pezzo · MONTA' : 'tuo · MONTA') : lock ? `🔒 ${fmt(cmpKm(id))} km` : `€ ${fmt(price)}`;
-        const cls = [isCur ? 'cur' : '', !isCur && own ? 'own' : '', lock || kwhy ? 'lock' : '', !isCur && !own && !lock ? 'buy' : '', !own && career && price > g.s.money ? 'poor' : ''].filter(Boolean).join(' ');
-        chips += `<span class="cmp-kit"><button type="button" class="cmp-play" data-cmp-play="${E(id)}" title="Ascolta" aria-label="Ascolta ${E(K.nome)}">▶</button>${chip(id, `<i class="of-dot ${isCur || own ? 'on' : 'off'}"></i>${E(K.nome)}`, sub, cls, K.nota)}</span>`;
+        const sub = isCur ? 'montato' : kwhy && !why ? 'non va qui' : own ? (id === auto ? 'col pezzo · MONTA' : 'tuo · MONTA') : lock ? `🔒 ${fmt(cmpKm(id))} km` : `€ ${fmt(price)} · ASCOLTA`;
+        const cls = [isCur ? 'cur' : '', !isCur && own ? 'own' : '', lock || kwhy ? 'lock' : '', !isCur && !own && !lock ? 'buy' : '', !own && career && price > g.s.money ? 'poor' : '', pick && pick.id === id ? 'sel' : ''].filter(Boolean).join(' ');
+        chips += `<span class="cmp-kit"><button type="button" class="cmp-play" data-cmp-play="${E(id)}" title="Ascolta" aria-label="Ascolta ${E(K.nome)}">▶</button>${chip(id, `<i class="of-dot ${isCur ? 'on' : own ? 'own' : 'off'}"></i>${E(K.nome)}`, sub, cls, K.nota)}</span>`;
+      }
+      // kit non tuo: prima lo senti (parte da solo), poi decidi se comprarlo
+      if (pick && pick.slot === S.id && CMP_KIT[pick.id] && !cmpOwns(g, pick.id, x)) {
+        const K = CMP_KIT[pick.id], price = cmpPrezzo(g, pick.id, x), lock = cmpLocked(g, pick.id, x), poor = career && price > g.s.money;
+        const lab = lock ? `🔒 Si sblocca a ${fmt(cmpKm(pick.id))} km` : poor ? `Servono € ${fmt(price)}` : `Compra e monta · € ${fmt(price)}`;
+        chips += `<div class="of-card" style="flex-basis:100%"><b class="ttl">${E(K.nome)}</b><p>${E(K.nota)}</p><div style="display:flex;gap:6px;margin-top:6px"><button type="button" class="cmp-play" style="width:auto;padding:0 12px;border-radius:8px;border-right:1px solid #4a4458" data-cmp-play="${E(pick.id)}">▶ Riascolta</button><button type="button" class="of-go" style="flex:1" data-cmp-buy="${E(pick.id)}" ${lock || poor ? 'disabled' : ''}>${E(lab)}</button><button type="button" class="cmp-play" style="width:auto;padding:0 12px;border-radius:8px;border-right:1px solid #4a4458;color:#a9a396" data-cmp-x="1">Lascia stare</button></div></div>`;
       }
       let inf = '';
       if (open[S.id]) inf = '<div class="of-info">' + `<p>${E(S.hint)}</p>` + kits.map((id) => `<p><b>${E(CMP_KIT[id].nome)}</b> — ${E(CMP_KIT[id].nota)}</p>`).join('') + '</div>';
@@ -581,9 +589,20 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
   // clic nella scheda: dà true se l'officina deve ridisegnare
   function click(el, ctx) {
     if (el.dataset.cmpPlay) { preview(el.dataset.cmpPlay); return false; }
+    if (el.dataset.cmpX) { pick = null; return true; }
+    if (el.dataset.cmpBuy) { const id = el.dataset.cmpBuy; pick = null; return monta(ctx, CMP_KIT[id].slot, id); }
     if (el.dataset.cmpI) { open[el.dataset.cmpI] = !open[el.dataset.cmpI]; return true; }
     if (el.dataset.cmp && el.getAttribute('aria-disabled') !== 'true') {
       const g = ctx.game, x = info0(ctx), slot = el.dataset.cmp, val = el.dataset.val;
+      if (CMP_KIT[val] && !cmpOwns(g, val, x)) { pick = { slot, id: val }; preview(val); return true; }   // non è tuo: si ascolta e si apre la scheda
+      pick = null;
+      return monta(ctx, slot, val);
+    }
+    return false;
+  }
+  function monta(ctx, slot, val) {
+    {
+      const g = ctx.game, x = info0(ctx);
       if (g.needsShop && g.needsShop()) { ctx.flash('I suoni li monta Luca: Da Luca Tuning è sulla mappa (L)', 2.6); return false; }
       const r = cmpMonta(g, g.car, slot, val, x);
       if (!r.ok) { ctx.flash(r.why, 2.6); return false; }

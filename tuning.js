@@ -177,6 +177,7 @@ const TUNING_SUPRA = {
     items: [
       { id: 'oem', price: 0, brand: 'Toyota', name: 'Originale (frontale piccolo)', note: 'Basta per la pressione di serie; in un allungo lungo o a 1 bar l\'aria scalda e la potenza cala anche del 7-8 %.', sim: { ic: { heat: 1.0 } } },
       { id: 'hks', price: 1300, brand: 'HKS', name: 'R-type frontale maggiorato', note: 'Massa radiante tripla: l\'aria resta fresca anche a 2 bar, la potenza non cala più tirando le marce. Un filo di ritardo in più del turbo.', sim: { ic: { heat: 0.35, lag: 1.06 } } },
+      { id: 'race', price: 2600, brand: 'Wagner', name: 'Intercooler da competizione aria-acqua', note: 'Scambiatore aria-acqua col suo radiatore e la sua pompa: tubi cortissimi e aria quasi a temperatura esterna anche a 2 bar, allungo dopo allungo. La potenza non cala più e il turbo risponde come col piccolo di serie.', sim: { ic: { heat: 0.12, lag: 1.0 } }, look: { fmic: 1 } },
     ],
   },
   suspension: suspCat({ make: 'Toyota', ids: ['oem', 'springs', 'dampers', 'tein', 'race', 'pro'], pitch: 1,

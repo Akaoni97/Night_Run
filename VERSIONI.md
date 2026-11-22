@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.95**
+**Versione attuale: v0.99**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -121,3 +121,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.96 | 22/11 | proprietario | Illustrazioni dei componenti dallo zip del proprietario (`img/componenti/`, `componenti.js`): nella scheda del pezzo e accanto a ogni reparto dell'officina di Luca (la Supra coi disegni esatti, le altre auto col pezzo dello stesso reparto a livello simile) e nelle valigette, dove il pezzo vinto esce nella cornice della sua rarità |
 | v0.97 | 22/11 | proprietario | Le illustrazioni dei componenti sono una libreria comune a tutte le auto (la Supra non fa da modello): stesse regole per ognuna (nome del pezzo, poi livello nel suo catalogo), biturbo col disegno dei due turbo, scarico dritto solo a quelli da gara |
 | v0.98 | 22/11 | proprietario | Prologo rifatto alla qualità del gioco: stessa risoluzione (densità doppia, disegni HD delle auto, presentazione come il gioco), via dei Cantieri sotto la pioggia con le facciate, i lampioni e le luci del gioco, la E36 che parcheggia e lui che scende davvero, studio del notaio ridisegnato, garage con le auto una alla volta sotto la lampada; corretti la lettera (intestazione, firma, righe spezzate), il camion che era un rettangolo nero, la scelta dell'auto che poteva saltare il finale, il prologo che partiva due volte |
+| v0.99 | 22/11 | cognato | Officina di Luca più chiara: pallino verde solo sul montato, grigio su quello tuo smontato, rosso su quello da comprare o bloccato (anche nei Suoni); nei Suoni un kit non tuo prima si ascolta e poi si compra («Compra e monta»); intercooler da competizione aria-acqua (auto da disegno, V40, Supra); turbo coi nomi da catalogo (GT2560R Quick Spool, PT6266 Top End, Twin RHF5 Sequential, VNT Rally Spec, GTX4294R Drag Monster, kit GT2871R e compressore TVS R900); la schermata non saltella più passando sopra i pezzi |

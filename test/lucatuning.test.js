@@ -82,3 +82,12 @@ test('di serie non cambia niente: V40 140 CV, rapporti e cambiate di fabbrica', 
   assert.equal(v.P.sim.gears, null); assert.equal(v.s.P.shiftK, E.CARS.v40.P.shiftK);
   for (const id of gen) { const r = picco(id, serie(E.CARS[id])); assert.equal(r.P.sim.gears, null, id); assert.equal(r.P.sim.shiftMul, 1, id); }
 });
+
+test('intercooler da competizione: raffredda più di tutti, su ogni auto con l\'intercooler', () => {
+  const sup = new Function(src + ';return TUNING_SUPRA')();
+  for (const [id, T] of gen.concat('v40').map((x) => [x, E.CARS[x].tuning]).concat([['supra', sup]])) {
+    const L = T.intercooler.items, r = L.find((x) => x.id === 'race');
+    assert.ok(r, `${id}: manca l'intercooler da competizione`);
+    assert.ok(L.every((x) => x === r || x.sim.ic.heat > r.sim.ic.heat), `${id}: c'è un intercooler che raffredda di più`);
+  }
+});

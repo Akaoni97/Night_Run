@@ -232,7 +232,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
 .of-chip { display: flex; flex-direction: column; align-items: flex-start; min-width: 78px; padding: 6px 9px; border: 1px solid #4a4458; border-bottom-width: 3px; border-radius: 9px; background: #262232; color: #ece6d6; cursor: pointer; font: 700 12px/1.15 var(--f-data, monospace); text-align: left; }
 .of-lv { display: flex; align-items: center; gap: 5px; }
 .of-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; box-shadow: 0 0 0 2px #0006; }
-.of-dot.on { background: #2fd16a; } .of-dot.off { background: #ff453a; }
+.of-dot.on { background: #2fd16a; box-shadow: 0 0 0 2px #0006, 0 0 6px #2fd16acc; } .of-dot.own { background: #77736b; } .of-dot.off { background: #ff453a; }
 .of-chip.cur .of-dot { box-shadow: 0 0 0 2px #1a1206; }
 .of-chip.buy small { color: #ffd27a; } .of-chip.lock small { color: #ff8a7a; }
 .of-chip small { font-weight: 500; color: #a9a396; margin-top: 2px; }
@@ -273,7 +273,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
-      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i]');            // scheda Suoni (campioni.js)
+      const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i], [data-cmp-buy], [data-cmp-x]');            // scheda Suoni (campioni.js)
       if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
       const go = e.target.closest('[data-go]');
       if (go) {                                                    // pulsante della scheda: monta (e, se serve, compra)
@@ -346,10 +346,10 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
   // d = anteprima di un pezzo (offPreview): sotto ogni numero la differenza, verde se migliora e rossa se peggiora
   function summary(ctx, d) {
     const sim = ctx.sim, g = ctx.game, est = sim.estimatePeak(), et = g.etEstimate(), kgcv = (sim.P.mass + 75) / est.cv;
-    const dl = (v, dec, unit, buonoSeNeg) => { if (!d || Math.abs(v) < Math.pow(10, -dec) / 2) return d ? '<i class="of-d">=</i>' : ''; const ok = buonoSeNeg ? v < 0 : v > 0; return `<i class="of-d ${ok ? 'su' : 'giu'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(dec).replace('.', ',')}${unit}</i>`; };
+    const dl = (v, dec, unit, buonoSeNeg) => { if (!d || Math.abs(v) < Math.pow(10, -dec) / 2) return d ? '<i class="of-d">=</i>' : '<i class="of-d" style="visibility:hidden">=</i>'; const ok = buonoSeNeg ? v < 0 : v > 0; return `<i class="of-d ${ok ? 'su' : 'giu'}">${v > 0 ? '+' : '−'}${Math.abs(v).toFixed(dec).replace('.', ',')}${unit}</i>`; };
     const kgcv2 = d ? (sim.P.mass + 75) / Math.max(10, est.cv + d.dcv) - kgcv : 0;
-    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small>${d ? dl(d.dcv, Math.abs(d.dcv) < 5 ? 1 : 0, ' CV', false) : ''}</div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small>${d ? dl(d.dnm, Math.abs(d.dnm) < 5 ? 1 : 0, ' Nm', false) : ''}</div>`
-      + `<div><b>${kgcv.toFixed(1).replace('.', ',')}</b><small>kg per CV</small>${d ? dl(kgcv2, 2, '', true) : ''}</div><div><b>${et.toFixed(1).replace('.', ',')} s</b><small>400 m stimati</small>${d ? dl(d.det, 2, ' s', true) : ''}</div></div>`;
+    return `<div class="of-sum"><div><b>${fmt(Math.round(est.cv / 5) * 5)}</b><small>CV a ${fmt(est.rpmCv)}</small>${d ? dl(d.dcv, Math.abs(d.dcv) < 5 ? 1 : 0, ' CV', false) : dl()}</div><div><b>${fmt(Math.round(est.nm / 5) * 5)}</b><small>Nm</small>${d ? dl(d.dnm, Math.abs(d.dnm) < 5 ? 1 : 0, ' Nm', false) : dl()}</div>`
+      + `<div><b>${kgcv.toFixed(1).replace('.', ',')}</b><small>kg per CV</small>${d ? dl(kgcv2, 2, '', true) : dl()}</div><div><b>${et.toFixed(1).replace('.', ',')} s</b><small>400 m stimati</small>${d ? dl(d.det, 2, ' s', true) : dl()}</div></div>`;
   }
 
   function draw(box, ctx) {
@@ -384,8 +384,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const chips = cat.items.map((it, i) => {
         const isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id);
         const st = isCur ? 'montato' : owned ? 'MONTA' : lock ? `🔒 ${fmt(g.partKm(k, it.id))} km` : `COMPRA € ${fmt(price)}`;
-        const buy = !isCur && !owned && !lock, sel = pick && pick.k === k && pick.id === it.id, cls = ['of-chip', sel ? 'sel' : '', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', buy ? 'buy' : '', buy && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');   // pallino verde = ce l'hai (si monta), rosso = da comprare o ancora bloccato
-        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}><span class="of-lv"><i class="of-dot ${isCur || owned ? 'on' : 'off'}"></i>${E(shortName(it, i))}</span><small>${E(st)}</small></button>`;
+        const buy = !isCur && !owned && !lock, sel = pick && pick.k === k && pick.id === it.id, cls = ['of-chip', sel ? 'sel' : '', isCur ? 'cur' : '', !isCur && owned ? 'own' : '', lock ? 'lock' : '', buy ? 'buy' : '', buy && career && price > money ? 'poor' : ''].filter(Boolean).join(' ');   // pallino verde = montato, grigio = tuo ma smontato, rosso = da comprare o bloccato
+        return `<button type="button" class="${cls}" data-k="${k}" data-id="${E(it.id)}" title="${E((it.brand || '') + ' ' + it.name)}" ${lock ? 'aria-disabled="true"' : ''}><span class="of-lv"><i class="of-dot ${isCur ? 'on' : owned ? 'own' : 'off'}"></i>${E(shortName(it, i))}</span><small>${E(st)}</small></button>`;
       }).join('');
       const c = cat.items[ci];
       let info = '';
@@ -396,7 +396,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
       if (k === 'gearbox' && typeof gbState === 'function' && ctx.adj && c.gb) h += gbBlock(ctx, c);
     }
-    return h + '<p class="of-hint"><b>Tocca un pezzo</b> per vedere cosa cambia: non spendi niente finché non premi il pulsante. <b style="color:#2fd16a">●</b> verde: ce l\'hai, lo monti gratis. <b style="color:#ff453a">●</b> rosso: da comprare. Con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
+    return h + '<p class="of-hint"><b>Tocca un pezzo</b> per vedere cosa cambia: non spendi niente finché non premi il pulsante. <b style="color:#2fd16a">●</b> verde: montato. <b style="color:#77736b">●</b> grigio: è tuo, lo rimonti gratis. <b style="color:#ff453a">●</b> rosso: non ce l\'hai (da comprare, col lucchetto servono ancora chilometri). Quello che compri resta tuo.</p>';
   }
 
   // nome corto per la scelta: «Filtro a fungo» invece di «LIV. 1» (il nome completo sta nella scheda e nel suggerimento)

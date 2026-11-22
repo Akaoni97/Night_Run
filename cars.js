@@ -75,6 +75,7 @@ const TUNING_V40 = {
     label: 'Intercooler',
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Volvo', name: 'Laterale piccolo (col kit turbo)', note: 'Quello della T4 dietro il paraurti: in un allungo l\'aria scalda e si perde fino al 10 %.', sim: { ic: { heat: 1.5 } } },
+      { id: 'race', price: 2400, km: 48, brand: 'Wagner', name: 'Intercooler da competizione aria-acqua', note: 'Scambiatore aria-acqua col suo radiatore e la sua pompa: tubi cortissimi e aria quasi a temperatura esterna anche a 2 bar, allungo dopo allungo. La potenza non cala più e il turbo risponde come col piccolo di serie.', sim: { ic: { heat: 0.12, lag: 1.0 } }, look: { fmic: 1 } },
       { id: 'fmic', price: 900, km: 32, brand: 'Forge', name: 'Frontale maggiorato', note: 'Si vede dietro la griglia del paraurti: aria fresca anche a 1,5 bar, potenza costante tirando le marce.', sim: { ic: { heat: 0.4, lag: 1.05 } }, look: { fmic: 1 } },
     ],
   },
@@ -210,11 +211,11 @@ function GEN_TURBO_PIU(c, dz) {
   const L = c.P.limiter || 6500, r = (f) => Math.round(L * f / 50) * 50;
   const T = (id, brand, name, max, a, b, up, down, price, km, note, tb, badge, twin) => ({ id, brand, name, price, km, note, sim: { turbo: { max, a, b, up, down, twin: !!twin } }, dsp: { tb: Object.assign({ damp: 2300, twin: 0, mani: 1 }, tb) }, look: { badge } });
   return [
-    T('tb_basso', 'Garrett', 'Turbo piccolo che tira dal basso', 1.1, r(0.26), r(0.46), 0.26, 0.7, 2400, 14, `Girante leggera: spinge già a ${r(0.3).toLocaleString('it-IT')} giri, perfetto in città e in uscita dai tornanti. In alto finisce il fiato.`, { f0: 2600, f1: 8800, w: 0.05, wh: 0.06, damp: 2500 }, 'TURBO'),
-    T('tb_alto', 'Precision', 'Turbo grosso che tira in alto', 1.6, r(0.56), r(0.82), 0.62, 0.95, 3900, 30, `Sotto i ${r(0.55).toLocaleString('it-IT')} giri dorme, poi arriva tutto insieme e ti stacca la schiena dal sedile. Lag vero, da anni 90.`, { f0: 1700, f1: 6800, w: 0.07, wh: 0.1, damp: 2100 }, 'TURBO'),
-    T('tb_twin', 'IHI', 'Biturbo sequenziale', 1.7, r(0.27), r(0.46), 0.34, 0.85, 5600, 45, 'Il piccolo spinge subito, il grande entra verso i 4.000 giri: coppia piena dal basso fino in cima, con lo scalino del secondo turbo che si sente.', { f0: 2100, f1: 7800, w: 0.06, wh: 0.09, twin: 1 }, 'TWIN TURBO', true),
-    T('tb_vgt', 'BorgWarner', 'Turbo a geometria variabile da corsa', 1.8, r(0.3), r(0.56), 0.3, 0.8, 6400, 55, 'Le palette mobili chiudono ai bassi e aprono in alto: risposta da turbo piccolo e fiato da turbo grosso. Quello che usano i rally.', { f0: 2300, f1: 8400, w: 0.075, wh: 0.09, damp: 2400 }, 'VGT'),
-    T('tb_drag', 'Garrett', 'Turbo da drag a 2 bar', 2.0, r(0.6), r(0.9), 0.8, 1.0, 8200, 70, 'Chiocciola enorme: sotto metà contagiri non c\'è niente, poi è un muro. Vuole la centralina stand-alone e gli iniettori grossi, se no non arriva a 2 bar.', { f0: 1450, f1: 6200, w: 0.09, wh: 0.13, damp: 1900 }, 'DRAG'),
+    T('tb_basso', 'Garrett', 'GT2560R Quick Spool (1,1 bar)', 1.1, r(0.26), r(0.46), 0.26, 0.7, 2400, 14, `Il piccolo che tira dal basso. Girante leggera: spinge già a ${r(0.3).toLocaleString('it-IT')} giri, perfetto in città e in uscita dai tornanti. In alto finisce il fiato.`, { f0: 2600, f1: 8800, w: 0.05, wh: 0.06, damp: 2500 }, 'TURBO'),
+    T('tb_alto', 'Precision', 'PT6266 Top End (1,6 bar)', 1.6, r(0.56), r(0.82), 0.62, 0.95, 3900, 30, `Il grosso che tira in alto. Sotto i ${r(0.55).toLocaleString('it-IT')} giri dorme, poi arriva tutto insieme e ti stacca la schiena dal sedile. Lag vero, da anni 90.`, { f0: 1700, f1: 6800, w: 0.07, wh: 0.1, damp: 2100 }, 'TURBO'),
+    T('tb_twin', 'IHI', 'Twin RHF5 Sequential (1,7 bar)', 1.7, r(0.27), r(0.46), 0.34, 0.85, 5600, 45, 'Biturbo sequenziale: il piccolo spinge subito, il grande entra verso i 4.000 giri: coppia piena dal basso fino in cima, con lo scalino del secondo turbo che si sente.', { f0: 2100, f1: 7800, w: 0.06, wh: 0.09, twin: 1 }, 'TWIN TURBO', true),
+    T('tb_vgt', 'BorgWarner', 'VNT Rally Spec (1,8 bar)', 1.8, r(0.3), r(0.56), 0.3, 0.8, 6400, 55, 'Geometria variabile da corsa: le palette mobili chiudono ai bassi e aprono in alto: risposta da turbo piccolo e fiato da turbo grosso. Quello che usano i rally.', { f0: 2300, f1: 8400, w: 0.075, wh: 0.09, damp: 2400 }, 'VGT'),
+    T('tb_drag', 'Garrett', 'GTX4294R Drag Monster (2,0 bar)', 2.0, r(0.6), r(0.9), 0.8, 1.0, 8200, 70, 'Il turbo da drag. Chiocciola enorme: sotto metà contagiri non c\'è niente, poi è un muro. Vuole la centralina stand-alone e gli iniettori grossi, se no non arriva a 2 bar.', { f0: 1450, f1: 6200, w: 0.09, wh: 0.13, damp: 1900 }, 'DRAG'),
   ];
 }
 // benzina: quanta pressione regge il motore prima che la centralina smagrisca e tagli. Quella di serie regge già i turbo che l'auto aveva.
@@ -293,7 +294,8 @@ function genCatalog(c) {
     turbo: { label: T ? 'Turbo' : 'Sovralimentazione', items: tb },
     intercooler: { label: 'Intercooler', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: T ? 'Originale' : 'Del kit', note: 'Piccolo: tirando le marce l\'aria scalda e si perde fino al 10 %.', sim: { ic: { heat: T ? (T.icHeat || 1.2) : 1.4 } } },
-      { id: 'fmic', price: $(1000), km: kk(30), brand: 'Wagner', name: 'Frontale maggiorato', note: 'Aria fresca anche ad alta pressione: la potenza non cala più.', sim: { ic: { heat: 0.4, lag: 1.05 } } } ] },
+      { id: 'fmic', price: $(1000), km: kk(30), brand: 'Wagner', name: 'Frontale maggiorato', note: 'Aria fresca anche ad alta pressione: la potenza non cala più.', sim: { ic: { heat: 0.4, lag: 1.05 } } },
+      { id: 'race', price: $(2600), km: kk(45), brand: 'Wagner', name: 'Intercooler da competizione aria-acqua', note: 'Scambiatore aria-acqua col suo radiatore e la sua pompa: tubi cortissimi e aria quasi a temperatura esterna anche a 2 bar, allungo dopo allungo. La potenza non cala più e il turbo risponde come col piccolo di serie.', sim: { ic: { heat: 0.12, lag: 1.0 } }, look: { fmic: 1 } } ] },
     tires: { label: c.fwd ? 'Gomme anteriori' : 'Gomme posteriori', items: [
       { id: 'oem', price: 0, km: 0, brand: M.ty ? M.ty[0] : (n.tyreBrand || 'Michelin'), name: n.tyreOem || 'Originali', note: 'Stradali: presa onesta, lavorano bene da fredde.', sim: { mu: c.mu || 1.05, tyre: { B: 19, C: 1.42, E: 0.1, opt: 80, win: 70, crr: 0.012 } } },
       { id: 'sport', price: $(800), km: kk(3), brand: M.ty ? 'Gomme' : 'Toyo', name: M.ty ? M.ty[1] : 'Proxes R1R', note: 'Sportive: +6 % di presa, sterzo più pronto, ideali a 85 °C.', sim: { mu: (c.mu || 1.05) * 1.06, tyre: { B: 20, C: 1.45, E: 0.2, opt: 85, win: 60, crr: 0.012 } } },
@@ -587,8 +589,8 @@ for (const q of GEN_NEW) {
     P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : Math.round((0.14 + mass / 12000) * (SU ? SU.ieK : 1) * 1000) / 1000, mass, r, cd, A, mu: T.mu || (heavy ? 0.9 : 1.0), cgH: T.cgH || (heavy ? 1.2 : 0.5), wb: T.wb || (heavy ? 5.9 : 2.5), tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
       T.mw ? genInerzia(T, r) : {}, heavy ? {} : { lossK: Math.round(Math.min(1.3, Math.max(0.55, mass / 1290)) * 100) / 100 }, heavy ? { Iw: 36, Iwf: 24, Ks: 240000, vmax: 90 } : {}),
     turbo: null,
-    boost: [KIT_SC('sc', 'Rotrex', 'Compressore volumetrico (0,5 bar)', 0.5, Math.round(2500 + price * 0.1), 30, 'Più spinta coi giri: +35 %.'),
-      KIT_T('turbo', 'Garrett', 'Kit turbo (0,9 bar)', 0.9, 2600, 3800, Math.round(4000 + price * 0.15), 45, 'Il kit grosso: servono centralina e intercooler.', 'TURBO')],
+    boost: [KIT_SC('sc', 'Eaton', 'TVS R900 Street Blower (0,5 bar)', 0.5, Math.round(2500 + price * 0.1), 30, 'Compressore volumetrico: spinta piena da subito e più spinta coi giri, +35 %.'),
+      KIT_T('turbo', 'Garrett', 'GT2871R Street Spool (0,9 bar)', 0.9, 2600, 3800, Math.round(4000 + price * 0.15), 45, 'Il kit turbo completo: collettore, turbo e tubi. Servono centralina e intercooler.', 'TURBO')],
     diff0: { name: 'Aperto', note: 'Di serie.', diff: 'open' }, priceK: heavy ? 3 : 1,
   });
 }
