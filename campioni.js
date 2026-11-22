@@ -16,7 +16,7 @@
 //  Parte pura (provata in test/campioni.test.js): cmpInfo, cmpServe, cmpAuto, cmpRisolvi, cmpFx, cmpOwns, cmpPrezzo,
 //  cmpCompra, cmpMonta, cmpFiles, cmpIndiceI. Parte audio: CampioniPlayer (Web Audio). Parte grafica: NightCampioni.html.
 // ============================================================================
-const CMP_VER = 1;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
+const CMP_VER = 2;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
 const CMP_DIR = 'audio/campioni/';
 const CMP = {
   k: 1.1,                                  // livello generale dei campioni sopra il motore sintetizzato (misurato con strumenti/ascolta_campioni.js)
