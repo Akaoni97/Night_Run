@@ -1366,7 +1366,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     audio.ctx = ctx;
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -8; comp.knee.value = 6; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.12;
-    comp.connect(ctx.destination);
+    comp.connect(ctx.destination); audio.comp = comp;   // sensi.js: dopo un incidente forte l'udito si ovatta
     player = new SamplePlayer(ctx, comp);
     if (window.NightCampioni) NightCampioni.attach(ctx, comp);       // campioni dei pezzi (campioni.js): stessa uscita del motore
     if (game.car === 'supra') loadSupraSamples();   // le registrazioni (1,9 MB) servono solo alla Supra: con le altre auto non si scaricano
@@ -2586,7 +2586,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     // market (bar, autogrill): cose da tenere nel bagagliaio
     if (I.id === 'grill' || I.id === 'bar') {
       const mr = group('Da portare via');
-      for (const k of VG_FOODS) mr.appendChild(row(`${IC(k)}${INV[k].name} <small>€ ${fmt(INV[k].price, INV[k].price % 1 ? 2 : 0)}</small>`, () => { const q = game.buyItem(k); renderTrunk(); return q; }));
+      for (const k of VG_FOODS.concat(I.id === 'grill' && typeof TABACCHI !== 'undefined' ? TABACCHI : [])) mr.appendChild(row(`${IC(k)}${INV[k].name} <small>€ ${fmt(INV[k].price, INV[k].price % 1 ? 2 : 0)}</small>`, () => { const q = game.buyItem(k); renderTrunk(); return q; }));
     }
   }
   const vgKm = (g) => (g.s.dist || 0) / 1000;
@@ -3336,6 +3336,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   window.nightRun.swapCar = (id) => { if (game.car === id) return true; game._dlForce = game.inside && game.inside.id === 'dealer' ? null : id; const sel = $('carSw'); sel.value = id; sel.dispatchEvent(new Event('change')); game._dlForce = null; if (placeOpen && game.car === id) renderPlaceCash(); return game.car === id; };
   window.nightRun.pausa = (on) => on ? pausaOn() : pausaOff(); Object.defineProperty(window.nightRun, 'inPausa', { get: () => pausaF, configurable: true });   // pausa a mano (prove)
   Object.defineProperty(window.nightRun, 'radio', { get: () => radio, configurable: true });   // la radio che disturba (notte.js)
+  Object.defineProperty(window.nightRun, 'audio', { get: () => audio, configurable: true });   // fischio nelle orecchie dopo un incidente forte (sensi.js)
   window.nightRun.save = () => { try { saveGame(); } catch (e) { /* ignora */ } };   // utile per provare eventi dalla console
   window.nightRun.shiftUp = () => { ensureAudio(); shiftUp(); }; window.nightRun.shiftDown = () => { ensureAudio(); shiftDown(); };   // marce dal banco prova
 
@@ -3711,6 +3712,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
 <script src="notte.js"></script>
+<script src="tabacchi.js"></script>   <!-- gratta e vinci e sigarette all'autogrill -->
+<script src="sensi.js"></script>   <!-- palpebre col sonno, fischio e buio dopo un incidente forte -->
 <script src="statistiche.js"></script>
 <script src="diario.js"></script>
 <script src="banco.js"></script>

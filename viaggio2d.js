@@ -255,12 +255,16 @@
     const v = game.vgView && game.vgView(); if (!v) return;
     const W = this.LW, H = 360, sl = v.needs.sleep;
     this._mirReq = game.inside ? null : { game, v, t };
-    if (sl < 0.35) {   // vignetta che si stringe
-      const a = Math.min(0.75, (0.35 - sl) * 2.2) * (0.75 + 0.25 * Math.sin(t * 1.3));
-      const gr = g.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, W * 0.62); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`);
-      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    if (this.palpebre && typeof senApertura === 'function') {   // sensi.js: occhi che si chiudono (sonno e colpi di sonno)
+      this.palpebre(g, senApertura(sl, t, v.blackout || 0));
+    } else {
+      if (sl < 0.35) {   // vignetta che si stringe
+        const a = Math.min(0.75, (0.35 - sl) * 2.2) * (0.75 + 0.25 * Math.sin(t * 1.3));
+        const gr = g.createRadialGradient(W / 2, H / 2, H * 0.25, W / 2, H / 2, W * 0.62); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`);
+        g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      }
+      if (v.blackout > 0) { g.fillStyle = `rgba(0,0,0,${Math.min(1, v.blackout * 1.3)})`; g.fillRect(0, 0, W, H); }
     }
-    if (v.blackout > 0) { g.fillStyle = `rgba(0,0,0,${Math.min(1, v.blackout * 1.3)})`; g.fillRect(0, 0, W, H); }
     if (v.mirror && Math.random() < 0.02) { g.fillStyle = 'rgba(200,210,255,.08)'; g.fillRect(0, 0, W, H); }
     if (v.glitch > 0) {
       const big = String(Math.floor(41200 + Math.random() * 9e5)), w = this.textW(big, 4);
