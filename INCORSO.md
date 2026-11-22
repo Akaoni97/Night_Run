@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Schermata iniziale rifatta: sfondo animato in stile Night Run, logo e pannello nuovi | `titolo.js` (nuovo), `prologo.js`, `index.html` | 22/11 |
