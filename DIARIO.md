@@ -3,6 +3,10 @@
 - Per il proprietario: proposta di anomalie in `AVVISI.md` (è storia: decidi tu). La scena «Quella dietro» è la prima cosa di storia scritta da noi: se non ti va, `NOTTE_DIETRO` in `notte.js`.
 - Aperto: l'auto gemella nella scena sta dietro di te e col quadro aperto si vede poco; il buio vero va provato giocando un'incursione intera.
 
+## 22/11/2026 · proprietario (Nico) · v0.90 (**meteo: vento vero, città, ora, nebbia horror**)
+- Fatto (decisioni di Nico al check): in `meteo2d.js` il vento ha una direzione per episodio e soffia sulla fisica (`sim.windV` m/s contro la marcia o a favore, `sim.windX` di traverso; in `sim.js` l'aria che frena è quella relativa all'auto, di serie 0 = Supra e V40 come prima): una Panda col vento contro perde più di 10 km/h di punta. Neve e nebbia anche in città (prima in città sparivano), la neve smette solo al mare e nel deserto. Tempo dinamico secondo l'ora (`meteoPesi`: nebbia all'alba e la sera, neve più facile di notte, vento di pomeriggio). Di notte la nebbia arriva poco da sola e sale nei momenti horror: durante un'incursione o, una volta su due, dopo una cosa strana (`horrorFog`). Fruscio del vento più basso, lento e senza sibili. Test `test/meteo.test.js` (329 test), provati vento e neve in città nel browser.
+- Aperto: il fruscio va sentito sul PC.
+
 ## 22/11/2026 · cognato (Luca) · v0.85 (**cinque auto iniziali**)
 - Fatto: dai disegni HD del proprietario cinque auto nuove economiche, all'Autosalone: **Fiat Panda 1000 Fire** (45 CV, € 3.000), **Citroën AX 1.1** (60 CV, € 3.500), **Renault Twingo 1.2** (58 CV, € 4.500) da subito, **Dacia Sandero 1.2 16V** (75 CV, € 10.500) e **Toyota Aygo 1.0** tre cilindri (69 CV, € 9.500) dal km 10. Dati veri del motore in `schede.js` (coi pezzi di ognuna e un reparto speciale), voce in `GEN_NEW`, freni (le tre vecchie senza ABS), posti, nomi, traffico, finestrini del guidatore, utilitarie in garage e documenti, le tre vecchie anche allo sfascio. Test 318 (`suoni.test.js` conta 25 auto), foto in guida, prova di fumo.
 - Aperto: guardarle e sentirle sul PC.

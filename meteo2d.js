@@ -7,8 +7,10 @@
 //  - vento: polvere o sabbia che corre (nel deserto color sabbia), velo caldo, raffiche laterali che spostano l'auto
 //    (sbandate solo nel disegno: corsie e urti non cambiano) e un fruscio sintetizzato.
 //  Scelta: menu Impostazioni → Grafica → Meteo (o tasto K): dinamico, sereno, pioggia, nebbia, neve, vento. In
-//  «dinamico» arrivano da sole secondo il paesaggio (nebbia in pianura e nei paesi, neve in montagna, vento nel
-//  deserto e a volte in autostrada), mai insieme alla pioggia. index.html chiama NightMeteo.apply(scelta) e
+//  «dinamico» arrivano da sole secondo il paesaggio E l'ora (22/11, decisioni di Nico): nebbia all'alba e la sera in
+//  pianura, nei paesi e anche in città, di notte solo ogni tanto e nei momenti horror (incursioni, cose strane); neve in
+//  montagna e a volte in città e in pianura, più facile di notte; vento soprattutto di pomeriggio. Mai con la pioggia.
+//  Il vento entra nella fisica (sim.windV contro/a favore, sim.windX di traverso: velocità massima e consumi cambiano). index.html chiama NightMeteo.apply(scelta) e
 //  NightMeteo.tick(dt, info) dentro tickAtmosphere. Si disegna agganciato a Street2D.drawComics (dopo vitaFront).
 // ============================================================================
 (() => {
@@ -30,19 +32,42 @@
     if (KINDS[scelta]) { M.forced = true; start(scelta, true); M.k = Math.max(M.k, 0.35); }
     else { if (M.forced) stop(true); M.forced = false; if (scelta === 'sereno') stop(true); }
   }
-  // ogni fotogramma (da tickAtmosphere): info = { auto, rain, bg, vol }
+  // probabilità di ogni tempo per paesaggio e ora (0-24): nebbia all'alba (5-9) e la sera (18-22), di notte (22-5) solo
+  // ogni tanto (il resto lo fanno i momenti horror); neve più facile di notte e fuori dalla montagna rara; vento di giorno,
+  // soprattutto di pomeriggio. Pura: provata in test/meteo.test.js
+  function meteoPesi(bg, hour) {
+    const h = ((hour % 24) + 24) % 24, alba = h >= 5 && h < 9, sera = h >= 18 && h < 22, notte = h >= 22 || h < 5, pom = h >= 12 && h < 18;
+    const neb = alba ? 1.4 : sera ? 1 : notte ? 0.25 : 0.4, nev = notte ? 1.3 : alba ? 1.1 : 0.7, ven = pom ? 1.4 : notte ? 0.5 : 1;
+    const base = { plain: { nebbia: 0.45, neve: 0.06, vento: 0.1 }, village: { nebbia: 0.4, neve: 0.08, vento: 0.06 }, mountain: { neve: 0.55, nebbia: 0.2, vento: 0.08 },
+      desert: { vento: 0.55 }, highway: { vento: 0.22, nebbia: 0.18, neve: 0.04 }, city: { nebbia: 0.22, neve: 0.1, vento: 0.06 }, sea: { vento: 0.3, nebbia: 0.15 } }[bg] || {};
+    const k = { nebbia: neb, neve: nev, vento: ven }, out = [];
+    for (const t of ['nebbia', 'neve', 'vento']) if (base[t]) out.push([t, Math.min(0.75, base[t] * k[t])]);
+    const tot = out.reduce((a, x) => a + x[1], 0);
+    return tot > 0.85 ? out.map(([t, w]) => [t, w * 0.85 / tot]) : out;
+  }
+  // nebbia horror: di notte, durante un'incursione della storia o subito dopo una cosa strana (una volta su due), sale la
+  // nebbia e se ne va qualche minuto dopo
+  function horrorFog(dt, info) {
+    const g = window.nightRun && window.nightRun.game, vg = g && g.s && g.s.vg;
+    if (!vg || (info.hour != null && info.hour >= 6 && info.hour < 20)) { M.odd0 = vg ? vg.oddCount : 0; return; }
+    const att = !!(vg.story && vg.story.att), odd = (vg.oddCount || 0) > (M.odd0 ?? (vg.oddCount || 0));
+    M.odd0 = vg.oddCount || 0;
+    if ((att || (odd && Math.random() < 0.5)) && M.kind !== 'nebbia') { start('nebbia', true); M.horror = true; M.timer = 120 + Math.random() * 90; }
+    if (M.horror && M.kind !== 'nebbia') M.horror = false;
+  }
+  // ogni fotogramma (da tickAtmosphere): info = { auto, rain, bg, vol, hour }
   function tick(dt, info) {
     const sim = window.nightRun && window.nightRun.sim, game = window.nightRun && window.nightRun.game;
     if (!M.forced && info.auto) {
       if (info.rain && M.kind) stop(true);                               // con la pioggia niente nebbia, neve o vento
       else if (!info.rain) {
         // fuori dal suo paesaggio la neve smette (la nebbia e il vento possono seguirti un po')
-        if (M.kind === 'neve' && info.bg !== 'mountain') stop();
-        if (M.kind && info.bg === 'city') stop();                         // in città, tra i palazzi, niente nebbia né vento: restano i neon
+        if (M.kind === 'neve' && (info.bg === 'desert' || info.bg === 'sea')) stop();   // nel deserto e al mare la neve smette
+        horrorFog(dt, info);
         if ((M.timer -= dt) <= 0) {
           if (M.kind) { stop(); M.timer = 90 + Math.random() * 120; }
           else {
-            const p = { plain: [['nebbia', 0.55]], village: [['nebbia', 0.45]], mountain: [['neve', 0.6], ['nebbia', 0.2]], desert: [['vento', 0.6]], highway: [['vento', 0.25], ['nebbia', 0.2]], city: [['nebbia', 0.15]], sea: [['vento', 0.3], ['nebbia', 0.2]] }[info.bg] || [];
+            const p = meteoPesi(info.bg, info.hour ?? 22);
             let r = Math.random(), pick = null; for (const [k, w] of p) { if (r < w) { pick = k; break; } r -= w; }
             if (pick) { start(pick); M.timer = 60 + Math.random() * 90; } else M.timer = 50 + Math.random() * 60;
           }
@@ -62,8 +87,12 @@
     const windK = M.shown === 'vento' ? M.k : 0;
     if ((M.gustT -= dt) <= 0) { M.gustT = 2.5 + Math.random() * 5; M.gustV = windK * (Math.random() < 0.5 ? -1 : 1) * (0.5 + Math.random() * 0.7); }
     M.gust += (M.gustV - M.gust) * Math.min(1, dt * 1.2); M.gustV *= Math.pow(0.7, dt);   // la raffica arriva in un attimo e cala in qualche secondo
+    // il vento nella fisica: ogni episodio ha la sua direzione (contro o a favore della marcia), le raffiche lo rinforzano
+    if (windK > 0.02 && M.windDir == null) M.windDir = Math.random() < 0.6 ? 1 : -1;
+    if (!windK) M.windDir = null;
+    if (sim) { sim.windV = windK ? windK * (M.windDir || 1) * (7 + 6 * Math.abs(M.gust)) : 0; sim.windX = windK ? windK * (10 + 14 * Math.abs(M.gust)) : 0; }
     M.sway = game && sim && windK > 0.05 && !game.inside && !game.ap ? M.gust * 0.9 * Math.min(1, Math.max(0, (Math.abs(sim.v) - 8) / 20)) : 0;   // metri di sbandamento
-    sound(windK * (0.5 + Math.abs(M.gust) * 0.8) * (info.vol ?? 0.8));
+    sound(windK * (0.6 + Math.abs(M.gust) * 0.35) * (info.vol ?? 0.8));   // fruscio: le raffiche si sentono, ma senza sbalzi
   }
   // fruscio del vento: rumore filtrato, più forte sulle raffiche
   function sound(level) {
@@ -73,12 +102,13 @@
         const ac = new (window.AudioContext || window.webkitAudioContext)(), len = ac.sampleRate * 2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
         let b = 0; for (let i = 0; i < len; i++) { b = 0.97 * b + 0.03 * (Math.random() * 2 - 1); d[i] = b * 4; }
         const src = ac.createBufferSource(), bp = ac.createBiquadFilter(), gg = ac.createGain();
-        src.buffer = buf; src.loop = true; bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = 0.7; gg.gain.value = 0;
-        src.connect(bp).connect(gg).connect(ac.destination); src.start();
+        src.buffer = buf; src.loop = true; bp.type = 'bandpass'; bp.frequency.value = 420; bp.Q.value = 0.5; gg.gain.value = 0;
+        const lpf = ac.createBiquadFilter(); lpf.type = 'lowpass'; lpf.frequency.value = 1400;   // niente sibili: il vento si sente, non fischia
+        src.connect(bp).connect(lpf).connect(gg).connect(ac.destination); src.start();
         M.snd = { ac, bp, gg };
       }
       const S = M.snd; if (S.ac.state !== 'running') S.ac.resume().catch(() => {});
-      const t = S.ac.currentTime; S.gg.gain.setTargetAtTime(Math.min(0.09, level * 0.07), t, 0.3); S.bp.frequency.setTargetAtTime(380 + level * 700, t, 0.4);
+      const t = S.ac.currentTime; S.gg.gain.setTargetAtTime(Math.min(0.04, level * 0.035), t, 0.8); S.bp.frequency.setTargetAtTime(340 + level * 260, t, 1.2);   // più basso e lento (22/11: «non fastidioso»)
     } catch (e) { /* senza audio va bene lo stesso */ }
   }
 
@@ -150,5 +180,5 @@
     g.restore();
   }
 
-  window.NightMeteo = { apply, tick, get kind() { return M.kind; }, get k() { return M.k; }, get raffica() { return { gust: M.gust, sway: M.sway || 0 }; }, label: () => M.kind || '', start: (k) => { M.forced = false; start(k); }, stop: () => stop() };
+  window.NightMeteo = { apply, tick, meteoPesi, get kind() { return M.kind; }, get k() { return M.k; }, get raffica() { return { gust: M.gust, sway: M.sway || 0 }; }, label: () => M.kind || '', start: (k) => { M.forced = false; start(k); }, stop: () => stop() };
 })();

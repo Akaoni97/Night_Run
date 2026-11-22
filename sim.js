@@ -418,7 +418,10 @@ class SupraSim {
     const v0 = this.v;
     // resistenza dell'aria: in scia a un'auto davanti (draft, 0..1 deciso dal gioco) ne resta meno; il rimorchio ne aggiunge
     const tk = this.trailerKg || 0;
-    const drag = 0.5 * 1.2 * (P.cd * ((tn.susp || {}).cdK || 1) * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) + (tk ? 0.85 : 0)) * this.v * Math.abs(this.v)
+    // vento (meteo2d.js): windV = componente contro la marcia in m/s (negativo = a favore), windX = di traverso. L'aria che
+    // conta è quella relativa all'auto; il vento di traverso aggiunge un po' di resistenza. Di serie 0: tutto come prima
+    const vr = this.v + (this.windV || 0), crossK = 1 + 0.12 * Math.min(1, Math.abs(this.windX || 0) / 15);
+    const drag = 0.5 * 1.2 * (P.cd * ((tn.susp || {}).cdK || 1) * (1 + this.damage * 0.25 + 0.04 * (this.winPos || 0)) * P.A * (1 - (this.draft || 0)) * crossK + (tk ? 0.85 : 0)) * vr * Math.abs(vr)
       + (this.scrapeT > 0 ? Math.sign(this.v) * 0.06 * this.massNow() * 9.81 : 0);   // fondo che striscia: frena un po'
     // ---- freni: ogni asse frena fino a quanto tiene la sua gomma, col carico che in frenata va avanti ----------------------
     // ripartizione fissa (P.bf sull'anteriore). Con l'ABS l'asse al limite lavora a impulsi; senza ABS si blocca e striscia

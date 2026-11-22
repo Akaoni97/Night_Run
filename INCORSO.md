@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico), con Claude | Meteo: vento nella fisica, neve e nebbia in città, meteo secondo l ora, nebbia nei momenti horror, fruscio più gentile | `meteo2d.js`, `index.html`, `test/` | 22/11/2026 sera |

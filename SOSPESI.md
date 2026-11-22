@@ -56,9 +56,9 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 ## Priorità bassa · rifiniture
 
 ### Meteo
-14. [meteo] **Il vento spinge davvero?** Deciso da Nico (22/11): sì, il vento incide nella fisica. (in lavoro)
-15. [meteo] **Neve e nebbia anche in città?** Deciso da Nico (22/11): sì; il meteo dinamico va anche secondo l'ora. (in lavoro)
-16. [meteo] **Nebbia di notte** e fruscio del vento. Deciso da Nico (22/11): nebbia di notte sì, nei momenti horror e ogni tanto; fruscio del vento sì ma non fastidioso. (in lavoro)
+14. [meteo] **Il vento spinge davvero?** Deciso da Nico (22/11): sì. **Fatto (v0.90)**: il vento contro frena, a favore spinge. Da provare guidando. (tutti e due)
+15. [meteo] **Neve e nebbia anche in città?** Deciso da Nico (22/11): sì, e il dinamico secondo l'ora. **Fatto (v0.90)**. (tutti e due)
+16. [meteo] **Nebbia di notte** e fruscio del vento. Deciso da Nico (22/11): nebbia di notte sì, nei momenti horror e ogni tanto; fruscio del vento sì ma non fastidioso. **Fatto (v0.90)**: il fruscio va sentito sul PC. (proprietario)
 
 ## Da guardare · arrivati il 22/11
 

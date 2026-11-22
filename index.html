@@ -3597,7 +3597,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     if (street2d && street2d.setDaylight) street2d.setDaylight(d, ss);
     game.dayK = d; game.hour = h;   // giorno e notte contano nel gioco (notte.js: volanti, cose strane, radio)
-    if (window.NightMeteo) NightMeteo.tick(dt, { auto: S.meteo === 'auto', rain: !!S.rain, bg: (game.loc && game.loc.bg) || 'city', vol: S.muted ? 0 : S.vol / 100 });
+    if (window.NightMeteo) NightMeteo.tick(dt, { auto: S.meteo === 'auto', rain: !!S.rain, bg: (game.loc && game.loc.bg) || 'city', vol: S.muted ? 0 : S.vol / 100, hour: h });
     if ((ATM.txt -= dt) <= 0) {
       ATM.txt = 0.5; const hh = Math.floor(ATM.hour), mm = Math.floor((ATM.hour - hh) * 60);
       $('hudClock').textContent = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + (S.rain ? ' · pioggia' : window.NightMeteo && NightMeteo.kind ? ' · ' + NightMeteo.kind : d > 0.5 ? ' · sole' : '');
