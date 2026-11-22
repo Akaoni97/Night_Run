@@ -209,7 +209,7 @@ if (typeof VG_PLACE !== 'undefined') {
     // lamiera ondulata col filo spinato, cancello a rete che scorre, ufficio in un container, bidone col fuoco, faro sul palo
     const C = this.C, ink = C.ink, t = st.t || 0, gy = 216, X = Math.round(x), L = X - 150, Rr = X + 172, orange = '#e0874a';
     const n = 1 - (this.day || 0), rnd = Street2D.rnd, seed = Math.round(e.x) % 953;
-    const POOL = ['panda', 'punto', 'corsa', 'polo', 'golf', 'clio', 'a80', 'p205', 'p206', 'taxi', 'v40', 'e30', 'r5', 'a112'].filter((id) => typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite);
+    const POOL = ['panda', 'punto', 'corsa', 'polo', 'golf', 'clio', 'a80', 'p205', 'p206', 'taxi', 'v40', 'e30', 'r5', 'a112', 'panda141', 'ax', 'twingo'].filter((id) => typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite);
     const wreck = (i) => this.lcWreck && POOL.length ? this.lcWreck(POOL[(seed + i * 5) % POOL.length]) : null;
     // un'auto schiacciata: lo stesso disegno, alto la metà
     const crushed = (c, cx, by, k, sq) => { if (!c) return; const w = c.width * k, h = c.height * k * sq; g.drawImage(c, Math.round(cx - w / 2), Math.round(by - h), Math.round(w), Math.round(h)); g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(Math.round(cx - w / 2), Math.round(by - 2), Math.round(w), 2); };

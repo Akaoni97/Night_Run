@@ -23,14 +23,14 @@ function bright(a) { let d = 0, e = 0; for (let i = 1; i < a.length; i++) { d +=
 
 test('le famiglie vengono dalla scheda del motore', () => {
   const att = {
-    citta: ['panda', 'punto', 'corsa'], berlina: ['a80'], sportiva: ['a112', 'golf', 'p205', 'p206', 'williams'], tre: ['polo', 'clio', 'p308'],
+    citta: ['panda', 'punto', 'corsa', 'panda141', 'ax', 'twingo', 'sandero'], berlina: ['a80'], sportiva: ['a112', 'golf', 'p205', 'p206', 'williams'], tre: ['polo', 'clio', 'p308', 'aygo'],
     turbo: ['a3'], cinque: ['v850'], diesel: ['doblo', 'taxi', 'van', 'polizia', 'ambulanza'], bus: ['bus'],
   };
   for (const [fam, ids] of Object.entries(att)) for (const id of ids) {
     assert.equal(suonoFamiglia(SCHEDE[id]), fam, `${id}`);
     assert.equal(CARS[id].sound, fam, `${id}: la famiglia nel gioco`);
   }
-  assert.equal(gen.length, 20);
+  assert.equal(gen.length, 25);
   for (const f of Object.keys(att)) assert.ok(SUONI_FAM[f]);
 });
 

@@ -17,6 +17,8 @@ const GAME_TRAFFIC = [   // solo le auto disegnate dal giocatore; w = quanto spe
   { vt: 'golf', len: 3.8, kmh: [105, 130], w: 4 }, { vt: 'p205', len: 3.7, kmh: [110, 135], w: 3 }, { vt: 'williams', len: 3.7, kmh: [110, 135], w: 3 },
   { vt: 'a112', len: 3.2, kmh: [90, 115], w: 3 }, { vt: 'e36', len: 4.4, kmh: [110, 140], w: 4 }, { vt: 'e34', len: 4.7, kmh: [110, 140], w: 3 },
   { vt: 'e30', len: 4.3, kmh: [105, 130], w: 3 }, { vt: 'b2002', len: 4.2, kmh: [95, 120], w: 2 }, { vt: 'r5', len: 3.7, kmh: [110, 135], w: 2 }, { vt: 'v40', len: 4.5, kmh: [105, 130], w: 4 },
+  { vt: 'panda141', len: 3.4, kmh: [90, 115], w: 5 }, { vt: 'ax', len: 3.5, kmh: [95, 120], w: 3 }, { vt: 'twingo', len: 3.4, kmh: [95, 120], w: 5 },
+  { vt: 'sandero', len: 4.06, kmh: [100, 125], w: 7 }, { vt: 'aygo', len: 3.46, kmh: [100, 125], w: 6 },
   // mezzi pesanti (CAMION in cars.js): cls = classe per la miscela dei luoghi (mix.truck); a 80-90 km/h in autostrada, sempre a destra
   { vt: 'tir', cls: 'truck', len: 16, kmh: [82, 90], w: 1.6 }, { vt: 'tir_furgone', cls: 'truck', len: 16, kmh: [82, 90], w: 1.4 },
   { vt: 'tir_cisterna', cls: 'truck', len: 14.5, kmh: [80, 88], w: 0.9 }, { vt: 'tir_bisarca', cls: 'truck', len: 18.5, kmh: [80, 88], w: 0.7 },
