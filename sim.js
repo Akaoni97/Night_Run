@@ -71,6 +71,8 @@ class SupraSim {
     if (this.tune.fd) this.P.fd = this.tune.fd;
     if (this.tune.clutchMax) this.P.clutchMax = this.tune.clutchMax;
     if (Array.isArray(this.tune.gears)) this.P.gears = this.tune.gears.slice();
+    if (this.P.shiftK0 === undefined) this.P.shiftK0 = this.P.shiftK || 1;
+    this.P.shiftK = this.P.shiftK0 * (t.shiftMul || 1);              // cambio sport o da corsa: cambiate più rapide (Supra e V40 non lo passano)
     if (this.tune.tyre && this.tune.tyre.crr) this.P.crr = this.tune.tyre.crr;
     this.cfg.valve = this.tune.valve;
   }

@@ -154,6 +154,7 @@ const TUNING_SUPRA = {
       { id: 'oem', price: 0, brand: 'Bridgestone', name: 'Potenza originali 265/40 R17', note: 'Stradali: picco al 10 % di slittamento, poi calano dolcemente. Lavorano bene da freddo (ideale 80 °C).', sim: { mu: 1.1, tyre: { B: 20, C: 1.42, E: 0.1, opt: 80, win: 70, crr: 0.012 } }, dsp: {} },
       { id: 'r888r', price: 1100, brand: 'Toyo', name: 'Proxes R888R', note: 'Semi-slick: tanta presa ma picco stretto al 7 %, oltre mollano di colpo. Vanno scaldate (ideale 95 °C).', sim: { mu: 1.3, tyre: { B: 22, C: 1.5, E: 0.4, opt: 95, win: 45, crr: 0.013 } }, dsp: {} },
       { id: 'etstreet', price: 1500, brand: 'Mickey Thompson', name: 'ET Street R', note: 'Radiali da drag: fianco morbido, picco largo al 15 % e calo minimo. Ideali tiepide (70 °C); in curva e in frenata sono le peggiori.', sim: { mu: 1.55, tyre: { B: 15, C: 1.3, E: -0.3, opt: 70, win: 55, crr: 0.016, brake: 0.88 } }, dsp: {} },
+      { id: 'slick', price: 2400, km: 45, brand: 'Mickey Thompson', name: 'Gomme da drag slick', note: 'Slick lisce da drag: la presa più alta di tutte, in partenza si piantano e in frenata mordono. Da fredde scivolano: scaldale (ideali 80 °C). Non omologate.', sim: { mu: 1.85, tyre: { B: 13, C: 1.35, E: -0.2, opt: 80, win: 50, crr: 0.017, brake: 1.0 } }, dsp: {} },
     ],
   },
   final: {
@@ -208,6 +209,23 @@ const SUPRA_PRESETS = [
 ];
 let TUNING_PRESETS = SUPRA_PRESETS;
 
+// cambio regolabile (auto da disegno, v0.91): «sport» = un rapporto unico che allunga o accorcia tutte le marce insieme,
+// «da corsa» = ogni marcia per conto suo. La regolazione sta in S.adj[auto] (gk e gr) accanto ad altezza e rigidità dell'assetto.
+const GB_ADJ = { all: [0.8, 1.2], each: [0.7, 1.3] };
+function gbState(item, adj) {
+  const gb = item && item.gb; if (!gb) return null;
+  const R = GB_ADJ[gb.mode === 'all' ? 'all' : 'each'], cl = (v) => Math.round(Math.min(R[1], Math.max(R[0], v)) * 100) / 100, base = gb.base;
+  if (gb.mode === 'all') { const k = cl(adj && Number.isFinite(adj.gk) ? adj.gk : gb.k0); return { mode: 'all', k, k0: gb.k0, min: R[0], max: R[1], base, mul: base.map((_, i) => (i ? k : 1)) }; }
+  const mul = base.map((_, i) => (i ? cl(adj && Array.isArray(adj.gr) && Number.isFinite(adj.gr[i]) ? adj.gr[i] : gb.m0[i]) : 1));
+  return { mode: 'each', min: R[0], max: R[1], base, mul, m0: gb.m0 };
+}
+// rapporti veri dal pezzo e dalla regolazione: una marcia non può essere più corta (rapporto più alto) di quella prima
+function gbGears(item, adj) {
+  const st = gbState(item, adj); if (!st) return item && item.sim ? item.sim.gears : null;
+  const g = st.base.map((v, i) => (i ? v * st.mul[i] : 0));
+  for (let i = 2; i < g.length; i++) g[i] = Math.min(g[i], g[i - 1] * 0.97);
+  return g.map((v) => Math.round(v * 1000) / 1000);
+}
 function tuningItemOf(catalog, cat, id) {
   const c = catalog[cat]; if (!c) return { id: 'oem', price: 0, name: '', sim: {}, dsp: {} };
   return c.items.find((i) => i.id === id) || c.items[0];

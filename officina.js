@@ -15,14 +15,14 @@
 //  Parte grafica: NightOfficina.panel(body, I, ctx), chiamata da openPlace (index.html) per Da Luca Tuning.
 // ============================================================================
 const OFF_GRUPPI = [
-  { id: 'motore', nome: 'Motore', cats: ['intake', 'cams', 'special', 'ecu', 'limiter'], hint: 'Aspirazione, camme, il reparto speciale dell\'auto, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
+  { id: 'motore', nome: 'Motore', cats: ['intake', 'displacement', 'cams', 'special', 'fuel', 'ecu', 'limiter'], hint: 'Aspirazione, cilindrata, camme, il reparto speciale dell\'auto, benzina, centralina e limitatore: quanta potenza fa il motore, a che giri la dà e quanta pressione regge.' },
   { id: 'turbo', nome: 'Turbo', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: pressione e fischio.' },
   { id: 'scarico', nome: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e catalizzatore: voce, fiamme e qualche cavallo.' },
   { id: 'trasm', nome: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
   { id: 'telaio', nome: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza e frenata.' },
 ];
 // i reparti che appartengono al MOTORE (con lo swap diventano quelli del donatore); il limitatore è comune a tutte le auto
-const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'cams', 'special', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
+const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'displacement', 'cams', 'special', 'fuel', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
 // campi della fisica e del suono che vengono dal motore (il resto dell'auto è quello dell'auto che ospita)
 const OFF_SIM = ['turbo', 'pw', 'limiter', 'sparkCut', 'ecuLaunch', 'ecuPops', 'idle', 'camLow', 'camHigh', 'lope', 'ic', 'valve', 'boostK', 'limType', 'flatShift'];
 const OFF_DSP = ['cyl', 'tb', 'bov', 'intake', 'scream', 'lope', 'spark', 'voice', 'ex', 'cat'];
@@ -183,6 +183,7 @@ function offCarattere(k, it, o) {
       const x = o.lim ? T.a / o.lim : 0.4;
       out.push(x < 0.34 ? 'Pronto: risponde presto, ripresa facile' : x < 0.46 ? 'Stradale: spinta ampia, compromesso fra risposta e allungo' : 'Allungo: sale più tardi e spinge forte in alto',
         `entra tra ${n(T.a)} e ${n(T.b)} giri`, `fino a ${bar(T.max)} bar`);
+      if (o.used > 0 && o.used < T.max - 0.04) out.push(`con la centralina e la benzina che hai ne usi solo ${bar(o.used)}: servono quelle più grosse`);
     }
   } else if (k === 'final' || k === 'gearbox') {
     const gears = k === 'gearbox' ? (s.gears || o.gears0 || o.gears) : o.gears, fd = k === 'final' && s.fd ? s.fd : o.fd, ora = giri130(o.gears, o.fd), poi = giri130(gears, fd);
@@ -278,6 +279,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
         const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj());
         ctx.setAdj(sres.dataset.sres === 'serie' ? { h: 0, k: 1 } : { h: st.h0, k: st.k0 }, () => render()); ctx.after && ctx.after(); render(); return;
       }
+      const gres = e.target.closest('[data-gbres]');
+      if (gres && ctx.setAdj && ctx.adj) {                         // cambio: come di serie (×1) o i rapporti consigliati del pezzo
+        const st = gbState(tuningItem('gearbox', ctx.S.tune.gearbox), ctx.adj()); if (!st) return;
+        const serie = gres.dataset.gbres === 'serie';
+        ctx.setAdj(st.mode === 'all' ? { gk: serie ? 1 : st.k0 } : { gr: serie ? st.mul.map(() => 1) : st.m0.slice() }, () => render()); ctx.after && ctx.after(); render(); return;
+      }
       const c = e.target.closest('[data-k]');
       if (c) { pick = pick && pick.k === c.dataset.k && pick.id === c.dataset.id ? null : { k: c.dataset.k, id: c.dataset.id }; render(); return; }   // toccare un pezzo lo mostra, non spende niente
       const s = e.target.closest('[data-swap]');
@@ -291,11 +298,24 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
     box.addEventListener('input', (e) => {
       if (e.target.closest('[data-cmp-vol]') && window.NightCampioni) { NightCampioni.input(e.target); return; }   // volume dei campioni
+      const gr = e.target.closest('[data-gb]');
+      if (gr && ctx.adj) {                                         // cambio: rapporti e velocità massima si aggiornano mentre trascini
+        const it = tuningItem('gearbox', ctx.S.tune.gearbox), st = gbState(it, ctx.adj()); if (!st) return;
+        const a = Object.assign({}, ctx.adj() || {}, gbAdjDa(box, st)), s2 = gbState(it, a), gears = gbGears(it, a);
+        if (s2.mode === 'all') box.querySelector('#ofGbK').textContent = gbKLab(s2.k);
+        else s2.mul.forEach((m, i) => { const b = i && box.querySelector('#ofGb' + i); if (b) b.textContent = `${gbF(gears[i])} · ×${gbF(m)}`; });
+        box.querySelector('#ofGbL').textContent = gbRiga(ctx, gears); return;
+      }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
     });
     box.addEventListener('change', (e) => {
+      const gr = e.target.closest('[data-gb]');
+      if (gr && ctx.setAdj && ctx.adj) {
+        const st = gbState(tuningItem('gearbox', ctx.S.tune.gearbox), ctx.adj()); if (!st) return;
+        ctx.setAdj(gbAdjDa(box, st), () => render()); ctx.after && ctx.after(); render(); return;
+      }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.setAdj) return;
       ctx.setAdj(r.dataset.susp === 'h' ? { h: +r.value } : { k: +r.value }, () => render()); ctx.after && ctx.after(); render();
     });
@@ -364,6 +384,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const card = pi >= 0 ? pezzoCard(ctx, k, cat.items[pi], pi, ci, career, money) : '';
       h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${card}${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
+      if (k === 'gearbox' && typeof gbState === 'function' && ctx.adj && c.gb) h += gbBlock(ctx, c);
     }
     return h + '<p class="of-hint"><b>Tocca un pezzo</b> per vedere cosa cambia: non spendi niente finché non premi il pulsante. <b style="color:#2fd16a">●</b> verde: ce l\'hai, lo monti gratis. <b style="color:#ff453a">●</b> rosso: da comprare. Con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
   }
@@ -377,7 +398,9 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
   // la scheda del pezzo toccato: cosa fa, che carattere ha, cosa cambia (calcolato sulla tua auto) e UN pulsante che dice cosa succede
   function pezzoCard(ctx, k, it, i, ci, career, money) {
     const g = ctx.game, isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id), sim = ctx.sim, P = sim.P;
-    const car = offCarattere(k, it, { lim: P.limiter, r: P.r, gears: P.gears, gears0: typeof CARS !== 'undefined' && CARS[g.car] && CARS[g.car].P ? CARS[g.car].P.gears : null, fd: P.fd });
+    let used = 0;                                                  // turbo: la pressione che lasciano davvero centralina e benzina montate
+    if (k === 'turbo' && !offSwapOf(g, g.car) && typeof tuningParams === 'function') try { used = tuningParams(Object.assign({}, ctx.S.tune, { turbo: it.id }), ctx.adj && ctx.adj()).sim.turbo.max; } catch (err) { used = 0; }
+    const car = offCarattere(k, it, { lim: P.limiter, r: P.r, gears: P.gears, gears0: typeof CARS !== 'undefined' && CARS[g.car] && CARS[g.car].P ? CARS[g.car].P.gears : null, fd: P.fd, used });
     let dl = '', solo = '';
     if (!isCur) {
       const d = offPreview(g, ctx.S.tune, k, it.id);
@@ -406,6 +429,26 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     return `<div class="of-susp${st.adjustable ? '' : ' off'}"><div class="of-sr"><span>Altezza</span><b id="ofSuspHv">${E(L.h)}</b><input type="range" data-susp="h" min="${st.hMin}" max="${st.hMax}" step="5" value="${st.h}" ${st.adjustable ? '' : 'disabled'} aria-label="Altezza da terra"></div>`
       + `<div class="of-sr"><span>Rigidità</span><b id="ofSuspKv">${E(L.k)}</b><input type="range" data-susp="k" min="${st.kMin}" max="${st.kMax}" step="0.1" value="${st.k}" ${st.adjustable ? '' : 'disabled'} aria-label="Rigidità delle molle"></div>`
       + (st.adjustable ? '<div class="of-sbtn"><button type="button" data-sres="serie">Come di serie</button><button type="button" data-sres="kit">Consigliato dal kit</button></div>' : '') + '</div>';
+  }
+
+  // cambio sport (un rapporto per tutte le marce) e da corsa (marcia per marcia): gratis, da fermi e da Luca come l'assetto
+  const gbF = (v, d = 2) => v.toFixed(d).replace('.', ',');
+  function gbRiga(ctx, gears) {
+    const P = ctx.sim.P, n = gears.length - 1, v = P.limiter / 60 * 2 * Math.PI * P.r / (gears[n] * P.fd) * 3.6;
+    return gears.slice(1).map((x, i) => `${i + 1}ª ${gbF(x)}`).join(' · ') + ` — in ${n}ª al limitatore ${fmt(v)} km/h`;
+  }
+  function gbKLab(k) { return '×' + gbF(k) + (k > 1.005 ? ' · più corte' : k < 0.995 ? ' · più lunghe' : ' · come di serie'); }
+  function gbBlock(ctx, item) {
+    const st = gbState(item, ctx.adj()), gears = gbGears(item, ctx.adj());
+    let h = '<div class="of-susp">';
+    if (st.mode === 'all') h += `<div class="of-sr"><span>Rapporto</span><b id="ofGbK">${E(gbKLab(st.k))}</b><input type="range" data-gb="k" min="${st.min}" max="${st.max}" step="0.01" value="${st.k}" aria-label="Rapporto di tutte le marce"></div>`;
+    else h += st.mul.slice(1).map((m, i) => `<div class="of-sr"><span>${i + 1}ª marcia</span><b id="ofGb${i + 1}">${gbF(gears[i + 1])} · ×${gbF(m)}</b><input type="range" data-gb="${i + 1}" min="${st.min}" max="${st.max}" step="0.01" value="${m}" aria-label="Rapporto della ${i + 1}ª"></div>`).join('');
+    return h + `<p class="of-hint" id="ofGbL" style="margin:2px">${E(gbRiga(ctx, gears))}</p><div class="of-sbtn"><button type="button" data-gbres="serie">Come di serie</button><button type="button" data-gbres="kit">Consigliato da Luca</button></div></div>`;
+  }
+  // la regolazione che darebbero i cursori adesso (mentre trascini)
+  function gbAdjDa(box, st) {
+    if (st.mode === 'all') return { gk: +box.querySelector('[data-gb="k"]').value };
+    return { gr: st.mul.map((m, i) => { const r = box.querySelector(`[data-gb="${i}"]`); return i && r ? +r.value : m; }) };
   }
 
   function drawSwap(ctx, carId, dId, career, money) {

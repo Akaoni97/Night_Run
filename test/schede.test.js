@@ -56,10 +56,10 @@ test('ogni auto ha pezzi suoi: nessuna copia dello stesso elenco', () => {
   const firme = new Set();
   for (const id of gen) {
     const T = CARS[id].tuning, s = SCHEDE[id];
-    const f = JSON.stringify([T.exhaust.items[1].name, T.intake.items[1].name, T.ecu.items[1].name, T.special && T.special.items.map((x) => x.name)]);
+    const f = JSON.stringify([T.exhaust.items[1].name, T.intake.items.find((x) => x.id === 'pf').name, T.ecu.items[1].name, T.special && T.special.items.map((x) => x.name)]);   // 'pf' = l'aspirazione sua (le altre sono comuni)
     assert.ok(!firme.has(f), `${id}: catalogo uguale a quello di un'altra auto`);
     firme.add(f);
-    assert.ok(T.special && T.special.items.length === 3, `${id}: manca il reparto suo`);
+    assert.ok(T.special && T.special.items.length === (/cilindrata/i.test(T.special.label) ? 4 : 3), `${id}: manca il reparto suo`);   // dove è la cilindrata, in fondo c'è la maggiorazione +300 cc
     if (s.fuel === 'diesel') {
       assert.ok(!T.cat && !T.cams, `${id}: un diesel non ha downpipe né camme sportive`);
       assert.equal(T.ecu.items[2].sim.spark, false, `${id}: un diesel non fa scoppi`);

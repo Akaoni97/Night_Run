@@ -2303,15 +2303,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const r = game.buy(k, id);
       if (!r.ok) { revert(); flash(r.why, 2.4); return; }
     }
-    S.tune[k] = id; if (k === 'suspension') delete S.adj[ACTIVE_CAR];          // pezzo nuovo: si riparte dai valori di fabbrica del livello
+    S.tune[k] = id;                                                  // pezzo nuovo: si riparte dai valori di fabbrica del livello (assetto o cambio)
+    { const a = S.adj[ACTIVE_CAR]; if (a && k === 'suspension') { delete a.h; delete a.k; } if (a && k === 'gearbox') { delete a.gk; delete a.gr; } }
     applySettings(); saveGame();
   }
   // altezza e rigidità dell'assetto: gratis, ma da fermi e da Luca come i pezzi
   function setSuspAdj(patch, revert) {
-    if (!game.canMount()) { revert(); flash('L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
-    if (game.needsShop()) { revert(); flash('L\'assetto lo regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
+    if (!game.canMount()) { revert(); flash('Assetto e cambio si regolano da fermo: accosta e frena', 2.4); return; }
+    if (game.needsShop()) { revert(); flash('Assetto e cambio li regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
     const st = suspState(tuningItem('suspension', S.tune.suspension), adjOf());
-    S.adj[ACTIVE_CAR] = { h: st.h, k: st.k, ...patch };
+    S.adj[ACTIVE_CAR] = { ...(adjOf() || {}), h: st.h, k: st.k, ...patch };      // tiene anche la regolazione del cambio (gk, gr)
     applySettings(); saveGame();
   }
   function mountPreset(p) {
