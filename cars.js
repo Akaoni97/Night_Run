@@ -436,6 +436,17 @@ const GEN_TELAIO = {
   sandero: { wb: 2.59, cgH: 0.56, dw: 0.61, mu: 0.97, mw: 14 }, aygo: { wb: 2.34, cgH: 0.55, dw: 0.61, mu: 0.94, mw: 12 },
   polizia: { wb: 2.68, cgH: 0.56, dw: 0.61, mu: 0.98, mw: 17 },
 };
+// (22/11) rapporti veri del cambio e del finale, dove le fonti sono affidabili (le altre auto tengono i cambi comuni G5/G6):
+// golf: prova di Motor Sport del 1983 sulla 1.8 · p205: cambio BE1 della 1.9 fino al 1989 · williams: JC5-014 · v850: M56 del
+// manuale Volvo · aygo: Toyota C551 · ax: cambio MA della AX · punto: Fiat C514 della Punto 1.2 · sandero e clio: Renault JH3 ·
+// corsa: Opel F13 (Corsa 1.4, stesso finale della 1.2 Twinport)
+const GEN_CAMBI = {
+  golf: { g: [3.48, 2.12, 1.44, 1.13, 0.912], fd: 3.65 }, p205: { g: [2.92, 1.85, 1.36, 1.07, 0.86], fd: 3.69 },
+  williams: { g: [3.091, 1.864, 1.321, 1.029, 0.794], fd: 4.067 }, v850: { g: [3.38, 1.90, 1.19, 0.87, 0.70], fd: 4.0 },
+  aygo: { g: [3.545, 1.913, 1.31, 1.027, 0.85], fd: 3.55 }, ax: { g: [3.416, 1.95, 1.357, 1.054, 0.853], fd: 3.937 },
+  punto: { g: [3.909, 2.158, 1.48, 1.121, 0.921], fd: 4.07 }, sandero: { g: [3.727, 2.048, 1.393, 1.029, 0.795], fd: 4.214 },
+  clio: { g: [3.727, 2.048, 1.393, 1.029, 0.756], fd: 4.5 }, corsa: { g: [3.727, 2.136, 1.414, 1.121, 0.892], fd: 3.94 },
+};
 // inerzia delle ruote (kg·m²) da massa e raggio: ruota e gomma come un anello pieno a 0,6, più il disco. Sull'asse motore
 // in più semiassi, differenziale e uscita del cambio
 function genInerzia(T, r) {
@@ -443,7 +454,8 @@ function genInerzia(T, r) {
   return { Iwf, Iw: Math.round((Iwf * 1.35 + 0.2) * 100) / 100 };
 }
 for (const q of GEN_NEW) {
-  const [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
+  let [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
+  if (GEN_CAMBI[id]) { gears = [0, ...GEN_CAMBI[id].g]; fd = GEN_CAMBI[id].fd; }
   GEN_DATA[id].tq = genTq(hp, rH, nm, rN, lim);
   const heavy = mass > 5000, T = GEN_TELAIO[id] || {};
   let voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }

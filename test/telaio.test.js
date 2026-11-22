@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'suoni.js', 'cars.js', 'samples.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const E = new Function(src + ';return { CARS, GEN_NEW, GEN_TELAIO, SupraSim, TUNING_PRESETS, tuningParams }')();
+const E = new Function(src + ';return { CARS, GEN_NEW, GEN_TELAIO, GEN_CAMBI, SupraSim, TUNING_PRESETS, tuningParams }')();
 const H = 1 / 240;
 const drive = (s, sec, each) => { for (let t = 0; t < sec; t += H) { if (each?.(s, t) === false) return; s.update(H); s.events.length = 0; } };
 
@@ -41,6 +41,14 @@ test('ogni auto da disegno ha il suo telaio, non quello comune', () => {
   assert.ok(E.CARS.v850.P.Iwf > E.CARS.panda141.P.Iwf * 1.5, 'ruote da 17 della 850 R più pesanti');
 });
 
+test('i rapporti veri del cambio arrivano all\'auto', () => {
+  for (const [id, c] of Object.entries(E.GEN_CAMBI)) {
+    assert.deepEqual(E.CARS[id].P.gears, [0, ...c.g], id + ' marce'); assert.equal(E.CARS[id].P.fd, c.fd, id + ' finale');
+    for (let i = 1; i < c.g.length; i++) assert.ok(c.g[i] < c.g[i - 1], id + ' marce in ordine');
+  }
+  assert.equal(E.CARS.e30.P.fd, 3.25, 'M3 E30 col finale europeo');
+});
+
 test('Supra e V40 restano come prima', () => {
   const v = E.CARS.v40.P;
   assert.equal(v.wb, 2.56); assert.equal(v.cgH, 0.52); assert.equal(v.Iwf, 1.6); assert.equal(v.lossK, undefined); assert.equal(v.Iw, undefined);
@@ -49,7 +57,7 @@ test('Supra e V40 restano come prima', () => {
 
 test('velocità massima e 0-100 vicini ai dati veri', () => {
   // [0-100 min, max, velocità massima min, max] dalle prove su strada (con un margine: il modello è semplice)
-  const att = { e30: [6.3, 7.3, 228, 245], panda: [13, 15.5, 152, 170], polo: [14.5, 18, 155, 176], ax: [11, 14, 155, 168], aygo: [12, 15, 152, 165], v850: [6.5, 7.6, 235, 260] };
+  const att = { e30: [6.3, 7.3, 228, 245], panda: [13, 15.5, 152, 170], polo: [14.5, 18, 155, 176], ax: [11, 14, 155, 168], aygo: [12, 15, 150, 168], golf: [7.8, 9.2, 178, 192], p205: [7.4, 8.6, 198, 214], williams: [7.4, 8.6, 205, 220], v850: [6.5, 7.6, 235, 260] };
   for (const [id, [a, b, c, d]] of Object.entries(att)) {
     const r = corsa(id);
     assert.ok(r.t100 > a && r.t100 < b, `${id}: 0-100 in ${r.t100.toFixed(1)} s, atteso tra ${a} e ${b}`);
