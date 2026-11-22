@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico), con Claude, per il cognato | Campioni dei pezzi più veri e meno robotici | `strumenti/campioni_pezzi.py`, `audio/campioni/`, `campioni.js` | 22/11/2026 sera |

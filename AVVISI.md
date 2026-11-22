@@ -9,7 +9,7 @@ questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
 
-## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **Cinque auto iniziali** (v0.83)
+## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **Cinque auto iniziali** (v0.85)
 - All'Autosalone ci sono le cinque auto dello zip «iniziali»: Panda 1000 Fire, AX e Twingo da subito (€ 3.000-4.500), Sandero e Aygo dal km 10 (€ 9.500-10.500), con scheda tecnica e pezzi.
 
 ## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **Auto nuove e camion** (v0.82)
