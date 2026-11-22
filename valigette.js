@@ -66,7 +66,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     const list = pick(cand); if (!list.length) return null;
     const c = list[Math.floor(Math.random() * list.length)];
     g.s.owned[g.ownKey(c.cat + ':' + c.it.id)] = true;
-    return { icon: c.cat === 'turbo' ? 'turbo' : 'pezzo', name: `${c.it.brand} ${c.it.name}`, text: `${TUNING[c.cat].label}: è tuo e sbloccato. Luca te lo monta senza farti pagare (vale € ${fmt(c.it.price)}).` };
+    return { icon: c.cat === 'turbo' ? 'turbo' : 'pezzo', comp: typeof compPos === 'function' ? compPos(c.cat, c.it.id, TUNING[c.cat].items) : null, name: `${c.it.brand} ${c.it.name}`, text: `${TUNING[c.cat].label}: è tuo e sbloccato. Luca te lo monta senza farti pagare (vale € ${fmt(c.it.price)}).` };
   };
   const midParts = (cand) => { const s = cand.filter((c) => c.it.price <= 4000); return s.length ? s : cand; };
   const topPart = (cand) => cand.sort((a, b) => b.it.price - a.it.price).slice(0, 1);
@@ -352,6 +352,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     const x = cv.getContext('2d');
     const off = document.createElement('canvas'); off.width = 120; off.height = 110; const ox = off.getContext('2d');
     const icn = document.createElement('canvas'); icn.width = 32; icn.height = 32; drawPrize(icn.getContext('2d'), prize.icon, ri);
+    if (prize.comp && window.compImg) { window.compImg(); if (window.compFrame) window.compFrame(ri); }   // il foglio dei componenti e la cornice, se non sono già pronti
     // l'auto regalata: il disegno del giocatore con le ruote (nei disegni del pacchetto sono a parte)
     let carImg = null;
     if (prize.car) carPic(prize.car, (c) => { carImg = c; });
@@ -451,7 +452,11 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
         x.save(); x.globalCompositeOperation = 'lighter'; x.fillStyle = halo; x.fillRect(cx - isz * 1.5, py - isz * 1.5, isz * 3, isz * 3); x.restore();
         x.save(); x.globalAlpha = fade * Math.min(1, u * 1.5); x.imageSmoothingEnabled = false;
         if (carImg) { const cwid = Math.min(W * 0.7, isz * 3.4), chg = cwid * carImg.height / carImg.width; x.drawImage(carImg, cx - cwid / 2, py - chg / 2, cwid, chg); }
-        else { const k = 0.85 + 0.15 * Math.sin(t * 3); x.drawImage(icn, cx - isz * k / 2, py - isz * k / 2, isz * k, isz * k); }
+        else if (prize.comp && window.compImg && window.compImg()) {   // il pezzo vero: l'illustrazione del componente nella cornice della sua rarità (componenti.js)
+          const k = 0.95 + 0.05 * Math.sin(t * 3), w = Math.min(W * 0.62, isz * 2.1) * k, h = w * 0.75, fr = window.compFrame && window.compFrame(ri);
+          if (fr) x.drawImage(fr, cx - w * 0.56, py - h * 0.56, w * 1.12, h * 1.12);
+          window.compDraw(x, prize.comp, cx - w / 2, py - h / 2, w, h);
+        } else { const k = 0.85 + 0.15 * Math.sin(t * 3); x.drawImage(icn, cx - isz * k / 2, py - isz * k / 2, isz * k, isz * k); }
         x.restore();
         // stelline intorno
         if (Math.random() < dt * (8 + ri * 6)) parts.push({ x: cx + (Math.random() - 0.5) * isz * 2, y: py + (Math.random() - 0.5) * isz * 1.6, vx: 0, vy: -20, life: 1, dec: 1.4, col: '#ffffff', s: 3 + Math.random() * 4, kind: 'star', rot: 0, vr: 0 });

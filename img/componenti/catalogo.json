@@ -1,0 +1,1162 @@
+{
+  "project": "Night Run",
+  "car": "Toyota Supra RZ",
+  "reference_commit": "b0c4228",
+  "art_direction": "Illustrazioni da modelli 3D originali; riferimenti fotografici e schede di prodotto.",
+  "visual_variant": {
+    "ecu:link": "SupraLink TS2JZX Plug-in",
+    "turbo:efr9180": "EFR 9180-B"
+  },
+  "visual_references": {
+    "turbo": [
+      "https://supraspecialties.com/products/toyota-supra-mk4-parts-for-sale-usdm-twin-turbo-set",
+      "https://www.garrettmotion.com/racing-and-performance/performance-catalog/turbo/gtx3582r-gen-ii/",
+      "https://www.precisionturbo.com/p377782-gen2-pt6466",
+      "https://www.borgwarner.com/docs/default-source/iam/boosting-technologies/efr-9180-b.pdf",
+      "https://www.hks-power.co.jp/en/product_search/product/147/status/9"
+    ],
+    "ecu": [
+      "https://rad-industries.com/2jz-gte-non-vvti-ecu-supra-turbo-6-speed-manual/",
+      "https://www.haltech.com/downloads/product-images/ecu",
+      "https://dealers.eu.linkecu.com/TS2JZX_2"
+    ],
+    "exhaust": [
+      "https://www.hkseurope.com/wp-content/uploads/2015/05/Hi-Power-Muffler-31008-BT001-Low-Res.pdf",
+      "https://www.apexi-usa.com/products/n1-evo-muffler-1993-1998-toyota-supra",
+      "https://www.realstreetperformance.com/tomei-full-titanium-4-inch-cat-back-expreme-ti-supra-2jz-jza80-tb6090-ty03a.html",
+      "https://greenline.jp/catalogue/item.php?brand=Blitz&carcode=JZA80A&category=exhaust&name=NUR-SPEC+R"
+    ],
+    "cat": [
+      "https://www.jzgte.com/tech/jza80/manuals/Engine.pdf"
+    ],
+    "intake": [
+      "https://www.hkseurope.com/manufacturer/toyota/supra/intake-supra"
+    ],
+    "wastegate": [
+      "https://tialsport.com/product/mvr-wastegate/"
+    ],
+    "gearbox": [
+      "https://www.shoarmateam.nl/upload/MKIVSupra/TSRM/JZA80%20TSRM%20%28USA-1998%29.pdf"
+    ],
+    "final": [
+      "https://www.tomeiusa.com/manuals/TC101.pdf"
+    ],
+    "suspension": [
+      "https://uk.tein.com/srch/uk_search.php?item=FLEXZ&maker=TOYOTA"
+    ],
+    "cams": [
+      "https://www.hks-power.co.jp/en/product_search/product/605/customer/stock.html"
+    ],
+    "intercooler": [
+      "https://www.hks-power.co.jp/en/product_search/product/123/type/32"
+    ],
+    "clutch": [
+      "https://osgikenusa.com/products/ty031-bc6"
+    ],
+    "bov": [
+      "https://www.hks-power.co.jp/en/product/blow_off/sqv/index.html",
+      "https://eu.turbosmart.com/products/genv-raceport-black"
+    ],
+    "tires": [
+      "https://www.toyotires.com/product/proxes-r888r/",
+      "https://www.mickeythompsontires.com/drag-tires/et-street-r/"
+    ]
+  },
+  "coordinates": "PNG RGBA, origine in alto a sinistra, livelli come da officina",
+  "cell_size": [
+    128,
+    96
+  ],
+  "atlas": "atlas.png",
+  "hd_cell_size": [
+    256,
+    192
+  ],
+  "atlas_hd": "atlas_hd.png",
+  "components": [
+    {
+      "category": "turbo",
+      "file": "turbo/ct12b.png",
+      "hd_file": "hd/turbo/ct12b.png",
+      "short": "CT12B biturbo",
+      "id": "ct12b",
+      "name": "CT12B biturbo sequenziale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "turbo",
+      "file": "turbo/gtx3582.png",
+      "hd_file": "hd/turbo/gtx3582.png",
+      "short": "GTX3582R",
+      "id": "gtx3582",
+      "name": "GTX3582R",
+      "brand": "Garrett",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 0,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "turbo",
+      "file": "turbo/pte6466.png",
+      "hd_file": "hd/turbo/pte6466.png",
+      "short": "6466 Gen2",
+      "id": "pte6466",
+      "name": "6466 Gen2",
+      "brand": "Precision",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 0,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "turbo",
+      "file": "turbo/efr9180.png",
+      "hd_file": "hd/turbo/efr9180.png",
+      "short": "EFR 9180",
+      "id": "efr9180",
+      "name": "EFR 9180",
+      "brand": "BorgWarner",
+      "level": 3,
+      "atlas": {
+        "x": 384,
+        "y": 0,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "turbo",
+      "file": "turbo/t51r.png",
+      "hd_file": "hd/turbo/t51r.png",
+      "short": "T51R SPL",
+      "id": "t51r",
+      "name": "T51R SPL",
+      "brand": "HKS",
+      "level": 4,
+      "atlas": {
+        "x": 512,
+        "y": 0,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/oem.png",
+      "hd_file": "hd/exhaust/oem.png",
+      "short": "Originale",
+      "id": "oem",
+      "name": "Originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/hks.png",
+      "hd_file": "hd/exhaust/hks.png",
+      "short": "Hi-Power",
+      "id": "hks",
+      "name": "Hi-Power",
+      "brand": "HKS",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/apexi.png",
+      "hd_file": "hd/exhaust/apexi.png",
+      "short": "N1 Evolution",
+      "id": "apexi",
+      "name": "N1 Evolution",
+      "brand": "Apexi",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/tomei.png",
+      "hd_file": "hd/exhaust/tomei.png",
+      "short": "Expreme Ti",
+      "id": "tomei",
+      "name": "Expreme Ti",
+      "brand": "Tomei",
+      "level": 3,
+      "atlas": {
+        "x": 384,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 768,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/blitz.png",
+      "hd_file": "hd/exhaust/blitz.png",
+      "short": "Nür-Spec",
+      "id": "blitz",
+      "name": "Nür-Spec",
+      "brand": "Blitz",
+      "level": 4,
+      "atlas": {
+        "x": 512,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 1024,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "exhaust",
+      "file": "exhaust/straight.png",
+      "hd_file": "hd/exhaust/straight.png",
+      "short": "Straight pipe",
+      "id": "straight",
+      "name": "Straight pipe 3,5\"",
+      "brand": "Su misura",
+      "level": 5,
+      "atlas": {
+        "x": 640,
+        "y": 96,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 1280,
+        "y": 192,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cat",
+      "file": "cat/oem.png",
+      "hd_file": "hd/cat/oem.png",
+      "short": "Cat 400 celle",
+      "id": "oem",
+      "name": "Catalizzatore originale a 400 celle",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 384,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 768,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cat",
+      "file": "cat/sport.png",
+      "hd_file": "hd/cat/sport.png",
+      "short": "Downpipe 200 celle",
+      "id": "sport",
+      "name": "Downpipe 3,5\" con cat 200 celle",
+      "brand": "Su misura",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 384,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 768,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cat",
+      "file": "cat/tubolare.png",
+      "hd_file": "hd/cat/tubolare.png",
+      "short": "Collettore 100 celle",
+      "id": "tubolare",
+      "name": "Collettore tubolare con downpipe e cat a 100 celle",
+      "brand": "Su misura",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 384,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 768,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cat",
+      "file": "cat/decat.png",
+      "hd_file": "hd/cat/decat.png",
+      "short": "Decat pista",
+      "id": "decat",
+      "name": "Decat (solo pista)",
+      "brand": "Su misura",
+      "level": 3,
+      "atlas": {
+        "x": 384,
+        "y": 384,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 768,
+        "y": 768,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "intake",
+      "file": "intake/oem.png",
+      "hd_file": "hd/intake/oem.png",
+      "short": "Airbox originale",
+      "id": "oem",
+      "name": "Airbox originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 480,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 960,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "intake",
+      "file": "intake/pf.png",
+      "hd_file": "hd/intake/pf.png",
+      "short": "Super Power Flow",
+      "id": "pf",
+      "name": "Super Power Flow",
+      "brand": "HKS",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 480,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 960,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "bov",
+      "file": "bov/oem.png",
+      "hd_file": "hd/bov/oem.png",
+      "short": "Ricircolo originale",
+      "id": "oem",
+      "name": "Ricircolo originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 576,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 1152,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "bov",
+      "file": "bov/ssqv.png",
+      "hd_file": "hd/bov/ssqv.png",
+      "short": "SSQV",
+      "id": "ssqv",
+      "name": "SSQV",
+      "brand": "HKS",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 576,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 1152,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "bov",
+      "file": "bov/raceport.png",
+      "hd_file": "hd/bov/raceport.png",
+      "short": "Race Port",
+      "id": "raceport",
+      "name": "Race Port",
+      "brand": "Turbosmart",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 576,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 1152,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "bov",
+      "file": "bov/greddy.png",
+      "hd_file": "hd/bov/greddy.png",
+      "short": "Type-RS",
+      "id": "greddy",
+      "name": "Type-RS",
+      "brand": "GReddy",
+      "level": 3,
+      "atlas": {
+        "x": 384,
+        "y": 576,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 768,
+        "y": 1152,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "wastegate",
+      "file": "wastegate/int.png",
+      "hd_file": "hd/wastegate/int.png",
+      "short": "Interna",
+      "id": "int",
+      "name": "Interna / ricircolata",
+      "brand": "Integrata",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 672,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 1344,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "wastegate",
+      "file": "wastegate/tial.png",
+      "hd_file": "hd/wastegate/tial.png",
+      "short": "MV-R 44 mm",
+      "id": "tial",
+      "name": "MV-R 44 mm con screamer pipe",
+      "brand": "TiAL",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 672,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 1344,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/oem.png",
+      "hd_file": "hd/suspension/oem.png",
+      "short": "Originale",
+      "id": "oem",
+      "name": "Originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/springs.png",
+      "hd_file": "hd/suspension/springs.png",
+      "short": "Molle sportive",
+      "id": "springs",
+      "name": "Molle sportive",
+      "brand": "Eibach",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/dampers.png",
+      "hd_file": "hd/suspension/dampers.png",
+      "short": "Kit sportivo",
+      "id": "dampers",
+      "name": "Molle e ammortizzatori sportivi",
+      "brand": "Bilstein",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/tein.png",
+      "hd_file": "hd/suspension/tein.png",
+      "short": "Flex Z",
+      "id": "tein",
+      "name": "Flex Z regolabile",
+      "brand": "Tein",
+      "level": 3,
+      "atlas": {
+        "x": 384,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 768,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/race.png",
+      "hd_file": "hd/suspension/race.png",
+      "short": "Road & Track",
+      "id": "race",
+      "name": "Road & Track",
+      "brand": "Öhlins",
+      "level": 4,
+      "atlas": {
+        "x": 512,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 1024,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "suspension",
+      "file": "suspension/pro.png",
+      "hd_file": "hd/suspension/pro.png",
+      "short": "Competizione",
+      "id": "pro",
+      "name": "Assetto da competizione",
+      "brand": "Su misura",
+      "level": 5,
+      "atlas": {
+        "x": 640,
+        "y": 192,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 1280,
+        "y": 384,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "ecu",
+      "file": "ecu/oem.png",
+      "hd_file": "hd/ecu/oem.png",
+      "short": "Denso originale",
+      "id": "oem",
+      "name": "Originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 288,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 576,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "ecu",
+      "file": "ecu/haltech.png",
+      "hd_file": "hd/ecu/haltech.png",
+      "short": "Elite 2500",
+      "id": "haltech",
+      "name": "Elite 2500",
+      "brand": "Haltech",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 288,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 576,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "ecu",
+      "file": "ecu/link.png",
+      "hd_file": "hd/ecu/link.png",
+      "short": "G4X SupraLink",
+      "id": "link",
+      "name": "G4X",
+      "brand": "Link",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 288,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 576,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cams",
+      "file": "cams/oem.png",
+      "hd_file": "hd/cams/oem.png",
+      "short": "Originali",
+      "id": "oem",
+      "name": "Originali",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 768,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 1536,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cams",
+      "file": "cams/hks264.png",
+      "hd_file": "hd/cams/hks264.png",
+      "short": "264° step pro",
+      "id": "hks264",
+      "name": "264° step pro",
+      "brand": "HKS",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 768,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 1536,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "cams",
+      "file": "cams/hks272.png",
+      "hd_file": "hd/cams/hks272.png",
+      "short": "272° step pro",
+      "id": "hks272",
+      "name": "272° step pro",
+      "brand": "HKS",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 768,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 1536,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "intercooler",
+      "file": "intercooler/oem.png",
+      "hd_file": "hd/intercooler/oem.png",
+      "short": "Frontale piccolo",
+      "id": "oem",
+      "name": "Originale (frontale piccolo)",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 864,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 1728,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "intercooler",
+      "file": "intercooler/hks.png",
+      "hd_file": "hd/intercooler/hks.png",
+      "short": "R-type",
+      "id": "hks",
+      "name": "R-type frontale maggiorato",
+      "brand": "HKS",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 864,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 1728,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "clutch",
+      "file": "clutch/oem.png",
+      "hd_file": "hd/clutch/oem.png",
+      "short": "Monodisco",
+      "id": "oem",
+      "name": "Monodisco originale",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 960,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 1920,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "clutch",
+      "file": "clutch/osgiken.png",
+      "hd_file": "hd/clutch/osgiken.png",
+      "short": "Bidisco",
+      "id": "osgiken",
+      "name": "Bidisco con volano alleggerito",
+      "brand": "OS Giken",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 960,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 1920,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "gearbox",
+      "file": "gearbox/oem.png",
+      "hd_file": "hd/gearbox/oem.png",
+      "short": "Getrag V160",
+      "id": "oem",
+      "name": "V160 a 6 marce",
+      "brand": "Getrag",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 1056,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 2112,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "gearbox",
+      "file": "gearbox/close.png",
+      "hd_file": "hd/gearbox/close.png",
+      "short": "Ravvicinato",
+      "id": "close",
+      "name": "Ravvicinato a 6 marce",
+      "brand": "Quaife",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 1056,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 2112,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "tires",
+      "file": "tires/oem.png",
+      "hd_file": "hd/tires/oem.png",
+      "short": "Potenza originali",
+      "id": "oem",
+      "name": "Potenza originali 265/40 R17",
+      "brand": "Bridgestone",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 1152,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 2304,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "tires",
+      "file": "tires/r888r.png",
+      "hd_file": "hd/tires/r888r.png",
+      "short": "Proxes R888R",
+      "id": "r888r",
+      "name": "Proxes R888R",
+      "brand": "Toyo",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 1152,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 2304,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "tires",
+      "file": "tires/etstreet.png",
+      "hd_file": "hd/tires/etstreet.png",
+      "short": "ET Street R",
+      "id": "etstreet",
+      "name": "ET Street R",
+      "brand": "Mickey Thompson",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 1152,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 2304,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "final",
+      "file": "final/oem.png",
+      "hd_file": "hd/final/oem.png",
+      "short": "Torsen 3,133",
+      "id": "oem",
+      "name": "Torsen, finale 3,133",
+      "brand": "Toyota",
+      "level": 0,
+      "atlas": {
+        "x": 0,
+        "y": 1248,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 0,
+        "y": 2496,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "final",
+      "file": "final/f3769.png",
+      "hd_file": "hd/final/f3769.png",
+      "short": "Torsen 3,769",
+      "id": "f3769",
+      "name": "Torsen, finale 3,769 (corto)",
+      "brand": "Toyota",
+      "level": 1,
+      "atlas": {
+        "x": 128,
+        "y": 1248,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 256,
+        "y": 2496,
+        "w": 256,
+        "h": 192
+      }
+    },
+    {
+      "category": "final",
+      "file": "final/osg4083.png",
+      "hd_file": "hd/final/osg4083.png",
+      "short": "Autobloccante 4,083",
+      "id": "osg4083",
+      "name": "Autobloccante a 2 vie, finale 4,083",
+      "brand": "OS Giken",
+      "level": 2,
+      "atlas": {
+        "x": 256,
+        "y": 1248,
+        "w": 128,
+        "h": 96
+      },
+      "atlas_hd": {
+        "x": 512,
+        "y": 2496,
+        "w": 256,
+        "h": 192
+      }
+    }
+  ],
+  "reward_rarities": [
+    {
+      "id": "comune",
+      "name": "Comune",
+      "col": "#c9ced6",
+      "rgb": "201,206,214",
+      "file": "rarita/comune.png",
+      "hd_file": "hd/rarita/comune.png"
+    },
+    {
+      "id": "noncomune",
+      "name": "Non comune",
+      "col": "#4ade80",
+      "rgb": "74,222,128",
+      "file": "rarita/noncomune.png",
+      "hd_file": "hd/rarita/noncomune.png"
+    },
+    {
+      "id": "raro",
+      "name": "Raro",
+      "col": "#3b9bff",
+      "rgb": "59,155,255",
+      "file": "rarita/raro.png",
+      "hd_file": "hd/rarita/raro.png"
+    },
+    {
+      "id": "epico",
+      "name": "Epico",
+      "col": "#b45cff",
+      "rgb": "180,92,255",
+      "file": "rarita/epico.png",
+      "hd_file": "hd/rarita/epico.png"
+    },
+    {
+      "id": "mitico",
+      "name": "Mitico",
+      "col": "#ff3b4a",
+      "rgb": "255,59,74",
+      "file": "rarita/mitico.png",
+      "hd_file": "hd/rarita/mitico.png"
+    },
+    {
+      "id": "leggendario",
+      "name": "Leggendario",
+      "col": "#ffc63a",
+      "rgb": "255,198,58",
+      "file": "rarita/leggendario.png",
+      "hd_file": "hd/rarita/leggendario.png"
+    }
+  ]
+}

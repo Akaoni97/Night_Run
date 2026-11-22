@@ -392,7 +392,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       if (open[k]) info = '<div class="of-info">' + cat.items.map((it, i) => `<p><b>${i === 0 ? 'Serie' : 'Liv. ' + i}${i === ci ? ' · montato' : ''}</b> · ${E(it.brand && !['Su misura', '—', 'Integrata'].includes(it.brand) ? it.brand + ' ' : '')}${E(it.name)} — ${E(it.note || '')}</p>`).join('') + '</div>';
       const pi = pick && pick.k === k ? cat.items.findIndex((x) => x.id === pick.id) : -1;
       const card = pi >= 0 ? pezzoCard(ctx, k, cat.items[pi], pi, ci, career, money) : '';
-      h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${card}${info}</div>`;
+      h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head">${typeof compHTML === 'function' ? compHTML(k, c.id, 'comp-mini') : ''}<span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${card}${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
       if (k === 'gearbox' && typeof gbState === 'function' && ctx.adj && c.gb) h += gbBlock(ctx, c);
     }
@@ -427,7 +427,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     else if (lock) { label = `Si sblocca a ${fmt(g.partKm(k, it.id))} km`; dis = true; }
     else if (career && price > money) { label = `Mancano € ${fmt(price - money)}`; dis = true; }
     else label = `Compra e monta · € ${fmt(price)}`;
-    return `<div class="of-card"><b class="ttl">${E(brand + (it.name || ''))}</b>${car ? `<p class="car">${E(car)}</p>` : ''}${it.note ? `<p>${E(it.note)}</p>` : ''}${solo}${dl}<button type="button" class="of-go" data-go="${k}" data-id="${E(it.id)}" ${dis ? 'disabled' : ''}>${E(label)}</button></div>`;
+    return `<div class="of-card">${typeof compHTML === 'function' ? compHTML(k, it.id) : ''}<b class="ttl">${E(brand + (it.name || ''))}</b>${car ? `<p class="car">${E(car)}</p>` : ''}${it.note ? `<p>${E(it.note)}</p>` : ''}${solo}${dl}<button type="button" class="of-go" data-go="${k}" data-id="${E(it.id)}" ${dis ? 'disabled' : ''}>${E(label)}</button></div>`;
   }
 
   // altezza da terra e rigidità delle molle (assetto a livelli, tuning.js): gratis, da fermi e da Luca; il livello 0 non si regola

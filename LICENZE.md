@@ -43,6 +43,9 @@ basso, in uno a pagamento è alto.
 **Consiglio** (quello che fanno quasi tutti gli indie): nomi inventati che richiamano l'originale (marca e modello),
 niente marca sul quadro strumenti, niente strisce M; i disegni possono restare, ma un po' distanti dagli originali.
 Lo stesso per i ricambi in `tuning.js` e `cars.js`: nomi generici ("terminale singolo grande", "semi-slick").
+Le illustrazioni dei componenti (`img/componenti/`, 22/11) sono del proprietario (fatte da modelli 3D originali), ma
+riproducono ricambi veri di marca (HKS, Garrett, Tomei, Öhlins...): stesso discorso dei nomi, per la vendita meglio
+forme e scritte meno riconoscibili. I riferimenti usati sono in `img/componenti/catalogo.json`.
 
 ## 3. Musica
 In `audio/` ci sono 13 canzoni (Apex to Apex, Metal Alive, Red Zone Needles, Redline at Midnight; in `audio/house/`
