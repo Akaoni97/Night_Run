@@ -198,7 +198,7 @@ const TUNING_SUPRA = {
     label: 'Frizione',
     items: [
       { id: 'oem', price: 0, brand: 'Toyota', name: 'Monodisco originale', note: 'Regge 820 Nm: col biturbo spinto slitta.', sim: { Ie: 0.21, clutch: 820 }, dsp: { rattle: 0 } },
-      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Bidisco OS Giken', note: 'Regge fino a 1.300 Nm: niente slittamenti nemmeno col biturbo al massimo. Pedale duro. Il volano è un reparto a parte.', sim: { Ie: 0.21, clutch: 1300 }, dsp: { rattle: 0 } },
+      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Trilama OS Giken', note: 'Regge fino a 1.500 Nm: niente slittamenti nemmeno col T51R e la cilindrata maggiorata. Pedale duro. Il volano è un reparto a parte.', sim: { Ie: 0.21, clutch: 1500 }, dsp: { rattle: 0 } },
     ],
   },
 };
@@ -217,7 +217,8 @@ let TUNING_PRESETS = SUPRA_PRESETS;
 const GB_ADJ = { all: [0.8, 1.2], each: [0.7, 1.3] };
 function gbState(item, adj) {
   const gb = item && item.gb; if (!gb) return null;
-  const R = GB_ADJ[gb.mode === 'all' ? 'all' : 'each'], cl = (v) => Math.round(Math.min(R[1], Math.max(R[0], v)) * 100) / 100, base = gb.base;
+  // il pezzo può allargare la ghiera verso il lungo (gb.lo, v0.107: i cambi di Luca arrivano a 300-350 all'ora)
+  const R0 = GB_ADJ[gb.mode === 'all' ? 'all' : 'each'], R = [Math.min(R0[0], gb.lo || R0[0]), R0[1]], cl = (v) => Math.round(Math.min(R[1], Math.max(R[0], v)) * 1000) / 1000, base = gb.base;
   if (gb.mode === 'all') { const k = cl(adj && Number.isFinite(adj.gk) ? adj.gk : gb.k0); return { mode: 'all', k, k0: gb.k0, min: R[0], max: R[1], base, mul: base.map((_, i) => (i ? k : 1)) }; }
   const mul = base.map((_, i) => (i ? cl(adj && Array.isArray(adj.gr) && Number.isFinite(adj.gr[i]) ? adj.gr[i] : gb.m0[i]) : 1));
   return { mode: 'each', min: R[0], max: R[1], base, mul, m0: gb.m0 };
@@ -296,19 +297,25 @@ function supraParams(sel, adj) {
 function supraParamsBase(sel, g, adj) {
   const tb = g('turbo'), ecu = g('ecu'), cams = g('cams'), cl = g('clutch'), fly = g('flywheel');
   // con una centralina programmabile i turbo di serie reggono circa 1 bar
-  const turbo = tb.sim.twin && ecu.id !== 'oem' ? Object.assign({}, tb.sim, { max: 1.0 }) : tb.sim;
-  const pw = g('exhaust').pw * g('cat').pw * g('intake').pw, su = suspResolve(g('suspension'), adj);
+  let turbo = tb.sim.twin && ecu.id !== 'oem' ? Object.assign({}, tb.sim, { max: 1.0 }) : tb.sim;
+  // aggiunte di Luca Tuning (v0.107): aspirazioni nuove (pw in sim), cilindrata, benzina che limita la pressione, cambi regolabili
+  const inn = g('intake'), dp = TUNING_SUPRA.displacement ? g('displacement') : null, fu = TUNING_SUPRA.fuel ? g('fuel') : null, gb = g('gearbox');
+  const cap = fu && fu.sim && fu.sim.cap;
+  if (cap && turbo && turbo.max > cap) turbo = Object.assign({}, turbo, { max: cap, cap });
+  const inPw = inn.pw ?? (inn.sim && inn.sim.pw) ?? 1;
+  const pw = g('exhaust').pw * g('cat').pw * inPw * ((dp && dp.sim && dp.sim.pw) || 1) * ((fu && fu.sim && fu.sim.pw) || 1), su = suspResolve(g('suspension'), adj);
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.launch, ecuPops: ecu.sim.pops,
-      idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: volanoIe(fly, cl), flyIdle: (fly.sim && fly.sim.idle) || 0, flyHunt: (fly.sim && fly.sim.hunt) || 0, clutchMax: cl.sim.clutch,
+      idle: cams.sim.idle, camLow: cams.sim.low * ((inn.sim && inn.sim.low) || 1), camHigh: cams.sim.high * ((inn.sim && inn.sim.high) || 1), lope: cams.sim.lope, Ie: volanoIe(fly, cl), flyIdle: (fly.sim && fly.sim.idle) || 0, flyHunt: (fly.sim && fly.sim.hunt) || 0, clutchMax: cl.sim.clutch,
       mu: g('tires').sim.mu * su.susp.grip, tyre: g('tires').sim.tyre,
-      ic: g('intercooler').sim.ic, susp: su.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: g('gearbox').sim.gears,
+      ic: g('intercooler').sim.ic, susp: su.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: gbGears(gb, adj), shiftMul: (gb.sim && gb.sim.shift) || 1,
       valve: g('bov').dsp.v === 2 ? 'flutter' : g('bov').dsp.v === 1 ? 'bov' : 'recirc',
     },
     dsp: {
       ex: g('exhaust').dsp, cat: g('cat').dsp, tb: tb.dsp, bov: g('bov').dsp,
-      scream: tb.sim.twin ? 0 : g('wastegate').dsp.scream, intake: g('intake').dsp, lope: cams.dsp.lope,
+      scream: tb.sim.twin ? 0 : g('wastegate').dsp.scream, intake: inn.dsp, lope: cams.dsp.lope,
+      voice: inn.dsp.howl ? { howl: inn.dsp.howl, howlF: inn.dsp.howlF } : undefined,
       rattle: volanoRattle(fly, cl), spark: ecu.sim.spark ? 1 : 0, cabin: g('weight').sim.cabin,
     },
     look: { low: su.low, susp: su.susp.pitch },

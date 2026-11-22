@@ -341,6 +341,21 @@ class SupraSim {
     // (SIM_TB.wgLag), quindi la pressione sale, sfora un attimo e si assesta, con un filo di tremolio intorno al target.
     // A gas chiuso la valvola sfiata, la girante continua a girare per inerzia e nel collettore c'è depressione (mapB).
     const TB = SIM_TB, B = tc.max > 0 ? this.boostTop(tc) : 0;
+    if (tc.sc && B > 0) {
+      // compressore a cinghia (tc.sc, v0.107): la girante va coi giri, niente ritardo, niente wastegate né picchi. Il volumetrico
+      // dà quasi tutto dai bassi e cala un filo in cima, il centrifugo cresce col quadrato dei giri; a farfalla chiusa la valvola
+      // di bypass riporta l'aria in aspirazione (nessuno sfiato)
+      const lim = P.limiter || 7000, x = Math.min(1.1, rpm / lim);
+      const shape = tc.sc === 'cen' ? x * x : SIM_SS(700, 2600, rpm) * (1 - 0.12 * SIM_SS(0.7, 1, x));
+      this.tur += (Math.min(1.05, x * 1.05) - this.tur) * Math.min(1, h / 0.04);
+      const closedS = this.thr < 0.12;
+      const capS = closedS ? 0 : B * shape * SIM_SS(0.1, 0.8, this.thr);
+      this.pipeP += (capS - this.pipeP) * Math.min(1, h / (closedS ? 0.08 : TB.fill));
+      if (this.pipeP < 0) this.pipeP = 0;
+      this.wg = 0; this.sec = 0; this.bovLatch = closedS;
+      const vacS = this.running ? -0.72 * Math.max(0, 1 - this.air * 1.6) * Math.min(1, rpm / 700) : 0;
+      this.mapB = (this.mapB || 0) + ((this.pipeP > 0.01 ? this.pipeP : vacS) - (this.mapB || 0)) * Math.min(1, h / 0.05);
+    } else {
     const flow = rpm * (1 + TB.fb * Math.max(0, this.pipeP));                // scarico in «giri equivalenti»
     let frac;
     if (tc.twin) {
@@ -378,6 +393,7 @@ class SupraSim {
     // manometro: in pressione la sovralimentazione, a farfalla chiusa la depressione del collettore (fino a −0,7 bar)
     const vac = this.running ? -0.72 * Math.max(0, 1 - this.air * 1.6) * Math.min(1, rpm / 700) : 0;
     this.mapB = (this.mapB || 0) + ((this.pipeP > 0.01 ? this.pipeP : vac) - (this.mapB || 0)) * Math.min(1, h / 0.05);
+    }
     this.charge = this.air * (1 + this.pipeP);
 
     // ---- coppia motore -------------------------------------------------------------------

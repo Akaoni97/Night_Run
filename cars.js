@@ -242,20 +242,31 @@ function genCilindrata(c, cc, $, kk, dz) {
 // slick da drag: la presa più alta del gioco, anche in frenata; da fredde scivolano
 const genSlick = (mu0, price, km, brand) => ({ id: 'slick', price, km, brand, name: 'Gomme da drag slick', note: 'Slick lisce da drag: la presa più alta di tutte (+50 %), in partenza si piantano e in frenata mordono. Da fredde scivolano: scaldale (ideali 80 °C). Non omologate.', sim: { mu: Math.round(mu0 * 1.5 * 100) / 100, tyre: { B: 13, C: 1.35, E: -0.2, opt: 80, win: 50, crr: 0.017, brake: 1.0 } } });
 // cambio: di serie, (quelli della scheda), sport col rapporto unico regolabile, da corsa marcia per marcia (gbState in tuning.js)
+// velocità in ultima al limitatore dei cambi di Luca (v0.107), km/h: belle sportive (≥ 200 CV) 350, piccole (≤ 90 CV) 300,
+// mezzi pesanti 300 col da corsa e 200 con lo sport tutto lungo, le altre 320. Il cambio sport resta corto di serie: la sua
+// ghiera arriva fino a quella velocità; il da corsa ha di serie l'ultima tarata lì e le marce in mezzo in progressione
+const GB_VMAX = { super: { sport: 300, race: 350 }, normale: { sport: 275, race: 320 }, piccola: { sport: 255, race: 300 }, pesante: { sport: 200, race: 300 } };
+const GB_PESANTI = ['bus', 'van', 'doblo', 'ambulanza'];
+function gbClasse(id, cv) { return GB_PESANTI.includes(id) ? 'pesante' : cv >= 200 ? 'super' : cv && cv <= 90 ? 'piccola' : 'normale'; }
+// km/h in ultima al limitatore con questi rapporti (fd = rapporto al ponte, r = raggio della ruota in m)
+function gbVtop(P, g) { return (P.limiter || 6500) / 9.5493 / (g[g.length - 1] * (P.fd || 4)) * (P.r || 0.3) * 3.6; }
 function genGearbox(c, $, kk) {
   const g0 = c.P.gears, n = g0.length - 1;
-  const m0 = g0.map((g, i) => (i ? Math.round((i === 1 ? 1.03 : g0[1] * Math.pow(g / g0[1], 0.9) / g) * 100) / 100 : 1));   // da corsa: prima un filo più corta, le altre più vicine alla prima
+  const V = GB_VMAX[c.gbClasse || 'normale'], v0 = gbVtop(c.P, g0);
+  // da corsa: prima un filo più corta, l'ultima allungata fino alla velocità della classe, le altre in progressione geometrica
+  const top = Math.min(1.05, v0 / V.race), g1 = g0[1] * 1.03, gN = g0[n] * top;
+  const m0 = g0.map((g, i) => (i ? Math.round((i === 1 ? 1.03 : g1 * Math.pow(gN / g1, (i - 1) / Math.max(1, n - 1)) / g) * 1000) / 1000 : 1));
   const items = [{ id: 'oem', price: 0, km: 0, brand: c.gearbox ? c.gearbox.brand0 : c.make, name: c.gearbox ? c.gearbox.name0 : `Originale a ${n} marce`, note: c.gearbox ? c.gearbox.note0 : 'I rapporti di fabbrica: comodi in autostrada, lunghi per scattare.', sim: { gears: null } }];
   if (c.gearbox) for (const g of c.gearbox.items) items.push(Object.assign({ km: kk(g.km), price: $(g.price) }, g, { sim: { gears: g.gears } }));
-  const sp = { id: 'sport', price: $(1800), km: kk(12), brand: 'Drenth', name: 'Cambio sport con rapporto regolabile', note: 'Sincronizzatori rinforzati e innesti più corti (cambiate −20 %). Con la ghiera allunghi o accorci tutte le marce insieme: corte per scattare, lunghe per la velocità.', gb: { mode: 'all', k0: 1.06, base: g0 } };
-  const rc = { id: 'race', price: $(4200), km: kk(40), brand: 'Quaife', name: 'Cambio da corsa a innesti frontali', note: 'Denti dritti e innesti frontali: cambiate −40 % e quel fischio da pista. Ogni marcia si regola da sola, dalla prima corta da partenza alla quinta lunga per la velocità.', gb: { mode: 'each', m0, base: g0 } };
+  const sp = { id: 'sport', price: $(1800), km: kk(12), brand: 'Drenth', name: 'Cambio sport con rapporto regolabile', note: `Sincronizzatori rinforzati e innesti più corti (cambiate −20 %). Con la ghiera allunghi o accorci tutte le marce insieme: corte per scattare, tutte lunghe per arrivare a ${V.sport} all'ora.`, gb: { mode: 'all', k0: 1.06, base: g0, lo: Math.min(0.8, Math.floor(v0 / V.sport * 100) / 100) } };
+  const rc = { id: 'race', price: $(4200), km: kk(40), brand: 'Quaife', name: 'Cambio da corsa a innesti frontali', note: `Denti dritti e innesti frontali: cambiate −40 % e quel fischio da pista. Di serie l'ultima tira fino a ${V.race} all'ora; ogni marcia si regola da sola, dalla prima corta da partenza all'ultima lunga per la velocità.`, gb: { mode: 'each', m0, base: g0, lo: Math.min(0.7, Math.floor(Math.min(...m0.slice(1)) * 0.9 * 100) / 100) } };
   sp.sim = { gears: gbGears(sp, null), shift: 0.8 }; rc.sim = { gears: gbGears(rc, null), shift: 0.6 };
   return { label: 'Cambio', items: items.concat([sp, rc]) };
 }
 // la V40 ha il suo catalogo: le aggiunte di Luca Tuning (v0.91) si mettono qui, coi suoi giri e i suoi rapporti.
 // La benzina di serie regge 1,5 bar come la vecchia centralina stand-alone: chi ha già i turbo grossi non cambia niente.
 (function v40Piu() {
-  const T = TUNING_V40, id = (x) => x, c = { make: 'Volvo', P: { limiter: 6500, gears: [0, 3.385, 1.905, 1.233, 0.906, 0.730] }, gearbox: null };
+  const T = TUNING_V40, id = (x) => x, c = { make: 'Volvo', P: { limiter: 6500, gears: [0, 3.385, 1.905, 1.233, 0.906, 0.730], r: 0.308, fd: 4 }, gearbox: null, gbClasse: gbClasse('v40', 140) };
   const I = genIntake(c, {}, {}, id, id, false), pick = (L, ids) => L.filter((x) => ids.includes(x.id));
   const [pan, con, cor] = pick(I, ['pannello', 'cono', 'cornetti']);
   T.intake.items.splice(1, 0, pan, con); T.intake.items.push(cor);
@@ -269,6 +280,25 @@ function genGearbox(c, $, kk) {
   for (const p of V40_PRESETS) p.sel.flywheel = { sleeper: 'leggero', full: 'leggero', drag: 'super' }[p.id] || 'oem';
 })();
 
+// la Supra ha il suo catalogo (tuning.js): le aggiunte di Luca Tuning arrivano anche a lei (v0.107), prima le mancavano
+// aspirazioni, cilindrata, benzina e i cambi regolabili. La benzina di serie regge già il T51R: chi ha i turbo grossi non perde niente
+(function supraPiu() {
+  if (typeof TUNING_SUPRA === 'undefined') return;
+  const T = TUNING_SUPRA, id = (x) => x, P0 = (typeof SupraSim !== 'undefined' ? new SupraSim().P : { gears: [0, 3.827, 2.36, 1.685, 1.312, 1, 0.793] });
+  const c = { id: 'supra', make: 'Toyota', P: { limiter: 7000, gears: P0.gears, r: 0.322, fd: 3.133 }, gearbox: null, gbClasse: gbClasse('supra', 280) };
+  const pf = T.intake.items.find((x) => x.id === 'pf');
+  const I = genIntake(c, { in: ['HKS', pf ? pf.name : 'Super Power Flow'] }, { inOem: T.intake.items[0].name }, id, id, false);
+  // la Supra ha già il suo filtro a fungo (il Power Flow): si aggiungono gli altri, nell'ordine di sempre
+  const nuovi = I.filter((x) => !T.intake.items.some((y) => y.id === x.id) && x.id !== 'fungo');
+  for (const x of nuovi) T.intake.items.push(x);
+  const ord = ['oem', 'pannello', 'cono', 'pf', 'airbox', 'cornetti'];
+  T.intake.items.sort((x, y) => ord.indexOf(x.id) - ord.indexOf(y.id));
+  T.displacement = genCilindrata(c, 2997, id, id, false);
+  T.fuel = genFuel(c, id, id, false, 2.1, 2.2);
+  T.gearbox.items.push(...genGearbox(c, id, id).items.filter((x) => x.id === 'sport' || x.id === 'race'));
+  if (typeof TUNING_PRESETS !== 'undefined') for (const p of TUNING_PRESETS) Object.assign(p.sel, { displacement: p.sel.displacement || 'oem', fuel: p.sel.fuel || 'oem' });
+})();
+
 // catalogo con le stesse categorie per ogni auto (nomi, prezzi e chilometri dalla scheda dell'auto)
 function genCatalog(c) {
   const M = c.mods || {}, dz = !!(c.voice && c.voice.diesel), n = c.names || {}, $ = (base) => Math.round(base * (c.priceK || 1) * (M.pk || 1) / 10) * 10, kk = (base) => Math.round(base * (c.kmK || 1) * (M.kk || 1));   // M = la personalità di quest'auto (schede.js)
@@ -277,7 +307,12 @@ function genCatalog(c) {
   if (T) tb.push({ id: 'stock', price: 0, km: 0, brand: T.brand, name: T.name, note: T.note, sim: { turbo: T.sim }, dsp: { tb: T.dsp } });
   else if (M.turboSerie) tb.push({ id: 'none', price: 0, km: 0, brand: M.turboSerie[0], name: M.turboSerie[1], note: M.turboSerie[2] + ' La sua spinta è già nella curva di coppia.', sim: { turbo: null } });
   else tb.push({ id: 'none', price: 0, km: 0, brand: '—', name: 'Aspirato', note: c.naNote || 'Nessuna sovralimentazione.', sim: { turbo: null } });
-  for (const u of c.boost) tb.push({ id: u.id, price: $(u.price), km: kk(u.km), brand: u.brand, name: u.name, note: u.note, sim: { turbo: u.sim }, dsp: { tb: u.dsp }, look: u.look || {} });
+  for (const u of c.boost) {
+    // compressore a cinghia (v0.107): niente turbina, la pressione segue i giri. Centrifugo (ESS, Vortech, Rotrex) cresce coi giri,
+    // volumetrico (roots, TVS, Eaton) piena già dai bassi
+    const sc = u.id === 'sc' || /compressore|blower|kompressor/i.test(u.name) ? (/centrifug|ESS|Vortech|Rotrex/i.test(u.name + ' ' + u.brand) ? 'cen' : 'vol') : null;
+    tb.push({ id: u.id, price: $(u.price), km: kk(u.km), brand: u.brand, name: u.name, note: u.note, sim: { turbo: sc ? Object.assign({}, u.sim, { sc }) : u.sim }, dsp: { tb: u.dsp }, look: u.look || {} });
+  }
   const bar0 = Math.max(0, ...tb.map((u) => (u.sim.turbo ? u.sim.turbo.max : 0)));   // la pressione più alta che l'auto aveva già: benzina di serie e centralina la reggono
   for (const u of GEN_TURBO_PIU(c, dz)) tb.push(Object.assign({}, u, { price: $(u.price), km: kk(u.km) }));
   { const first = tb.shift(); tb.sort((x, y) => x.price - y.price); tb.unshift(first); }      // livelli in ordine di prezzo (gli id non cambiano: i salvataggi restano buoni)
@@ -340,6 +375,7 @@ function genCatalog(c) {
     if (cat.special && /cilindrata/i.test(cat.special.label)) cat.special.items.push(p300);
     else cat.displacement = genCilindrata(c, cc, $, kk, dz);
   }
+  c.gbClasse = c.gbClasse || gbClasse(c.id, typeof SCHEDE !== 'undefined' && SCHEDE[c.id] ? SCHEDE[c.id].hp : 0);
   cat.gearbox = genGearbox(c, $, kk);
   return cat;
 }
