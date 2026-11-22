@@ -118,7 +118,9 @@ body.buio #stDark { background: radial-gradient(ellipse 75% 55% at 45% 78%, tran
     g.onRadioDist = (text) => disturbo(text);
   };
   // la radio che disturba: fruscio, titolo che diventa un avviso vecchio, poi torna com'era
-  const sporca = (t) => t.split('').map((c) => (c !== ' ' && Math.random() < 0.18 ? '▒' : c)).join('');
+  // segni del fruscio: solo caratteri che i font del gioco hanno (il ▒ di prima usciva come spazio vuoto)
+  const SEGNI = '#%*/\\~=';
+  const sporca = (t) => t.split('').map((c) => (c !== ' ' && Math.random() < 0.18 ? SEGNI[Math.floor(Math.random() * SEGNI.length)] : c)).join('');
   let busy = false;
   function disturbo(text) {
     if (busy) return; busy = true;

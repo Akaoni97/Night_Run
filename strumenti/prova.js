@@ -82,7 +82,8 @@ const STATO = () => {
     const i = st.indexOf(':'), k = i < 0 ? st : st.slice(0, i), a = i < 0 ? '' : st.slice(i + 1);
     if (k === 'tappa') {
       const x = await page.evaluate((id) => { const g = nightRun.game; let n = Math.max(0, Math.ceil((g.s.dist + 20 - VG_STOP0) / VG_STEP));
-        const is = (s) => s.id === id || (id === 'piazza' ? !!s.twin : s.twin && s.twin.id === id);
+        // il negozio vero della tappa (non il secondo di una piazzetta: lì «entra» aprirebbe il primo); piazza = una tappa con due negozi
+        const is = (s) => (id === 'piazza' ? !!s.twin : s.id === id);
         for (let j = 0; j < 400 && !is(VG.stop(n + j)); j++) if (j === 399) return null; while (!is(VG.stop(n))) n++;
         const x = VG.stopX(n); g.s.dist = x - 9; g.sim.v = 0; return x; }, a);
       log(x == null ? `tappa ${a}: non trovata` : `tappa ${a}: km ${(x / 1000).toFixed(1)}`); await page.waitForTimeout(1500);
