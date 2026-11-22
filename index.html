@@ -1287,7 +1287,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ogni auto ha la sua selezione di pezzi (S.tunes) e la sua estetica (S.coss); S.tune e S.cos sono quelle dell'auto in uso
   const COS0 = { glow: 'none', rims: 'none', caliper: 'none', stripe: 'none', tint: 'none', decal: 'none', wheels: 'none', kit: 'none', spoiler: 'none', st_door: 'none', st_rear: 'none', st_glass: 'none' };
   // Il Viaggio è la modalità principale: la prima volta si parte da lì (la carriera resta, coi suoi salvataggi e pezzi)
-  if (S.trip === undefined) { S.trip = true; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.gearOther = S.gearAdj; S.tunes = {}; S.coss = {}; S.adj = {}; S.gearAdj = {}; }
+  if (S.trip === undefined) { S.trip = true; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.tunes = {}; S.coss = {}; S.adj = {}; }
   if (S.trip) {
     game.reset(); game.mode = 'career';
     const tg = localStorage.getItem('nightrun-viaggio');
@@ -1307,7 +1307,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       S.coss[id] = Object.assign({}, COS0, S.coss[id] || {});
     }
     // regolazione dell'assetto (altezza e rigidità) di ogni auto; il vecchio assetto da drag della Supra è il livello 4
-    S.adj = S.adj || {}; S.gearAdj = S.gearAdj || {};
+    S.adj = S.adj || {};
     if (S.tunes.supra.suspension === 'drag') { S.tunes.supra.suspension = 'race'; S.adj.supra = S.adj.supra || { h: -20, k: 0.8 }; }
     if (game.s.owned && game.s.owned['suspension:drag']) game.s.owned['suspension:race'] = true;
     if (!S.v40mig && !game.s.vg) {                    // la vecchia scala della V40 diventa pezzi ed estetica posseduti
@@ -1436,10 +1436,6 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (carId === 'supra' && audio.ctx) loadSupraSamples();          // passando alla Supra: le sue registrazioni (una volta sola)
     if (TP.sim.boostK === undefined) TP.sim.boostK = 1;          // la Supra a piena efficienza anche dopo la V40
     if (!TP.sim.clutchMax) TP.sim.clutchMax = sim.P.clutchMax;
-    if (typeof offGearAdj === 'function') {                       // rapporti regolati da Luca (officina.js): marcia per marcia e finale
-      const r = offGearAdj(TP.sim.gears || sim.P.gears, TP.sim.fd || sim.P.fd, S.gearAdj && S.gearAdj[carId]);
-      TP.sim.gears = r.gears; TP.sim.fd = r.fd;
-    }
     TP.sim.maint = game.maint();                                  // olio, candele, pastiglie (da Nico)
     game.applyMass(TP.sim.dm || 0, TP.sim.rearOff);
     $('carTag').textContent = CARS[carId].tag + (MOTE ? ` · motore: ${MOTE.tipo} da ${MOTE.hp} CV (swap)` : '');
@@ -2309,24 +2305,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const r = game.buy(k, id);
       if (!r.ok) { revert(); flash(r.why, 2.4); return; }
     }
-    S.tune[k] = id; if (k === 'suspension') delete S.adj[ACTIVE_CAR];          // pezzo nuovo: si riparte dai valori di fabbrica del livello
+    S.tune[k] = id;                                                  // pezzo nuovo: si riparte dai valori di fabbrica del livello (assetto o cambio)
+    { const a = S.adj[ACTIVE_CAR]; if (a && k === 'suspension') { delete a.h; delete a.k; } if (a && k === 'gearbox') { delete a.gk; delete a.gr; } }
     applySettings(); saveGame();
-  }
-  // rapporti del cambio: ogni marcia e il finale si allungano o accorciano in % (da -15 a +15), gratis, da fermi e da Luca come l'assetto
-  function setGearAdj(patch, revert) {
-    if (!game.canMount()) { revert(); flash('I rapporti si cambiano da fermo: accosta e frena', 2.4); return; }
-    if (game.needsShop()) { revert(); flash('I rapporti li regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
-    S.gearAdj = S.gearAdj || {};
-    if (patch.reset) delete S.gearAdj[ACTIVE_CAR];
-    else { const a = S.gearAdj[ACTIVE_CAR] = Object.assign({ fd: 0, g: [] }, S.gearAdj[ACTIVE_CAR]); if (patch.fd !== undefined) a.fd = patch.fd; if (patch.g) a.g[patch.g[0]] = patch.g[1]; }
-    applySettings(); saveGame(); flash('Rapporti regolati', 1.4);
   }
   // altezza e rigidità dell'assetto: gratis, ma da fermi e da Luca come i pezzi
   function setSuspAdj(patch, revert) {
-    if (!game.canMount()) { revert(); flash('L\'assetto si regola da fermo: accosta e frena', 2.4); return; }
-    if (game.needsShop()) { revert(); flash('L\'assetto lo regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
+    if (!game.canMount()) { revert(); flash('Assetto e cambio si regolano da fermo: accosta e frena', 2.4); return; }
+    if (game.needsShop()) { revert(); flash('Assetto e cambio li regola Luca: Da Luca Tuning è sulla mappa (L)', 2.8); return; }
     const st = suspState(tuningItem('suspension', S.tune.suspension), adjOf());
-    S.adj[ACTIVE_CAR] = { h: st.h, k: st.k, ...patch };
+    S.adj[ACTIVE_CAR] = { ...(adjOf() || {}), h: st.h, k: st.k, ...patch };      // tiene anche la regolazione del cambio (gk, gr)
     applySettings(); saveGame();
   }
   function mountPreset(p) {
@@ -2501,10 +2489,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (!!S.trip === on && !fresh) return;
     if (game.inside) { flash('Prima esci dal locale', 1.6); return; }
     if (!fresh) saveGame();
-    if (!!S.trip !== on) { const ot = S.tunesOther, oc = S.cossOther, oa = S.adjOther, og = S.gearOther; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.gearOther = S.gearAdj; S.tunes = ot || {}; S.coss = oc || {}; S.adj = oa || {}; S.gearAdj = og || {}; }
+    if (!!S.trip !== on) { const ot = S.tunesOther, oc = S.cossOther, oa = S.adjOther; S.tunesOther = S.tunes; S.cossOther = S.coss; S.adjOther = S.adj; S.tunes = ot || {}; S.coss = oc || {}; S.adj = oa || {}; }
     S.trip = on; game.reset(); game.mode = 'career'; game.track = 'city';
     const g = fresh ? null : localStorage.getItem(on ? 'nightrun-viaggio' : 'nightrun');
-    if (g) { game.load(g); restoreSim(); } else if (on) { S.tunes = {}; S.coss = {}; S.adj = {}; S.gearAdj = {}; game.startTrip(); }
+    if (g) { game.load(g); restoreSim(); } else if (on) { S.tunes = {}; S.coss = {}; S.adj = {}; game.startTrip(); }
     fillTunes(); useCar(game.car);
     for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
     if (on && S.look !== '2d') { S.look = '2d'; applyLook(); }
@@ -2716,7 +2704,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca un pezzo: ti dico cosa cambia. Lo monto quando premi il pulsante.');
       if (window.NightOfficina) {                                       // officina semplice (officina.js): Modifiche e Swap motore
-        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, gearAdj: () => S.gearAdj && S.gearAdj[ACTIVE_CAR], setGearAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
+        const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
       }
       if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
@@ -3334,7 +3322,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (Date.now() - newArm > 4000) { newArm = Date.now(); b.textContent = 'Sicuro? Clicca di nuovo per azzerare'; setTimeout(() => { b.textContent = S.trip ? 'Nuovo viaggio' : 'Nuova carriera'; }, 4000); return; }
     if (S.trip) { newArm = 0; switchTrip(true, true); flash('Nuovo viaggio: km 0, una V40 di serie e € 450', 2.6); return; }
     game.reset(); sim.fuel = 0.72;
-    S.tunes = {}; S.coss = {}; S.adj = {}; S.gearAdj = {};
+    S.tunes = {}; S.coss = {}; S.adj = {};
     for (const id of CAR_IDS) { S.tunes[id] = Object.assign({}, CARS[id].presets[0].sel); S.coss[id] = Object.assign({}, COS0); }
     S.v40mig = 1; useCar('supra');
     b.textContent = 'Nuova carriera'; newArm = 0;

@@ -15,30 +15,18 @@
 //  Parte grafica: NightOfficina.panel(body, I, ctx), chiamata da openPlace (index.html) per Da Luca Tuning.
 // ============================================================================
 const OFF_GRUPPI = [
-  { id: 'motore', nome: 'Motore', cats: ['intake', 'cams', 'special', 'ecu', 'limiter'], hint: 'Aspirazione, camme, il reparto speciale dell\'auto, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
+  { id: 'motore', nome: 'Motore', cats: ['intake', 'displacement', 'cams', 'special', 'fuel', 'ecu', 'limiter'], hint: 'Aspirazione, cilindrata, camme, il reparto speciale dell\'auto, benzina, centralina e limitatore: quanta potenza fa il motore, a che giri la dà e quanta pressione regge.' },
   { id: 'turbo', nome: 'Turbo', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: pressione e fischio.' },
   { id: 'scarico', nome: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e catalizzatore: voce, fiamme e qualche cavallo.' },
   { id: 'trasm', nome: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
   { id: 'telaio', nome: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza e frenata.' },
 ];
 // i reparti che appartengono al MOTORE (con lo swap diventano quelli del donatore); il limitatore è comune a tutte le auto
-const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'cams', 'special', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
+const OFF_MOTORE = ['exhaust', 'cat', 'intake', 'displacement', 'cams', 'special', 'fuel', 'ecu', 'turbo', 'intercooler', 'wastegate', 'bov'];
 // campi della fisica e del suono che vengono dal motore (il resto dell'auto è quello dell'auto che ospita)
 const OFF_SIM = ['turbo', 'pw', 'limiter', 'sparkCut', 'ecuLaunch', 'ecuPops', 'idle', 'camLow', 'camHigh', 'lope', 'ic', 'valve', 'boostK', 'limType', 'flatShift'];
 const OFF_DSP = ['cyl', 'tb', 'bov', 'intake', 'scream', 'lope', 'spark', 'voice', 'ex', 'cat'];
 const OFF = { liberoCv: 200, kmPerCv: 0.5, kmMax: 150, euroPerCv: 14, base: 500 };       // swap: fino a 200 CV sempre disponibile, oltre servono km; prezzo = base + CV × euroPerCv
-
-// rapporti regolati da Luca: adj = { fd, g: [_, p1, p2...] } in % da -15 a +15, positivo = più lungo (rapporto più basso).
-// Dà i rapporti nuovi e il finale nuovo; ogni marcia resta più lunga della precedente (almeno del 2 %). Senza adj, tutto com'era.
-const OFF_RAP = { min: -15, max: 15 };
-function offGearAdj(gears, fd, adj) {
-  const base = Array.isArray(gears) ? gears.slice() : gears;
-  if (!adj || !Array.isArray(base)) return { gears: base, fd };
-  const cl = (v) => Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +v || 0)), r3 = (x) => Math.round(x * 1000) / 1000;
-  const g = base.map((r, i) => (i > 0 && r ? r * (1 - cl((adj.g || [])[i]) / 100) : r));
-  for (let i = 2; i < g.length; i++) if (g[i] > g[i - 1] * 0.98) g[i] = g[i - 1] * 0.98;
-  return { gears: g.map((r) => (r ? r3(r) : r)), fd: r3(fd * (1 - cl(adj.fd) / 100)) };
-}
 
 // peso del motore di serie di un'auto (per lo swap): dai cilindri e dal tipo (era motKgSerie del vecchio Pistone)
 function offKgSerie(carId) {
@@ -203,6 +191,7 @@ function offCarattere(k, it, o) {
       const x = o.lim ? T.a / o.lim : 0.4;
       out.push(x < 0.34 ? 'Pronto: risponde presto, ripresa facile' : x < 0.46 ? 'Stradale: spinta ampia, compromesso fra risposta e allungo' : 'Allungo: sale più tardi e spinge forte in alto',
         `entra tra ${n(T.a)} e ${n(T.b)} giri`, `fino a ${bar(T.max)} bar`);
+      if (o.used > 0 && o.used < T.max - 0.04) out.push(`con la centralina e la benzina che hai ne usi solo ${bar(o.used)}: servono quelle più grosse`);
     }
   } else if (k === 'final' || k === 'gearbox') {
     const gears = k === 'gearbox' ? (s.gears || o.gears0 || o.gears) : o.gears, fd = k === 'final' && s.fd ? s.fd : o.fd, ora = giri130(o.gears, o.fd), poi = giri130(gears, fd);
@@ -263,7 +252,6 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
 .of-hint { color: #9a9486; font-size: 12.5px; margin: 6px 2px; }
 .of-cur { margin: 8px 0; padding: 8px 10px; border: 1px solid #38bdf8; border-radius: 10px; background: #0f1a22; font-size: 13px; }
 .of-swaps { max-height: 360px; overflow: auto; padding-right: 2px; }
-.of-gear { display: grid; gap: 4px; padding: 8px 2px 2px; border-top: 1px dashed #3a3548; margin-top: 6px; } .of-gear.off { opacity: .45; } .of-gear h5 { margin: 0 0 2px; font: 700 12px/1.2 var(--f-data, monospace); color: #ffd27a; } .of-gear .of-gz { justify-self: start; margin-top: 4px; padding: 5px 10px; border: 1px solid #4a4458; border-radius: 8px; background: transparent; color: #cfc8b8; font: 700 11px/1 var(--f-data, monospace); cursor: pointer; }
 .of-susp { display: grid; gap: 6px; padding: 6px 2px 2px; } .of-susp.off { opacity: .45; }
 .of-sr { display: grid; grid-template-columns: 70px 1fr; gap: 2px 10px; align-items: center; }
 .of-sr span { font: 400 11px/1 var(--f-data, monospace); letter-spacing: .1em; text-transform: uppercase; color: #9a9486; }
@@ -282,7 +270,6 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     const box = document.createElement('div'); box.className = 'of'; body.appendChild(box);
     const render = () => draw(box, ctx);
     box.addEventListener('click', (e) => {
-      if (e.target.closest('[data-gzero]')) { if (ctx.setGearAdj) { ctx.setGearAdj({ reset: true }, () => render()); ctx.after && ctx.after(); } render(); return; }
       const t = e.target.closest('[data-tab]'); if (t) { tab = t.dataset.tab; render(); return; }
       const g = e.target.closest('[data-grp]'); if (g) { grp = g.dataset.grp; render(); return; }
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
@@ -300,6 +287,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
         const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj());
         ctx.setAdj(sres.dataset.sres === 'serie' ? { h: 0, k: 1 } : { h: st.h0, k: st.k0 }, () => render()); ctx.after && ctx.after(); render(); return;
       }
+      const gres = e.target.closest('[data-gbres]');
+      if (gres && ctx.setAdj && ctx.adj) {                         // cambio: come di serie (×1) o i rapporti consigliati del pezzo
+        const st = gbState(tuningItem('gearbox', ctx.S.tune.gearbox), ctx.adj()); if (!st) return;
+        const serie = gres.dataset.gbres === 'serie';
+        ctx.setAdj(st.mode === 'all' ? { gk: serie ? 1 : st.k0 } : { gr: serie ? st.mul.map(() => 1) : st.m0.slice() }, () => render()); ctx.after && ctx.after(); render(); return;
+      }
       const c = e.target.closest('[data-k]');
       if (c) { pick = pick && pick.k === c.dataset.k && pick.id === c.dataset.id ? null : { k: c.dataset.k, id: c.dataset.id }; render(); return; }   // toccare un pezzo lo mostra, non spende niente
       const s = e.target.closest('[data-swap]');
@@ -312,16 +305,25 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     });
     // cursori dell'assetto: l'etichetta si muove mentre trascini, il valore si applica al rilascio
     box.addEventListener('input', (e) => {
-      const gr = e.target.closest('[data-gear]');
-      if (gr) { const l = box.querySelector('[data-gl="' + gr.dataset.gear + '"]'); if (l) l.textContent = gearLab(+gr.value); return; }
       if (e.target.closest('[data-cmp-vol]') && window.NightCampioni) { NightCampioni.input(e.target); return; }   // volume dei campioni
+      const gr = e.target.closest('[data-gb]');
+      if (gr && ctx.adj) {                                         // cambio: rapporti e velocità massima si aggiornano mentre trascini
+        const it = tuningItem('gearbox', ctx.S.tune.gearbox), st = gbState(it, ctx.adj()); if (!st) return;
+        const a = Object.assign({}, ctx.adj() || {}, gbAdjDa(box, st)), s2 = gbState(it, a), gears = gbGears(it, a);
+        if (s2.mode === 'all') box.querySelector('#ofGbK').textContent = gbKLab(s2.k);
+        else s2.mul.forEach((m, i) => { const b = i && box.querySelector('#ofGb' + i); if (b) b.textContent = `${gbF(gears[i])} · ×${gbF(m)}`; });
+        box.querySelector('#ofGbL').textContent = gbRiga(ctx, gears); return;
+      }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.adj) return;
       const st = suspState(tuningItem('suspension', ctx.S.tune.suspension), ctx.adj()), h = box.querySelector('[data-susp="h"]'), k = box.querySelector('[data-susp="k"]');
       const L = suspLab(st, +h.value, +k.value); box.querySelector('#ofSuspHv').textContent = L.h; box.querySelector('#ofSuspKv').textContent = L.k;
     });
     box.addEventListener('change', (e) => {
-      const gr = e.target.closest('[data-gear]');
-      if (gr) { if (ctx.setGearAdj) { ctx.setGearAdj(gr.dataset.gear === 'fd' ? { fd: +gr.value } : { g: [+gr.dataset.gear, +gr.value] }, () => render()); ctx.after && ctx.after(); } render(); return; }
+      const gr = e.target.closest('[data-gb]');
+      if (gr && ctx.setAdj && ctx.adj) {
+        const st = gbState(tuningItem('gearbox', ctx.S.tune.gearbox), ctx.adj()); if (!st) return;
+        ctx.setAdj(gbAdjDa(box, st), () => render()); ctx.after && ctx.after(); render(); return;
+      }
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.setAdj) return;
       ctx.setAdj(r.dataset.susp === 'h' ? { h: +r.value } : { k: +r.value }, () => render()); ctx.after && ctx.after(); render();
     });
@@ -392,8 +394,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const card = pi >= 0 ? pezzoCard(ctx, k, cat.items[pi], pi, ci, career, money) : '';
       h += `<div class="of-row${ci > 0 ? ' mod' : ''}"><div class="of-head"><span><b>${E(cat.label)}</b><em>${E(c.name || '')}</em></span><button type="button" class="of-i" data-i="${k}" aria-expanded="${!!open[k]}" aria-label="Cosa fa" title="Cosa fa">i</button></div><div class="of-chips">${chips}</div>${card}${info}</div>`;
       if (k === 'suspension' && typeof suspState === 'function' && ctx.adj) h += suspBlock(ctx, c);
+      if (k === 'gearbox' && typeof gbState === 'function' && ctx.adj && c.gb) h += gbBlock(ctx, c);
     }
-    if (G.id === 'trasm' && ctx.gearAdj) h += gearBlock(ctx);
     return h + '<p class="of-hint"><b>Tocca un pezzo</b> per vedere cosa cambia: non spendi niente finché non premi il pulsante. <b style="color:#2fd16a">●</b> verde: ce l\'hai, lo monti gratis. <b style="color:#ff453a">●</b> rosso: da comprare. Con il lucchetto servono ancora chilometri. Quello che compri resta tuo.</p>';
   }
 
@@ -406,7 +408,9 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
   // la scheda del pezzo toccato: cosa fa, che carattere ha, cosa cambia (calcolato sulla tua auto) e UN pulsante che dice cosa succede
   function pezzoCard(ctx, k, it, i, ci, career, money) {
     const g = ctx.game, isCur = i === ci, owned = g.owns(k, it.id), lock = g.partLocked(k, it.id), price = g.price(k, it.id), sim = ctx.sim, P = sim.P;
-    const car = offCarattere(k, it, { lim: P.limiter, r: P.r, gears: P.gears, gears0: typeof CARS !== 'undefined' && CARS[g.car] && CARS[g.car].P ? CARS[g.car].P.gears : null, fd: P.fd });
+    let used = 0;                                                  // turbo: la pressione che lasciano davvero centralina e benzina montate
+    if (k === 'turbo' && !offSwapOf(g, g.car) && typeof tuningParams === 'function') try { used = tuningParams(Object.assign({}, ctx.S.tune, { turbo: it.id }), ctx.adj && ctx.adj()).sim.turbo.max; } catch (err) { used = 0; }
+    const car = offCarattere(k, it, { lim: P.limiter, r: P.r, gears: P.gears, gears0: typeof CARS !== 'undefined' && CARS[g.car] && CARS[g.car].P ? CARS[g.car].P.gears : null, fd: P.fd, used });
     let dl = '', solo = '';
     if (!isCur) {
       const d = offPreview(g, ctx.S.tune, k, it.id);
@@ -437,22 +441,24 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       + (st.adjustable ? '<div class="of-sbtn"><button type="button" data-sres="serie">Come di serie</button><button type="button" data-sres="kit">Consigliato dal kit</button></div>' : '') + '</div>';
   }
 
-  // rapporti: una barra per marcia e una per il finale, da -15 % (più corta) a +15 % (più lunga); a destra la velocità al limitatore
-  function gearLab(v) { return v === 0 ? 'di serie' : (v > 0 ? '+' : '−') + Math.abs(v) + ' %' + (v > 0 ? ' · più lunga' : ' · più corta'); }
-  const rap = (x) => x.toFixed(3).replace('.', ',');
-  function gearBlock(ctx) {
-    const P = ctx.sim.P, a = ctx.gearAdj() || { fd: 0, g: [] }, n = P.gears.length - 1, lim = P.limiter;
-    const vAt = (i) => Math.round(lim / 60 / (P.gears[i] * P.fd) * 2 * Math.PI * P.r * 3.6);
-    let h = '<div class="of-gear"><h5>Rapporti del cambio</h5>';
-    for (let i = 1; i <= n; i++) {
-      const v = Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +(a.g || [])[i] || 0));
-      h += `<div class="of-sr"><span>${i}ª</span><b data-gl="${i}">${E(gearLab(v))}</b><input type="range" data-gear="${i}" min="${OFF_RAP.min}" max="${OFF_RAP.max}" step="1" value="${v}" aria-label="Rapporto della ${i}ª marcia"><small style="color:#8a8478;grid-column:2;text-align:right">${rap(P.gears[i])} · ${vAt(i)} km/h</small></div>`;
-    }
-    const f = Math.max(OFF_RAP.min, Math.min(OFF_RAP.max, +a.fd || 0));
-    h += `<div class="of-sr"><span>Finale</span><b data-gl="fd">${E(gearLab(f))}</b><input type="range" data-gear="fd" min="${OFF_RAP.min}" max="${OFF_RAP.max}" step="1" value="${f}" aria-label="Rapporto finale"><small style="color:#8a8478;grid-column:2;text-align:right">${rap(P.fd)}</small></div>`;
-    h += '<p class="of-hint" style="margin:2px 0 0">Più lunga = giri più bassi e più velocità in quella marcia, meno spinta. Più corta = più spinta, meno velocità. Il finale cambia tutte le marce insieme. Si regola da fermi, gratis. A destra: rapporto e velocità al limitatore.</p>'
-      + `<button type="button" class="of-gz" data-gzero="1">Rapporti di serie</button></div>`;
-    return h;
+  // cambio sport (un rapporto per tutte le marce) e da corsa (marcia per marcia): gratis, da fermi e da Luca come l'assetto
+  const gbF = (v, d = 2) => v.toFixed(d).replace('.', ',');
+  function gbRiga(ctx, gears) {
+    const P = ctx.sim.P, n = gears.length - 1, v = P.limiter / 60 * 2 * Math.PI * P.r / (gears[n] * P.fd) * 3.6;
+    return gears.slice(1).map((x, i) => `${i + 1}ª ${gbF(x)}`).join(' · ') + ` — in ${n}ª al limitatore ${fmt(v)} km/h`;
+  }
+  function gbKLab(k) { return '×' + gbF(k) + (k > 1.005 ? ' · più corte' : k < 0.995 ? ' · più lunghe' : ' · come di serie'); }
+  function gbBlock(ctx, item) {
+    const st = gbState(item, ctx.adj()), gears = gbGears(item, ctx.adj());
+    let h = '<div class="of-susp">';
+    if (st.mode === 'all') h += `<div class="of-sr"><span>Rapporto</span><b id="ofGbK">${E(gbKLab(st.k))}</b><input type="range" data-gb="k" min="${st.min}" max="${st.max}" step="0.01" value="${st.k}" aria-label="Rapporto di tutte le marce"></div>`;
+    else h += st.mul.slice(1).map((m, i) => `<div class="of-sr"><span>${i + 1}ª marcia</span><b id="ofGb${i + 1}">${gbF(gears[i + 1])} · ×${gbF(m)}</b><input type="range" data-gb="${i + 1}" min="${st.min}" max="${st.max}" step="0.01" value="${m}" aria-label="Rapporto della ${i + 1}ª"></div>`).join('');
+    return h + `<p class="of-hint" id="ofGbL" style="margin:2px">${E(gbRiga(ctx, gears))}</p><div class="of-sbtn"><button type="button" data-gbres="serie">Come di serie</button><button type="button" data-gbres="kit">Consigliato da Luca</button></div></div>`;
+  }
+  // la regolazione che darebbero i cursori adesso (mentre trascini)
+  function gbAdjDa(box, st) {
+    if (st.mode === 'all') return { gk: +box.querySelector('[data-gb="k"]').value };
+    return { gr: st.mul.map((m, i) => { const r = box.querySelector(`[data-gb="${i}"]`); return i && r ? +r.value : m; }) };
   }
 
   function drawSwap(ctx, carId, dId, career, money) {
@@ -475,5 +481,5 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       + '<div class="of-swaps">' + row(carId, true) + list.map((id) => row(id, false)).join('') + '</div>';
   }
 
-  window.NightOfficina = { panel, OFF_GRUPPI, gearLab };
+  window.NightOfficina = { panel, OFF_GRUPPI };
 })();

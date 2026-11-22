@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'missioni.js', 'officina.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offPreview, offSwapApply, offSwapDo, offSwapOf, offCatalog, offKgSerie, offPistoneRimborso, offGearAdj, OFF_RAP, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
+const E = new Function(src + ';return { SupraSim, StreetGame, CARS, CAR_IDS, setActiveCar, tuningParams, offMerge, offEstimate, offSwapPrice, offSwapKm, offPreview, offSwapApply, offSwapDo, offSwapOf, offCatalog, offKgSerie, offPistoneRimborso, OFF, OFF_MOTORE, TUNING_SUPRA, TUNING_V40, getT: () => TUNING };')();
 
 const nuovo = (car = 'v40') => {
   E.setActiveCar(car);
@@ -91,34 +91,7 @@ test('officina: l\'anteprima di un pezzo dice quanto cambia senza montarlo', () 
   assert.equal(stock[k], cat[k].items[0].id, 'non cambia la selezione passata');
 });
 
-// ---- rapporti regolabili (v0.75) e frizione che segue il motore dello swap ----
-test('rapporti: ogni marcia e il finale si allungano o accorciano in %, ordine sempre rispettato', () => {
-  const g = [0, 3.827, 2.36, 1.685, 1.312, 1.0, 0.793];
-  const r0 = E.offGearAdj(g, 3.133, null); assert.deepEqual(r0.gears, g); assert.equal(r0.fd, 3.133);
-  const r = E.offGearAdj(g, 3.133, { fd: 10, g: [0, 0, 10, -10] });
-  assert.equal(r.gears[0], 0); assert.equal(r.gears[1], 3.827, 'la prima non si è mossa');
-  assert.ok(Math.abs(r.gears[2] - 2.36 * 0.9) < 0.002, 'più lunga: rapporto più basso');
-  assert.ok(Math.abs(r.gears[3] - 1.685 * 1.1) < 0.002, 'più corta: rapporto più alto');
-  assert.ok(Math.abs(r.fd - 3.133 * 0.9) < 0.002);
-  for (let i = 2; i < r.gears.length; i++) assert.ok(r.gears[i] < r.gears[i - 1], `la ${i}ª resta più lunga della ${i - 1}ª`);
-  // valori fuori misura si tengono nei limiti; una terza lunghissima non supera la quarta
-  const x = E.offGearAdj(g, 3.133, { fd: 99, g: [0, 0, 0, 99, -99] });
-  assert.ok(Math.abs(x.fd - 3.133 * (1 - E.OFF_RAP.max / 100)) < 0.002);
-  for (let i = 2; i < x.gears.length; i++) assert.ok(x.gears[i] < x.gears[i - 1]);
-  assert.equal(g[2], 2.36, 'l\'elenco di partenza non viene toccato');
-});
-
-test('rapporti: con marce più lunghe la velocità al limitatore sale, con quelle corte scende', () => {
-  const { sim, game, S } = nuovo('golf'); game.s.carId = 'golf';
-  const base = applica(game, S, sim), v0 = sim.P.limiter / 60 / (sim.P.gears[3] * sim.P.fd) * 2 * Math.PI * sim.P.r * 3.6;
-  for (const [pc, su] of [[10, true], [-10, false]]) {
-    const r = E.offGearAdj(sim.P.gears, sim.P.fd, { g: [0, 0, 0, pc] });
-    const v = sim.P.limiter / 60 / (r.gears[3] * sim.P.fd) * 2 * Math.PI * sim.P.r * 3.6;
-    assert.equal(v > v0, su, `3ª ${pc} %`);
-  }
-  assert.ok(base.TP);
-});
-
+// ---- frizione che segue il motore dello swap (v0.92) ----
 test('swap: la frizione segue il motore (stesso livello del donatore), mai meno di quella dell\'auto', () => {
   for (const [car, donor] of [['v40', 'supra'], ['panda', 'supra'], ['golf', 'e36'], ['polo', 'e34']]) {
     for (const lv of [0, 1, 2]) {
