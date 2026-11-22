@@ -90,7 +90,7 @@ function slotScambia(L, da, a) {
       const u = inUso(); row.textContent = '';
       for (let n = 1; n <= SLOT.n; n++) {
         const r = riassunto(n), b = document.createElement('button'); b.type = 'button'; b.className = 'nr-slot' + (n === u ? ' on' : '');
-        const t = r ? (r.prologo ? `${r.auto} · km ${km(r.km)}` : 'Appena cominciata') : 'Vuota';
+        const t = r ? (r.prologo ? `${r.auto} · km ${km(r.km)}` : 'Nuova') : 'Vuota';
         b.innerHTML = `<b>Partita ${n}</b><span>${t}</span><i>${r && r.prologo ? euro(r.soldi) : r ? '' : 'si parte da capo'}${n === u ? (r && r.prologo ? ' · in uso' : r ? 'in uso' : ' · in uso') : ''}</i>`;
         b.addEventListener('click', (e) => {
           e.stopPropagation(); if (n === inUso()) return;
@@ -113,7 +113,8 @@ function slotScambia(L, da, a) {
   function titolo() {
     const go = document.getElementById('goBtn'); if (!go || document.querySelector('#introMenu .nr-slots')) return;
     const c = caselle(false); go.parentNode.insertBefore(c, go);
-    const small = go.parentNode.querySelector('small'); if (small) small.textContent = 'Tre partite separate in questo browser (una a testa e una di prova). Dal menu (Tab) ci sono anche le modalità libere: città libera e montagna.';
+    const small = go.parentNode.querySelector('small'), tn = small && [...small.childNodes].find((n) => n.nodeType === 3);   // solo il testo: il link «Crediti» (crediti.js) resta
+    if (tn) tn.data = 'Tre partite separate in questo browser (una a testa e una di prova). ';
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', titolo); else titolo();
 

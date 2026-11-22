@@ -104,6 +104,7 @@ const TRG_LIST = [
   document.head.appendChild(css);
   function next() {
     if (showing || !queue.length) return;
+    const gt = document.getElementById('gate'); if ((gt && !gt.hidden) || (window.NightPrologo && NightPrologo.playing)) { setTimeout(next, 1000); return; }   // sulla schermata iniziale e nel prologo aspetta
     const T = queue.shift(), g = G(); showing = true;
     const el = document.createElement('div'); el.className = 'trg-pop'; el.setAttribute('role', 'status');
     el.innerHTML = `<div class="cup">${CUP()}</div><div><small>TRAGUARDO SBLOCCATO</small><b>${esc(T.name)}</b><span>${esc(T.text)} · premio <em>${esc(g ? g.achPrizeText(T.prize) : '')}</em></span></div>`;
