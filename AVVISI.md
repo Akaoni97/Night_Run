@@ -7,7 +7,9 @@ per primo a ogni sessione di Claude, finché la voce c'è.
 risposta, in parole semplici, prima di qualunque altra cosa. Quando lui ti dice che l'ha letto, togli la sua voce da
 questo file (commit con `Per:` suo) e caricala su `main`.
 
-Formato: `## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **La notte e una proposta di anomalie** (v0.89)
+Formato: `## data · per chi · da chi` e due o tre righe.
+
+## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **La notte e una proposta di anomalie** (v0.89)
 - Di notte meno volanti e più cose strane, la radio ogni tanto disturba, interfaccia Essenziale, buio giocabile nelle incursioni, e la scena **«Quella dietro»** al benzinaio (di notte, una volta): è storia, se non ti va si toglie (`NOTTE_DIETRO` in `notte.js`).
 - **Da decidere tu** (Codex dice che l'horror si sente poco tra una scena e l'altra, e gli eventi strani di `viaggio.js`, `VG_ODD`, sono vuoti con gli effetti già pronti). Proposta, tre livelli, rari, senza musica:
   1. *Si notano appena*: un'auto nello specchietto che sparisce quando cambi corsia (`ghost`); un cartello «USCITA 18 KM» che dieci km dopo dice ancora 18 (`sign`); la radio che dice il km in cui sei.
@@ -15,7 +17,6 @@ Formato: `## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **
   3. *Lasciano qualcosa*: nella cassa del motel un oggetto che non hai mai preso (`gives`); sei auto parcheggiate tutte uguali davanti a una tappa chiusa (`parked`).
   Se dici sì, li scriviamo noi in `VG_ODD` con questi testi o coi tuoi.
 
-## data · per chi · da chi` e due o tre righe.
 
 ## 22/11/2026 · per il proprietario · dal cognato (con Claude) · **Cinque auto iniziali** (v0.85)
 - All'Autosalone ci sono le cinque auto dello zip «iniziali»: Panda 1000 Fire, AX e Twingo da subito (€ 3.000-4.500), Sandero e Aygo dal km 10 (€ 9.500-10.500), con scheda tecnica e pezzi.

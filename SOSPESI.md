@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**22/11 sera, check (Nico)**: nuovi il 5 (anomalie, decidi tu) e il 6 (la notte); dal vecchio 5 in poi tutto scala di due (il 5 ora è il 7... il 17 è il 19).
+
 **22/11 notte (Nico)**: nuovo il 3 (fisica e trazione vere, v0.86); dal vecchio 3 in poi tutto scala di uno (il 3 ora è il 4... il 16 è il 17).
 
 **22/11 sera (Nico)**: approvati e tolti il 3 (scheda del pezzo), il 5 (Prestazioni), il 6 e il 7 (Windows), il 13 (camminata). Numeri cambiati: 4→3, 8→4, 9→5, 10→6, 11→7, 12→8, 14→9, 15→10, 16→11, 17→12, 18→13, 19→14, 20→15, 21→16.
@@ -28,51 +30,50 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 4. [officina] **Rimborso di Nico**: chi aveva speso dal vecchio Nico (livelli, pezzi, motori costruiti) riceve i soldi una
     volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
 
+### Notte e storia
+5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). È storia: **decidi tu** sì/no e se coi loro testi o coi tuoi. (proprietario)
+6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; nel titolo della radio i caratteri del fruscio (▒) escono come spazi vuoti. Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
+
 ## Priorità media · decisioni e tarature
 
 ### Officina
-5. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. **Vendita**: un'auto elaborata vale metà di quello speso in pezzi e swap (v0.74, `DL.modPezzi`, `DL.modSwap`): giusto? (tutti e due)
-6. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
-7. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
-8. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
+7. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. **Vendita**: un'auto elaborata vale metà di quello speso in pezzi e swap (v0.74, `DL.modPezzi`, `DL.modSwap`): giusto? (tutti e due)
+8. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
+9. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
+10. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
 
 ### Menu e locali
-9. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
+11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
    tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi, tre slot di salvataggio. Quali e in
    che ordine? (proprietario)
 ### Personaggi e storia
-10. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
-11. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
+12. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
+13. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
    (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
 
 ## Priorità bassa · rifiniture
 
 ### Meteo
-12. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
-13. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
-14. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
+14. [meteo] **Il vento spinge davvero?** Oggi sbanda solo nel disegno. (proprietario)
+15. [meteo] **Neve e nebbia anche in città?** Oggi in «dinamico» no. (tutti e due)
+16. [meteo] **Nebbia di notte** e fruscio del vento (fatto senza poterlo ascoltare). (proprietario)
 
 ## Da guardare · arrivati il 22/11
 
 ### Disegni del proprietario
-15. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
+17. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
 ### Economia e guida
-16. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
+18. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
    (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco, € 28.000 guadagnati (70 % dalle missioni),
    € 16.700 in tasca al km 200; benzina, cibo e motel non pesano quasi niente. (tutti e due)
-17. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta, gomme bucate ogni
+19. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta, gomme bucate ogni
    ~30 km. Luca (21/11): per ora si lascia così, si tara giocando. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 22/11 sera, decisioni di Nico: scheda del pezzo al tocco ok, Prestazioni ok, Windows (installatore, portatile e aggiornamenti) ok, camminata nei locali va bene così.
-- 22/11 controllo della sera (Nico con Claude): 318 test passano, prova di fumo senza errori in tutte le tappe, foto di strada, Autosalone, Officina Nico e Russian Kùstòm a posto. Lista riordinata per priorità e blocchi (numeri tutti cambiati, vedi in cima); avvisi v0.74 e v0.75 letti e tolti.
-- 21/11 notte (v0.79-v0.81, Luca): suoni diversi per ogni auto, scarichi a cinque livelli e collettore; scheda del pezzo al tocco; 25 auto rifatte dai disegni in alta definizione con le versioni tuning.
-- 21/11 notte (v0.78, Luca): campioni audio dei pezzi del motore, scheda Suoni nell'officina (42 kit, 10 componenti, fatti a codice); build di Windows di nuovo in piedi (`desktop/copia-gioco.js` cercava ancora `pistone/`).
-- 21/11 sera (v0.77, Luca): codice morto tolto (scene vecchie degli interni, vecchie consegne della città e reputazione, sfide, traguardo ARRIVO, pedali e cambio nascosti nella scheda Guida, calore e motore rotto del Pistone); `test/motori.test.js` → `test/test1.test.js` («Test 1»); insegne grandi e oggetti del marciapiede in alta definizione leggera (`insegne2d.js`). Il riquadro dei traguardi in verticale si lascia così.
-- 21/11 sera (v0.76, Luca): aspetto dei personaggi (Nico giovane e tatuato, Tito pazzo, Rocco fisicato, Massimo barbone).
-- 21/11 sera (v0.75, Luca): Nico al posto di Mario (Officina Nico, tagliandi) e col carro attrezzi del soccorso; Neon Kustom → Russian Kùstòm; Motel Ovunque → Motel 4Ever con Tito; Nabir al bar, Rossana al benzinaio, Phill Grill all'autogrill, Rocco Lostallone all'Autosalone, Massimo Lo Sfascio allo sfascio.
-- 21/11 sera (v0.74, Luca): missione del signore della valigetta a 38 km resta così; vecchio Pistone cancellato (`pistone/`, il
-  peso del motore per lo swap ora è in `officina.js`, rimborso una volta sola); sezione Prestazioni; auto elaborate valgono di più.
+- 22/11 sera, check (Nico con Claude): 326 test, prova di fumo senza errori in tutte le tappe, notte e interfaccia Essenziale provate; sistemato `AVVISI.md` (l'avviso della v0.89 era finito dentro la riga del formato e non si vedeva).
+- 22/11 (v0.86-v0.88, Nico): telaio vero di ogni auto da disegno, cambi veri per tutte (ricerca di Codex), M3 E30 col finale europeo.
+- 22/11 (v0.82-v0.85, v0.89, Luca): auto in alta definizione con versioni tuning, camion nel traffico, cinque auto iniziali, la notte.
+- 22/11 (v0.83-v0.84, Nico per Luca): campioni dei pezzi meno robotici, poi corretti.
