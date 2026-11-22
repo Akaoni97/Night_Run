@@ -55,7 +55,8 @@ const TUNING_V40 = {
     items: [
       { id: 'oem', price: 0, km: 0, brand: 'Bosch', name: 'Motronic originale', note: 'Limitatore a 6500, taglio d\'iniezione morbido. Col turbo grosso non regge più di 1 bar.', sim: { lim: 6500, pw: 1, spark: false, maxBoost: 1.0 } },
       { id: 'remap', price: 450, km: 6, brand: 'Su misura', name: 'Rimappatura', note: 'Anticipo e benzina rivisti, limitatore a 6900: +4 % e allungo. Col turbo regge 1,2 bar.', sim: { lim: 6900, pw: 1.04, spark: false, maxBoost: 1.2 } },
-      { id: 'standalone', price: 1800, km: 30, brand: 'Link', name: 'G4X stand-alone', note: 'Taglio d\'accensione a 7200, launch control, mappa pop & bang: col turbo scoppi e fiammate.', sim: { lim: 7200, pw: 1.05, spark: true, maxBoost: 2.2 } },
+      { id: 'standalone', price: 1800, km: 30, brand: 'Link', name: 'G4X stand-alone', note: 'Taglio d\'accensione a 7200, launch control. Gli scoppi in rilascio vogliono la mappa pop & bang (livello dopo).', sim: { lim: 7200, pw: 1.05, spark: true, maxBoost: 2.2 } },
+      { id: 'popbang', price: 2250, km: 30, brand: 'Link', name: 'G4X + mappa pop & bang', note: 'La stand-alone più la mappa in più: in rilascio anticipo ritardato e benzina che brucia nello scarico, scoppi e fiammate (col turbo ancora di più). Niente potenza in più.', sim: { lim: 7200, pw: 1.05, spark: true, maxBoost: 2.2, pops: true } },
     ],
   },
   limiter: LIMITER_CAT,
@@ -108,13 +109,14 @@ const TUNING_V40 = {
     ],
   },
   clutch: {
-    label: 'Frizione e volano',
+    label: 'Frizione',
     items: [
-      { id: 'oem', price: 0, km: 0, brand: 'Sachs', name: 'Originale a doppia massa', note: 'Morbida e silenziosa; con il turbo grosso slitta.', sim: { Ie: 0.16, clutch: 420 }, dsp: { rattle: 0 } },
-      { id: 'sport', price: 900, km: 20, brand: 'Sachs', name: 'Rinforzata con volano alleggerito', note: 'Giri che salgono di scatto e tintinnio in folle: regge 450 Nm.', sim: { Ie: 0.12, clutch: 620 }, dsp: { rattle: 1 } },
-      { id: 'race', price: 2400, km: 40, brand: 'Sachs', name: 'Bidisco da corsa', note: 'Due dischi in ceramica: regge 900 Nm, pedale duro e rumoroso, giri che salgono di scatto. Serve con i turbo grossi.', sim: { Ie: 0.1, clutch: 920 }, dsp: { rattle: 1 } },
+      { id: 'oem', price: 0, km: 0, brand: 'Sachs', name: 'Originale', note: 'Morbida e silenziosa; con il turbo grosso slitta.', sim: { Ie: 0.16, clutch: 420 }, dsp: { rattle: 0 } },
+      { id: 'sport', price: 900, km: 20, brand: 'Sachs', name: 'Rinforzata', note: 'Spingidisco più duro: regge 620 Nm. Il volano è un reparto a parte.', sim: { Ie: 0.16, clutch: 620 }, dsp: { rattle: 0 } },
+      { id: 'race', price: 2400, km: 40, brand: 'Sachs', name: 'Bidisco da corsa', note: 'Due dischi in ceramica: regge 920 Nm, pedale duro e attacco secco. Serve con i turbo grossi.', sim: { Ie: 0.16, clutch: 920 }, dsp: { rattle: 0.4 } },
     ],
   },
+  flywheel: volanoCat(0.16, null, null, 'Sachs'),
   weight: {
     label: 'Alleggerimento',
     items: [
@@ -151,11 +153,11 @@ function v40ParamsBase(sel, adj) {
   if (tb.sim.turbo && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
   const hasT = !!tb.sim.turbo;
   const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * (hasT ? (ct.pwTurbo || ct.pw || 1) : (ct.pw || 1)) * inn.sim.pw * ecu.sim.pw * ((dp.sim && dp.sim.pw) || 1) * ((fu.sim && fu.sim.pw) || 1);
-  const pops = ecu.sim.spark && hasT;
+  const pops = !!ecu.sim.pops;                                           // solo con la mappa pop & bang montata (v0.105)
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
-      idle: cm.sim.idle, camLow: cm.sim.low * (inn.sim.low || 1), camHigh: cm.sim.high * (inn.sim.high || 1), lope: cm.sim.lope, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
+      idle: cm.sim.idle, camLow: cm.sim.low * (inn.sim.low || 1), camHigh: cm.sim.high * (inn.sim.high || 1), lope: cm.sim.lope, Ie: volanoIe(g('flywheel'), cl), flyIdle: g('flywheel').sim.idle || 0, flyHunt: g('flywheel').sim.hunt || 0, clutchMax: cl.sim.clutch,
       mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
       diff: fin.sim.diff, fd: fin.sim.fd, gears: gbGears(gb, adj), shiftMul: gb.sim.shift || 1, dm: wt.sim.dm, rearOff: wt.sim.rearOff || 1,
       valve: hasT ? 'bov' : 'recirc', boostK: 0.42 * ((tb.sim.flow) || 1),     // 1.9-2.0 litri: la stessa pressione rende meno che sul 3.0 della Supra
@@ -165,7 +167,7 @@ function v40ParamsBase(sel, adj) {
       cyl: 4, ex: V40_EX[ex.dsp], cat: { lp: ct.dsp.lp || (ex.dsp === 'stock' ? 2400 : 3800), g: ct.dsp.g > 1 ? 0.9 * ct.dsp.g : 0.9, pop: (pops ? 1.4 : hasT ? 0.7 : 0.25) * (ct.dsp.pop || 1), len: ct.dsp.len, tone: ct.dsp.tone, bark: ct.dsp.bark, edge: ct.dsp.edge, rasp: ct.dsp.rasp, jet: ct.dsp.jet },
       tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
       bov: hasT ? { v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.7, chirp: 0.3 } : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
-      intake: inn.dsp, scream: 0, lope: cm.dsp.lope, rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
+      intake: inn.dsp, scream: 0, lope: cm.dsp.lope, rattle: volanoRattle(g('flywheel'), cl), spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
     },
     look: {
       low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0,
@@ -263,6 +265,8 @@ function genGearbox(c, $, kk) {
   T.fuel = genFuel(c, id, id, false, 1.5, 1.5);
   T.gearbox.items.push(...pick(genGearbox(c, id, id).items, ['sport', 'race']));
   for (const p of V40_PRESETS) Object.assign(p.sel, { displacement: 'oem', fuel: 'oem' });
+  // volano (v0.105): le preparazioni con la frizione rinforzata o da corsa avevano già il volano alleggerito
+  for (const p of V40_PRESETS) p.sel.flywheel = { sleeper: 'leggero', full: 'leggero', drag: 'super' }[p.id] || 'oem';
 })();
 
 // catalogo con le stesse categorie per ogni auto (nomi, prezzi e chilometri dalla scheda dell'auto)
@@ -288,7 +292,9 @@ function genCatalog(c) {
     ecu: { label: 'Centralina', items: [
       { id: 'oem', price: 0, km: 0, brand: c.ecuBrand || 'Bosch', name: M.ecu ? M.ecu[0] : 'Originale', note: `Limitatore a ${c.P.limiter}, taglio d'iniezione morbido.`, sim: { lim: c.P.limiter, pw: 1, spark: false, maxBoost: c.ecuMax || 1.0 } },
       { id: 'remap', price: $(500), km: kk(6), brand: 'Su misura', name: M.ecu ? M.ecu[1] : 'Rimappatura', note: dz ? `Gasolio e pressione rivisti, limitatore a ${c.P.limiter + 300}: +10 %.` : `Anticipo e benzina rivisti, limitatore a ${c.P.limiter + 300}: +4 %.`, sim: { lim: c.P.limiter + 300, pw: dz ? 1.1 : 1.04, spark: false, maxBoost: (c.ecuMax || 1.0) + 0.3 } },
-      { id: 'standalone', price: $(2000), km: kk(30), brand: dz ? 'Su misura' : 'MoTeC', name: M.ecu ? M.ecu[2] : (dz ? 'Gestione completa' : 'M84 stand-alone'), note: dz ? `Mappe complete di pressione e gasolio, limitatore a ${c.P.limiter + 500}: +12 %. Niente scoppi: è un diesel.` : `Taglio d'accensione a ${c.P.limiter + 500}, launch control, pop & bang.`, sim: { lim: c.P.limiter + 500, pw: dz ? 1.12 : 1.05, spark: !dz, maxBoost: Math.max((c.ecuMax || 1.0) + 0.8, 2.2) } } ] },
+      { id: 'standalone', price: $(2000), km: kk(30), brand: dz ? 'Su misura' : 'MoTeC', name: M.ecu ? M.ecu[2] : (dz ? 'Gestione completa' : 'M84 stand-alone'), note: dz ? `Mappe complete di pressione e gasolio, limitatore a ${c.P.limiter + 500}: +12 %. Niente scoppi: è un diesel.` : `Taglio d'accensione a ${c.P.limiter + 500}, launch control. Gli scoppi in rilascio vogliono la mappa pop & bang (livello dopo).`, sim: { lim: c.P.limiter + 500, pw: dz ? 1.12 : 1.05, spark: !dz, maxBoost: Math.max((c.ecuMax || 1.0) + 0.8, 2.2) } },
+      // pop & bang (v0.105): non più una spunta nel menu di pausa, ma una mappa in più sulla centralina più potente. Sui diesel no
+      ...(dz ? [] : [{ id: 'popbang', price: $(2450), km: kk(30), brand: 'MoTeC', name: (M.ecu && M.ecu[3]) || ((M.ecu ? M.ecu[2] : 'M84 stand-alone') + ' + mappa pop & bang'), note: `La stand-alone più la mappa in più: in rilascio anticipo ritardato e benzina che brucia nello scarico, scoppi e fiammate (col turbo ancora di più). Niente potenza in più.`, sim: { lim: c.P.limiter + 500, pw: 1.05, spark: true, maxBoost: Math.max((c.ecuMax || 1.0) + 0.8, 2.2), pops: true } }]) ] },
     fuel: genFuel(c, $, kk, dz, bar0),
     limiter: LIMITER_CAT,
     turbo: { label: T ? 'Turbo' : 'Sovralimentazione', items: tb },
@@ -306,10 +312,11 @@ function genCatalog(c) {
     final: { label: 'Differenziale e finale', items: [
       { id: 'oem', price: 0, km: 0, brand: c.make, name: c.diff0.name, note: c.diff0.note, sim: { fd: c.P.fd, diff: c.diff0.diff } },
       { id: 'lsd', price: $(1600), km: kk(30), brand: 'Drexler', name: `Autobloccante al 40 %, finale ${(c.P.fd * 1.12).toFixed(2).replace('.', ',')}`, note: 'Blocca la ruota che slitta e accorcia le marce: partenze piantate, meno velocità massima.', sim: { fd: Math.round(c.P.fd * 1.12 * 100) / 100, diff: 'lsd' } } ] },
-    clutch: { label: 'Frizione e volano', items: [
+    clutch: { label: 'Frizione', items: [
       { id: 'oem', price: 0, km: 0, brand: 'Sachs', name: 'Originale', note: 'Morbida; con molta coppia slitta.', sim: { Ie: c.P.Ie, clutch: c.P.clutchMax }, dsp: { rattle: 0 } },
-      { id: 'sport', price: $(1000), km: kk(15), brand: 'Sachs', name: 'Rinforzata con volano alleggerito', note: 'Giri che salgono di scatto, tintinnio in folle.', sim: { Ie: Math.round(c.P.Ie * 0.75 * 100) / 100, clutch: Math.round(c.P.clutchMax * 1.5) }, dsp: { rattle: 1 } },
-      { id: 'race', price: $(2600), km: kk(40), brand: 'Sachs', name: 'Bidisco da corsa con volano in acciaio leggero', note: 'Regge tutta la coppia che il motore può dare: niente slittamenti. Pedale duro, giri che salgono di scatto, tintinnio in folle.', sim: { Ie: Math.round(c.P.Ie * 0.6 * 100) / 100, clutch: Math.round(c.P.clutchMax * 3) }, dsp: { rattle: 1 } } ] },
+      { id: 'sport', price: $(1000), km: kk(15), brand: 'Sachs', name: 'Rinforzata', note: 'Spingidisco più duro: regge una volta e mezza la coppia di serie. Il volano è un reparto a parte.', sim: { Ie: c.P.Ie, clutch: Math.round(c.P.clutchMax * 1.5) }, dsp: { rattle: 0 } },
+      { id: 'race', price: $(2600), km: kk(40), brand: 'Sachs', name: 'Bidisco da corsa', note: 'Regge tutta la coppia che il motore può dare: niente slittamenti. Pedale duro, attacco secco.', sim: { Ie: c.P.Ie, clutch: Math.round(c.P.clutchMax * 3) }, dsp: { rattle: 0.4 } } ] },
+    flywheel: volanoCat(c.P.Ie, $, kk, c.make),
     weight: { label: 'Alleggerimento', items: [
       { id: 'oem', price: 0, km: 0, brand: '—', name: 'Di serie', note: `${c.mass} kg.`, sim: { dm: 0, cabin: 1 } },
       { id: 's1', price: $(600), km: kk(10), brand: '—', name: 'Sedili racing, via insonorizzanti', note: `−${Math.round(c.mass * 0.045)} kg.`, sim: { dm: -Math.round(c.mass * 0.045), cabin: 1.15 } },
@@ -362,13 +369,13 @@ function genParamsBase(c) {
     const turbo = hasT ? Object.assign({}, tb.sim.turbo, { max: Math.min(tb.sim.turbo.max, cap), cap }) : { max: 0, a: 9000, b: 9900, up: 1, down: 1, twin: false };
     if (hasT && ex.sim.spool) { turbo.up *= ex.sim.spool; turbo.a *= 0.97; }
     const pw = (hasT ? (ex.sim.pwTurbo || ex.sim.pw) : ex.sim.pw) * (ct ? (hasT ? (ct.pwTurbo || ct.pw || 1) : (ct.pw || 1)) : 1) * (sp ? sp.pw || 1 : 1) * inn.sim.pw * ecu.sim.pw * (dp ? dp.sim.pw : 1) * (fu ? fu.sim.pw : 1);
-    const pops = ecu.sim.spark && hasT;
+    const pops = !!ecu.sim.pops;                                           // solo con la mappa pop & bang montata (v0.105)
     const exd = typeof ex.dsp === 'string' ? GEN_EX[ex.dsp] : ex.dsp;
     const vo0 = c.voice || {}, vo = inn.dsp && inn.dsp.howl > (vo0.howl || 0) ? Object.assign({}, vo0, { howl: inn.dsp.howl, howlF: inn.dsp.howlF || vo0.howlF }) : vo0;   // i cornetti ululano
     return {
       sim: {
         turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.spark, ecuPops: pops,
-        idle: cm ? cm.sim.idle : c.P.idle, camLow: (cm ? cm.sim.low : 1) * (inn.sim.low || 1), camHigh: (cm ? cm.sim.high : 1) * (inn.sim.high || 1), lope: (vo.lope || 0) * 0.6 + (cm ? cm.sim.lope : 0), Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
+        idle: cm ? cm.sim.idle : c.P.idle, camLow: (cm ? cm.sim.low : 1) * (inn.sim.low || 1), camHigh: (cm ? cm.sim.high : 1) * (inn.sim.high || 1), lope: (vo.lope || 0) * 0.6 + (cm ? cm.sim.lope : 0), Ie: volanoIe(g('flywheel'), cl), flyIdle: g('flywheel').sim.idle || 0, flyHunt: g('flywheel').sim.hunt || 0, clutchMax: cl.sim.clutch,
         mu: ty.sim.mu * su.susp.grip, tyre: ty.sim.tyre, susp: su.susp, ic: hasT ? ic.sim.ic : null,
         diff: fin.sim.diff, fd: fin.sim.fd, gears: gb ? gbGears(gb, adj) : null, shiftMul: gb ? gb.sim.shift || 1 : 1, dm: wt.sim.dm, rearOff: 0.6,
         valve: hasT ? 'bov' : 'recirc', boostK: c.boostK || (c.turbo ? 0.9 : 0.72),   // kit su aspirate: rapporto di compressione alto, si spinge meno
@@ -377,7 +384,7 @@ function genParamsBase(c) {
         cyl: c.cyl, ex: exd, cat: { lp: (ct && ct.dsp.lp) || (ex.id === 'oem' ? 2600 : 4200), g: ct && ct.dsp.g > 1 ? 0.95 * ct.dsp.g : 0.95, pop: (pops ? 1.4 : hasT ? 0.7 : 0.3) * (ct ? ct.dsp.pop || 1 : 1), len: ct ? ct.dsp.len : undefined, tone: ct ? ct.dsp.tone : undefined, bark: ct ? ct.dsp.bark : undefined, edge: ct ? ct.dsp.edge : undefined, rasp: ct ? ct.dsp.rasp : undefined, jet: ct ? ct.dsp.jet : undefined },
         tb: hasT ? tb.dsp.tb : { f0: 2500, f1: 8000, w: 0, wh: 0, damp: 1700, twin: 0, mani: 1 },
         bov: hasT ? Object.assign({ v: 1, f0: 2200, sw: 900, q: 0.8, g: 0.75, chirp: 0.25 }, vo.bov) : { v: 0, f0: 1800, sw: 600, q: 0.7, g: 0.05, chirp: 0 },
-        intake: inn.dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
+        intake: inn.dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: volanoRattle(g('flywheel'), cl), spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
         voice: vo,
       },
       look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, badge: (tb.look || {}).badge || '' },

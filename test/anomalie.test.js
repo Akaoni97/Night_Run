@@ -50,3 +50,11 @@ test('anomalie: nella cassa del motel compare un oggetto che non hai preso', () 
   g.vgOddFai(odd('cassa'), 160, 'motel');
   assert.equal(g.s.vg.cassa.length, n + 1); assert.equal(g.s.vg.cassa[n].kind, 'caffe');
 });
+
+test('anomalie: nei testi il nome dell\'auto c\'è davvero (prima restava scritto «{Auto}»), per la gemella quella che guidi', () => {
+  const g = nuovo(); let chiesto = null; g.ask = (q) => { chiesto = q; };
+  g.s.carId = 'twingo'; g.s.vg.eredita = 'v40';
+  g.vgOddFai(odd('gemella'), 70, 'bar');                               // fuori strada il testo arriva subito
+  assert.ok(chiesto && !/\{/.test(chiesto.text), chiesto && chiesto.text);
+  assert.match(chiesto.text, /^La Twingo ferma/);
+});

@@ -241,11 +241,17 @@ class SupraSim {
         if (I.brake > 0.25 && Math.abs(this.v) < 1.0) { this.lock = false; this.clutch = Math.min(1, this.clutch + h / 0.08); }
         else if (this.lock) {
           this.clutch = Math.max(0, this.clutch - h / 0.1);
-          if (rpm < 880) this.lock = false;
-          if (rpm < 700) this.clutch = 1;
+          // antistallo: le soglie seguono il minimo vero del motore (camme da corsa, volano leggero: minimo a 1.100 e oltre).
+          // Prima erano fisse a 880 e 700 giri: un motore così era già spento quando la frizione cominciava ad aprirsi.
+          // Con un minimo normale (fino a ~950 giri) restano 880 e 700, come prima
+          const idleE = P.idle + (tn.flyIdle || 0);
+          if (rpm < Math.max(880, idleE * 0.92)) this.lock = false;
+          if (rpm < Math.max(700, idleE * 0.8)) this.clutch = 1;
         } else {
           const tgt = 1 - SIM_SS(1050, 2700, rpm);
-          this.clutch += SIM_CLAMP(tgt - this.clutch, -h * 5, h * 8);
+          // sotto il minimo vero (volano leggero, camme da corsa) la frizione si riapre in fretta, se no il motore si spegne
+          const idleE = P.idle + (tn.flyIdle || 0), apri = rpm < idleE * 0.95 ? 30 : 8;
+          this.clutch += SIM_CLAMP(tgt - this.clutch, -h * 5, h * apri);
           if (slip < 70 && this.clutch < 0.35 && rpm > 950) this.lock = true;
         }
       } else this.clutch = Math.max(0, this.clutch - h / 0.2);
@@ -256,7 +262,8 @@ class SupraSim {
     }
 
     // ---- controllo di trazione (TRC): oltre il picco della gomma toglie gas finché le ruote riprendono ----
-    const tcOn = cfg.tc && this.gear > 0 && this.running && Math.abs(this.v) > 0.3 && !this.shiftSeq;
+    // vicino al minimo il TC non taglia: col gas tolto e la frizione chiusa trascinerebbe giù il motore fino a spegnerlo
+    const tcOn = cfg.tc && this.gear > 0 && this.running && Math.abs(this.v) > 0.3 && !this.shiftSeq && rpm > P.idle + (tn.flyIdle || 0) + 350;
     // taglio progressivo: sotto il picco della gomma (~0,10) nessun taglio, poi cresce fino al massimo verso lo 0,22 di slittamento;
     // si riprende in fretta (prima era tutto o niente e restava un 0,3 s di gas tolto dopo ogni piccolo slittamento)
     const over = tcOn ? SIM_SS(0.10, 0.22, this.slipNow || 0) : 0;
@@ -280,7 +287,9 @@ class SupraSim {
     const rk = Math.max(rpm / 3000, 0.35), k = 4.2 / rk;
     const aThr = (1 - Math.exp(-k * this.thr)) / (1 - Math.exp(-k));
     let iac = 0;
-    const idleT = P.idle + 520 * Math.exp(-this.runT / 4) + tn.lope * 45 * Math.sin(this.runT * 4.1) * Math.sin(this.runT * 1.3);
+    // volano (v0.105): pesante = minimo più basso e rotondo, leggero = più alto e ballerino (tn.flyIdle, tn.flyHunt; di serie 0)
+    const idleT = P.idle + 520 * Math.exp(-this.runT / 4) + tn.lope * 45 * Math.sin(this.runT * 4.1) * Math.sin(this.runT * 1.3)
+      + (tn.flyIdle || 0) + (tn.flyHunt || 0) * Math.sin(this.runT * 9.3) * (0.6 + 0.4 * Math.sin(this.runT * 2.2));
     if (this.running) {
       const err = (idleT - rpm) / idleT;
       if (this.thr < 0.03 && !this.dfco) this.iacI = SIM_CLAMP(this.iacI + err * h * 1.2, -0.08, 0.25);
@@ -402,7 +411,7 @@ class SupraSim {
     let fr = Math.sin(ty.C * Math.atan(bk - ty.E * (bk - Math.atan(bk))));
     const kpk = Math.tan(Math.PI / (2 * Math.max(1.05, ty.C))) / ty.B;      // slittamento del picco
     // quanto della caduta dopo il picco resta (1 = come prima). Col segno: con lo slittamento all'indietro (freno motore,
-    // scalata, ruote lanciate su un'auto fermata) la gomma frena; prima di v1.04 qui diventava una spinta in avanti e la
+    // scalata, ruote lanciate su un'auto fermata) la gomma frena; prima di v0.104 qui diventava una spinta in avanti e la
     // ruota prendeva a girare all'indietro sempre più forte, sgommando anche a motore spento
     if (Math.abs(this.kap) > kpk) fr = Math.sign(fr) * (1 - (1 - Math.abs(fr)) * (ty.fall ?? 0.45));
     const Ft = Fmax * fr;

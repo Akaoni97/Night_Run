@@ -85,7 +85,7 @@ test('campioni: la voce del pezzo arriva da sola montando pezzi non di serie (e 
   assert.equal(auto('supra', { wastegate: 'tial' }).res.wastegate, null, 'col biturbo di serie la wastegate esterna non c\'è');
   assert.equal(auto('supra', { exhaust: 'straight' }).res.scarico, 'scarico/pentola');
   assert.equal(auto('supra', { exhaust: 'tomei' }).res.scarico, 'scarico/titanio');
-  assert.equal(auto('supra', { ecu: 'haltech' }).res.mappa, 'mappa/crackle');
+  assert.equal(auto('supra', { ecu: 'popbang' }).res.mappa, 'mappa/crackle');
   assert.equal(auto('supra', { limiter: '3step' }).res.limitatore, 'limitatore/fucilata');
   assert.equal(auto('supra', { limiter: 'stutter' }).res.limitatore, 'limitatore/stutter');
   assert.equal(auto('supra', { gearbox: 'close' }).res.cambio, 'cambio/denti_dritti');
@@ -104,7 +104,7 @@ test('campioni: la voce del pezzo arriva da sola montando pezzi non di serie (e 
 });
 
 test('campioni: con lo swap contano i pezzi del motore del donatore (id col prefisso)', () => {
-  const a = auto('v40', { turbo: 'supra:t51r', exhaust: 'supra:straight', ecu: 'supra:haltech' }, 'supra');
+  const a = auto('v40', { turbo: 'supra:t51r', exhaust: 'supra:straight', ecu: 'supra:popbang' }, 'supra');
   assert.equal(a.res.turbo, 'turbo/sirena'); assert.equal(a.res.scarico, 'scarico/pentola'); assert.equal(a.res.mappa, 'mappa/crackle');
   assert.equal(a.res.valvola, 'valvola/pssh', 'la V40 non ha il reparto valvola: col turbo nuovo arriva lo sfiato in aria');
   assert.equal(auto('v40', {}, 'supra').res.turbo, null, 'il biturbo di serie della Supra non porta un fischio in più');

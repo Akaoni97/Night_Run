@@ -142,8 +142,10 @@ const TUNING_SUPRA = {
     label: 'Centralina',
     items: [
       { id: 'oem', price: 0, brand: 'Toyota', name: 'Originale', note: 'Limitatore a 7000 a taglio d’iniezione: niente scoppi, niente launch.', sim: { lim: 7000, spark: false, launch: false, pops: false } },
-      { id: 'haltech', price: 2600, brand: 'Haltech', name: 'Elite 2500', note: 'Taglio d’accensione a 7600, launch control, mappa pop & bang.', sim: { lim: 7600, spark: true, launch: true, pops: true } },
-      { id: 'link', price: 2100, brand: 'Link', name: 'G4X', note: 'Taglio d’accensione a 7500, launch control, mappa pop & bang.', sim: { lim: 7500, spark: true, launch: true, pops: true } },
+      { id: 'haltech', price: 2600, brand: 'Haltech', name: 'Elite 2500', note: 'Taglio d’accensione a 7600, launch control. Gli scoppi in rilascio vogliono la mappa pop & bang.', sim: { lim: 7600, spark: true, launch: true, pops: false } },
+      { id: 'link', price: 2100, brand: 'Link', name: 'G4X', note: 'Taglio d’accensione a 7500, launch control. Gli scoppi in rilascio vogliono la mappa pop & bang.', sim: { lim: 7500, spark: true, launch: true, pops: false } },
+      // pop & bang (v0.105): una mappa in più sulla centralina più potente, non più una spunta nel menu di pausa
+      { id: 'popbang', price: 3050, brand: 'Haltech', name: 'Elite 2500 + mappa pop & bang', note: 'La Haltech più la mappa in più: in rilascio anticipo ritardato e benzina che brucia nello scarico, scoppi e fiammate. Niente potenza in più.', sim: { lim: 7600, spark: true, launch: true, pops: true } },
     ],
   },  limiter: null,
 
@@ -193,10 +195,10 @@ const TUNING_SUPRA = {
     ],
   },
   clutch: {
-    label: 'Frizione e volano',
+    label: 'Frizione',
     items: [
-      { id: 'oem', price: 0, brand: 'Toyota', name: 'Monodisco originale', note: 'Volano pesante: salite di giri morbide.', sim: { Ie: 0.21, clutch: 820 }, dsp: { rattle: 0 } },
-      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Bidisco con volano alleggerito', note: 'Regge fino a 1.300 Nm: niente slittamenti nemmeno col biturbo al massimo. Giri che salgono e scendono di scatto, tipico tintinnio in folle al minimo.', sim: { Ie: 0.16, clutch: 1300 }, dsp: { rattle: 1 } },
+      { id: 'oem', price: 0, brand: 'Toyota', name: 'Monodisco originale', note: 'Regge 820 Nm: col biturbo spinto slitta.', sim: { Ie: 0.21, clutch: 820 }, dsp: { rattle: 0 } },
+      { id: 'osgiken', price: 1800, brand: 'OS Giken', name: 'Bidisco OS Giken', note: 'Regge fino a 1.300 Nm: niente slittamenti nemmeno col biturbo al massimo. Pedale duro. Il volano è un reparto a parte.', sim: { Ie: 0.21, clutch: 1300 }, dsp: { rattle: 0 } },
     ],
   },
 };
@@ -227,6 +229,25 @@ function gbGears(item, adj) {
   for (let i = 2; i < g.length; i++) g[i] = Math.min(g[i], g[i - 1] * 0.97);
   return g.map((v) => Math.round(v * 1000) / 1000);
 }
+// ---- Volano (v0.105): reparto suo, separato dalla frizione (che decide solo quanta coppia regge). Quattro livelli che cambiano
+// l'inerzia del motore (P.Ie): pesante = giri che salgono e scendono piano, minimo più rotondo, partenze che non si spengono;
+// leggero e superleggero = motore nervoso che prende e perde giri in fretta (e tintinnio del cambio in folle).
+// Ie0 = inerzia di serie dell'auto; pr(n) e kk(n) = prezzo e km dell'auto (le generiche li scalano)
+const VOLANO_LV = [
+  { id: 'oem', k: 1, name: 'Originale', note: 'Il volano di fabbrica: né pigro né nervoso.' },
+  { id: 'pesante', k: 1.4, price: 350, km: 0, name: 'Pesante in ghisa', note: 'Più massa che gira: il motore sale e scende di giri più piano, il minimo è più rotondo e corposo, in partenza non si spegne. In ripresa sembra più lento.' },
+  { id: 'leggero', k: 0.72, price: 700, km: 10, name: 'Alleggerito', note: 'Acciaio tornito: i giri salgono e scendono più in fretta, le cambiate sono più svelte. Un po\' di tintinnio del cambio in folle.' },
+  { id: 'super', k: 0.5, price: 1400, km: 25, name: 'Superleggero in alluminio', note: 'Metà dell\'inerzia: motore nervosissimo, prende giri a ogni tocco del gas e li perde appena molli. Minimo ballerino, partenze da dosare o si spegne, tintinnio forte in folle.' },
+];
+function volanoCat(Ie0, pr, kk, brand) {
+  pr = pr || ((n) => n); kk = kk || ((n) => n);
+  return { label: 'Volano', items: VOLANO_LV.map((v) => ({ id: v.id, price: v.id === 'oem' ? 0 : pr(v.price), km: v.id === 'oem' ? 0 : kk(v.km), brand: v.id === 'oem' ? (brand || 'Di serie') : v.id === 'pesante' ? 'Sachs' : 'Fidanza',
+    name: v.name, note: v.note, sim: { Ie: Math.round(Ie0 * v.k * 1000) / 1000, k: v.k, idle: v.k > 1 ? -40 : v.k <= 0.5 ? 110 : v.k < 1 ? 40 : 0, hunt: v.k <= 0.5 ? 75 : v.k < 1 ? 25 : 0 }, dsp: { rattle: v.k <= 0.5 ? 1 : v.k < 1 ? 0.6 : 0 } })) };
+}
+// inerzia e tintinnio da volano e frizione (senza reparto Volano resta quella della frizione, come prima)
+function volanoIe(fly, cl) { return fly && fly.sim && fly.sim.Ie ? fly.sim.Ie : cl.sim.Ie; }
+function volanoRattle(fly, cl) { return Math.max((cl.dsp && cl.dsp.rattle) || 0, (fly && fly.dsp && fly.dsp.rattle) || 0); }
+
 function tuningItemOf(catalog, cat, id) {
   const c = catalog[cat]; if (!c) return { id: 'oem', price: 0, name: '', sim: {}, dsp: {} };
   return c.items.find((i) => i.id === id) || c.items[0];
@@ -250,6 +271,7 @@ const LIMITER_CAT = {
   ],
 };
 TUNING_SUPRA.limiter = LIMITER_CAT;
+TUNING_SUPRA.flywheel = volanoCat(0.21, null, null, 'Toyota');
 // applica il limitatore scelto ai parametri della fisica e del suono
 function applyLimiter(out, item, ecuSim) {
   const L = (item && item.sim) || { lt: 'fuel' };
@@ -272,14 +294,14 @@ function supraParams(sel, adj) {
   return applyLimiter(supraParamsBase(sel, g, adj), g('limiter'), g('ecu').sim);
 }
 function supraParamsBase(sel, g, adj) {
-  const tb = g('turbo'), ecu = g('ecu'), cams = g('cams'), cl = g('clutch');
+  const tb = g('turbo'), ecu = g('ecu'), cams = g('cams'), cl = g('clutch'), fly = g('flywheel');
   // con una centralina programmabile i turbo di serie reggono circa 1 bar
   const turbo = tb.sim.twin && ecu.id !== 'oem' ? Object.assign({}, tb.sim, { max: 1.0 }) : tb.sim;
   const pw = g('exhaust').pw * g('cat').pw * g('intake').pw, su = suspResolve(g('suspension'), adj);
   return {
     sim: {
       turbo, pw, limiter: ecu.sim.lim, sparkCut: ecu.sim.spark, ecuLaunch: ecu.sim.launch, ecuPops: ecu.sim.pops,
-      idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: cl.sim.Ie, clutchMax: cl.sim.clutch,
+      idle: cams.sim.idle, camLow: cams.sim.low, camHigh: cams.sim.high, lope: cams.sim.lope, Ie: volanoIe(fly, cl), flyIdle: (fly.sim && fly.sim.idle) || 0, flyHunt: (fly.sim && fly.sim.hunt) || 0, clutchMax: cl.sim.clutch,
       mu: g('tires').sim.mu * su.susp.grip, tyre: g('tires').sim.tyre,
       ic: g('intercooler').sim.ic, susp: su.susp, dm: g('weight').sim.dm, fd: g('final').sim.fd, diff: g('final').sim.diff, gears: g('gearbox').sim.gears,
       valve: g('bov').dsp.v === 2 ? 'flutter' : g('bov').dsp.v === 1 ? 'bov' : 'recirc',
@@ -287,7 +309,7 @@ function supraParamsBase(sel, g, adj) {
     dsp: {
       ex: g('exhaust').dsp, cat: g('cat').dsp, tb: tb.dsp, bov: g('bov').dsp,
       scream: tb.sim.twin ? 0 : g('wastegate').dsp.scream, intake: g('intake').dsp, lope: cams.dsp.lope,
-      rattle: cl.dsp.rattle, spark: ecu.sim.spark ? 1 : 0, cabin: g('weight').sim.cabin,
+      rattle: volanoRattle(fly, cl), spark: ecu.sim.spark ? 1 : 0, cabin: g('weight').sim.cabin,
     },
     look: { low: su.low, susp: su.susp.pitch },
   };

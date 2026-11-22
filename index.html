@@ -1080,7 +1080,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <label class="tg"><input type="checkbox" id="tBox">Cambio automatico (cambia marcia da solo)</label>
         <label class="tg"><input type="checkbox" id="tAuto">Frizione automatica</label>
         <label class="tg"><input type="checkbox" id="tRev">Doppietta in scalata</label>
-        <label class="tg"><input type="checkbox" id="tPops">Mappa pop &amp; bang</label>
+        <label class="tg" hidden><input type="checkbox" id="tPops">Mappa pop &amp; bang</label><!-- v0.105: è un pezzo della centralina da Luca Tuning -->
         <label class="tg"><input type="checkbox" id="tLaunch"><span id="tLaunchL">Launch control 4300</span></label>
         <label class="tg"><input type="checkbox" id="tLane">Guida automatica (AUTO 1 dopo 5 s senza tasti)</label>
         <label class="tg"><input type="checkbox" id="tTc">Controllo di trazione</label>
@@ -1311,6 +1311,26 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     S.adj = S.adj || {};
     if (S.tunes.supra.suspension === 'drag') { S.tunes.supra.suspension = 'race'; S.adj.supra = S.adj.supra || { h: -20, k: 0.8 }; }
     if (game.s.owned && game.s.owned['suspension:drag']) game.s.owned['suspension:race'] = true;
+    // v0.105: il volano è un reparto a parte. Chi aveva la frizione rinforzata o da corsa (che prima alleggeriva anche il volano)
+    // ritrova il volano alleggerito montato e suo, gratis: la macchina resta nervosa come prima
+    if (!S.volanoMig) {
+      S.volanoMig = 1;
+      if (game.s.owned) for (const id of Object.keys(S.tunes)) {
+        const t = S.tunes[id], cat = (id === 'supra' ? TUNING_SUPRA : (CARS[id] || {}).tuning || {}).flywheel;
+        if (!t || !cat || t.flywheel || !t.clutch || t.clutch === 'oem') continue;
+        t.flywheel = 'leggero'; game.s.owned[(id === 'supra' ? '' : id + '|') + 'flywheel:leggero'] = true;
+      }
+    }
+    // v0.105: il pop & bang non è più una spunta del menu ma una mappa in più della centralina (livello «popbang»). Chi aveva la
+    // spunta accesa la ritrova montata, gratis, su ogni auto con la centralina programmabile
+    if (!S.popsMig) {
+      S.popsMig = 1;
+      if (S.pops && game.s.owned) for (const id of Object.keys(S.tunes)) {
+        const t = S.tunes[id], cat = (id === 'supra' ? TUNING_SUPRA : (CARS[id] || {}).tuning || {}).ecu;
+        if (!t || !cat || !cat.items.some((x) => x.id === 'popbang')) continue;
+        if (t.ecu === 'standalone' || (id === 'supra' && (t.ecu === 'haltech' || t.ecu === 'link'))) { t.ecu = 'popbang'; game.s.owned[(id === 'supra' ? '' : id + '|') + 'ecu:popbang'] = true; }
+      }
+    }
     if (!S.v40mig && !game.s.vg) {                    // la vecchia scala della V40 diventa pezzi ed estetica posseduti
       S.v40mig = 1;
       for (const [k, id] of Object.entries(leg.sel)) if (id !== CARS.v40.presets[0].sel[k]) game.s.owned['v40|' + k + ':' + id] = true;
@@ -1358,7 +1378,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
     const cmp = window.NightCampioni ? NightCampioni.sync(game, TP, S.tune) : {};   // campioni dei pezzi montati (campioni.js): cosa suona e cosa abbassare nella sintesi
-    return { tune: TP.dsp, pops: S.pops && TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
+    return { tune: TP.dsp, pops: TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine'), valv: cmp.valv | 0, turb: cmp.turb | 0, bur: cmp.bur | 0 } };
   }
   function ensureAudio() {
@@ -1461,12 +1481,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       $('limRpm').max = limMax; $('limRpm').value = limR; $('limOut').textContent = limR; $('lchRpm').max = limR - 400; $('lchRpm').value = sim.P.launchRpm; $('lchOut').textContent = sim.P.launchRpm;
       $('tLaunchL').textContent = `${lt === 'stutter' ? 'Stutter box' : 'Launch control'} ${sim.P.launchRpm}`;
       $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : '') + (lt === 'soft' ? ' Il soft cut non taglia a colpi: discesa e durata non servono.' : ' Discesa e durata: la benzina riparte quando i giri sono scesi e il tempo è passato. Discesa 0 = cadenza fissa a tempo; durata “solo giri” = rimbalzo deciso dai giri.'); }
-    Object.assign(sim.cfg, { pops: S.pops && TP.sim.ecuPops && !exhClosed(), launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
+    Object.assign(sim.cfg, { pops: !!TP.sim.ecuPops && !exhClosed(), launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
     if (garage) { garage.setTips(TP.dsp.ex.tips); garage.setPaint(S.paint); }
     if (street2d) { street2d.setCosmetics(cosView()); street2d.setCar(carId, TP.look, carPaint()); }
     renderTuning();
-    $('tPops').disabled = !TP.sim.ecuPops; $('tLaunch').disabled = !TP.sim.ecuLaunch;
-    $('ecuHint').textContent = (TP.sim.ecuPops ? '' : 'La mappa pop & bang richiede una centralina programmabile. ') + (TP.sim.ecuLaunch ? '' : 'Per il launch serve un limitatore 2-step (reparto Limitatore) o una centralina programmabile.');
+    $('tPops').disabled = true; $('tLaunch').disabled = !TP.sim.ecuLaunch;
+    $('ecuHint').textContent = (TP.sim.ecuPops ? 'Mappa pop & bang montata: scoppi in rilascio (si smonta da Luca Tuning, reparto Centralina). ' : 'Gli scoppi in rilascio vogliono la mappa pop & bang: da Luca Tuning, reparto Centralina. ') + (TP.sim.ecuLaunch ? '' : 'Per il launch serve un limitatore 2-step (reparto Limitatore) o una centralina programmabile.');
     if (!S.autoClutch) sim.lock = false;
     if (themeReady && S.ui === 'orig' && TH.name !== 'Originale ' + carId) applyTheme('orig');   // quadro dell'auto appena scelta
     audio.send({ cfg: dspCfg() });
@@ -1481,7 +1501,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     });
     game.autoLane = autoMode() > 0; $('tLane').checked = autoMode() > 0; $('tTc').checked = S.tc !== false;
     $('tBox').checked = S.gearbox === 'auto'; $('tAuto').disabled = S.gearbox === 'auto';
-    $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = S.pops; $('tLaunch').checked = S.launch;
+    $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = !!TP.sim.ecuPops; $('tLaunch').checked = S.launch;
     $('tRev').disabled = !S.autoClutch;
     $('vol').value = S.vol; $('volOut').textContent = S.muted ? 'muto' : S.vol;
     const pre = TUNING_PRESETS.find((p) => Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k]));
@@ -2254,7 +2274,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     { id: 'motore', name: 'Motore', cats: ['cams', 'intake', 'ecu', 'limiter'], hint: 'Camme, aspirazione, centralina e limitatore: quanta potenza fa il motore e a che giri la dà.' },
     { id: 'turbo', name: 'Turbo e aria', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: quanta pressione e che fischio.' },
     { id: 'scarico', name: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e downpipe: voce, fiamme e qualche cavallo in più.' },
-    { id: 'trasm', name: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
+    { id: 'trasm', name: 'Trasmissione', cats: ['gearbox', 'final', 'clutch', 'flywheel'], hint: 'Cambio, differenziale, frizione e volano: come la potenza arriva alle ruote.' },
     { id: 'telaio', name: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza, frenata e quanto è pronta in curva.' },
   ];
   let tuneTab = 'motore';

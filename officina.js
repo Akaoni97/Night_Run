@@ -18,7 +18,7 @@ const OFF_GRUPPI = [
   { id: 'motore', nome: 'Motore', cats: ['intake', 'displacement', 'cams', 'special', 'fuel', 'ecu', 'limiter'], hint: 'Aspirazione, cilindrata, camme, il reparto speciale dell\'auto, benzina, centralina e limitatore: quanta potenza fa il motore, a che giri la dà e quanta pressione regge.' },
   { id: 'turbo', nome: 'Turbo', cats: ['turbo', 'intercooler', 'wastegate', 'bov'], hint: 'Turbo, intercooler, wastegate e valvola pop-off: pressione e fischio.' },
   { id: 'scarico', nome: 'Scarico', cats: ['exhaust', 'cat'], hint: 'Scarico e catalizzatore: voce, fiamme e qualche cavallo.' },
-  { id: 'trasm', nome: 'Trasmissione', cats: ['gearbox', 'final', 'clutch'], hint: 'Cambio, differenziale e frizione: come la potenza arriva alle ruote.' },
+  { id: 'trasm', nome: 'Trasmissione', cats: ['gearbox', 'final', 'clutch', 'flywheel'], hint: 'Cambio, differenziale, frizione e volano: come la potenza arriva alle ruote.' },
   { id: 'telaio', nome: 'Ruote e telaio', cats: ['tires', 'suspension', 'weight'], hint: 'Gomme, assetto e peso: aderenza e frenata.' },
 ];
 // i reparti che appartengono al MOTORE (con lo swap diventano quelli del donatore); il limitatore è comune a tutte le auto

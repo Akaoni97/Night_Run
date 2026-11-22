@@ -33,8 +33,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
     volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
 
 ### Notte e storia
-5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). **Deciso da Nico (22/11): sì, così come l'ha proposto Luca.** **Fatto (v1.00)**: le otto in `VG_ODD` (specchietto dal km 12, cartello «USCITA 18 KM» che torna uguale dieci km dopo, radio che dice il km, gemella ferma con le quattro frecce dal km 60, barista, cippo «KM -n» dal km 80, thermos nella cassa del motel e sei auto uguali dal km 150). I testi brevi li ha scritti Claude dalle idee di Luca: **da rivedere da Luca**. Da provare giocando: se sono troppo rare o troppo frequenti. (cognato)
-6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v1.00). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
+5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). **Deciso da Nico (22/11): sì, così come l'ha proposto Luca.** **Fatto (v0.100)**: le otto in `VG_ODD` (specchietto dal km 12, cartello «USCITA 18 KM» che torna uguale dieci km dopo, radio che dice il km, gemella ferma con le quattro frecce dal km 60, barista, cippo «KM -n» dal km 80, thermos nella cassa del motel e sei auto uguali dal km 150). I testi brevi li ha scritti Claude dalle idee di Luca: **da rivedere da Luca**. Da provare giocando: se sono troppo rare o troppo frequenti. (cognato)
+6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
 
 ## Priorità media · decisioni e tarature
 
@@ -43,9 +43,12 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 8. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
 9. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
 10. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
+10b. [officina] **Potenze al massimo dei pezzi** (controllo dei motori, v0.104): ogni pezzo da solo dà un guadagno
+   sensato, ma si moltiplicano tutti senza freno: E36 1.393 CV, E34 1.532, A112 da 70 a 595 (×8,5). Si mette un
+   rendimento che cala quando il motore è già tirato, o si lascia così perché è un gioco? (cognato)
 
 ### Menu e locali
-11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): **tre slot di salvataggio fatti (v1.01)**; restano pausa a due livelli, sfondo vivo, controller e
+11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): **tre slot di salvataggio fatti (v0.101)**; restano pausa a due livelli, sfondo vivo, controller e
    tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi. Quali e in
    che ordine? (proprietario)
 ### Personaggi e storia

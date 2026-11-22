@@ -1,5 +1,5 @@
 // ============================================================================
-//  Night Run · Tre salvataggi (v1.01, chiesti da Nico): tre partite del Viaggio separate sullo stesso computer
+//  Night Run · Tre salvataggi (v0.101, chiesti da Nico): tre partite del Viaggio separate sullo stesso computer
 //  (per esempio una di Nico, una di Luca e una di prova), che non si cancellano a vicenda.
 //  Come funziona: la partita in uso sta dove è sempre stata (`nightrun-viaggio`, le foto del diario `nr_diario_foto`,
 //  l'ultimo personaggio `nr_pg`, e i pezzi montati dentro `banco2jz`: tunes, coss, adj, paint), così il resto del gioco

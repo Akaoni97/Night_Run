@@ -587,8 +587,8 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
     h += `<div class="cmp-vol"><span>VOLUME CAMPIONI</span><input type="range" data-cmp-vol="" min="0" max="150" step="5" value="${vol}" aria-label="Volume dei campioni"><b id="cmpVolOut">${vol} %</b></div>`;
     for (const S of CMP_SLOT) {
       const why = cmpServe(S.id, x), auto = cmpAuto(S.id, x), now = res[S.id], v = m[S.id] || 'auto';
-      const spenta = S.id === 'mappa' && now && !((NR().sim || {}).cfg || {}).pops;                 // la mappa pop & bang si accende in Guida
-      const st = why ? `<span class="cmp-st no">${E(why)}</span>` : now ? `<span class="cmp-st${spenta ? ' no' : ''}">${E(CMP_KIT[now].nome)}${now === auto && v === 'auto' ? ' · col pezzo' : ''}${spenta ? ' · mappa pop & bang spenta (Guida)' : ''}</span>` : `<span class="cmp-st off">${v === 'off' ? 'spento' : 'di serie: niente in più'}</span>`;
+      const spenta = S.id === 'mappa' && now && !((NR().sim || {}).cfg || {}).pops;                 // valvola dello scarico chiusa: niente botti
+      const st = why ? `<span class="cmp-st no">${E(why)}</span>` : now ? `<span class="cmp-st${spenta ? ' no' : ''}">${E(CMP_KIT[now].nome)}${now === auto && v === 'auto' ? ' · col pezzo' : ''}${spenta ? ' · scarico in silenzio: niente botti' : ''}</span>` : `<span class="cmp-st off">${v === 'off' ? 'spento' : 'di serie: niente in più'}</span>`;
       const kits = Object.keys(CMP_KIT).filter((id) => CMP_KIT[id].slot === S.id);
       const chip = (val, label, sub, cls, title) => `<button type="button" class="of-chip ${cls}" data-cmp="${E(S.id)}" data-val="${E(val)}" title="${E(title || label)}" ${why ? 'aria-disabled="true"' : ''}><span class="of-lv">${label}</span><small>${E(sub)}</small></button>`;
       // pallini come in officina: verde = montato, grigio = tuo ma smontato, rosso = non ce l'hai (da comprare o bloccato)
@@ -637,8 +637,6 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
       if (g.needsShop && g.needsShop()) { ctx.flash('I suoni li monta Luca: Da Luca Tuning è sulla mappa (L)', 2.6); return false; }
       const r = cmpMonta(g, g.car, slot, val, x);
       if (!r.ok) { ctx.flash(r.why, 2.6); return false; }
-      // chi monta apposta un kit di botti li vuole sentire: si accende la mappa pop & bang (si spegne in Guida)
-      if (slot === 'mappa' && CMP_KIT[val]) { const cb = document.getElementById('tPops'); if (cb && !cb.checked && !cb.disabled) { cb.checked = true; cb.dispatchEvent(new Event('change')); } }
       ctx.apply(); ctx.save(); if (ctx.after) ctx.after();
       const now = cur && cur.res[slot];
       ctx.flash(val === 'off' ? 'Spento: su questo componente resta solo il motore' : now ? `Montato: ${CMP_KIT[now].nome}` : 'Voce del pezzo: per ora niente in più', 2);

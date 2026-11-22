@@ -616,7 +616,9 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
   // l'evento strano o: gli effetti sulla strada e il testo (finestra, pensiero o radio)
   P.vgOddFai = function (o, km, where) {
-    const v = this.s.vg, d = this.s.dist, sub = (t) => String(t).replace('{km10}', Math.floor(km) + 10).replace('{km}', Math.floor(km));
+    // {Auto}/{auto} nei testi (v0.105: prima restava scritto «{Auto}»); per la gemella è l'auto che guidi, non quella dello zio
+    const chi = o.twin ? { s: { vg: { eredita: this.car } } } : this;
+    const v = this.s.vg, d = this.s.dist, sub = (t) => vgTesto(chi, String(t).replace('{km10}', Math.floor(km) + 10).replace('{km}', Math.floor(km)));
     if (o.then) (v.oddDue = v.oddDue || []).push({ id: o.then.id, km: km + o.then.dopo });
     if (o.glitch) { v.glitch = 0.9; return; }
     if (o.ghost && o.mirror) { this.ents.push({ id: this.id++, kind: 'ghost', mirror: o.id, lane: this.lane, lane0: this.lane, gap: 16 + Math.random() * 10, x: d - 20, v: Math.max(0, this.sim.v), ttl: 40 }); return; }   // il testo arriva quando sparisce

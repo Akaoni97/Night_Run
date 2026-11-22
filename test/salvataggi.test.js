@@ -1,4 +1,4 @@
-// Prove dei tre salvataggi (salvataggi.js, v1.01): lo scambio non perde niente, una partita vuota riparte da capo.
+// Prove dei tre salvataggi (salvataggi.js, v0.101): lo scambio non perde niente, una partita vuota riparte da capo.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';

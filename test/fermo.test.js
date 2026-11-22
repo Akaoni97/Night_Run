@@ -1,4 +1,4 @@
-// Ruote e auto che si fermano (v1.04). Due errori: oltre il picco della gomma lo slittamento all'indietro (freno motore,
+// Ruote e auto che si fermano (v0.104). Due errori: oltre il picco della gomma lo slittamento all'indietro (freno motore,
 // scalata, ruote lanciate su un'auto fermata) dava una spinta in avanti al posto di una frenata, e la ruota prendeva a
 // girare all'indietro sempre più forte, sgommando anche a motore spento; il gioco che ferma l'auto di colpo (Luca Garage,
 // tutorial, «Vai a») azzerava solo la velocità e non ruote e trasmissione. Qui: sim.ferma() e la gomma col segno giusto.

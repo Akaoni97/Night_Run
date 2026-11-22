@@ -1,6 +1,6 @@
 // ============================================================================
-//  Night Run · La schermata iniziale (v1.02, chiesta da Nico: «una facciata da rifare completamente»)
-//  Sfondo (v1.03, dopo la prova di Nico: l'animazione scattava e le ruote sembravano ferme): un quadro fermo, disegnato
+//  Night Run · La schermata iniziale (v0.102, chiesta da Nico: «una facciata da rifare completamente»)
+//  Sfondo (v0.103, dopo la prova di Nico: l'animazione scattava e le ruote sembravano ferme): un quadro fermo, disegnato
 //  una volta sola alla risoluzione del gioco (tela 1280×720, coordinate 640×360, presentazione ×n netta e poi morbida)
 //  con gli attrezzi del prologo (`NightPrologo.arte`): l'autostrada di notte, la luna, la città con l'insegna «SOLO
 //  AVANTI», il cartello «USCITA 18 KM», i lampioni (quello in mezzo spento), le scie del traffico come in una foto a
