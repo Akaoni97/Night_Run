@@ -69,7 +69,7 @@
       // colore della carrozzeria e strumenti (mappa, schermo intero, foto, replay): prima stavano nella scheda Vista
       const tools = panel('Colore e strumenti', [$('swatches'), $('mapBtn'), $('fsBtn2'), $('photoBtn'), $('replayBtn')], 'gm-row');
       const how = [...document.querySelectorAll('section.extras > .panel')].find((p) => /Come si gioca/.test(p.textContent));
-      return [sum, box, tools, how, window.NightAggiorna && NightAggiorna.panel()];
+      return [sum, box, window.NightSalvataggi && NightSalvataggi.panel(), tools, how, window.NightAggiorna && NightAggiorna.panel()];
     }],
     ['garage', 'Officina', 'Manutenzione, rapporti, chilometri', '#ff7a3a', () => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'I pezzi e lo swap del motore si fanno da Luca Tuning (sulla mappa, tasto L): un clic e sono montati.'; return [p, q('section.tuning')]; }],
     ['bagagliaio', 'Bagagliaio', 'Quello che porti con te', '#2ee6ff', () => [$('trunkPanel')]],

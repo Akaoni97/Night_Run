@@ -45,8 +45,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 10. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
 
 ### Menu e locali
-11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): pausa a due livelli, sfondo vivo, controller e
-   tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi, tre slot di salvataggio. Quali e in
+11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): **tre slot di salvataggio fatti (v1.01)**; restano pausa a due livelli, sfondo vivo, controller e
+   tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi. Quali e in
    che ordine? (proprietario)
 ### Personaggi e storia
 12. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
