@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Claude) | Prologo rifatto alla qualità del gioco: densità doppia, disegni HD delle auto, facciate e lampioni del gioco, errori corretti | `prologo.js` | 22/11 |
