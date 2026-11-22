@@ -124,7 +124,7 @@
     }
     if (e.kind === 'vgsign') {
       const X = Math.round(x);
-      if (e.cippo) { g.fillStyle = C.ink; g.fillRect(X - 1, 196, 16, 32); g.fillStyle = '#e8e6df'; g.fillRect(X, 197, 14, 30); g.fillStyle = '#c8282b'; g.fillRect(X, 197, 14, 4); this.text(g, 'KM', X + 2, 205, '#14161e'); this.text(g, '9', X + 5, 213, '#14161e'); return true; }
+      if (e.cippo) { g.fillStyle = C.ink; g.fillRect(X - 1, 196, 16, 32); g.fillStyle = '#e8e6df'; g.fillRect(X, 197, 14, 30); g.fillStyle = '#c8282b'; g.fillRect(X, 197, 14, 4); this.text(g, 'KM', X + 2, 205, '#14161e'); const n = String(e.num || '9'); this.text(g, n, X + 7 - Math.round(this.textW(n) / 2), 213, '#14161e'); return true; }
       if (e.app) {                                   // cartellone luminoso: scarica l'app (il telefono la offre quando lo superi)
         const L = e.text.split('|'), w = Math.max(...L.map((s) => s.length)) * 4 + 12, h = L.length * 9 + 8, top = 150, bx = X - Math.round(w / 2);
         g.fillStyle = C.ink; g.fillRect(bx + 6, top + h, 3, 228 - top - h); g.fillRect(bx + w - 9, top + h, 3, 228 - top - h);

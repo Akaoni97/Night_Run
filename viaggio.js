@@ -117,7 +117,25 @@ const VG_CHAPTERS = [
 // Ogni evento: id, where (dove succede: fuel, bar, grill, motel, niko, road, radio, ride), km (da quanti km in poi), once (una sola volta),
 // need (id di un evento già visto), title e text (il messaggio). Effetti già pronti: sign (cartello scritto a mano), cippo, parked, twin,
 // ghost, glitch, gives (un oggetto nella cassa del motel). Il testo può usare {km} e {km10}.
-const VG_ODD = [];
+// Aggiunti con le anomalie di Luca (v0.99): pens (il testo diventa un pensiero, non una finestra), radio (la radio lo dice:
+// disturbo di notte.js), mirror (con ghost: l'auto resta dietro nella tua corsia e sparisce quando cambi corsia; il testo
+// arriva allora), then: { id, dopo } (un altro evento che succede di sicuro dopo quei km), cippo con il suo numero, parked
+// e twin fermi in corsia d'emergenza (parked: sei auto tutte uguali; twin: la tua, con le tue ammaccature).
+// Anomalie proposte da Luca e decise da Nico (22/11): tre livelli, rare, senza musica. Testi da rivedere da chi scrive la storia.
+const VG_ODD = [
+  // 1 · si notano appena
+  { id: 'specchio', where: 'road', km: 12, ghost: true, mirror: true, pens: true, title: 'Specchietto', text: 'La macchina che avevi dietro non c\'è più. Non ti ha superato, non è uscita. Non c\'è più.' },
+  { id: 'uscita18', where: 'road', km: 18, once: true, sign: 'USCITA 18 KM', pens: true, then: { id: 'uscita18bis', dopo: 10 }, title: 'Cartello', text: 'Uscita a 18 km. Bene, manca poco.' },
+  { id: 'uscita18bis', where: 'never', km: 0, once: true, sign: 'USCITA 18 KM', pens: true, title: 'Cartello', text: 'Uscita a 18 km. Come dieci chilometri fa.' },
+  { id: 'radioKm', where: 'radio', km: 25, radio: 'SEI AL KM {km}', pens: true, title: 'Radio', text: 'La radio ha detto il chilometro in cui sei. Proprio quello.' },
+  // 2 · si possono verificare
+  { id: 'gemella', where: 'road', km: 60, once: true, twin: true, title: 'Corsia d\'emergenza', text: '{Auto} ferma in corsia d\'emergenza. Stesso colore, stessa ammaccatura. Le quattro frecce accese, e dentro non c\'è nessuno.' },
+  { id: 'barista', where: 'bar', km: 60, once: true, title: 'Al bancone', text: '«Il solito? Come l\'altra volta.» Il barista ti sorride come si sorride a un cliente di sempre. Tu qui non ci sei mai entrato.' },
+  { id: 'cippoFalso', where: 'road', km: 80, once: true, cippo: '-{km}', pens: true, title: 'Cippo', text: 'Il cippo diceva un chilometro col meno davanti. Non esiste un chilometro così.' },
+  // 3 · lasciano qualcosa
+  { id: 'cassa', where: 'motel', km: 150, once: true, gives: 'caffe', title: 'La cassa', text: 'Nella cassa c\'è un thermos di caffè ancora caldo. Non l\'hai comprato tu. Non l\'ha portato nessuno.' },
+  { id: 'seiUguali', where: 'road', km: 150, once: true, parked: true, title: 'Parcheggiate', text: 'Sei auto parcheggiate in fila, tutte uguali, davanti a un\'area di servizio chiusa. Le luci sono spente da anni.' },
+];
 
 // storie a bordo: autostoppisti particolari (per ora vuoto: li scrive la nuova storia)
 // Ogni passeggero: id, km (da quanti km compare, una volta), name, ask (cosa dice quando lo incontri), end (cosa succede quando scende),
@@ -127,7 +145,7 @@ const VG_STORY_PAX = [];
 // ---------------------------------------------------------------- stato
 function vgFresh() {
   return { on: true, needs: { food: 0.9, water: 0.9, sleep: 0.95, wash: 0.9, pee: 1, poo: 1 }, cassa: [], garage: ['v40'], owned: {}, trailer: false, trailerOn: false,
-    pax: [], seen: {}, chapters: {}, stops: 0, fuelStops: 0, lastKm: 0, nextHitch: 1.2, nextOdd: 8, oddCount: 0, lastMotel: -1, sleepAt: null,
+    pax: [], seen: {}, chapters: {}, stops: 0, fuelStops: 0, lastKm: 0, nextHitch: 1.2, nextOdd: 8, oddCount: 0, oddDue: [], lastMotel: -1, sleepAt: null,
     jobs: 0, earned: 0, line: null, horrorT: 0, glitch: 0, blackout: 0, again: null };
 }
 const vgOn = (game) => !!(game.s && game.s.vg && game.s.vg.on);
@@ -373,6 +391,11 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     // quello che non torna
     v.glitch = Math.max(0, v.glitch - dt);
     if (km > v.nextOdd && !this.prompt && !this.inside && !this.ap) this.vgOdd('road', km);
+    // gli eventi che devono arrivare dopo un altro (then), e l'auto dello specchietto
+    if (v.oddDue && v.oddDue.length && !this.prompt && !this.inside && !this.ap) {
+      const i = v.oddDue.findIndex((q) => km >= q.km); if (i >= 0) { const q = v.oddDue.splice(i, 1)[0], o = VG_ODD.find((x) => x.id === q.id); if (o) { v.seen[o.id] = true; this.vgOddFai(o, km, 'road'); } }
+    }
+    this.vgSpecchio(dt);
     // cippi chilometrici: cartelli speciali piazzati poco avanti
     this.ents = this.ents.filter((e) => !(e.kind === 'vgsign' || e.kind === 'parked') || e.x - this.s.dist > -150);
   };
@@ -589,16 +612,37 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (!pool.length) return;
     const o = pool[Math.floor(Math.random() * pool.length)];
     v.seen[o.id] = true; v.oddCount++;
-    const d = this.s.dist;
+    this.vgOddFai(o, km, where);
+  };
+  // l'evento strano o: gli effetti sulla strada e il testo (finestra, pensiero o radio)
+  P.vgOddFai = function (o, km, where) {
+    const v = this.s.vg, d = this.s.dist, sub = (t) => String(t).replace('{km10}', Math.floor(km) + 10).replace('{km}', Math.floor(km));
+    if (o.then) (v.oddDue = v.oddDue || []).push({ id: o.then.id, km: km + o.then.dopo });
     if (o.glitch) { v.glitch = 0.9; return; }
+    if (o.ghost && o.mirror) { this.ents.push({ id: this.id++, kind: 'ghost', mirror: o.id, lane: this.lane, lane0: this.lane, gap: 16 + Math.random() * 10, x: d - 20, v: Math.max(0, this.sim.v), ttl: 40 }); return; }   // il testo arriva quando sparisce
     if (o.ghost) { this.ents.push({ id: this.id++, kind: 'ghost', lane: 1 + Math.floor(Math.random() * 3), x: d + 40 + Math.random() * 60, v: Math.max(0, this.sim.v), ttl: 6 }); return; }
-    if (o.sign || o.cippo) this.ents.push({ id: this.id++, kind: 'vgsign', lane: 0, x: d + 240, v: 0, text: o.sign || 'KM 9', cippo: !!o.cippo, wall: o.id === 'ultimaUscita' });
-    if (o.parked) for (let q = 0; q < 6; q++) this.ents.push({ id: this.id++, kind: 'parked', lane: 0, x: d + 220 + q * 7, v: 0, color: GAME_COLORS[q % GAME_COLORS.length] });
-    if (o.twin) { const e = this.spawnTraffic(d - 30, this.lane === 1 ? 2 : 1); if (e) { e.vt = CARS[this.car] && CARS[this.car].sprite ? this.car : 'e36'; e.len = 4.5; e.twin = true; e.v = this.sim.v + 9; e.color = parseInt(String(this.paintHex || '#c81d11').slice(1), 16); } }
-    if (o.gives) v.cassa.push({ kind: o.gives, kg: INV[o.gives].kg });
-    const text = o.text.replace('{km10}', Math.floor(km) + 10).replace('{km}', Math.floor(km));
-    if (where === 'road' && (o.sign || o.cippo || o.parked)) { setTimeout(() => this.ask({ kind: 'odd', title: o.title, text, time: 18, options: [{ label: '…' }] }), 6000); return; }
-    this.ask({ kind: 'odd', title: o.title, text, time: 22, options: [{ label: '…' }] });
+    if (o.sign || o.cippo) this.ents.push({ id: this.id++, kind: 'vgsign', lane: 0, x: d + 240, v: 0, text: o.sign || 'KM 9', cippo: !!o.cippo, num: typeof o.cippo === 'string' ? sub(o.cippo) : '9', wall: o.id === 'ultimaUscita' });
+    const mio = CARS[this.car] && CARS[this.car].sprite ? this.car : 'e36', mioCol = parseInt(String(this.paintHex || '#c81d11').slice(1), 16);
+    if (o.parked) { const vt = ['panda', 'punto', 'corsa', 'polo', 'a80'][Math.floor(Math.random() * 5)], col = GAME_COLORS[Math.floor(Math.random() * GAME_COLORS.length)];   // sei auto tutte uguali, ferme in fila
+      for (let q = 0; q < 6; q++) this.ents.push({ id: this.id++, kind: 'traffic', vt: CARS[vt] ? vt : mio, len: 4.4, lane: 0, x: d + 230 + q * 6.5, v: 0, vT: 0, vBase: 0, still: true, parked: true, odd: true, soc: true, color: col }); }   // soc: non si urtano (game.js)
+    if (o.twin) this.ents.push({ id: this.id++, kind: 'traffic', vt: mio, len: 4.5, lane: 0, x: d + 240, v: 0, vT: 0, vBase: 0, still: true, parked: true, odd: true, soc: true, twin: true, hazard: true, dent: (this.sim.damage || 0) > 0.05, color: mioCol });   // la tua gemella, ferma con le quattro frecce
+    if (o.gives && typeof INV !== 'undefined' && INV[o.gives]) v.cassa.push({ kind: o.gives, kg: INV[o.gives].kg });
+    if (o.radio && typeof window !== 'undefined' && window.NightNotte && window.NightNotte.disturbo) window.NightNotte.disturbo(sub(o.radio));
+    const text = sub(o.text);
+    const show = () => { if (o.pens && this.vgThink) this.vgThink(text); else this.ask({ kind: 'odd', title: o.title, text, time: o.radio ? 18 : 22, options: [{ label: '…' }] }); };
+    if (o.radio) { setTimeout(show, 2600); return; }
+    if (where === 'road' && (o.sign || o.cippo || o.parked || o.twin)) { setTimeout(show, 6000); return; }
+    show();
+  };
+  // l'auto dello specchietto: ti sta dietro nella tua corsia (si vede nel radar); quando cambi corsia non c'è più
+  P.vgSpecchio = function (dt) {
+    for (const e of this.ents) {
+      if (e.kind !== 'ghost' || !e.mirror) continue;
+      e.ttl -= dt; e.x = this.s.dist - e.gap; e.v = Math.max(0, this.sim.v);
+      if (this.lane !== e.lane0) { e.gone = true; const o = VG_ODD.find((x) => x.id === e.mirror); if (o && this.vgThink) this.vgThink(vgTesto(this, o.text)); }
+      else if (e.ttl <= 0) e.gone = true;
+    }
+    if (this.ents.some((e) => e.gone)) this.ents = this.ents.filter((e) => !e.gone);
   };
 
   // stato per l'interfaccia
