@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico), con Claude | Fisica e trazione reali delle auto (la V40 resta com è) | `sim.js`, `cars.js`, `schede.js`, `test/` | 22/11/2026 sera |

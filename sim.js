@@ -390,7 +390,8 @@ class SupraSim {
     const Ft = Fmax * fr;
     this.slipNow = slip;
     this.slipPow = Math.abs(Ft * (vw - this.v));                          // potenza dissipata nello slittamento (W)
-    const Tloss = (6 + 0.35 * Math.abs(this.ww)) * Math.tanh(this.ww * 4);
+    // attriti di trasmissione, cuscinetti e gomme che rotolano; P.lossK li scala per le auto piccole e strette (di serie 1: Supra e V40 come prima)
+    const Tloss = (6 + 0.35 * Math.abs(this.ww)) * Math.tanh(this.ww * 4) * (P.lossK ?? 1);
     const Tload = Ft * P.r + Tloss;
 
     // ---- frizione: coppia trasmessa (aggancio implicito, stabile) ------------------------------

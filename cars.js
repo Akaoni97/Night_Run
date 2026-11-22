@@ -345,11 +345,11 @@ const GEN_CARS = [
     voice: { pop: { f: 1.2, crack: 1.25, len: 0.9 }, mani: [0.55, 0.5, 0.5, 0.55], rf: -0.42, pulse: 0.78, rough: 0.12, lope: 0.18, howl: 0.75, howlF: 820, metal: 0.5, metalF: 3100, boomRpm: 3600, hiRpm: 7250 },
     shiftK: 1.1, hesK: 0.4, engine: 'S14 2.3 16V aspirato', mass: 1200, driveW: 0.47, fwd: false, cyl: 4, exStock: GEN_EX.bmw4, pitch: 0.95, mu: 1.05, ecuBrand: 'Bosch Motronic', inStock: { in: 1.8, roar: 2.0, wh: 1 },
     naNote: 'Quattro farfalle singole: grida fino a 7250 giri.',
-    P: { idle: 880, limiter: 7250, launchRpm: 4500, Ie: 0.13, mass: 1200, r: 0.30, cd: 0.33, A: 1.9, mu: 1.05, cgH: 0.48, wb: 2.565, tank: 70, gears: [0, 3.72, 2.40, 1.77, 1.26, 1.00], rev: -4.23, fd: 4.10, clutchMax: 450 },
+    P: { idle: 880, limiter: 7250, launchRpm: 4500, Ie: 0.13, mass: 1200, r: 0.30, cd: 0.33, A: 1.9, mu: 1.05, cgH: 0.48, wb: 2.565, tank: 70, gears: [0, 3.72, 2.40, 1.77, 1.26, 1.00], rev: -4.23, fd: 3.25, clutchMax: 450 },
     turbo: null,
     boost: [KIT_SC('sc', 'Rotrex', 'Compressore centrifugo (0,5 bar)', 0.5, 4200, 30, 'Spinta che cresce coi giri come un aspirato più grosso: +35 % in alto, fischio da compressore.'),
       KIT_T('turbo', 'Garrett', 'Kit turbo GT28 (1,0 bar)', 1.0, 2900, 4100, 5200, 45, 'Pistoni bassi e turbo: il 2.3 da corsa arriva a 330 CV.', 'TURBO')],
-    diff0: { name: 'Autobloccante 25 %, finale 4,10', note: 'Di serie sulla M3.', diff: 'torsen' } },
+    diff0: { name: 'Autobloccante 25 %, finale 3,25', note: 'Di serie sulla M3.', diff: 'torsen' } },
   { id: 'e36', name: 'BMW M3 E36', short: 'M3 E36', make: 'BMW', tag: 'BMW M3 E36 coupé · S50 3.0 sei in linea · trazione posteriore · 5 marce',
     voice: { pop: { f: 0.95, crack: 1.05, len: 1.05 }, mani: [0.5, 0.47, 0.45, 0.45, 0.47, 0.5], split: 0.12, rf: -0.36, pulse: 0.84, howl: 0.35, howlF: 950, metal: 0.8, metalF: 3400, boomRpm: 3400, hiRpm: 7200 },
     shiftK: 1.0, hesK: 0.25, engine: 'S50 3.0 aspirato', mass: 1460, driveW: 0.49, fwd: false, cyl: 6, exStock: GEN_EX.bmw6, pitch: 0.9, mu: 1.07, ecuBrand: 'Bosch Motronic',
@@ -416,10 +416,36 @@ const GEN_NEW = [
   ['aygo', 'Toyota Aygo 1.0 VVT-i', 'Aygo', 'Toyota', '1.0 VVT-i (3 cilindri)', 840, true, 3, 69, 6000, 95, 4300, 6600, 800, G5, 4.24, 0.28, 0.30, 2.05, 9500, 10],
   ['polizia', 'Auto della polizia (dismessa)', 'Ex polizia', 'Polizia', '2.0 TDI', 1450, true, 4, 150, 4000, 340, 1750, 4800, 780, G6, 3.4, 0.31, 0.31, 2.2, 11000, 150, 1],
 ];
+// (22/11) telaio vero di ogni auto: passo (wb, m), baricentro (cgH, m), quota del peso sull'asse motore a vuoto (dw: davanti per
+// le trazioni anteriori, dietro per le posteriori), aderenza delle gomme di serie (mu: 1 = gomma moderna da 15-16 pollici;
+// le strette degli anni 80 e quelle da furgone tengono meno, le sportive larghe di più) e massa di ruota e gomma (mw, kg).
+// Prima tutte avevano passo 2,50 m, baricentro a 50 cm, 62 % davanti, aderenza 1 e le ruote pesanti della Supra.
+// Dati da schede di omologazione e prove su strada; il baricentro è stimato dall'altezza della scocca.
+const GEN_TELAIO = {
+  a80: { wb: 2.61, cgH: 0.53, dw: 0.60, mu: 0.97, mw: 15 }, a3: { wb: 2.636, cgH: 0.54, dw: 0.61, mu: 1.02, mw: 19 },
+  a112: { wb: 2.04, cgH: 0.50, dw: 0.63, mu: 0.92, mw: 11 }, bus: { wb: 5.9, cgH: 1.2, dw: 0.62, mu: 0.9 },
+  doblo: { wb: 2.755, cgH: 0.66, dw: 0.59, mu: 0.94, mw: 16 }, panda: { wb: 2.30, cgH: 0.58, dw: 0.61, mu: 0.96, mw: 13 },
+  punto: { wb: 2.51, cgH: 0.54, dw: 0.62, mu: 0.97, mw: 14 }, golf: { wb: 2.40, cgH: 0.50, dw: 0.62, mu: 0.95, mw: 12.5 },
+  corsa: { wb: 2.51, cgH: 0.54, dw: 0.62, mu: 0.96, mw: 14 }, p205: { wb: 2.42, cgH: 0.49, dw: 0.61, mu: 0.98, mw: 13 },
+  p206: { wb: 2.44, cgH: 0.51, dw: 0.63, mu: 1.0, mw: 15 }, p308: { wb: 2.62, cgH: 0.53, dw: 0.62, mu: 1.0, mw: 17 },
+  clio: { wb: 2.59, cgH: 0.53, dw: 0.62, mu: 0.97, mw: 14 }, williams: { wb: 2.47, cgH: 0.49, dw: 0.62, mu: 1.0, mw: 14 },
+  taxi: { wb: 2.68, cgH: 0.55, dw: 0.61, mu: 0.98, mw: 17 }, v850: { wb: 2.665, cgH: 0.54, dw: 0.63, mu: 1.03, mw: 20 },
+  polo: { wb: 2.56, cgH: 0.54, dw: 0.62, mu: 0.96, mw: 14 }, van: { wb: 2.70, cgH: 0.68, dw: 0.60, mu: 0.92, mw: 17 },
+  ambulanza: { wb: 3.665, cgH: 0.85, dw: 0.52, mu: 0.9, mw: 24 }, panda141: { wb: 2.16, cgH: 0.55, dw: 0.60, mu: 0.9, mw: 11 },
+  ax: { wb: 2.285, cgH: 0.52, dw: 0.62, mu: 0.92, mw: 11 }, twingo: { wb: 2.345, cgH: 0.58, dw: 0.60, mu: 0.92, mw: 11 },
+  sandero: { wb: 2.59, cgH: 0.56, dw: 0.61, mu: 0.97, mw: 14 }, aygo: { wb: 2.34, cgH: 0.55, dw: 0.61, mu: 0.94, mw: 12 },
+  polizia: { wb: 2.68, cgH: 0.56, dw: 0.61, mu: 0.98, mw: 17 },
+};
+// inerzia delle ruote (kg·m²) da massa e raggio: ruota e gomma come un anello pieno a 0,6, più il disco. Sull'asse motore
+// in più semiassi, differenziale e uscita del cambio
+function genInerzia(T, r) {
+  const Iwf = Math.round((2 * 0.6 * T.mw * r * r + 0.1) * 100) / 100;
+  return { Iwf, Iw: Math.round((Iwf * 1.35 + 0.2) * 100) / 100 };
+}
 for (const q of GEN_NEW) {
   const [id, name, short, make, engine, mass, fwd, cyl, hp, rH, nm, rN, lim, idle, gears, fd, r, cd, A, price, km, diesel] = q;
   GEN_DATA[id].tq = genTq(hp, rH, nm, rN, lim);
-  const heavy = mass > 5000;
+  const heavy = mass > 5000, T = GEN_TELAIO[id] || {};
   let voice = diesel ? { mani: cyl === 6 ? [0.88, 0.84, 0.82, 0.82, 0.84, 0.88] : [0.7, 0.66, 0.66, 0.7], rf: -0.3, pulse: heavy ? 1.8 : 1.5, rough: 0.45, diesel: heavy ? 1.2 : 1, boomRpm: lim * 0.4, hiRpm: lim }
     : { pulse: hp > 120 ? 0.85 : 1.05, rough: hp < 80 ? 0.2 : 0.1, metal: hp > 120 ? 0.35 : 0, boomRpm: lim * 0.5, hiRpm: lim };
   // scoppi dello scarico: le piccole acute e secche, le grosse più cupe e lunghe, i diesel quasi niente schiocco
@@ -433,9 +459,9 @@ for (const q of GEN_NEW) {
   GEN_CARS.push({
     id, name, short, make, tag: `${name} · ${engine} · ${fwd ? 'trazione anteriore' : 'trazione posteriore'} · ${gears.length - 1} marce`,
     shiftK: SU ? SU.shiftK : heavy ? 1.6 : diesel ? 1.2 : 1.05, hesK: SU ? SU.hesK : diesel ? 0.15 : 0.3, voice, sound: SU ? SU.fam : null, exTer: SU && SU.exTer, exCat: SU && SU.exCat, exCen: SU && SU.exCen, exRace: SU && SU.exRace, inStock: SU && SU.inStock, buy: { price, km },
-    engine, mass, driveW: fwd ? 0.62 : 0.55, fwd, cyl, exStock: SU ? SU.ex : diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: heavy ? 0.9 : 1.0, ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
-    P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : Math.round((0.14 + mass / 12000) * (SU ? SU.ieK : 1) * 1000) / 1000, mass, r, cd, A, mu: heavy ? 0.9 : 1.0, cgH: heavy ? 1.2 : 0.5, wb: heavy ? 5.9 : 2.5, tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
-      heavy ? { Iw: 36, Ks: 240000, vmax: 90 } : {}),
+    engine, mass, driveW: T.dw || (fwd ? 0.62 : 0.55), fwd, cyl, exStock: SU ? SU.ex : diesel ? GEN_EX.diesel : cyl >= 5 ? GEN_EX.bmw6 : GEN_EX.old4, pitch: heavy ? 0.6 : 1.0, mu: T.mu || (heavy ? 0.9 : 1.0), ecuBrand: diesel ? 'Bosch EDC' : 'Originale',
+    P: Object.assign({ idle, limiter: lim, launchRpm: diesel ? 2000 : 3800, Ie: heavy ? 2.6 : Math.round((0.14 + mass / 12000) * (SU ? SU.ieK : 1) * 1000) / 1000, mass, r, cd, A, mu: T.mu || (heavy ? 0.9 : 1.0), cgH: T.cgH || (heavy ? 1.2 : 0.5), wb: T.wb || (heavy ? 5.9 : 2.5), tank: heavy ? 300 : 50, gears, rev: -3.5, fd, clutchMax: Math.round(nm * 1.6) },
+      T.mw ? genInerzia(T, r) : {}, heavy ? {} : { lossK: Math.round(Math.min(1.3, Math.max(0.55, mass / 1290)) * 100) / 100 }, heavy ? { Iw: 36, Iwf: 24, Ks: 240000, vmax: 90 } : {}),
     turbo: null,
     boost: [KIT_SC('sc', 'Rotrex', 'Compressore volumetrico (0,5 bar)', 0.5, Math.round(2500 + price * 0.1), 30, 'Più spinta coi giri: +35 %.'),
       KIT_T('turbo', 'Garrett', 'Kit turbo (0,9 bar)', 0.9, 2600, 3800, Math.round(4000 + price * 0.15), 45, 'Il kit grosso: servono centralina e intercooler.', 'TURBO')],
