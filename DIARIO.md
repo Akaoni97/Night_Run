@@ -1,3 +1,6 @@
+## 23/11/2026 · cognato · v0.130 (**marmitta rovente più calma**)
+- Tempi del rosso (`MARMITTA` in `fiamme.js`): di serie comincia prima e ci mette di più (da 13 a 21 s, prima 15-21), media da 9,5 a 15 (prima 10-14,5), spinta da 3 a 7 (prima 2-5,5). Test aggiornati.
+
 ## 23/11/2026 · cognato · v0.129 (**marmitta rovente rifatta**)
 - Via l'alone tondo grande e biancastro (era la luce notturna larga più il bagliore): ora di notte c'è solo un bagliore stretto sulla bocca e il riflesso rosso sull'asfalto (di giorno solo il metallo e il riflesso tenue).
 - Il terminale si scalda a pixel (celle da mezzo pixel del disegno): rosso ciliegia scuro → rosso → arancio, giallo quasi bianco solo alla bocca al massimo; il tubo si spegne a scalini verso la carrozzeria, il centro è più chiaro, il contorno diventa rosso cupo, il buco resta scuro e poi brilla dei gas; il calore tremola e al massimo staccano faville minuscole. Costanti in `MARM` (`effetti2d.js`). Provato con `strumenti/scarichi.js --rossa` e nel gioco sulla V40 di serie.

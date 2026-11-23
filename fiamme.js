@@ -52,10 +52,10 @@ function flamePalFor(tier, r) {
 // ---------------------------------------------------------------- marmitta rovente
 // Tenendo il gas negli ultimi MARMITTA.banda giri prima del limitatore (limitatore compreso) lo scarico si scalda: dopo
 // `inizio` secondi il terminale comincia a diventare rosso, a `picco` è incandescente. Per livello dell'auto (flameTier):
-// di serie o poco preparata 15 s, media 10 s, spinta 2 s (picco a 5,5). Fuori dal tiro si raffredda (`fredda` secondi di
+// di serie o poco preparata da 13 s a 21 s (passaggio lento, 8 s), media da 9,5 a 15, spinta da 3 a 7 (v0.130). Fuori dal tiro si raffredda (`fredda` secondi di
 // calore persi al secondo, più piano dello scaldarsi) e il calore non sale oltre il picco + `margine`: dal massimo il rosso
 // si spegne in una decina di secondi.
-const MARMITTA = { banda: 1500, gas: 0.5, inizio: [15, 10, 2], picco: [21, 14.5, 5.5], fredda: 0.6, margine: 1 };
+const MARMITTA = { banda: 1500, gas: 0.5, inizio: [13, 9.5, 3], picco: [21, 15, 7], fredda: 0.6, margine: 1 };
 // calore accumulato (in secondi di tiro) dopo dt: o = { rpm, lim (giri del limitatore), gas (pedale 0-1), acceso, tier }
 function marmittaPasso(h, dt, o) {
   const t = Math.max(0, Math.min(2, (o && o.tier) | 0)), M = MARMITTA;

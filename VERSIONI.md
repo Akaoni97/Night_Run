@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.129**
+**Versione attuale: v0.130**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -153,3 +153,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.127 | 23/11 | proprietario | Schermata iniziale: tolto il riflesso di luce del pulsante premium (`.go::after`, `pShine`) che passava sopra il blocchetto d'accensione |
 | v0.128 | 23/11 | proprietario | Blocchetto d'accensione rifatto sul modello del proprietario: pannello «ACCENSIONE» in metallo spazzolato con viti, spie BAT/OLIO/MOT, arco LOCK-ACC-ON-START col puntino ambra, chiave vista da sopra con presa a righe, riga di stato e barra a segmenti |
 | v0.129 | 23/11 | cognato | Marmitta rovente rifatta: metallo che si arroventa a pixel (bocca più calda, tubo che si spegne a scalini, buco che brilla, faville al massimo), alone piccolo e solo di notte |
+| v0.130 | 23/11 | cognato | Marmitta rovente più calma: di serie da 13 a 21 s, media da 9,5 a 15, spinta da 3 a 7 |
