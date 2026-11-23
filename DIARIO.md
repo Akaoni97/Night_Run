@@ -1,3 +1,7 @@
+## 23/11/2026 · cognato (Luca) · v0.126 (**vignette a versi**)
+- Fatto: le nuvolette del protagonista non dicono più parole («WOW!», «SORPASSO!»), fanno **solo versi** come chi imita la macchina (`reazioni.js`): secondo il momento (accelerata, partenza, sorpasso, scoppi, limitatore, turbo), secondo il motore (`REA_FAM`: tre cilindri «TRATRATRA!», diesel «BRUUUUUU!», cinque cilindri «BWAAAAAAH!», sei «UUUAAAAAAH!», utilitaria «NIIIIIII!», turbo «VRUUU FIIIUUU!») e negli scoppi secondo la preparazione (`REA_BOTTO`: leggera POP!, media PUPUPU!, spinta TRATATAN! / TARATARATA!). Più carattere: le lettere escono una alla volta e ballano, l'ultima salta su; scoppi, limitatore e partenze hanno la vignetta a punte che trema (più gialla e coi colori alternati quando l'auto è spinta); coda a punta verso la testa. Check: approvati 1, 2, 3, 4, 8, 9, 12, 17, 19, 23 (tolti dai sospesi). Test 409, foto di tutti i tipi su V40 e Polo, nessun errore.
+- Aperto: guardarle guidando sul PC (sospeso 25).
+
 ## 23/11/2026 · proprietario (Nico) · v0.125 (**la chiave vista da sopra**)
 - La chiave è ora una **barretta verticale** al centro del cilindro, vista dalla testa dall'alto, che ruota quando tieni premuto (LOCK → ACC → ON → START). I fari di ricerca sono ritagliati davvero nel cielo (prima un fascio passava ancora sopra il blocchetto).
 
