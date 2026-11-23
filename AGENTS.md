@@ -167,6 +167,7 @@ Strumenti: `node strumenti/prova.js [--mob] [--vista 1920x1080] [--out cartella]
 Campioni dei pezzi: `python3 strumenti/campioni_pezzi.py [kit o componente] [--grafici cartella]` li rifà (deterministico) e
 `node strumenti/ascolta_campioni.js <auto> '<pezzi JSON>' <giro|launch|limitatore> <file.wav> [vista] [ambiente]` mette insieme
 fisica, sintesi e campioni in un WAV e stampa i livelli di motore, campioni e mix ogni mezzo secondo (Playwright, come `prova.js`).
+Video «di serie e preparate» (v0.115): `node strumenti/reel/preparate.js OUT/riprese`, poi `node strumenti/reel/suono_preparate.js OUT/riprese` (campioni dei pezzi inclusi), `node strumenti/reel/cartelli_preparate.js OUT/cartelli OUT/riprese` e `python3 strumenti/reel/monta_preparate.py OUT`.
 Partita intera a tempo accelerato: `node strumenti/giocatore.js --km 200 --out cartella` (un giocatore automatico prudente:
 lavori, missioni, benzina, cibo, motel, Nico, documenti; non compra auto né pezzi; diario in `diario.json`, ~25 minuti veri
 per 200 km). Serve a misurare ritmo ed economia dopo un cambio di prezzi o paghe.
