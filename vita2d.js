@@ -174,11 +174,22 @@
       const wet = (rain ? 1 : 0.6) * night;
       // a densità doppia trattini di mezza unità, più fitti e più fini (sull'asciutto ondeggiano meno): un riflesso, non una scala
       const u = 1 / (this.SS || 1), fine = u < 1, step = fine ? 1.5 : 3, hh = fine ? 1 : 2, q = (v) => Math.round(v / u) * u;
+      // v0.136: i trattini si raggruppano in 6 livelli di trasparenza e ogni livello è una figura sola (prima un fillRect per
+      // trattino, ~350 a fotogramma); la differenza fra un livello e l'altro non si vede
+      const LIV = 6, bins = [];
       const streak = (x, rgb, a, w) => {
-        g.fillStyle = `rgb(${rgb})`;
+        for (let i = 0; i < LIV; i++) bins[i] = null;
         for (let y = 240; y < 334; y += step) {
           const k = (y - 240) / 94, wob = Math.sin(y * 0.45 + t * (rain ? 9 : 4) + x * 0.1) * (1 + k * 2) * (fine && !rain ? 0.7 : 1), ww = Math.max(u, q(w * (1 - k * 0.5)));
-          g.globalAlpha = a * (1 - k) * (0.7 + 0.3 * Math.sin(y * 1.7 + t * 6)) * (fine ? 0.9 : 1); g.fillRect(q(x + wob - ww / 2), y, ww, hh);
+          const al = (1 - k) * (0.7 + 0.3 * Math.sin(y * 1.7 + t * 6)), b = Math.max(0, Math.min(LIV - 1, Math.round(al * (LIV - 1))));
+          (bins[b] || (bins[b] = [])).push(q(x + wob - ww / 2), y, ww);
+        }
+        g.fillStyle = `rgb(${rgb})`;
+        for (let b = 0; b < LIV; b++) {
+          const R = bins[b]; if (!R) continue;
+          g.globalAlpha = a * (b / (LIV - 1)) * (fine ? 0.9 : 1); g.beginPath();
+          for (let i = 0; i < R.length; i += 3) g.rect(R[i], R[i + 1], R[i + 2], hh);
+          g.fill();
         }
         g.globalAlpha = 1;
       };

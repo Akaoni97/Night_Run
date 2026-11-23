@@ -76,12 +76,16 @@ class Street2D {
   textW(str, sc = 1) { return (String(str).length * 4 - 1) * sc; }
 
   // ellisse piena a pixel netti (per righe)
+  // v0.136: le righe vanno in una figura sola riempita una volta (prima un fillRect per riga: con le nuvole della pioggia
+  // più di 700 comandi a fotogramma per la scheda video). Stessi pixel.
   span(g, cx, cy, rx, ry) {
     if (rx < 1 || ry < 1) return;
+    g.beginPath();
     for (let y = -Math.floor(ry); y <= Math.floor(ry); y++) {
       const hw = Math.round(rx * Math.sqrt(Math.max(0, 1 - (y * y) / (ry * ry))));
-      if (hw > 0) g.fillRect(Math.round(cx - hw), Math.round(cy + y), hw * 2, 1);
+      if (hw > 0) g.rect(Math.round(cx - hw), Math.round(cy + y), hw * 2, 1);
     }
+    g.fill();
   }
   // luce che si somma: ellissi concentriche a bande (posterizzate, niente rumore)
   light(g, cx, cy, rx, ry, hex, a, bands = 4) {
@@ -1980,7 +1984,7 @@ class Street2D {
       this.light(g, x + 18, 252, 70, 13, lampCol, 0.07, 4);                 // pozza sull'asfalto, corsia lontana
       this.light(g, x + 18, 226, 46, 6, lampCol, 0.08, 3);                  // pozza sul marciapiede
       g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = `rgba(${lampRgb},.05)`;
-      for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.fillRect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); }   // riflesso tremolante
+      g.beginPath(); for (let y = 266; y < 330; y += 2) { const w = Math.max(1, 6 - (y - 266) / 14); g.rect(Math.round(x + 18 - w / 2 + Math.sin(y * 0.7 + st.t) * 1.5), y, Math.round(w), 1); } g.fill();   // riflesso tremolante (una figura sola, v0.136)
       g.restore();
     }
     this._lampX = TUN ? [] : lampX; this._shops = shops;
@@ -2319,11 +2323,13 @@ class Street2D {
       g.fillStyle = 'rgba(10,14,28,.18)'; g.fillRect(0, 0, W, 360);
       const sl = Math.min(6, Math.abs(s.v) * 0.12), n = 260;
       g.fillStyle = 'rgba(170,190,230,.45)';
+      g.beginPath();                                                    // v0.136: tutte le gocce in una figura sola (erano 1.300 fillRect a fotogramma)
       for (let i = 0; i < n; i++) {
         const sx = (Street2D.rnd(i * 3 + 1) * (W + 60) - (st.t * (60 + Math.abs(s.v) * 25) + i * 7) % (W + 60) + W + 60) % (W + 60) - 30;
         const sy = (Street2D.rnd(i * 3 + 2) * 360 + st.t * (420 + Street2D.rnd(i) * 160)) % 360;
-        for (let k = 0; k < 5; k++) g.fillRect(Math.round(sx + k * sl / 5), Math.round(sy - k * 2), 1, 2);
+        for (let k = 0; k < 5; k++) g.rect(Math.round(sx + k * sl / 5), Math.round(sy - k * 2), 1, 2);
       }
+      g.fill();
       g.fillStyle = 'rgba(190,210,240,.55)';
       for (let i = 0; i < 26; i++) { const x = Street2D.rnd(i + Math.floor(st.t * 9) * 31) * W, y = 230 + Street2D.rnd(i * 7 + Math.floor(st.t * 9)) * 110; g.fillRect(Math.round(x) - 1, Math.round(y), 3, 1); g.fillRect(Math.round(x), Math.round(y) - 1, 1, 1); }
       g.restore();

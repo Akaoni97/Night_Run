@@ -1,3 +1,8 @@
+## 24/11/2026 · proprietario (Nico) · v0.137 (**prestazioni, terzo giro: meno comandi alla scheda video**)
+- Contati i comandi di disegno di un fotogramma (notte, pioggia, Roma): **3.877 `fillRect`**, 281 `drawImage`, 80 sfumature rifatte, ~2 tele nuove (gli sbuffi di fumo, finché la loro scorta non è piena). Una scheda video paga ogni comando: tanti rettangoli piccoli costano molto più dei loro pixel. Ora si riempiono in una figura sola: pioggia (1.300 → 1), `span` (le ellissi a righe: nuvole della pioggia, ombre, 760 → 1 per ellisse), riflessi sull'asfalto in 6 livelli di trasparenza (`vitaRiflessi`, ~350 → pochi), riflesso tremolante dei lampioni, sampietrini di Roma (~280 → 2). Totale ~900 `fillRect`. Stesso fotogramma prima e dopo: differenza media 0,1 su 255.
+- Nel browser di prova (senza scheda video, anche quella «emulata» è software) non cambia niente, come previsto: lì conta solo il numero di pixel. Sul PC vero conta il numero di comandi: va visto sul contatore.
+- Aperto: «30 fps esatti» su uno schermo a 60 Hz vuol dire fotogrammi appena sopra i 16,7 ms (il browser ne mostra uno ogni due rinfreschi) oppure browser senza scheda video. Serve la riga del **Contatore FPS** (Impostazioni → Grafica) dal PC vero: fps, ms del gioco, della strada, del browser e nome della scheda video (sospeso 27).
+
 ## 24/11/2026 · cognato · v0.136 (**proposta: progetto impennata**)
 - `docs/fisica/IMPENNATA.md`: impennata solo se la fisica lo permette (μ_eff·G ≥ b/h), trazione posteriore, slick calde, 4-link, peso dietro, colpo della frizione; pioggia e trazione anteriore no; grafica a taglio verticale con tetto a 8°; interruttore «Progetto impennata» in Sviluppatori (spento = gioco identico); piano in 6 passi e 5 domande per Luca. Nessun codice cambiato.
 

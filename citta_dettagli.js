@@ -249,7 +249,11 @@
   RD.roma = (c) => {
     const { g, px, x0, r, ppm } = c;                                                                       // sampietrini: tasselli scuri a macchie
     if (r(31) < 0.55) { const x = x0 + r(32) * ppm * 6, y = 246 + Math.floor(r(33) * 70), w = 26 + Math.floor(r(34) * 30), h = 10 + Math.floor(r(35) * 12);
-      for (let a = 0; a < w; a += 4) for (let b = 0; b < h; b += 3) { px((a + b) % 3 ? '#242636' : '#2e3044', x + a + (b % 2) * 2, y + b, 3, 2); } }
+      for (const [col, on] of [['#242636', true], ['#2e3044', false]]) {   // due colori, due figure (v0.136: erano ~280 fillRect a fotogramma)
+        g.fillStyle = col; g.beginPath();
+        for (let a = 0; a < w; a += 4) for (let b = 0; b < h; b += 3) if (((a + b) % 3 !== 0) === on) g.rect(Math.round(x + a + (b % 2) * 2), Math.round(y + b), 3, 2);
+        g.fill();
+      } }
   };
   RD.washington = (c) => { const { px, x0, ppm } = c; px('#e8b020', x0, 239, ppm * 9, 1); };
   RD.parigi = (c) => { const { px, x0, ppm, r } = c; if (r(41) < 0.3) for (let q = 0; q < 6; q++) px('rgba(196,200,214,.35)', x0 + r(42 + q) * ppm * 9, 244 + Math.floor(r(50 + q) * 70), 2, 1); };
