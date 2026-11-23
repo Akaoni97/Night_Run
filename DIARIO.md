@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.126 (**via il fascio di luce dal blocchetto**)
+- Il fascio di luce che passava sopra il blocchetto era il riflesso lucido del pulsante «premium» (`premium.css`, `.gate .go::after`, animazione `pShine`): nella schermata iniziale ora è spento.
+
 ## 23/11/2026 · proprietario (Nico) · v0.125 (**la chiave vista da sopra**)
 - La chiave è ora una **barretta verticale** al centro del cilindro, vista dalla testa dall'alto, che ruota quando tieni premuto (LOCK → ACC → ON → START). I fari di ricerca sono ritagliati davvero nel cielo (prima un fascio passava ancora sopra il blocchetto).
 

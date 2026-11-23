@@ -285,6 +285,7 @@
 /* il blocchetto d'accensione */
 .gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;justify-items:center;gap:6px;width:226px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
 .gate.nt .go.nt-sw:active{cursor:grabbing}
+.gate.nt .go.nt-sw::after,.gate.nt .go.nt-sw::before{display:none!important;animation:none!important}
 .gate.nt .go.nt-sw:focus-visible .nt-svg{filter:drop-shadow(0 0 10px #ffb347)}
 .nt-svg{width:226px;height:226px;overflow:visible;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
 .nt-svg .nt-k{filter:drop-shadow(1px 3px 2px rgba(0,0,0,.65));transform-origin:110px 110px;transform:rotate(var(--g,0deg))}
