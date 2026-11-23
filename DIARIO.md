@@ -1,3 +1,10 @@
+## 23/11/2026 · proprietario (Nico) · v0.119 (**il protagonista reagisce, vapore, fari sul bagnato**)
+- **Il protagonista in pixel art**: la figura in auto era a vettori sfumati; ora si porta alla griglia di mezza unità dei disegni HD (`drvPixel` in `pilota2d.js`), con colori a livelli e il contorno scuro dei passanti, senza perdere occhi e bocca (sopracciglia, occhi e bocca più grandi in `personaggio.js`).
+- **Nuvolette di pensiero** (`reazioni.js`, nuovo): accelerazione forte, launch (pronti / via), sorpasso, scoppio grosso, motore al limitatore. Esce sopra la testa una nuvoletta con la sua frase (WOW!, ANCORA!, CHE SPINTA!, SORPASSO!, CHE BOTTI!...) e in faccia compare lo stupore (occhi grandi, bocca a O). Mai più di una ogni 7-11 secondi, ogni tipo ha il suo riposo. Si spegne con Grafiche anime.
+- **Vapore**: colonne dai tombini più alte e larghe, e dallo sfiato sul tetto dei locali di ramen/soba (prima `meta.steam` non faceva niente).
+- **Fari sul bagnato** (`fxFariBagnato`): la luce dei fari e del fanale si specchia sull'asfalto; molto con la pioggia, appena sull'asciutto; più forte il fanale quando freni.
+- Provato nel browser (prima e dopo, con 3 foto per cosa); 401 test.
+
 ## 23/11/2026 · proprietario (Nico) · v0.118 (**livelli: locali dietro i passanti, riflessi sotto le auto**)
 - **Passanti e locali**: le facciate dei locali (bar, benzinaio, Sosta 24, motel, officine, Autosalone, sfascio, piazzetta) erano disegnate dopo i passanti, quindi chi camminava sul marciapiede spariva dietro l'edificio. Ora in città e nei paesi i locali si disegnano prima dei pedoni (`placesEarly` in `draw` di `street2d.js`); traffico e auto restano nel passaggio delle entità, dopo. Fuori da città e paesi non cambia niente.
 - **Strisce di luce sull'asfalto**: i riflessi verticali di insegne e lampioni (e le scintille sul bagnato) erano in `vitaFront`, dopo le auto, e passavano sopra la carrozzeria. Ora sono `vitaRiflessi` (`vita2d.js`), disegnati prima delle auto: stanno sulla strada e la macchina ci passa sopra. `RIFL_K` 1,7 compensa la penombra che viene dopo.

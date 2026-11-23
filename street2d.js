@@ -1089,7 +1089,7 @@ class Street2D {
       for (let k = 0; k < 4; k++) { const nx = 6 + k * ((w - 10) / 4); px(ink, nx, gy - 26, (w - 10) / 4 - 1, 15); px('#1a2a52', nx + 1, gy - 26, (w - 10) / 4 - 3, 14); px('#f4f1e6', nx + (w - 10) / 8 - 2, gy - 22, 3, 3); }
       meta.glows.push({ x: w / 2, y: gy - 8, r: 26, col: '#ffcf7a', a: 0.12 });
       for (const lx of [2, w - 6]) { px(ink, lx, top + 22, 7, 11); px('#ff3a2a', lx + 1, top + 23, 5, 9); px('#ffd0a0', lx + 2, top + 26, 3, 1); meta.glows.push({ x: lx + 3, y: top + 27, r: 11, col: '#ff3a2a', a: 0.14 }); }
-      meta.shop = { x: w / 2, w: w - 10, col: '#ffcf7a' }; meta.steam = true;
+      meta.shop = { x: w / 2, w: w - 10, col: '#ffcf7a' }; meta.steam = { x: w - 14, y: top + 3 };   // sfiato sul tetto: qui esce il vapore della cucina
     } else {                                                                                   // parcheggio a piani
       px(ink, 0, top - 1, w + 2, h + 1); px('#4a4e5c', 1, top, w, h);
       for (let lv = 0; lv < 4; lv++) {
@@ -1367,6 +1367,7 @@ class Street2D {
       for (const bc of b.beacons) if (Math.floor(t * 1.5 + i) % 2) { g.fillStyle = '#ff3b3b'; g.fillRect(x + bc.x, y + bc.y, 2, 2); this.light(g, x + bc.x + 1, y + bc.y + 1, 5, 5, '#ff3b3b', 0.12, 2); }
       if (b.glows) for (const gl of b.glows) this.light(g, x + gl.x, y + gl.y, gl.r, gl.r * (gl.ry || 0.7), gl.col, gl.a || 0.09, 3);
       if (b.shop) shops.push({ x: x + b.shop.x, w: b.shop.w, col: b.shop.col });
+      if (b.steam && this._steams) this._steams.push({ x: x + b.steam.x, y: y + b.steam.y });
     }
     return shops;
   }
@@ -1817,7 +1818,14 @@ class Street2D {
       this.drawCity(g, dist, st.t, 'far', 0.07, 200, 52);
       g.fillStyle = `rgba(${DM ? DM.haze.join(',') : '70,50,114'},${Math.min(0.5, 0.22 * (DM ? DM.hazeA : 1))})`; g.fillRect(0, 168, W, 34);
       if (!DM || DM.A.id === 'centro' || DM.A.id === 'casa') this.drawTrain(g, dist, st.t);
+      this._steams = [];
       shops = this.drawCity(g, dist, st.t, 'mid', 0.22, 216, 72);
+      // vapore dei locali di ramen (v0.119): una colonna dallo sfiato sul tetto, sale e si piega con l'aria; più fitto con la pioggia e il freddo
+      if (this.quality !== 'bassa' && !this.noVita && this._steams.length) {
+        const m0 = wx(0);
+        if (typeof window !== 'undefined' && window.__steamDbg) for (const sv of this._steams) { g.fillStyle = '#f0f'; g.fillRect(sv.x - 2, sv.y - 2, 5, 5); }
+        for (const sv of this._steams) if (Math.random() < dt * (this.rainOn ? 7 : 5)) this.parts.push({ k: 'steam', m: (sv.x - m0) / PPM + (Math.random() - 0.5) * 0.4, y: sv.y, vy: -13 - Math.random() * 9, dx: -3 - Math.random() * 5, r: 2.6 + Math.random() * 1.4, gr: 8, a: 0.42, life: 1 });
+      }
     } else this.drawScenery(g, dist, st.t, bg, { wx, visFrom, visTo });
     // velocità: lo sfondo lascia una scia (copie spostate e trasparenti), più lunga quanto più si va forte
     // (più leggera e a densità vera dal 20/11/2026: parte dai 70 km/h circa, così in crociera lo sfondo resta nitido)
@@ -1881,7 +1889,7 @@ class Street2D {
       if (TUN && m > TUN.a - 40 && m < TUN.b + 20) continue;
       g.fillStyle = C.ink; this.span(g, x, 282, 14, 4); g.fillStyle = '#2a2f40'; this.span(g, x, 282, 12, 3);
       g.fillStyle = '#14172a'; for (let k = -10; k <= 10; k += 3) g.fillRect(x + k, 280, 1, 5);
-      if (Math.random() < dt * 4) this.parts.push({ k: 'steam', m: m + (Math.random() - 0.5) * 0.6, y: 278, vy: -18 - Math.random() * 10, r: 2, life: 1, dx: 0 });
+      if (this.quality !== 'bassa' && !this.noVita && Math.random() < dt * (this.rainOn ? 12 : 9)) this.parts.push({ k: 'steam', m: m + (Math.random() - 0.5) * 0.5, y: 279, vy: -22 - Math.random() * 16, r: 3 + Math.random() * 1.6, gr: 11, a: 0.46, life: 1, dx: (Math.random() - 0.4) * 6 });   // colonna di vapore: più alta e larga di prima (v0.119)
     }
     for (let m = Math.ceil(visFrom / 113) * 113 + 40; m < visTo; m += 113) {                    // frecce dipinte
       const x = wx(m); g.fillStyle = '#cfcab9';
@@ -2187,6 +2195,7 @@ class Street2D {
       this.fxBeamAt(g, fx, fy, 380, 7, 28 * bz, (s.high ? 0.8 : 1) * (1 + wet) * night, 0.8);
       if (s.high) this.fxBeamAt(g, fx, fy - 1, 520, -1, 30 * bz, (1 + wet * 0.5) * night, 0.3);
       this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
+      if (this.fxFariBagnato) this.fxFariBagnato(g, fx, y0, left + GE.tail[0] * k + 2, s, night, st.t);   // riflessi dei fari sull'asfalto (vita2d.js)
     }
     // ---- effetti
     const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));

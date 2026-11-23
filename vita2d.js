@@ -192,6 +192,30 @@
     g.restore();
   };
 
+  // ---------------------------------------------------------------- fari sul bagnato (v0.119)
+  // I fari e le luci posteriori si specchiano sull'asfalto: una colonna che trema sotto il muso e sotto il fanale, e una chiazza di luce
+  // allungata davanti. Con la pioggia molto, sull'asciutto appena. Si disegna sotto la linea di terra: non copre la carrozzeria.
+  S.fxFariBagnato = function (g, fx, y0, tx, s, night, t) {
+    if (off(this) || night < 0.15 || this.noLuci) return;
+    const wet = (this.rainOn ? 1 : 0.32) * night;
+    const u = 1 / (this.SS || 1), col = (x, rgb, a, len, w) => {
+      g.fillStyle = `rgb(${rgb})`;
+      for (let y = 0; y < len; y += 1) {
+        const k = y / len, wob = Math.sin(y * 0.9 + t * (this.rainOn ? 9 : 4) + x) * (0.6 + k * 1.6);
+        g.globalAlpha = Math.min(1, a * (1 - k) * (0.75 + 0.25 * Math.sin(y * 2.1 + t * 7)));
+        g.fillRect(Math.round((x + wob - w / 2) / u) * u, y0 + 1 + y, w, 1);
+      }
+      g.globalAlpha = 1;
+    };
+    g.save(); g.globalCompositeOperation = 'lighter';
+    this.light(g, fx + 46, y0 + 5, 78, 6, '#fff2cf', 0.2 * wet, 3);                                   // chiazza davanti al muso
+    col(fx, '255,240,200', 0.5 * wet, 16, 3); col(fx - 3, '255,230,180', 0.25 * wet, 11, 2);         // colonna del faro
+    const brake = s && s.brake > 0.05;
+    col(tx, '255,50,70', (brake ? 0.62 : 0.22) * (this.rainOn ? 1 : 0.7) * night, brake ? 18 : 12, 3);   // fanale posteriore (più forte frenando)
+    if (brake) this.light(g, tx - 16, y0 + 5, 30, 4, '#ff3a4a', 0.16 * wet, 3);
+    g.restore();
+  };
+
   // ---------------------------------------------------------------- davanti, dopo la penombra: falene e lucciole, raggi di sole, miraggio
   S.vitaFront = function (g, dist, t, bg, dt, s) {
     if (off(this)) return;
