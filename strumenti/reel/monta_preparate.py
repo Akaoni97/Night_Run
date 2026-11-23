@@ -8,15 +8,16 @@ def sh(*a):
     if r.returncode: print(r.stderr[-1500:]); sys.exit(1)
     return r.stdout
 def dur(f): return float(sh('ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f))
-CLIP = ['e30_a_serie', 'e30_b_preparata', 'p205_a_serie', 'p205_b_preparata', 'golf_a_serie', 'golf_b_preparata']
-CARD = ['e30_a', 'e30_b', 'p205_a', 'p205_b', 'golf_a', 'golf_b']
+CLIP = ['e30_a_serie', 'e30_b_preparata', 'p205_a_serie', 'p205_b_preparata', 'p205_c_tira', 'golf_a_serie', 'golf_b_preparata', 'golf_c_tira']
+CARD = ['e30_a', 'e30_b', 'p205_a', 'p205_b', 'p205_b', 'golf_a', 'golf_b', 'golf_b']
+CUT = {'p205_c_tira': 6.4, 'golf_c_tira': 6.4}      # la tirata si ferma prima del limitatore in ultima (un ronzio fisso non serve)
 clips = []; t = 0; plan = []
 for i, c in enumerate(CLIP):
-    src = f'{R}/riprese/{c}.mp4'; d = dur(src); out = f'{T}/c{i}.mp4'
+    src = f'{R}/riprese/{c}.mp4'; d = min(dur(src), CUT.get(c, 99)); out = f'{T}/c{i}.mp4'
     fade = f'fade=t=in:st=0:d=0.12,fade=t=out:st={d-0.12:.2f}:d=0.12'
     fc = ('[0:v]split[s1][s2];[s1]scale=-2:1920:flags=bicubic,crop=1080:1920,boxblur=30:2,eq=brightness=-0.3[bg];'
           f'[s2]crop=1080:1080:160:0[fg];[bg][fg]overlay=0:(H-h)/2+40,{fade},format=yuv420p[v]')
-    sh('ffmpeg', '-v', 'error', '-y', '-i', src, '-filter_complex', fc, '-map', '[v]', '-r', '30', '-c:v', 'libx264', '-crf', '16', out)
+    sh('ffmpeg', '-v', 'error', '-y', '-i', src, '-filter_complex', fc, '-map', '[v]', '-t', f'{d:.3f}', '-r', '30', '-c:v', 'libx264', '-crf', '16', out)
     clips.append(out); plan.append((c, CARD[i], t, d)); t += d
 TOT = t; print('durata', round(TOT, 1))
 open(f'{T}/lista.txt', 'w').write(''.join(f"file '{c}'\n" for c in clips))
@@ -24,7 +25,7 @@ sh('ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', f'{T}/list
 ins = []; fc = []; labs = []
 for n, (c, card, s, d) in enumerate(plan):
     ins += ['-i', f'{R}/riprese/{c}.wav']; ms = int(s * 1000)
-    fc.append(f'[{n}:a]adelay={ms}|{ms}[e{n}]'); labs.append(f'[e{n}]')
+    fc.append(f'[{n}:a]atrim=0:{d:.3f},afade=t=out:st={d-0.15:.3f}:d=0.15,adelay={ms}|{ms}[e{n}]'); labs.append(f'[e{n}]')
 fc.append(f"{''.join(labs)}amix=inputs={len(labs)}:normalize=0:duration=longest,loudnorm=I=-13:TP=-1.0:LRA=9,atrim=0:{TOT:.2f}[a]")
 sh('ffmpeg', '-v', 'error', '-y', *ins, '-filter_complex', ';'.join(fc), '-map', '[a]', '-ar', '48000', '-ac', '2', f'{T}/audio.wav')
 cards = [(card, s + 0.15, s + d - 0.1) for c, card, s, d in plan] + [('fine', TOT - 2.8, TOT)]

@@ -1,3 +1,8 @@
+## 23/11/2026 · proprietario (Nico) · v0.116 (**video: la 205 e la Golf tirano le marce lunghe**)
+- Nel video «di serie e preparate» la 205 e la Golf preparate facevano un rumore strano: sono a trazione anteriore con 700-800 CV, da fermi il controllo di trazione tagliava il gas quasi sempre e il motore restava a un regime quasi fisso. Ora fanno le sgasate da ferme e poi una tirata in marcia (2ª, 3ª, 4ª, 5ª a gas pieno, i giri salgono e scendono a ogni cambiata), tagliata prima del limitatore in ultima (`mode: 'tira'` in `strumenti/reel/preparate.js`).
+- Solo per il video: nelle due tirate le gomme hanno +80 % di aderenza (`grip` nella ripresa), il gioco non cambia. La BMW è rimasta com'era.
+- `suono_preparate.js` non fa più andare oltre lo zero il picco del suono. Non toccato il gioco.
+
 ## 23/11/2026 · proprietario (Nico) · v0.115 (**video «di serie e preparate»**)
 - Quattro strumenti nuovi in `strumenti/reel/` per un video verticale di ~66 s: tre auto (E30 col motore della Supra, 205 GTI col cinque cilindri della 850 R, Golf col 3.0 dell'M3 E36) prima di serie e poi preparate (swap, pezzi, kit, neon, cerchi). Fermo al semaforo fa sgasate e limitatore, poi parte a fondo.
 - `suono_preparate.js` rifà il suono con motore, campioni dei pezzi (turbina, valvola, scoppi, limitatore a raffica) e compressore del gioco, partendo dallo stato della fisica salvato a ogni passo.

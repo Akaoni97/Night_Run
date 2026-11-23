@@ -16,16 +16,20 @@ const FPS = 30, W = 1920, H = 1080, PREP = 1.0;
 const COS_FULL = { kit: 'tuning', tint: 'dark', decal: 'NIGHT RUN' };
 const AUTO = [
   { id: 'e30', donor: 'supra', lim: 'stutter', paint: '#d9a82e', cos: Object.assign({ glow: '#2ee6ff', rims: '#1c1d22', caliper: '#d0141e', stripe: '#0d0e10' }, COS_FULL) },
-  { id: 'p205', donor: 'v850', lim: 'msd', paint: '#c81d11', cos: Object.assign({ glow: '#ff2e88', rims: '#d9a82e', caliper: '#2e6bff', stripe: '#f2f2ee' }, COS_FULL) },
-  { id: 'golf', donor: 'e36', lim: 'stutter', paint: '#36c5d6', cos: Object.assign({ glow: '#b8ff3a', rims: '#1c1d22', caliper: '#d0141e', stripe: '#0d0e10' }, COS_FULL) },
+  { id: 'p205', tira: 1, donor: 'v850', lim: 'msd', paint: '#c81d11', cos: Object.assign({ glow: '#ff2e88', rims: '#d9a82e', caliper: '#2e6bff', stripe: '#f2f2ee' }, COS_FULL) },
+  { id: 'golf', tira: 1, donor: 'e36', lim: 'stutter', paint: '#36c5d6', cos: Object.assign({ glow: '#b8ff3a', rims: '#1c1d22', caliper: '#d0141e', stripe: '#0d0e10' }, COS_FULL) },
 ];
 // sgasate: [da, a, gas] in secondi dall'inizio; poi, a `go`, via a gas pieno con le cambiate
 const GAS0 = [[0.5, 0.8, 0.55], [1.2, 1.55, 0.7], [2.0, 3.1, 1], [3.5, 3.8, 0.8]];
 const GAS1 = [[0.4, 0.7, 0.7], [1.0, 1.3, 0.85], [1.9, 3.8, 1], [4.2, 4.5, 0.9], [4.7, 4.95, 1]];
 const SHOTS = [];
 for (const A of AUTO) {
+  const prep = { id: A.id, tipo: 'full', donor: A.donor, lim: A.lim, paint: A.paint, cos: A.cos };
   SHOTS.push({ name: A.id + '_a_serie', km: 1.5, sec: 10.0, t0: 50, lane: 2, env: 1, tc: true, car: { id: A.id, tipo: 'stock' }, drive: { mode: 'sgasate', gas: GAS0, go: 4.4 } });
-  SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 12.0, t0: 50, lane: 2, env: 1, tc: true, car: { id: A.id, tipo: 'full', donor: A.donor, lim: A.lim, paint: A.paint, cos: A.cos }, drive: { mode: 'sgasate', gas: GAS1, go: 5.2 } });
+  if (A.tira) {   // auto leggere con tanta potenza: da fermi il controllo di trazione taglia il gas e il motore «sbuffa»; meglio sgasate ferme e poi una tirata in marcia lunga
+    SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 6.4, t0: 50, lane: 2, env: 1, tc: true, car: prep, drive: { mode: 'sgasate', gas: GAS1, go: 99 } });
+    SHOTS.push({ name: A.id + '_c_tira', km: 1.5, sec: 8.4, t0: 50, lane: 2, env: 1, tc: true, grip: 1.8, car: prep, drive: { mode: 'tira', gear: 2, rpm0: 3000 } });
+  } else SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 12.0, t0: 50, lane: 2, env: 1, tc: true, car: prep, drive: { mode: 'sgasate', gas: GAS1, go: 5.2 } });
 }
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.css': 'text/css' };
@@ -100,6 +104,9 @@ function regia([w, h]) {
         br = 1; thr = 0; for (const [a, b, v] of d.gas) if (t >= a && t < b) thr = v;
       } else {                                                         // gas anche per il cambio automatico del gioco: lo vede a zero e cambierebbe a 3.000 giri
         if (R.leva !== 'D') { nightRun.leva('D'); R.leva = 'D'; window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW', bubbles: true })); } if (sim.gear === 0) sim.shift(1); thr = sim.shiftSeq ? 0 : 1; shiftUp(lim() * 0.96); }
+    } else if (d.mode === 'tira') {                                    // marcia lunga a gas pieno fino al limitatore, poi la dopo, e via: il motore canta
+      if (R.leva !== 'D') { nightRun.leva('D'); R.leva = 'D'; window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW', bubbles: true })); }
+      thr = t < 0 ? 0.15 : 1; if (sim.gear === 0) sim.shift(d.gear); shiftUp(lim() * 0.97);
     } else if (d.mode === 'pass') {
       const u = Math.max(0, Math.min(1, (t - d.at) / d.dur)), vt = t < d.back ? d.v0 + (d.vlow - d.v0) * (u * u * (3 - 2 * u)) : d.vlow + (t - d.back) * 2.2;
       [thr, br] = hold(vt, t);
@@ -183,6 +190,7 @@ function prepara(s) {
     sim.setCar(Object.assign({}, C.P));
     const MOTE = offSwapApply(g, id, TPs, sim, sel);
     if (TPs.sim.boostK === undefined) TPs.sim.boostK = 1; if (!TPs.sim.clutchMax) TPs.sim.clutchMax = sim.P.clutchMax;
+    if (s.grip) TPs.sim.mu = (TPs.sim.mu || sim.P.mu || 1.1) * s.grip;      // solo per il video: a trazione anteriore con 600 CV le gomme da strada non tengono, il motore resterebbe inchiodato al limitatore
     sim.setTune(TPs.sim); g.applyMass(TPs.sim.dm || 0, TPs.sim.rearOff);
     sim.cfg.pops = !!TPs.sim.ecuPops; sim.cfg.launch = false; sim.cfg.autoClutch = true;
     const est = sim.estimatePeak();
@@ -205,7 +213,7 @@ function prepara(s) {
   }
   if (s.drive.mode !== 'start') { sim.setIgnition(true); sim.running = true; sim.starter = false; sim.we = 900 / 9.5493; }
   R.setSpeed(s.drive.mode === 'cruise' ? s.drive.v : s.drive.mode === 'pass' ? s.drive.v0 : 0);
-  if (s.drive.mode === 'pull') { const v = s.drive.rpm0 / 9.5493 / sim.ratio(s.drive.gear) * sim.P.r; R.setSpeed(v); sim.gear = s.drive.gear; sim.we = sim.ww * sim.ratio(s.drive.gear); }   // motore già ai giri della marcia
+  if (s.drive.mode === 'pull' || s.drive.mode === 'tira') { const v = s.drive.rpm0 / 9.5493 / sim.ratio(s.drive.gear) * sim.P.r; R.setSpeed(v); sim.gear = s.drive.gear; sim.we = sim.ww * sim.ratio(s.drive.gear); }   // motore già ai giri della marcia
   if (s.drive.mode === 'start') { sim.setIgnition(false); sim.running = false; sim.we = 0; }
   if (s.rival) { const e = { id: g.id++, kind: 'traffic', vt: s.rival.vt, len: 4.4, lane: s.rival.lane, x: g.s.dist + 0.6, v: 0, vT: 0, vBase: 0, color: 'orig', _teaser: true }; g.ents.push(e); R.rival = e; }
   if (s.block) {
@@ -244,7 +252,7 @@ function prepara(s) {
   await page.evaluate(() => { try { nightRun.leva('D'); } catch (e) { /* niente */ } });   // la leva dopo il prologo è in P: l'auto non si muoverebbe
 
   for (const sh of SHOTS) {
-    if (process.env.SOLO && !sh.name.includes(process.env.SOLO)) continue;
+    if (process.env.SOLO && !new RegExp(process.env.SOLO).test(sh.name)) continue;
     await page.evaluate(prepara, sh);
     await run(PREP * 1000);
     const file = path.join(OUT, sh.name + '.mp4');
