@@ -105,16 +105,18 @@ function pgDriver(x, P) {
   poly([[nx, cy - 0.8], [nx + nl, cy + 1.2], [nx + 0.1, cy + 1.6]], C.skin);                                     // naso
   const ex = cx + 2.3 - fp * 1.5 - fn * 0.4, ey = cy - 0.6 + (P.lookUp || 0) * -0.3;
   const sl = P.sleepy || 0;
+  const aw = P.awe || 0;                                                                                          // stupore (reazioni.js): occhi grandi, sopracciglia su, bocca a O
   const eye = (xx) => {
-    if (P.blink) { line([[xx - 0.45, ey], [xx + 0.45, ey]], '#1a1414', 0.3); return; }
-    el(xx, ey, 0.5, 0.42, '#f2ece2'); el(xx + 0.12, ey, 0.32, 0.36, '#1a1414');                                    // bianco e pupilla
+    if (P.blink && aw < 0.3) { line([[xx - 0.6, ey], [xx + 0.6, ey]], '#1a1414', 0.45); return; }
+    el(xx, ey, 0.7 + aw * 0.25, 0.6 + aw * 0.4, '#f2ece2'); el(xx + 0.15, ey, 0.46, 0.5 + aw * 0.1, '#1a1414');   // bianco e pupilla (più grandi: si leggono anche a pixel)
     if (sl > 0.35) poly([[xx - 0.6, ey - 0.5], [xx + 0.6, ey - 0.5], [xx + 0.6, ey - 0.45 + sl * 0.5], [xx - 0.6, ey - 0.45 + sl * 0.5]], C.skinSh);   // palpebra pesante
   };
-  line([[ex - 0.6, ey - 0.95 - (P.yawn || 0) * 0.3], [ex + 0.8, ey - 0.85 - (P.yawn || 0) * 0.3]], C.hair, 0.42);                    // sopracciglio
+  line([[ex - 0.7, ey - 1.05 - (P.yawn || 0) * 0.3 - aw * 0.55], [ex + 0.9, ey - 0.95 - (P.yawn || 0) * 0.3 - aw * 0.8]], C.hair, 0.55);   // sopracciglio
   const my = cy + 2.5, mx = nx - 0.6;
   if ((P.yawn || 0) > 0.05) el(mx, my + 0.2, 0.55, 0.3 + P.yawn * 0.75, '#3a1416');                               // sbadiglio
+  else if (aw > 0.25) el(mx, my + 0.1, 0.55 + aw * 0.2, 0.45 + aw * 0.6, '#3a1416');                                  // «wow»: bocca aperta
   else if (P.sing) el(mx, my, 0.45, 0.32, '#4a1a1c');                                                                   // canticchia
-  else line([[mx - 0.5, my], [mx + 0.45, my - 0.05]], pgShade(C.skinSh, -0.2), 0.3);                                   // bocca chiusa
+  else line([[mx - 0.6, my], [mx + 0.55, my - 0.05]], pgShade(C.skinSh, -0.3), 0.45);                                   // bocca chiusa
   if (fn < 0.6) eye(ex);
   if (fp > 0.45) eye(ex - 2.1);                                                                                   // si vede anche l'altro occhio
   el(cx - 0.7 - fp * 0.9 + fn * 0.8, cy + 0.6, 0.9, 1.3, pgShade(C.skinSh, -0.15));                              // orecchio

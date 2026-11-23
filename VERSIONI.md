@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.117**
+**Versione attuale: v0.120**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -142,4 +142,5 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.117 | 23/11 | proprietario | Disegno più leggero di fiammate, fumo e fumetti, con meno aggiornamenti della posizione degli avvisi. |
 | v0.117 | 23/11 | proprietario | Fiamme dal punto vero dello scarico (anche laterale) per 23 auto col kit; gomme del kit più piccole su E30 e Golf (`wk`); video con accelerazione-rilascio-accelerazione |
 | v0.118 | 23/11 | proprietario | Livelli del 2D: facciate dei locali dietro i passanti (non spariscono più dietro gli edifici), riflessi di luce sull'asfalto sotto le auto (`vitaRiflessi`) |
+| v0.119 | 23/11 | proprietario | Il protagonista in pixel art e reazioni al motore (nuvolette di pensiero, stupore in faccia: `reazioni.js`), vapore dai tombini e dai locali di ramen, fari sul bagnato |
 | v0.120 | 23/11 | cognato | Fiamme e terminale allineati su tutte le auto (fiamma 2 pixel troppo bassa, terminale fisso al paraurti anche col kit laterale, punti delle auto di serie misurati); marmitta che si arroventa tenendo i giri alti (15 s di serie, 10 media, 2-5,5 s spinta); `strumenti/scarichi.js` |

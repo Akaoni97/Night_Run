@@ -10,7 +10,7 @@
 (() => {
   if (typeof Street2D === 'undefined') return;
   const S = Street2D.prototype;
-  const F = 3;                                                   // risoluzione del guidatore: 3 pixel per unità del disegno
+  const F = 4;                                                   // risoluzione del guidatore: 4 pixel per unità del disegno (poi ridotti a 2: drvPixel)
 
   // finestrino del pilota di ogni auto, misurato sul disegno: [sinistra, destra, alto, basso] in pixel del disegno.
   // Serve perché sulle vernici argento, bianche e grigie il colore della carrozzeria somiglia a quello del vetro e il
@@ -99,6 +99,37 @@
     return (hd._gm = { glass: mk(glass), win: mk(win), n, band });
   };
 
+  // dal disegno a vettori a pixel netti (v0.119): riduce la figura a 2 pixel per unità (la griglia di mezza unità dei disegni HD delle auto e
+  // dei passanti). In ogni blocco vince la media, ma un dettaglio scuro (occhio, sopracciglio, bocca, naso) non si perde; colori a livelli,
+  // contorno scuro di personaggio.js. Solo la fascia dei finestrini: il resto è comunque coperto dalla maschera dei vetri.
+  S.drvPixel = function (x, L, w, h, B) {
+    const P = 2, bl = F / P;
+    const gx = B && B.x0 != null, rx0 = gx ? Math.max(0, Math.floor(B.x0) - 3) : 0, rx1 = gx ? Math.min(w, Math.ceil(B.x1) + 3) : w, ry0 = B ? Math.max(0, B.top - 3) : 0, ry1 = B ? Math.min(h, B.bot + 4) : h;
+    const sw = Math.ceil((rx1 - rx0) * P), sh = Math.ceil((ry1 - ry0) * P); if (sw < 2 || sh < 2) return;
+    const Sm = this._drvP || (this._drvP = document.createElement('canvas')); if (Sm.width !== sw || Sm.height !== sh) { Sm.width = sw; Sm.height = sh; }
+    const sg = Sm.getContext('2d', { willReadFrequently: true });
+    const W0 = (rx1 - rx0) * F, H0 = (ry1 - ry0) * F, src = x.getImageData(rx0 * F, ry0 * F, W0, H0).data;
+    const out = sg.createImageData(sw, sh), d = out.data;
+    for (let py = 0; py < sh; py++) for (let px = 0; px < sw; px++) {
+      let n = 0, r = 0, gg = 0, b = 0, dark = 1e9, dr = 0, dg = 0, db = 0;
+      for (let yy = 0; yy < bl; yy++) for (let xx = 0; xx < bl; xx++) {
+        const sx = px * bl + xx, sy = py * bl + yy; if (sx >= W0 || sy >= H0) continue;
+        const i = (sy * W0 + sx) * 4, a = src[i + 3]; if (a < 150) continue;
+        n++; r += src[i]; gg += src[i + 1]; b += src[i + 2];
+        const lu = src[i] * 0.3 + src[i + 1] * 0.59 + src[i + 2] * 0.11; if (lu < dark) { dark = lu; dr = src[i]; dg = src[i + 1]; db = src[i + 2]; }
+      }
+      if (n < bl * bl * 0.45) continue;                          // meno di metà pieno: vuoto
+      r /= n; gg /= n; b /= n;
+      const mean = r * 0.3 + gg * 0.59 + b * 0.11;
+      if (dark < mean * 0.55 && mean > 40) { r = dr; gg = dg; b = db; }
+      const o = (py * sw + px) * 4; d[o] = (r >> 3) << 3; d[o + 1] = (gg >> 3) << 3; d[o + 2] = (b >> 3) << 3; d[o + 3] = 255;
+    }
+    sg.putImageData(out, 0, 0);
+    if (typeof pgOutline === 'function') pgOutline(sg, '#0b0a12');
+    x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.imageSmoothingEnabled = false;
+    x.clearRect(rx0 * F, ry0 * F, W0, H0); x.drawImage(Sm, 0, 0, sw, sh, rx0 * F, ry0 * F, sw * bl, sh * bl);
+  };
+
   // il guidatore. G: geometria dell'auto (hx, hy testa, wy, wr), spr: sprite (con spr.hd), st: stato della vista
   S.drawDriver = function (g, spr, G, st, s, k) {
     const hd = spr.hd || spr, w = hd.width, h = hd.height;
@@ -118,6 +149,7 @@
     const ay = B && B.x0 != null ? B.top + bh * 0.17 + 4.6 * sc : B ? B.top + 0.8 + 4.9 * sc : (G.hy ?? 0) + 17;
     x.translate(ax, ay); x.scale(sc, sc); x.translate(-ax, -ay);
     const cx = ax + lean / sc, cy = ay + bob / sc, sx = ax + lean * 0.4 / sc;
+    this._drvHead = { ax: (ax + lean / sc) * spr.width / w, ay: (ay + bob / sc - 4.2 * sc) * spr.height / h, m: g.getTransform() };   // in unità dello sprite sullo schermo   // dove sta la testa (reazioni.js: la nuvoletta di pensiero)
     const shade = (hex, f) => Street2D.shade(hex, f);
     const dk = 0.42 * nt;                                         // di notte la figura è in ombra, illuminata solo da cruscotto e lampioni
     const C = { seat: shade('#2a2c36', -dk * 0.5), seatHi: shade('#454a5c', -dk * 0.4), jacket: shade('#2b3348', -dk * 0.45), jacketHi: shade('#46557a', -dk * 0.35),
@@ -138,7 +170,8 @@
     // dove guarda: freccia a sinistra = verso l'altro finestrino, a destra = verso di noi (specchietto e spalla);
     // ogni tanto un'occhiata allo specchietto; fermo da un po' si guarda intorno
     const mirror = (t % 9.3) > 8.5, sig = s.signal === 'L' ? -0.75 : s.signal === 'R' ? 0.8 : 0;
-    const want = sig || (M2.still > 3 ? Math.sin(t * 0.45) * 0.85 : mirror ? 0.35 : 0);
+    let want = sig || (M2.still > 3 ? Math.sin(t * 0.45) * 0.85 : mirror ? 0.35 : 0);
+    if (this._rea && this._rea.awe > 0.2) want = 0.15;                                      // stupito: guarda avanti, la strada
     M2.turn += (want - M2.turn) * Math.min(1, dt * 5);
     // sterzo: la mano segue lo spostamento di corsia
     const lz = this.st.lz ?? 0; if (M2.lz === null) M2.lz = lz;
@@ -161,7 +194,7 @@
     const blink = (t % 3.9) < 0.11 || ((t + 1.7) % 7.3) < 0.1;
     if (typeof pgDriver === 'function') {
       pgDriver(x, { cx: cx + swayX, cy: cy + beat + nod + swayY, sx, wx, wy, C: pgColors(look, dk * 0.38), look, turn: nod > 0.3 ? 0 : M2.turn, blink: blink || (sleepy > 0.7 && (t % 2.4) < 0.5), breath: Math.sin(t * 1.6),
-        steer: M2.steer, elbow: M2.elbow, shiftK: M2.shiftK, lookUp: mirror && !sig ? 1 : 0, sleepy, yawn, sing });
+        steer: M2.steer, elbow: M2.elbow, shiftK: M2.shiftK, lookUp: mirror && !sig ? 1 : 0, sleepy, yawn, sing, awe: this._rea ? this._rea.awe : 0 });
     }
     // volante (corona vista di taglio)
     x.strokeStyle = C.wheel; x.lineWidth = 1; x.beginPath(); x.ellipse(wx, wy - 0.5, 1.3, 4.6, -0.3, 0, Math.PI * 2); x.stroke();
@@ -174,6 +207,9 @@
     const lamp = this._drvLamp || 0;
     if (lamp > 0.02) { const top = x.createLinearGradient(0, cy - 8, 0, cy + 10); top.addColorStop(0, `rgba(255,214,150,${0.5 * lamp})`); top.addColorStop(1, 'rgba(255,214,150,0)'); x.fillStyle = top; x.fillRect(sx - 14, cy - 10, 34, 30); }
     if (day > 0.05) { x.fillStyle = `rgba(190,215,255,${0.18 * day})`; x.fillRect(sx - 14, cy - 10, 34, 30); }
+    // pixel nitidi come il resto dei personaggi (v0.119): la figura è disegnata a vettori, qui si porta alla griglia di mezza unità
+    // (la stessa dei disegni HD delle auto e dei passanti), con colori a pochi livelli e il contorno scuro di personaggio.js
+    if (this.quality !== 'bassa' && !window.__noDrvPix) this.drvPixel(x, L, w, h, B);
     // solo dentro i vetri
     x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-in';
     if (M.n > 12) x.drawImage(M.win, 0, 0); else { x.fillStyle = 'rgba(0,0,0,.85)'; x.fillRect(0, 0, L.width, L.height); }
