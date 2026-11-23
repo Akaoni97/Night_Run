@@ -3276,7 +3276,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       toastQ.sort((a, b) => (TOAST_PRI[b.kind] || 1) - (TOAST_PRI[a.kind] || 1));
       if (toastQ.length > 8) toastQ.length = 8;
       toastGap -= dt;
-      if (toastQ.length && toastGap <= 0 && box.children.length < 2) {
+      const gt0 = document.getElementById('gate'), sulTitolo = (gt0 && !gt0.hidden && !gt0.classList.contains('out')) || (window.NightPrologo && NightPrologo.playing);   // sul titolo e nel prologo gli avvisi aspettano
+      if (toastQ.length && toastGap <= 0 && box.children.length < 2 && !sulTitolo) {
         const m = toastQ.shift(), t = document.createElement('div'); t.className = 'toast ' + m.kind; t.textContent = m.text;
         box.append(t); toastGap = 0.5;
         setTimeout(() => t.remove(), toastQ.length > 2 ? 3600 : 5200);

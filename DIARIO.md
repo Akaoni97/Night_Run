@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.108 (**check e avvisi sul titolo**)
+- Check: nessun commit nuovo su `main`, 384 test su 384, prova di fumo senza errori. Corretto il punto 20 dei sospesi: gli avvisi a destra aspettano finché c'è la schermata iniziale o il prologo (`index.html`).
+
 ## 22/11/2026 · cognato (Luca) · v0.107 (**pezzi per tutti i motori, cambi lunghi, compressori veri**)
 - Supra (2JZ): da Luca ora ha gli stessi reparti delle altre: aspirazioni (pannello, cono, il suo filtro, airbox con presa fredda, cornetti), cilindrata (alesata e +300 cc), benzina (pompa, iniettori) e i cambi sport e da corsa regolabili. La frizione bidisco OS Giken ora regge 1.500 Nm (con la cilindrata maggiorata 1.300 non bastavano). I diesel restano senza camme e catalizzatore apposta (c'è il FAP).
 - Cambi: il da corsa di serie in ultima al limitatore tira a 350 km/h sulle belle (dai 200 CV: Supra, M3, M5...), 320 sulle normali, 300 sulle piccole (Panda, Twingo...) e sui mezzi pesanti; il cambio sport con la ghiera tutta lunga arriva a 300/275/255 e il bus a 200. È la velocità del rapporto: se il motore non ha i cavalli, l'aria lo ferma prima.

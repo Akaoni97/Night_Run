@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.107**
+**Versione attuale: v0.108**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -130,3 +130,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.105 | 22/11 | cognato | Da Luca Tuning: il pop & bang non è più una spunta del menu di pausa ma una mappa in più sulla centralina più potente (ultimo livello, niente sui diesel, chi l'aveva accesa la ritrova montata); il volano è un reparto suo, separato dalla frizione, con quattro livelli (originale, pesante, alleggerito, superleggero: salita e discesa dei giri, minimo, tintinnio; chi aveva la frizione rinforzata o da corsa ritrova l'alleggerito); antistallo della frizione automatica sul minimo vero (con volano superleggero le partenze si spegnevano); nelle anomalie non resta più scritto «{Auto}»; numerazione tornata su v0 (v1.00-v1.04 → v0.100-v0.104). |
 | v0.106 | 22/11 | cognato | Turbo più vero: la girante la muove l'energia dei gas di scarico (il turbo «entra»), wastegate che apre poco prima del target e in ritardo (picco e assestamento, un filo di tremolio), meno pressione a gas parziale, depressione sul manometro a gas chiuso; suono: soffio dell'aria nel compressore udibile, fischio che resta e cala in rilascio, valvola nitida (sintesi e campioni rifatti), turbo e valvola udibili anche in abitacolo. |
 | v0.107 | 22/11 | cognato | Pezzi per tutti i motori: la Supra ha anche aspirazioni (pannello, cono, airbox, cornetti), cilindrata, benzina e cambi sport e da corsa regolabili; cambi più lunghi per tutte: il da corsa al limitatore in ultima tira a 350 km/h sulle belle (≥ 200 CV: Supra, M3...), 320 sulle normali, 300 sulle piccole e sui mezzi pesanti, il cambio sport tutto lungo a 300/275/255 e il bus a 200; compressori volumetrici e centrifughi a cinghia (niente ritardo, niente valvola), il turbo nuovo vale per ogni motore. |
+| v0.108 | 23/11 | proprietario | Check della sera: gli avvisi a destra (per esempio «Valigetta di bronzo») non compaiono più sopra la schermata iniziale e il prologo, aspettano. 384 test e prova di fumo senza errori. |

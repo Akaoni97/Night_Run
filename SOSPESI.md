@@ -70,7 +70,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 18. [prologo] **Prologo nuovo** (v0.98): stessa risoluzione del gioco, arrivo sotto la pioggia, studio, garage con le auto una alla volta, autostrada. Da guardare sul PC: ritmo dell'arrivo (14 s) e volume della pioggia. (proprietario)
 19. [menu] **Schermata iniziale col quadro fermo** (v0.103): piace così? (proprietario)
-20. [menu] **Tre salvataggi** (v0.101): da provare anche nel programma per Windows. Piccola cosa vista nel check: gli avvisi a destra (per esempio «Valigetta di bronzo») possono comparire sopra la schermata iniziale; i traguardi aspettano già, questi no. (proprietario)
+20. [menu] **Tre salvataggi** (v0.101): da provare anche nel programma per Windows. Gli avvisi a destra sulla schermata iniziale: sistemato nel check del 23/11 (v0.108), aspettano. (proprietario)
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
