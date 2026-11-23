@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**23/11 sera, check (Luca con Claude)**: il 19 cambia (ora è la schermata iniziale con la chiave, col problema del telefono); nuovi il 24 (capitali da guardare) e il 25 (fiamme, marmitta, nuvolette, vapore). Nessun altro numero è cambiato.
+
 **22/11 sera, decisioni (Nico)**: 1-4 si provano stasera giocando; 5 sì come l'ha proposto Luca; 6 da provare; media dopo; bassa decisa (vedi 14-16). Numeri invariati.
 
 **22/11 sera, check (Nico)**: nuovi il 5 (anomalie, decidi tu) e il 6 (la notte); dal vecchio 5 in poi tutto scala di due (il 5 ora è il 7... il 17 è il 19).
@@ -66,11 +68,16 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 ## Da guardare · arrivati il 22/11 (Nico)
 
 ### Disegni del proprietario
-17. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
+17. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. Con le **cinque auto iniziali** (v0.85: Panda 1000 Fire, AX, Twingo, Sandero, Aygo) da guardare e sentire. (tutti e due)
 
 18. [prologo] **Prologo nuovo** (v0.98): stessa risoluzione del gioco, arrivo sotto la pioggia, studio, garage con le auto una alla volta, autostrada. Da guardare sul PC: ritmo dell'arrivo (14 s) e volume della pioggia. (proprietario)
-19. [menu] **Schermata iniziale col quadro fermo** (v0.103): piace così? (proprietario)
+19. [menu] **Schermata iniziale con la chiave** (v0.121-v0.123, `titolo.js`): sfondo animato, tempo a caso, chiave da tenere premuta, partite come portachiavi, avviamento col motore vero. Da sentire a orecchio l'avviamento. **Al telefono in orizzontale esce dallo schermo**: chiave, «Accendi e parti» e partite 2 e 3 sono tagliati a destra (provato su Pixel 7 e iPhone 13 nel check del 23/11). Da sistemare. (proprietario)
 20. [menu] **Tre salvataggi** (v0.101): da provare anche nel programma per Windows. Gli avvisi a destra sulla schermata iniziale: sistemato nel check del 23/11 (v0.108), aspettano. (proprietario)
+
+## Da guardare · arrivati il 23/11
+
+24. [città] **Capitali con l'aspetto delle città vere** (v0.112-v0.114): palazzi, insegne, quartieri, oggetti del marciapiede, bandiere e 28 monumenti ad alta definizione. Roma guardata nel check (quartiere EUR): a posto. Le altre da guardare sul PC. (tutti e due)
+25. [grafica] **Fiamme, marmitta e reazioni** (v0.117-v0.120): fiamme dal punto vero dello scarico e allineate al terminale, marmitta che si arroventa ai giri alti (Luca), protagonista in pixel art con le nuvolette di pensiero (WOW!, SORPASSO!...), vapore dai tombini e dai ramen, fari che si specchiano sul bagnato, locali dietro i passanti (Nico). Da guardare guidando sul PC: le nuvolette ogni 7-11 s sono troppe? (tutti e due)
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
@@ -86,8 +93,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 23. [storia] **Le dodici capitali** (proposta in `docs/storia/PROPOSTA_CITTA.md`): (la cosa da vedere per città è FATTA, v0.112) collegamenti diversi, un momento forte per le capitali che non ce l'hanno, forse un bivio. Sei domande per Luca. (cognato; nessun numero è cambiato)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 23/11 (v0.112, Nico): le capitali hanno l'aspetto delle città vere (palazzi, insegne, monumenti). Da guardare sul PC.
-- 23/11 (v0.110, Nico): pausa a due livelli, premi come avvisi del telefono, nomi dei salvataggi, mappa del diario. Da provare sul PC (decide Nico se la coppa dei traguardi deve tornare).
-- 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.
-- 22/11 (v0.98-v0.103, Nico): prologo alla qualità del gioco, due errori piccoli, anomalie di Luca, tre salvataggi, schermata iniziale nuova.
-- 22/11 (v0.99, v0.104-v0.107, Luca): officina più chiara, gomme che non sgommano più da ferme, volume per ogni pezzo, pop & bang nella centralina, volano a quattro livelli, turbo più vero, pezzi per tutti i motori (anche la Supra), cambi lunghi, compressori a cinghia.
+- 23/11, check (Luca con Claude): 408 test, prova di fumo, foto di schermata iniziale (computer e telefono), Roma e guida.
+- 23/11 (v0.113-v0.123, Nico): capitali più vere, video «di serie e preparate», fluidità di fiammate e scritte, livelli del 2D, protagonista in pixel art con nuvolette, schermata iniziale con la chiave, aggiornamenti subito (`sw.js`).
+- 23/11 (v0.120, Luca): fiamme allineate allo scarico, marmitta rovente.
+- 22/11 (v0.85, Luca): cinque auto iniziali all'Autosalone.
