@@ -126,9 +126,6 @@
       if (V().lampHD) V().lampHD(g, lx, acceso, '#ffd9a0', lx);
       if (acceso) { if (V().lampCone) V().lampCone(g, lx, '#ffd9a0', t, false); light(g, lx + 19, 126, 18, 9, '#ffd9a0', 0.14); light(g, lx + 19, 300, 90, 16, '#ffcf8a', 0.05); A.reflect(g, lx + 19, 240, 60, 10, '#ffd9a0', 0.12, t); }
     }
-    // le scie del traffico nelle due corsie di sopra: chi va avanti (fanali rossi) e il riflesso sull'asfalto bagnato
-    scie(262, '255,60,40', 0.55, 5, 11); scie(268, '255,236,190', 0.45, 4, 23); scie(304, '255,60,40', 0.45, 4, 37); scie(310, '255,236,190', 0.4, 3, 41);
-    scie(252, '255,170,60', 0.35, 2, 53);                                                                               // le luci di ingombro di un camion
     // la nostra auto ferma in corsia d'emergenza, con le quattro frecce e i fari accesi
     if (mia) {
       const D = mia.D, x = 196, gnd = 332, top = gnd - (D.wy + D.wr);
@@ -168,14 +165,6 @@
 .gate.nt.nt-on .nt-bg,.gate.nt.nt-on .nt-scena{opacity:1}
 .nt-scena{position:absolute;opacity:0;transition:opacity 1.6s;pointer-events:none;overflow:visible}
 .nt-scena>*{position:absolute;pointer-events:none}
-/* traffico: una coppia di luci (fanale rosso dietro, faro bianco davanti) con la sua scia, da sinistra a destra */
-.nt-tr{left:0;width:calc(var(--u)*34);height:0;will-change:transform;animation:ntTr var(--d) linear var(--dl) infinite}
-.nt-tr i{position:absolute;top:calc(var(--u)*-.8);height:calc(var(--u)*1.6);border-radius:3px}
-.nt-tr .r{left:0;width:calc(var(--u)*2.4);background:#ff3a2a;box-shadow:0 0 calc(var(--u)*3) calc(var(--u)*.9) rgba(255,58,42,.85)}
-.nt-tr .t{left:calc(var(--u)*-70);width:calc(var(--u)*70);top:calc(var(--u)*-.35);height:calc(var(--u)*.7);background:linear-gradient(90deg,transparent,rgba(255,70,50,.55))}
-.nt-tr .f{right:0;width:calc(var(--u)*2.4);background:#fff4d8;box-shadow:0 0 calc(var(--u)*4) calc(var(--u)*1.2) rgba(255,244,216,.9)}
-.nt-tr .b{right:calc(var(--u)*-26);width:calc(var(--u)*28);top:calc(var(--u)*-.6);height:calc(var(--u)*1.2);background:linear-gradient(90deg,rgba(255,244,216,.55),transparent)}
-@keyframes ntTr{from{transform:translateX(calc(var(--u)*-110))}to{transform:translateX(calc(var(--u)*700))}}
 /* le quattro frecce dell'auto ferma */
 .nt-hz{width:calc(var(--u)*3.4);height:calc(var(--u)*2.4);margin:calc(var(--u)*-1.2) 0 0 calc(var(--u)*-1.7);border-radius:50%;background:#ffb12a;box-shadow:0 0 calc(var(--u)*7) calc(var(--u)*3) rgba(255,170,40,.8);animation:ntHz 1.05s steps(1) infinite;opacity:0}
 @keyframes ntHz{0%{opacity:1}50%{opacity:0}}
@@ -189,6 +178,25 @@
 /* stelle che brillano */
 .nt-st{width:calc(var(--u)*1.1);height:calc(var(--u)*1.1);margin:calc(var(--u)*-.5) 0 0 calc(var(--u)*-.5);background:#fff6e0;border-radius:50%;box-shadow:0 0 calc(var(--u)*2) rgba(255,246,224,.8);opacity:.2;animation:ntSt var(--d) ease-in-out var(--dl) infinite}
 @keyframes ntSt{0%,100%{opacity:.12}50%{opacity:.95}}
+/* lo sfondo che vive: nuvole, luna, fari di ricerca, aereo, luci rosse in cima ai grattacieli, finestre che si accendono e si spengono */
+.nt-nu{width:calc(var(--u)*280);height:calc(var(--u)*30);background:radial-gradient(closest-side,rgba(104,86,160,.42),rgba(104,86,160,0));animation:ntNu var(--d) linear var(--dl) infinite}
+@keyframes ntNu{from{transform:translateX(calc(var(--u)*-320))}to{transform:translateX(calc(var(--u)*720))}}
+.nt-luna{width:calc(var(--u)*120);height:calc(var(--u)*120);margin:calc(var(--u)*-60) 0 0 calc(var(--u)*-60);background:radial-gradient(closest-side,rgba(255,244,220,.5),rgba(184,176,255,.2) 45%,rgba(184,176,255,0));animation:ntLuna 7s ease-in-out infinite alternate}
+@keyframes ntLuna{from{opacity:.45;transform:scale(.94)}to{opacity:.9;transform:scale(1.06)}}
+.nt-faro{width:calc(var(--u)*7);height:calc(var(--u)*230);margin-left:calc(var(--u)*-3.5);background:linear-gradient(rgba(255,244,255,0),rgba(255,244,255,.16) 60%,rgba(255,244,255,.26));clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
+@keyframes ntFaro{from{transform:rotate(-24deg)}to{transform:rotate(26deg)}}
+.nt-aereo{left:0;top:calc(var(--u)*34);width:calc(var(--u)*3);height:calc(var(--u)*3);animation:ntAereo 70s linear var(--dl) infinite}
+.nt-aereo::before{content:"";position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;background:#fff;box-shadow:0 0 calc(var(--u)*4) calc(var(--u)*1.5) rgba(255,255,255,.9);animation:ntStrobo 1.6s steps(1) infinite}
+.nt-aereo::after{content:"";position:absolute;left:calc(var(--u)*-8);top:calc(var(--u)*.6);width:calc(var(--u)*1.6);height:calc(var(--u)*1.6);border-radius:50%;background:#ff3030;box-shadow:0 0 calc(var(--u)*3) calc(var(--u)*1) rgba(255,50,50,.9);animation:ntStrobo 1.6s steps(1) -.6s infinite}
+@keyframes ntStrobo{0%,86%{opacity:.15}90%,96%{opacity:1}}
+@keyframes ntAereo{0%{transform:translate(calc(var(--u)*-30),calc(var(--u)*6))}38%{transform:translate(calc(var(--u)*690),calc(var(--u)*-10))}100%{transform:translate(calc(var(--u)*690),calc(var(--u)*-10))}}
+.nt-bea{width:calc(var(--u)*3);height:calc(var(--u)*3);margin:calc(var(--u)*-1.5) 0 0 calc(var(--u)*-1.5);border-radius:50%;background:#ff3a3a;box-shadow:0 0 calc(var(--u)*8) calc(var(--u)*3) rgba(255,58,58,.9);animation:ntBea 2.2s steps(1) var(--dl) infinite}
+@keyframes ntBea{0%,55%{opacity:1}56%,100%{opacity:.08}}
+.nt-fin{inset:0;width:100%;height:100%;image-rendering:pixelated;animation:ntFin var(--d) steps(1) var(--dl) infinite}
+@keyframes ntFin{0%{opacity:0}18%{opacity:1}41%{opacity:0}57%{opacity:1}64%{opacity:0}88%{opacity:1}100%{opacity:0}}
+/* i lampioni che sfarfallano: un buio sulla testa e lampi di luce */
+.nt-lamd{width:calc(var(--u)*17);height:calc(var(--u)*6);margin:calc(var(--u)*-3) 0 0 calc(var(--u)*-8);border-radius:40%;background:rgba(10,8,26,.8);animation:ntLamD var(--d) steps(1) var(--dl) infinite}
+@keyframes ntLamD{0%,30%{opacity:0}31%{opacity:1}33%{opacity:0}34%{opacity:1}36%,70%{opacity:0}71%{opacity:1}72%{opacity:0}73%{opacity:1}75%,100%{opacity:0}}
 /* i fari dell'auto che si accendono forte quando giri la chiave */
 .nt-fari{width:calc(var(--u)*120);height:calc(var(--u)*34);margin:calc(var(--u)*-17) 0 0 calc(var(--u)*-6);background:radial-gradient(ellipse at 6% 50%,rgba(255,240,200,.9),rgba(255,240,200,.35) 28%,rgba(255,240,200,0) 70%);opacity:0;transition:opacity .5s}
 .gate.nt.nt-avvio .nt-fari{opacity:1}
@@ -212,11 +220,58 @@
 @keyframes ntSpk{0%,86%,100%{opacity:0;transform:scale(.2) rotate(0)}91%{opacity:1;transform:scale(1) rotate(25deg)}96%{opacity:0;transform:scale(.4) rotate(45deg)}}
 .gate.nt .intro-title .t3{transition:opacity .6s}
 .gate.nt .intro-title .t3.nt-cambia{opacity:0}
+
+/* il cruscotto: al posto del pannello, le partite sono i portachiavi e «Accendi e parti» è il blocchetto d'accensione */
+.gate.nt .intro-menu{background:none!important;box-shadow:none!important;border:0!important;padding:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;gap:0;width:auto}
+@media (min-width:900px){.gate.nt .intro-menu{right:max(30px,3.4vw);bottom:max(22px,4vh);width:min(470px,36vw)}}
+.gate.nt .intro-menu h2,.gate.nt .intro-menu ul,.gate.nt.nt-nuova .intro-menu ul{display:none!important}
+.nt-cr{display:grid;gap:10px;justify-items:center}
+.gate.nt .nt-cr .nr-slots{margin:0;width:100%;gap:10px;position:relative;padding-top:12px}
+.gate.nt .nt-cr .nr-slots::before{content:"";position:absolute;left:4%;right:4%;top:6px;height:5px;border-radius:3px;background:linear-gradient(#6a6e7c,#2a2c36);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+.gate.nt .nr-slots-h{display:none}
+.gate.nt .nr-slot{background:linear-gradient(160deg,#1c1d27,#0d0e14)!important;border-radius:6px 6px 14px 14px;padding:16px 11px 10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09),0 6px 14px rgba(0,0,0,.55);position:relative;transition:transform .25s,box-shadow .25s}
+.gate.nt .nr-slot::before{content:"";position:absolute;left:50%;top:-9px;width:14px;height:14px;margin-left:-7px;border-radius:50%;border:3px solid #9aa0ae;background:#05060a;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.7)}
+.gate.nt .nr-slot:hover,.gate.nt .nr-slot:focus-visible{transform:translateY(-3px) rotate(-1.5deg)}
+.gate.nt .nr-slot.on{background:linear-gradient(160deg,#3a2810,#18100a)!important;box-shadow:inset 0 0 0 2px #ffb347,0 0 22px rgba(255,170,60,.35),0 6px 14px rgba(0,0,0,.55)}
+.gate.nt .nr-slot .ed{top:8px}
+.nt-pie{display:flex;gap:14px;align-items:center;justify-content:center;font:500 12px/1 "Barlow Semi Condensed",system-ui,sans-serif;color:#9a927e}
+.gate.nt .nt-pie small{font-size:0;color:inherit;display:inline}
+.gate.nt .nt-pie small a{font-size:12px;color:#b9ae94}
+.nt-aiuto{all:unset;cursor:pointer;font:500 12px/1 "Barlow Semi Condensed",system-ui,sans-serif;color:#b9ae94;border-bottom:1px dotted #6a6252}
+.nt-aiuto:hover,.nt-aiuto:focus-visible{color:#ffb347}
+.nt-pop{position:absolute;right:0;bottom:calc(100% + 10px);width:min(440px,90vw);padding:14px 16px;border-radius:12px;background:rgba(10,10,18,.94);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 12px 34px rgba(0,0,0,.6);display:none;z-index:5}
+.nt-pop.on{display:block}
+.nt-pop h3{margin:0 0 8px;font:400 15px/1 "Saira Stencil One",Impact,sans-serif;letter-spacing:.08em;color:#ffb347}
+.nt-pop p{margin:0 0 10px;font:500 13px/1.45 "Barlow Semi Condensed",system-ui,sans-serif;color:#e0d8c8}
+.gate.nt .nt-pop .keys{display:flex!important;flex-wrap:wrap;gap:6px 12px;margin:0}
+/* il blocchetto d'accensione */
+.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;justify-items:center;gap:6px;width:200px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+.gate.nt .go.nt-sw:active{cursor:grabbing}
+.gate.nt .go.nt-sw:focus-visible .nt-svg{filter:drop-shadow(0 0 10px #ffb347)}
+.nt-svg{width:190px;height:190px;overflow:visible;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
+.nt-svg .nt-k{transform-origin:110px 110px;transform:rotate(var(--g,0deg))}
+.gate.nt .nt-sw.nt-molla .nt-k{transition:transform .38s cubic-bezier(.3,1.6,.5,1)}
+.nt-svg .nt-tk{fill:#6c6552;font:400 9px "Share Tech Mono",monospace;letter-spacing:.08em;transition:fill .2s}
+.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start{fill:#ffb347}
+.nt-sw[data-fase="on"] .nt-tk.acc,.nt-sw[data-fase="start"] .nt-tk.acc,.nt-sw[data-fase="start"] .nt-tk.on{fill:#a89a74}
+.nt-spie{display:flex;gap:7px;height:16px}
+.nt-spie i{font:400 8px/1 "Share Tech Mono",monospace;letter-spacing:.06em;padding:3px 5px;border-radius:3px;background:#12131a;color:#3a3c48;box-shadow:inset 0 0 0 1px #20222c;transition:color .15s,background .15s,box-shadow .15s}
+.nt-sw.nt-acceso .nt-spie i.b{color:#ff4a3a;background:#2a0f0c;box-shadow:inset 0 0 0 1px #6a2018,0 0 8px rgba(255,74,58,.55)}
+.nt-sw.nt-acceso .nt-spie i.o{color:#ffb12a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14,0 0 8px rgba(255,177,42,.5)}
+.nt-sw.nt-acceso .nt-spie i.m{color:#ffb12a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14,0 0 8px rgba(255,177,42,.5)}
+.nt-sw.nt-tremo .nt-svg{animation:ntTremo .07s linear infinite}
+@keyframes ntTremo{0%{transform:translate(.8px,-.5px)}50%{transform:translate(-.8px,.6px)}100%{transform:translate(.6px,.4px)}}
+.nt-lab{font:600 11px/1.2 "Share Tech Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#a8936a;text-align:center;white-space:nowrap;min-height:14px;font-size:10px;letter-spacing:.1em}
+.nt-stato{font:400 17px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#ffb347;text-align:center;text-shadow:0 0 14px rgba(255,170,60,.45)}
+.nt-sw.nt-prova .nt-lab{color:#ff9a6a}
+.gate.nt.nt-avvio .nt-cr .nr-slots,.gate.nt.nt-avvio .nt-pie,.gate.nt.nt-avvio .nt-lab,.gate.nt.nt-avvio .nt-stato{opacity:0;transition:opacity .5s}
+@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}.nt-svg{width:150px;height:150px}.gate.nt .go.nt-sw{width:160px}}
+@media (max-height:620px) and (min-width:900px){.nt-svg{width:130px;height:130px}.gate.nt .go.nt-sw{width:150px}}
 /* girare la chiave: il pannello scende e sparisce, il logo si accende */
 .gate.nt .intro-menu{transition:opacity .45s,transform .45s}
-.gate.nt.nt-avvio .intro-menu{opacity:0;transform:translateY(16px);pointer-events:none}
+.gate.nt.nt-avvio .intro-menu{pointer-events:none}
 .gate.nt.nt-avvio .intro-title .t1{text-shadow:0 0 46px rgba(255,170,60,.7),0 0 18px rgba(255,95,168,.6),0 6px 0 rgba(0,0,0,.5);transition:text-shadow .8s}
-@media (prefers-reduced-motion:reduce){.nt-tr,.nt-hz,.nt-lamp,.nt-tel,.nt-st,.nt-rain,.nt-rain2,.nt-fog,.nt-spk{animation:none!important}.gate.nt .nt-push{transition:none}}
+@media (prefers-reduced-motion:reduce){.nt-nu,.nt-luna,.nt-faro,.nt-aereo,.nt-bea,.nt-fin,.nt-lamd,.nt-hz,.nt-lamp,.nt-tel,.nt-st,.nt-rain,.nt-rain2,.nt-fog,.nt-spk{animation:none!important}.gate.nt .nt-push{transition:none}}
 .gate.nt .intro-title{z-index:1;left:max(28px,4vw);top:max(26px,6vh);transform:none!important;justify-items:start;text-align:left;opacity:1}
 .gate.nt .intro-title .t1{font-size:clamp(46px,7.4vw,112px);text-shadow:0 0 30px rgba(255,95,168,.35),0 6px 0 rgba(0,0,0,.5)}
 .gate.nt .intro-title .t2{font-size:clamp(15px,1.9vw,28px);padding-left:.2em;letter-spacing:.32em}
@@ -240,7 +295,7 @@
   function pannello() {
     const G = window.nightRun && window.nightRun.game, s = G && G.s, vg = s && s.vg, iniziata = !!(vg && vg.prologo);
     gate.classList.toggle('nt-nuova', !iniziata);
-    const go = document.getElementById('goBtn'); if (go) go.textContent = iniziata ? 'Continua il viaggio' : 'Accendi e parti';
+    if (stato) stato.textContent = iniziata ? 'Continua il viaggio' : 'Accendi e parti';
     if (iniziata) {
       const C = typeof CARS !== 'undefined' && CARS[G.car], km = Math.max(0, (s.dist || 0) / 1000);
       cont.innerHTML = `Riparti da dove eri: <b>${C ? C.name : G.car}</b>, km <b>${km.toLocaleString('it-IT', { maximumFractionDigits: 1 })}</b>, in tasca <b>€ ${Math.round(s.money || 0).toLocaleString('it-IT')}</b>.`;
@@ -255,20 +310,56 @@
   const pct = (v, m) => (v / m * 100).toFixed(3) + '%';
   const el = (cls, st, html) => { const e = document.createElement('div'); e.className = cls; if (st) e.style.cssText = st; if (html) e.innerHTML = html; scena.appendChild(e); return e; };
   let fatto = false;
+  // le finestre accese e le luci rosse si trovano nei pixel del quadro (una volta sola): le finestre sono quadratini gialli, le luci rosse puntini rossi
+  function trova() {
+    const x0 = 0, y0 = 70 * SS, w = lo.width, h = 160 * SS, im = g.getImageData(x0, y0, w, h), d = im.data;
+    const m = new Uint8Array(w * h), rosso = new Uint8Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+      const r = d[i * 4], gg = d[i * 4 + 1], b = d[i * 4 + 2];
+      m[i] = r > 170 && gg > 130 && b < 150 && r - b > 40 ? 1 : 0;
+      rosso[i] = r > 200 && gg < 100 && b < 100 ? 1 : 0;
+    }
+    const comp = (mask, mn, mx) => {
+      const out = [], seen = new Uint8Array(w * h);
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const k = y * w + x; if (!mask[k] || seen[k]) continue;
+        let minx = x, maxx = x, miny = y, maxy = y, n = 0; const st = [k]; seen[k] = 1;
+        while (st.length) { const q = st.pop(), qx = q % w, qy = (q - qx) / w; n++; if (qx < minx) minx = qx; if (qx > maxx) maxx = qx; if (qy < miny) miny = qy; if (qy > maxy) maxy = qy;
+          for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = qx + ax, ny = qy + ay; if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue; const nk = ny * w + nx; if (mask[nk] && !seen[nk]) { seen[nk] = 1; st.push(nk); } } }
+        if (n >= mn && n <= mx) out.push({ x: minx, y: miny + y0, w: maxx - minx + 1, h: maxy - miny + 1 });
+      }
+      return out;
+    };
+    return { fin: comp(m, 2, 60), ros: comp(rosso, 1, 30), dati: d, w, y0 };
+  }
   function strati() {
     if (fatto) return; fatto = true;
     // stelle
     for (let i = 0; i < 26; i++) el('nt-st', `left:${pct(8 + hash(i + 71) * 624, W)};top:${pct(6 + hash(i + 93) * 150, H)};--d:${(2.4 + hash(i + 5) * 4).toFixed(2)}s;--dl:${(-hash(i + 17) * 6).toFixed(2)}s`);
+    // la luna che respira e le nuvole che le passano davanti
+    el('nt-luna', `left:${pct(470, W)};top:${pct(70, H)}`);
+    for (let i = 0; i < 5; i++) el('nt-nu', `top:${pct(46 + hash(i + 40) * 120, H)};transform-origin:0 0;--d:${(70 + hash(i + 9) * 70).toFixed(0)}s;--dl:${(-hash(i + 3) * 120).toFixed(0)}s;opacity:${(0.55 + hash(i) * 0.45).toFixed(2)}`);
+    // i fari di ricerca dalla città e l'aereo con i lampeggianti
+    for (const [x, d, dl] of [[142, 13, -3], [452, 17, -9]]) el('nt-faro', `left:${pct(x, W)};top:${pct(206 - 230, H)};--d:${d}s;--dl:${dl}s`);
+    el('nt-aereo', `--dl:${-6}s`);
+    // le finestre che si spengono e si riaccendono (tre gruppi con tempi diversi) e le luci rosse in cima ai palazzi che lampeggiano
+    try {
+      const T = trova(), G = [0, 1, 2].map((i) => { const c = document.createElement('canvas'); c.width = lo.width; c.height = lo.height; c.className = 'nt-fin'; c.style.cssText = `--d:${[9, 13, 19][i]}s;--dl:${-i * 4.1}s`; scena.appendChild(c); return c.getContext('2d'); });
+      T.fin.forEach((f, i) => {
+        const gr = hash(i * 3.7 + 1); if (gr > 0.5) return;                                  // metà delle finestre resta accesa
+        const cx = G[Math.floor(gr * 6) % 3], bx = Math.max(0, f.x - 2), k = ((f.y - T.y0) * T.w + bx) * 4;
+        cx.fillStyle = `rgb(${T.dati[k]},${T.dati[k + 1]},${T.dati[k + 2]})`; cx.fillRect(f.x, f.y, f.w, f.h);   // il colore del palazzo accanto
+      });
+      T.ros.forEach((r, i) => el('nt-bea', `left:${pct((r.x + r.w / 2) / SS, W)};top:${pct((r.y + r.h / 2) / SS, H)};--dl:${(-i * 0.7).toFixed(2)}s`));
+    } catch (e) { /* senza le finestre il resto va avanti */ }
     // nebbia (tre banchi che vanno e vengono) e pioggia (due strati) + asfalto lucido
     for (let i = 0; i < 3; i++) el('nt-fog', `left:${pct(-40 + i * 200, W)};top:${pct(214 + i * 38, H)};--d:${24 + i * 9}s;--dl:${-i * 7}s`);
     el('nt-rain'); el('nt-rain2'); el('nt-wet');
-    // il traffico: sette coppie di luci su quattro corsie, a velocità diverse (negative: si comincia a metà strada)
-    const corsie = [252, 262, 268, 304, 310, 258, 300];
-    corsie.forEach((y, i) => el('nt-tr', `top:${pct(y, H)};--d:${(4.2 + hash(i + 31) * 6).toFixed(2)}s;--dl:${(-hash(i + 7) * 9).toFixed(2)}s`, '<i class="t"></i><i class="r"></i><i class="b"></i><i class="f"></i>'));
-    // l'auto ferma: fari forti (per la chiave), frecce, il lampione spento che sfarfalla, il telefono
+    // l'auto ferma: fari forti (per la chiave), frecce, il telefono; i lampioni che sfarfallano (il centrale, spento, fa qualche lampo)
     if (POS.head) el('nt-fari', `left:${pct(POS.head[0], W)};top:${pct(POS.head[1], H)}`);
     for (const [fx, fy] of POS.fl) el('nt-hz', `left:${pct(fx, W)};top:${pct(fy, H)}`);
     el('nt-lamp', `left:${pct(349, W)};top:${pct(126, H)}`);
+    [[89, 11, -2], [549, 15, -7]].forEach(([x, d, dl]) => el('nt-lamd', `left:${pct(x, W)};top:${pct(126, H)};--d:${d}s;--dl:${dl}s`));
     if (POS.phone) el('nt-tel', `left:${pct(POS.phone[0], W)};top:${pct(POS.phone[1], H)}`);
   }
   // il tempo di questo avvio
@@ -286,49 +377,169 @@
     [[14, 14, 0], [48, 8, -2.4], [78, 30, -4.5], [31, 62, -1.2]].forEach(([x, y, d]) => { const k = document.createElement('i'); k.className = 'nt-spk'; k.style.cssText = `left:${x}%;top:${y}%;--dl:${d}s`; tt.appendChild(k); });
   }
 
-  // ------------------------------------------------------------ «Accendi e parti» gira la chiave
-  // l'avviamento: il motorino a scatti (come quando gira a vuoto), poi il motore che prende, un colpo di gas e il minimo
-  function chiave(ac) {
-    const t0 = ac.currentTime + 0.05, out = ac.createGain(); out.gain.value = 0.55; out.connect(ac.destination);
-    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.connect(out);
-    // motorino: una sega bassa con la tensione che va a colpi (sei giri di compressione in 0,8 s)
-    const m = ac.createOscillator(), mg = ac.createGain(); m.type = 'sawtooth'; m.frequency.setValueAtTime(26, t0); m.frequency.linearRampToValueAtTime(34, t0 + 0.8);
-    mg.gain.setValueAtTime(0, t0); for (let i = 0; i < 6; i++) { const a = t0 + i * 0.135; mg.gain.setValueAtTime(0.0, a); mg.gain.linearRampToValueAtTime(0.7, a + 0.04); mg.gain.linearRampToValueAtTime(0.18, a + 0.12); }
-    mg.gain.linearRampToValueAtTime(0, t0 + 0.86); m.connect(mg); mg.connect(lp); m.start(t0); m.stop(t0 + 0.9);
-    // il motore che prende: sega che sale e si assesta sul minimo (con il «lope» a 7 Hz), un colpo di gas
-    const e = ac.createOscillator(), eg = ac.createGain(), lfo = ac.createOscillator(), lg = ac.createGain();
-    e.type = 'sawtooth'; e.frequency.setValueAtTime(34, t0 + 0.82); e.frequency.linearRampToValueAtTime(56, t0 + 0.98); e.frequency.linearRampToValueAtTime(48, t0 + 1.15);
-    e.frequency.linearRampToValueAtTime(96, t0 + 1.4); e.frequency.linearRampToValueAtTime(52, t0 + 1.85);
-    eg.gain.setValueAtTime(0, t0 + 0.8); eg.gain.linearRampToValueAtTime(0.85, t0 + 0.98); eg.gain.linearRampToValueAtTime(0.5, t0 + 1.2); eg.gain.linearRampToValueAtTime(0.95, t0 + 1.4); eg.gain.linearRampToValueAtTime(0.38, t0 + 1.9); eg.gain.linearRampToValueAtTime(0, t0 + 2.6);
-    lfo.frequency.value = 7; lg.gain.value = 0.18; lfo.connect(lg); lg.connect(eg.gain); e.connect(eg); eg.connect(lp); e.start(t0 + 0.8); lfo.start(t0 + 0.8); e.stop(t0 + 2.7); lfo.stop(t0 + 2.7);
-    // un filo di scarico: rumore filtrato che segue il colpo di gas
-    const n = ac.createBufferSource(), nb = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), d = nb.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    n.buffer = nb; const nf = ac.createBiquadFilter(); nf.type = 'bandpass'; nf.frequency.value = 180; nf.Q.value = 0.8; const ng = ac.createGain();
-    ng.gain.setValueAtTime(0, t0 + 0.8); ng.gain.linearRampToValueAtTime(0.5, t0 + 1.0); ng.gain.linearRampToValueAtTime(0.1, t0 + 1.3); ng.gain.linearRampToValueAtTime(0.5, t0 + 1.4); ng.gain.linearRampToValueAtTime(0, t0 + 2.2);
-    n.connect(nf); nf.connect(ng); ng.connect(out); n.start(t0 + 0.8); n.stop(t0 + 2.4);
-    setTimeout(() => { try { ac.close(); } catch (er) { /* niente */ } }, 3200);
-  }
-  let via = false;
-  function gira(vera) {
-    if (via) return; via = true;
-    gate.classList.add('nt-avvio');
-    try { const AC = window.AudioContext || window.webkitAudioContext; if (AC) { const ac = new AC(); if (ac.state === 'suspended') ac.resume(); chiave(ac); } } catch (e) { /* senza audio si parte lo stesso */ }
-    setTimeout(() => { window.__ntVia = true; const go = document.getElementById('goBtn'); if (go) go.click(); }, 1750);
-  }
+  // ------------------------------------------------------------ il cruscotto: il blocchetto d'accensione e i portachiavi
   const goBtn = document.getElementById('goBtn');
-  if (goBtn) goBtn.addEventListener('click', (e) => { if (window.__ntVia || !e.isTrusted || gate.hidden) return; e.preventDefault(); e.stopImmediatePropagation(); gira(true); }, true);   // solo un clic vero: le prove automatiche partono subito
+  const SVG = `<svg class="nt-svg" viewBox="0 0 220 220" aria-hidden="true"><defs>
+    <radialGradient id="ntMet" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#4a4f60"/><stop offset=".55" stop-color="#232632"/><stop offset="1" stop-color="#0d0e14"/></radialGradient>
+    <linearGradient id="ntOro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a5a12"/><stop offset=".35" stop-color="#ffd27a"/><stop offset=".7" stop-color="#e0922a"/><stop offset="1" stop-color="#7a4a0e"/></linearGradient>
+    <radialGradient id="ntCro" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#e8ecf4"/><stop offset=".5" stop-color="#8b90a0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
+    <circle cx="110" cy="110" r="104" fill="url(#ntMet)" stroke="#05060a" stroke-width="2"/><circle cx="110" cy="110" r="98" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
+    <circle cx="110" cy="110" r="70" fill="#0a0b10" stroke="#2a2c38" stroke-width="2"/>
+    <g font-family="monospace">
+      <text class="nt-tk lock" x="110" y="24" text-anchor="middle">LOCK</text>
+      <text class="nt-tk acc" x="188" y="58" text-anchor="middle">ACC</text>
+      <text class="nt-tk on" x="204" y="122" text-anchor="middle">ON</text>
+      <text class="nt-tk start" x="176" y="184" text-anchor="middle">START</text></g>
+    <g stroke="#3a3d4a" stroke-width="2" stroke-linecap="round"><path d="M110 8v7"/><path d="M162 22l-3 6"/><path d="M200 60l-6 3"/><path d="M214 112h-7"/><path d="M192 168l-6-3"/></g>
+    <circle cx="110" cy="110" r="30" fill="url(#ntCro)" stroke="#12131a" stroke-width="2"/>
+    <g class="nt-k"><rect x="100" y="52" width="20" height="60" rx="5" fill="url(#ntOro)" stroke="#4a300a" stroke-width="1.5"/>
+      <rect x="88" y="6" width="44" height="52" rx="17" fill="#15161d" stroke="#05060a" stroke-width="2"/><rect x="92" y="10" width="36" height="44" rx="14" fill="none" stroke="#2c2e3a" stroke-width="1.5"/>
+      <rect x="103" y="14" width="14" height="16" rx="3" fill="url(#ntOro)" stroke="#4a300a"/><circle cx="110" cy="22" r="4" fill="#0a0b10"/>
+      <path d="M104 62v40M110 60v44" stroke="rgba(60,36,6,.55)" stroke-width="1.2"/></g>
+    <circle cx="110" cy="110" r="14" fill="url(#ntCro)" stroke="#05060a" stroke-width="2"/><rect x="108" y="104" width="4" height="12" rx="1" fill="#05060a"/></svg>`;
+  let lab = null, stato = null, sw = null;
+  function cruscotto() {
+    if (!goBtn || goBtn.classList.contains('nt-sw')) return;
+    goBtn.classList.add('nt-sw'); sw = goBtn; goBtn.setAttribute('aria-label', 'Accendi e parti: tieni premuto per girare la chiave');
+    goBtn.innerHTML = '<span class="nt-spie" aria-hidden="true"><i class="b">BATT</i><i class="o">OLIO</i><i class="m">MOT</i></span>' + SVG + '<span class="nt-lab">Tieni premuto: gira la chiave</span><span class="nt-stato"></span>';
+    lab = goBtn.querySelector('.nt-lab'); stato = goBtn.querySelector('.nt-stato');
+    const cr = document.createElement('div'); cr.className = 'nt-cr';
+    const slots = menu.querySelector('.nr-slots'); if (slots) cr.appendChild(slots);
+    cr.appendChild(goBtn);
+    const pie = document.createElement('div'); pie.className = 'nt-pie';
+    const aiuto = document.createElement('button'); aiuto.type = 'button'; aiuto.className = 'nt-aiuto'; aiuto.textContent = 'Come si gioca';
+    const pop = document.createElement('div'); pop.className = 'nt-pop';
+    pop.innerHTML = '<h3>Come si gioca</h3><p>Si parte dal km 0 con la Volvo di tuo zio e € 450 in tasca. L’autostrada va solo avanti. Al bar del km 1,8 ti aspetta il primo lavoro. Mangia, bevi, dormi al Motel 4Ever e tieni d’occhio il telefono (tasto 0).</p>';
+    const keys = menu.querySelector('.keys'); if (keys) pop.appendChild(keys);
+    pie.append(aiuto); const small = menu.querySelector('small'); if (small) pie.appendChild(small);
+    cr.appendChild(pie); menu.appendChild(cr); cr.style.position = 'relative'; cr.appendChild(pop);
+    aiuto.addEventListener('click', (e) => { e.stopPropagation(); pop.classList.toggle('on'); });
+    document.addEventListener('click', () => pop.classList.remove('on'));
+  }
+
+  // ------------------------------------------------------------ il suono dell'avviamento: il motore vero del gioco (dsp.js + sim.js), reso una volta sola
+  // motorino che gira, il motore che prende, un colpo di gas e il minimo (3,4 s); l'auto è quella della partita scelta, di serie
+  let SUONO = null, rendendo = false;
+  function rendiMotore() {
+    if (SUONO || rendendo || typeof EngineDSP === 'undefined' || typeof SupraSim === 'undefined' || typeof CARS === 'undefined') return;
+    rendendo = true;
+    try {
+      const G = window.nightRun && window.nightRun.game, id = (G && CARS[G.car] && G.car) || 'v40', C = CARS[id], tp = C.params(C.presets[0].sel);
+      const sim = new SupraSim(); sim.setCar(id === 'supra' ? null : Object.assign({}, C.P)); sim.setTune(tp.sim);
+      const SR = 48000, DT = 1 / 60, FR = Math.round(3.4 / DT), per = Math.round(SR * DT), Bk = 128, dsp = new EngineDSP(SR);
+      dsp.msg({ cfg: { tune: tp.dsp, view: 1, vol: 0.9, pops: 0, fx: {} } }); dsp.msg({ env: 0 });
+      const L = new Float32Array(FR * per), Rr = new Float32Array(FR * per), bl = new Float32Array(Bk), br = new Float32Array(Bk);
+      sim.setIgnition(true); sim.setStarter(true);
+      let f = 0;
+      const fetta = () => {
+        const t1 = performance.now() + 14;                       // a fette da pochi millisecondi: la schermata non si ferma
+        while (f < FR && performance.now() < t1) {
+          const t = f * DT;
+          if (t > 0.95) sim.setStarter(false);                    // il motorino si stacca quando il motore ha preso
+          sim.in.thr = t > 1.7 && t < 2.05 ? 0.7 : 0; sim.in.brake = 0; sim.in.clutch = 0; sim.update(DT);
+          dsp.msg({ p: sim.audioParams(), ev: sim.events.splice(0) });
+          for (let i = 0; i < per; i += Bk) { const n = Math.min(Bk, per - i); dsp.render(bl, br, Bk); L.set(bl.subarray(0, n), f * per + i); Rr.set(br.subarray(0, n), f * per + i); }
+          f++;
+        }
+        if (f < FR) { setTimeout(fetta, 0); return; }
+        let pk = 0; for (let i = 0; i < L.length; i++) pk = Math.max(pk, Math.abs(L[i]), Math.abs(Rr[i]));
+        const gn = pk > 0 ? Math.min(1.6, 0.8 / pk) : 1; for (let i = 0; i < L.length; i++) { L[i] *= gn; Rr[i] *= gn; }
+        for (let i = 0; i < 2400; i++) { const k = i / 2400; L[L.length - 1 - i] *= k; Rr[Rr.length - 1 - i] *= k; }   // coda morbida
+        SUONO = { L, R: Rr, sr: SR }; rendendo = false;
+      };
+      fetta();
+    } catch (e) { rendendo = false; SUONO = null; }
+  }
+  // riproduzione: parte quando il motorino comincia a girare (tenendo premuta la chiave); fermabile
+  let AC = null, SRC = null, GAIN = null;
+  function suona(da) {
+    try {
+      const Ctor = window.AudioContext || window.webkitAudioContext; if (!Ctor) return;
+      AC = AC || new Ctor(); if (AC.state === 'suspended') AC.resume();
+      if (SUONO) {
+        const b = AC.createBuffer(2, SUONO.L.length, SUONO.sr); b.copyToChannel(SUONO.L, 0); b.copyToChannel(SUONO.R, 1);
+        SRC = AC.createBufferSource(); SRC.buffer = b; GAIN = AC.createGain(); GAIN.gain.value = 1; SRC.connect(GAIN); GAIN.connect(AC.destination); SRC.start(0, da || 0);
+      } else semplice(AC);                                        // il motore vero non è pronto: un avviamento semplice
+    } catch (e) { /* senza audio si parte lo stesso */ }
+  }
+  function ferma() { try { if (GAIN && AC) { GAIN.gain.setTargetAtTime(0, AC.currentTime, 0.04); const s = SRC; setTimeout(() => { try { s.stop(); } catch (e) { /* già fermo */ } }, 220); } } catch (e) { /* niente */ } SRC = GAIN = null; }
+  function semplice(ac) {                                         // riserva: motorino a scatti e un minimo semplice
+    const t0 = ac.currentTime + 0.03, out = ac.createGain(); out.gain.value = 0.5; out.connect(ac.destination);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 480; lp.connect(out);
+    const m = ac.createOscillator(), mg = ac.createGain(); m.type = 'sawtooth'; m.frequency.value = 30; mg.gain.value = 0; m.connect(mg); mg.connect(lp);
+    for (let i = 0; i < 6; i++) { const a = t0 + i * 0.14; mg.gain.setValueAtTime(0, a); mg.gain.linearRampToValueAtTime(0.7, a + 0.04); mg.gain.linearRampToValueAtTime(0.2, a + 0.12); }
+    mg.gain.setValueAtTime(0, t0 + 0.86); m.start(t0); m.stop(t0 + 0.9);
+    const e = ac.createOscillator(), eg = ac.createGain(); e.type = 'sawtooth'; e.frequency.setValueAtTime(40, t0 + 0.85); e.frequency.linearRampToValueAtTime(52, t0 + 1.2);
+    eg.gain.setValueAtTime(0, t0 + 0.85); eg.gain.linearRampToValueAtTime(0.7, t0 + 1.0); eg.gain.linearRampToValueAtTime(0, t0 + 2.4); e.connect(eg); eg.connect(lp); e.start(t0 + 0.85); e.stop(t0 + 2.5);
+  }
+
+  // ------------------------------------------------------------ girare la chiave: si tiene premuto
+  // 0 → 0,38 s: la chiave va su ACC e ON, si accendono le spie; 0,38 → 1,33 s: START, il motorino gira (se la molli prima il motore non prende e la chiave torna indietro);
+  // al 1,33 s il motore prende, le spie si spengono, la chiave resta su ON, la scena spinge in avanti e dopo ~1,1 s parte il gioco.
+  const T_ACC = 380, T_START = 1330;
+  let tenuta = null, via = false;
+  const angolo = (ms) => ms < T_ACC ? 40 * (ms / T_ACC) : 40 + 40 * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
+  function fase(f) { if (sw) sw.dataset.fase = f; }
+  function chiaveA(deg) { if (sw) sw.style.setProperty('--g', deg.toFixed(1) + 'deg'); }
+  function giraTieni(da) {
+    if (via || tenuta) return;
+    rendiMotore();
+    const t0 = performance.now(); tenuta = { t0, suono: false, raf: 0 };
+    sw.classList.remove('nt-molla', 'nt-prova'); if (lab) lab.textContent = 'Tieni premuto…';
+    const passo = () => {
+      if (!tenuta) return; const ms = performance.now() - t0;
+      chiaveA(angolo(ms) + (ms > T_ACC ? Math.sin(ms * 0.09) * 1.6 : 0));
+      if (ms > 120 && !sw.classList.contains('nt-acceso')) { sw.classList.add('nt-acceso'); fase('acc'); }
+      if (ms >= T_ACC && !tenuta.suono) { tenuta.suono = true; fase('start'); sw.classList.add('nt-tremo'); suona(0); }
+      if (ms >= T_START) { accendi(); return; }
+      tenuta.raf = requestAnimationFrame(passo);
+    };
+    tenuta.raf = requestAnimationFrame(passo);
+  }
+  function rilascia() {
+    if (!tenuta || via) return;
+    const ms = performance.now() - tenuta.t0; cancelAnimationFrame(tenuta.raf);
+    if (ms < T_ACC) { tenuta.suono = false; tenuta = null; accendiDaSolo(); return; }                  // un clic (non una pressione lunga): gira da sola fino in fondo
+    tenuta = null; ferma(); sw.classList.remove('nt-tremo', 'nt-acceso'); sw.classList.add('nt-molla', 'nt-prova'); chiaveA(0); fase('');
+    if (lab) lab.textContent = 'Ancora un po’: tieni premuto';
+  }
+  // un clic: la chiave gira da sola (stessi tempi, senza tenerla)
+  function accendiDaSolo() {
+    if (via) return; rendiMotore(); const t0 = performance.now(); tenuta = { t0, suono: false, raf: 0, auto: true };
+    sw.classList.remove('nt-molla', 'nt-prova'); sw.classList.add('nt-acceso'); fase('acc'); if (lab) lab.textContent = 'Gira la chiave…';
+    const passo = () => {
+      if (!tenuta) return; const ms = performance.now() - t0;
+      chiaveA(angolo(ms) + (ms > T_ACC ? Math.sin(ms * 0.09) * 1.6 : 0));
+      if (ms >= T_ACC && !tenuta.suono) { tenuta.suono = true; fase('start'); sw.classList.add('nt-tremo'); suona(0); }
+      if (ms >= T_START) { accendi(); return; }
+      tenuta.raf = requestAnimationFrame(passo);
+    };
+    tenuta.raf = requestAnimationFrame(passo);
+  }
+  function accendi() {
+    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(52); fase('on');
+    gate.classList.add('nt-avvio'); if (lab) lab.textContent = '';
+    setTimeout(() => { window.__ntVia = true; goBtn.click(); }, 1150);
+  }
+  if (goBtn) {
+    goBtn.addEventListener('pointerdown', (e) => { if (!e.isTrusted || e.button > 0 || window.__ntVia) return; e.preventDefault(); try { goBtn.setPointerCapture(e.pointerId); } catch (er) { /* niente */ } giraTieni(); });
+    goBtn.addEventListener('pointerup', (e) => { if (e.isTrusted) rilascia(); });
+    goBtn.addEventListener('pointercancel', () => rilascia());
+    goBtn.addEventListener('click', (e) => { if (window.__ntVia || !e.isTrusted || gate.hidden) return; e.preventDefault(); e.stopImmediatePropagation(); }, true);   // i clic veri li gestisce la chiave; le prove automatiche partono subito
+  }
   window.addEventListener('keydown', (e) => {
-    if (window.__ntVia || !e.isTrusted || gate.hidden || e.repeat || (e.key !== 'Enter' && e.key !== ' ')) return;
+    if (window.__ntVia || !e.isTrusted || gate.hidden || (e.key !== 'Enter' && e.key !== ' ')) return;
     if (e.metaKey || e.ctrlKey || e.altKey || (e.target.closest && e.target.closest('input, textarea'))) return;
-    e.preventDefault(); e.stopImmediatePropagation(); gira(true);
+    e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) giraTieni();
   }, true);
+  window.addEventListener('keyup', (e) => { if (!window.__ntVia && !gate.hidden && (e.key === 'Enter' || e.key === ' ') && tenuta && !tenuta.auto) { e.preventDefault(); e.stopImmediatePropagation(); rilascia(); } }, true);
 
   function avvia() {
-    pannello();
+    cruscotto(); pannello(); setTimeout(rendiMotore, 1800);
     prepara().then(() => { quadro(); strati(); frasi(); present(); gate.classList.add('nt-on'); window.addEventListener('resize', () => { if (!gate.hidden) ridisegna(); }); }).catch(() => {});
   }
   if (document.readyState === 'complete') setTimeout(avvia, 0); else window.addEventListener('load', avvia);
 
   // per le prove: ridisegna il quadro subito
-  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, gira };
+  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, accendi: accendiDaSolo };
 })();

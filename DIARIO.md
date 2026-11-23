@@ -1,3 +1,9 @@
+## 23/11/2026 · proprietario (Nico) · v0.123 (**la chiave si gira davvero**)
+- **Schermata iniziale** (`titolo.js`): via le luci che passano e le scie; strada ferma, lampioni che sfarfallano. Sfondo animato in CSS: luna con alone, nuvole, due fari di ricerca, un aereo, luci rosse sui palazzi, finestre che si accendono e si spengono (trovate leggendo i pixel del quadro).
+- **Niente più pannello «Accendi e parti»**: c'è il blocchetto d'accensione con la chiave. Si **tiene premuto** (mouse, dito, Invio o Spazio): ACC, ON, poi START col motorino; a metà la chiave torna indietro e il motore non prende. In fondo il motore prende, le spie (BATT, OLIO, MOT) si spengono e parte il gioco. Le tre partite sono portachiavi su una barra; «Come si gioca» è un fumetto.
+- **Suono**: l'avviamento non è più sintetizzato a mano ma reso una volta con `EngineDSP` e `SupraSim` del gioco (motorino, presa, colpo di gas, minimo); se non è pronto, riserva semplice. **Non posso ascoltarlo: da giudicare a orecchio.**
+- Le prove automatiche partono subito (solo i clic veri girano la chiave). Dopo il caricamento Ctrl+F5.
+
 ## 23/11/2026 · proprietario (Nico) · v0.122 (**aggiornamenti subito**)
 - Dopo un caricamento su `main` il gioco poteva mostrare il codice vecchio fino a 10 minuti anche ricaricando: `sw.js` chiedeva i file alla rete ma passando dalla cache HTTP di GitHub Pages. Ora chiede sempre se il file è cambiato (`cache: 'no-cache'`: se è uguale arriva un 304), e `VERSIONE` è `nr-3-aggiornamenti`. Il service worker nuovo si attiva alla seconda apertura dopo il caricamento; intanto si forza con Ctrl+F5.
 
