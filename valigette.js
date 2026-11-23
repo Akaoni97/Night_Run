@@ -40,8 +40,9 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
   };
   P.caseGrant = function (type, why) {
     const C = this.cases(); C.own.push({ type, why: why || '' });
-    this.say(`${CASE_TYPES[type].name} guadagnata${why ? ' (' + why + ')' : ''}: aprila dal telefono, app Valigette`, 'money');
-    if (typeof window !== 'undefined' && window.valigette) window.valigette.notify(type, why);
+    // il premio arriva come avviso del telefono; senza telefono (prove, test) resta l'avviso a destra
+    if (typeof window !== 'undefined' && window.valigette && window.telefono && window.telefono.toast) window.valigette.notify(type, why);
+    else this.say(`${CASE_TYPES[type].name} guadagnata${why ? ' (' + why + ')' : ''}: aprila dal telefono, app Valigette`, 'money');
   };
   P.caseBuy = function (type) {
     const T = CASE_TYPES[type]; if (!T) return { ok: false };
@@ -617,7 +618,7 @@ let CASE_GIVE = null;                                 // i premi, riusati dalla 
     play, openCase, drawCase, drawPrize, carPic, SND, ac,
     notify(type) {
       const nuova = offerApp();
-      if (window.telefono && window.telefono.toast) window.telefono.toast('Valigette', nuova ? `${CASE_TYPES[type].name}! Scarica l'app Valigette dal telefono per aprirla.` : `${CASE_TYPES[type].name}: aprila dal telefono`, false);
+      if (window.telefono && window.telefono.toast) window.telefono.toast('Valigette', nuova ? `${CASE_TYPES[type].name}! Scarica l'app Valigette dal telefono per aprirla.` : `${CASE_TYPES[type].name}: aprila dal telefono`, false, nuova ? null : () => window.telefono.show('vgl'), true);
       if (window.telefono && window.telefono.render) window.telefono.render();
     },
     // per provare la scena: window.valigette.demo('oro', 5)

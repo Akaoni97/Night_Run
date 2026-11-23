@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const src = readFileSync(new URL('../salvataggi.js', import.meta.url), 'utf8');
-const { SLOT, slotRiassunto, slotScambia } = new Function(src + ';return { SLOT, slotRiassunto, slotScambia };')();
+const { SLOT, slotRiassunto, slotScambia, slotNome, slotQuando } = new Function(src + ';return { SLOT, slotRiassunto, slotScambia, slotNome, slotQuando };')();
 const finto = (o = {}) => { const m = new Map(Object.entries(o)); return { m, getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k) }; };
 const partita = (km, soldi, auto) => JSON.stringify({ mode: 'career', s: { dist: km * 1000, money: soldi, carId: auto, vg: { on: true, prologo: 1 } } });
 
@@ -35,4 +35,19 @@ test('salvataggi: andata e ritorno, la partita 1 torna identica (anche pezzi, pe
 
 test('salvataggi: scambiare con sé stessa non fa niente', () => {
   const L = finto({ 'nightrun-viaggio': 'x' }); assert.equal(slotScambia(L, 2, 2), false); assert.equal(L.getItem('nightrun-viaggio'), 'x');
+});
+
+test('salvataggi: nome scelto e ultima volta', () => {
+  assert.equal(slotNome({}, 2), 'Partita 2');
+  assert.equal(slotNome({ 2: { nome: '  Luca  ' } }, 2), 'Luca');
+  assert.equal(slotNome({ 1: { nome: 'Un nome molto troppo lungo' } }, 1).length, 14);
+  assert.equal(slotNome({ 3: { nome: '   ' } }, 3), 'Partita 3');
+  const ora = new Date(2026, 10, 23, 15, 0).getTime(), g = (n, h = 10) => new Date(2026, 10, 23 - n, h, 0).getTime();
+  assert.equal(slotQuando(0, ora), '');
+  assert.equal(slotQuando(g(0, 1), ora), 'oggi');
+  assert.equal(slotQuando(g(1, 23), ora), 'ieri');
+  assert.equal(slotQuando(g(3), ora), '3 giorni fa');
+  assert.equal(slotQuando(g(8), ora), '1 settimana fa');
+  assert.equal(slotQuando(g(15), ora), '2 settimane fa');
+  assert.equal(slotQuando(g(60), ora), 'più di un mese fa');
 });

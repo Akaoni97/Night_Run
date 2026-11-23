@@ -48,7 +48,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
    rendimento che cala quando il motore è già tirato, o si lascia così perché è un gioco? (cognato)
 
 ### Menu e locali
-11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): **tre slot di salvataggio fatti (v0.101)**; restano pausa a due livelli, sfondo vivo, controller e
+11. [menu] **Resto delle idee sul menu** (fatte solo Impostazioni e meteo): **tre slot di salvataggio fatti (v0.101)**; **pausa a due livelli fatta (v0.110)**, **nomi dei salvataggi, mappa del diario e foto fatte (v0.110)**; restano sfondo vivo, controller e
    tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi. Quali e in
    che ordine? (proprietario)
 ### Personaggi e storia
@@ -82,6 +82,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
    ~30 km. Luca (21/11): per ora si lascia così, si tara giocando. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 23/11 (v0.110, Nico): pausa a due livelli, premi come avvisi del telefono, nomi dei salvataggi, mappa del diario. Da provare sul PC (decide Nico se la coppa dei traguardi deve tornare).
 - 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.
 - 22/11 (v0.98-v0.103, Nico): prologo alla qualità del gioco, due errori piccoli, anomalie di Luca, tre salvataggi, schermata iniziale nuova.
 - 22/11 (v0.99, v0.104-v0.107, Luca): officina più chiara, gomme che non sgommano più da ferme, volume per ogni pezzo, pop & bang nella centralina, volano a quattro livelli, turbo più vero, pezzi per tutti i motori (anche la Supra), cambi lunghi, compressori a cinghia.

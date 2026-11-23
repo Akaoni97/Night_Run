@@ -3363,7 +3363,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // ---------------------------------------------------------------- ciclo principale
   let slipFrizT = 0, slipFrizMsg = -1e9, fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0;
   function frame(now) {
-    if (pausaF) { last = now; requestAnimationFrame(frame); return; }
+    if (pausaF || window.__nrPausaM) { last = now; requestAnimationFrame(frame); return; }
     if (window.NR_PREST && NR_PREST.fps) {                        // tetto ai fotogrammi (prestazioni.js)
       const iv = 1000 / NR_PREST.fps;
       if (now < fpsNext - 1) { requestAnimationFrame(frame); return; }
@@ -3735,6 +3735,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="diario.js"></script>
 <script src="banco.js"></script>
 <script src="jeshka.js"></script>
+<script src="pausa.js"></script>
 <script src="leggibile.js"></script>
 </body>
 </html>

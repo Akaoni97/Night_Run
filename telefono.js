@@ -268,12 +268,15 @@ const telThreads = (km) => {
   }, true);
 
   // avviso di messaggio nuovo: una striscia sopra la strada
-  function toast(from, text, bad, go) {
+  function toastShow(from, text, bad, go, gold) {
     if (!toastEl) { toastEl = document.createElement('div'); toastEl.className = 'tel-toast'; toastEl.style.cssText = 'position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:62;max-width:min(340px,92vw);padding:10px 14px;border-radius:16px;background:rgba(18,20,28,.92);color:#eceef5;font:13px/1.3 system-ui;box-shadow:0 8px 24px #000a;cursor:pointer;transition:opacity .3s;opacity:0;pointer-events:none'; toastEl.addEventListener('click', () => { if (toastEl._go) { toastEl._go(); return; } setOpen(true); ST.view = 'msg'; ST.stack = ['msg']; render(); }); document.body.appendChild(toastEl); }
     toastEl._go = go || null;
-    toastEl.innerHTML = `<b style="display:block;font-size:12px;color:${bad ? '#ff8a80' : '#8fb4ff'}">${esc(from)}</b>${esc(text)}`;
-    toastEl.style.opacity = '1'; toastEl.style.pointerEvents = 'auto'; clearTimeout(toast.t); toast.t = setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.pointerEvents = 'none'; }, 4200);
+    toastEl.innerHTML = `<b style="display:block;font-size:12px;color:${bad ? '#ff8a80' : gold ? '#ffc63a' : '#8fb4ff'}">${esc(from)}</b>${esc(text)}`;
+    toastEl.style.opacity = '1'; toastEl.style.pointerEvents = 'auto'; clearTimeout(toast.t); toast.t = setTimeout(() => { toastEl.style.opacity = '0'; toastEl.style.pointerEvents = 'none'; }, 4200); toast.busy = true; clearTimeout(toast.q); toast.q = setTimeout(() => { toast.busy = false; const n = toast.fila.shift(); if (n) toastShow(...n); }, 4700);
   }
+  // gli avvisi si mettono in fila (premi, valigette, messaggi): uno alla volta, nessuno copre l'altro
+  function toast(from, text, bad, go, gold) { if (toast.busy) { if (toast.fila.length < 5) toast.fila.push([from, text, bad, go, gold]); return; } toastShow(from, text, bad, go, gold); }
+  toast.fila = [];
   function ring(who, o) { if (ST.call) return; ST.call = Object.assign({ who }, o); if (!ST.on) setOpen(true); ST.view = ST.view === 'lock' ? 'home' : ST.view; render(); }
 
   // ogni secondo: messaggi che arrivano coi km, chiamate scritte, conto alla rovescia e durata chiamata

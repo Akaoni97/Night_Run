@@ -1,3 +1,10 @@
+## 23/11/2026 · proprietario (Nico) · v0.110 (**pausa, avvisi del telefono, nomi dei salvataggi, mappa del diario**)
+- **Pausa** (`pausa.js`): Esc ferma gioco e suono e apre una finestrella; Menu completo, Impostazioni e Salvataggi aprono il menu a schede e chiudendolo si torna alla finestrella. «Salva e torna al titolo» chiede conferma.
+- **Premi sul telefono**: traguardi e valigette guadagnate arrivano come avvisi del telefono (uno alla volta, tocco = la loro app). Tolto il doppione «Valigetta di bronzo» a destra. Senza telefono resta la coppa grande.
+- **Salvataggi**: ogni partita ha un nome (matita sulla casella) e «oggi / ieri / N giorni fa».
+- **Diario**: mappa a serpentina con le dodici capitali, la strada fatta, dove sei e un punto per ogni momento; tocco sulla foto la ingrandisce.
+- Da guardare sul PC: se la pausa a due livelli è comoda, se la coppa dei traguardi vi manca (si rimette facilmente), se la mappa piace.
+
 ## 23/11/2026 · proprietario (Nico) · v0.109 (**pulizia del codice**)
 - Controllo del codice morto: tolte `renderUps` e `suspLabels` (index.html) e `sim0` (polizia.js), nessuno le chiamava; tolta `desk-fine.png` (uscita della prova di fumo) e messa in `.gitignore`. Restano esportate ma senza uso `bancoSim`, `gvMedia`, `gvVincita` (le provano i test), `FLAME_TIERS`, `ST_CAT_NAME`. Immagini e suoni: tutti usati.
 

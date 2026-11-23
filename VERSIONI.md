@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.109**
+**Versione attuale: v0.110**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -132,3 +132,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.107 | 22/11 | cognato | Pezzi per tutti i motori: la Supra ha anche aspirazioni (pannello, cono, airbox, cornetti), cilindrata, benzina e cambi sport e da corsa regolabili; cambi più lunghi per tutte: il da corsa al limitatore in ultima tira a 350 km/h sulle belle (≥ 200 CV: Supra, M3...), 320 sulle normali, 300 sulle piccole e sui mezzi pesanti, il cambio sport tutto lungo a 300/275/255 e il bus a 200; compressori volumetrici e centrifughi a cinghia (niente ritardo, niente valvola), il turbo nuovo vale per ogni motore. |
 | v0.108 | 23/11 | proprietario | Check della sera: gli avvisi a destra (per esempio «Valigetta di bronzo») non compaiono più sopra la schermata iniziale e il prologo, aspettano. 384 test e prova di fumo senza errori. |
 | v0.109 | 23/11 | proprietario | Pulizia del codice: tolte due funzioni mai usate dell'officina vecchia (`renderUps`, `suspLabels`) e una della polizia; tolta una foto di prova finita nel repository per sbaglio. 384 test e prova di fumo senza errori. |
+| v0.110 | 23/11 | proprietario | Pausa a due livelli (Esc: finestrella con Continua, Menu completo, Impostazioni, Salvataggi, Salva e torna al titolo); premi (traguardi e valigette) come avvisi del telefono, in fila; salvataggi con nome e «ultima volta»; diario con la mappa del Viaggio e foto ingrandibili. 388 test. |

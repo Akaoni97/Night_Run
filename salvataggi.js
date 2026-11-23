@@ -23,6 +23,13 @@ function slotRiassunto(json, cars) {
   } catch (e) { return null; }
 }
 
+// il nome scelto per una partita (o «Partita n») e quando è stata giocata l'ultima volta (v0.110)
+function slotNome(meta, n) { const m = meta && meta[n]; const t = m && typeof m.nome === 'string' ? m.nome.trim().slice(0, 14) : ''; return t || 'Partita ' + n; }
+function slotQuando(ts, now) {
+  if (!ts) return ''; const g = Math.floor((new Date(now).setHours(0, 0, 0, 0) - new Date(ts).setHours(0, 0, 0, 0)) / 86400000);
+  return g <= 0 ? 'oggi' : g === 1 ? 'ieri' : g < 7 ? g + ' giorni fa' : g < 30 ? Math.floor(g / 7) + (g < 14 ? ' settimana fa' : ' settimane fa') : 'più di un mese fa';
+}
+
 // lo scambio su uno spazio di chiavi (localStorage o un oggetto finto nei test): la partita `da` va da parte, `a` torna in uso
 function slotScambia(L, da, a) {
   if (da === a) return false;
@@ -53,6 +60,11 @@ function slotScambia(L, da, a) {
     return L.getItem('nightrun-viaggio@' + n);
   };
   const riassunto = (n) => slotRiassunto(json(n), typeof CARS !== 'undefined' ? CARS : null);
+  // nomi e ultima volta (sono del computer, non seguono lo scambio delle partite)
+  const metaGet = () => { try { return JSON.parse(L.getItem('nr_slot_meta') || '{}') || {}; } catch (e) { return {}; } };
+  const metaSet = (m) => { try { L.setItem('nr_slot_meta', JSON.stringify(m)); } catch (e) { /* pieno */ } };
+  const tocca = () => { const m = metaGet(), n = inUso(); m[n] = Object.assign(m[n] || {}, { ora: Date.now() }); metaSet(m); };
+  if (!window.__nrSlotOra) { window.__nrSlotOra = true; setInterval(tocca, 60000); window.addEventListener('pagehide', tocca); }
   const euro = (x) => '€ ' + x.toLocaleString('it-IT');
   const km = (x) => x.toLocaleString('it-IT', { maximumFractionDigits: x < 10 ? 1 : 0 });
 
@@ -60,6 +72,7 @@ function slotScambia(L, da, a) {
     const da = inUso(); if (n === da) return;
     if (window.nightRun && window.nightRun.game && window.nightRun.game.inside) return false;   // dentro un locale no: prima si esce
     try { if (window.nightRun && window.nightRun.save) window.nightRun.save(); } catch (e) { /* si va avanti */ }
+    tocca();
     window.__nrRiavvia = true;                                   // il gioco non risalva mentre la pagina si chiude (riavvia.js)
     try { slotScambia(L, da, n); } catch (e) { window.__nrRiavvia = false; return; }
     location.reload();
@@ -71,6 +84,7 @@ function slotScambia(L, da, a) {
 .nr-slot{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:2px;padding:9px 10px;border-radius:8px;background:rgba(10,12,22,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);font:500 12px/1.35 "Barlow Semi Condensed",system-ui,sans-serif;color:#c9c2b0;min-width:0;transition:box-shadow .15s,background .15s}
 .nr-slot:hover,.nr-slot:focus-visible{background:rgba(30,26,18,.7);box-shadow:inset 0 0 0 1px rgba(255,179,71,.6)}
 .nr-slot b{font:400 13px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#e8dcc0}
+.nr-slot{position:relative}.nr-slot .ed{position:absolute;top:6px;right:7px;font-size:12px;color:#8a8270;cursor:pointer;padding:0 3px}.nr-slot .ed:hover{color:#ffb347}
 .nr-slot span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nr-slot i{font-style:normal;font-size:11px;color:#8a8270}
 .nr-slot.on{background:rgba(60,40,10,.6);box-shadow:inset 0 0 0 2px #ffb347}
@@ -91,13 +105,21 @@ function slotScambia(L, da, a) {
       for (let n = 1; n <= SLOT.n; n++) {
         const r = riassunto(n), b = document.createElement('button'); b.type = 'button'; b.className = 'nr-slot' + (n === u ? ' on' : '');
         const t = r ? (r.prologo ? `${r.auto} · km ${km(r.km)}` : 'Nuova') : 'Vuota';
-        b.innerHTML = `<b>Partita ${n}</b><span>${t}</span><i>${r && r.prologo ? euro(r.soldi) : r ? '' : 'si parte da capo'}${n === u ? (r && r.prologo ? ' · in uso' : r ? 'in uso' : ' · in uso') : ''}</i>`;
+        const M = metaGet(), q = r && M[n] && M[n].ora ? slotQuando(M[n].ora, Date.now()) : '';
+        b.innerHTML = `<b></b><span class="ed" role="button" title="Cambia nome" aria-label="Cambia nome">✎</span><span>${t}</span><i>${r && r.prologo ? euro(r.soldi) : r ? '' : 'si parte da capo'}${n === u ? (r && r.prologo ? ' · in uso' : r ? 'in uso' : ' · in uso') : q ? (r && r.prologo ? ' · ' : '') + q : ''}</i>`;
+        b.querySelector('b').textContent = slotNome(M, n);
+        b.querySelector('.ed').addEventListener('click', (e) => {
+          e.stopPropagation(); e.preventDefault();
+          let nome; try { nome = window.prompt('Nome della partita (max 14 lettere)', slotNome(M, n)); } catch (err) { nome = null; }
+          if (nome == null) return; const m = metaGet(); m[n] = Object.assign(m[n] || {}, { nome: nome.trim().slice(0, 14) }); metaSet(m); disegna();
+        });
         b.addEventListener('click', (e) => {
           e.stopPropagation(); if (n === inUso()) return;
           if (!conferma) { vai(n); return; }
           const old = box.querySelector('.nr-slot-ask'); if (old) old.remove();
           const a = document.createElement('div'); a.className = 'nr-slot-ask';
-          a.innerHTML = `<span>Passare alla <b>Partita ${n}</b>? Quella di adesso si salva e resta qui. Il gioco riparte dal titolo.</span><button type="button" class="si">Sì, cambia</button><button type="button" class="no">No</button>`;
+          a.innerHTML = `<span>Passare a <b class="nm"></b>? Quella di adesso si salva e resta qui. Il gioco riparte dal titolo.</span><button type="button" class="si">Sì, cambia</button><button type="button" class="no">No</button>`;
+          a.querySelector('.nm').textContent = slotNome(metaGet(), n);
           a.querySelector('.si').addEventListener('click', (ev) => { ev.stopPropagation(); if (vai(n) === false) a.querySelector('span').textContent = 'Prima esci dal locale, poi cambia partita.'; });
           a.querySelector('.no').addEventListener('click', (ev) => { ev.stopPropagation(); a.remove(); });
           box.appendChild(a);
@@ -131,4 +153,4 @@ function slotScambia(L, da, a) {
   window.NightSalvataggi = { panel, vai, get inUso() { return inUso(); }, riassunto };
 })();
 
-if (typeof window !== 'undefined') Object.assign(window, { SLOT, slotRiassunto, slotScambia });
+if (typeof window !== 'undefined') Object.assign(window, { SLOT, slotRiassunto, slotScambia, slotNome, slotQuando });

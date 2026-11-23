@@ -105,7 +105,13 @@ const TRG_LIST = [
   function next() {
     if (showing || !queue.length) return;
     const gt = document.getElementById('gate'); if ((gt && !gt.hidden) || (window.NightPrologo && NightPrologo.playing)) { setTimeout(next, 1000); return; }   // sulla schermata iniziale e nel prologo aspetta
-    const T = queue.shift(), g = G(); showing = true;
+    const T = queue.shift(), g = G();
+    // con il telefono: il traguardo arriva come avviso del telefono (tocco = app Traguardi); la coppa grande resta senza telefono
+    if (window.telefono && window.telefono.toast) {
+      chime(); window.telefono.toast('Traguardo sbloccato', `${T.name} · premio ${g ? g.achPrizeText(T.prize) : ''}`, false, () => window.telefono.show('trg'), true);
+      setTimeout(next, 800); return;
+    }
+    showing = true;
     const el = document.createElement('div'); el.className = 'trg-pop'; el.setAttribute('role', 'status');
     el.innerHTML = `<div class="cup">${CUP()}</div><div><small>TRAGUARDO SBLOCCATO</small><b>${esc(T.name)}</b><span>${esc(T.text)} · premio <em>${esc(g ? g.achPrizeText(T.prize) : '')}</em></span></div>`;
     document.body.appendChild(el); chime();
