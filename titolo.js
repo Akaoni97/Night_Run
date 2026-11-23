@@ -72,6 +72,20 @@
   }
   function colline(x) {
     x.fillStyle = '#0d0c22'; x.beginPath(); x.moveTo(0, 226); for (let k = 0; k <= W; k += 4) x.lineTo(k, 200 + Math.sin(k * 0.011 + 1) * 9 + Math.sin(k * 0.037) * 4); x.lineTo(W, 226); x.fill();
+    // le case sulle colline: tetti a falde, camini, finestre accese, pini
+    const hy = (k) => 200 + Math.sin(k * 0.011 + 1) * 9 + Math.sin(k * 0.037) * 4;
+    for (let k = 4, n = 0; k < W - 6; n++) {
+      const w = 8 + Math.floor(hash(n + 61) * 8), h = 6 + Math.floor(hash(n + 71) * 5), by = Math.round(hy(k + w / 2)) + 3;
+      if (k > 364 && k < 422) { k += 62; continue; }                                     // sotto la ruota panoramica non ci sono case
+      if (hash(n + 81) < 0.22) { const th = 8 + hash(n + 5) * 8; x.fillStyle = '#0c0b20'; x.beginPath(); x.moveTo(k, by); x.lineTo(k + 3, by - th); x.lineTo(k + 6, by); x.fill(); k += 7; continue; }   // un pino
+      const bc = ['#1a1840', '#171637', '#201c44', '#14132f'][Math.floor(hash(n + 91) * 4)];
+      R(x, k, by - h, w, h, bc); x.fillStyle = '#0d0c26'; x.beginPath(); x.moveTo(k - 1, by - h); x.lineTo(k + w / 2, by - h - 4 - hash(n + 3) * 3); x.lineTo(k + w + 1, by - h); x.fill();
+      if (hash(n + 13) < 0.5) R(x, k + w - 3, by - h - 6, 2, 4, '#0d0c26');             // il camino
+      const nw = w > 11 ? 2 : 1; for (let q = 0; q < nw; q++) if (hash(n * 5 + q + 21) < 0.62) { const wx = k + 2 + q * 5; R(x, wx, by - h + 2, 2, 2, hash(n * 7 + q) < 0.2 ? '#7fd8ff' : '#ffcf7a'); glow(x, wx + 1, by - h + 3, 5, '#ffb84a', 0.1); }
+      k += w + 2 + Math.floor(hash(n + 41) * 12);
+    }
+    // la ruota panoramica: le gambe (la ruota gira sopra, a parte)
+    { const rx = 392, ry = 152, b = hy(rx) + 4; x.strokeStyle = '#1e1b40'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(rx, ry); x.lineTo(rx - 15, b); x.moveTo(rx, ry); x.lineTo(rx + 15, b); x.stroke(); R(x, rx - 17, b - 1, 34, 2, '#14122e'); }
     // piloni dell'alta tensione sulle colline
     for (const px of [90, 300, 520]) { const y = 196 + Math.sin(px * 0.011 + 1) * 9; R(x, px, y - 26, 1, 26, '#1c1a38'); R(x, px - 5, y - 24, 11, 1, '#1c1a38'); R(x, px - 3, y - 18, 7, 1, '#1c1a38'); }
     x.strokeStyle = 'rgba(40,36,80,.8)'; x.lineWidth = 0.5; x.beginPath(); x.moveTo(-10, 176); x.quadraticCurveTo(195, 186, 300, 172); x.quadraticCurveTo(410, 186, 520, 172); x.quadraticCurveTo(600, 182, 660, 176); x.stroke();
@@ -112,26 +126,24 @@
     g.setTransform(SS, 0, 0, SS, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false; A.kit(g);
     const t = 3.2;                                                                     // un istante fisso (coni, riflessi, pulviscolo)
     paste(layer('cielo', cielo)); paste(layer('colline', colline));
-    // l'insegna SOLO AVANTI sul tetto della città, rosa
-    { const xx = 120; R(g, xx + 8, 150, 1, 10, '#1a1838'); R(g, xx + 70, 150, 1, 10, '#1a1838'); if (V().text) { V().text(g, 'SOLO AVANTI', xx, 142, '#ff5fa8', 1); light(g, xx + 39, 145, 50, 10, '#ff5fa8', 0.07); } }
     paste(layer('strada', strada));
     for (let k = 4; k < W; k += 64) R(g, k, 286, 32, 2, '#d8d4c6');                                                    // tratteggio
     for (let gx = 6; gx < W + 50; gx += 50) R(g, gx, 222, 2, 14, '#3a3e4e');                                           // guardrail
     R(g, 0, 224, W, 4, '#5a5e70'); R(g, 0, 224, W, 1, '#8a90a8'); R(g, 0, 228, W, 1, '#2a2c38');
-    // il cartello verde a bordo strada: USCITA 18 KM (quello che non cambia mai)
+    // il cartello verde a bordo strada: ULTIMA USCITA (quello che non cambia mai)
     { const sx = 206; R(g, sx + 6, 170, 3, 56, '#2a2c38'); R(g, sx + 58, 170, 3, 56, '#2a2c38'); R(g, sx - 1, 139, 70, 33, INK); R(g, sx, 140, 68, 31, '#0b5a30'); R(g, sx + 2, 142, 64, 27, '#0e6a38'); R(g, sx + 4, 144, 60, 0.5, '#d8e8d8');
-      if (V().text) { V().text(g, 'USCITA', sx + 34 - V().textW('USCITA', 1) / 2, 148, '#f2f2e6', 1); V().text(g, '18 KM', sx + 34 - V().textW('18 KM', 2) / 2, 156, '#f2f2e6', 2); } light(g, sx + 34, 156, 40, 18, '#9affc0', 0.03); }
+      if (V().text) { V().text(g, 'ULTIMA', sx + 34 - V().textW('ULTIMA', 2) / 2, 145, '#f2f2e6', 2); V().text(g, 'USCITA', sx + 34 - V().textW('USCITA', 2) / 2, 157, '#f2f2e6', 2); } light(g, sx + 34, 156, 40, 18, '#9affc0', 0.03); }
     // i lampioni: due accesi, quello in mezzo spento
     for (const [lx, acceso] of [[70, true], [330, false], [530, true]]) {
       if (V().lampHD) V().lampHD(g, lx, acceso, '#ffd9a0', lx);
-      if (acceso) { if (V().lampCone) V().lampCone(g, lx, '#ffd9a0', t, false); light(g, lx + 19, 126, 18, 9, '#ffd9a0', 0.14); light(g, lx + 19, 300, 90, 16, '#ffcf8a', 0.05); A.reflect(g, lx + 19, 240, 60, 10, '#ffd9a0', 0.12, t); }
+      if (acceso) { if (V().lampCone && lx < 400) V().lampCone(g, lx, '#ffd9a0', t, false); light(g, lx + 19, 126, 18, 9, '#ffd9a0', 0.14); if (lx < 400) { light(g, lx + 19, 300, 90, 16, '#ffcf8a', 0.05); A.reflect(g, lx + 19, 240, 60, 10, '#ffd9a0', 0.12, t); } }
     }
     // la nostra auto ferma in corsia d'emergenza, con le quattro frecce e i fari accesi
     if (mia) {
       const D = mia.D, x = 196, gnd = 332, top = gnd - (D.wy + D.wr);
       A.reflect(g, x + D.head[0], gnd + 2, 18, 12, '#ffe8b0', 0.16, t); A.reflect(g, x + D.tail[0] + 2, gnd + 2, 14, 7, '#ff3a2a', 0.14, t);
       A.shadowUnder(g, x, gnd, D.w, 0.7);
-      A.beam(g, x + D.head[0], top + D.head[1] + 2, 300, 0.36);
+      A.beam(g, x + D.head[0], top + D.head[1] + 2, 80, 0.36);
       A.drawCar(g, mia, x, gnd, 0, 1);
       const tl = D.tail; R(g, x + tl[0], top + tl[1], tl[2], tl[3], '#ff3a2a'); light(g, x + tl[0] + 2, top + tl[1] + 2, 16, 8, '#ff3020', 0.18);
       light(g, x + D.head[0], top + D.head[1], 12, 7, '#fff0c8', 0.3);
@@ -183,8 +195,6 @@
 @keyframes ntNu{from{transform:translateX(calc(var(--u)*-320))}to{transform:translateX(calc(var(--u)*720))}}
 .nt-luna{width:calc(var(--u)*120);height:calc(var(--u)*120);margin:calc(var(--u)*-60) 0 0 calc(var(--u)*-60);background:radial-gradient(closest-side,rgba(255,244,220,.5),rgba(184,176,255,.2) 45%,rgba(184,176,255,0));animation:ntLuna 7s ease-in-out infinite alternate}
 @keyframes ntLuna{from{opacity:.45;transform:scale(.94)}to{opacity:.9;transform:scale(1.06)}}
-.nt-faro{width:calc(var(--u)*7);height:calc(var(--u)*230);margin-left:calc(var(--u)*-3.5);background:linear-gradient(rgba(255,244,255,0),rgba(255,244,255,.16) 60%,rgba(255,244,255,.26));clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
-@keyframes ntFaro{from{transform:rotate(-24deg)}to{transform:rotate(26deg)}}
 .nt-aereo{left:0;top:calc(var(--u)*34);width:calc(var(--u)*3);height:calc(var(--u)*3);animation:ntAereo 70s linear var(--dl) infinite}
 .nt-aereo::before{content:"";position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;background:#fff;box-shadow:0 0 calc(var(--u)*4) calc(var(--u)*1.5) rgba(255,255,255,.9);animation:ntStrobo 1.6s steps(1) infinite}
 .nt-aereo::after{content:"";position:absolute;left:calc(var(--u)*-8);top:calc(var(--u)*.6);width:calc(var(--u)*1.6);height:calc(var(--u)*1.6);border-radius:50%;background:#ff3030;box-shadow:0 0 calc(var(--u)*3) calc(var(--u)*1) rgba(255,50,50,.9);animation:ntStrobo 1.6s steps(1) -.6s infinite}
@@ -194,6 +204,34 @@
 @keyframes ntBea{0%,55%{opacity:1}56%,100%{opacity:.08}}
 .nt-fin{inset:0;width:100%;height:100%;image-rendering:pixelated;animation:ntFin var(--d) steps(1) var(--dl) infinite}
 @keyframes ntFin{0%{opacity:0}18%{opacity:1}41%{opacity:0}57%{opacity:1}64%{opacity:0}88%{opacity:1}100%{opacity:0}}
+/* fari di ricerca nel cielo (ritagliati sopra la città), dirigibile, ruota panoramica, stelle cadenti, uccelli */
+.nt-scena>.nt-sk{left:0;top:0;width:100%;overflow:hidden;clip-path:inset(0);contain:paint}
+.nt-sk>*{position:absolute}
+.nt-sk .nt-faro{width:calc(var(--u)*34);height:calc(var(--u)*230);margin-left:calc(var(--u)*-17);background:linear-gradient(to top,rgba(236,228,255,.38),rgba(236,228,255,.14) 40%,rgba(236,228,255,.04) 75%,rgba(236,228,255,0));clip-path:polygon(47% 100%,53% 100%,100% 0,0 0);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
+@keyframes ntFaro{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}
+.nt-fbase{width:calc(var(--u)*9);height:calc(var(--u)*5);margin:calc(var(--u)*-2.5) 0 0 calc(var(--u)*-4.5);border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.9),rgba(236,228,255,0));animation:ntFB 3.4s ease-in-out var(--dl) infinite}
+@keyframes ntFB{0%,100%{opacity:.5}50%{opacity:1}}
+.nt-dir{left:0;width:calc(var(--u)*50);height:calc(var(--u)*16);animation:ntDir 130s linear var(--dl) infinite}
+@keyframes ntDir{from{transform:translateX(calc(var(--u)*-70))}to{transform:translateX(calc(var(--u)*700))}}
+.nt-dir .c{position:absolute;left:0;top:0;width:100%;height:calc(var(--u)*12);border-radius:50%;background:radial-gradient(ellipse at 50% 28%,#4a4690,#211f4a 62%,#12102c);box-shadow:inset 0 calc(var(--u)*-1.5) calc(var(--u)*2) rgba(0,0,0,.5)}
+.nt-dir .g{position:absolute;left:calc(var(--u)*21);top:calc(var(--u)*11);width:calc(var(--u)*8);height:calc(var(--u)*3);border-radius:0 0 40% 40%;background:#1a1838;box-shadow:0 0 calc(var(--u)*3) rgba(255,207,122,.6)}
+.nt-dir .p{position:absolute;right:calc(var(--u)*1);top:calc(var(--u)*5);width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#ff3a3a;box-shadow:0 0 calc(var(--u)*4) rgba(255,58,58,.9);animation:ntStrobo 1.4s steps(1) infinite}
+.nt-dir b{position:absolute;left:0;width:100%;top:calc(var(--u)*3.4);text-align:center;font:400 calc(var(--u)*3.6)/1 "Share Tech Mono",monospace;letter-spacing:.12em;color:#ff7ab8;text-shadow:0 0 calc(var(--u)*2.5) #ff5fa8;animation:ntLed 5s steps(1) infinite}
+@keyframes ntLed{0%,70%{opacity:1}72%{opacity:.3}74%{opacity:1}78%{opacity:.3}80%,100%{opacity:1}}
+.nt-ruota{width:calc(var(--u)*66);height:calc(var(--u)*66);margin:calc(var(--u)*-33) 0 0 calc(var(--u)*-33);animation:ntGira 70s linear infinite}
+.nt-ruota svg{width:100%;height:100%;overflow:visible;display:block}
+@keyframes ntGira{to{transform:rotate(360deg)}}
+.nt-ruota .cb{animation:ntCab 2.6s ease-in-out calc(var(--i)*-.22s) infinite alternate}
+@keyframes ntCab{from{opacity:.35}to{opacity:1}}
+.nt-cad{width:calc(var(--u)*16);height:calc(var(--u)*.9);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95));border-radius:50%;opacity:0;animation:ntCad var(--d) linear var(--dl) infinite}
+@keyframes ntCad{0%,90%{opacity:0;transform:rotate(24deg) translateX(0)}91%{opacity:1}100%{opacity:0;transform:rotate(24deg) translateX(calc(var(--u)*70))}}
+.nt-uc{left:0;width:calc(var(--u)*40);height:calc(var(--u)*12);animation:ntUc var(--d) linear var(--dl) infinite}
+@keyframes ntUc{from{transform:translateX(calc(var(--u)*-50))}to{transform:translateX(calc(var(--u)*700))}}
+.nt-uc i{position:absolute;width:calc(var(--u)*4);height:calc(var(--u)*1.2);animation:ntAli var(--f) ease-in-out infinite alternate}
+.nt-uc i::before,.nt-uc i::after{content:"";position:absolute;top:0;width:55%;height:100%;background:#3b3566;border-radius:50%}
+.nt-uc i::before{left:0;transform-origin:100% 50%;transform:rotate(-20deg)}
+.nt-uc i::after{right:0;transform-origin:0 50%;transform:rotate(20deg)}
+@keyframes ntAli{from{transform:scaleY(1)}to{transform:scaleY(-1)}}
 /* i lampioni che sfarfallano: un buio sulla testa e lampi di luce */
 .nt-lamd{width:calc(var(--u)*17);height:calc(var(--u)*6);margin:calc(var(--u)*-3) 0 0 calc(var(--u)*-8);border-radius:40%;background:rgba(10,8,26,.8);animation:ntLamD var(--d) steps(1) var(--dl) infinite}
 @keyframes ntLamD{0%,30%{opacity:0}31%{opacity:1}33%{opacity:0}34%{opacity:1}36%,70%{opacity:0}71%{opacity:1}72%{opacity:0}73%{opacity:1}75%,100%{opacity:0}}
@@ -245,16 +283,17 @@
 .nt-pop p{margin:0 0 10px;font:500 13px/1.45 "Barlow Semi Condensed",system-ui,sans-serif;color:#e0d8c8}
 .gate.nt .nt-pop .keys{display:flex!important;flex-wrap:wrap;gap:6px 12px;margin:0}
 /* il blocchetto d'accensione */
-.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;justify-items:center;gap:6px;width:200px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;justify-items:center;gap:6px;width:226px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
 .gate.nt .go.nt-sw:active{cursor:grabbing}
 .gate.nt .go.nt-sw:focus-visible .nt-svg{filter:drop-shadow(0 0 10px #ffb347)}
-.nt-svg{width:190px;height:190px;overflow:visible;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
-.nt-svg .nt-k{transform-origin:110px 110px;transform:rotate(var(--g,0deg))}
+.nt-svg{width:226px;height:226px;overflow:visible;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
+.nt-svg .nt-k{filter:drop-shadow(1px 3px 2px rgba(0,0,0,.65));transform-origin:110px 110px;transform:rotate(var(--g,0deg))}
 .gate.nt .nt-sw.nt-molla .nt-k{transition:transform .38s cubic-bezier(.3,1.6,.5,1)}
-.nt-svg .nt-tk{fill:#6c6552;font:400 9px "Share Tech Mono",monospace;letter-spacing:.08em;transition:fill .2s}
-.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start{fill:#ffb347}
-.nt-sw[data-fase="on"] .nt-tk.acc,.nt-sw[data-fase="start"] .nt-tk.acc,.nt-sw[data-fase="start"] .nt-tk.on{fill:#a89a74}
-.nt-spie{display:flex;gap:7px;height:16px}
+.nt-svg .nt-tk{fill:#7a7388;font:400 9.5px "Share Tech Mono",monospace;letter-spacing:.08em;transition:fill .2s}
+.nt-svg .nt-dt{fill:#2a2c38;transition:fill .2s,filter .2s}
+.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start,.nt-sw[data-fase="start"] .nt-tk.on{fill:#ffb347}
+.nt-sw[data-fase="acc"] .nt-dt.acc,.nt-sw[data-fase="on"] .nt-dt.on,.nt-sw[data-fase="start"] .nt-dt.start,.nt-sw[data-fase="start"] .nt-dt.on,.nt-sw[data-fase="start"] .nt-dt.acc{fill:#ffb347;filter:drop-shadow(0 0 4px #ff9a2a)}
+.nt-spie{display:flex;gap:7px;height:16px;margin-bottom:14px}
 .nt-spie i{font:400 8px/1 "Share Tech Mono",monospace;letter-spacing:.06em;padding:3px 5px;border-radius:3px;background:#12131a;color:#3a3c48;box-shadow:inset 0 0 0 1px #20222c;transition:color .15s,background .15s,box-shadow .15s}
 .nt-sw.nt-acceso .nt-spie i.b{color:#ff4a3a;background:#2a0f0c;box-shadow:inset 0 0 0 1px #6a2018,0 0 8px rgba(255,74,58,.55)}
 .nt-sw.nt-acceso .nt-spie i.o{color:#ffb12a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14,0 0 8px rgba(255,177,42,.5)}
@@ -265,13 +304,13 @@
 .nt-stato{font:400 17px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#ffb347;text-align:center;text-shadow:0 0 14px rgba(255,170,60,.45)}
 .nt-sw.nt-prova .nt-lab{color:#ff9a6a}
 .gate.nt.nt-avvio .nt-cr .nr-slots,.gate.nt.nt-avvio .nt-pie,.gate.nt.nt-avvio .nt-lab,.gate.nt.nt-avvio .nt-stato{opacity:0;transition:opacity .5s}
-@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}.nt-svg{width:150px;height:150px}.gate.nt .go.nt-sw{width:160px}}
-@media (max-height:620px) and (min-width:900px){.nt-svg{width:130px;height:130px}.gate.nt .go.nt-sw{width:150px}}
+@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}.nt-svg{width:170px;height:170px}.gate.nt .go.nt-sw{width:180px}}
+@media (max-height:620px) and (min-width:900px){.nt-svg{width:150px;height:150px}.gate.nt .go.nt-sw{width:170px}}
 /* girare la chiave: il pannello scende e sparisce, il logo si accende */
 .gate.nt .intro-menu{transition:opacity .45s,transform .45s}
 .gate.nt.nt-avvio .intro-menu{pointer-events:none}
 .gate.nt.nt-avvio .intro-title .t1{text-shadow:0 0 46px rgba(255,170,60,.7),0 0 18px rgba(255,95,168,.6),0 6px 0 rgba(0,0,0,.5);transition:text-shadow .8s}
-@media (prefers-reduced-motion:reduce){.nt-nu,.nt-luna,.nt-faro,.nt-aereo,.nt-bea,.nt-fin,.nt-lamd,.nt-hz,.nt-lamp,.nt-tel,.nt-st,.nt-rain,.nt-rain2,.nt-fog,.nt-spk{animation:none!important}.gate.nt .nt-push{transition:none}}
+@media (prefers-reduced-motion:reduce){.nt-nu,.nt-luna,.nt-faro,.nt-fbase,.nt-dir,.nt-ruota,.nt-cad,.nt-uc,.nt-aereo,.nt-bea,.nt-fin,.nt-lamd,.nt-hz,.nt-lamp,.nt-tel,.nt-st,.nt-rain,.nt-rain2,.nt-fog,.nt-spk{animation:none!important}.gate.nt .nt-push{transition:none}}
 .gate.nt .intro-title{z-index:1;left:max(28px,4vw);top:max(26px,6vh);transform:none!important;justify-items:start;text-align:left;opacity:1}
 .gate.nt .intro-title .t1{font-size:clamp(46px,7.4vw,112px);text-shadow:0 0 30px rgba(255,95,168,.35),0 6px 0 rgba(0,0,0,.5)}
 .gate.nt .intro-title .t2{font-size:clamp(15px,1.9vw,28px);padding-left:.2em;letter-spacing:.32em}
@@ -332,6 +371,9 @@
     };
     return { fin: comp(m, 2, 60), ros: comp(rosso, 1, 30), dati: d, w, y0 };
   }
+  // la ruota panoramica (si disegna una volta, gira con una animazione CSS)
+  const RUOTA = (() => { const cab = ['#ff5fa8', '#ffcf7a', '#7fd8ff', '#9affc0'], pts = []; for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2, x = 50 + Math.sin(a) * 41, y = 50 - Math.cos(a) * 41; pts.push(`<line x1="50" y1="50" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#a79bff" stroke-opacity=".55" stroke-width=".8"/><circle class="cb" style="--i:${i}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="${cab[i % 4]}"/>`); }
+    return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="rgba(8,6,24,.5)"/><circle cx="50" cy="50" r="41" fill="none" stroke="#c3b9ff" stroke-opacity=".7" stroke-width="1.2"/><circle cx="50" cy="50" r="30" fill="none" stroke="#a79bff" stroke-opacity=".35" stroke-width=".7"/>${pts.join('')}<circle cx="50" cy="50" r="3" fill="#ffd9a0"/></svg>`; })();
   function strati() {
     if (fatto) return; fatto = true;
     // stelle
@@ -340,14 +382,22 @@
     el('nt-luna', `left:${pct(470, W)};top:${pct(70, H)}`);
     for (let i = 0; i < 5; i++) el('nt-nu', `top:${pct(46 + hash(i + 40) * 120, H)};transform-origin:0 0;--d:${(70 + hash(i + 9) * 70).toFixed(0)}s;--dl:${(-hash(i + 3) * 120).toFixed(0)}s;opacity:${(0.55 + hash(i) * 0.45).toFixed(2)}`);
     // i fari di ricerca dalla città e l'aereo con i lampeggianti
-    for (const [x, d, dl] of [[142, 13, -3], [452, 17, -9]]) el('nt-faro', `left:${pct(x, W)};top:${pct(206 - 230, H)};--d:${d}s;--dl:${dl}s`);
+    { const sk = el('nt-sk', `height:${pct(214, H)}`);            // i fari di ricerca stanno nel cielo: non arrivano mai sulla strada
+      [[150, 196, 12, -3, 1], [300, 190, 15, -8, 2], [455, 194, 18, -5, 3], [30, 198, 14, -11, 4]].forEach(([x, y, d, dl, n]) => {
+        const b = document.createElement('div'); b.className = 'nt-faro'; b.style.cssText = `left:${pct(x, W)};top:${pct(y - 230, H)};--d:${d}s;--dl:${dl}s;--a:${n % 2 ? -34 : 30}deg;--b:${n % 2 ? 24 : -36}deg`; sk.appendChild(b);
+        const h = document.createElement('div'); h.className = 'nt-fbase'; h.style.cssText = `left:${pct(x, W)};top:${pct(y, H)};--dl:${dl}s`; sk.appendChild(h); }); }
     el('nt-aereo', `--dl:${-6}s`);
+    // il dirigibile con la scritta a led, la ruota panoramica che gira, le stelle cadenti e gli uccelli
+    el('nt-dir', `top:${pct(112, H)};--dl:${-40}s`, '<i class="c"></i><i class="g"></i><i class="p"></i><b>NIGHT RUN</b>');
+    el('nt-ruota', `left:${pct(392, W)};top:${pct(152, H)}`, RUOTA);
+    for (let i = 0; i < 3; i++) el('nt-cad', `left:${pct(120 + i * 190 + hash(i) * 60, W)};top:${pct(14 + i * 24, H)};--d:${11 + i * 5}s;--dl:${-3 - i * 4.3}s`);
+    for (let i = 0; i < 2; i++) { const e = el('nt-uc', `top:${pct(150 + i * 14, H)};--d:${36 + i * 13}s;--dl:${-9 - i * 17}s`); for (let b = 0; b < 5; b++) { const u = document.createElement('i'); u.style.cssText = `left:calc(var(--u)*${(b * 7 + (b % 2) * 3)});top:calc(var(--u)*${(b % 3) * 3 - 3});--f:${(0.5 + hash(b + i * 9) * 0.4).toFixed(2)}s`; e.appendChild(u); } }
     // le finestre che si spengono e si riaccendono (tre gruppi con tempi diversi) e le luci rosse in cima ai palazzi che lampeggiano
     try {
-      const T = trova(), G = [0, 1, 2].map((i) => { const c = document.createElement('canvas'); c.width = lo.width; c.height = lo.height; c.className = 'nt-fin'; c.style.cssText = `--d:${[9, 13, 19][i]}s;--dl:${-i * 4.1}s`; scena.appendChild(c); return c.getContext('2d'); });
+      const T = trova(), G = [0, 1, 2, 3, 4].map((i) => { const c = document.createElement('canvas'); c.width = lo.width; c.height = lo.height; c.className = 'nt-fin'; c.style.cssText = `--d:${[7, 11, 16, 21, 9][i]}s;--dl:${-i * 3.3}s`; scena.appendChild(c); return c.getContext('2d'); });
       T.fin.forEach((f, i) => {
-        const gr = hash(i * 3.7 + 1); if (gr > 0.5) return;                                  // metà delle finestre resta accesa
-        const cx = G[Math.floor(gr * 6) % 3], bx = Math.max(0, f.x - 2), k = ((f.y - T.y0) * T.w + bx) * 4;
+        const gr = hash(i * 3.7 + 1); if (gr > 0.7) return;                                  // un po' di finestre resta sempre accesa
+        const cx = G[Math.floor(gr * 7) % 5], bx = Math.max(0, f.x - 2), k = ((f.y - T.y0) * T.w + bx) * 4;
         cx.fillStyle = `rgb(${T.dati[k]},${T.dati[k + 1]},${T.dati[k + 2]})`; cx.fillRect(f.x, f.y, f.w, f.h);   // il colore del palazzo accanto
       });
       T.ros.forEach((r, i) => el('nt-bea', `left:${pct((r.x + r.w / 2) / SS, W)};top:${pct((r.y + r.h / 2) / SS, H)};--dl:${(-i * 0.7).toFixed(2)}s`));
@@ -379,24 +429,29 @@
 
   // ------------------------------------------------------------ il cruscotto: il blocchetto d'accensione e i portachiavi
   const goBtn = document.getElementById('goBtn');
-  const SVG = `<svg class="nt-svg" viewBox="0 0 220 220" aria-hidden="true"><defs>
-    <radialGradient id="ntMet" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#4a4f60"/><stop offset=".55" stop-color="#232632"/><stop offset="1" stop-color="#0d0e14"/></radialGradient>
-    <linearGradient id="ntOro" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8a5a12"/><stop offset=".35" stop-color="#ffd27a"/><stop offset=".7" stop-color="#e0922a"/><stop offset="1" stop-color="#7a4a0e"/></linearGradient>
-    <radialGradient id="ntCro" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#e8ecf4"/><stop offset=".5" stop-color="#8b90a0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
-    <circle cx="110" cy="110" r="104" fill="url(#ntMet)" stroke="#05060a" stroke-width="2"/><circle cx="110" cy="110" r="98" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="1"/>
-    <circle cx="110" cy="110" r="70" fill="#0a0b10" stroke="#2a2c38" stroke-width="2"/>
-    <g font-family="monospace">
-      <text class="nt-tk lock" x="110" y="24" text-anchor="middle">LOCK</text>
-      <text class="nt-tk acc" x="188" y="58" text-anchor="middle">ACC</text>
-      <text class="nt-tk on" x="204" y="122" text-anchor="middle">ON</text>
-      <text class="nt-tk start" x="176" y="184" text-anchor="middle">START</text></g>
-    <g stroke="#3a3d4a" stroke-width="2" stroke-linecap="round"><path d="M110 8v7"/><path d="M162 22l-3 6"/><path d="M200 60l-6 3"/><path d="M214 112h-7"/><path d="M192 168l-6-3"/></g>
-    <circle cx="110" cy="110" r="30" fill="url(#ntCro)" stroke="#12131a" stroke-width="2"/>
-    <g class="nt-k"><rect x="100" y="52" width="20" height="60" rx="5" fill="url(#ntOro)" stroke="#4a300a" stroke-width="1.5"/>
-      <rect x="88" y="6" width="44" height="52" rx="17" fill="#15161d" stroke="#05060a" stroke-width="2"/><rect x="92" y="10" width="36" height="44" rx="14" fill="none" stroke="#2c2e3a" stroke-width="1.5"/>
-      <rect x="103" y="14" width="14" height="16" rx="3" fill="url(#ntOro)" stroke="#4a300a"/><circle cx="110" cy="22" r="4" fill="#0a0b10"/>
-      <path d="M104 62v40M110 60v44" stroke="rgba(60,36,6,.55)" stroke-width="1.2"/></g>
-    <circle cx="110" cy="110" r="14" fill="url(#ntCro)" stroke="#05060a" stroke-width="2"/><rect x="108" y="104" width="4" height="12" rx="1" fill="#05060a"/></svg>`;
+  // il blocchetto d'accensione: ghiera cromata, targa scura con le posizioni (LOCK, ACC, ON, START), chiave con la testa in gomma nera e l'anima in ottone
+  const A_ACC = 28, A_ON = 56, A_START = 84;
+  const SVG = (() => {
+    const P = (a, r) => [(110 + Math.sin(a * Math.PI / 180) * r).toFixed(1), (110 - Math.cos(a * Math.PI / 180) * r).toFixed(1)];
+    let tk = '', lb = '';
+    for (let a = 0; a <= 90; a += 7) { const [x1, y1] = P(a, 78), [x2, y2] = P(a, a % 28 === 0 ? 90 : 85); tk += `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${a % 28 === 0 ? '#8a8aa0' : '#4a4c5e'}" stroke-width="${a % 28 === 0 ? 2 : 1}" stroke-linecap="round"/>`; }
+    for (const [cl, a, t] of [['lock', 0, 'LOCK'], ['acc', A_ACC, 'ACC'], ['on', A_ON, 'ON'], ['start', A_START, 'START']]) { const [x, y] = P(a, 120), [dx, dy] = P(a, 103); lb += `<circle class="nt-dt ${cl}" cx="${dx}" cy="${dy}" r="2.4"/><text class="nt-tk ${cl}" x="${x}" y="${(+y + 3).toFixed(1)}" text-anchor="${a < 20 ? 'middle' : 'start'}">${t}</text>`; }
+    let br = ''; for (let r = 40; r < 90; r += 5) br += `<circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(255,255,255,${(0.025 + (r % 10 ? 0.015 : 0)).toFixed(3)})"/>`;
+    return `<svg class="nt-svg" viewBox="-12 -12 250 250" aria-hidden="true"><defs>
+    <linearGradient id="ntGh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f6"/><stop offset=".3" stop-color="#8d92a3"/><stop offset=".55" stop-color="#3b3e4c"/><stop offset=".8" stop-color="#a7acbb"/><stop offset="1" stop-color="#4b4e5c"/></linearGradient>
+    <radialGradient id="ntTg" cx="40%" cy="30%" r="85%"><stop offset="0" stop-color="#2d303e"/><stop offset=".7" stop-color="#14151d"/><stop offset="1" stop-color="#0a0b11"/></radialGradient>
+    <linearGradient id="ntOt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a4d0c"/><stop offset=".3" stop-color="#ffd98a"/><stop offset=".65" stop-color="#d98f26"/><stop offset="1" stop-color="#6a400a"/></linearGradient>
+    <linearGradient id="ntGm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b3d4a"/><stop offset=".5" stop-color="#15161d"/><stop offset="1" stop-color="#050509"/></linearGradient>
+    <radialGradient id="ntCr" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#f4f6fb"/><stop offset=".45" stop-color="#9aa0b0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
+    <circle cx="110" cy="110" r="106" fill="url(#ntGh)" stroke="#05060a" stroke-width="2"/><circle cx="110" cy="110" r="97" fill="#07080d"/><circle cx="110" cy="110" r="94" fill="url(#ntTg)"/>${br}
+    <path d="M${P(-4, 94).join(' ')}A94 94 0 0 1 ${P(94, 94).join(' ')}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>${tk}${lb}
+    <circle cx="110" cy="110" r="27" fill="url(#ntCr)" stroke="#12131a" stroke-width="2"/><circle cx="110" cy="110" r="21" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><circle cx="110" cy="110" r="17" fill="#0c0d12"/>
+    <g class="nt-k">
+      <rect x="101.5" y="68" width="17" height="84" rx="8.5" fill="url(#ntGm)" stroke="#000" stroke-width="2"/>
+      <rect x="104" y="72" width="3" height="76" rx="1.5" fill="rgba(255,255,255,.3)"/>
+      <rect x="108" y="97" width="4" height="26" rx="2" fill="url(#ntOt)" stroke="#2a1804" stroke-width=".8"/>
+      <circle cx="110" cy="77" r="2.2" fill="#050509" stroke="#9aa0b0" stroke-width=".8"/></g></svg>`;
+  })();
   let lab = null, stato = null, sw = null;
   function cruscotto() {
     if (!goBtn || goBtn.classList.contains('nt-sw')) return;
@@ -478,7 +533,7 @@
   // al 1,33 s il motore prende, le spie si spengono, la chiave resta su ON, la scena spinge in avanti e dopo ~1,1 s parte il gioco.
   const T_ACC = 380, T_START = 1330;
   let tenuta = null, via = false;
-  const angolo = (ms) => ms < T_ACC ? 40 * (ms / T_ACC) : 40 + 40 * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
+  const angolo = (ms) => ms < T_ACC ? A_ON * (ms / T_ACC) : A_ON + (A_START - A_ON) * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
   function fase(f) { if (sw) sw.dataset.fase = f; }
   function chiaveA(deg) { if (sw) sw.style.setProperty('--g', deg.toFixed(1) + 'deg'); }
   function giraTieni(da) {
@@ -517,7 +572,7 @@
     tenuta.raf = requestAnimationFrame(passo);
   }
   function accendi() {
-    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(52); fase('on');
+    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(A_ON); fase('on');
     gate.classList.add('nt-avvio'); if (lab) lab.textContent = '';
     setTimeout(() => { window.__ntVia = true; goBtn.click(); }, 1150);
   }

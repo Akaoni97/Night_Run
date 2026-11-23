@@ -1,3 +1,13 @@
+## 23/11/2026 · proprietario (Nico) · v0.125 (**la chiave vista da sopra**)
+- La chiave è ora una **barretta verticale** al centro del cilindro, vista dalla testa dall'alto, che ruota quando tieni premuto (LOCK → ACC → ON → START). I fari di ricerca sono ritagliati davvero nel cielo (prima un fascio passava ancora sopra il blocchetto).
+
+## 23/11/2026 · proprietario (Nico) · v0.124 (**schermata iniziale: più vita, chiave di taglio**)
+- **Blocchetto d'accensione** rifatto: ghiera cromata, targa con LOCK/ACC/ON/START (e i puntini che si accendono), la chiave vista **di taglio dalla testa**, infilata nel cilindro, che gira con lui.
+- Via l'insegna «SOLO AVANTI» dal palazzo (ora è scritta sul dirigibile che passa) e il cartello dice **ULTIMA USCITA**.
+- **Fari di ricerca** rifatti: stanno nel cielo (ritagliati sopra la città), con la base che brilla, mai sulla strada né sul blocchetto. Tolti il fascio lungo dei fari dell'auto e il cono del lampione di destra.
+- **Più sfondo**: case sulle colline con finestre e camini, pini, **ruota panoramica** che gira con le cabine che brillano, dirigibile con scritta a led, stelle cadenti, stormi di uccelli, cinque gruppi di finestre che si accendono e spengono.
+- Provato: foto a 1280×720 e 1920×1080, chiave in giro, 4 test, prova di fumo. Da guardare dal vivo.
+
 ## 23/11/2026 · proprietario (Nico) · v0.123 (**la chiave si gira davvero**)
 - **Schermata iniziale** (`titolo.js`): via le luci che passano e le scie; strada ferma, lampioni che sfarfallano. Sfondo animato in CSS: luna con alone, nuvole, due fari di ricerca, un aereo, luci rosse sui palazzi, finestre che si accendono e si spengono (trovate leggendo i pixel del quadro).
 - **Niente più pannello «Accendi e parti»**: c'è il blocchetto d'accensione con la chiave. Si **tiene premuto** (mouse, dito, Invio o Spazio): ACC, ON, poi START col motorino; a metà la chiave torna indietro e il motore non prende. In fondo il motore prende, le spie (BATT, OLIO, MOT) si spengono e parte il gioco. Le tre partite sono portachiavi su una barra; «Come si gioca» è un fumetto.
