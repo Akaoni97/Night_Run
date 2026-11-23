@@ -33,7 +33,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
     volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
 
 ### Notte e storia
-5. [storia] **Anomalie proposte da Luca** (v0.89, in `AVVISI.md`): tre livelli di cose strane rare (auto nello specchietto che sparisce, cartello «USCITA 18 KM» che non cambia, l'auto gemella in corsia d'emergenza, il barista che ti riconosce, oggetti nella cassa del motel...). **Deciso da Nico (22/11): sì, così come l'ha proposto Luca.** **Fatto (v0.100)**: le otto in `VG_ODD` (specchietto dal km 12, cartello «USCITA 18 KM» che torna uguale dieci km dopo, radio che dice il km, gemella ferma con le quattro frecce dal km 60, barista, cippo «KM -n» dal km 80, thermos nella cassa del motel e sei auto uguali dal km 150). I testi brevi li ha scritti Claude dalle idee di Luca: **da rivedere da Luca**. Da provare giocando: se sono troppo rare o troppo frequenti. (cognato)
+5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
 
 ## Priorità media · decisioni e tarature
@@ -63,22 +63,25 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 15. [meteo] **Neve e nebbia anche in città?** Deciso da Nico (22/11): sì, e il dinamico secondo l'ora. **Fatto (v0.90)**. (tutti e due)
 16. [meteo] **Nebbia di notte** e fruscio del vento. Deciso da Nico (22/11): nebbia di notte sì, nei momenti horror e ogni tanto; fruscio del vento sì ma non fastidioso. **Fatto (v0.90)**: il fruscio va sentito sul PC. (proprietario)
 
-## Da guardare · arrivati il 22/11
+## Da guardare · arrivati il 22/11 (Nico)
 
 ### Disegni del proprietario
 17. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
 
+18. [prologo] **Prologo nuovo** (v0.98): stessa risoluzione del gioco, arrivo sotto la pioggia, studio, garage con le auto una alla volta, autostrada. Da guardare sul PC: ritmo dell'arrivo (14 s) e volume della pioggia. (proprietario)
+19. [menu] **Schermata iniziale col quadro fermo** (v0.103): piace così? (proprietario)
+20. [menu] **Tre salvataggi** (v0.101): da provare anche nel programma per Windows. Piccola cosa vista nel check: gli avvisi a destra (per esempio «Valigetta di bronzo») possono comparire sopra la schermata iniziale; i traguardi aspettano già, questi no. (proprietario)
+
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
 ### Economia e guida
-18. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
+21. [economia] **Soldi ed economia in generale**: si toccano verso la fine del lavoro, non prima. Prova dei primi 200 km
    (giocatore automatico, `strumenti/giocatore.js`, 20/11): ~2 h 20 di gioco, € 28.000 guadagnati (70 % dalle missioni),
    € 16.700 in tasca al km 200; benzina, cibo e motel non pesano quasi niente. (tutti e due)
-19. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta, gomme bucate ogni
+22. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta, gomme bucate ogni
    ~30 km. Luca (21/11): per ora si lascia così, si tara giocando. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
-- 22/11 sera, check (Nico con Claude): 326 test, prova di fumo senza errori in tutte le tappe, notte e interfaccia Essenziale provate; sistemato `AVVISI.md` (l'avviso della v0.89 era finito dentro la riga del formato e non si vedeva).
-- 22/11 (v0.86-v0.88, Nico): telaio vero di ogni auto da disegno, cambi veri per tutte (ricerca di Codex), M3 E30 col finale europeo.
-- 22/11 (v0.82-v0.85, v0.89, Luca): auto in alta definizione con versioni tuning, camion nel traffico, cinque auto iniziali, la notte.
-- 22/11 (v0.83-v0.84, Nico per Luca): campioni dei pezzi meno robotici, poi corretti.
+- 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.
+- 22/11 (v0.98-v0.103, Nico): prologo alla qualità del gioco, due errori piccoli, anomalie di Luca, tre salvataggi, schermata iniziale nuova.
+- 22/11 (v0.99, v0.104-v0.107, Luca): officina più chiara, gomme che non sgommano più da ferme, volume per ogni pezzo, pop & bang nella centralina, volano a quattro livelli, turbo più vero, pezzi per tutti i motori (anche la Supra), cambi lunghi, compressori a cinghia.
