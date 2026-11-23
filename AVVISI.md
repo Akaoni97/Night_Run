@@ -9,8 +9,9 @@ questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
 
-## 23/11/2026 · per cognato (Luca) · da proprietario con Claude
-È pronta una proposta sulle dodici capitali (cosa c'è, cosa manca, sei domande per te): `docs/storia/PROPOSTA_CITTA.md`. Non cambia la storia, serve a decidere insieme cosa fare. Rispondi per numero.
 
 ## 23/11/2026 · per proprietario (Nico) · da cognato con Claude
 Da guardare almeno una volta: **quanto stiamo sfruttando il motore grafico**, parte per parte, con le barre di carico e il totale (oggi ~66 % del fotogramma su un PC medio, stima). È in `SFRUTTAMENTO.md`, con cosa pesa di più (il pilota in auto e la logica, poi foschia, asfalto bagnato e ingrandimento) e cosa si può recuperare. Quando volete la misura aggiornata chiedete a Claude «sfruttamento motore» (`node strumenti/carico.js`).
+
+## 23/11/2026 · per proprietario (Nico) · da cognato con Claude
+Luca ha risposto alla proposta sulle capitali: risposte in fondo a `docs/storia/PROPOSTA_CITTA.md` (sezione 5). In breve: collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (la torre di luci), Vienna da decidere; i bivi come progetto futuro; la storia va confermata tutta con te.

@@ -52,3 +52,11 @@ hai raccolto. Si può fare solo dopo che A, B e C sono chiari.
 
 Nota tecnica: A e B non toccano il salvataggio e si fanno in `street2d.js`, `quartieri2d.js` e `viaggio.js` senza cambiare la storia.
 C e D sì: restano a te e al proprietario.
+
+## 5. Risposte di Luca (23/11/2026, notte)
+1. **Sì**: una cosa da vedere per città va bene (già fatta nella v0.112).
+2. **I collegamenti: subito paesaggi veri, poi andando avanti nel viaggio diventano strani.**
+3. **Momenti forti**: Roma al **Colosseo**, Washington all'**obelisco**, Tokyo alla **torre piena di luci**; Vienna da decidere. (Cosa succede in quei momenti lo scrive Luca, da confermare con Nico.)
+4. Non so: da decidere.
+5. **Qualche bivio sarebbe bello, inserito nella storia. Progetto futuro** (annotato in `SOSPESI.md`, punto 28).
+6. Non so: **la storia è da confermare tutta con Nico.**
