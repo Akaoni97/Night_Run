@@ -6,3 +6,4 @@
 - `../strumenti/` · gli strumenti per le auto, la prova nel browser e il suono.
 - `../test/` · i test (`node --test test/*.test.js`).
 - Alla radice restano i file del gioco (HTML e JavaScript caricati da `index.html`), `README.md`, `AGENTS.md` e `PASSAGGIO.md`.
+- `fisica/IMPENNATA.md` · proposta del progetto impennata (fisica vera, pezzi, grafica, interruttore, piano).

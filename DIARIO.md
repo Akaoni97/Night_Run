@@ -1,3 +1,6 @@
+## 24/11/2026 · cognato · v0.136 (**proposta: progetto impennata**)
+- `docs/fisica/IMPENNATA.md`: impennata solo se la fisica lo permette (μ_eff·G ≥ b/h), trazione posteriore, slick calde, 4-link, peso dietro, colpo della frizione; pioggia e trazione anteriore no; grafica a taglio verticale con tetto a 8°; interruttore «Progetto impennata» in Sviluppatori (spento = gioco identico); piano in 6 passi e 5 domande per Luca. Nessun codice cambiato.
+
 ## 23/11/2026 · cognato · v0.135 (**risposte sulle capitali**)
 - Luca ha risposto alle sei domande di `docs/storia/PROPOSTA_CITTA.md` (sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; bivi come progetto futuro (`SOSPESI.md` 28); la storia va confermata tutta con Nico. Tolto l'avviso per Luca, messo quello per Nico.
 

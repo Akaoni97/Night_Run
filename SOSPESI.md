@@ -78,6 +78,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Proposte nuove
 
+30. [fisica] **Progetto impennata** (proposta del 24/11, `docs/fisica/IMPENNATA.md`): da leggere e rispondere alle 5 domande del §7 prima di scrivere codice; interruttore in Sviluppatori, spento di serie. (Luca)
+
 28. [storia] **Bivi nella storia** (progetto futuro, da Luca il 23/11): qualche bivio inserito nella storia, dopo una capitale due uscite con prove diverse e il finale che ne tiene conto (proposta D di `docs/storia/PROPOSTA_CITTA.md`). Si fa dopo i collegamenti e i momenti forti delle capitali. (Luca, da confermare con Nico)
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)
 

@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.135**
+**Versione attuale: v0.136**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -159,3 +159,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.133 · 23/11/2026 · cognato · il contatore FPS dice quale scheda video usa il browser; se è un rendering software, avviso all'avvio con come riaccendere l'accelerazione grafica
 - v0.134 · 23/11/2026 · proprietario · prestazioni, secondo giro: la tela dello schermo è un multiplo intero della scena (al massimo 1440 righe, anche su 4K o con lo zoom di Windows) e il browser la porta alla misura vera con la scheda video, in una passata invece di due; bagliore, colori e vignettatura sulla tela interna anche con lo zoom della ripresa; bagliore sommato in una passata; quadro strumenti grande quanto si vede; gradino delle Prestazioni rimisurato una volta; `strumenti/misura_fps.js`. Al gradino più basso da ~20 a ~47 fps, a densità doppia da ~11 a ~18 (browser di prova senza scheda video)
 - v0.135 · 23/11/2026 · cognato · risposte di Luca alla proposta sulle capitali (`PROPOSTA_CITTA.md`), bivi come progetto futuro in `SOSPESI.md` (28, 29), avviso per Nico
+- v0.136 · 24/11/2026 · cognato · proposta del progetto impennata (`docs/fisica/IMPENNATA.md`): fisica, pezzi, grafica, interruttore, piano e domande; solo documento
