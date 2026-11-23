@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.114**
+**Versione attuale: v0.117**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -139,3 +139,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.114 | 23/11 | proprietario | Monumenti delle capitali ad alta definizione e con tanti dettagli (pietra a conci, colonne scanalate, cupole a spicchi, rosoni, quadrante del Big Ben, quadriga di Brandeburgo, tetto a losanghe dello Stephansdom, London Eye e Riesenrad, toro di Osborne...): 28 monumenti ridisegnati al doppio della risoluzione in `citta_monumenti.js`. 397 test. |
 | v0.115 | 23/11 | proprietario | Video «di serie e preparate»: strumenti per registrare tre auto (E30, 205 GTI, Golf) prima e dopo swap di motore, pezzi, kit, neon e cerchi, con il suono vero dei campioni dei pezzi (`strumenti/reel/preparate.js`, `suono_preparate.js`, `cartelli_preparate.js`, `monta_preparate.py`) |
 | v0.116 | 23/11 | proprietario | Video «di serie e preparate»: la 205 e la Golf preparate fanno sgasate da ferme e poi una tirata in marcia lunga (2ª-5ª a gas pieno); aderenza delle gomme maggiorata solo nelle riprese |
+| v0.117 | 23/11 | proprietario | Disegno più leggero di fiammate, fumo e fumetti, con meno aggiornamenti della posizione degli avvisi. |

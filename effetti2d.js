@@ -17,6 +17,29 @@
     return (h(ix, iy) * (1 - ux) + h(ix + 1, iy) * ux) * (1 - uy) + (h(ix, iy + 1) * (1 - ux) + h(ix + 1, iy + 1) * ux) * uy;
   };
 
+  // Nelle fiammate cambiano scala e intensità dell'alone. Il profilo della luce resta lo stesso.
+  const flameGlows = new Map();
+  function flameLight(view, g, cx, cy, rx, ry, hex, a, bands) {
+    if (!(view.SS > 1)) { view.light(g, cx, cy, rx, ry, hex, a, bands); return; }
+    if (rx < 1 || ry < 1 || a <= 0) return;
+    const key = hex + bands;
+    let image = flameGlows.get(key);
+    if (!image) {
+      const r = 64, color = Street2D.rgb(hex);
+      image = document.createElement('canvas'); image.width = image.height = 2 * r;
+      const ctx = image.getContext('2d'), gradient = ctx.createRadialGradient(r, r, 0, r, r, r);
+      gradient.addColorStop(0, hex); gradient.addColorStop(0.25, hex);
+      gradient.addColorStop(0.85, `rgba(${color},${1.2 / bands})`);
+      gradient.addColorStop(1, `rgba(${color},0)`);
+      ctx.fillStyle = gradient; ctx.fillRect(0, 0, image.width, image.height);
+      flameGlows.set(key, image);
+    }
+    g.save();
+    g.globalCompositeOperation = 'lighter'; g.globalAlpha *= Math.min(1, a * bands); g.imageSmoothingEnabled = true;
+    g.drawImage(image, cx - rx, cy - ry, rx * 2, ry * 2);
+    g.restore();
+  }
+
   // ---------------------------------------------------------------- sbuffi di fumo (sprite in cache)
   // Tre toni per sbuffo (ombra sotto, mezzo, luce sopra). I toni "lit_" si disegnano sopra, trasparenti,
   // quando lo sbuffo passa vicino a una luce: lampione, stop, fiammata.
@@ -51,12 +74,19 @@
       const a = i / 6 * Math.PI * 2 + rnd(v * 17 + i) * 0.9, lr = RR * (0.32 + rnd(v * 7 + i * 3) * 0.2), dd = Math.min(RR - lr, RR * (0.4 + rnd(v * 31 + i) * 0.22));
       lobes.push([Math.cos(a) * dd, Math.sin(a) * dd, lr]);
     }
+    // Al retino serve solo sapere se il pixel è dentro un lobo o dentro il suo bordo interno.
+    const circles = lobes.map(([x, y, radius]) => {
+      const inner = radius - 1.3 * SS;
+      return { x, y, outer2: radius * radius, inner2: inner < 0 ? -1 : inner * inner };
+    });
     for (let py = 0; py < N; py++) for (let px = 0; px < N; px++) {
-      const dx = px - cx, dy = py - cx; let e = -9;
-      for (const l of lobes) e = Math.max(e, l[2] - Math.hypot(dx - l[0], dy - l[1]));
-      if (e < 0) continue;
-      const by = Street2D.bayer(px, py);
-      if (rq > 3 && e < 1.3 * SS && by < 0.42) continue;                         // bordo a retino, più morbido
+      const dx = px - cx, dy = py - cx, by = Street2D.bayer(px, py), inner = rq > 3 && by < 0.42;
+      let inside = false;
+      for (const l of circles) {
+        const lx = dx - l.x, ly = dy - l.y;
+        if (lx * lx + ly * ly <= (inner ? l.inner2 : l.outer2)) { inside = true; break; }
+      }
+      if (!inside) continue;
       const sv = dy / RR * 0.85 + dx / RR * 0.2 + (by - 0.5) * 0.34;         // luce dall'alto
       const col = T[sv < -0.22 ? 2 : sv < 0.3 ? 1 : 0], i = (py * N + px) * 4;
       d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = 255;
@@ -156,17 +186,22 @@
     const m = g.getTransform(), W = Math.round(46 * k), H = Math.round(18 * k), x0 = rx - W, y0 = exY - H + Math.round(3 * k);
     const dx = Math.round(m.a * x0 + m.e), dy = Math.round(m.d * y0 + m.f), dw = Math.round(m.a * W), dh = Math.round(m.d * H);
     if (dw < 4 || dh < 4 || dx < 0 || dy < 0 || dx + dw > g.canvas.width || dy + dh > g.canvas.height) return;
-    const T = this._hz || (this._hz = document.createElement('canvas'));
-    if (T.width !== dw || T.height !== dh) { T.width = dw; T.height = dh; }
-    const tx = T.getContext('2d'); tx.clearRect(0, 0, dw, dh); tx.drawImage(g.canvas, dx, dy, dw, dh, 0, 0, dw, dh);
     const t = this.st.t, step = Math.max(1, Math.round(m.d)), amp = 1.6 * a * m.a;
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+    if (amp * 1.5 < 0.5) return;               // tutte le righe arrotonderebbero a uno spostamento zero
+    let source;
     for (let y = 0; y < dh; y += step) {
-      const f = y / dh, ramp = Math.sin(Math.PI * f) * (0.4 + 0.6 * (1 - Math.abs((dw * 0.6) / dw - 0.6)));   // più forte al centro della colonna
+      const ramp = Math.sin(Math.PI * y / dh);  // più forte al centro della colonna
       const off = Math.round(Math.sin(t * 23 + y * 0.55 / step) * amp * ramp + Math.sin(t * 9 - y * 0.21 / step) * amp * 0.5 * ramp);
-      if (off) g.drawImage(T, 0, y, dw, step, dx + off, dy + y, dw, step);
+      if (!off) continue;
+      if (!source) {
+        source = this._hz || (this._hz = document.createElement('canvas'));
+        if (source.width !== dw || source.height !== dh) { source.width = dw; source.height = dh; }
+        const tx = source.getContext('2d'); tx.clearRect(0, 0, dw, dh); tx.drawImage(g.canvas, dx, dy, dw, dh, 0, 0, dw, dh);
+        g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false;
+      }
+      g.drawImage(source, 0, y, dw, step, dx + off, dy + y, dw, step);
     }
-    g.restore();
+    if (source) g.restore();
   };
 
   // tavolozze della fiamma: arancione (miscela grassa), gialla, blu alla radice con la punta arancione (magra, la classica
@@ -181,23 +216,32 @@
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
     const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)) * (O.len || 1))), H0 = (3.4 + f * 4.2) * k * (O.th || 1), fr = Math.floor(t * 30);
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;                   // densità doppia: colonne e altezze a mezze unità
+    const cut = P.cut || 0;
     const cols = [];
     for (let i = 0; i < L; i += u1) {
-      const u = i / L, env = (u < 0.14 ? 0.55 + u / 0.14 * 0.45 : 1) * Math.pow(1 - u, 0.7);
+      const u = i / L, x = rx - 1 - i, env = (u < 0.14 ? 0.55 + u / 0.14 * 0.45 : 1) * Math.pow(1 - u, 0.7);
       const half = H0 * env * (0.78 + 0.44 * vn(i * 0.2 - t * 15));
-      cols.push([rx - 1 - i, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
-        half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u]);
+      cols.push([x, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
+        half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u,
+        cut && u > cut + 0.06 * Math.sin(x * 0.7 + fr) ? 1 : 0]);
     }
     g.fillStyle = P.o;                                                           // contorno scuro: stacca la fiamma dallo sfondo
     for (const c of cols) { const y1 = rq(c[1] - c[2]), y2 = rq(c[1] + c[3]); if (y2 - y1 >= 2) g.fillRect(c[0], y1 - u1, u1, y2 - y1 + 2 * u1); }
-    const cut = P.cut || 0;                                                      // dove la radice blu diventa punta arancione
+    // Nella stessa banda, le colonne contigue con altezza e colore identici sono un solo rettangolo.
     const band = (bc, sz, taper) => {
+      let left = 0, right = 0, top = 0, height = 0, color;
       for (const c of cols) {
         const m = sz * Math.max(0, 1 - c[4] * taper), y1 = rq(c[1] - c[2] * m), y2 = rq(c[1] + c[3] * m);
-        g.fillStyle = cut && (c[4] > cut + 0.06 * Math.sin(c[0] * 0.7 + fr) ? 1 : 0) ? bc[1] : bc[0];
-        if (y2 - y1 >= u1) g.fillRect(c[0], y1, u1, y2 - y1);
-        else if (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) g.fillRect(c[0], y1, u1, u1);    // punta sfrangiata
+        const h = y2 - y1 >= u1 || (sz === 1 && rnd(c[0] * 3.1 + fr) < 0.55) ? Math.max(u1, y2 - y1) : 0;
+        const col = bc[c[5]];
+        if (h && h === height && y1 === top && col === color) { left = c[0]; continue; }
+        if (height) g.fillRect(left, top, right - left, height);
+        height = h;
+        if (!h) continue;
+        if (col !== color) { g.fillStyle = col; color = col; }
+        left = c[0]; right = left + u1; top = y1;
       }
+      if (height) g.fillRect(left, top, right - left, height);
     };
     band(P.b[0], 1, 0); band(P.b[1], 0.74, 0.25); band(P.b[2], 0.5, 0.6); band(P.b[3], 0.27, 1.1);
     if (big) {
@@ -209,8 +253,8 @@
       g.fillStyle = c[4] > 0.7 ? P.b[0][1] : P.b[1][1]; g.fillRect(c[0], rq(c[1] - c[2] - 2 - rnd(c[0] + fr) * 3 * k), u1 * 2, u1 * 2);
     }
     const a = Math.min(1, f) * (O.dim || 1);
-    this.light(g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, P.l, 0.13 * a, 3);              // alone
-    this.light(g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, '#ff8a20', 0.24 * a, 4);                  // luce sull'asfalto
+    flameLight(this, g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, P.l, 0.13 * a, 3);              // alone
+    flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, '#ff8a20', 0.24 * a, 4);                  // luce sull'asfalto
     return L;
   };
   // le quattro versioni della fiamma libera (così l'occhio non vede sempre la stessa): 0 classica, 1 doppia lingua, 2 lunga e sottile, 3 corta e tozza
@@ -237,8 +281,8 @@
     for (let n = 1; n <= 4; n++) { const i = n * L / 5.2, x = rx - 1 - i, hh = th * (0.95 - n * 0.12); if (hh > 0.3) g.fillRect(rq(x - 1), rq(exY - hh), 3, Math.max(u1, rq(hh * 2))); }
     g.fillStyle = '#e8f8ff'; g.fillRect(rx - 1, rq(exY - th * 1.4), 2, Math.max(1, rq(th * 2.8)));   // radice alla bocca
     const a = Math.min(1, f);
-    this.light(g, rx - L * 0.45, exY - 1, L, th * 5 + 3, '#7aa8ff', 0.17 * a, 3);
-    this.light(g, rx - L * 0.4, y0 + 1, L * 1.1 + 12, 5, '#6aa0ff', 0.18 * a, 3);
+    flameLight(this, g, rx - L * 0.45, exY - 1, L, th * 5 + 3, '#7aa8ff', 0.17 * a, 3);
+    flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.1 + 12, 5, '#6aa0ff', 0.18 * a, 3);
     return L;
   };
   // BOTTO: niente fiamma, un piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito)
@@ -246,9 +290,10 @@
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, a = Math.max(0, 1 - ph);
     const r = (2.4 + ph * 10.5) * k, cx = rx - (3 + ph * 5) * k, n = Math.max(18, Math.round(r * 5 * SS));
     g.save();
+    g.fillStyle = ph < 0.3 ? '#fff4d0' : ph < 0.6 ? '#ffb83c' : '#e2561c';
     for (let q = 0; q < n; q++) {                                                  // l'anello che si allarga e sbiadisce
       const an = q / n * Math.PI * 2, wob = 1 + 0.07 * Math.sin(an * 3 + this.st.t * 40);
-      g.globalAlpha = a * (q % 5 === 0 ? 0.55 : 0.95); g.fillStyle = ph < 0.3 ? '#fff4d0' : ph < 0.6 ? '#ffb83c' : '#e2561c';
+      if (q % 5 < 2) g.globalAlpha = a * (q % 5 === 0 ? 0.55 : 0.95);
       g.fillRect(rq(cx + Math.cos(an) * r * 0.9 * wob), rq(exY + Math.sin(an) * r * wob), u1 * (ph < 0.5 ? 2 : 1), u1 * (ph < 0.5 ? 2 : 1));
     }
     if (ph < 0.42) {                                                               // lampo bianco al centro nei primi istanti
@@ -256,8 +301,8 @@
       for (let y = -rr; y <= rr; y += u1) { const w = Math.sqrt(Math.max(0, rr * rr - y * y)); g.fillRect(rq(cx - w), rq(exY + y), Math.max(u1, rq(w * 2)), u1); }
     }
     g.restore();
-    this.light(g, cx, exY, r * 3 + 6, r * 2 + 4, '#ff9a30', 0.22 * a, 3);
-    this.light(g, cx, y0 + 1, r * 3.5 + 8, 5, '#ff8a20', 0.14 * a, 3);
+    flameLight(this, g, cx, exY, r * 3 + 6, r * 2 + 4, '#ff9a30', 0.22 * a, 3);
+    flameLight(this, g, cx, y0 + 1, r * 3.5 + 8, 5, '#ff8a20', 0.14 * a, 3);
     return r;
   };
 
