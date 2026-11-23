@@ -10,6 +10,7 @@
 //        'bang'   BOTTO       niente fiamma: un piccolo scoppio quasi circolare dietro il tubo
 //        'big'    GROSSA      la bella fiammata: libera e grande, con l'anello d'urto (e l'ossidrica insieme, nello spinto)
 //    kind = in che momento: 'limiter' (taglio d'accensione), 'lift' (rilascio sotto i 5.000 giri), 'liftHigh' (rilascio sopra), 'shift' (cambiata)
+//    marmittaPasso / marmittaRossa   il terminale che si arroventa tenendo i giri alti (MARMITTA)
 //  Leggero: soprattutto botti. Medio: fiammate libere, diverse tra loro. Spinto: ossidrica, e fiamma libera quando si rilascia
 //  ai giri medi; qualche botto nelle cambiate.
 // ============================================================================
@@ -48,4 +49,25 @@ function flamePalFor(tier, r) {
   if (tier === 1) return r < 0.45 ? 'arancio' : r < 0.85 ? 'gialla' : 'blu';
   return 'arancio';
 }
-if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM });
+// ---------------------------------------------------------------- marmitta rovente
+// Tenendo il gas negli ultimi MARMITTA.banda giri prima del limitatore (limitatore compreso) lo scarico si scalda: dopo
+// `inizio` secondi il terminale comincia a diventare rosso, a `picco` è incandescente. Per livello dell'auto (flameTier):
+// di serie o poco preparata 15 s, media 10 s, spinta 2 s (picco a 5,5). Fuori dal tiro si raffredda (`fredda` secondi di
+// calore persi al secondo, più piano dello scaldarsi) e il calore non sale oltre il picco + `margine`: dal massimo il rosso
+// si spegne in una decina di secondi.
+const MARMITTA = { banda: 1500, gas: 0.5, inizio: [15, 10, 2], picco: [21, 14.5, 5.5], fredda: 0.6, margine: 1 };
+// calore accumulato (in secondi di tiro) dopo dt: o = { rpm, lim (giri del limitatore), gas (pedale 0-1), acceso, tier }
+function marmittaPasso(h, dt, o) {
+  const t = Math.max(0, Math.min(2, (o && o.tier) | 0)), M = MARMITTA;
+  const tira = o && o.acceso && o.gas >= M.gas && o.rpm >= o.lim - M.banda;
+  const top = M.picco[t] + M.margine;
+  const n = tira ? Math.min(top, (h || 0) + dt) : Math.max(0, Math.min(top, h || 0) - dt * M.fredda);
+  return n;
+}
+// quanto è rosso il terminale (0 freddo, 1 incandescente), con una curva morbida tra inizio e picco
+function marmittaRossa(h, tier) {
+  const t = Math.max(0, Math.min(2, tier | 0)), a = MARMITTA.inizio[t], b = MARMITTA.picco[t];
+  const u = Math.max(0, Math.min(1, ((h || 0) - a) / (b - a)));
+  return u * u * (3 - 2 * u);
+}
+if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa });

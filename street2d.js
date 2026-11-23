@@ -175,9 +175,10 @@ class Street2D {
     x.setTransform(m, 0, 0, m, 0, 0);                            // sporco, scarico, scritte e adesivi nelle unità dello sprite
     const ink = this.C.ink, px = (col, a, b, w = 1, h = 1) => { x.fillStyle = col; x.fillRect(Math.round(a), Math.round(b), w, h); };
     if ((C0.dirt || 0) > 0.3) this.dirtLayer(x, W, H, Math.round(D.wy - D.wr * 0.9), Math.round(D.wy + D.wr * 0.6), (C0.dirt - 0.25) * 1.3, D.ax.map((a) => [a, D.wy]));
-    const ey = D.ex[1];
-    if (L.exhaust === 2) { px(ink, 0, ey - 2, 12, 6); px('#c9ced6', 1, ey - 1, 10, 4); px('#f4f1e6', 2, ey - 1, 7, 1); px('#1a1c22', 2, ey, 3, 2); }
-    else if (L.exhaust) { px(ink, 1, ey - 1, 10, 5); px('#c9ced6', 2, ey, 8, 3); px('#f4f1e6', 3, ey, 5, 1); }
+    // terminale dello scarico: centrato sul punto da cui escono le fiamme (D.ex), la bocca a sinistra, il tubo sotto la carrozzeria
+    const ex0 = Math.round(D.ex[0]) - 2, ey = Math.round(D.ex[1]);
+    if (L.exhaust === 2) { px(ink, ex0, ey - 3, 12, 7); px('#c9ced6', ex0 + 1, ey - 2, 10, 5); px('#f4f1e6', ex0 + 2, ey - 2, 7, 1); px('#1a1c22', ex0 + 1, ey - 1, 3, 3); }
+    else if (L.exhaust) { px(ink, ex0, ey - 2, 10, 5); px('#c9ced6', ex0 + 1, ey - 1, 8, 3); px('#f4f1e6', ex0 + 2, ey - 1, 5, 1); px('#2a2d34', ex0 + 1, ey, 2, 1); }
     if (L.badge) { const bx = Math.round(D.ax[0] + D.wr + 4), by = Math.round(D.wy - D.wr * 0.75); this.text(x, L.badge, bx + 1, by + 1, ink); this.text(x, L.badge, bx, by, '#e8ecf2'); }
     this.drawStickers(x);
     return (this.spr[key] = c);
@@ -2189,7 +2190,7 @@ class Street2D {
       this.fxHeadlamp(g, fx, fy, y0, Math.min(1, night * (s.high ? 1 : 0.9)), (performance.now() || 0) / 1000);
     }
     // ---- effetti
-    const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) + (spr.img ? k : 0));
+    const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) - (spr.img ? k : 0));   // come il disegno (- k): la fiamma esce proprio da GE.ex
     // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
     this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
     if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02 || (st.sus || 0) > 0.03)) this.lightAdd(rx - 20, exY, 90, 40, st.flame > 0.05 && st.flamePal === 'blu' ? '150,170,255' : '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0, (st.sus || 0) * 0.45)) * 0.9);

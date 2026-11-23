@@ -221,7 +221,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Dettagli dell'auto nel 2D**: dischi dei freni che si arrossano con `sim.brakeT` (rosso cupo, ciliegia, arancio;
   sotto i copricerchi solo un riflesso a terra), vetro del finestrino che scende con `sim.winPos` (bordo del
   cristallo, interno più scuro sopra), aria calda che fa tremolare lo sfondo dietro lo scarico (`fxHaze`).
-- **Effetti del 2D** (`effetti2d.js`): fumo, fiammate (arancio, gialla o blu, con fiammella che resta accesa tra uno scoppio e l'altro), scintille, ombre proiettate, fari, luci sulla carrozzeria,
+- **Effetti del 2D** (`effetti2d.js`): fumo, fiammate (arancio, gialla o blu, con fiammella che resta accesa tra uno scoppio e l'altro; dal punto `ex` del disegno, controllo con `node strumenti/scarichi.js`), marmitta che si arroventa ai giri alti (v0.120), scintille, ombre proiettate, fari, luci sulla carrozzeria,
   asfalto. `street2d.js` li chiama da `update()`; per provarli senza guidare si forzano `flame`, `spin`, `brake`
   nello stato passato a `view2d.update`.
 - **Interfaccia** (`menu.js`): schermata di gioco a tutta finestra, menu a schede con Tab. I pannelli restano quelli

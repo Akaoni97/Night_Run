@@ -286,6 +286,37 @@
     return L;
   };
   // BOTTO: niente fiamma, un piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito)
+  // Terminale rovente: tenendo i giri alti lo scarico diventa rosso scuro, poi rosso vivo, poi arancio quasi bianco al
+  // centro (h 0-1 da marmittaRossa di fiamme.js). Si disegna sul terminale montato (o, senza, sul tubo che spunta sotto il
+  // paraurti) a partire da GE.ex, con un alone e un riflesso sull'asfalto. Tremola appena, come il metallo caldo.
+  const MARM_COL = [[90, 12, 8], [200, 32, 12], [255, 96, 24], [255, 226, 186]];
+  const marmCol = (u) => { const x = Math.max(0, Math.min(1, u)) * (MARM_COL.length - 1), i = Math.min(MARM_COL.length - 2, Math.floor(x)), f = x - i, a = MARM_COL[i], b = MARM_COL[i + 1]; return [0, 1, 2].map((q) => Math.round(a[q] + (b[q] - a[q]) * f)); };
+  S.fxMarmitta = function (g, rx, exY, k, h, y0) {
+    const L = (this.carId === 'v40' ? this.v40Look : this.carLook) || {}, tip = L.exhaust || 0, v40 = this.carId === 'v40';
+    const len = (tip === 2 ? 11 : tip ? 9 : 5) + (v40 && tip ? 2 : 0), half = tip === 2 ? 2 : 1;      // parte calda del tubo, nelle unità del disegno
+    const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;
+    const fl = 0.93 + 0.07 * Math.sin((this.st.t || 0) * 23) * Math.sin((this.st.t || 0) * 7.1);       // tremolio del calore
+    const x0 = rq(rx - 1 * k), w = rq(len * k), y = rq(exY - half * k), hh = Math.max(u1, rq((half * 2 + 1) * k));
+    const c = marmCol(h * 0.9), cc = marmCol(Math.min(1, h * 1.05 + 0.08));
+    g.save();
+    // il tubo: più caldo verso la bocca, si spegne andando sotto la carrozzeria
+    const gr = g.createLinearGradient(x0, 0, x0 + w, 0);
+    gr.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${(0.35 + 0.6 * h) * fl})`);
+    gr.addColorStop(0.65, `rgba(${c[0]},${c[1]},${c[2]},${(0.25 + 0.5 * h) * fl})`);
+    gr.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+    g.fillStyle = gr; g.fillRect(x0, y, w, hh);
+    // cuore più chiaro sulla riga di mezzo, solo quando è bello caldo
+    if (h > 0.35) {
+      const a = Math.min(1, (h - 0.35) / 0.5) * fl, gc = g.createLinearGradient(x0, 0, x0 + w * 0.8, 0);
+      gc.addColorStop(0, `rgba(${cc[0]},${cc[1]},${cc[2]},${0.85 * a})`); gc.addColorStop(1, `rgba(${cc[0]},${cc[1]},${cc[2]},0)`);
+      g.fillStyle = gc; g.fillRect(x0, rq(exY - u1 * (half > 1 ? 1 : 0.5) * Math.max(1, k * 0.5)), w * 0.8, Math.max(u1, rq(k * (half > 1 ? 1.5 : 1))));
+    }
+    g.restore();
+    flameLight(this, g, x0 + w * 0.35, exY, (6 + 6 * h) * k, (3 + 3 * h) * k, h > 0.6 ? '#ff7a2a' : '#ff3a14', (0.1 + 0.22 * h) * fl, 3);   // alone
+    this.light(g, x0 + w * 0.4, y0, (10 + 10 * h) * k, 4, '#ff4a18', 0.1 * h * fl, 3);                                                  // riflesso sull'asfalto
+    if (this.lightAdd) this.lightAdd(x0 + w * 0.4, exY, (14 + 16 * h) * k, (8 + 6 * h) * k, h > 0.6 ? '255,120,50' : '255,60,30', 0.55 * h * fl);   // luce nella notte
+  };
+
   S.fxBang = function (g, rx, exY, k, ph, y0) {
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, a = Math.max(0, 1 - ph);
     const r = (2.4 + ph * 10.5) * k, cx = rx - (3 + ph * 5) * k, n = Math.max(18, Math.round(r * 5 * SS));
@@ -544,6 +575,7 @@
     if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
     if (!low) this.fxHaze(g, rx, exY, s, st, k);
     if (st.tipHeat > 0.03) { g.fillStyle = `rgba(255,${120 + (1 - st.tipHeat) * 80 | 0},40,${st.tipHeat * 0.8})`; g.fillRect(rx, exY - Math.round(k), Math.max(2, Math.round(5 * k)), Math.max(1, Math.round(2 * k))); }
+    if ((s.marmitta || 0) > 0.01) this.fxMarmitta(g, rx, exY, k, s.marmitta, y0);                               // terminale rovente (fiamme.js)
     if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));

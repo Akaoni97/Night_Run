@@ -68,3 +68,33 @@ test('fiamme: la fiamma libera ha quattro versioni e i colori seguono il livello
   assert.ok(spinto.has('blu') && flamePalFor(2, 0.1) === 'blu', 'lo spinto è blu');
   assert.equal(flamePalFor(0, 0.5), 'arancio');
 });
+
+// ---------------------------------------------------------------- marmitta rovente (v0.119)
+const M = new Function(src + ';return { MARMITTA, marmittaPasso, marmittaRossa };')();
+const tira = (tier, sec, o = {}) => {                  // secondi di gas negli ultimi giri, a passi di 1/60
+  let h = 0; const n = Math.round(sec * 60);
+  for (let i = 0; i < n; i++) h = M.marmittaPasso(h, 1 / 60, Object.assign({ rpm: 6200, lim: 6500, gas: 1, acceso: true, tier }, o));
+  return h;
+};
+test('marmitta: di serie diventa rossa dopo 15 s di giri alti, media dopo 10, spinta dopo 2 e incandescente a 5,5', () => {
+  assert.equal(M.marmittaRossa(tira(0, 14.5), 0), 0, 'di serie a 14,5 s ancora fredda');
+  assert.ok(M.marmittaRossa(tira(0, 16), 0) > 0.01, 'di serie a 16 s comincia');
+  assert.equal(M.marmittaRossa(tira(0, 22), 0), 1, 'di serie a 22 s incandescente');
+  assert.equal(M.marmittaRossa(tira(1, 9.5), 1), 0, 'media a 9,5 s fredda');
+  assert.ok(M.marmittaRossa(tira(1, 11), 1) > 0.01, 'media a 11 s comincia');
+  assert.equal(M.marmittaRossa(tira(2, 1.9), 2), 0, 'spinta a 1,9 s fredda');
+  assert.ok(M.marmittaRossa(tira(2, 3.5), 2) > 0.2, 'spinta a 3,5 s già rossa');
+  assert.equal(M.marmittaRossa(tira(2, 5.6), 2), 1, 'spinta a 5,6 s incandescente');
+});
+test('marmitta: sotto gli ultimi 1.500 giri, senza gas o a motore spento non si scalda; poi si raffredda piano', () => {
+  assert.equal(tira(2, 10, { rpm: 4900 }), 0, 'a 4.900 giri su 6.500 niente');
+  assert.equal(tira(2, 10, { gas: 0.3 }), 0, 'gas a un terzo niente');
+  assert.equal(tira(2, 10, { acceso: false }), 0, 'motore spento niente');
+  assert.ok(tira(2, 10, { rpm: 6500 }) > 5, 'sul limitatore sì');
+  let h = tira(2, 30);
+  assert.ok(h <= M.MARMITTA.picco[2] + M.MARMITTA.margine + 1e-9, 'il calore non cresce all\'infinito');
+  for (let i = 0; i < 60 * 3; i++) h = M.marmittaPasso(h, 1 / 60, { rpm: 3000, lim: 6500, gas: 0.2, acceso: true, tier: 2 });
+  assert.ok(M.marmittaRossa(h, 2) > 0.3, 'dopo 3 s di crociera è ancora rossa');
+  for (let i = 0; i < 60 * 10; i++) h = M.marmittaPasso(h, 1 / 60, { rpm: 900, lim: 6500, gas: 0, acceso: true, tier: 2 });
+  assert.equal(M.marmittaRossa(h, 2), 0, 'dopo altri 10 s è fredda');
+});
