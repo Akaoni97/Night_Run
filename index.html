@@ -1671,9 +1671,21 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // gioco (tutto il codice del fotogramma), strada (il disegno di street2d.js, compreso) e browser (il resto: impaginazione,
   // pannelli, scheda video). Con 60 FPS il fotogramma ha 16,7 ms.
   let fpsJs = 0, fpsSt = 0;
+  // la scheda video che il browser usa davvero (anche integrata). Se è un rendering software (SwiftShader, llvmpipe,
+  // «Microsoft Basic Render Driver») il gioco lo disegna il processore e va a scatti: lo dice il contatore, e una volta
+  // all'avvio un avviso spiega come riaccenderla (accelerazione grafica del browser, scheda «prestazioni elevate» in Windows).
+  const GPU = (() => { try {
+    const c = document.createElement('canvas'), gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+    if (!gl) return { nome: 'WebGL spento', sw: true };
+    const e = gl.getExtension('WEBGL_debug_renderer_info'), n = String(e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
+    const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext();
+    return { nome: n.replace(/^ANGLE \((.*)\)$/, '$1').replace(/ Direct3D.*$/, '').replace(/^[^,]*, /, '').slice(0, 40), sw: /swiftshader|llvmpipe|softpipe|software|basic render/i.test(n) };
+  } catch (e) { return { nome: '?', sw: false }; } })();
+  window.nightRun_gpu = GPU;
+  if (GPU.sw) setTimeout(() => { try { if (!sessionStorage.getItem('nr_gpu_av')) { sessionStorage.setItem('nr_gpu_av', '1'); flash('Il browser non sta usando la scheda video: il gioco va a scatti. Chrome/Edge → Impostazioni → Sistema → «Usa accelerazione grafica» acceso, poi riavvia il browser.', 9); } } catch (e) { /* niente */ } }, 6000);
   function fpsTick(dtv) { if (!S.fps) { if (!fpsBox.hidden) fpsBox.hidden = true; return; } fpsN++; fpsT += dtv; fpsJs += frameJs; fpsSt += (street2d && street2d.tPrev) || 0;
     if (fpsT >= 0.5) { const f = Math.round(fpsN / fpsT), ms = fpsT * 1000 / fpsN, js = fpsJs / fpsN, st = fpsSt / fpsN; fpsN = 0; fpsT = 0; fpsJs = 0; fpsSt = 0; fpsBox.hidden = false; fpsBox.style.color = f >= 50 ? '#b8ff3a' : f >= 30 ? '#ffd27a' : '#ff7a6a';
-      fpsBox.textContent = f + ' FPS · ' + ms.toFixed(1) + ' ms: gioco ' + js.toFixed(1) + ' (strada ' + Math.min(js, st).toFixed(1) + ') · browser ' + Math.max(0, ms - js).toFixed(1) + (street2d && street2d.slow ? ' · densità semplice (auto)' : ''); } }
+      fpsBox.textContent = f + ' FPS · ' + ms.toFixed(1) + ' ms: gioco ' + js.toFixed(1) + ' (strada ' + Math.min(js, st).toFixed(1) + ') · browser ' + Math.max(0, ms - js).toFixed(1) + (street2d && street2d.slow ? ' · densità semplice (auto)' : '') + (GPU.sw ? ' · SENZA SCHEDA VIDEO (' + GPU.nome + ')' : ' · ' + GPU.nome); } }
 
 
   // gamepad
