@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Luca), con Claude | Ottimizzazione: da 11-24 fps a 50-60 | `street2d.js`, `nitido2d.js`, `luci2d.js`, `effetti2d.js`, `vita2d.js`, `index.html` e altri del disegno | 23/11/2026 notte |
