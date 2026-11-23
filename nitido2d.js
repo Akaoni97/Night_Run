@@ -49,7 +49,8 @@
   // c = contesto dello schermo; (sx, sy, sw, sh) = rettangolo della tela interna in pixel veri; (dx, dy, dw, dh) = dove va
   S.blit = function (c, sx, sy, sw, sh, dx, dy, dw, dh) {
     const k = dh / sh;
-    if (this.sharp === false || k < 1.02 || Math.abs(k - Math.round(k)) < 0.01) {
+    // tela dello schermo già a multiplo intero (fitScreen di street2d.js, v0.134): una passata a pixel netti, il resto lo fa il browser
+    if (this.sharp === false || k < 1.02 || Math.abs(k - Math.round(k)) < 0.01 || this._ir === 'auto') {
       c.imageSmoothingEnabled = k < 0.99; c.imageSmoothingQuality = k >= 0.5 ? 'low' : 'medium';   // rimpicciolire poco: basta la sfumatura semplice ('high' rifaceva le mipmap a ogni fotogramma)
       c.drawImage(this.lo, sx, sy, sw, sh, dx, dy, dw, dh);
       c.imageSmoothingEnabled = false; return;
@@ -202,7 +203,20 @@
     };
     pass('bl', 3, 'brightness(0.5) contrast(4.6) saturate(1.5) blur(1.5px)', 0.46 - day * 0.3);
     if (!this.slow) pass('bl2', 8, 'brightness(0.47) contrast(4.2) saturate(1.6) blur(5px)', 0.3 - day * 0.22);
-    for (const [cv, alpha] of todo) { c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = alpha; c.drawImage(cv, 0, 0, W2, H2); c.restore(); }
+    if (!todo.length) return;
+    // v0.134: i due livelli si sommano prima su una tela piccola (quella dello stretto) e poi una passata sola sulla scena
+    // grande, invece di due: il largo è già sfocato di 5 px a 1/8, passare da 1/3 non cambia niente
+    let src2 = todo[0][0], a2 = todo[0][1];
+    if (todo.length > 1) {
+      const [c1, al1] = todo[0], [c2, al2] = todo[1], m = this._blM || (this._blM = document.createElement('canvas'));
+      if (m.width !== c1.width || m.height !== c1.height) { m.width = c1.width; m.height = c1.height; }
+      const mx = m.getContext('2d'), top = Math.max(al1, al2);
+      mx.globalCompositeOperation = 'source-over'; mx.globalAlpha = 1; mx.clearRect(0, 0, m.width, m.height); mx.imageSmoothingEnabled = true;
+      mx.globalCompositeOperation = 'lighter'; mx.globalAlpha = al1 / top; mx.drawImage(c1, 0, 0);
+      mx.globalAlpha = al2 / top; mx.drawImage(c2, 0, 0, m.width, m.height);
+      src2 = m; a2 = top;
+    }
+    c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = a2; c.drawImage(src2, 0, 0, W2, H2); c.restore();
   };
 
   // ---------------------------------------------------------------- marciapiede lontano a densità doppia (y 215 → 236)

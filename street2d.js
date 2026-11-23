@@ -725,10 +725,28 @@ class Street2D {
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     if (!w || !h) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
+    this.devW = Math.round(w * dpr); this.devH = Math.round(h * dpr);                 // pixel veri dello schermo
+    this.canvas.width = this.devW; this.canvas.height = this.devH;
     this.LW = Math.round(this.LH * w / h);
     this.fitLo();
+    this.fitScreen();
     this.skyCache = null;
+  }
+  // v0.134 (ottimizzazione, Nico): la tela dello schermo. Se l'ingrandimento della tela interna non è un numero intero, invece di
+  // disegnare a tutto schermo in due passate (×n a pixel netti su una tela d'appoggio, poi giù alla misura vera) la tela dello
+  // schermo è già ×n (al massimo ×2 a densità doppia, ×3 a quella normale: 1440 o 1080 righe, anche su 4K o con lo zoom di
+  // Windows) e la porta alla misura vera il browser con la scheda video (image-rendering: auto). Stesso aspetto, una passata sola
+  // e niente tela d'appoggio. Con un ingrandimento intero (o più piccolo dello schermo) resta tutto come prima.
+  fitScreen() {
+    const dW = this.devW, dH = this.devH; if (!dW || !dH) return;
+    const SS = this.SS || 1, loH = this.LH * SS, k = dH / loH;
+    let W = dW, H = dH, liscia = false;
+    if (this.sharp !== false && this.blit && k >= 1.02 && Math.abs(k - Math.round(k)) >= 0.01) {
+      const n = Math.min(Math.ceil(k), SS > 1 ? 2 : 3); W = Math.round(this.LW * SS * n); H = loH * n; liscia = true;
+    }
+    if (this.canvas.width !== W || this.canvas.height !== H) { this.canvas.width = W; this.canvas.height = H; this.vg = null; this.gr2 = null; }
+    const ir = liscia ? 'auto' : '';
+    if (this._ir !== ir) { this._ir = ir; this.canvas.style.imageRendering = ir; }   // '' = quella del foglio di stile (pixelated)
   }
 
   // Tela interna: le coordinate restano quelle di sempre (360 righe), ma con qualità alta ogni unità vale
@@ -2364,14 +2382,17 @@ class Street2D {
 
   present(shake, shakeX) {
     if (!this.visible) return;
+    this.fitScreen();
     if (typeof NightInterni !== 'undefined' && NightInterni.covers) return;   // dentro un locale la scena dell'interno copre tutto: niente lavoro per una strada che non si vede
     const c = this.ctx, SS = this.SS || 1; c.imageSmoothingEnabled = false;
-    c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (shake || shakeX || this.padBottom || this.bars > 0.001 || (this.zoom || 1) * (this.fxZoom || 1) > 1.001) { c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height); }   // solo se resta un bordo scoperto (v0.134)
     // inquadratura: zoom su un punto (sigla) o scena intera
     const z = Math.max(1, (this.zoom || 1) * (this.fxZoom || 1)), pad = this.padBottom || 0;
     // senza zoom bagliore, colori e vignettatura si fanno sulla tela interna, prima dell'ingrandimento (prestazioni, 23/11/2026):
     // sono sfumature larghe, a schermo pieno costavano da 2 a 4 volte i pixel per lo stesso risultato. Con lo zoom come prima.
-    const fxLo = !(z > 1.001 || pad) && this.fxLo !== false;
+    // v0.134: anche con lo zoom della ripresa (tra 60 e 160 km/h c'è quasi sempre, 1,00-1,02, e fermi fino a 1,3): lo zoom ritaglia
+    // solo un pezzo della scena già finita, la vignettatura resta appena più morbida ai bordi. Solo la sigla (padBottom) come prima.
+    const fxLo = !pad && this.fxLo !== false;
     if (fxLo) { const L = this.g; L.save(); L.setTransform(1, 0, 0, 1, 0, 0); this.presentFx(L, [0, 0, this.LW, this.LH], SS, 'lo'); L.restore(); }
     let src = [0, 0, this.LW, this.LH];
     if (z > 1.001 || pad) {

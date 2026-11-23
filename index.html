@@ -3073,10 +3073,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
   function drawHudPro() {
     const c = $('hudP'); c.hidden = false;
-    const dpr = Math.min(2.5, window.devicePixelRatio || 1), W = 560, H = 240;
-    if (c.width !== Math.round(W * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
-    const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-    HudPro.draw(g, W, H, hudData(), (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, dpr);
+    // v0.127: la tela è grande quanto si vede (prima 560×240 per lo zoom dello schermo anche se il quadro occupa ~330×141:
+    // quasi tre volte i pixel); il disegno resta in coordinate 560×240
+    const dpr = Math.min(2.5, window.devicePixelRatio || 1), W = 560, H = 240, cw = c.clientWidth;
+    const sc = Math.round(Math.min(dpr, cw ? Math.max(0.4, cw * dpr / W) : dpr) * 20) / 20;   // a passi di 0,05: le facce dei quadranti restano in cache
+    if (c.width !== Math.round(W * sc) || c.height !== Math.round(H * sc)) { c.width = Math.round(W * sc); c.height = Math.round(H * sc); }
+    const g = c.getContext('2d'); g.setTransform(sc, 0, 0, sc, 0, 0);
+    HudPro.draw(g, W, H, hudData(), (CARS[game.car] || CARS.supra).cluster || CLUSTERS.supra, sc);
   }
   // strumenti tuning da mostrare (fino a quattro)
   (function buildPods() {

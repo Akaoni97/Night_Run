@@ -65,6 +65,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 26. [telefono] **Schermata iniziale tagliata al telefono in orizzontale**: chiave, «Accendi e parti» e partite 2 e 3 escono a destra (Pixel 7 e iPhone 13, check del 23/11; da ricontrollare dopo la v0.125). Il gioco si prova anche dal telefono. (proprietario)
 
+27. [prestazioni] **Fps sul PC vero** (v0.131-v0.134, prestazioni in due giri, Nico e Luca): guardare il contatore FPS (dice anche quale scheda video usa il browser) a 1080p di notte con la pioggia, in «Automatica» e a densità doppia. Nel browser di prova senza scheda video: gradino più basso ~47 fps, densità doppia ~18. Se resta sotto i 50, il prossimo passo sono carrozzerie e passanti. (tutti e due)
+
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
 ### Economia e guida

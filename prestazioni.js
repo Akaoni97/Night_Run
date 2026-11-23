@@ -28,6 +28,9 @@ const NR_PREST = (() => {
   return Object.assign({}, PREST_DEF, o);
 })();
 function prestSave() { try { localStorage.setItem('nr_prest', JSON.stringify(NR_PREST)); } catch (e) { /* ignora */ } }
+// v0.127: il gioco ora disegna molto meno. Il gradino ricordato da prima (spesso il più basso) si rimisura una volta da capo.
+const PREST_RIMISURA = '127';
+try { if (typeof localStorage !== 'undefined' && localStorage.getItem('nr_slow_v') !== PREST_RIMISURA) { localStorage.removeItem('nr_slow'); localStorage.setItem('nr_slow_v', PREST_RIMISURA); } } catch (e) { /* ignora */ }
 // gradino automatico raggiunto da questo computer (0-3); il vecchio '1' di nr_slow (densità semplice) vale 3
 function prestLvLoad() { try { const v = localStorage.getItem('nr_slow'); return v === '1' ? 3 : Math.max(0, Math.min(3, parseInt(v, 10) || 0)); } catch (e) { return 0; } }
 // cosa disegnare, dalle scelte e dal gradino automatico (puro, provato in test/prestazioni.test.js)

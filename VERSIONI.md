@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.133**
+**Versione attuale: v0.134**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -157,3 +157,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.131 | 23/11 | cognato | Sfruttamento del motore grafico: `strumenti/carico.js` (barre di carico per parte sul fotogramma), `SFRUTTAMENTO.md`, skill `night-run-sfruttamento`, avviso per Nico |
 - v0.132 · 23/11/2026 · cognato · prestazioni, primo giro: niente scritture inutili sulla pagina (`leggero.js`), pilota a 20 Hz, ingrandimento senza tela rifatta e senza mipmap, riflesso bagnato in pochi tratti, bagliore e colori sulla tela interna, niente strada sotto gli interni, contatore FPS coi millisecondi
 - v0.133 · 23/11/2026 · cognato · il contatore FPS dice quale scheda video usa il browser; se è un rendering software, avviso all'avvio con come riaccendere l'accelerazione grafica
+- v0.134 · 23/11/2026 · proprietario · prestazioni, secondo giro: la tela dello schermo è un multiplo intero della scena (al massimo 1440 righe, anche su 4K o con lo zoom di Windows) e il browser la porta alla misura vera con la scheda video, in una passata invece di due; bagliore, colori e vignettatura sulla tela interna anche con lo zoom della ripresa; bagliore sommato in una passata; quadro strumenti grande quanto si vede; gradino delle Prestazioni rimisurato una volta; `strumenti/misura_fps.js`. Al gradino più basso da ~20 a ~47 fps, a densità doppia da ~11 a ~18 (browser di prova senza scheda video)
