@@ -186,10 +186,26 @@
   const baseLandmark = S.landmark;
   S.landmark = function (kind, r, D) {
     if (!LM[kind]) return baseLandmark.call(this, kind, r, D);
-    const d = LM[kind], w = d.w, h = d.h, top = 25, { c, px, line, x } = mk(w + 2, h + 26), gy = top + h;
-    const base = D.far[0], dk = sh(base, -0.25), lt = sh(base, 0.5), meta = { w: w + 2, h: h + 26, signs: [], beacons: [], shop: null, glows: [] };
+    // `lift`: i monumenti bassi (Colosseo, Partenone...) poggiano su un basamento di case lontane, così sporgono sopra i palazzi vicini
+    const d = LM[kind], w = d.w, h = d.h, lift = d.lift || 0, top = 25, { c, px, line, x } = mk(w + 2, h + 26 + lift), gy = top + h;
+    const base = D.far[0], dk = sh(base, -0.25), lt = sh(base, 0.5), meta = { w: w + 2, h: h + 26 + lift, signs: [], beacons: [], shop: null, glows: [] };
+    if (lift) {
+      for (let xx = 0, k = 0; xx < w + 2; k++) { const bw = 10 + Math.floor(r(60 + k) * 10), bh = Math.round(lift * (0.62 + 0.38 * r(70 + k))); px(dk, xx, gy + lift - bh, Math.min(bw, w + 2 - xx), bh); xx += bw; }
+      for (let q = 0; q < Math.round(w * lift / 90); q++) px(r(80 + q) < 0.6 ? '#c89a4a' : '#8a86d0', 2 + Math.floor(r(90 + q) * (w - 4)), gy + 4 + Math.floor(r(100 + q) * (lift - 8)), 2, 2);
+    }
     d.draw({ px, line, x, w, h, top, gy, dk, lt, base, r, meta, sh, D, S: this });
     return { c, ...meta };
+  };
+  // monumenti a distanza regolare (uno ogni `landEvery` tessere lontane, di norma meno di uno per schermo) invece che a caso
+  const baseBuilding = S.building;
+  S.building = function (layer, i, D) {
+    if (!this._city || layer !== 'far' || !D || !D.land || !D.landEvery) return baseBuilding.call(this, layer, i, D);
+    const key = layer + ':' + i, hit = this.tiles.get(key); if (hit) return hit;
+    const E = D.landEvery, ph = ((i % E) + E) % E, k = String(D.land).split('|');
+    if (ph !== D.landPhase % E) return baseBuilding.call(this, layer, i, Object.assign({}, D, { land: null }));
+    const rr = (n) => Street2D.rnd(i * 13.7 + 1 + n), t = this.landmark(k[Math.floor(i / E + 3) % k.length] || k[0], rr, D);
+    this.tiles.set(key, t); if (this.tiles.size > 260) this.tiles.delete(this.tiles.keys().next().value);
+    return t;
   };
 
   // ---------------------------------------------------------------- quartieri per città

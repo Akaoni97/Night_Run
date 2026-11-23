@@ -17,7 +17,7 @@
   const FL = '#e8c070', FL2 = '#c8984a', WH = '#e8e4d0';
   const arches = (o, x0, y0, n, aw, ah, gap, col, lit) => { for (let k = 0; k < n; k++) { const ax = x0 + k * (aw + gap); o.px(col, ax, y0 + 2, aw, ah - 2); o.px(col, ax + 1, y0 + 1, aw - 2, 1); if (lit) o.px(lit, ax + 1, y0 + 3, aw - 2, ah - 4); } };
 
-  LM.colosseo = { w: 124, h: 54, draw(o) {
+  LM.colosseo = { lift: 70, w: 124, h: 54, draw(o) {
     // anello a tre ordini di arcate, più alto a sinistra e spezzato a destra, attico con finestrelle
     const { px, w, gy } = o, y1 = gy - 50;
     const hAt = (xx) => xx < w * 0.55 ? 50 : Math.max(26, 50 - (xx - w * 0.55) * 0.55);
@@ -26,7 +26,7 @@
     px(sh(o.dk, 0.25), 2, gy - 50, 62, 1); for (let xx = 6; xx < 68; xx += 6) px(FL2, xx, gy - 49, 2, 3);
     o.meta.glows.push({ x: w / 2, y: gy - 20, r: 56, ry: 0.35, col: FL, a: 0.1 }); } };
 
-  LM.cupola = { w: 66, h: 96, draw(o) {
+  LM.cupola = { lift: 44, w: 66, h: 96, draw(o) {
     // San Pietro: tamburo con le colonne, cupola a spicchi, lanterna, facciata bassa
     const { px, w, gy, line } = o, cx = w / 2;
     px(o.dk, 4, gy - 22, w - 8, 22); for (let xx = 8; xx < w - 8; xx += 5) px(FL2, xx, gy - 18, 2, 14); px(sh(o.dk, 0.3), 4, gy - 22, w - 8, 1);
@@ -36,7 +36,7 @@
     px(o.dk, cx - 3, gy - 70, 6, 9); px(FL2, cx - 1, gy - 68, 2, 5); px(o.dk, cx - 1, gy - 78, 2, 9); px(o.dk, cx - 3, gy - 75, 6, 2);
     o.meta.glows.push({ x: cx, y: gy - 40, r: 26, col: FL, a: 0.1 }); o.meta.beacons.push({ x: cx, y: gy - 80 }); } };
 
-  LM.eiffel = { w: 74, h: 148, draw(o) {
+  LM.eiffel = { lift: 4, w: 74, h: 148, draw(o) {
     // traliccio che si stringe, tre piani, antenna: acceso d'oro
     const { px, line, w, gy } = o, cx = w / 2, FE = '#c89a4a';
     const half = (y) => { const t = (gy - y) / 138; return Math.max(1.5, 30 * Math.pow(1 - t, 1.9) + 2); };
@@ -48,7 +48,7 @@
     px(o.dk, cx - 1, gy - 150 + 12, 2, 24); px(FE, cx, gy - 138, 1, 8); o.meta.beacons.push({ x: cx, y: gy - 138 });
     o.meta.glows.push({ x: cx, y: gy - 60, r: 40, ry: 1.2, col: FL, a: 0.1 }); } };
 
-  LM.arco = { w: 66, h: 62, draw(o) {
+  LM.arco = { lift: 62, w: 66, h: 62, draw(o) {
     const { px, w, gy } = o, cx = w / 2;
     px(o.dk, 4, gy - 56, w - 8, 56); px('#b89048', 4, gy - 56, w - 8, 1); px('#b89048', 4, gy - 49, w - 8, 1);
     for (let k = 0; k < 9; k++) px(FL2, 8 + k * 6, gy - 54, 3, 4);           // attico con gli scudi
@@ -58,7 +58,7 @@
     px(sh(o.dk, 0.3), 3, gy - 57, w - 6, 2);
     o.meta.glows.push({ x: cx, y: gy - 30, r: 34, ry: 0.7, col: FL, a: 0.1 }); } };
 
-  LM.bigben = { w: 74, h: 128, draw(o) {
+  LM.bigben = { lift: 14, w: 74, h: 128, draw(o) {
     // torre dell'orologio (quadrante acceso) accanto al palazzo di Westminster coi pinnacoli
     const { px, w, gy, line } = o, tx = 12, tw = 20;
     px(o.dk, 34, gy - 26, w - 36, 26); for (let k = 36; k < w - 4; k += 5) { px(FL2, k, gy - 18, 2, 6); px(o.dk, k, gy - 32, 1, 6); }
@@ -73,7 +73,7 @@
     for (const dx of [-2, tw]) { px(o.dk, tx + dx, gy - 118, 2, 6); px(FL2, tx + dx, gy - 118, 1, 2); }
     o.meta.glows.push({ x: tx + 10, y: gy - 103, r: 16, col: FL, a: 0.16 }); o.meta.beacons.push({ x: tx + 10, y: gy - 138 }); } };
 
-  LM.stadshuset = { w: 42, h: 112, draw(o) {
+  LM.stadshuset = { lift: 22, w: 42, h: 112, draw(o) {
     // municipio di Stoccolma: torre quadrata di mattoni con le aperture ad arco e le tre corone d'oro
     const { px, w, gy } = o, cx = w / 2;
     px(o.dk, 4, gy - 36, w - 8, 36); for (let k = 8; k < w - 8; k += 6) px(FL2, k, gy - 26, 3, 8);
@@ -101,7 +101,7 @@
     px(SHAFT, cx - 6, by + 10, 12, 4); px(SHAFT, cx - 1, by - 40, 2, 28); px(SHAFT, cx - 1, by - 50, 1, 50); px(FL2, cx, by - 36, 1, 4);
     o.meta.glows.push({ x: cx, y: by, r: 24, col: FL, a: 0.16 }); o.meta.beacons.push({ x: cx, y: by - 46 }); } };
 
-  LM.brandenburg = { w: 96, h: 56, draw(o) {
+  LM.brandenburg = { lift: 60, w: 96, h: 56, draw(o) {
     const { px, w, gy } = o;
     px(o.dk, 4, gy - 4, w - 8, 4); px(o.dk, 6, gy - 44, w - 12, 8); px(sh(o.dk, 0.3), 6, gy - 44, w - 12, 1); px(o.dk, 24, gy - 52, w - 48, 8);
     for (let k = 0; k < 6; k++) { const xx = 8 + k * 15; px(o.dk, xx, gy - 38, 6, 34); px(FL2, xx + 1, gy - 36, 2, 30); }
@@ -110,7 +110,7 @@
     for (let k = 0; k < 4; k++) px(o.dk, w / 2 - 12 + k * 6, gy - 68, 3, 6);
     o.meta.glows.push({ x: w / 2, y: gy - 22, r: 48, ry: 0.5, col: FL, a: 0.1 }); } };
 
-  LM.tyn = { w: 70, h: 124, draw(o) {
+  LM.tyn = { lift: 26, w: 70, h: 124, draw(o) {
     // chiesa di Tyn: due guglie gotiche coi torricini agli angoli e il frontone in mezzo
     const { px, w, gy } = o;
     px(o.dk, 6, gy - 52, w - 12, 52); for (let k = 10; k < w - 10; k += 8) px(FL2, k, gy - 30, 3, 10);
@@ -123,7 +123,7 @@
     for (let j = 0; j < 12; j++) px(o.dk, 28 + j, gy - 54 - j, w - 56 - 2 * j, 1);
     o.meta.glows.push({ x: w / 2, y: gy - 50, r: 38, col: FL, a: 0.09 }); } };
 
-  LM.vito = { w: 92, h: 112, draw(o) {
+  LM.vito = { lift: 30, w: 92, h: 112, draw(o) {
     // castello di Praga: la cattedrale di San Vito con la guglia alta e le mura col palazzo
     const { px, w, gy, line } = o;
     px(o.dk, 0, gy - 26, w, 26); for (let k = 4; k < w - 4; k += 6) px(FL2, k, gy - 18, 2, 6); px(sh(o.dk, 0.25), 0, gy - 26, w, 1);
@@ -134,7 +134,7 @@
     line(30, gy - 40, 22, gy - 26, o.dk); line(60, gy - 40, 68, gy - 26, o.dk);
     o.meta.glows.push({ x: 48, y: gy - 50, r: 34, col: FL, a: 0.1 }); o.meta.beacons.push({ x: 59, y: gy - 108 }); } };
 
-  LM.stephansdom = { w: 76, h: 124, draw(o) {
+  LM.stephansdom = { lift: 20, w: 76, h: 124, draw(o) {
     // duomo di Vienna: tetto altissimo a losanghe e la guglia sud
     const { px, w, gy } = o;
     px(o.dk, 18, gy - 42, 54, 42); for (let k = 22; k < 68; k += 7) px(FL2, k, gy - 20, 3, 12);
@@ -145,7 +145,7 @@
     px(o.dk, 10, gy - 128 + 6, 2, 6); px(FL2, 9, gy - 60, 4, 14); px(FL2, 9, gy - 34, 4, 10); px(FL, 10, gy - 104, 2, 5);
     o.meta.glows.push({ x: 22, y: gy - 60, r: 34, col: FL, a: 0.1 }); o.meta.beacons.push({ x: 11, y: gy - 125 }); } };
 
-  LM.metropolis = { w: 46, h: 96, draw(o) {
+  LM.metropolis = { lift: 30, w: 46, h: 96, draw(o) {
     // edificio Metropolis di Madrid: scalinata di piani, cupola di ardesia e la Vittoria alata d'oro
     const { px, w, gy } = o, cx = w / 2;
     px(o.dk, 4, gy - 40, w - 8, 40); px(sh(o.dk, 0.3), 3, gy - 41, w - 6, 2); for (let yy = gy - 36; yy < gy - 6; yy += 9) for (let k = 8; k < w - 10; k += 7) px(r2(o, k, yy) ? FL : '#2a2038', k, yy, 3, 5);
@@ -155,7 +155,7 @@
     o.meta.glows.push({ x: cx, y: gy - 60, r: 28, col: FL, a: 0.1 }); o.meta.beacons.push({ x: cx, y: gy - 106 }); } };
   const r2 = (o, a, b) => o.r(a * 3.7 + b * 1.3) < 0.6;
 
-  LM.santajusta = { w: 34, h: 104, draw(o) {
+  LM.santajusta = { lift: 24, w: 34, h: 104, draw(o) {
     // ascensore di Santa Justa: torre di ferro neogotica con la passerella in cima
     const { px, w, gy, line } = o, cx = w / 2;
     for (const dx of [-8, 7]) px(o.dk, cx + dx, gy - 82, 2, 82);
@@ -163,7 +163,7 @@
     px(o.dk, cx - 14, gy - 92, 29, 6); px(FL2, cx - 12, gy - 90, 25, 2); px(o.dk, cx - 6, gy - 104 + 4, 14, 12); px(FL, cx - 3, gy - 96, 8, 3);
     px(o.dk, cx, gy - 110 + 8, 1, 6); px(FL2, cx - 9, gy - 64, 5, 8); o.meta.glows.push({ x: cx, y: gy - 70, r: 20, col: FL, a: 0.1 }); o.meta.beacons.push({ x: cx, y: gy - 104 }); } };
 
-  LM.castelo = { w: 96, h: 58, draw(o) {
+  LM.castelo = { lift: 40, w: 96, h: 58, draw(o) {
     // castello di Sao Jorge sulla collina: mura merlate e torri illuminate
     const { px, w, gy } = o;
     for (let xx = 0; xx < w; xx++) { const hh = 10 + Math.round(10 * Math.sin(xx / w * Math.PI)); px('#2a2030', xx, gy - hh, 1, hh); }
@@ -171,7 +171,7 @@
     for (const tx of [10, 44, w - 22]) { px(o.dk, tx, gy - 50, 12, 36); for (let k = 0; k < 12; k += 4) px(o.dk, tx + k, gy - 54, 2, 4); px(FL2, tx + 4, gy - 40, 3, 7); }
     o.meta.glows.push({ x: w / 2, y: gy - 30, r: 40, ry: 0.5, col: FL, a: 0.1 }); } };
 
-  LM.partenone = { w: 112, h: 74, draw(o) {
+  LM.partenone = { lift: 44, w: 112, h: 74, draw(o) {
     // Acropoli: la roccia e il Partenone con le colonne e il frontone, illuminati d'oro
     const { px, w, gy } = o, rock = '#2a2230';
     for (let xx = 0; xx < w; xx++) { const t = xx / w, hh = Math.round(14 + 12 * Math.sin(Math.min(1, t * 1.15) * Math.PI) + (t < 0.12 ? -6 : 0)); px(rock, xx, gy - hh, 1, hh); }
@@ -183,7 +183,7 @@
     for (let j = 0; j < 9; j++) px(FL2, bx + j * 3, by - 38 + j, bw - j * 6, 1);
     o.meta.glows.push({ x: w / 2, y: gy - 36, r: 58, ry: 0.5, col: FL, a: 0.14 }); } };
 
-  LM.campidoglio = { w: 112, h: 80, draw(o) {
+  LM.campidoglio = { lift: 44, w: 112, h: 80, draw(o) {
     // Campidoglio di Washington: la cupola bianca su due ali
     const { px, w, gy } = o, cx = w / 2, W1 = '#d8d6cc', W2 = '#a8a69c';
     px(W2, 2, gy - 22, w - 4, 22); px(W1, 2, gy - 22, w - 4, 2); for (let k = 6; k < w - 6; k += 6) { px('#2a2840', k, gy - 16, 3, 8); }
@@ -336,6 +336,6 @@
       words: ['MUSEUM', 'CAFE', 'BANK', 'DELI'], neon: ['#ff3a2a', '#2a5fd8', '#f4f1e6'],
       haze: [50, 64, 112], glow: [200, 220, 255], lamp: '#fff0d0', grade: [180, 200, 250], gradeA: 0.1, land: 'obelisco|campidoglio', landP: 0.3, people: 4 }),
   ];
-  // i monumenti si vedono più spesso (le tessere lontane sono sfumate dalla foschia)
-  for (const id in CITY) for (const d of CITY[id]) d.landP = Math.min(0.42, d.landP * 1.45);
+  // un monumento ogni 12 tessere lontane (se ne vede più o meno uno per schermo), con una fase diversa per quartiere
+  let ph = 2; for (const id in CITY) for (const d of CITY[id]) { if (d.land) { d.landEvery = 12; d.landPhase = ph; ph = (ph + 4) % 9; } }
 })();

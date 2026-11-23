@@ -26,16 +26,20 @@ const FPS = 30, W = 1920, H = 1080, PREP = 1.0;     // PREP: secondi di gioco pr
 // Altro per ripresa: tc false = controllo di trazione spento; rain = pioggia e asfalto bagnato (meno aderenza);
 // car = { id, preset } auto e preparazione (tuning.js); phone = messaggio sul telefono a `at` secondi
 const SHOTS = [
-  { name: '01_tokyo', km: 1.5, sec: 3.4, t0: 50, lane: 2, env: 1, drive: { mode: 'cruise', v: 11 } },
-  { name: '02_roma', km: 46, sec: 3.2, t0: 90, lane: 2, env: 1, drive: { mode: 'cruise', v: 13 } },
-  { name: '03_semaforo', km: 0.75, sec: 5.2, t0: 0, lane: 1, env: 1, rain: true, tc: false, light: true, rival: { vt: 'e30', lane: 2, k: 0.94 }, drive: { mode: 'drag', go: 2.0, wet: 0.24 } },
-  { name: '04_parigi', km: 90, rain: true, sec: 4.4, t0: 70, lane: 2, env: 1, block: 50, drive: { mode: 'pass', v0: 14, vlow: 4.5, at: 0.5, dur: 2.2, back: 4.4 } },
-  { name: '05_londra', km: 130, sec: 3.2, t0: 160, lane: 2, env: 1, drive: { mode: 'cruise', v: 12 } },
-  { name: '06_mare', km: 320, sec: 3.4, t0: 201, lane: 2, drive: { mode: 'cruise', v: 10 } },
-  { name: '07_e36', km: 200, sec: 3.4, t0: 120, lane: 2, car: { id: 'e36', preset: 'single' }, drive: { mode: 'cruise', v: 17 } },
-  { name: '08_telefono', km: 160, sec: 4.4, t0: 120, lane: 2, drive: { mode: 'cruise', v: 19 }, phone: { at: 0.7, from: 'Sconosciuto', text: 'Ho lasciato sei auto. Tu ne hai presa una.' } },
-  { name: '09_supra', km: 8, sec: 6.2, t0: 40, lane: 2, env: 1, tc: false, car: { id: 'supra', preset: 'single', paint: '#c81d11' }, drive: { mode: 'pull', gear: 3, rpm0: 5200, hold: 1.0 } },
+  { name: '01_tokyo', km: 1.5, sec: 2.8, t0: 50, lane: 2, env: 1, drive: { mode: 'cruise', v: 11 } },
+  { name: '02_roma', km: 46, sec: 3.0, t0: 90, lane: 2, env: 1, drive: { mode: 'cruise', v: 13 } },
+  { name: '03_parigi', km: 90, rain: true, sec: 4.2, t0: 70, lane: 2, env: 1, block: 50, drive: { mode: 'pass', v0: 14, vlow: 4.5, at: 0.5, dur: 2.0, back: 4.2 } },
+  { name: '04_londra', km: 130, sec: 3.0, t0: 160, lane: 2, env: 1, drive: { mode: 'cruise', v: 12 } },
+  { name: '05_berlino', km: 214, sec: 2.8, t0: 60, lane: 2, env: 1, drive: { mode: 'cruise', v: 12 } },
+  { name: '06_atene', km: 424, sec: 2.8, t0: 60, lane: 2, env: 1, drive: { mode: 'cruise', v: 12 } },
+  { name: '07_washington', km: 466, sec: 2.8, t0: 60, lane: 2, env: 1, drive: { mode: 'cruise', v: 12 } },
+  { name: '08_semaforo', km: 0.75, sec: 4.8, t0: 0, lane: 1, env: 1, rain: true, tc: false, light: true, rival: { vt: 'e30', lane: 2, k: 0.94 }, drive: { mode: 'drag', go: 2.0, wet: 0.24 } },
+  { name: '09_e36', km: 200, sec: 3.0, t0: 120, lane: 2, car: { id: 'e36', preset: 'single' }, drive: { mode: 'cruise', v: 17 } },
+  { name: '10_mare', km: 320, sec: 3.0, t0: 201, lane: 2, drive: { mode: 'cruise', v: 10 } },
+  { name: '11_telefono', km: 160, sec: 4.2, t0: 120, lane: 2, drive: { mode: 'cruise', v: 19 }, phone: { at: 0.7, from: 'Sconosciuto', text: 'Ho lasciato sei auto. Tu ne hai presa una.' } },
+  { name: '12_supra', km: 8, sec: 6.0, t0: 40, lane: 2, env: 1, tc: false, car: { id: 'supra', preset: 'single', paint: '#c81d11' }, drive: { mode: 'pull', gear: 3, rpm0: 5200, hold: 1.0 } },
 ];
+
 
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.css': 'text/css' };
