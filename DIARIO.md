@@ -1,3 +1,8 @@
+## 23/11/2026 · proprietario (Nico) · v0.117 (**fiamme dal vero scarico, gomme del kit più piccole, rilascio nel video**)
+- **Fiamme e scoppi partono dal punto vero dello scarico** nel disegno col kit carrozzeria: prima partivano sempre dal paraurti dietro (`ex: [3, ...]`), anche dove lo scarico del kit è laterale (Golf, E36, E34, Audi 80, A112, Polo, Punto, Williams, Doblò, Van...). Misurato sui disegni di 23 auto (`spriteT.ex` in `cars.js`); restano come prima il bus e l'ambulanza (scarico non visibile) e le auto senza kit.
+- **Gomme del kit più piccole** su BMW M3 E30 e Golf: col kit la ruota era il 5 % (E30) e il 15 % (Golf) più grande di quella di serie. Nuovo campo `wk` in `GEN_DATA[id].spriteT` (scala del disegno della ruota, letto da `genWheel` di `street2d.js`) e `wr` più piccolo: E30 14,4 (wk 0,935), Golf 14,2 (wk 0,91).
+- Video «di serie e preparate»: ogni clip fa **accelerazione, rilascio, accelerazione...** (`waves`/`ONDE` in `strumenti/reel/preparate.js`), così si sentono borbottio e scoppi al rilascio di tutti i motori; le preparate hanno sgasate ferme + tirata in marcia a ondate (tutte e tre, BMW compresa). 397 test e prova di fumo ok.
+
 ## 23/11/2026 · proprietario · v0.117 (**più fluidità con fiammate e scritte**)
 - Alleggerito il disegno di fiammate, aloni, fumo e fumetti. Le scritte riusano il disegno delle lettere, e gli avvisi misurano la loro posizione prima di spostarsi.
 - Frequenza e durata degli scoppi, impostazioni del motore e suono restano quelli della preparazione. Provati i 397 test e il disegno nel browser a densità doppia e semplice.

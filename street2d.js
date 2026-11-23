@@ -240,7 +240,7 @@ class Street2D {
   genWheel(g, cx, cy, k, ang, speed = 0, rear = false) {
     const wi = this.genWheelImg(), D = this.genDef(); if (!wi) return;
     this.brake(g, Math.round(cx), Math.round(cy), k * D.wr / 15, ang, rear);
-    const s2 = wi.width * k;
+    const s2 = wi.width * k * (D.wk || 1);                          // wk: il disegno della ruota più piccolo (kit carrozzeria di alcune auto: gomme troppo grandi)
     const wh = D.wheelHd && this.SS > 1 ? this.genWheelImg(2) : null;   // la ruota disegnata a parte, a densità doppia
     if (this.wheelDraw) { this.wheelDraw(g, wh || wi, cx, cy, s2, ang, speed); return; }   // gira liscia (nitido2d.js)
     g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));

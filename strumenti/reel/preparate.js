@@ -22,14 +22,17 @@ const AUTO = [
 // sgasate: [da, a, gas] in secondi dall'inizio; poi, a `go`, via a gas pieno con le cambiate
 const GAS0 = [[0.5, 0.8, 0.55], [1.2, 1.55, 0.7], [2.0, 3.1, 1], [3.5, 3.8, 0.8]];
 const GAS1 = [[0.4, 0.7, 0.7], [1.0, 1.3, 0.85], [1.9, 3.8, 1], [4.2, 4.5, 0.9], [4.7, 4.95, 1]];
+// accelera / rilascia / accelera: gas pieno e gas tolto (da `a` a `b`, in secondi), così si sente il rilascio (borbottio, scoppi, fiammate)
+const ONDE_SERIE = [[0, 1.6, 1], [1.6, 2.6, 0], [2.6, 4.2, 1], [4.2, 5.3, 0], [5.3, 6.6, 1]];             // dopo il via, per le auto di serie
+const ONDE = [[0, 1.5, 1], [1.5, 2.6, 0], [2.6, 4.2, 1], [4.2, 5.4, 0], [5.4, 7.2, 1], [7.2, 8.4, 0], [8.4, 10, 1]];   // tirata in marcia, per le preparate
 const SHOTS = [];
 for (const A of AUTO) {
   const prep = { id: A.id, tipo: 'full', donor: A.donor, lim: A.lim, paint: A.paint, cos: A.cos };
-  SHOTS.push({ name: A.id + '_a_serie', km: 1.5, sec: 10.0, t0: 50, lane: 2, env: 1, tc: true, car: { id: A.id, tipo: 'stock' }, drive: { mode: 'sgasate', gas: GAS0, go: 4.4 } });
-  if (A.tira) {   // auto leggere con tanta potenza: da fermi il controllo di trazione taglia il gas e il motore «sbuffa»; meglio sgasate ferme e poi una tirata in marcia lunga
-    SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 6.4, t0: 50, lane: 2, env: 1, tc: true, car: prep, drive: { mode: 'sgasate', gas: GAS1, go: 99 } });
-    SHOTS.push({ name: A.id + '_c_tira', km: 1.5, sec: 8.4, t0: 50, lane: 2, env: 1, tc: true, grip: 1.8, car: prep, drive: { mode: 'tira', gear: 2, rpm0: 3000 } });
-  } else SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 12.0, t0: 50, lane: 2, env: 1, tc: true, car: prep, drive: { mode: 'sgasate', gas: GAS1, go: 5.2 } });
+  SHOTS.push({ name: A.id + '_a_serie', km: 1.5, sec: 11.0, t0: 50, lane: 2, env: 1, tc: true, car: { id: A.id, tipo: 'stock' }, drive: { mode: 'sgasate', gas: GAS0, go: 4.4, waves: ONDE_SERIE } });
+  // preparata: sgasate ferme (con rilascio) e poi tirata in marcia a ondate. Le auto leggere, a trazione anteriore o no, hanno più aderenza
+  // (`grip`, solo per il video): con 600-800 CV le gomme non reggono e il motore resterebbe inchiodato al limitatore
+  SHOTS.push({ name: A.id + '_b_preparata', km: 1.5, sec: 6.4, t0: 50, lane: 2, env: 1, tc: true, car: prep, drive: { mode: 'sgasate', gas: GAS1, go: 99 } });
+  SHOTS.push({ name: A.id + '_c_tira', km: 1.5, sec: 10.0, t0: 50, lane: 2, env: 1, tc: true, grip: 1.8, car: prep, drive: { mode: 'tira', gear: 3, rpm0: 3200, waves: ONDE } });
 }
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.css': 'text/css' };
@@ -103,10 +106,14 @@ function regia([w, h]) {
         if (sim.gear !== 0 && !sim.shiftSeq) sim.shift(0);
         br = 1; thr = 0; for (const [a, b, v] of d.gas) if (t >= a && t < b) thr = v;
       } else {                                                         // gas anche per il cambio automatico del gioco: lo vede a zero e cambierebbe a 3.000 giri
-        if (R.leva !== 'D') { nightRun.leva('D'); R.leva = 'D'; window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW', bubbles: true })); } if (sim.gear === 0) sim.shift(1); thr = sim.shiftSeq ? 0 : 1; shiftUp(lim() * 0.96); }
+        if (R.leva !== 'D') { nightRun.leva('D'); R.leva = 'D'; window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW', bubbles: true })); }
+        if (sim.gear === 0) sim.shift(1); thr = sim.shiftSeq ? 0 : 1; shiftUp(lim() * 0.96);
+        if (d.waves) for (const [a, b, v] of d.waves) if (t - d.go >= a && t - d.go < b) thr = v;   // gas pieno / gas tolto
+      }
     } else if (d.mode === 'tira') {                                    // marcia lunga a gas pieno fino al limitatore, poi la dopo, e via: il motore canta
       if (R.leva !== 'D') { nightRun.leva('D'); R.leva = 'D'; window.dispatchEvent(new KeyboardEvent('keydown', { key: 'w', code: 'KeyW', bubbles: true })); }
       thr = t < 0 ? 0.15 : 1; if (sim.gear === 0) sim.shift(d.gear); shiftUp(lim() * 0.97);
+      if (d.waves && t >= 0) for (const [a, b, v] of d.waves) if (t >= a && t < b) thr = v;   // gas pieno / gas tolto (rilascio)
     } else if (d.mode === 'pass') {
       const u = Math.max(0, Math.min(1, (t - d.at) / d.dur)), vt = t < d.back ? d.v0 + (d.vlow - d.v0) * (u * u * (3 - 2 * u)) : d.vlow + (t - d.back) * 2.2;
       [thr, br] = hold(vt, t);

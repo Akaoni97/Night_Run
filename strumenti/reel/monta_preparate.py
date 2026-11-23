@@ -8,9 +8,9 @@ def sh(*a):
     if r.returncode: print(r.stderr[-1500:]); sys.exit(1)
     return r.stdout
 def dur(f): return float(sh('ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f))
-CLIP = ['e30_a_serie', 'e30_b_preparata', 'p205_a_serie', 'p205_b_preparata', 'p205_c_tira', 'golf_a_serie', 'golf_b_preparata', 'golf_c_tira']
-CARD = ['e30_a', 'e30_b', 'p205_a', 'p205_b', 'p205_b', 'golf_a', 'golf_b', 'golf_b']
-CUT = {'p205_c_tira': 6.4, 'golf_c_tira': 6.4}      # la tirata si ferma prima del limitatore in ultima (un ronzio fisso non serve)
+CLIP = ['e30_a_serie', 'e30_b_preparata', 'e30_c_tira', 'p205_a_serie', 'p205_b_preparata', 'p205_c_tira', 'golf_a_serie', 'golf_b_preparata', 'golf_c_tira']
+CARD = ['e30_a', 'e30_b', 'e30_b', 'p205_a', 'p205_b', 'p205_b', 'golf_a', 'golf_b', 'golf_b']
+CUT = {}      # durate massime per clip (secondi), se serve tagliarne una
 clips = []; t = 0; plan = []
 for i, c in enumerate(CLIP):
     src = f'{R}/riprese/{c}.mp4'; d = min(dur(src), CUT.get(c, 99)); out = f'{T}/c{i}.mp4'

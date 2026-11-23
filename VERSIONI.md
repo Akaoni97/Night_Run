@@ -140,3 +140,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.115 | 23/11 | proprietario | Video «di serie e preparate»: strumenti per registrare tre auto (E30, 205 GTI, Golf) prima e dopo swap di motore, pezzi, kit, neon e cerchi, con il suono vero dei campioni dei pezzi (`strumenti/reel/preparate.js`, `suono_preparate.js`, `cartelli_preparate.js`, `monta_preparate.py`) |
 | v0.116 | 23/11 | proprietario | Video «di serie e preparate»: la 205 e la Golf preparate fanno sgasate da ferme e poi una tirata in marcia lunga (2ª-5ª a gas pieno); aderenza delle gomme maggiorata solo nelle riprese |
 | v0.117 | 23/11 | proprietario | Disegno più leggero di fiammate, fumo e fumetti, con meno aggiornamenti della posizione degli avvisi. |
+| v0.117 | 23/11 | proprietario | Fiamme dal punto vero dello scarico (anche laterale) per 23 auto col kit; gomme del kit più piccole su E30 e Golf (`wk`); video con accelerazione-rilascio-accelerazione |
