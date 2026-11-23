@@ -143,3 +143,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.117 | 23/11 | proprietario | Fiamme dal punto vero dello scarico (anche laterale) per 23 auto col kit; gomme del kit più piccole su E30 e Golf (`wk`); video con accelerazione-rilascio-accelerazione |
 | v0.118 | 23/11 | proprietario | Livelli del 2D: facciate dei locali dietro i passanti (non spariscono più dietro gli edifici), riflessi di luce sull'asfalto sotto le auto (`vitaRiflessi`) |
 | v0.119 | 23/11 | proprietario | Il protagonista in pixel art e reazioni al motore (nuvolette di pensiero, stupore in faccia: `reazioni.js`), vapore dai tombini e dai locali di ramen, fari sul bagnato |
+| v0.120 | 23/11 | proprietario | Schermata iniziale viva: traffico, frecce, lampione che sfarfalla, stelle, tempo a caso (sereno, pioggia, nebbia), «Accendi e parti» che gira la chiave con l'avviamento, frasi che cambiano sotto il logo, partite come schede con auto, luogo, km e soldi |

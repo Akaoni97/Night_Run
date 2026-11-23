@@ -1,3 +1,11 @@
+## 23/11/2026 · proprietario (Nico) · v0.120 (**la schermata iniziale vive**)
+- **Scena animata** (`titolo.js`), sempre con animazioni CSS sulla scheda video (nessun ridisegno: lo scatto della v0.103 non torna): auto del traffico che passano con fanale rosso, faro bianco e scia; le quattro frecce che lampeggiano; il lampione spento che ogni tanto sfarfalla; il telefono che pulsa; stelle che brillano.
+- **Il tempo cambia a ogni avvio**: sereno, pioggia o nebbia, a caso (si prova con `?meteo=pioggia` nell'indirizzo).
+- **«Accendi e parti» gira la chiave**: il pannello scende, le frecce si spengono, i fari si accendono forte, la telecamera spinge in avanti e si sente un avviamento (motorino, motore che prende, colpo di gas, minimo; sintetizzato). Poi parte il gioco di sempre. Funziona con clic e con Invio o Spazio; le prove automatiche partono subito.
+- **Logo**: scintille e sotto, al posto di «Stanotte si corre» fisso, una frase che cambia (sette frasi: capitali, motori, meteo, partite...).
+- **Partite come schede**: auto, dove sei arrivato (capitale), km, soldi e ultima volta.
+- Provato: foto delle tre atmosfere, sequenza della chiave con clic vero (il gioco parte e non ci sono errori), schede con tre partite finte; 405 test.
+
 ## 23/11/2026 · proprietario (Nico) · v0.119 (**il protagonista reagisce, vapore, fari sul bagnato**)
 - **Il protagonista in pixel art**: la figura in auto era a vettori sfumati; ora si porta alla griglia di mezza unità dei disegni HD (`drvPixel` in `pilota2d.js`), con colori a livelli e il contorno scuro dei passanti, senza perdere occhi e bocca (sopracciglia, occhi e bocca più grandi in `personaggio.js`).
 - **Nuvolette di pensiero** (`reazioni.js`, nuovo): accelerazione forte, launch (pronti / via), sorpasso, scoppio grosso, motore al limitatore. Esce sopra la testa una nuvoletta con la sua frase (WOW!, ANCORA!, CHE SPINTA!, SORPASSO!, CHE BOTTI!...) e in faccia compare lo stupore (occhi grandi, bocca a O). Mai più di una ogni 7-11 secondi, ogni tipo ha il suo riposo. Si spegne con Grafiche anime.

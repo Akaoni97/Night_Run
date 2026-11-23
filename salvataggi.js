@@ -14,12 +14,13 @@
 const SLOT = { n: 3, chiavi: ['nightrun-viaggio', 'nr_diario_foto', 'nr_pg'], pezzi: ['tunes', 'coss', 'adj', 'paint'] };
 
 // il riassunto di una partita salvata (testo JSON di game.save()), o null se è vuota o illeggibile
-function slotRiassunto(json, cars) {
+function slotRiassunto(json, cars, luogoDi) {
   if (!json) return null;
   try {
     const o = JSON.parse(json), s = o && o.s; if (!s || !s.vg) return null;
-    const id = s.carId, C = cars && cars[id];
-    return { km: Math.max(0, (s.dist || 0) / 1000), soldi: Math.round(s.money || 0), auto: C ? (C.short || C.name) : (id || ''), prologo: !!s.vg.prologo };
+    const id = s.carId, C = cars && cars[id], km = Math.max(0, (s.dist || 0) / 1000);
+    let luogo = ''; try { luogo = (luogoDi && luogoDi(km)) || ''; } catch (e) { luogo = ''; }   // v0.120: dove sei arrivato (la capitale o il tratto)
+    return { km, soldi: Math.round(s.money || 0), auto: C ? (C.short || C.name) : (id || ''), prologo: !!s.vg.prologo, luogo, marce: s.vg.dia ? s.vg.dia.length : 0 };
   } catch (e) { return null; }
 }
 
@@ -59,7 +60,12 @@ function slotScambia(L, da, a) {
     if (n === inUso()) { try { const g = window.nightRun && window.nightRun.game; if (g && g.s && g.s.vg) return g.save(); } catch (e) { /* dal salvataggio */ } return L.getItem('nightrun-viaggio'); }
     return L.getItem('nightrun-viaggio@' + n);
   };
-  const riassunto = (n) => slotRiassunto(json(n), typeof CARS !== 'undefined' ? CARS : null);
+  // dove sei arrivato: il nome del luogo (la capitale, senza la via) dal km, quando viaggio.js e game.js ci sono
+  const luogoDi = (km) => {
+    if (typeof VG === 'undefined' || !VG.locAt || typeof GAME_LOCS === 'undefined') return '';
+    const id = VG.locAt(km), L = GAME_LOCS.find((x) => x.id === id); return L ? String(L.name).split(' · ')[0] : '';
+  };
+  const riassunto = (n) => slotRiassunto(json(n), typeof CARS !== 'undefined' ? CARS : null, luogoDi);
   // nomi e ultima volta (sono del computer, non seguono lo scambio delle partite)
   const metaGet = () => { try { return JSON.parse(L.getItem('nr_slot_meta') || '{}') || {}; } catch (e) { return {}; } };
   const metaSet = (m) => { try { L.setItem('nr_slot_meta', JSON.stringify(m)); } catch (e) { /* pieno */ } };
@@ -86,7 +92,8 @@ function slotScambia(L, da, a) {
 .nr-slot b{font:400 13px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#e8dcc0}
 .nr-slot{position:relative}.nr-slot .ed{position:absolute;top:6px;right:7px;font-size:12px;color:#8a8270;cursor:pointer;padding:0 3px}.nr-slot .ed:hover{color:#ffb347}
 .nr-slot span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nr-slot i{font-style:normal;font-size:11px;color:#8a8270}
+.nr-slot span.a{color:#f2ead8;font-weight:600}.nr-slot span.d{color:#c9b98e}
+.nr-slot i{font-style:normal;font-size:11px;color:#8a8270;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nr-slot.on{background:rgba(60,40,10,.6);box-shadow:inset 0 0 0 2px #ffb347}
 .nr-slot.on b{color:#ffb347}
 .nr-slots-h{font:600 11px/1 "Share Tech Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:#a8936a;margin-top:10px}
@@ -104,9 +111,11 @@ function slotScambia(L, da, a) {
       const u = inUso(); row.textContent = '';
       for (let n = 1; n <= SLOT.n; n++) {
         const r = riassunto(n), b = document.createElement('button'); b.type = 'button'; b.className = 'nr-slot' + (n === u ? ' on' : '');
-        const t = r ? (r.prologo ? `${r.auto} · km ${km(r.km)}` : 'Nuova') : 'Vuota';
         const M = metaGet(), q = r && M[n] && M[n].ora ? slotQuando(M[n].ora, Date.now()) : '';
-        b.innerHTML = `<b></b><span class="ed" role="button" title="Cambia nome" aria-label="Cambia nome">✎</span><span>${t}</span><i>${r && r.prologo ? euro(r.soldi) : r ? '' : 'si parte da capo'}${n === u ? (r && r.prologo ? ' · in uso' : r ? 'in uso' : ' · in uso') : q ? (r && r.prologo ? ' · ' : '') + q : ''}</i>`;
+        const t = r ? (r.prologo ? r.auto : 'Nuova') : 'Vuota';                                           // l'auto (v0.120: la scheda dice anche dove sei)
+        const dove = r && r.prologo ? `${r.luogo ? r.luogo + ' · ' : ''}km ${km(r.km)}` : '';
+        const pie = r && r.prologo ? euro(r.soldi) + (n === u ? ' · in uso' : q ? ' · ' + q : '') : r ? (n === u ? 'in uso' : '') : 'si parte da capo' + (n === u ? ' · in uso' : '');
+        b.innerHTML = `<b></b><span class="ed" role="button" title="Cambia nome" aria-label="Cambia nome">✎</span><span class="a">${t}</span>${dove ? `<span class="d">${dove}</span>` : ''}<i>${pie}</i>`;
         b.querySelector('b').textContent = slotNome(M, n);
         b.querySelector('.ed').addEventListener('click', (e) => {
           e.stopPropagation(); e.preventDefault();
@@ -150,7 +159,7 @@ function slotScambia(L, da, a) {
     return p;
   }
 
-  window.NightSalvataggi = { panel, vai, get inUso() { return inUso(); }, riassunto };
+  window.NightSalvataggi = { panel, vai, get inUso() { return inUso(); }, riassunto, aggiorna: () => { for (const bx of document.querySelectorAll('.nr-slots')) { const w = bx.parentNode; if (w && w._disegna) w._disegna(); } } };
 })();
 
 if (typeof window !== 'undefined') Object.assign(window, { SLOT, slotRiassunto, slotScambia, slotNome, slotQuando });
