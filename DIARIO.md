@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.122 (**aggiornamenti subito**)
+- Dopo un caricamento su `main` il gioco poteva mostrare il codice vecchio fino a 10 minuti anche ricaricando: `sw.js` chiedeva i file alla rete ma passando dalla cache HTTP di GitHub Pages. Ora chiede sempre se il file è cambiato (`cache: 'no-cache'`: se è uguale arriva un 304), e `VERSIONE` è `nr-3-aggiornamenti`. Il service worker nuovo si attiva alla seconda apertura dopo il caricamento; intanto si forza con Ctrl+F5.
+
 ## 23/11/2026 · proprietario (Nico) · v0.121 (**la schermata iniziale vive**)
 - **Scena animata** (`titolo.js`), sempre con animazioni CSS sulla scheda video (nessun ridisegno: lo scatto della v0.103 non torna): auto del traffico che passano con fanale rosso, faro bianco e scia; le quattro frecce che lampeggiano; il lampione spento che ogni tanto sfarfalla; il telefono che pulsa; stelle che brillano.
 - **Il tempo cambia a ogni avvio**: sereno, pioggia o nebbia, a caso (si prova con `?meteo=pioggia` nell'indirizzo).

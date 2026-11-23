@@ -9,7 +9,7 @@
 //    volta dopo).
 //  Per buttare via tutto basta cambiare VERSIONE.
 // ============================================================================
-const VERSIONE = 'nr-2-font-locali';
+const VERSIONE = 'nr-3-aggiornamenti';
 const CODICE = /\.(html|js|mjs|css|json)$/i;
 const FISSI = /\.(mp3|ogg|wav|woff2?|ttf|otf)$/i;   // una volta scaricati restano (si rinnovano cambiando VERSIONE)
 
@@ -27,8 +27,9 @@ self.addEventListener('fetch', (e) => {
   if (req.headers.get('range')) return;                         // pezzi di audio chiesti dal lettore: li gestisce il browser
   const pagina = req.mode === 'navigate' || (mio && (CODICE.test(url.pathname) || url.pathname.endsWith('/')));
   if (pagina) {
-    // prima la rete (con la cache HTTP del browser: i file uguali tornano in un attimo), la copia se si è senza rete
-    e.respondWith(fetch(req).then((r) => salva(req, r)).catch(() => caches.match(req).then((r) => r || caches.match('./index.html'))));
+    // prima la rete, ma chiedendo sempre al sito se il file è cambiato (`no-cache`: se è uguale torna un 304 in un attimo): prima la cache
+    // HTTP di GitHub Pages (10 minuti) faceva vedere per un po' il codice vecchio dopo un aggiornamento. La copia salvata serve senza rete.
+    e.respondWith(fetch(req, { cache: 'no-cache' }).then((r) => salva(req, r)).catch(() => caches.match(req).then((r) => r || caches.match('./index.html'))));
     return;
   }
   if (FISSI.test(url.pathname)) {                             // la copia se c'è, altrimenti la rete (e si salva)
