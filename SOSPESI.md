@@ -81,6 +81,10 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 22. [guida] **Danni**: 4 tamponamenti in 94 km anche con l'AUTO 1, carrozziere fino a € 2.600 a volta, gomme bucate ogni
    ~30 km. Luca (21/11): per ora si lascia così, si tara giocando. (tutti e due)
 
+## Proposte nuove
+
+23. [storia] **Le dodici capitali** (proposta in `docs/storia/PROPOSTA_CITTA.md`): una cosa da vedere per città, collegamenti diversi, un momento forte per le capitali che non ce l'hanno, forse un bivio. Sei domande per Luca. (cognato; nessun numero è cambiato)
+
 ## Fatto di recente (si toglie al prossimo controllo)
 - 23/11 (v0.110, Nico): pausa a due livelli, premi come avvisi del telefono, nomi dei salvataggi, mappa del diario. Da provare sul PC (decide Nico se la coppa dei traguardi deve tornare).
 - 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.

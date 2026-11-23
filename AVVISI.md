@@ -8,3 +8,6 @@ risposta, in parole semplici, prima di qualunque altra cosa. Quando lui ti dice 
 questo file (commit con `Per:` suo) e caricala su `main`.
 
 Formato: `## data · per chi · da chi` e due o tre righe.
+
+## 23/11/2026 · per cognato (Luca) · da proprietario con Claude
+È pronta una proposta sulle dodici capitali (cosa c'è, cosa manca, sei domande per te): `docs/storia/PROPOSTA_CITTA.md`. Non cambia la storia, serve a decidere insieme cosa fare. Rispondi per numero.
