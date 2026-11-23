@@ -11,7 +11,7 @@ for (const id of ['e30', 'p205', 'golf']) {
   CARDS[id + '_a'] = { pos: 'top', city: NOME[id], en: 'STOCK · ' + (a ? a.hp : '?') + ' HP', it: 'Di serie' };
   CARDS[id + '_b'] = { pos: 'top', city: NOME[id], en: 'ENGINE SWAP · ' + (p ? String(p.motore).replace(' aspirato', ' + turbo') : '') + ' · ' + (p ? p.hp : '?') + ' HP', it: 'Preparata: motore cambiato, kit, neon, cerchi' };
 }
-CARDS.fine = { pos: 'end', big: 'NIGHT <em>RUN</em>', sub: 'THE LAST HIGHWAY', en: 'Play free in your browser', it: 'Gioca gratis dal browser', link: 'LINK IN BIO' };
+CARDS.fine = { pos: 'end', big: 'NIGHT <em>RUN</em>', sub: 'THE LAST HIGHWAY', en: 'Play free in your browser', it: 'Gioca gratis dal browser' };
 
 const css = `
 :root{--amb:#ffb347;--pink:#ff5fa8;--mut:#cfc6b8}

@@ -20,7 +20,7 @@ const CARDS = {
   mare: cap('Every night is different', 'Ogni notte è diversa'),
   telefono: cap('Something is wrong…', 'Qualcosa non torna…'),
   supra: cap('Turbo. Pop & bang. Real engine sound.', 'Turbo, scoppi e suono del motore'),
-  fine: { pos: 'end', big: 'NIGHT <em>RUN</em>', sub: 'THE LAST HIGHWAY', en: 'Play free in your browser', it: 'Gioca gratis dal browser', link: 'LINK IN BIO' },
+  fine: { pos: 'end', big: 'NIGHT <em>RUN</em>', sub: 'THE LAST HIGHWAY', en: 'Play free in your browser', it: 'Gioca gratis dal browser' },
 };
 const css = `
 :root{--amb:#ffb347;--pink:#ff5fa8;--mut:#cfc6b8}
