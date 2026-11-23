@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.124**
+**Versione attuale: v0.125**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -148,3 +148,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.122 | 23/11 | proprietario | Aggiornamenti subito: `sw.js` chiede sempre al sito se i file sono cambiati (`no-cache`), niente più codice vecchio per 10 minuti dopo un caricamento |
 | v0.123 | 23/11 | proprietario | Schermata iniziale: tolti i fari che passano; sfondo animato (luna, nuvole, fari di ricerca, aereo, luci rosse, finestre che si accendono, lampioni che sfarfallano); al posto del pannello il blocchetto d'accensione con la chiave da girare tenendo premuto; avviamento reso col motore vero del gioco |
 | v0.124 | 23/11 | proprietario | Schermata iniziale: blocchetto d'accensione ridisegnato (chiave vista di taglio, ghiera cromata), niente insegna SOLO AVANTI (ora sul dirigibile), cartello «ULTIMA USCITA», fari di ricerca ritagliati nel cielo, case sulle colline, ruota panoramica, dirigibile, stelle cadenti, uccelli, più finestre che si accendono; via il fascio dei fari dell'auto e il cono del lampione dietro il blocchetto |
+| v0.125 | 23/11 | proprietario | Chiave del blocchetto vista da sopra: una barretta verticale centrata nel cilindro che ruota; i fari di ricerca non sbordano più sul blocchetto (ritaglio `contain: paint`) |

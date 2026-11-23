@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.125 (**la chiave vista da sopra**)
+- La chiave è ora una **barretta verticale** al centro del cilindro, vista dalla testa dall'alto, che ruota quando tieni premuto (LOCK → ACC → ON → START). I fari di ricerca sono ritagliati davvero nel cielo (prima un fascio passava ancora sopra il blocchetto).
+
 ## 23/11/2026 · proprietario (Nico) · v0.124 (**schermata iniziale: più vita, chiave di taglio**)
 - **Blocchetto d'accensione** rifatto: ghiera cromata, targa con LOCK/ACC/ON/START (e i puntini che si accendono), la chiave vista **di taglio dalla testa**, infilata nel cilindro, che gira con lui.
 - Via l'insegna «SOLO AVANTI» dal palazzo (ora è scritta sul dirigibile che passa) e il cartello dice **ULTIMA USCITA**.

@@ -205,7 +205,7 @@
 .nt-fin{inset:0;width:100%;height:100%;image-rendering:pixelated;animation:ntFin var(--d) steps(1) var(--dl) infinite}
 @keyframes ntFin{0%{opacity:0}18%{opacity:1}41%{opacity:0}57%{opacity:1}64%{opacity:0}88%{opacity:1}100%{opacity:0}}
 /* fari di ricerca nel cielo (ritagliati sopra la città), dirigibile, ruota panoramica, stelle cadenti, uccelli */
-.nt-scena>.nt-sk{left:0;top:0;width:100%;overflow:hidden}
+.nt-scena>.nt-sk{left:0;top:0;width:100%;overflow:hidden;clip-path:inset(0);contain:paint}
 .nt-sk>*{position:absolute}
 .nt-sk .nt-faro{width:calc(var(--u)*34);height:calc(var(--u)*230);margin-left:calc(var(--u)*-17);background:linear-gradient(to top,rgba(236,228,255,.38),rgba(236,228,255,.14) 40%,rgba(236,228,255,.04) 75%,rgba(236,228,255,0));clip-path:polygon(47% 100%,53% 100%,100% 0,0 0);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
 @keyframes ntFaro{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}
@@ -445,15 +445,12 @@
     <radialGradient id="ntCr" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#f4f6fb"/><stop offset=".45" stop-color="#9aa0b0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
     <circle cx="110" cy="110" r="106" fill="url(#ntGh)" stroke="#05060a" stroke-width="2"/><circle cx="110" cy="110" r="97" fill="#07080d"/><circle cx="110" cy="110" r="94" fill="url(#ntTg)"/>${br}
     <path d="M${P(-4, 94).join(' ')}A94 94 0 0 1 ${P(94, 94).join(' ')}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>${tk}${lb}
+    <circle cx="110" cy="110" r="27" fill="url(#ntCr)" stroke="#12131a" stroke-width="2"/><circle cx="110" cy="110" r="21" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><circle cx="110" cy="110" r="17" fill="#0c0d12"/>
     <g class="nt-k">
-      <rect x="105" y="30" width="10" height="80" rx="4.5" fill="url(#ntOt)" stroke="#2a1804" stroke-width="1"/>
-      <rect x="107.5" y="36" width="2" height="70" rx="1" fill="rgba(255,244,210,.55)"/>
-      <path d="M99 24q0-10 11-10t11 10v30q0 5-11 5t-11-5z" fill="url(#ntGm)" stroke="#000" stroke-width="2"/>
-      <path d="M102 26v26" stroke="rgba(255,255,255,.3)" stroke-width="2" stroke-linecap="round"/>
-      <rect x="99" y="57" width="22" height="4" rx="2" fill="url(#ntCr)" stroke="#20222c" stroke-width=".8"/>
-      <circle cx="110" cy="20" r="2.2" fill="#050509" stroke="#9aa0b0" stroke-width=".8"/>
-      <circle cx="110" cy="110" r="25" fill="url(#ntCr)" stroke="#12131a" stroke-width="2"/><circle cx="110" cy="110" r="19" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><circle cx="110" cy="110" r="13" fill="#0c0d12"/>
-      <rect x="105" y="100" width="10" height="20" rx="3" fill="url(#ntOt)" stroke="#2a1804" stroke-width="1"/></g></svg>`;
+      <rect x="101.5" y="68" width="17" height="84" rx="8.5" fill="url(#ntGm)" stroke="#000" stroke-width="2"/>
+      <rect x="104" y="72" width="3" height="76" rx="1.5" fill="rgba(255,255,255,.3)"/>
+      <rect x="108" y="97" width="4" height="26" rx="2" fill="url(#ntOt)" stroke="#2a1804" stroke-width=".8"/>
+      <circle cx="110" cy="77" r="2.2" fill="#050509" stroke="#9aa0b0" stroke-width=".8"/></g></svg>`;
   })();
   let lab = null, stato = null, sw = null;
   function cruscotto() {
