@@ -15,7 +15,7 @@ SD.prototype.landmark = function () { return { c: { width: 1, height: 1 } }; };
 SD.prototype.districtInfo = function () { return { D: null }; }; SD.prototype.districtMix = function () { return null; }; SD.prototype.kindExtra = function () { return { base: true }; };
 globalThis.Street2D = SD;
 const run = (f) => new Function(readFileSync(new URL('../' + f, import.meta.url), 'utf8'))();
-run('citta2d.js'); run('citta_dati.js'); run('citta_dettagli.js');
+run('citta2d.js'); run('citta_dati.js'); run('citta_monumenti.js'); run('citta_dettagli.js');
 const CITY = SD.CITY_DISTRICTS, FAC = SD.CITY_FACADES, LM = SD.CITY_LANDMARKS, PROP = SD.CITY_PROPS, ROAD = SD.CITY_ROAD;
 const CAPS = ['roma', 'parigi', 'londra', 'stoccolma', 'berlino', 'praga', 'vienna', 'madrid', 'lisbona', 'atene', 'washington'];
 const KINDS_BASE = new Set(['tower', 'office', 'hotel', 'boutique', 'park', 'containers', 'house', 'konbini', 'warehouse', 'factory']);
@@ -46,7 +46,8 @@ test('città: ogni facciata si disegna e dà una tessera con le sue parti', () =
 test('città: ogni monumento si disegna', () => {
   const s = new SD(); s.landmark = Object.getPrototypeOf(s).landmark;
   const proto = SD.prototype; const D = { far: ['#2a2a5a'], neon: ['#fff'] };
-  for (const id of Object.keys(LM)) { const t = proto.landmark.call(s, id, (n) => SD.rnd(n), D); assert.ok(t.c && t.w > 10 && t.h > 40, id); }
+  for (const id of Object.keys(LM)) { const t = proto.landmark.call(s, id, (n) => SD.rnd(n), D); assert.ok(t.c && t.w > 10 && t.h > 40, id); assert.equal(t.hd, true, id + ' ad alta definizione'); }
+  assert.ok(Object.keys(LM).length >= 26);
 });
 test('città: districtInfo segue la città in cui si è, Tokyo e fuori città come prima', () => {
   const s = new SD(); s._city = 'roma';
