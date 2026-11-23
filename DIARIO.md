@@ -1,3 +1,6 @@
+## 23/11/2026 · cognato · v0.131 (**sfruttamento del motore grafico**)
+- `node strumenti/carico.js` misura quanto pesa ogni parte su un fotogramma (pilota, logica, asfalto bagnato, foschia, ingrandimento, luci, fisica, città, passanti, effetti, vita, scritte) e stampa le barre col totale; schema, metodo e storico in `SFRUTTAMENTO.md`; skill `night-run-sfruttamento` per rifarla quando la chiedete. Prima misura: ~66 % del fotogramma su un PC medio (stima dal cloud, ±30-50 %); i pezzi più pesanti sono il pilota in auto e la logica. Luca vede 11-24 fps sul suo PC: serve un contatore vero (da fare). Avviso per Nico in `AVVISI.md`.
+
 ## 23/11/2026 · cognato · v0.130 (**marmitta rovente più calma**)
 - Tempi del rosso (`MARMITTA` in `fiamme.js`): di serie comincia prima e ci mette di più (da 13 a 21 s, prima 15-21), media da 9,5 a 15 (prima 10-14,5), spinta da 3 a 7 (prima 2-5,5). Test aggiornati.
 

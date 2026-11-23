@@ -154,6 +154,7 @@ Procedure del progetto scritte per gli assistenti: Claude Code le carica da sola
 | `night-run-sera` | controllo della sera («check»): cosa è cambiato su `main` dall'ultima volta, test, prova (`strumenti/controllo_sera.sh`), cose in sospeso e da rivedere (`SOSPESI.md`) |
 | `night-run-storia` | dove si scrive la storia e cosa non deve fare un assistente |
 | `night-run-controllo` | controllo del gioco con voti per area e proposte |
+| `night-run-sfruttamento` | «sfruttamento motore»: quanto pesa ogni parte su un fotogramma, barre di carico e totale (`strumenti/carico.js`, `SFRUTTAMENTO.md`) |
 
 Skill nuove o modificate si fanno sul ramo **`skill`** (partito da `main`): una cartella
 `.claude/skills/<nome>/SKILL.md` con `name` uguale al nome della cartella e una `description` che dice quando usarla,
@@ -170,6 +171,7 @@ Campioni dei pezzi: `python3 strumenti/campioni_pezzi.py [kit o componente] [--g
 fisica, sintesi e campioni in un WAV e stampa i livelli di motore, campioni e mix ogni mezzo secondo (Playwright, come `prova.js`).
 Video «di serie e preparate» (v0.115): `node strumenti/reel/preparate.js OUT/riprese`, poi `node strumenti/reel/suono_preparate.js OUT/riprese` (campioni dei pezzi inclusi), `node strumenti/reel/cartelli_preparate.js OUT/cartelli OUT/riprese` e `python3 strumenti/reel/monta_preparate.py OUT`.
 Scarichi e fiamme di tutte le auto (di serie e col kit, coi terminali): `node strumenti/scarichi.js [--out cartella] [--solo id,id] [--nuda] [--rossa 0.8]` salva un foglio ingrandito per auto con la fiamma (o la marmitta rovente) dove la mette il gioco.
+Sfruttamento del motore grafico: `node strumenti/carico.js [--pioggia] [--secondi 9] [--json file]` cronometra ogni parte del disegno, la fisica e il ciclo e stampa le barre di carico sul fotogramma da 16,7 ms (stima per un PC medio); schema e storico in `SFRUTTAMENTO.md`.
 Partita intera a tempo accelerato: `node strumenti/giocatore.js --km 200 --out cartella` (un giocatore automatico prudente:
 lavori, missioni, benzina, cibo, motel, Nico, documenti; non compra auto né pezzi; diario in `diario.json`, ~25 minuti veri
 per 200 km). Serve a misurare ritmo ed economia dopo un cambio di prezzi o paghe.
