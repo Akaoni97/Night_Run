@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.109 (**pulizia del codice**)
+- Controllo del codice morto: tolte `renderUps` e `suspLabels` (index.html) e `sim0` (polizia.js), nessuno le chiamava; tolta `desk-fine.png` (uscita della prova di fumo) e messa in `.gitignore`. Restano esportate ma senza uso `bancoSim`, `gvMedia`, `gvVincita` (le provano i test), `FLAME_TIERS`, `ST_CAT_NAME`. Immagini e suoni: tutti usati.
+
 ## 23/11/2026 · proprietario (Nico) · v0.108 (**check e avvisi sul titolo**)
 - Check: nessun commit nuovo su `main`, 384 test su 384, prova di fumo senza errori. Corretto il punto 20 dei sospesi: gli avvisi a destra aspettano finché c'è la schermata iniziale o il prologo (`index.html`).
 

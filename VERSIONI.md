@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.108**
+**Versione attuale: v0.109**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -131,3 +131,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.106 | 22/11 | cognato | Turbo più vero: la girante la muove l'energia dei gas di scarico (il turbo «entra»), wastegate che apre poco prima del target e in ritardo (picco e assestamento, un filo di tremolio), meno pressione a gas parziale, depressione sul manometro a gas chiuso; suono: soffio dell'aria nel compressore udibile, fischio che resta e cala in rilascio, valvola nitida (sintesi e campioni rifatti), turbo e valvola udibili anche in abitacolo. |
 | v0.107 | 22/11 | cognato | Pezzi per tutti i motori: la Supra ha anche aspirazioni (pannello, cono, airbox, cornetti), cilindrata, benzina e cambi sport e da corsa regolabili; cambi più lunghi per tutte: il da corsa al limitatore in ultima tira a 350 km/h sulle belle (≥ 200 CV: Supra, M3...), 320 sulle normali, 300 sulle piccole e sui mezzi pesanti, il cambio sport tutto lungo a 300/275/255 e il bus a 200; compressori volumetrici e centrifughi a cinghia (niente ritardo, niente valvola), il turbo nuovo vale per ogni motore. |
 | v0.108 | 23/11 | proprietario | Check della sera: gli avvisi a destra (per esempio «Valigetta di bronzo») non compaiono più sopra la schermata iniziale e il prologo, aspettano. 384 test e prova di fumo senza errori. |
+| v0.109 | 23/11 | proprietario | Pulizia del codice: tolte due funzioni mai usate dell'officina vecchia (`renderUps`, `suspLabels`) e una della polizia; tolta una foto di prova finita nel repository per sbaglio. 384 test e prova di fumo senza errori. |

@@ -355,7 +355,6 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     if (!st(this).fuga) return;                  // (la fuga è finita prima del posto di blocco)
     this.say('Hai bruciato il posto di blocco.', 'police');   // una delle due volanti ti insegue (update, polJoin)
   };
-  const sim0 = (g) => Math.max(0, g.sim.v * 0.6);
 
   // ------------------------------------------------------------ autovelox (pochi, a volte niente per 7-12 km) e Tutor (uno ogni 10-15 km, lungo 0,5-1 km)
   P.polPlan = function () {
