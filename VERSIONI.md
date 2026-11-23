@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.131**
+**Versione attuale: v0.132**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -155,3 +155,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.129 | 23/11 | cognato | Marmitta rovente rifatta: metallo che si arroventa a pixel (bocca più calda, tubo che si spegne a scalini, buco che brilla, faville al massimo), alone piccolo e solo di notte |
 | v0.130 | 23/11 | cognato | Marmitta rovente più calma: di serie da 13 a 21 s, media da 9,5 a 15, spinta da 3 a 7 |
 | v0.131 | 23/11 | cognato | Sfruttamento del motore grafico: `strumenti/carico.js` (barre di carico per parte sul fotogramma), `SFRUTTAMENTO.md`, skill `night-run-sfruttamento`, avviso per Nico |
+- v0.132 · 23/11/2026 · cognato · prestazioni, primo giro: niente scritture inutili sulla pagina (`leggero.js`), pilota a 20 Hz, ingrandimento senza tela rifatta e senza mipmap, riflesso bagnato in pochi tratti, bagliore e colori sulla tela interna, niente strada sotto gli interni, contatore FPS coi millisecondi
