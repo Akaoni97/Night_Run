@@ -282,31 +282,38 @@
 .nt-pop h3{margin:0 0 8px;font:400 15px/1 "Saira Stencil One",Impact,sans-serif;letter-spacing:.08em;color:#ffb347}
 .nt-pop p{margin:0 0 10px;font:500 13px/1.45 "Barlow Semi Condensed",system-ui,sans-serif;color:#e0d8c8}
 .gate.nt .nt-pop .keys{display:flex!important;flex-wrap:wrap;gap:6px 12px;margin:0}
-/* il blocchetto d'accensione */
-.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;justify-items:center;gap:6px;width:226px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
+/* il blocchetto d'accensione: pannello «ACCENSIONE» in metallo spazzolato, spie, quadrante con la chiave vista da sopra, stato e barra */
+.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;gap:8px;width:100%;padding:12px 14px 12px;border-radius:14px;background:linear-gradient(#1d1f27,#0e0f15);box-shadow:inset 0 0 0 1px #2c2f3a,inset 0 1px 0 rgba(255,255,255,.06),0 14px 30px rgba(0,0,0,.62);cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
 .gate.nt .go.nt-sw:active{cursor:grabbing}
 .gate.nt .go.nt-sw::after,.gate.nt .go.nt-sw::before{display:none!important;animation:none!important}
-.gate.nt .go.nt-sw:focus-visible .nt-svg{filter:drop-shadow(0 0 10px #ffb347)}
-.nt-svg{width:226px;height:226px;overflow:visible;filter:drop-shadow(0 12px 18px rgba(0,0,0,.6))}
-.nt-svg .nt-k{filter:drop-shadow(1px 3px 2px rgba(0,0,0,.65));transform-origin:110px 110px;transform:rotate(var(--g,0deg))}
-.gate.nt .nt-sw.nt-molla .nt-k{transition:transform .38s cubic-bezier(.3,1.6,.5,1)}
-.nt-svg .nt-tk{fill:#7a7388;font:400 9.5px "Share Tech Mono",monospace;letter-spacing:.08em;transition:fill .2s}
-.nt-svg .nt-dt{fill:#2a2c38;transition:fill .2s,filter .2s}
-.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start,.nt-sw[data-fase="start"] .nt-tk.on{fill:#ffb347}
-.nt-sw[data-fase="acc"] .nt-dt.acc,.nt-sw[data-fase="on"] .nt-dt.on,.nt-sw[data-fase="start"] .nt-dt.start,.nt-sw[data-fase="start"] .nt-dt.on,.nt-sw[data-fase="start"] .nt-dt.acc{fill:#ffb347;filter:drop-shadow(0 0 4px #ff9a2a)}
-.nt-spie{display:flex;gap:7px;height:16px;margin-bottom:14px}
-.nt-spie i{font:400 8px/1 "Share Tech Mono",monospace;letter-spacing:.06em;padding:3px 5px;border-radius:3px;background:#12131a;color:#3a3c48;box-shadow:inset 0 0 0 1px #20222c;transition:color .15s,background .15s,box-shadow .15s}
-.nt-sw.nt-acceso .nt-spie i.b{color:#ff4a3a;background:#2a0f0c;box-shadow:inset 0 0 0 1px #6a2018,0 0 8px rgba(255,74,58,.55)}
-.nt-sw.nt-acceso .nt-spie i.o{color:#ffb12a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14,0 0 8px rgba(255,177,42,.5)}
-.nt-sw.nt-acceso .nt-spie i.m{color:#ffb12a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14,0 0 8px rgba(255,177,42,.5)}
+.gate.nt .go.nt-sw:focus-visible{box-shadow:inset 0 0 0 1px #ffb347,0 0 18px rgba(255,170,60,.35),0 14px 30px rgba(0,0,0,.62)}
+.nt-ph{display:flex;align-items:center;justify-content:space-between}
+.nt-ph b{font:600 10px/1 "Share Tech Mono",monospace;letter-spacing:.2em;color:#cfc8b6}
+.nt-svg{width:100%;height:auto;display:block;overflow:visible}
+.nt-svg .nt-k,.nt-svg .nt-ad{transform-origin:170px 116px;transform:rotate(var(--g,-59deg))}
+.nt-svg .nt-k{filter:drop-shadow(2px 4px 3px rgba(0,0,0,.7))}
+.gate.nt .nt-sw.nt-molla .nt-k,.gate.nt .nt-sw.nt-molla .nt-ad{transition:transform .38s cubic-bezier(.3,1.6,.5,1)}
+.nt-svg .nt-tk{fill:#bdb6a4;font:600 13px "Barlow Semi Condensed",system-ui,sans-serif;letter-spacing:.04em;transition:fill .2s}
+.nt-sw:not([data-fase]) .nt-tk.lock,.nt-sw[data-fase=""] .nt-tk.lock,.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start{fill:#ffc674}
+.nt-svg .nt-ad circle{fill:#ffb347;filter:drop-shadow(0 0 4px #ff9a2a)}
+.nt-spie{display:flex;gap:6px}
+.nt-spie i{display:inline-flex;align-items:center;gap:5px;font:400 9px/1 "Share Tech Mono",monospace;letter-spacing:.08em;padding:5px 7px;border-radius:5px;background:#12131a;color:#666a78;box-shadow:inset 0 0 0 1px #262833;font-style:normal;transition:color .15s,background .15s,box-shadow .15s}
+.nt-spie i::before{content:"";width:4px;height:4px;border-radius:50%;background:#3a3d4a;transition:background .15s,box-shadow .15s}
+.nt-sw.nt-acceso .nt-spie i.b{color:#ff7a6a;background:#2a0f0c;box-shadow:inset 0 0 0 1px #6a2018}.nt-sw.nt-acceso .nt-spie i.b::before{background:#ff4a3a;box-shadow:0 0 6px #ff4a3a}
+.nt-sw.nt-acceso .nt-spie i.o,.nt-sw.nt-acceso .nt-spie i.m{color:#ffcf7a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14}.nt-sw.nt-acceso .nt-spie i.o::before,.nt-sw.nt-acceso .nt-spie i.m::before{background:#ffb12a;box-shadow:0 0 6px #ffb12a}
+.nt-pf{display:flex;align-items:center;justify-content:space-between;padding:0 2px}
+.nt-pt{display:flex;align-items:center;gap:8px;font:400 10px/1 "Share Tech Mono",monospace;letter-spacing:.14em;color:#b9b2a0}
+.nt-pt em{font-style:normal}
+.nt-pt u{width:5px;height:5px;border-radius:50%;background:#ffb347;box-shadow:0 0 6px rgba(255,170,60,.7)}
+.nt-sg{display:flex;gap:2px}.nt-sg s{width:4px;height:11px;background:#2c2e38;transition:background .12s}.nt-sg s.l{background:#ffb347;box-shadow:0 0 5px rgba(255,170,60,.6)}
 .nt-sw.nt-tremo .nt-svg{animation:ntTremo .07s linear infinite}
 @keyframes ntTremo{0%{transform:translate(.8px,-.5px)}50%{transform:translate(-.8px,.6px)}100%{transform:translate(.6px,.4px)}}
-.nt-lab{font:600 11px/1.2 "Share Tech Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#a8936a;text-align:center;white-space:nowrap;min-height:14px;font-size:10px;letter-spacing:.1em}
+.nt-lab{margin-top:2px;font:600 11px/1.2 "Share Tech Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#a8936a;text-align:center;white-space:nowrap;min-height:14px;font-size:10px;letter-spacing:.1em}
 .nt-stato{font:400 17px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#ffb347;text-align:center;text-shadow:0 0 14px rgba(255,170,60,.45)}
 .nt-sw.nt-prova .nt-lab{color:#ff9a6a}
 .gate.nt.nt-avvio .nt-cr .nr-slots,.gate.nt.nt-avvio .nt-pie,.gate.nt.nt-avvio .nt-lab,.gate.nt.nt-avvio .nt-stato{opacity:0;transition:opacity .5s}
-@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}.nt-svg{width:170px;height:170px}.gate.nt .go.nt-sw{width:180px}}
-@media (max-height:620px) and (min-width:900px){.nt-svg{width:150px;height:150px}.gate.nt .go.nt-sw{width:170px}}
+@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}}
+@media (max-height:700px) and (min-width:900px){.gate.nt .go.nt-sw{width:300px;justify-self:center}}
 /* girare la chiave: il pannello scende e sparisce, il logo si accende */
 .gate.nt .intro-menu{transition:opacity .45s,transform .45s}
 .gate.nt.nt-avvio .intro-menu{pointer-events:none}
@@ -431,33 +438,35 @@
   // ------------------------------------------------------------ il cruscotto: il blocchetto d'accensione e i portachiavi
   const goBtn = document.getElementById('goBtn');
   // il blocchetto d'accensione: ghiera cromata, targa scura con le posizioni (LOCK, ACC, ON, START), chiave con la testa in gomma nera e l'anima in ottone
-  const A_ACC = 28, A_ON = 56, A_START = 84;
+  const A_LOCK = -59, A_ACC = -18, A_ON = 22, A_START = 65;
   const SVG = (() => {
-    const P = (a, r) => [(110 + Math.sin(a * Math.PI / 180) * r).toFixed(1), (110 - Math.cos(a * Math.PI / 180) * r).toFixed(1)];
-    let tk = '', lb = '';
-    for (let a = 0; a <= 90; a += 7) { const [x1, y1] = P(a, 78), [x2, y2] = P(a, a % 28 === 0 ? 90 : 85); tk += `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${a % 28 === 0 ? '#8a8aa0' : '#4a4c5e'}" stroke-width="${a % 28 === 0 ? 2 : 1}" stroke-linecap="round"/>`; }
-    for (const [cl, a, t] of [['lock', 0, 'LOCK'], ['acc', A_ACC, 'ACC'], ['on', A_ON, 'ON'], ['start', A_START, 'START']]) { const [x, y] = P(a, 120), [dx, dy] = P(a, 103); lb += `<circle class="nt-dt ${cl}" cx="${dx}" cy="${dy}" r="2.4"/><text class="nt-tk ${cl}" x="${x}" y="${(+y + 3).toFixed(1)}" text-anchor="${a < 20 ? 'middle' : 'start'}">${t}</text>`; }
-    let br = ''; for (let r = 40; r < 90; r += 5) br += `<circle cx="110" cy="110" r="${r}" fill="none" stroke="rgba(255,255,255,${(0.025 + (r % 10 ? 0.015 : 0)).toFixed(3)})"/>`;
-    return `<svg class="nt-svg" viewBox="-12 -12 250 250" aria-hidden="true"><defs>
-    <linearGradient id="ntGh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f6"/><stop offset=".3" stop-color="#8d92a3"/><stop offset=".55" stop-color="#3b3e4c"/><stop offset=".8" stop-color="#a7acbb"/><stop offset="1" stop-color="#4b4e5c"/></linearGradient>
-    <radialGradient id="ntTg" cx="40%" cy="30%" r="85%"><stop offset="0" stop-color="#2d303e"/><stop offset=".7" stop-color="#14151d"/><stop offset="1" stop-color="#0a0b11"/></radialGradient>
-    <linearGradient id="ntOt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7a4d0c"/><stop offset=".3" stop-color="#ffd98a"/><stop offset=".65" stop-color="#d98f26"/><stop offset="1" stop-color="#6a400a"/></linearGradient>
-    <linearGradient id="ntGm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b3d4a"/><stop offset=".5" stop-color="#15161d"/><stop offset="1" stop-color="#050509"/></linearGradient>
-    <radialGradient id="ntCr" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#f4f6fb"/><stop offset=".45" stop-color="#9aa0b0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
-    <circle cx="110" cy="110" r="106" fill="url(#ntGh)" stroke="#05060a" stroke-width="2"/><circle cx="110" cy="110" r="97" fill="#07080d"/><circle cx="110" cy="110" r="94" fill="url(#ntTg)"/>${br}
-    <path d="M${P(-4, 94).join(' ')}A94 94 0 0 1 ${P(94, 94).join(' ')}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1.5"/>${tk}${lb}
-    <circle cx="110" cy="110" r="27" fill="url(#ntCr)" stroke="#12131a" stroke-width="2"/><circle cx="110" cy="110" r="21" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><circle cx="110" cy="110" r="17" fill="#0c0d12"/>
-    <g class="nt-k">
-      <rect x="101.5" y="68" width="17" height="84" rx="8.5" fill="url(#ntGm)" stroke="#000" stroke-width="2"/>
-      <rect x="104" y="72" width="3" height="76" rx="1.5" fill="rgba(255,255,255,.3)"/>
-      <rect x="108" y="97" width="4" height="26" rx="2" fill="url(#ntOt)" stroke="#2a1804" stroke-width=".8"/>
-      <circle cx="110" cy="77" r="2.2" fill="#050509" stroke="#9aa0b0" stroke-width=".8"/></g></svg>`;
+    const CX = 170, CY = 116, P = (a, r) => [(CX + Math.sin(a * Math.PI / 180) * r).toFixed(1), (CY - Math.cos(a * Math.PI / 180) * r).toFixed(1)];
+    const R = 78, [x0, y0] = P(A_LOCK, R), [x1, y1] = P(A_START, R);
+    let tk = ''; for (const a of [A_ACC, A_ON, A_START]) { const [p, q] = P(a, R - 3), [u, v] = P(a, R + 7); tk += `<path d="M${p} ${q}L${u} ${v}" stroke="#9a9484" stroke-width="1.6" stroke-linecap="round"/>`; }
+    let lb = ''; for (const [cl, a, t, an, r] of [['lock', A_LOCK, 'LOCK', 'end', 98], ['acc', A_ACC, 'ACC', 'middle', 96], ['on', A_ON, 'ON', 'middle', 96], ['start', A_START, 'START', 'start', 98]]) { const [x, y] = P(a, r); lb += `<text class="nt-tk ${cl}" x="${x}" y="${(+y + 4).toFixed(1)}" text-anchor="${an}">${t}</text>`; }
+    let sc = ''; for (const [x, y] of [[16, 16], [324, 16], [16, 198], [324, 198]]) sc += `<circle cx="${x}" cy="${y}" r="5.5" fill="url(#ntSc)" stroke="#0a0b0f"/><path d="M${x - 3.2} ${y + 1.5}L${x + 3.2} ${y - 1.5}" stroke="#14151b" stroke-width="1.4"/>`;
+    let rg = ''; for (let i = 0; i < 9; i++) rg += `<path d="M${(CX - 17).toFixed(1)} ${(CY - 41 + i * 4.4).toFixed(1)}h34" stroke="rgba(255,255,255,.34)" stroke-width="1.5"/><path d="M${(CX - 17).toFixed(1)} ${(CY - 39.5 + i * 4.4).toFixed(1)}h34" stroke="rgba(0,0,0,.45)" stroke-width="1"/>`;
+    return `<svg class="nt-svg" viewBox="0 0 340 214" aria-hidden="true"><defs>
+    <linearGradient id="ntPl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23252d"/><stop offset="1" stop-color="#14151b"/></linearGradient>
+    <pattern id="ntBr" width="6" height="2" patternUnits="userSpaceOnUse"><rect width="6" height="1" fill="rgba(255,255,255,.035)"/><rect y="1" width="6" height="1" fill="rgba(0,0,0,.08)"/></pattern>
+    <radialGradient id="ntSc" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#6a6d78"/><stop offset="1" stop-color="#2a2c34"/></radialGradient>
+    <linearGradient id="ntRi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8c909e"/><stop offset=".35" stop-color="#2c2e38"/><stop offset=".7" stop-color="#1a1b22"/><stop offset="1" stop-color="#7d818f"/></linearGradient>
+    <radialGradient id="ntKn" cx="40%" cy="32%" r="80%"><stop offset="0" stop-color="#1b1c23"/><stop offset=".7" stop-color="#0c0d11"/><stop offset="1" stop-color="#050609"/></radialGradient>
+    <linearGradient id="ntKe" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b5b9c6"/><stop offset=".3" stop-color="#5f6372"/><stop offset=".6" stop-color="#2a2c36"/><stop offset="1" stop-color="#8d91a0"/></linearGradient>
+    <radialGradient id="ntCe" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#e6e9f1"/><stop offset=".5" stop-color="#8a8fa0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
+    <rect x=".5" y=".5" width="339" height="213" rx="10" fill="url(#ntPl)" stroke="#2c2f3a"/><rect x=".5" y=".5" width="339" height="213" rx="10" fill="url(#ntBr)"/><rect x="7" y="7" width="326" height="200" rx="7" fill="none" stroke="rgba(255,255,255,.08)"/>${sc}
+    <path d="M${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1"/>${tk}${lb}
+    <circle cx="${CX}" cy="${CY}" r="64" fill="#07080b" stroke="url(#ntRi)" stroke-width="4"/><circle cx="${CX}" cy="${CY}" r="58" fill="url(#ntKn)" stroke="rgba(255,255,255,.08)"/><circle cx="${CX}" cy="${CY}" r="52" fill="none" stroke="rgba(255,255,255,.05)"/>
+    <g class="nt-ad"><circle cx="${CX}" cy="${CY - R}" r="4"/></g>
+    <g class="nt-k"><rect x="${CX - 20}" y="${CY - 47}" width="40" height="94" rx="20" fill="url(#ntKe)" stroke="#07080b" stroke-width="2"/><rect x="${CX - 16}" y="${CY - 43}" width="32" height="86" rx="16" fill="#1c1d25" stroke="rgba(255,255,255,.12)"/>${rg}
+      <circle cx="${CX}" cy="${CY + 14}" r="12" fill="url(#ntCe)" stroke="#12131a" stroke-width="1.5"/><rect x="${CX - 3}" y="${CY + 5}" width="6" height="18" rx="2" fill="#0c0d12"/></g></svg>`;
   })();
-  let lab = null, stato = null, sw = null;
+  let lab = null, stato = null, sw = null, ptx = null, segs = [];
   function cruscotto() {
     if (!goBtn || goBtn.classList.contains('nt-sw')) return;
     goBtn.classList.add('nt-sw'); sw = goBtn; goBtn.setAttribute('aria-label', 'Accendi e parti: tieni premuto per girare la chiave');
-    goBtn.innerHTML = '<span class="nt-spie" aria-hidden="true"><i class="b">BATT</i><i class="o">OLIO</i><i class="m">MOT</i></span>' + SVG + '<span class="nt-lab">Tieni premuto: gira la chiave</span><span class="nt-stato"></span>';
+    goBtn.innerHTML = '<span class="nt-ph"><b>ACCENSIONE</b><span class="nt-spie" aria-hidden="true"><i class="b">BAT</i><i class="o">OLIO</i><i class="m">MOT</i></span></span>' + SVG + '<span class="nt-pf"><span class="nt-pt"><u></u><em>QUADRO SPENTO</em></span><span class="nt-sg">' + '<s></s>'.repeat(10) + '</span></span><span class="nt-lab">Tieni premuto: gira la chiave</span><span class="nt-stato"></span>';
+    ptx = goBtn.querySelector('.nt-pt em'); segs = [...goBtn.querySelectorAll('.nt-sg s')]; chiaveA(A_LOCK);
     lab = goBtn.querySelector('.nt-lab'); stato = goBtn.querySelector('.nt-stato');
     const cr = document.createElement('div'); cr.className = 'nt-cr';
     const slots = menu.querySelector('.nr-slots'); if (slots) cr.appendChild(slots);
@@ -534,9 +543,10 @@
   // al 1,33 s il motore prende, le spie si spengono, la chiave resta su ON, la scena spinge in avanti e dopo ~1,1 s parte il gioco.
   const T_ACC = 380, T_START = 1330;
   let tenuta = null, via = false;
-  const angolo = (ms) => ms < T_ACC ? A_ON * (ms / T_ACC) : A_ON + (A_START - A_ON) * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
-  function fase(f) { if (sw) sw.dataset.fase = f; }
-  function chiaveA(deg) { if (sw) sw.style.setProperty('--g', deg.toFixed(1) + 'deg'); }
+  const angolo = (ms) => ms < T_ACC ? A_LOCK + (A_ON - A_LOCK) * (ms / T_ACC) : A_ON + (A_START - A_ON) * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
+  const FASE_TXT = { '': 'QUADRO SPENTO', acc: 'ACCESSORI', on: 'QUADRO ACCESO', start: 'AVVIAMENTO IN CORSO' };
+  function fase(f) { if (!sw) return; sw.dataset.fase = f; if (ptx) ptx.textContent = FASE_TXT[f] || ''; }
+  function chiaveA(deg) { if (!sw) return; sw.style.setProperty('--g', deg.toFixed(1) + 'deg'); const n = Math.max(0, Math.min(10, Math.round((deg - A_LOCK) / (A_START - A_LOCK) * 10))); segs.forEach((e, i) => e.classList.toggle('l', i < n)); }
   function giraTieni(da) {
     if (via || tenuta) return;
     rendiMotore();
@@ -556,7 +566,7 @@
     if (!tenuta || via) return;
     const ms = performance.now() - tenuta.t0; cancelAnimationFrame(tenuta.raf);
     if (ms < T_ACC) { tenuta.suono = false; tenuta = null; accendiDaSolo(); return; }                  // un clic (non una pressione lunga): gira da sola fino in fondo
-    tenuta = null; ferma(); sw.classList.remove('nt-tremo', 'nt-acceso'); sw.classList.add('nt-molla', 'nt-prova'); chiaveA(0); fase('');
+    tenuta = null; ferma(); sw.classList.remove('nt-tremo', 'nt-acceso'); sw.classList.add('nt-molla', 'nt-prova'); chiaveA(A_LOCK); fase('');
     if (lab) lab.textContent = 'Ancora un po’: tieni premuto';
   }
   // un clic: la chiave gira da sola (stessi tempi, senza tenerla)
@@ -573,7 +583,7 @@
     tenuta.raf = requestAnimationFrame(passo);
   }
   function accendi() {
-    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(A_ON); fase('on');
+    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(A_ON); fase('on'); if (ptx) ptx.textContent = 'MOTORE ACCESO';
     gate.classList.add('nt-avvio'); if (lab) lab.textContent = '';
     setTimeout(() => { window.__ntVia = true; goBtn.click(); }, 1150);
   }

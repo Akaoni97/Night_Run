@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.127**
+**Versione attuale: v0.128**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -151,3 +151,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.125 | 23/11 | proprietario | Chiave del blocchetto vista da sopra: una barretta verticale centrata nel cilindro che ruota; i fari di ricerca non sbordano più sul blocchetto (ritaglio `contain: paint`) |
 | v0.126 | 23/11 | cognato | Vignette del protagonista solo a versi (niente parole): secondo il momento, il motore dell'auto (tre cilindri, diesel, cinque, sei, turbo, utilitaria) e, negli scoppi, quanto è preparata (POP! → PUPUPU! → TRATATAN!); lettere che escono una alla volta e ballano, vignetta a punte per scoppi, limitatore e partenze |
 | v0.127 | 23/11 | proprietario | Schermata iniziale: tolto il riflesso di luce del pulsante premium (`.go::after`, `pShine`) che passava sopra il blocchetto d'accensione |
+| v0.128 | 23/11 | proprietario | Blocchetto d'accensione rifatto sul modello del proprietario: pannello «ACCENSIONE» in metallo spazzolato con viti, spie BAT/OLIO/MOT, arco LOCK-ACC-ON-START col puntino ambra, chiave vista da sopra con presa a righe, riga di stato e barra a segmenti |

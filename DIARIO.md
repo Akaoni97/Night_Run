@@ -1,3 +1,6 @@
+## 23/11/2026 · proprietario (Nico) · v0.128 (**il blocchetto come nel modello**)
+- Il blocchetto d'accensione della schermata iniziale (`titolo.js`) ora segue l'immagine del proprietario: pannello «ACCENSIONE» in metallo spazzolato con le viti agli angoli, spie BAT / OLIO / MOT in alto a destra, arco con LOCK, ACC, ON e START e un puntino ambra che segue la chiave, la chiave vista da sopra (testa ovale con la presa a righe) che gira nel quadrante, e sotto «QUADRO SPENTO → ACCESSORI → AVVIAMENTO IN CORSO → MOTORE ACCESO» con la barra a dieci segmenti che si riempie.
+
 ## 23/11/2026 · proprietario (Nico) · v0.127 (**via il fascio di luce dal blocchetto**)
 - Il fascio di luce che passava sopra il blocchetto era il riflesso lucido del pulsante «premium» (`premium.css`, `.gate .go::after`, animazione `pShine`): nella schermata iniziale ora è spento.
 ## 23/11/2026 · cognato (Luca) · v0.126 (**vignette a versi**)
