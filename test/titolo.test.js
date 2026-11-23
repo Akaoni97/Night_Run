@@ -1,4 +1,4 @@
-// Schermata iniziale (titolo.js, v0.120): le frasi, i keyframes usati dal CSS e le schede delle partite con il luogo.
+// Schermata iniziale (titolo.js, v0.121): le frasi, i keyframes usati dal CSS e le schede delle partite con il luogo.
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');

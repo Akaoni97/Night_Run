@@ -11,7 +11,7 @@
 //  che dice «Continua il viaggio» se la partita è già cominciata, i comandi, Crediti). Stessi id di prima (#gate,
 //  #introMenu, #goBtn): index.html e gli altri file non cambiano. La scena si ferma quando la schermata si chiude.
 //  Prova: NightTitolo.foto() ridisegna il quadro.
-//  v0.120 (chiesta da Nico: «lavorare tanto sulla schermata iniziale»): la scena ora vive, ma sempre con animazioni CSS fatte dalla
+//  v0.121 (chiesta da Nico: «lavorare tanto sulla schermata iniziale»): la scena ora vive, ma sempre con animazioni CSS fatte dalla
 //  scheda video (nessun ridisegno: lo scatto della v0.103 non torna). Sopra il quadro fermo c'è uno strato (`.nt-scena`, grande come la
 //  scena e in scala con lei, 1 unità = `--u` px) con: auto del traffico che passano (fanali rossi e fari bianchi con la scia), le quattro
 //  frecce che lampeggiano, il lampione spento che ogni tanto sfarfalla, il telefono che pulsa, le stelle che brillano e il tempo
