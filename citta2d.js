@@ -64,9 +64,9 @@
   S.cityFacade = function (id, r, D) {
     const P = FAC[id], ink = this.C.ink, TOP = 46;
     const w = P.w[0] + Math.floor(r(1) * (P.w[1] - P.w[0] + 1)), h = P.h[0] + Math.floor(r(2) * (P.h[1] - P.h[0] + 1)), gy = TOP + h;
-    const { c, px, line } = mk(w + 2, h + TOP + 1);
+    const { c, x: cx, px, line } = mk(w + 2, h + TOP + 1), winPos = [];
     const meta = { w: w + 2, h: h + TOP + 1, signs: [], beacons: [], shop: null, glows: [] };
-    const wall = P.wall[Math.floor(r(4) * P.wall.length)], gH = P.ground === 'tank' ? 0 : 20;       // altezza del piano terra
+    const wall = P.wall[Math.floor(r(4) * P.wall.length)], gH = P.ground === 'tank' ? 0 : 20, ground = P.alt && r(23) < P.alt[1] ? P.alt[0] : P.ground;       // altezza del piano terra
     // corpo
     px(ink, 0, TOP, w + 2, h + 1); px(wall, 1, TOP + 1, w, h - 1);
     px(sh(wall, 0.14), 1, TOP + 1, 3, h - 1); px(sh(wall, -0.3), w - 1, TOP + 1, 2, h - 1);
@@ -96,7 +96,7 @@
     for (let yy = y0, row = 0; yy <= y1; yy += stepY, row++) {
       for (let k = 0; k < nx; k++) {
         const xx = Math.round(gap * (k + 1) + ww * k), q = r(xx * 0.31 + yy * 1.7 + 9);
-        win(xx + 1, yy, q >= P.dark, r(xx * 1.3 + yy * 0.7));
+        win(xx + 1, yy, q >= P.dark, r(xx * 1.3 + yy * 0.7)); winPos.push([xx + 1, yy, ww, wh]);
       }
       if (P.bal === 'long' && row % 2 === 1) { px(ink, 1, yy + wh + 1, w, 1); for (let k = 2; k < w; k += 3) px(ink, k, yy + wh + 1, 1, 3); }
       if (P.bal === 'box' && row % 2 === 0) for (let k = 0; k < nx; k += 2) { const xx = Math.round(gap * (k + 1) + ww * k); px(ink, xx - 1, yy + wh + 1, ww + 4, 3); px(sh(wall, 0.1), xx, yy + wh + 1, ww + 2, 2); }
@@ -141,28 +141,37 @@
     if (gH) {
       px(ink, 0, gy - gH, w + 2, gH + 1); px(sh(wall, -0.45), 1, gy - gH + 1, w, gH - 1);
       const lit = r(13) < 0.78, glass = lit ? ['#ffe6a3', '#ffd9a0', '#fff0c8'][Math.floor(r(16) * 3)] : '#1b2a44';
-      if (P.ground === 'arcade') {
+      if (ground === 'arcade') {
         const n = Math.max(3, Math.floor(w / 14)), pw = (w - 2) / n;
         for (let k = 0; k < n; k++) { const ax = 1 + Math.round(k * pw), aw = Math.round(pw) - 3; px(ink, ax + 1, gy - gH + 2, aw + 2, gH - 2); px(lit ? glass : '#0d1426', ax + 2, gy - gH + 3, aw, gH - 3); px(ink, ax + 1, gy - gH + 2, 1, 1); px(ink, ax + aw + 2, gy - gH + 2, 1, 1); if (lit) px(sh(glass, -0.3), ax + 2, gy - 6, aw, 5); px(sh(wall, 0.2), ax + 1, gy - gH + 1, aw + 2, 1); }
         if (lit) meta.shop = { x: w / 2, w: w - 10, col: glass };
-      } else if (P.ground === 'columns') {
+      } else if (ground === 'columns') {
         px(ink, 2, gy - gH + 1, w - 2, 2); px(sh(wall, 0.3), 3, gy - gH + 1, w - 4, 1);
         for (let k = 4; k < w - 3; k += 9) { px(ink, k, gy - gH + 3, 4, gH - 3); px(sh(wall, 0.25), k + 1, gy - gH + 3, 2, gH - 3); }
         px('#241a12', 8, gy - 12, 10, 12); px(lit ? glass : '#0d1426', 10, gy - 11, 6, 11); if (lit) meta.shop = { x: 13, w: 14, col: glass };
         px(ink, 0, gy - 2, w + 2, 2); px(sh(wall, 0.15), 1, gy - 2, w, 1);
-      } else if (P.ground === 'cafe') {
+      } else if (ground === 'cafe') {
         px(lit ? glass : '#1b2a44', 5, gy - 14, w - 20, 12); px(sh(glass, -0.3), 5, gy - 6, w - 20, 4); if (!lit) px('#2a3a54', 5, gy - 14, w - 20, 1);
         for (let k = 9; k < w - 18; k += 10) { px('#1a1530', k, gy - 9, 3, 7); px(this.C.skin, k, gy - 11, 3, 3); }
         const a = P.aw[Math.floor(r(14) * P.aw.length)]; for (let k = 1; k < w + 1; k++) px(Math.floor(k / 4) % 2 ? a : '#e8e0cc', k, gy - gH + 1, 1, 4); for (let k = 1; k < w + 1; k += 4) px(a, k, gy - gH + 5, 2, 2); px('rgba(0,0,0,.35)', 1, gy - gH + 5, w, 1);
         px('#241a12', w - 12, gy - 13, 8, 13); px('#3a2a1c', w - 11, gy - 12, 6, 12);
         for (let k = 0; k < 2; k++) { const tx = 6 + k * 14; px(ink, tx, gy - 2, 7, 1); px(ink, tx + 3, gy - 2, 1, 2); px('#e8e0cc', tx, gy - 3, 7, 1); }
         if (lit) meta.shop = { x: 5 + (w - 20) / 2, w: w - 20, col: glass };
-      } else if (P.ground === 'shop') {
+      } else if (ground === 'shop') {
         px(lit ? glass : '#1b2a44', 5, gy - 14, w - 20, 13); if (lit) { px(sh(glass, -0.25), 5, gy - 5, w - 20, 4); for (let k = 8; k < w - 18; k += 8) px(['#6b4a2e', '#2b8a6e', '#c42a1a', '#163a8c'][Math.floor(r(k) * 4)], k, gy - 9, 3, 4); }
         const a = P.aw[Math.floor(r(14) * P.aw.length)]; px(a, 1, gy - gH + 1, w, 3); for (let k = 1; k < w; k += 5) px(sh(a, 0.25), k, gy - gH + 1, 2, 3);
         px('#241a12', w - 12, gy - 13, 8, 13); px('#3a2a1c', w - 11, gy - 12, 6, 12); px('#d9c08a', w - 6, gy - 7, 1, 1);
         if (lit) meta.shop = { x: 5 + (w - 20) / 2, w: w - 20, col: glass };
-      } else if (P.ground === 'door') {
+      } else if (ground === 'pub') {
+        // pub: facciata nera e verde con le lettere d'oro, finestre calde a riquadri, lanterne e insegna a bandiera
+        px(sh('#14301f', 0.05), 1, gy - gH + 1, w, gH - 1); px('#c9a84a', 1, gy - gH + 1, w, 1); px('#0a1a12', 1, gy - gH + 6, w, 1);
+        let name = ['THE ROYAL OAK', 'THE CROWN', 'RED LION', 'KINGS ARMS', 'WHITE HART', 'THE ANCHOR'][Math.floor(r(24) * 6)]; while (name.length > 3 && this.textW(name, 1) > w - 10) name = name.slice(0, -1);
+        this.text(cx, name, Math.round((w + 2 - this.textW(name, 1)) / 2), gy - gH + 2, '#e8c878', 1);
+        for (let k = 4; k < w - 18; k += 13) { px(ink, k, gy - 13, 11, 11); px(lit ? '#ffcf7a' : '#2a1d12', k + 1, gy - 12, 9, 9); px(ink, k + 5, gy - 12, 1, 9); px(ink, k + 1, gy - 8, 9, 1); if (lit) meta.glows.push({ x: k + 5, y: gy - 8, r: 9, col: '#ffcf7a', a: 0.08 }); }
+        px('#241a12', w - 12, gy - 13, 8, 13); px('#3a2a1c', w - 11, gy - 12, 6, 12); px('#c9a84a', w - 6, gy - 7, 1, 1);
+        px(ink, w - 3, gy - gH - 6, 1, 9); px(ink, w - 3, gy - gH - 6, 6, 1); px(ink, w + 1, gy - gH - 5, 1, 3); px('#c9a84a', w - 1, gy - gH - 2, 5, 5); px('#5a3a1a', w, gy - gH - 1, 3, 3);   // insegna a bandiera
+        if (lit) meta.shop = { x: w / 2, w: w - 14, col: '#ffcf7a' };
+      } else if (ground === 'door') {
         px(sh(wall, -0.2), 1, gy - gH + 1, w, 2);
         for (let k = 0; k < 2; k++) { const dx = 6 + k * Math.floor(w / 2 - 6); if (dx + 10 > w) continue; px(ink, dx, gy - 15, 10, 15); px(r(k + 20) < 0.5 ? '#14181e' : '#2a1d3a', dx + 1, gy - 14, 8, 14); px(lit ? '#ffd98a' : '#0d1426', dx + 2, gy - 14, 6, 3); px('#c9a84a', dx + 7, gy - 7, 1, 1); px(sh(wall, 0.3), dx - 1, gy - 1, 12, 1); px(sh(wall, 0.2), dx - 2, gy - 2, 14, 2); if (lit) meta.glows.push({ x: dx + 5, y: gy - 12, r: 8, col: '#ffd98a', a: 0.08 }); }
         px(ink, 1, gy - 5, w, 1); for (let k = 2; k < w; k += 4) px(ink, k, gy - 5, 1, 5);     // ringhiera
@@ -175,6 +184,26 @@
         meta.signs.push({ word, sc, x: Math.round((w + 2 - this.textW(word, sc)) / 2), y: TOP + 6 + Math.floor(r(8) * (h - 50)), col: D.neon[Math.floor(r(9) * D.neon.length)], flick: r(10) < D.flick });
       }
     }
+    // particolari della città: targhe, insegne, bucato, bandiere, fiori... (P.ex, ognuno con la sua probabilità)
+    const EX = {
+      plate: () => { const T = P.plate; if (!T || !gH) return; let tx = T[2]; while (tx.length > 3 && this.textW(tx, 1) > w - 12) tx = tx.slice(0, -1); const tw = this.textW(tx, 1), xx = 5 + Math.floor(r(30) * Math.max(1, w - tw - 14)), yy = gy - gH - 7;
+        px(ink, xx - 2, yy - 1, tw + 4, 8); px(T[0], xx - 1, yy, tw + 2, 6); this.text(cx, tx, xx, yy + 0.5, T[1], 1); },
+      tabacchi: () => { if (!gH) return; const xx = w - 12 - Math.floor(r(31) * 8), yy = gy - gH - 14; px(ink, xx - 1, yy - 1, 10, 12); px('#14141c', xx, yy, 8, 10); this.text(cx, 'T', xx + 2, yy + 2, '#f4f1e6', 1); px('#f4f1e6', xx + 1, yy + 8, 6, 1); meta.glows.push({ x: xx + 4, y: yy + 5, r: 7, col: '#ffffff', a: 0.05 }); },
+      tabacFr: () => { if (!gH) return; const xx = w - 13 - Math.floor(r(32) * 6), yy = gy - gH - 15; for (let j = 0; j < 5; j++) { const ww = (5 - j) * 2 - 1; px('#d82a2a', xx + 5 - (5 - j), yy + 4 + j, ww, 1); px('#d82a2a', xx + 5 - (5 - j), yy + 4 - j, ww, 1); } px('#ffd0d0', xx + 3, yy + 3, 2, 2); meta.glows.push({ x: xx + 4, y: yy + 4, r: 9, col: '#ff3a2a', a: 0.12 }); },
+      pharmacy: () => { if (!gH) return; const xx = 6 + Math.floor(r(33) * 10), yy = gy - gH - 15; px(ink, xx - 1, yy - 1, 11, 11); px('#14301f', xx, yy, 9, 9); px('#3aff7a', xx + 3, yy + 1, 3, 7); px('#3aff7a', xx + 1, yy + 3, 7, 3); meta.glows.push({ x: xx + 4.5, y: yy + 4.5, r: 12, col: '#3aff7a', a: 0.18 }); },
+      bucato: () => { const row = winPos[Math.floor(r(34) * winPos.length)]; if (!row) return; const y = row[1] + row[3] + 3; px(ink, 2, y, w - 2, 1);
+        for (let k = 5; k < w - 8; k += 6) { const col = ['#e8e4d4', '#c4241c', '#2a6ad8', '#e8c84a', '#d87aa8'][Math.floor(r(35 + k) * 5)]; px(col, k, y + 1, 4, 5 + Math.floor(r(36 + k) * 3)); px(sh(col, -0.3), k + 3, y + 1, 1, 5); } },
+      madonnella: () => { const yy = TOP + 22 + Math.floor(r(37) * 20), xx = 4 + Math.floor(r(38) * (w - 16)); px(ink, xx - 1, yy - 1, 8, 12); px('#3a5a8a', xx, yy, 6, 10); px('#e8d8a8', xx + 2, yy + 2, 2, 4); px('#c9a84a', xx + 1, yy + 1, 4, 1); px('#ffe9b8', xx + 2, yy + 7, 2, 1); meta.glows.push({ x: xx + 3, y: yy + 5, r: 10, col: '#ffd98a', a: 0.12 }); },
+      fleurs: () => { for (const [xx, yy, ww, wh] of winPos) if (r(xx * 3.1 + yy) < 0.7) { px(ink, xx - 2, yy + wh - 1, ww + 4, 3); px('#2f6a3a', xx - 1, yy + wh - 1, ww + 2, 1); for (let k = 0; k < ww + 2; k += 2) px(k % 4 ? '#d82a2a' : '#f0a0c0', xx - 1 + k, yy + wh - 2, 1, 1); } },
+      flag: () => { const T = P.flag; if (!T) return; const xx = w - 9, yy = TOP - 24; px(ink, xx, yy, 1, 24); px(T[0], xx + 1, yy + 1, 9, 6); if (T[1] === 'cross') { px(T[2], xx + 3, yy + 1, 2, 6); px(T[2], xx + 1, yy + 3, 9, 1); } else if (T[1] === 'stripes') { for (let k = 0; k < 6; k += 2) px(T[2], xx + 1, yy + 1 + k, 9, 1); px('#2a5aa8', xx + 1, yy + 1, 4, 4); px('#f4f1e6', xx + 2, yy + 1, 1, 4); } else if (T[1] === 'us') { for (let k = 0; k < 6; k += 2) px('#d82a2a', xx + 1, yy + 1 + k, 9, 1); px('#1a2a8a', xx + 1, yy + 1, 4, 4); } },
+      graffiti: () => { if (!gH) return; for (let k = 0; k < 3; k++) { const col = ['#e84a8a', '#2ad8e8', '#e8c84a', '#8a5aff', '#3aff7a'][Math.floor(r(40 + k) * 5)]; const gx = 4 + k * Math.floor((w - 12) / 3), gyy = gy - 12 - Math.floor(r(43 + k) * 3); for (let j = 0; j < 14; j++) px(col, gx + j, gyy + Math.round(Math.sin(j * 0.8 + k) * 2), 1, 2); px(ink, gx + 1, gyy + 3, 10, 1); } },
+      azulejo: () => { const xx = 4 + Math.floor(r(44) * (w - 22)), yy = gy - gH - 14; px(ink, xx - 1, yy - 1, 16, 14); px('#e8e4d4', xx, yy, 14, 12); for (let a = 0; a < 7; a++) for (let b = 0; b < 6; b++) if ((a + b) % 2 === 0) px('#2a5aa8', xx + a * 2, yy + b * 2, 2, 2); px('#2a5aa8', xx, yy, 14, 1); px('#2a5aa8', xx, yy + 11, 14, 1); },
+      jamon: () => { if (!meta.shop) return; const sx = meta.shop.x - meta.shop.w / 2 + 2; for (let k = 0; k < 4; k++) { const hx = sx + 3 + k * 8; if (hx > w - 16) break; px('#5a2a1a', hx, gy - 14, 1, 2); px('#a03a2a', hx - 1, gy - 12, 4, 5); px('#7a2a1a', hx, gy - 7, 2, 2); px('#e8d8c0', hx + 1, gy - 12, 1, 2); } },
+      statuette: () => { for (let k = 0; k < 3; k++) { const xx = 8 + k * Math.floor((w - 18) / 2); px(ink, xx - 1, TOP - 12, 5, 11); px('#6a6a62', xx, TOP - 11, 3, 9); px('#6a6a62', xx - 1, TOP - 9, 5, 1); px('#6a6a62', xx, TOP - 13, 3, 2); } },
+      bougainvillea: () => { const xx = w - 4 - Math.floor(r(45) * 10); for (let k = 0; k < 14; k++) { px(k % 3 ? '#c8208a' : '#e84aa8', xx - (k * 5) % 12, TOP + 4 + (k * 3) % 26, 3, 2); } for (let k = 0; k < 8; k++) px('#2f6a3a', xx - (k * 4) % 12 + 1, TOP + 5 + (k * 4) % 26, 2, 1); },
+      balcLights: () => { const y = TOP + 8 + Math.floor(r(46) * 20); px(ink, 3, y, w - 3, 1); for (let k = 5; k < w - 4; k += 4) px(['#ff5a3a', '#ffd23f', '#3ad8a0', '#5a8aff'][(k >> 2) % 4], k, y + 1, 2, 2); },
+    };
+    (P.ex || []).forEach((name, k) => { if (EX[name] && r(200 + k * 3.3) < (P.exP == null ? 0.55 : P.exP)) EX[name](); });
     if (r(21) < 0.35 && (rt === 'flat' || rt === 'tank' || rt === 'pediment')) meta.beacons.push({ x: 8, y: TOP - 4 });
     return { c, ...meta };
   };

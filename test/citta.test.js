@@ -15,8 +15,8 @@ SD.prototype.landmark = function () { return { c: { width: 1, height: 1 } }; };
 SD.prototype.districtInfo = function () { return { D: null }; }; SD.prototype.districtMix = function () { return null; }; SD.prototype.kindExtra = function () { return { base: true }; };
 globalThis.Street2D = SD;
 const run = (f) => new Function(readFileSync(new URL('../' + f, import.meta.url), 'utf8'))();
-run('citta2d.js'); run('citta_dati.js');
-const CITY = SD.CITY_DISTRICTS, FAC = SD.CITY_FACADES, LM = SD.CITY_LANDMARKS;
+run('citta2d.js'); run('citta_dati.js'); run('citta_dettagli.js');
+const CITY = SD.CITY_DISTRICTS, FAC = SD.CITY_FACADES, LM = SD.CITY_LANDMARKS, PROP = SD.CITY_PROPS, ROAD = SD.CITY_ROAD;
 const CAPS = ['roma', 'parigi', 'londra', 'stoccolma', 'berlino', 'praga', 'vienna', 'madrid', 'lisbona', 'atene', 'washington'];
 const KINDS_BASE = new Set(['tower', 'office', 'hotel', 'boutique', 'park', 'containers', 'house', 'konbini', 'warehouse', 'factory']);
 const FONT = /^[A-Z0-9 ,.\/\-!?]+$/;
@@ -57,4 +57,19 @@ test('città: districtInfo segue la città in cui si è, Tokyo e fuori città co
   s._city = null; assert.equal(SD.prototype.districtInfo.call(s, 0).D, null);
   s.tiles = new Map([['a', 1]]); s._city = 'parigi'; s.setCity('londra'); assert.equal(s.tiles.size, 0); s.tiles.set('b', 2); s.setCity('londra'); assert.equal(s.tiles.size, 1);
   s.setCity(null); assert.equal(s._city, null);
+});
+
+test('città: ogni quartiere ha i suoi oggetti del marciapiede e ognuno si disegna', () => {
+  const g = ctx(), c = { g, px: () => {}, X: 100, ink: '#000', night: 1, t: 1.5, r: (n) => SD.rnd(n), S: { text: () => {}, lightAdd: () => {}, light: () => {} } };
+  for (const id of CAPS) for (const d of CITY[id]) { assert.ok(d.props.length >= 3 && d.propP > 0, d.id); for (const k of d.props) assert.equal(typeof PROP[k], 'function', d.id + ' ' + k); }
+  for (const k of Object.keys(PROP)) assert.doesNotThrow(() => PROP[k](c), k);
+});
+test('città: segni sull\'asfalto solo per città che esistono', () => {
+  for (const id of Object.keys(ROAD)) assert.ok(CITY[id], id);
+  assert.ok(ROAD.londra && ROAD.roma && ROAD.washington);
+});
+test('città: i particolari di facciata usati dagli stili esistono (targhe, bandiere, ecc.)', () => {
+  const s = new SD(); const D = { words: ['BAR'], neon: ['#fff'], signP: 1, flick: 0 };
+  for (const id of Object.keys(FAC)) { const P = FAC[id]; if (P.ex && P.ex.includes('plate')) assert.ok(P.plate && P.plate[2].length >= 3, id); if (P.ex && P.ex.includes('flag')) assert.ok(P.flag, id);
+    for (let k = 0; k < 12; k++) assert.doesNotThrow(() => s.cityFacade(id, (n) => SD.rnd(k * 3.3 + n), D), id); }
 });
