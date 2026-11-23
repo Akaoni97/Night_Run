@@ -13,16 +13,17 @@
   css.textContent = '.prompt:not([hidden]){z-index:80}.nr-leg-off{visibility:hidden!important}';
   document.head.appendChild(css);
 
-  const vis = (el) => { if (!el || el.hidden) return null; const s = getComputedStyle(el); if (s.display === 'none' || s.visibility === 'hidden' || +s.opacity < 0.05) return null;
+  const vis = (el, masked = false) => { if (!el || el.hidden) return null; const s = getComputedStyle(el); if (s.display === 'none' || (!masked && s.visibility === 'hidden') || +s.opacity < 0.05) return null;
     const r = el.getBoundingClientRect(); return r.width > 2 && r.height > 2 ? r : null; };
   const hit = (a, b, m = 4) => a && b && a.left < b.right + m && b.left < a.right + m && a.top < b.bottom + m && b.top < a.bottom + m;
   // il riquadro "vero" degli avvisi: la loro colonna, non tutto il contenitore
-  const box = (el) => { if (!el) return null; if (el.id === 'toasts') { let r = null; for (const c of el.children) { const q = vis(c); if (!q) continue; r = r ? { left: Math.min(r.left, q.left), right: Math.max(r.right, q.right), top: Math.min(r.top, q.top), bottom: Math.max(r.bottom, q.bottom) } : { left: q.left, right: q.right, top: q.top, bottom: q.bottom }; } return r; } return vis(el); };
-  const shift = new Map();
+  const box = (el, masked) => { if (el.id === 'toasts') { let r = null; for (const c of el.children) { const q = vis(c, masked); if (!q) continue; r = r ? { left: Math.min(r.left, q.left), right: Math.max(r.right, q.right), top: Math.min(r.top, q.top), bottom: Math.max(r.bottom, q.bottom) } : { left: q.left, right: q.right, top: q.top, bottom: q.bottom }; } return r; } return vis(el, masked); };
+  const shift = new WeakMap();
   const set = (el, dy, off) => {
+    const prev = shift.get(el);
+    if ((prev?.dy || 0) !== dy) el.style.translate = dy ? `0 ${dy}px` : '';
+    if ((prev?.off || false) !== off) el.classList.toggle('nr-leg-off', off);
     shift.set(el, { dy, off });
-    el.style.translate = dy ? `0 ${Math.round(dy)}px` : '';
-    el.classList.toggle('nr-leg-off', off);
   };
   setInterval(() => {
     const prompt = document.getElementById('promptBox'), msg = document.getElementById('msg'), toasts = document.getElementById('toasts'), tel = document.querySelector('.tel-toast');
@@ -30,10 +31,13 @@
     const order = [msg, tel, toasts].filter(Boolean);
     const pR = vis(prompt), H = window.innerHeight;
     const fixed = pR ? [pR] : [];
-    for (const el of order) {
-      el.style.translate = ''; el.classList.remove('nr-leg-off');            // misura dove starebbe da solo
-      let r = box(el);
-      if (!r) { shift.delete(el); continue; }
+    // Prima tutte le misure. La posizione di partenza si ricava dallo spostamento già applicato.
+    const measures = order.map((el) => {
+      const prev = shift.get(el), r = box(el, prev?.off), dy = prev?.dy || 0;
+      return { el, r: r && { left: r.left, right: r.right, top: r.top - dy, bottom: r.bottom - dy } };
+    });
+    for (const { el, r } of measures) {
+      if (!r) { set(el, 0, false); continue; }
       let dy = 0, off = false;
       for (let k = 0; k < 4; k++) {
         const over = fixed.find((f) => hit({ left: r.left, right: r.right, top: r.top + dy, bottom: r.bottom + dy }, f));
@@ -43,7 +47,7 @@
       }
       if (!off && r.bottom + dy > H - 4) off = true;
       if (!off && pR && hit({ left: r.left, right: r.right, top: r.top + dy, bottom: r.bottom + dy }, pR)) off = true;
-      set(el, off ? 0 : dy, off);
+      set(el, off ? 0 : Math.round(dy), off);
       if (!off) fixed.push({ left: r.left, right: r.right, top: r.top + dy, bottom: r.bottom + dy });
     }
   }, 200);

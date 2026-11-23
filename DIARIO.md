@@ -1,3 +1,7 @@
+## 23/11/2026 · proprietario · v0.117 (**più fluidità con fiammate e scritte**)
+- Alleggerito il disegno di fiammate, aloni, fumo e fumetti. Le scritte riusano il disegno delle lettere, e gli avvisi misurano la loro posizione prima di spostarsi.
+- Frequenza e durata degli scoppi, impostazioni del motore e suono restano quelli della preparazione. Provati i 397 test e il disegno nel browser a densità doppia e semplice.
+
 ## 23/11/2026 · proprietario (Nico) · v0.116 (**video: la 205 e la Golf tirano le marce lunghe**)
 - Nel video «di serie e preparate» la 205 e la Golf preparate facevano un rumore strano: sono a trazione anteriore con 700-800 CV, da fermi il controllo di trazione tagliava il gas quasi sempre e il motore restava a un regime quasi fisso. Ora fanno le sgasate da ferme e poi una tirata in marcia (2ª, 3ª, 4ª, 5ª a gas pieno, i giri salgono e scendono a ogni cambiata), tagliata prima del limitatore in ultima (`mode: 'tira'` in `strumenti/reel/preparate.js`).
 - Solo per il video: nelle due tirate le gomme hanno +80 % di aderenza (`grip` nella ripresa), il gioco non cambia. La BMW è rimasta com'era.

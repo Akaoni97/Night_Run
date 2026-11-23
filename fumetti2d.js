@@ -58,8 +58,63 @@
   };
 
   // ---------------------------------------------------------------- disegnare
+  const OUTLINE = [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [1, -1], [-1, 1], [2, 2]];
+  function comicText(view, g, c, ink, x, y, w, h, sz, u) {
+    if (c.shadow) view.text(g, c.text, x + u, y + u, c.shadow, sz);
+    for (const [ox, oy] of OUTLINE) view.text(g, c.text, x + ox * u, y + oy * u, ink, sz);
+    view.text(g, c.text, x, y, c.col, sz);
+    if (c.col2) { g.save(); g.beginPath(); g.rect(x - 4, y + Math.round(h * 0.55), w + 8, h); g.clip(); view.text(g, c.text, x, y, c.col2, sz); g.restore(); }
+    g.save(); g.beginPath(); g.rect(x - 4, y - 1, w + 8, Math.max(1, Math.round(h * 0.3))); g.clip(); view.text(g, c.text, x, y, 'rgba(255,255,255,.45)', sz); g.restore();
+  }
+
+  const comicWords = new Map(), MAX_WORD_PIXELS = 1_000_000;
+  const comicDots = new Map();
+  let wordPixels = 0;
+  function comicWord(view, c, ink, w, h, sz, u, density) {
+    const key = JSON.stringify([c.text, c.col, c.col2, c.shadow, ink, sz, density]);
+    let word = comicWords.get(key);
+    if (word) {
+      comicWords.delete(key);
+      comicWords.set(key, word);
+      return word;
+    }
+    const pad = 2 * u + 2, width = Math.ceil((w + pad * 2) * density), height = (h + pad * 2) * density;
+    const pixels = width * height;
+    if (pixels > MAX_WORD_PIXELS) return null;
+    while (wordPixels + pixels > MAX_WORD_PIXELS) {
+      const oldest = comicWords.keys().next().value;
+      const image = comicWords.get(oldest).image;
+      wordPixels -= image.width * image.height;
+      comicWords.delete(oldest);
+    }
+    const image = document.createElement('canvas'); image.width = width; image.height = height;
+    const g = image.getContext('2d'); g.scale(density, density);
+    comicText(view, g, c, ink, pad, pad, w, h, sz, u);
+    word = { image, pad };
+    comicWords.set(key, word);
+    wordPixels += pixels;
+    return word;
+  }
+
+  function burstDots(radius) {
+    let dots = comicDots.get(radius);
+    if (dots) return dots;
+    dots = new Path2D();
+    for (let y = -radius; y < radius; y += 4) {
+      const stagger = ((y / 4) & 1) ? 2 : 0;
+      for (let x = -radius; x < radius; x += 4) {
+        if (x + y * 1.4 > radius * 0.2) dots.rect(x + stagger, y * 0.62, 2, 2);
+      }
+    }
+    if (comicDots.size >= 32) comicDots.delete(comicDots.keys().next().value);
+    comicDots.set(radius, dots);
+    return dots;
+  }
+
   P.drawComics = function (g, dt) {
+    if (!this.comics.length) return;
     const ink = this.C.ink;
+    const density = this.SS > 1 && this.sharp !== false && this.quality !== 'bassa' && this.quality !== 'leggera' && g.getTransform().a >= 1.99 ? 2 : 1;
     for (const c of this.comics) {
       c.t += dt;
       if (c.t < 0) continue;                                                   // scritta ritardata (l'eco dell'urto)
@@ -83,11 +138,13 @@
 
       // ---- testo: contorno, ombra colorata, colore, seconda tinta in basso e riflesso in alto
       const x0 = cx - Math.round(w / 2), y0 = cy - Math.round(hh / 2), u = Math.max(1, sz >> 1);
-      if (c.shadow) this.text(g, c.text, x0 + u, y0 + u, c.shadow, sz);
-      for (const [ox, oy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [1, -1], [-1, 1], [2, 2]]) this.text(g, c.text, x0 + ox * u, y0 + oy * u, ink, sz);
-      this.text(g, c.text, x0, y0, c.col, sz);
-      if (c.col2) { g.save(); g.beginPath(); g.rect(x0 - 4, y0 + Math.round(hh * 0.55), w + 8, hh); g.clip(); this.text(g, c.text, x0, y0, c.col2, sz); g.restore(); }
-      g.save(); g.beginPath(); g.rect(x0 - 4, y0 - 1, w + 8, Math.max(1, Math.round(hh * 0.3))); g.clip(); this.text(g, c.text, x0, y0, 'rgba(255,255,255,.45)', sz); g.restore();
+      // Durante la dissolvenza gli strati continuano a fondersi uno per volta, come nel disegno originale.
+      const word = g.globalAlpha === 1 ? comicWord(this, c, ink, w, hh, sz, u, density) : null;
+      if (word) {
+        const { image, pad } = word;
+        g.imageSmoothingEnabled = false;
+        g.drawImage(image, x0 - pad, y0 - pad, image.width / density, image.height / density);
+      } else comicText(this, g, c, ink, x0, y0, w, hh, sz, u);
       g.restore();
     }
     this.comics = this.comics.filter((c) => c.t < c.life);
@@ -108,7 +165,8 @@
     g.fillStyle = c.burst; path(R1, R2, 0); g.fill();
     g.save(); path(R1, R2, 0); g.clip();                                       // retino: puntini più scuri in basso a destra
     g.fillStyle = Street2D.shade ? Street2D.shade(c.burst, -0.22) : 'rgba(0,0,0,.2)';
-    for (let yy = -R1; yy < R1; yy += 4) for (let xx = -R1; xx < R1; xx += 4) if (xx + yy * 1.4 > R1 * 0.2) g.fillRect(cx + xx + (((yy / 4) & 1) ? 2 : 0), cy + yy * flat, 2, 2);
+    g.translate(cx, cy);
+    g.fill(burstDots(R1));
     g.restore();
     g.fillStyle = '#fff6c2'; path(R1 * 0.55, R2 * 0.55, 0); g.fill();
     if (c.t < 0.06) { g.fillStyle = 'rgba(255,255,255,.85)'; path(R1 * 0.9, R2 * 0.9, 0); g.fill(); }   // lampo del primo istante
