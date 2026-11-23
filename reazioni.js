@@ -1,28 +1,65 @@
 // ============================================================================
 //  Night Run · Reazioni del protagonista (dopo fumetti2d.js, meteo2d.js e sensi.js, v0.119)
 //  Il protagonista si accorge di quello che fa la macchina e ci reagisce: quando accelera forte, fa un launch, sorpassa, quando
-//  lo scarico spara o il motore canta al limitatore, sopra la sua testa esce una nuvoletta di pensiero in pixel art («WOW!»,
-//  «ANCORA!»...) e in faccia gli si legge lo stupore (occhi grandi, bocca aperta: `awe` di pgDriver in personaggio.js).
+//  lo scarico spara o il motore canta al limitatore, sopra la sua testa esce una vignetta in pixel art e in faccia gli si legge
+//  lo stupore (occhi grandi, bocca aperta: `awe` di pgDriver in personaggio.js).
+//  v0.124 (deciso da Luca): **niente parole, solo versi** che imitano la macchina, come un bambino che fa il motore: secondo il
+//  momento e il suono vero dell'auto (famiglia del motore in `REA_FAM`: tre cilindri «TRATRATRA», diesel «BRUUU», sei
+//  cilindri «UUUAAAH»...) e gli scoppi secondo quanto è preparata (`REA_BOTTO`: POP! → PUPUPU! → TRATATAN!). Le lettere escono
+//  una alla volta come se le dicesse, ballano e negli urli tremano; scoppi, limitatore e partenze hanno la vignetta a punte.
 //  Si spegne con Impostazioni → Grafica → Grafiche anime (`street2d.comicsOn`, come le scritte da fumetto).
-//  Parte pura (provata in test/reazioni.test.js): REA_LINES, reaPick, reaAccelStep. Disegno: agganciato a Street2D.drawComics.
+//  Parte pura (provata in test/reazioni.test.js): REA_LINES, REA_FAM, REA_BOTTO, reaFam, reaPick, reaAccelStep. Disegno: agganciato a Street2D.drawComics.
 //  La posizione della testa la scrive pilota2d.js (`_drvHead`), la faccia legge `_rea.awe`.
 //  Prova a mano: `nightRun.view2d.reaSay('accel')` (tipi: accel, launch1, launch2, sorpasso, botto, giri, turbo).
 // ============================================================================
-// frasi per tipo di momento (maiuscole senza accenti: il carattere a pixel non li ha; '|' = a capo, al massimo due righe di 12 lettere)
+// versi per tipo di momento (maiuscole senza accenti: il carattere a pixel non li ha; '|' = a capo, al massimo due righe di 12 lettere).
+// Solo versi, niente parole: sono quelli di base (un quattro cilindri sportivo); REA_FAM li cambia secondo il motore.
 const REA_LINES = {
-  accel: ['WOW!', 'ANCORA!', 'CHE SPINTA!', 'SI VOLA!', 'SIII!', 'SPETTACOLO!', 'MI INCOLLA|AL SEDILE!', 'CHE FORZA!', 'ANCORA,|ANCORA!'],
-  launch1: ['PRONTI...', 'ORA SI|PARTE!', 'CARICA!', 'TIENITI|FORTE!'],
-  launch2: ['VIA!', 'CHE|PARTENZA!', 'VOLA!', 'SIIII!'],
-  sorpasso: ['SORPASSO!', 'CIAO CIAO!', 'TI SALUTO!', 'VIA DI QUI!', 'ADDIO!'],
-  botto: ['CHE BOTTI!', 'SENTI CHE|SUONO!', 'CHE CATTIVO!', 'AHAH!', 'CHE|MUSICA!'],
-  giri: ['ANCORA GIRI!', 'CHE URLO!', 'CANTA!', 'SENTILO|CANTARE!'],
-  turbo: ['SENTI IL|TURBO!', 'CHE FISCHIO!', 'ARIA!', 'IL TURBO|SOFFIA!'],
+  accel: ['VRAAAAM!', 'VRRRAAAA|AAAAM!', 'NYAAAAAA!', 'BRAAAAP!'],
+  launch1: ['BRA BRA|BRAAAA!', 'TA-TA-TA-TA!', 'NGA NGA NGA!', 'BRAP BRAP!'],
+  launch2: ['VRUUUUUM!', 'ZOOOOOOM!', 'NYAAAAAAA!', 'SKRIIIIII!'],
+  sorpasso: ['ZIIIUUUM!', 'FIUUUUUN!', 'NYOOOOM!', 'FSSSSHUM!'],
+  botto: ['PUPUPU!', 'PA-PA-PAM!', 'POP POP!', 'PUPU-PAM!'],
+  giri: ['TATATATA!', 'RA-RA-RA-RA!', 'BRRAP BRRAP!', 'NGNGNGNG!'],
+  turbo: ['FIIIUUUU!', 'PSSSSHHH!', 'STUTUTUTU!', 'FIIIISSSH!'],
 };
+// il verso cambia col motore (famiglia di suoni.js, o cilindri e alimentazione per le auto fatte a mano)
+const REA_FAM = {
+  citta: { accel: ['NIIIIIII!', 'VIIIIUUU!', 'NYEEEEEE!', 'ZIIIIII!'], giri: ['NI-NI-NI-NI!', 'NENENENE!'] },
+  berlina: { accel: ['VUUUUUM!', 'BROOOOOM!', 'VROOOOOM!'], giri: ['BRO-BRO-BRO!', 'VU-VU-VU-VU!'] },
+  tre: { accel: ['TRRRRAAA!', 'BRRRRRRR!', 'TRATRATRA!', 'GRRRRAAA!'], giri: ['TRA-TRA-TRA!', 'TRTRTRTR!'] },
+  turbo: { accel: ['VRUUU|FIIIUUU!', 'SSSHVROOOM!', 'FSSSS|VRAAAM!'] },
+  cinque: { accel: ['UOOOOOAAA!', 'BWAAAAAAH!', 'WRAAOOOOW!'], giri: ['UA-UA-UA-UA!', 'BWABWABWA!'] },
+  sei: { accel: ['UUUAAAAAAH!', 'NGAAAAAAA!', 'AAAOOOOWW!'], giri: ['AAAAAAAA!', 'NGA-NGA-NGA!'] },
+  diesel: { accel: ['BRUUUUUU!', 'TOCTOCTOC|BRUUU!', 'BRRROOOO!'], giri: ['BRU-BRU-BRU!', 'TOC-TOC-TOC!'], botto: ['PUF!', 'TOC!'] },
+  bus: { accel: ['BRUUUUUUM!', 'FSSHH|BRUUUUM!'], giri: ['BRU-BRU-BRU!'], botto: ['PUF!', 'PFFF!'] },
+};
+// gli scoppi secondo quanto è preparata l'auto (flameTier di fiamme.js: 0 leggera, 1 media, 2 spinta)
+const REA_BOTTO = [['POP!', 'PUP!', 'TOC!', 'POC!'], ['PUPUPU!', 'PA-PA-PAM!', 'POP POP!', 'PUPU-PAM!'], ['TRATATAN!', 'TARATARATA!', 'BAM BAM BAM!', 'TATATA-BAM!']];
 // colore del testo per tipo
 const REA_COL = { accel: '#d6261c', launch1: '#e8590c', launch2: '#d6261c', sorpasso: '#1c6fd6', botto: '#c97a00', giri: '#7a2bd6', turbo: '#0a8f8f' };
-// una frase a caso del tipo, mai uguale alla precedente. rnd = numero casuale in [0, 1)
-function reaPick(tipo, prev, rnd) {
-  const v = REA_LINES[tipo]; if (!v) return null;
+// vignetta a punte (urlo) per questi momenti
+const REA_URLO = { botto: 1, giri: 1, launch2: 1 };
+// la famiglia del verso per un'auto (c = CARS[id])
+function reaFam(id, c) {
+  if (!c) return id === 'supra' ? 'sei' : null;
+  if (c.sound && REA_FAM[c.sound]) return c.sound;
+  if (id === 'supra' || c.cyl === 6) return 'sei';
+  if (c.diesel) return 'diesel';
+  if (c.cyl === 5) return 'cinque';
+  if (c.cyl === 3) return 'tre';
+  return null;
+}
+// l'elenco dei versi per un momento: dal motore (fam), per gli scoppi dalla preparazione (tier)
+function reaVersi(tipo, fam, tier) {
+  const F = fam && REA_FAM[fam];
+  if (F && F[tipo]) return F[tipo];
+  if (tipo === 'botto' && tier != null) return REA_BOTTO[Math.max(0, Math.min(2, tier | 0))];
+  return REA_LINES[tipo];
+}
+// un verso a caso del tipo, mai uguale al precedente. rnd = numero casuale in [0, 1)
+function reaPick(tipo, prev, rnd, fam, tier) {
+  const v = reaVersi(tipo, fam, tier); if (!v) return null;
   let i = Math.floor((rnd == null ? Math.random() : rnd) * v.length) % v.length;
   if (v.length > 1 && v[i] === prev) i = (i + 1) % v.length;
   return v[i];
@@ -48,9 +85,11 @@ function reaAccelStep(S, v, dt) {
     const R = stato(this);
     if (!force && (R.cd > 0 || R.cat[tipo] > 0 || R.bub)) return false;
     if (!force && Math.random() > 0.8) { R.cat[tipo] = 4; return false; }        // non sempre: a volte tace
-    const txt = reaPick(tipo, R.last[tipo]); if (!txt) return false;
+    const NR = typeof window !== 'undefined' && window.nightRun, id = NR && NR.game && NR.game.car;
+    let tier = null; try { tier = NR && NR.exh ? NR.exh().tier : null; } catch (e) { tier = null; }
+    const txt = reaPick(tipo, R.last[tipo], null, reaFam(id, typeof CARS !== 'undefined' && CARS[id]), tier); if (!txt) return false;
     R.last[tipo] = txt; R.cat[tipo] = REA.cat[tipo] || 15; R.cd = REA.cdAll + Math.random() * 4;
-    R.bub = { t: 0, life: 1.9 + txt.length * 0.03, lines: txt.split('|'), tipo, j: Math.random() * 6.28 };
+    R.bub = { t: 0, life: 2.1 + txt.length * 0.04, lines: txt.split('|'), tipo, j: Math.random() * 6.28, n: txt.replace('|', '').length, urlo: !!REA_URLO[tipo], forte: tier === 2 };
     R.awe = Math.max(R.awe, awe == null ? 1 : awe);
     return true;
   };
@@ -104,22 +143,50 @@ function reaAccelStep(S, v, dt) {
     const bx = Math.round(hx + 6), by = Math.round(hy - 28 - h / 2 + bob);                        // centro della nuvoletta, sopra il tetto
     g.save(); g.globalAlpha = fade; g.globalCompositeOperation = 'source-over';
     if (typeof window !== 'undefined' && window.__reaDbg) { g.fillStyle = '#f0f'; g.fillRect(Math.round(hx) - 1, Math.round(hy) - 1, 3, 3); }
-    // coda: tre cerchi che salgono dalla testa
-    const tail = [[hx + 2, hy - 7, 1.5], [hx + 3.5, hy - 13, 2.2], [hx + 5, hy - 20, 3]];
-    for (const [tx, ty, r] of tail) disc(g, tx, ty + bob * 0.4, Math.round(r * k) + 1, ink);
-    for (const [tx, ty, r] of tail) disc(g, tx, ty + bob * 0.4, Math.round(r * k), '#fff8e8');
-    // nuvoletta: scatola a spigoli smussati, scala dal centro
-    const ww = Math.round(w * k), hh = Math.round(h * k), x0 = Math.round(bx - ww / 2), y0 = Math.round(by - hh / 2);
+    // nuvoletta: scatola a spigoli smussati, scala dal centro (negli urli trema un po')
+    const sh = b.urlo && b.t < b.life - 0.3 ? Math.round(Math.sin(b.t * 47 + b.j) * (b.forte ? 1.3 : 0.8)) : 0;
+    const ww = Math.round(w * k), hh = Math.round(h * k), x0 = Math.round(bx - ww / 2) + sh, y0 = Math.round(by - hh / 2);
     const box = (xx, yy, w2, h2, col) => { g.fillStyle = col; g.fillRect(xx + 2, yy, w2 - 4, h2); g.fillRect(xx, yy + 2, w2, h2 - 4); g.fillRect(xx + 1, yy + 1, w2 - 2, h2 - 2); };
-    box(x0 - 1, y0 - 1, ww + 2, hh + 2, ink); box(x0, y0, ww, hh, '#fff8e8');
+    // punte dell'urlo: triangoli a pixel intorno alla scatola, prima il contorno poi il fondo
+    const punta = (cx, cy, an, len, wd, col) => {
+      g.fillStyle = col; const ca = Math.cos(an), sa = Math.sin(an);
+      for (let d = 0; d <= len; d++) { const r = Math.max(0, Math.round(wd * (1 - d / len))); g.fillRect(Math.round(cx + ca * d - r), Math.round(cy + sa * d - r), 2 * r + 1, 2 * r + 1); }
+    };
+    const punte = [];
+    if (b.urlo) {
+      const n = 9, rx = ww / 2, ry = hh / 2;
+      for (let i = 0; i < n; i++) {
+        const an = (i / n) * Math.PI * 2 + 0.3 + Math.sin(b.t * 9 + i) * 0.04;
+        if (an % (Math.PI * 2) > 1.55 && an % (Math.PI * 2) < 2.35) continue;                  // lascia libero dove esce la coda
+        const ex = Math.cos(an), ey = Math.sin(an), sc2 = Math.min(rx / Math.max(0.01, Math.abs(ex)), ry / Math.max(0.01, Math.abs(ey)));
+        punte.push([bx + sh + ex * sc2 * 0.85, by + ey * sc2 * 0.85, an, (5 + (i % 2) * 3 + (b.forte ? 2 : 0)) * k, 2.4 * k]);
+      }
+    }
+    // coda a punta verso la testa (è lui che fa il verso)
+    const coda = (col, o) => { g.fillStyle = col; const ax = bx - ww * 0.18, ay = y0 + hh - 1; for (let d = 0; d <= 1; d += 1 / 16) { const x = ax + (hx + 3 - ax) * d, y = ay + (hy - 6 - ay) * d, r = Math.round((1 - d) * 3 * k) + o; g.fillRect(Math.round(x - r), Math.round(y - r / 2), 2 * r + 1, Math.max(1, r)); } };
+    for (const p of punte) punta(p[0], p[1], p[2], p[3] + 1, p[4] + 1, ink);
+    coda(ink, 1); box(x0 - 1, y0 - 1, ww + 2, hh + 2, ink);
+    const fondo = b.urlo ? (b.forte ? '#fff2a8' : '#fff6d0') : '#fff8e8';
+    for (const p of punte) punta(p[0], p[1], p[2], p[3], p[4], fondo);
+    coda(fondo, 0); box(x0, y0, ww, hh, fondo);
     g.fillStyle = '#e9dcc0'; g.fillRect(x0 + 2, y0 + hh - 2, ww - 4, 1);                         // ombra sotto
-    // raggi d'entusiasmo nel primo istante
-    if (b.t < 0.45) { g.fillStyle = ink; const rr = 3 + b.t * 14; for (let i = 0; i < 6; i++) { const an = -Math.PI * (0.1 + i * 0.16); g.fillRect(Math.round(bx + Math.cos(an) * (ww / 2 + rr)), Math.round(by + Math.sin(an) * (hh / 2 + rr)), 2, 2); } }
+    // raggi d'entusiasmo nel primo istante (non negli urli: hanno già le punte)
+    if (!b.urlo && b.t < 0.45) { g.fillStyle = ink; const rr = 3 + b.t * 14; for (let i = 0; i < 6; i++) { const an = -Math.PI * (0.1 + i * 0.16); g.fillRect(Math.round(bx + Math.cos(an) * (ww / 2 + rr)), Math.round(by + Math.sin(an) * (hh / 2 + rr)), 2, 2); } }
     if (k > 0.9) {
-      const col = REA_COL[b.tipo] || '#d6261c';
-      b.lines.forEach((l, i) => {
-        const tx = Math.round(bx - this.textW(l, sc) / 2), ty = y0 + pad + i * lh;
-        this.text(g, l, tx + 1, ty + 1, '#1a1520', sc); this.text(g, l, tx, ty, col, sc);
+      // le lettere escono una alla volta come se le dicesse, e ballano; negli urli tremano
+      const col = REA_COL[b.tipo] || '#d6261c', vis = Math.floor(b.t * 24) + 2, amp = b.urlo ? 1.6 : 1;
+      let n = 0;
+      b.lines.forEach((l, li) => {
+        const tx = Math.round(bx - this.textW(l, sc) / 2) + sh, ty = y0 + pad + li * lh;
+        for (let i = 0; i < l.length; i++, n++) {
+          if (n >= vis) return;
+          const ch = l[i]; if (ch === ' ') continue;
+          const fresh = vis - n <= 2 ? -1 : 0;                                                   // l'ultima lettera uscita salta su
+          const dy = Math.round(Math.sin(b.t * 11 - n * 0.8) * amp) + fresh + (b.urlo ? Math.round(Math.sin(b.t * 53 + n * 2.1) * 0.6) : 0);
+          const c2 = b.forte && b.tipo === 'botto' && n % 2 ? '#e8590c' : col;
+          const cx = tx + i * 4 * sc;
+          this.text(g, ch, cx + 1, ty + 1 + dy, '#1a1520', sc); this.text(g, ch, cx, ty + dy, c2, sc);
+        }
       });
     }
     g.restore();
@@ -131,4 +198,4 @@ function reaAccelStep(S, v, dt) {
     return prev.call(this, g, dt);
   };
 })();
-if (typeof window !== 'undefined') Object.assign(window, { REA_LINES, REA_COL, reaPick, reaAccelStep });
+if (typeof window !== 'undefined') Object.assign(window, { REA_LINES, REA_FAM, REA_BOTTO, REA_COL, reaFam, reaPick, reaAccelStep });

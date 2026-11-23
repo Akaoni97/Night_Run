@@ -9,6 +9,10 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**23/11 notte (Luca)**: approvati e tolti 1, 2, 3, 4, 8, 9, 12, 17, 19, 23; il 25 fatto come chiesto (vignette a versi, v0.126). Nuovo il 26 (schermata iniziale al telefono, staccata dal 19). Gli altri numeri non cambiano.
+
+**23/11 sera, check (Luca con Claude)**: il 19 cambia (ora è la schermata iniziale con la chiave, col problema del telefono); nuovi il 24 (capitali da guardare) e il 25 (fiamme, marmitta, nuvolette, vapore). Nessun altro numero è cambiato.
+
 **22/11 sera, decisioni (Nico)**: 1-4 si provano stasera giocando; 5 sì come l'ha proposto Luca; 6 da provare; media dopo; bassa decisa (vedi 14-16). Numeri invariati.
 
 **22/11 sera, check (Nico)**: nuovi il 5 (anomalie, decidi tu) e il 6 (la notte); dal vecchio 5 in poi tutto scala di due (il 5 ora è il 7... il 17 è il 19).
@@ -21,17 +25,6 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Priorità alta · cose nuove non ancora verificate (si fanno prima)
 
-### Suono
-1. [suono] **Suoni diversi per ogni auto, scarichi a cinque livelli e collettore** (v0.79-v0.80, `suoni.js`): famiglie città, berlina, sportiva, tricilindrico, turbo, cinque cilindri, diesel, autobus; scarichi originale / terminale / catback / senza centrale / da gara; cat a 400, 200 e 100 celle e decat che alzano il tono e rendono il suono più cattivo. Misurati ma **non ascoltati**: da sentire sul PC auto per auto (passi tra un livello e l'altro, «cattivo» del tubolare e del decat, volumi). Manca il fischio del turbo sulle auto col turbo di serie. (tutti e due)
-2. [suono] **Campioni dei pezzi** (v0.78, rifatti meno robotici nella v0.83 su richiesta di Luca e corretti nella v0.84 perché a Nico sembravano stridii, `strumenti/campioni_pezzi.py`): 42 kit fatti a codice. Prima i botti e i fischi erano toni puri («da tastiera»); ora i botti sono aria che risuona nel tubo, i fischi aria intonata che ondeggia, i «tu-tu» sbuffi; volumi percepiti come prima. Misurati ma **non ascoltati** da Claude: da sentire sul PC in cuffia. Confronto pronto: prima e dopo, kit per kit e dentro il gioco con V40 e Golf (file mandati a Nico il 22/11). Se ancora non convincono si torna ai file della v0.78. Se un kit è ancora finto: si ritocca la sua ricetta (`POPS`, `BANGP`, `FLUP`, `BOVP`, anelli) e il livello in `LIVELLO`. (cognato, Luca)
-
-### Guida
-3. [guida] **Fisica e trazione vere delle auto da disegno** (v0.86, `GEN_TELAIO` in `cars.js`): passo, baricentro, peso sull'asse motore, gomme e ruote di ogni auto; velocità massime vere. Da provare guidando sul PC (partenze, frenate, piccole contro grosse). Rapporti veri del cambio per tutte le auto da disegno (v0.87 e v0.88, ricerca di Codex); restano coi cambi comuni solo i mezzi generici. (proprietario)
-
-### Officina
-4. [officina] **Rimborso di Nico**: chi aveva speso dal vecchio Nico (livelli, pezzi, motori costruiti) riceve i soldi una
-    volta sola, con un messaggio di Luca (`offPistoneRimborso`). Controllare messaggio e conti su una partita vera. (tutti e due)
-
 ### Notte e storia
 5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
@@ -40,8 +33,6 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ### Officina
 7. [officina] **Officina nuova** (Modifiche e Swap motore), **assetto a livelli**, **pezzi nuovi della V40 e pallini verde/rosso** (verde monta, rosso compra): CV, prezzi e km tarati a occhio; la preparazione «Drag 450» arriva a ~520 CV. **Vendita**: un'auto elaborata vale metà di quello speso in pezzi e swap (v0.74, `DL.modPezzi`, `DL.modSwap`): giusto? (tutti e due)
-8. [officina] **Schede tecniche e pezzi per ogni auto** (v0.66, `schede.js`): ogni auto ha motore, cilindri e potenza veri e i suoi pezzi (diesel senza camme e downpipe, tricilindrici Polo/Clio/308, reparto speciale a due livelli). Provata a vista solo la V40; le altre auto col catalogo nuovo vanno aperte da Luca e guardate (prezzi, km e rese sono tarati a occhio). (tutti e due)
-9. [officina] **Voci della scheda da rivedere**: la V40 dice 140 CV a 5500 (vero) mentre il riquadro dell'officina ne stima 140 a 6000; l'autobus ha 390 CV perché la curva del gioco li dà (la scheda segue il gioco). Il turbo di serie di A3, 308, Clio, 850 R e diesel è già dentro la curva: i kit turbo si aggiungono sopra. (proprietario)
 10. [officina] **Idee di Codex NON fatte** (file Night_Run_Tuning_per_Claude, 21/11): pressione fissa / manuale / elettronica con due profili Strada e Spinta; tre turbo «Pronto / Stradale / Allungo» rifatti su ogni auto con la loro risposta e un limite di portata agli alti; anteprima dell'altezza che muove subito l'auto mentre trascini; barre di erogazione bassi/medi/alti; freni a tre livelli; confronto della risposta (non solo dei picchi). Sono lavori grossi: quali ci interessano? (tutti e due)
 10b. [officina] **Potenze al massimo dei pezzi** (controllo dei motori, v0.104): ogni pezzo da solo dà un guadagno
    sensato, ma si moltiplicano tutti senza freno: E36 1.393 CV, E34 1.532, A112 da 70 a 595 (×8,5). Si mette un
@@ -52,7 +43,6 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
    tastiera, garage vero, diario con mappa e foto, confronto prima/dopo sui pezzi. Quali e in
    che ordine? (proprietario)
 ### Personaggi e storia
-12. [personaggi] **Aspetto dei personaggi** (v0.76): Nico giovane con canotta, braccia tatuate, catenina e occhiali da sole (anche sul furgone del soccorso); Tito vecchio e pazzo (capelli bianchi sparati, occhi sbarrati, ghigno); Rocco fisicato (spalle larghe, canotta, catenina); Massimo barbone (berretto, barba lunga, toppe, bottiglia). Da guardare sul PC. (tutti e due)
 13. [storia] **Testi segnaposto**: pensieri (`pensieri.js`), prologo (`PRO_LETTERA`, `PRO_NOTAIO`), finali A, C, D
    (`STORIA_EPI`, scritti da Claude). Chi li riscrive e quando? (cognato)
 
@@ -65,12 +55,15 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Da guardare · arrivati il 22/11 (Nico)
 
-### Disegni del proprietario
-17. [disegni] **Auto e camion nuovi** (v0.82): le 25 auto da disegno rifatte dai disegni ad alta definizione con le ruote disegnate a parte, versioni tuning col «Kit completo» di Russian Kùstòm (€ 1.600), 12 mezzi pesanti nel traffico (autoarticolati, cisterna, bisarca, portacontainer con 7 livree, carro attrezzi, che fa anche il traino di Nico). Da guardare sul PC: guidatore nei finestrini, colore delle auto ridipinte, quanti camion ci sono in autostrada. (tutti e due)
-
 18. [prologo] **Prologo nuovo** (v0.98): stessa risoluzione del gioco, arrivo sotto la pioggia, studio, garage con le auto una alla volta, autostrada. Da guardare sul PC: ritmo dell'arrivo (14 s) e volume della pioggia. (proprietario)
-19. [menu] **Schermata iniziale col quadro fermo** (v0.103): piace così? (proprietario)
 20. [menu] **Tre salvataggi** (v0.101): da provare anche nel programma per Windows. Gli avvisi a destra sulla schermata iniziale: sistemato nel check del 23/11 (v0.108), aspettano. (proprietario)
+
+## Da guardare · arrivati il 23/11
+
+24. [città] **Capitali con l'aspetto delle città vere** (v0.112-v0.114): palazzi, insegne, quartieri, oggetti del marciapiede, bandiere e 28 monumenti ad alta definizione. Roma guardata nel check (quartiere EUR): a posto. Le altre da guardare sul PC. (tutti e due)
+25. [grafica] **Fiamme, marmitta e reazioni** (vignette rifatte a soli versi nella v0.126, chiesto da Luca) (v0.117-v0.120): fiamme dal punto vero dello scarico e allineate al terminale, marmitta che si arroventa ai giri alti (Luca), protagonista in pixel art con le nuvolette di pensiero (WOW!, SORPASSO!...), vapore dai tombini e dai ramen, fari che si specchiano sul bagnato, locali dietro i passanti (Nico). Da guardare guidando sul PC: le nuvolette ogni 7-11 s sono troppe? (tutti e due)
+
+26. [telefono] **Schermata iniziale tagliata al telefono in orizzontale**: chiave, «Accendi e parti» e partite 2 e 3 escono a destra (Pixel 7 e iPhone 13, check del 23/11; da ricontrollare dopo la v0.125). Il gioco si prova anche dal telefono. (proprietario)
 
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
@@ -83,11 +76,9 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Proposte nuove
 
-23. [storia] **Le dodici capitali** (proposta in `docs/storia/PROPOSTA_CITTA.md`): (la cosa da vedere per città è FATTA, v0.112) collegamenti diversi, un momento forte per le capitali che non ce l'hanno, forse un bivio. Sei domande per Luca. (cognato; nessun numero è cambiato)
-
 ## Fatto di recente (si toglie al prossimo controllo)
-- 23/11 (v0.112, Nico): le capitali hanno l'aspetto delle città vere (palazzi, insegne, monumenti). Da guardare sul PC.
-- 23/11 (v0.110, Nico): pausa a due livelli, premi come avvisi del telefono, nomi dei salvataggi, mappa del diario. Da provare sul PC (decide Nico se la coppa dei traguardi deve tornare).
-- 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.
-- 22/11 (v0.98-v0.103, Nico): prologo alla qualità del gioco, due errori piccoli, anomalie di Luca, tre salvataggi, schermata iniziale nuova.
-- 22/11 (v0.99, v0.104-v0.107, Luca): officina più chiara, gomme che non sgommano più da ferme, volume per ogni pezzo, pop & bang nella centralina, volano a quattro livelli, turbo più vero, pezzi per tutti i motori (anche la Supra), cambi lunghi, compressori a cinghia.
+- 23/11 notte (Luca): approvati suoni per auto e campioni, fisica vera, rimborso di Nico, schede, voci delle schede, aspetto dei personaggi, auto e camion nuovi, schermata iniziale, proposta delle capitali. Vignette a versi (v0.126).
+- 23/11, check (Luca con Claude): 408 test, prova di fumo, foto di schermata iniziale (computer e telefono), Roma e guida.
+- 23/11 (v0.113-v0.123, Nico): capitali più vere, video «di serie e preparate», fluidità di fiammate e scritte, livelli del 2D, protagonista in pixel art con nuvolette, schermata iniziale con la chiave, aggiornamenti subito (`sw.js`).
+- 23/11 (v0.120, Luca): fiamme allineate allo scarico, marmitta rovente.
+- 22/11 (v0.85, Luca): cinque auto iniziali all'Autosalone.
