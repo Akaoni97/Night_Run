@@ -25,7 +25,7 @@ contorno e le domande a cui deve rispondere lui. Gli esempi sono **solo per far 
 4. **Il percorso è lineare**: nessuna scelta di strada, mentre la storia vive di scelte (Marco, patto, varco).
 
 ## 3. Proposte (da piccola a grossa)
-**A. Una cosa da vedere per città** (solo grafica e suono, zero trama). Per ognuna, una di queste: una sagoma lontana
+**A. Una cosa da vedere per città** (**FATTO il 23/11, v0.112, dal proprietario: ogni capitale ha palazzi, insegne e monumenti suoi**; restano da decidere B, C e D) (solo grafica e suono, zero trama). Per ognuna, una di queste: una sagoma lontana
 (il sistema dei punti di riferimento di `quartieri2d.js` ne ha: ruota panoramica, gru, ciminiere, guglia, cisterna, pagoda),
 una luce o una tinta diversa del cielo, un meteo che torna spesso (nebbia a Londra), una stazione radio o un jingle suo.
 Esempi di forma, da correggere: Tokyo pagoda, Parigi guglia, Londra nebbia, Stoccolma acqua che riflette le luci

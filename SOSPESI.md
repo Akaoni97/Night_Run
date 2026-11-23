@@ -83,9 +83,10 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Proposte nuove
 
-23. [storia] **Le dodici capitali** (proposta in `docs/storia/PROPOSTA_CITTA.md`): una cosa da vedere per città, collegamenti diversi, un momento forte per le capitali che non ce l'hanno, forse un bivio. Sei domande per Luca. (cognato; nessun numero è cambiato)
+23. [storia] **Le dodici capitali** (proposta in `docs/storia/PROPOSTA_CITTA.md`): (la cosa da vedere per città è FATTA, v0.112) collegamenti diversi, un momento forte per le capitali che non ce l'hanno, forse un bivio. Sei domande per Luca. (cognato; nessun numero è cambiato)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 23/11 (v0.112, Nico): le capitali hanno l'aspetto delle città vere (palazzi, insegne, monumenti). Da guardare sul PC.
 - 23/11 (v0.110, Nico): pausa a due livelli, premi come avvisi del telefono, nomi dei salvataggi, mappa del diario. Da provare sul PC (decide Nico se la coppa dei traguardi deve tornare).
 - 23/11, check (Nico con Claude): 384 test, prova di fumo senza errori in tutte le tappe, officina di Luca e schermata iniziale guardate su computer e telefono.
 - 22/11 (v0.98-v0.103, Nico): prologo alla qualità del gioco, due errori piccoli, anomalie di Luca, tre salvataggi, schermata iniziale nuova.

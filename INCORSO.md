@@ -10,4 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (con Claude) | Città con l'aspetto di quelle vere (Roma, Parigi, Londra...) e poi nuovo reel | `quartieri2d.js`, `street2d.js`, `game.js` (luoghi), `capitali.js`, `strumenti/reel/` | 23/11 |
+| proprietario (con Claude) | Nuovo reel con le città nuove (le città sono fatte: v0.112) | `strumenti/reel/` | 23/11 |

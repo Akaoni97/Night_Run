@@ -1,3 +1,8 @@
+## 23/11/2026 · proprietario (Nico) · v0.112 (**le capitali sembrano città vere**)
+- Prima tutte le capitali erano Tokyo con un altro nome (konbini, ramen, pagode). Ora ognuna ha i suoi palazzi, le sue insegne nella lingua del posto (BOULANGERIE, PUB, BIERGARTEN, TAPAS, TAVERNA...), i suoi quartieri (con i nomi di `capitali.js`) e i suoi monumenti sullo sfondo, illuminati: Colosseo e San Pietro, Torre Eiffel e Arco di Trionfo, Big Ben e ruota panoramica, Stadshuset, Fernsehturm e Porta di Brandeburgo, Tyn e San Vito, Stephansdom, Metropolis, Santa Justa, Partenone, Campidoglio e obelisco. File nuovi `citta2d.js` e `citta_dati.js`, aggancio in `street2d.js` (`setCity`). Tokyo non è cambiata.
+- Strumenti del reel in `strumenti/reel/` (LEGGIMI.md); nelle riprese del teaser la leva va in D (prima l'auto restava ferma).
+- Da guardare sul PC: se i colori di notte (tutto un po' viola) e i monumenti vi piacciono; i monumenti si vedono bene solo con l'auto in movimento (da fermi l'inquadratura taglia in alto). Non toccano la storia: è la parte «A» della proposta per Luca.
+
 ## 23/11/2026 · proprietario (Nico) · v0.111 (**proposta sulle capitali per Luca**)
 - Scritto `docs/storia/PROPOSTA_CITTA.md`: com'è il giro oggi, cosa manca (le città sembrano tutte uguali, i collegamenti si ripetono) e sei domande per Luca. Niente trama inventata. Avviso per Luca in `AVVISI.md`, sospeso 23.
 

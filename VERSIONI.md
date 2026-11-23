@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.111**
+**Versione attuale: v0.112**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -134,3 +134,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.109 | 23/11 | proprietario | Pulizia del codice: tolte due funzioni mai usate dell'officina vecchia (`renderUps`, `suspLabels`) e una della polizia; tolta una foto di prova finita nel repository per sbaglio. 384 test e prova di fumo senza errori. |
 | v0.110 | 23/11 | proprietario | Pausa a due livelli (Esc: finestrella con Continua, Menu completo, Impostazioni, Salvataggi, Salva e torna al titolo); premi (traguardi e valigette) come avvisi del telefono, in fila; salvataggi con nome e «ultima volta»; diario con la mappa del Viaggio e foto ingrandibili. 388 test. |
 | v0.111 | 23/11 | proprietario | Proposta per Luca sulle dodici capitali (`docs/storia/PROPOSTA_CITTA.md`, avviso e sospeso 23). Solo documenti, il gioco non cambia. |
+| v0.112 | 23/11 | proprietario | Le capitali con l'aspetto delle città vere: Roma, Parigi, Londra, Stoccolma, Berlino, Praga, Vienna, Madrid, Lisbona, Atene e Washington hanno i loro palazzi (17 stili di facciata), le loro insegne nella lingua del posto, i loro quartieri e monumenti illuminati sullo sfondo (Colosseo, Eiffel, Big Ben, Fernsehturm, Partenone, Campidoglio...). Tokyo resta com'è. In più gli strumenti del reel di presentazione (`strumenti/reel/`) e la leva in D nelle riprese del teaser. 394 test. |

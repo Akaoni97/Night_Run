@@ -1784,6 +1784,7 @@ class Street2D {
     if (game && game.inside && game.inside.phase === 'shop') { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
     // ---- sfondo: cielo, tre piani di città, foschia
     this._bg = (game && game.loc && game.loc.bg) || this.bg || 'city';            // il cielo sa dove sei (fari e elicottero solo in città)
+    if (this.setCity) this.setCity(game && game.loc && game.loc.cap ? game.loc.id : null);   // le capitali hanno i loro palazzi (citta2d.js)
     this.drawSky(g, st.t, dist);
     // temporale: con la pioggia ogni tanto un fulmine (saetta nel cielo, lampo su tutta la scena, poi il tuono)
     st.bolt = Math.max(0, (st.bolt || 0) - dt * 3.2);
