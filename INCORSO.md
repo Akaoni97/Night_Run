@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (con Claude) | Nuovo reel con le città nuove (le città sono fatte: v0.112) | `strumenti/reel/` | 23/11 |
