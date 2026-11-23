@@ -286,35 +286,66 @@
     return L;
   };
   // BOTTO: niente fiamma, un piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito)
-  // Terminale rovente: tenendo i giri alti lo scarico diventa rosso scuro, poi rosso vivo, poi arancio quasi bianco al
-  // centro (h 0-1 da marmittaRossa di fiamme.js). Si disegna sul terminale montato (o, senza, sul tubo che spunta sotto il
-  // paraurti) a partire da GE.ex, con un alone e un riflesso sull'asfalto. Tremola appena, come il metallo caldo.
-  const MARM_COL = [[90, 12, 8], [200, 32, 12], [255, 96, 24], [255, 226, 186]];
+  // Terminale rovente (v0.129): il metallo si scalda a pixel, come ferro alla forgia. h 0-1 da marmittaRossa di fiamme.js.
+  // - Colore dal corpo nero: rosso ciliegia scuro → rosso → arancio → giallo quasi bianco solo alla bocca e al massimo.
+  // - La bocca (prima colonna e il bordo) è la parte più calda, il tubo si spegne a scalini andando sotto la carrozzeria,
+  //   la riga di mezzo è più chiara (il metallo è più spesso sopra e sotto), il contorno del terminale si fa rosso cupo.
+  // - Il buco della bocca resta scuro finché non è bello caldo, poi brilla dei gas dentro.
+  // - Il calore tremola cella per cella; al massimo staccano faville minuscole.
+  // - Luce: niente alone grande; di notte un bagliore stretto sulla bocca e il riflesso sull'asfalto, di giorno solo il metallo.
+  const MARM_COL = [[0, 0, 0], [62, 6, 6], [128, 14, 9], [196, 30, 12], [240, 72, 18], [255, 138, 40], [255, 206, 112], [255, 244, 210]];
   const marmCol = (u) => { const x = Math.max(0, Math.min(1, u)) * (MARM_COL.length - 1), i = Math.min(MARM_COL.length - 2, Math.floor(x)), f = x - i, a = MARM_COL[i], b = MARM_COL[i + 1]; return [0, 1, 2].map((q) => Math.round(a[q] + (b[q] - a[q]) * f)); };
+  const MARM = { notte: 0.35, alone: 0.16, asfalto: 0.12, faville: 0.78 };
   S.fxMarmitta = function (g, rx, exY, k, h, y0) {
     const L = (this.carId === 'v40' ? this.v40Look : this.carLook) || {}, tip = L.exhaust || 0, v40 = this.carId === 'v40';
-    const len = (tip === 2 ? 11 : tip ? 9 : 5) + (v40 && tip ? 2 : 0), half = tip === 2 ? 2 : 1;      // parte calda del tubo, nelle unità del disegno
-    const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;
-    const fl = 0.93 + 0.07 * Math.sin((this.st.t || 0) * 23) * Math.sin((this.st.t || 0) * 7.1);       // tremolio del calore
-    const x0 = rq(rx - 1 * k), w = rq(len * k), y = rq(exY - half * k), hh = Math.max(u1, rq((half * 2 + 1) * k));
-    const c = marmCol(h * 0.9), cc = marmCol(Math.min(1, h * 1.05 + 0.08));
+    const len = (tip === 2 ? 10 : tip ? 8 : 5) + (v40 && tip ? 2 : 0), half = tip === 2 ? 2 : 1;   // parte del tubo che si vede, unità del disegno
+    const SS = this.SS || 1, t = this.st.t || 0, rq = (v) => Math.round(v * SS) / SS;
+    const cs = Math.max(1 / SS, rq(k / 2)), x0 = rq(rx - k), y1 = rq(exY - half * k);                    // celle da mezzo pixel del disegno
+    const nx = Math.max(3, Math.round(len * k / cs)), ny = Math.max(3, Math.round((half * 2 + 1) * k / cs)), mid = (ny - 1) / 2;
+    const night = Math.max(0, Math.min(1, 1 - (this.day || 0)));
+    const cell = (i, j, T, a) => { if (T <= 0.02 || a <= 0.01) return; const c = marmCol(T); g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${Math.min(1, a)})`; g.fillRect(x0 + i * cs, y1 + j * cs, cs, cs); };
     g.save();
-    // il tubo: più caldo verso la bocca, si spegne andando sotto la carrozzeria
-    const gr = g.createLinearGradient(x0, 0, x0 + w, 0);
-    gr.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${(0.35 + 0.6 * h) * fl})`);
-    gr.addColorStop(0.65, `rgba(${c[0]},${c[1]},${c[2]},${(0.25 + 0.5 * h) * fl})`);
-    gr.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
-    g.fillStyle = gr; g.fillRect(x0, y, w, hh);
-    // cuore più chiaro sulla riga di mezzo, solo quando è bello caldo
-    if (h > 0.35) {
-      const a = Math.min(1, (h - 0.35) / 0.5) * fl, gc = g.createLinearGradient(x0, 0, x0 + w * 0.8, 0);
-      gc.addColorStop(0, `rgba(${cc[0]},${cc[1]},${cc[2]},${0.85 * a})`); gc.addColorStop(1, `rgba(${cc[0]},${cc[1]},${cc[2]},0)`);
-      g.fillStyle = gc; g.fillRect(x0, rq(exY - u1 * (half > 1 ? 1 : 0.5) * Math.max(1, k * 0.5)), w * 0.8, Math.max(u1, rq(k * (half > 1 ? 1.5 : 1))));
+    if (!tip) { g.fillStyle = `rgba(30,32,38,${Math.min(1, h * 5)})`; g.fillRect(x0, y1, nx * cs, ny * cs); }    // senza terminale: il tubo che spunta
+    // contorno rosso cupo (sopra, sotto e il bordo della bocca)
+    const rim = h * 0.42;
+    for (let i = 0; i < nx; i++) { const f = 1 - i / nx; cell(i, -1, rim * f, 0.75 * h); cell(i, ny, rim * f, 0.75 * h); }
+    for (let j = -1; j <= ny; j++) cell(-1, j, rim * 1.1, 0.85 * h);
+    // il tubo, cella per cella
+    for (let i = 0; i < nx; i++) {
+      const u = i / (nx - 1), lungo = Math.max(0.05, 0.9 - Math.pow(u, 0.8) * 0.62 - (u > 0.85 ? (u - 0.85) * 1.5 : 0));   // si spegne verso la carrozzeria
+      for (let j = 0; j < ny; j++) {
+        const v = 1 - Math.abs(j - mid) / (mid + 0.6) * 0.38;                                           // più chiaro al centro
+        const fl = 0.93 + 0.07 * Math.sin(t * 9.3 + i * 1.7 + j * 2.9) * Math.sin(t * 3.1 + i * 0.6);    // tremolio del calore
+        let T = h * lungo * v * fl;
+        if (i === 0) T = Math.min(1, T * 1.18 + 0.04 * h);                                               // il bordo della bocca
+        cell(i, j, Math.max(T, 0.16 * Math.min(1, h * 6)), Math.min(1, h * 5));                         // opaco: metallo scuro che arrossa, non vernice rosa
+      }
+    }
+    // il buco della bocca: scuro da freddo, brilla dei gas da caldo
+    const hb = Math.max(1, ny - 2 * Math.max(1, Math.round(ny / 4)));
+    const yb = Math.round((ny - hb) / 2), gas = Math.max(0, (h - 0.45) / 0.55);
+    for (let j = yb; j < yb + hb; j++) {
+      if (gas > 0) cell(0, j, 0.55 + 0.45 * gas * (0.9 + 0.1 * Math.sin(t * 17 + j)), 1);
+      else { g.fillStyle = 'rgba(16,6,4,0.9)'; g.fillRect(x0, y1 + j * cs, cs, cs); }
+    }
+    // faville: al massimo, poche e minuscole, cadono dietro la bocca
+    if (h > MARM.faville && this.quality !== 'bassa') {
+      const n = 3, pot = (h - MARM.faville) / (1 - MARM.faville);
+      for (let q = 0; q < n; q++) {
+        const ph = t * 1.4 + q * 0.413, ciclo = Math.floor(ph), p = ph - ciclo;
+        if (Street2D.rnd(ciclo * 7 + q * 131) > 0.35 + 0.5 * pot) continue;
+        const dx = -(2 + p * (10 + 8 * Street2D.rnd(ciclo + q))) * k, dy = (-1 + p * p * 7 + (Street2D.rnd(ciclo * 3 + q) - 0.5) * 3) * k;
+        const c = marmCol(0.95 - p * 0.35); g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${(1 - p) * pot})`;
+        g.fillRect(rq(x0 + dx), rq(exY + dy), 1 / SS, 1 / SS);
+      }
     }
     g.restore();
-    flameLight(this, g, x0 + w * 0.35, exY, (6 + 6 * h) * k, (3 + 3 * h) * k, h > 0.6 ? '#ff7a2a' : '#ff3a14', (0.1 + 0.22 * h) * fl, 3);   // alone
-    this.light(g, x0 + w * 0.4, y0, (10 + 10 * h) * k, 4, '#ff4a18', 0.1 * h * fl, 3);                                                  // riflesso sull'asfalto
-    if (this.lightAdd) this.lightAdd(x0 + w * 0.4, exY, (14 + 16 * h) * k, (8 + 6 * h) * k, h > 0.6 ? '255,120,50' : '255,60,30', 0.55 * h * fl);   // luce nella notte
+    // luce: solo di notte e stretta sulla bocca; il riflesso sull'asfalto resta (più tenue di giorno)
+    if (night > 0.05) {
+      flameLight(this, g, x0 + cs, exY + k * 0.5, (2.2 + 2.6 * h) * k, (1.4 + 1.6 * h) * k, h > 0.7 ? '#ff6a22' : '#ff3014', MARM.alone * h * night, 3);
+      if (this.lightAdd) this.lightAdd(x0 + 2 * k, exY + k, (5 + 6 * h) * k, (3 + 3 * h) * k, h > 0.7 ? '255,96,36' : '255,48,24', MARM.notte * h * night);
+    }
+    this.light(g, x0 + len * k * 0.4, y0, (9 + 9 * h) * k, 4, '#ff4018', MARM.asfalto * h * (0.3 + 0.7 * night), 3);
   };
 
   S.fxBang = function (g, rx, exY, k, ph, y0) {

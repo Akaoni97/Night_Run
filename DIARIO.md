@@ -1,3 +1,7 @@
+## 23/11/2026 · cognato · v0.129 (**marmitta rovente rifatta**)
+- Via l'alone tondo grande e biancastro (era la luce notturna larga più il bagliore): ora di notte c'è solo un bagliore stretto sulla bocca e il riflesso rosso sull'asfalto (di giorno solo il metallo e il riflesso tenue).
+- Il terminale si scalda a pixel (celle da mezzo pixel del disegno): rosso ciliegia scuro → rosso → arancio, giallo quasi bianco solo alla bocca al massimo; il tubo si spegne a scalini verso la carrozzeria, il centro è più chiaro, il contorno diventa rosso cupo, il buco resta scuro e poi brilla dei gas; il calore tremola e al massimo staccano faville minuscole. Costanti in `MARM` (`effetti2d.js`). Provato con `strumenti/scarichi.js --rossa` e nel gioco sulla V40 di serie.
+
 ## 23/11/2026 · proprietario (Nico) · v0.128 (**il blocchetto come nel modello**)
 - Il blocchetto d'accensione della schermata iniziale (`titolo.js`) ora segue l'immagine del proprietario: pannello «ACCENSIONE» in metallo spazzolato con le viti agli angoli, spie BAT / OLIO / MOT in alto a destra, arco con LOCK, ACC, ON e START e un puntino ambra che segue la chiave, la chiave vista da sopra (testa ovale con la presa a righe) che gira nel quadrante, e sotto «QUADRO SPENTO → ACCESSORI → AVVIAMENTO IN CORSO → MOTORE ACCESO» con la barra a dieci segmenti che si riempie.
 
