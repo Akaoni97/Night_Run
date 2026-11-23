@@ -141,3 +141,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 | v0.116 | 23/11 | proprietario | Video «di serie e preparate»: la 205 e la Golf preparate fanno sgasate da ferme e poi una tirata in marcia lunga (2ª-5ª a gas pieno); aderenza delle gomme maggiorata solo nelle riprese |
 | v0.117 | 23/11 | proprietario | Disegno più leggero di fiammate, fumo e fumetti, con meno aggiornamenti della posizione degli avvisi. |
 | v0.117 | 23/11 | proprietario | Fiamme dal punto vero dello scarico (anche laterale) per 23 auto col kit; gomme del kit più piccole su E30 e Golf (`wk`); video con accelerazione-rilascio-accelerazione |
+| v0.118 | 23/11 | proprietario | Livelli del 2D: facciate dei locali dietro i passanti (non spariscono più dietro gli edifici), riflessi di luce sull'asfalto sotto le auto (`vitaRiflessi`) |

@@ -1832,6 +1832,7 @@ class Street2D {
 
     // ---- marciapiede lontano, luce delle vetrine, pedoni
     let walkHD = false;                                                         // lastre e cordolo a densità doppia (nitido2d.js)
+    let placesEarly = false;                                                    // le facciate dei locali si disegnano prima dei passanti (v0.118)
     if (bg === 'city' || bg === 'village') {
     walkHD = !!(this.walkHD && this.walkHD(g, dist, PPM, W));
     if (!walkHD) {
@@ -1842,6 +1843,18 @@ class Street2D {
     g.fillStyle = '#4a5070'; g.fillRect(0, 230, W, 2);
     }
     for (const sh of shops) { this.light(g, sh.x, 224, sh.w * 0.6, 7, sh.col, 0.07, 3); if (this.lightAdd) this.lightAdd(sh.x, 232, sh.w * 0.9 + 20, 30, Street2D.rgb(sh.col), 0.5); }
+    // facciate dei locali (bar, benzinaio, officine...): stanno dietro il marciapiede, quindi prima dei passanti, che ci camminano davanti
+    // e non spariscono più dietro l'edificio. Il traffico e le auto restano nel passaggio delle entità, dopo.
+    if (game) {
+      const pl = game.ents.filter((e) => e.kind === 'place' || e.kind === 'station');
+      if (game.placesOn) for (const p of game.placesBetween(visFrom - 160, visTo + 160)) pl.push(p);
+      for (const e of pl) {
+        const x = wx(e.x); if (x < -300 || x > W + 300) continue;
+        if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); if (this.lightAdd) { this.lightAdd(x, 240, 170, 60, '255,214,150', 0.6); this.lightAdd(x, 300, 140, 40, e.col ? Street2D.rgb(e.col) : '255,200,120', 0.3); } }
+        else this.drawStation(g, x);
+      }
+      placesEarly = true;
+    }
     if (bg === 'city' && this.districtPeople) this.districtPeople(g, wx, visFrom, visTo, st.t);   // pedoni e oggetti del quartiere
     else for (let k = 0; k < (bg === 'city' ? (DM ? DM.people : 6) : 2); k++) {
       const span = W + 120, walkX = ((k * 157 + st.t * (14 + k * 5) * (k % 2 ? 1 : -1) - dist * PPM * 0.22) % span + span) % span - 60;
@@ -1944,6 +1957,7 @@ class Street2D {
       g.restore();
     }
     this._lampX = TUN ? [] : lampX; this._shops = shops;
+    if (this.vitaRiflessi && !(game && game.inside)) this.vitaRiflessi(g, dist, st.t, bg, dt, s);   // riflessi sull'asfalto: sotto le auto (vita2d.js)
     if (TUN) for (const m of this.tunnelLamps(TUN, visFrom, visTo)) { lampX.push(wx(m) - 18); if (this.lightAdd) this.lightAdd(wx(m), 290, 110, 70, '255,179,71', 0.55); }   // le luci della volta scorrono sulla carrozzeria
     for (const [x, on, lm] of lampAll) {
       if (this.lampHD && this.lampHD(g, x, on, lampCol, lm)) { if (!on) continue; }   // lampione a densità doppia (nitido2d.js)
@@ -1977,6 +1991,7 @@ class Street2D {
     const drawEnt = (e) => {
       const x = wx(e.x);
       if (x < -300 || x > W + 300) return;
+      if (placesEarly && (e.kind === 'place' || e.kind === 'station')) return;   // già disegnati dietro i passanti
       if (this.drawTripEnt && this.drawTripEnt(g, e, x, st)) return;
       if (e.kind === 'place') { this.drawPlace(g, e, x, st, game, dist); if (this.lightAdd) { this.lightAdd(x, 240, 170, 60, '255,214,150', 0.6); this.lightAdd(x, 300, 140, 40, e.col ? Street2D.rgb(e.col) : '255,200,120', 0.3); } return; }
       if (e.kind === 'station') { this.drawStation(g, x); return; }

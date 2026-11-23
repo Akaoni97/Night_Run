@@ -160,13 +160,16 @@
     }
   };
 
-  // ---------------------------------------------------------------- davanti, dopo la penombra: riflessi e lucine
-  S.vitaFront = function (g, dist, t, bg, dt, s) {
+  // ---------------------------------------------------------------- sull'asfalto, prima delle auto: riflessi e scintille sul bagnato
+  // (v0.118) Erano in vitaFront, dopo le auto: le strisce di luce passavano sopra la carrozzeria. Ora stanno sulla strada e le auto ci
+  // passano sopra; la penombra notturna viene dopo e li scurisce, quindi l'intensità è un po' più alta di prima (RIFL_K).
+  const RIFL_K = 1.7;
+  S.vitaRiflessi = function (g, dist, t, bg, dt, s) {
     if (off(this)) return;
-    const W = this.LW, day = this.day || 0, ss = this.sunset || 0, night = 1 - day, rain = !!this.rainOn;
+    const W = this.LW, day = this.day || 0, night = 1 - day, rain = !!this.rainOn;
     const lamps = this._lampX || [], shops = this._shops || [], slow = !!this.slow;
+    if (night <= 0.2) return;
     g.save(); g.globalCompositeOperation = 'lighter';
-    if (night > 0.2) {
       // riflessi verticali sull'asfalto: lunghe strisce tremolanti sotto insegne e lampioni (di più col bagnato)
       const wet = (rain ? 1 : 0.6) * night;
       // a densità doppia trattini di mezza unità, più fitti e più fini (sull'asciutto ondeggiano meno): un riflesso, non una scala
@@ -179,13 +182,24 @@
         }
         g.globalAlpha = 1;
       };
-      for (const sh of shops) if (sh.x > -20 && sh.x < W + 20) streak(sh.x, Street2D.rgb(sh.col), 0.32 * wet, Math.min(14, sh.w * 0.3));
-      for (const x of lamps) if (x > -40 && x < W + 20) streak(x + 19, '255,214,150', 0.3 * wet, 7);
+      for (const sh of shops) if (sh.x > -20 && sh.x < W + 20) streak(sh.x, Street2D.rgb(sh.col), 0.32 * RIFL_K * wet, Math.min(14, sh.w * 0.3));
+      for (const x of lamps) if (x > -40 && x < W + 20) streak(x + 19, '255,214,150', 0.3 * RIFL_K * wet, 7);
       // scintille sul bagnato: puntini che si accendono e spengono nelle pozze di luce dei lampioni
       if (!slow) for (const x of lamps) for (let i = 0; i < (rain ? 9 : 4); i++) {
         const sd = Math.floor(t * 5) + i * 17 + Math.round(x), px = x + 19 + (rnd(sd) - 0.5) * 110, py = 246 + rnd(sd + 1) * 80;
-        if (rnd(sd + 2) < 0.5) continue; g.fillStyle = `rgba(255,240,210,${0.5 * night})`; g.fillRect(q(px), q(py), 1, 1);
+        if (rnd(sd + 2) < 0.5) continue; g.fillStyle = `rgba(255,240,210,${Math.min(1, 0.5 * RIFL_K * night)})`; g.fillRect(q(px), q(py), 1, 1);
       }
+    g.restore();
+  };
+
+  // ---------------------------------------------------------------- davanti, dopo la penombra: falene e lucciole, raggi di sole, miraggio
+  S.vitaFront = function (g, dist, t, bg, dt, s) {
+    if (off(this)) return;
+    const W = this.LW, day = this.day || 0, ss = this.sunset || 0, night = 1 - day, rain = !!this.rainOn;
+    const lamps = this._lampX || [], shops = this._shops || [], slow = !!this.slow;
+    g.save(); g.globalCompositeOperation = 'lighter';
+    if (night > 0.2) {
+      const u = 1 / (this.SS || 1), fine = u < 1, q = (v) => Math.round(v / u) * u;
       // falene intorno alla testa dei lampioni
       if (!rain) for (const x of lamps) {
         if (x < -40 || x > W + 20) continue;
