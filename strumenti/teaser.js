@@ -222,6 +222,7 @@ function prepara(s) {
   for (let i = 0; i < 6; i++) { await page.evaluate(() => { const g = nightRun.game; if (g.prompt) try { g.answer(0); } catch (e) { /* niente */ } }); await run(150); }
   await page.evaluate((p) => { window.__PREP = p; }, PREP);
   await page.evaluate(regia, [W, H]);
+  await page.evaluate(() => { try { nightRun.leva('D'); } catch (e) { /* niente */ } });   // dopo il prologo la leva è in P: senza questo l'auto non si muove
 
   for (const sh of SHOTS) {
     if (process.env.SOLO && !sh.name.includes(process.env.SOLO)) continue;
