@@ -208,7 +208,7 @@
   }
   // inquadratura: la scena copre la parte di schermo che il pannello del locale lascia libera (a sinistra sul computer,
   // in alto sul telefono) e si centra sul punto importante della scena (focus: chi ti serve, la tua auto)
-  let lastKey = '';
+  let lastKey = '', fitT = 0, fitDirty = true, fullT = 0;
   function resize() {
     if (!cv) return; const b = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = Math.max(2, Math.round(b.width * dpr)), h = Math.max(2, Math.round(b.height * dpr)); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
@@ -228,9 +228,11 @@
   function draw(now) {
     if (!cur) return;
     const t = (now - t0) / 1000, S = SCENE[cur.id];
-    const k = fitKey(); if (k !== lastKey) { lastKey = k; resize(); }
+    // misure della pagina 4 volte al secondo (e al cambio di finestra): leggerle a ogni fotogramma obbligava il browser a rifare l'impaginazione
+    if (!(t - (fitT || 0) < 0.25) || fitDirty) { fitT = t; fitDirty = false; const k = fitKey(); if (k !== lastKey) { lastKey = k; resize(); } }
     alpha = closing ? Math.max(0, alpha - 0.06) : Math.min(1, alpha + 0.06);
     cv.style.opacity = String(alpha);
+    if (alpha >= 1 && !closing) { if (!fullT) fullT = performance.now(); } else fullT = 0;
     og.setTransform(SSc, 0, 0, SSc, 0, 0); og.globalCompositeOperation = 'source-over'; og.globalAlpha = 1; og.imageSmoothingEnabled = false;
     og.drawImage(bg, 0, 0, W, H);
     // la tua auto si ridisegna due volte al secondo: vernice, cerchi e pezzi provati o comprati si vedono subito
@@ -246,7 +248,7 @@
     if (closing && alpha <= 0) { stop(); return; }
     raf = requestAnimationFrame(draw);
   }
-  function stop() { cancelAnimationFrame(raf); raf = 0; cur = null; closing = false; if (cv) { cv.style.opacity = '0'; cv.style.pointerEvents = 'none'; } if (tag) tag.style.opacity = 0; }
+  function stop() { cancelAnimationFrame(raf); raf = 0; cur = null; fullT = 0; closing = false; if (cv) { cv.style.opacity = '0'; cv.style.pointerEvents = 'none'; } if (tag) tag.style.opacity = 0; }
 
   window.NightInterni = {
     SCENE,
@@ -257,15 +259,17 @@
       mount(); if (!cv) return false;
       if (cur && cur.id === id && !closing) return true;               // il pannello si ridisegna: la scena resta
       const S = {}; setSS(SCENE[id].ss || 1); bgg.setTransform(SSc, 0, 0, SSc, 0, 0); bgg.clearRect(0, 0, W, H); bgg.imageSmoothingEnabled = false; SCENE[id].static(bgg, rng(id.length * 977 + 13), S);
-      cur = { id, S }; closing = false; t0 = performance.now(); cv.style.pointerEvents = 'auto'; resize();
+      cur = { id, S }; closing = false; t0 = performance.now(); fitDirty = true; cv.style.pointerEvents = 'auto'; resize();
       if (!raf) raf = requestAnimationFrame(draw);
       AMB.start(SCENE[id].amb);
       return true;
     },
     close() { if (!cur) return; closing = true; AMB.stop(); },
     get current() { return cur && cur.id; },
+    // la scena copre tutta la strada (piena e non in dissolvenza): street2d.js non presenta la strada sotto (prestazioni)
+    get covers() { return !!(cur && !closing && alpha >= 1 && fullT && performance.now() - fullT > 700); },   // 0,7 s: la dissolvenza CSS (0,45 s) è finita
     // da coordinate della scena (640×360) a coordinate dello schermo (per le prove)
     point(x, y) { if (!cv) return null; const b = cv.getBoundingClientRect(), dpr = cv.width / b.width; return { x: b.left + (fit.ox + x * fit.s) / dpr, y: b.top + (fit.oy + y * fit.s) / dpr }; },
   };
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => { fitDirty = true; resize(); });
 })();

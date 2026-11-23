@@ -68,16 +68,17 @@
   // bagliore a due livelli: stretto (1/4) per i contorni delle luci, largo (1/8) per l'alone morbido
   S.glowPass = function (c, src, SS) {
     if (typeof c.filter !== 'string' || this.glow === false || (this.quality || 'alta') !== 'alta') return;
-    const day = this.day || 0, W2 = c.canvas.width, H2 = c.canvas.height;
+    const day = this.day || 0, W2 = c.canvas.width, H2 = c.canvas.height; const todo = [];
     const pass = (key, div, filt, alpha) => {
       const bw = Math.max(1, Math.round(this.LW / div)), bh = Math.max(1, Math.round(360 / div));
       const cv = this[key] || (this[key] = document.createElement('canvas'));
       if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
       const b = cv.getContext('2d'); b.filter = filt; b.clearRect(0, 0, bw, bh);
       b.drawImage(this.lo, src[0] * SS, src[1] * SS, src[2] * SS, src[3] * SS, 0, 0, bw, bh); b.filter = 'none';
-      c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = alpha; c.drawImage(cv, 0, 0, W2, H2); c.restore();
+      todo.push([cv, alpha]);   // prima si leggono tutti e due dalla scena, poi si sommano (la scena può essere la tela stessa: present a densità vera)
     };
     pass('bl', 4, 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)', 0.52 - day * 0.3);
     if (!this.slow) pass('bl2', 8, 'brightness(0.5) contrast(3.6) saturate(1.6) blur(5px)', 0.42 - day * 0.28);   // il largo si spegne sui dispositivi lenti
+    for (const [cv, alpha] of todo) { c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = alpha; c.drawImage(cv, 0, 0, W2, H2); c.restore(); }
   };
 })();

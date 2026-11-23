@@ -923,6 +923,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 </style>
 <!-- estetica premium di layout, banner e icone (tutto sotto :root:not(.classico); Impostazioni → Grafica → Premium o Classico) -->
 <link rel="stylesheet" href="premium.css">
+<script src="leggero.js"></script>   <!-- niente scritture inutili sulla pagina (prestazioni) -->
 <script src="premium.js"></script>
 </head>
 <body>
@@ -1666,7 +1667,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   fpsBox.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:60;padding:3px 8px;border-radius:6px;background:rgba(10,9,7,.72);color:#b8ff3a;font:600 12px/1.3 var(--f-data,monospace);letter-spacing:.06em;pointer-events:none';
   document.body.appendChild(fpsBox);
   let fpsN = 0, fpsT = 0;
-  function fpsTick(dtv) { if (!S.fps) { if (!fpsBox.hidden) fpsBox.hidden = true; return; } fpsN++; fpsT += dtv; if (fpsT >= 0.5) { const f = Math.round(fpsN / fpsT); fpsN = 0; fpsT = 0; fpsBox.hidden = false; fpsBox.style.color = f >= 50 ? '#b8ff3a' : f >= 30 ? '#ffd27a' : '#ff7a6a'; fpsBox.textContent = f + ' FPS' + (street2d && street2d.slow ? ' · densità semplice (auto)' : ''); } }
+  // contatore: fotogrammi al secondo e, per capire dove va il tempo, i millisecondi medi di un fotogramma divisi in
+  // gioco (tutto il codice del fotogramma), strada (il disegno di street2d.js, compreso) e browser (il resto: impaginazione,
+  // pannelli, scheda video). Con 60 FPS il fotogramma ha 16,7 ms.
+  let fpsJs = 0, fpsSt = 0;
+  function fpsTick(dtv) { if (!S.fps) { if (!fpsBox.hidden) fpsBox.hidden = true; return; } fpsN++; fpsT += dtv; fpsJs += frameJs; fpsSt += (street2d && street2d.tPrev) || 0;
+    if (fpsT >= 0.5) { const f = Math.round(fpsN / fpsT), ms = fpsT * 1000 / fpsN, js = fpsJs / fpsN, st = fpsSt / fpsN; fpsN = 0; fpsT = 0; fpsJs = 0; fpsSt = 0; fpsBox.hidden = false; fpsBox.style.color = f >= 50 ? '#b8ff3a' : f >= 30 ? '#ffd27a' : '#ff7a6a';
+      fpsBox.textContent = f + ' FPS · ' + ms.toFixed(1) + ' ms: gioco ' + js.toFixed(1) + ' (strada ' + Math.min(js, st).toFixed(1) + ') · browser ' + Math.max(0, ms - js).toFixed(1) + (street2d && street2d.slow ? ' · densità semplice (auto)' : ''); } }
 
 
   // gamepad
@@ -1982,8 +1989,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   const disp = { rpm: 0, kmh: 0, boost: -1 };
+  let cvVis = null;
   function draw() {
-    if (!W || !H || !cv.offsetWidth) return;                                 // quadro grande nascosto nel menu: niente da disegnare
+    if (!W || !H || !(cvVis ?? cv.offsetWidth)) return;                     // quadro grande nascosto nel menu: niente da disegnare (cvVis dal ResizeObserver: leggere offsetWidth a ogni fotogramma rifaceva l'impaginazione)
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
     const lit = sim.ign;
@@ -3367,7 +3375,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 
   // ---------------------------------------------------------------- ciclo principale
   let slipFrizT = 0, slipFrizMsg = -1e9, fpsNext = 0, last = performance.now(), wasRunning = false, smpLoad = 0, flameT = 0, keyAxis = 0, flameCut = 0, flameRpm0 = 0, flameKick = 0, marmH = 0;
+  let frameJs = 0;
   function frame(now) {
+    const fj0 = performance.now();
     if (pausaF || window.__nrPausaM) { last = now; requestAnimationFrame(frame); return; }
     if (window.NR_PREST && NR_PREST.fps) {                        // tetto ai fotogrammi (prestazioni.js)
       const iv = 1000 / NR_PREST.fps;
@@ -3483,6 +3493,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         options: [{ label: 'Automatico', act: pick('auto') }, { label: 'Manuale', act: pick('man') }] });
     }
     draw(); updateDom(dt);
+    frameJs = performance.now() - fj0;
     requestAnimationFrame(frame);
   }
 
@@ -3510,7 +3521,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     } else setTimeout(startRadio, 700);
   });
   window.addEventListener('resize', layout);
-  if (window.ResizeObserver) new ResizeObserver(() => { if (Math.abs(cv.clientWidth - W) > 1) layout(); }).observe(cv);
+  if (window.ResizeObserver) new ResizeObserver((es) => { const r = es[es.length - 1].contentRect; cvVis = r.width > 0 && r.height > 0 ? 1 : 0; if (Math.abs(cv.clientWidth - W) > 1) layout(); }).observe(cv);
   if (game.mode === 'career') for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;
   // ---------------------------------------------------------------- pioggia: vista 2D e 3D, aderenza, rumore
   const rainSnd = { g: null };

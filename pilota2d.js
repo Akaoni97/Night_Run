@@ -136,7 +136,7 @@
     const M = this.glassMasks(hd, G);
     const L = this._drv || (this._drv = document.createElement('canvas'));
     if (L.width < w * F || L.height < h * F) { L.width = Math.max(L.width, w * F); L.height = Math.max(L.height, h * F); }
-    const x = L.getContext('2d');
+    const x = L.getContext('2d', { willReadFrequently: true });   // si rilegge (drvPixel): tela in memoria, niente andata e ritorno dalla scheda video
     x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'source-over'; x.clearRect(0, 0, L.width, L.height);
     x.setTransform(F, 0, 0, F, 0, 0);
     const day = this.day || 0, nt = 1 - day, bob = Math.max(-1, Math.min(1, -st.heave * 0.15));
@@ -266,5 +266,23 @@
     const c = document.createElement('canvas'); c.width = spr.width; c.height = spr.height;
     const x = c.getContext('2d'); x.drawImage(spr, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = `rgb(${rgb})`; x.fillRect(0, 0, c.width, c.height);
     return (spr._hz[key] = c);
+  };
+
+  // il guidatore si ridisegna al massimo 20 volte al secondo (prestazioni, 23/11/2026): la figura a pixel (drvPixel) costa
+  // parecchio e i suoi movimenti sono lenti; negli altri fotogrammi si rimette la figura già pronta, sempre nella
+  // posizione dell'auto di questo fotogramma. Cambio di auto o di sprite: si ridisegna subito.
+  const DRV_HZ = 20, dd0 = S.drawDriver;
+  S.drawDriver = function (g, spr, G, st, s, k) {
+    const t = this.st.t || 0, c = this._drvC, L = this._drv;
+    if (c && L && c.spr === spr && t >= c.t && t - c.t < 1 / DRV_HZ && this.drvLive !== true) {
+      const hd = spr.hd || spr;
+      if (c.head) this._drvHead = { ax: c.head.ax, ay: c.head.ay, m: g.getTransform() };
+      g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+      g.drawImage(L, 0, 0, hd.width * F, hd.height * F, 0, 0, spr.width, spr.height);
+      g.restore();
+      return;
+    }
+    dd0.call(this, g, spr, G, st, s, k);
+    this._drvC = { spr, t, head: this._drvHead };
   };
 })();

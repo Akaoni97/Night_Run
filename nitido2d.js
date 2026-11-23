@@ -50,16 +50,20 @@
   S.blit = function (c, sx, sy, sw, sh, dx, dy, dw, dh) {
     const k = dh / sh;
     if (this.sharp === false || k < 1.02 || Math.abs(k - Math.round(k)) < 0.01) {
-      c.imageSmoothingEnabled = k < 0.99; c.imageSmoothingQuality = 'high';
+      c.imageSmoothingEnabled = k < 0.99; c.imageSmoothingQuality = k >= 0.5 ? 'low' : 'medium';   // rimpicciolire poco: basta la sfumatura semplice ('high' rifaceva le mipmap a ogni fotogramma)
       c.drawImage(this.lo, sx, sy, sw, sh, dx, dy, dw, dh);
       c.imageSmoothingEnabled = false; return;
     }
     const n = Math.min(4, Math.ceil(k)), uw = Math.round(sw * n), uh = Math.round(sh * n);
+    // la tela di mezzo cresce e basta: con lo zoom e le scosse la misura cambierebbe a ogni fotogramma, e rifarla ogni
+    // volta (memoria nuova sulla scheda video) costava più dell'ingrandimento. Si usa solo l'angolo in alto a sinistra.
     const up = this._up || (this._up = document.createElement('canvas'));
-    if (up.width !== uw || up.height !== uh) { up.width = uw; up.height = uh; }
+    if (up.width < uw || up.height < uh) { up.width = Math.max(up.width, uw + 16); up.height = Math.max(up.height, uh + 16); }
     const ux = up.getContext('2d'); ux.imageSmoothingEnabled = false;
     ux.drawImage(this.lo, sx, sy, sw, sh, 0, 0, uw, uh);                               // ×n a pixel netti
-    c.imageSmoothingEnabled = true; c.imageSmoothingQuality = this.blitQ || 'medium';
+    // giù alla misura vera: si rimpicciolisce sempre meno della metà, basta la sfumatura semplice ('low'). 'medium' rifaceva
+    // a ogni fotogramma le copie rimpicciolite (mipmap) di una tela da milioni di pixel, per lo stesso risultato.
+    c.imageSmoothingEnabled = true; c.imageSmoothingQuality = this.blitQ || 'low';
     c.drawImage(up, 0, 0, uw, uh, dx, dy, dw, dh);                                      // poi giù alla misura vera, morbido
     c.imageSmoothingEnabled = false;
   };
@@ -186,7 +190,7 @@
   if (glow0) S.glowPass = function (c, src, SS) {
     if (this.sharp === false) return glow0.call(this, c, src, SS);
     if (typeof c.filter !== 'string' || this.glow === false || (this.quality || 'alta') !== 'alta') return;
-    const day = this.day || 0, W2 = c.canvas.width, H2 = c.canvas.height;
+    const day = this.day || 0, W2 = c.canvas.width, H2 = c.canvas.height; const todo = [];
     const pass = (key, div, filt, alpha) => {
       if (alpha <= 0.01) return;
       const bw = Math.max(1, Math.round(this.LW / div)), bh = Math.max(1, Math.round(360 / div));
@@ -194,10 +198,11 @@
       if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
       const b = cv.getContext('2d'); b.filter = filt; b.clearRect(0, 0, bw, bh);
       b.drawImage(this.lo, src[0] * SS, src[1] * SS, src[2] * SS, src[3] * SS, 0, 0, bw, bh); b.filter = 'none';
-      c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = alpha; c.drawImage(cv, 0, 0, W2, H2); c.restore();
+      todo.push([cv, alpha]);   // prima si leggono tutti e due dalla scena, poi si sommano (la scena può essere la tela stessa: present a densità vera)
     };
     pass('bl', 3, 'brightness(0.5) contrast(4.6) saturate(1.5) blur(1.5px)', 0.46 - day * 0.3);
     if (!this.slow) pass('bl2', 8, 'brightness(0.47) contrast(4.2) saturate(1.6) blur(5px)', 0.3 - day * 0.22);
+    for (const [cv, alpha] of todo) { c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = alpha; c.drawImage(cv, 0, 0, W2, H2); c.restore(); }
   };
 
   // ---------------------------------------------------------------- marciapiede lontano a densità doppia (y 215 → 236)
@@ -351,13 +356,32 @@
     if (rf.width !== RW || rf.height !== RH) { rf.width = RW; rf.height = RH; }
     const rg = rf.getContext('2d'); rg.imageSmoothingEnabled = true; rg.imageSmoothingQuality = 'medium'; rg.clearRect(0, 0, RW, RH);
     rg.drawImage(this.lo, 0, 110 * SS, W * SS, 106 * SS, 0, 0, RW, RH);
-    const st = 1 / SS, sh = st / 0.85 / 2;
+    const st = 1 / SS;
+    // (prestazioni, 23/11/2026) prima 180 copie a strisce, ognuna capovolta e sfumata da sola; ora il riflesso si capovolge
+    // e si sfuma (1 − r/95) tutto insieme in una tela, e si copiano solo i tratti di righe con lo stesso spostamento
+    // (sull'asciutto quasi tutte): stesso disegno, molte meno copie
+    const fl = this._rfFl || (this._rfFl = document.createElement('canvas'));
+    if (fl.width !== W * SS || fl.height !== 90 * SS) { fl.width = W * SS; fl.height = 90 * SS; }
+    const fx = fl.getContext('2d');
+    fx.save(); fx.globalCompositeOperation = 'copy'; fx.imageSmoothingEnabled = true; fx.imageSmoothingQuality = 'medium';
+    fx.setTransform(SS, 0, 0, -SS, 0, 105 * 0.85 * SS);            // riga r della tela = riga (105 − r/0,85)/2 del riflesso
+    fx.drawImage(rf, 0, 0, RW, RH, 0, 0, W, 106 * 0.85);
+    fx.setTransform(SS, 0, 0, SS, 0, 0); fx.globalCompositeOperation = 'destination-in';
+    const fade = fx.createLinearGradient(0, 0, 0, 95); fade.addColorStop(0, 'rgba(0,0,0,1)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+    fx.fillStyle = fade; fx.fillRect(0, 0, W, 90); fx.restore();
     g.save(); g.globalCompositeOperation = 'lighter'; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'medium';
-    for (let r = 0; r < 90; r += st) {
-      const sy = (105 - r / 0.85) / 2; if (sy < 0) break;
-      const amp = (1 + r * 0.03) * (rain ? 1.6 : 0.35), wob = Math.round(Math.sin(r * 0.55 + t * (rain ? 6 : 2.5)) * amp * SS) / SS;
-      g.globalAlpha = wetA * (1 - r / 95) * (rain ? 1 : 0.9);
-      g.drawImage(rf, 0, sy, RW, sh, wob, 241 + r, W, st);
+    g.globalAlpha = wetA * (rain ? 1 : 0.9);
+    const amp0 = rain ? 1.6 : 0.35, ph = t * (rain ? 6 : 2.5), wobOf = (r) => Math.round(Math.sin(r * 0.55 + ph) * (1 + r * 0.03) * amp0 * SS) / SS;
+    const R1 = 105 * 0.85;                                           // oltre, il riflesso finisce (sy < 0)
+    let r0 = 0, w0 = wobOf(0);
+    for (let r = st; ; r += st) {
+      const end = r >= 90 || r > R1, w = end ? NaN : wobOf(r);
+      if (end || w !== w0) {
+        const h = Math.min(r, 90) - r0;
+        g.drawImage(fl, 0, Math.round(r0 * SS), W * SS, Math.round(h * SS), w0, 241 + r0, W, h);
+        if (end) break;
+        r0 = r; w0 = w;
+      }
     }
     g.restore();
     return true;

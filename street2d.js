@@ -2327,12 +2327,52 @@ class Street2D {
     this.tPrev = performance.now() - tStart;
   }
 
+  // bagliore a due livelli (luci2d.js), colori da anime e vignettatura. c = dove si disegna: lo schermo, o la tela interna
+  // con la trasformazione a uno (present senza zoom); src = parte della scena inquadrata; k = chiave della cache delle sfumature
+  presentFx(c, src, SS, k) {
+    if (this.glowPass) this.glowPass(c, src, SS);
+    else if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {
+      const bw = Math.max(1, Math.round(this.LW / 4)), bh = 90;
+      if (!this.bl) { this.bl = document.createElement('canvas'); }
+      if (this.bl.width !== bw) { this.bl.width = bw; this.bl.height = bh; }
+      const b = this.bl.getContext('2d');
+      b.filter = 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0] * SS, src[1] * SS, src[2] * SS, src[3] * SS, 0, 0, bw, bh); b.filter = 'none';
+      c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.62 - (this.day || 0) * 0.35;
+      c.drawImage(this.bl, 0, 0, c.canvas.width, c.canvas.height); c.restore();
+    }
+    const W2 = c.canvas.width, H2 = c.canvas.height, cache = this._pfx || (this._pfx = {});
+    // vignettatura
+    let vg = cache['v' + k];
+    if (!vg || vg.w !== W2 || vg.h !== H2) {
+      const gr = c.createRadialGradient(W2 / 2, H2 * 0.55, H2 * 0.35, W2 / 2, H2 * 0.55, Math.max(W2, H2) * 0.75);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.45)'); vg = cache['v' + k] = { w: W2, h: H2, gr };
+    }
+    // colori da anime: ombre verso il ciano, luci verso il magenta, un velo di luce rosa dall'alto
+    if (this.quality !== 'bassa') {
+      const nt = 1 - (this.day || 0) * 0.7;
+      let g2 = cache['g' + k];
+      if (!g2 || g2.w !== W2 || g2.h !== H2) {
+        const a = c.createLinearGradient(0, 0, 0, H2); a.addColorStop(0, '#ff4fa8'); a.addColorStop(0.55, '#6a5cff'); a.addColorStop(1, '#19d3ff');
+        const b2 = c.createRadialGradient(W2 * 0.15, -H2 * 0.1, 0, W2 * 0.15, -H2 * 0.1, H2 * 0.9); b2.addColorStop(0, 'rgba(255,120,190,.5)'); b2.addColorStop(1, 'rgba(255,120,190,0)');
+        g2 = cache['g' + k] = { w: W2, h: H2, a, b: b2 };
+      }
+      c.save(); c.globalCompositeOperation = 'soft-light'; c.globalAlpha = 0.28 * nt; c.fillStyle = g2.a; c.fillRect(0, 0, W2, H2);
+      c.globalCompositeOperation = 'screen'; c.globalAlpha = 0.18 * nt; c.fillStyle = g2.b; c.fillRect(0, 0, W2, H2); c.restore();
+    }
+    c.fillStyle = vg.gr; c.fillRect(0, 0, W2, H2);
+  }
+
   present(shake, shakeX) {
     if (!this.visible) return;
+    if (typeof NightInterni !== 'undefined' && NightInterni.covers) return;   // dentro un locale la scena dell'interno copre tutto: niente lavoro per una strada che non si vede
     const c = this.ctx, SS = this.SS || 1; c.imageSmoothingEnabled = false;
     c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height);
     // inquadratura: zoom su un punto (sigla) o scena intera
     const z = Math.max(1, (this.zoom || 1) * (this.fxZoom || 1)), pad = this.padBottom || 0;
+    // senza zoom bagliore, colori e vignettatura si fanno sulla tela interna, prima dell'ingrandimento (prestazioni, 23/11/2026):
+    // sono sfumature larghe, a schermo pieno costavano da 2 a 4 volte i pixel per lo stesso risultato. Con lo zoom come prima.
+    const fxLo = !(z > 1.001 || pad) && this.fxLo !== false;
+    if (fxLo) { const L = this.g; L.save(); L.setTransform(1, 0, 0, 1, 0, 0); this.presentFx(L, [0, 0, this.LW, this.LH], SS, 'lo'); L.restore(); }
     let src = [0, 0, this.LW, this.LH];
     if (z > 1.001 || pad) {
       // padBottom: la ripresa può scendere sotto la scena (lì c'è la banda nera della sigla)
@@ -2343,34 +2383,7 @@ class Street2D {
       else c.drawImage(this.lo, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);
     } else if (this.blit) this.blit(c, 0, 0, this.lo.width, this.lo.height, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
     else c.drawImage(this.lo, shakeX * (this.canvas.height / this.LH), shake * (this.canvas.height / this.LH), this.canvas.width, this.canvas.height);
-    // bagliore a due livelli (luci2d.js); senza il file resta quello semplice
-    if (this.glowPass) this.glowPass(c, src, SS);
-    else if (typeof c.filter === 'string' && this.glow !== false && (this.quality || 'alta') === 'alta') {
-      const bw = Math.max(1, Math.round(this.LW / 4)), bh = 90;
-      if (!this.bl) { this.bl = document.createElement('canvas'); }
-      if (this.bl.width !== bw) { this.bl.width = bw; this.bl.height = bh; }
-      const b = this.bl.getContext('2d');
-      b.filter = 'brightness(0.56) contrast(4) saturate(1.4) blur(2px)'; b.clearRect(0, 0, bw, bh); b.drawImage(this.lo, src[0] * SS, src[1] * SS, src[2] * SS, src[3] * SS, 0, 0, bw, bh); b.filter = 'none';
-      c.save(); c.imageSmoothingEnabled = true; c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.62 - (this.day || 0) * 0.35;
-      c.drawImage(this.bl, 0, 0, this.canvas.width, this.canvas.height); c.restore();
-    }
-    // vignettatura
-    if (!this.vg || this.vg.w !== this.canvas.width) {
-      const W2 = this.canvas.width, H2 = this.canvas.height, gr = c.createRadialGradient(W2 / 2, H2 * 0.55, H2 * 0.35, W2 / 2, H2 * 0.55, Math.max(W2, H2) * 0.75);
-      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.45)'); this.vg = { w: W2, gr };
-    }
-    // colori da anime: ombre verso il ciano, luci verso il magenta, un velo di luce rosa dall'alto
-    if (this.quality !== 'bassa') {
-      const W2 = this.canvas.width, H2 = this.canvas.height, nt = 1 - (this.day || 0) * 0.7;
-      if (!this.gr2 || this.gr2.w !== W2 || this.gr2.h !== H2) {
-        const a = c.createLinearGradient(0, 0, 0, H2); a.addColorStop(0, '#ff4fa8'); a.addColorStop(0.55, '#6a5cff'); a.addColorStop(1, '#19d3ff');
-        const b2 = c.createRadialGradient(W2 * 0.15, -H2 * 0.1, 0, W2 * 0.15, -H2 * 0.1, H2 * 0.9); b2.addColorStop(0, 'rgba(255,120,190,.5)'); b2.addColorStop(1, 'rgba(255,120,190,0)');
-        this.gr2 = { w: W2, h: H2, a, b: b2 };
-      }
-      c.save(); c.globalCompositeOperation = 'soft-light'; c.globalAlpha = 0.28 * nt; c.fillStyle = this.gr2.a; c.fillRect(0, 0, W2, H2);
-      c.globalCompositeOperation = 'screen'; c.globalAlpha = 0.18 * nt; c.fillStyle = this.gr2.b; c.fillRect(0, 0, W2, H2); c.restore();
-    }
-    c.fillStyle = this.vg.gr; c.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (!fxLo) this.presentFx(c, src, SS, 'scr');
     if (this.bars > 0.001) { const bh = Math.round(this.canvas.height * this.bars); c.fillStyle = '#000'; c.fillRect(0, 0, this.canvas.width, bh); c.fillRect(0, this.canvas.height - bh, this.canvas.width, bh); }
   }
 }
