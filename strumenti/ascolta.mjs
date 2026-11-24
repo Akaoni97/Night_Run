@@ -55,6 +55,7 @@ const COP = {
 const C = COP[copione];
 if (!C) { console.error('copione sconosciuto: ' + copione + ' (' + Object.keys(COP).join(', ') + ')'); process.exit(1); }
 
+if (process.env.SOLO) dsp.solo = process.env.SOLO;   // un componente da solo (turbo, fischio, aria, aspirazione, cambio, valvola)
 // avviamento a parte (non si registra), poi il copione
 sim.setIgnition(true);
 for (let t = 0; t < 4; t += 1 / 60) { sim.setStarter(t < 1.2); sim.update(1 / 60); sim.events.length = 0; }

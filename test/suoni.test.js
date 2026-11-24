@@ -83,9 +83,11 @@ test('cinque scarichi, quattro ampliamenti: ogni livello è più corto, più ape
 });
 
 test('gli scarichi si sentono: il suono cresce di livello in livello (media su tre regimi)', () => {
+  // v0.142: si misura il solo scarico (d.solo = 'scarico'): aspirazione e turbo non c'entrano e, essendo nati dagli stessi
+  // impulsi dei cilindri, sommati allo scarico spostavano di un soffio l'ordine di due livelli quasi uguali (A3: catback e centrale)
   for (const id of ['panda', 'p205', 'a3', 'v40']) {
     const c = CARS[id], lim = c.P.limiter, ids = c.tuning.exhaust.items.map((x) => x.id);
-    const m = ids.map((e) => { let r = 0; for (const f of [0.3, 0.5, 0.7]) { seed = 71; const d = new EngineDSP(SR); d.msg({ cfg: { tune: c.params(Object.assign({}, c.presets[0].sel, { exhaust: e })).dsp, view: 1, vol: 1, fx: {} }, p: { rpm: lim * f, thr: 0.5, charge: 0.5, air: 0.5, running: 1 } }); const L = new Float32Array(SR * 2), R = new Float32Array(SR * 2); d.render(L, R, L.length); d.render(L, R, L.length); r += rms(L); } return r / 3; });
+    const m = ids.map((e) => { let r = 0; for (const f of [0.3, 0.5, 0.7]) { seed = 71; const d = new EngineDSP(SR); d.solo = 'scarico'; d.msg({ cfg: { tune: c.params(Object.assign({}, c.presets[0].sel, { exhaust: e })).dsp, view: 1, vol: 1, fx: {} }, p: { rpm: lim * f, thr: 0.5, charge: 0.5, air: 0.5, running: 1 } }); const L = new Float32Array(SR * 2), R = new Float32Array(SR * 2); d.render(L, R, L.length); d.render(L, R, L.length); r += rms(L); } return r / 3; });
     assert.ok(m[m.length - 1] > m[0] * 1.5, `${id}: lo scarico da gara dovrebbe suonare molto più forte dell'originale (${m.map((x) => x.toFixed(3))})`);
     for (let i = 1; i < m.length; i++) assert.ok(m[i] > m[i - 1] * 0.97, `${id}: il livello ${ids[i]} suona meno del precedente (${m.map((x) => x.toFixed(3))})`);
   }

@@ -1,3 +1,7 @@
+## 24/11/2026 · cognato · v0.142 (**suono di turbo, cambiate e aspirazione**)
+- Turbo: la nota della girante non è più un fischio fisso a 5-9 kHz ma aria intorno a una nota più bassa, con le bande dell'albero, che sale dentro ogni marcia e cala alla cambiata; forte mentre prende giri, più calma a pressione ferma; sotto un «vooosh» grave che cresce coi bar. Aria del compressore più cupa (prima più di metà dell'energia era fruscio sopra i 6 kHz). Cambiata: innesto metallico + botta della trasmissione + leva. Aspirazione: cassa del filtro, tubo, aria che pulsa coi cilindri, «whoomp» al colpo di gas. Anelli dei campioni di turbo, compressore e cambio rifatti (CMP_VER 5). Manopole in `DSP_TB`/`DSP_CB` (`dsp.js`). **Scarichi e collettori non toccati** (il test dei livelli degli scarichi ora misura il solo scarico).
+- Aperto: va ascoltato sul PC (sei MP3 prima/dopo mandati a Luca); la Supra di serie ha il soffio del turbo più basso di prima (~3 dB(A)): era quasi tutto fruscio acuto.
+
 ## 24/11/2026 · proprietario (Nico) · v0.141 (**interfaccia Street Racing**)
 - Riquadro Partita con garage notturno e sprite dell’auto, obiettivo prima delle statistiche, navigazione a pixel e barra compatta al tocco. Lo stile si sceglie in Impostazioni → Grafica.
 - Avvisi, domande, quartieri, capitali e traguardi usano pannelli opachi con icone a pixel, titoli leggibili e colori per tipo. Gli avvisi usano la stessa scadenza per la barra visiva e per la coda.

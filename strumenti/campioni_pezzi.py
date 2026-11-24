@@ -309,19 +309,27 @@ def _f(f):
 
 
 def turbo_loop(seed, p):
-    """fischio della girante: tono con le sue parziali, banda d'aria intonata, soffio largo"""
+    """fischio della girante (v0.142): non più un seno con un po' d'aria sotto, ma aria stretta intorno alla nota delle pale
+    con le bande laterali dell'albero (la nota «rolla»), un'ottava sopra più leggera, il corpo grave dell'aria in pressione
+    e il soffio. Tutto rumore periodico: l'anello si richiude da solo. p: f nota, bw larghezza della nota (ottave), sb bande
+    laterali, tone quanto seno puro resta, oct ottava, corpo/cf corpo grave, air/af soffio, pale (11)"""
     N = nlen(LOOP)
     t = ts(N)
     fb = _f(p['f'])
-    pm = p.get('vib', 0.6) * np.sin(TAU * 3.0 * t + 1.3) + 0.3 * np.sin(TAU * 7.5 * t)
-    x = np.sin(TAU * fb * t + pm)
+    fs = _f(fb / p.get('pale', 11))
+    bw = p.get('bw', 0.03)
+    nota = pnoise(N, lambda F: lbump(F, fb, bw) + p.get('sb', 0.45) * (lbump(F, fb + fs, bw * 0.8) + lbump(F, fb - fs, bw * 0.8)), seed)
+    pm = p.get('vib', 0.5) * np.sin(TAU * _f(2.5) * t + 1.3) + 0.25 * np.sin(TAU * _f(6.5) * t)
+    seno = np.sin(TAU * fb * t + pm) * (1 + 0.3 * np.sin(TAU * fs * t))
+    x = nota + p.get('tone', 0.3) * seno
     for k, g in p.get('parz', []):
-        x += g * np.sin(TAU * _f(fb * k) * t + k * pm + 0.7 * k)
-    air = pnoise(N, lambda F: lbump(F, fb, p.get('aw', 0.06)), seed)
-    whoosh = pnoise(N, lambda F: lbump(F, p.get('wf', fb * 0.4), 1.0), seed + 1)
-    am = 1 + 0.05 * np.sin(TAU * 1.5 * t) + 0.04 * np.sin(TAU * 4.0 * t + 2)
-    y = (p.get('tone', 1.0) * x + p.get('air', 0.25) * air + p.get('whoosh', 0.1) * whoosh) * am
-    return norm(y, 0.7)
+        x += g * pnoise(N, lambda F, k=k: lbump(F, _f(fb * k), bw * 1.2), seed + int(k * 10) + 7)
+    x += p.get('oct', 0.25) * pnoise(N, lambda F: lbump(F, 2 * fb, bw * 1.4), seed + 3)
+    corpo = pnoise(N, lambda F: lbump(F, p.get('cf', 650), 0.9), seed + 1)
+    soffio = pnoise(N, lambda F: lbump(F, p.get('af', fb * 0.35), 1.0), seed + 2)
+    am = 1 + 0.06 * np.sin(TAU * _f(1.5) * t) + 0.04 * np.sin(TAU * _f(4.0) * t + 2)
+    y = (x + p.get('corpo', 0.35) * corpo + p.get('air', 0.3) * soffio) * am
+    return norm(lp(y, p.get('lp', 9000), 2), 0.7)
 
 
 def sc_loop(seed, p):
@@ -330,10 +338,11 @@ def sc_loop(seed, p):
     t = ts(N)
     f0 = _f(p['f'])
     x = np.zeros(N)
+    # v0.142: ogni armonica metà nota e metà aria stretta intorno (prima seni puri: suonava da sintetizzatore)
     for h, g in enumerate(p['harm'], start=1):
         if f0 * h > SR * 0.45:
             break
-        x += g * np.sin(TAU * f0 * h * t + h * 0.9)
+        x += g * (0.5 * np.sin(TAU * f0 * h * t + h * 0.9) + 0.6 * pnoise(N, lambda F, h=h: lbump(F, f0 * h, 0.02 + 0.006 * h), seed + 20 + h))
     if p.get('siren'):
         x += p['siren'] * np.sin(TAU * _f(f0 * 1.5) * t + 0.4)
     if p.get('am'):
@@ -367,7 +376,10 @@ def gear_loop(seed, p):
     N = nlen(LOOP)
     t = ts(N)
     fm, fs = _f(p['f']), _f(p['fs'])
-    x = np.sin(TAU * fm * t) + p.get('h2', 0.35) * np.sin(TAU * 2 * fm * t + 0.5) + p.get('h3', 0.12) * np.sin(TAU * 3 * fm * t + 1.1)
+    # v0.142: la nota dei denti con aria stretta intorno e un po' meno armoniche pure (prima tre seni: un fischio elettronico)
+    def nn(k, w):
+        return pnoise(N, lambda F: lbump(F, fm * k, w), seed + 30 + k)
+    x = (0.55 * np.sin(TAU * fm * t) + 0.7 * nn(1, 0.018)) + p.get('h2', 0.35) * (0.4 * np.sin(TAU * 2 * fm * t + 0.5) + 0.6 * nn(2, 0.02)) + p.get('h3', 0.12) * nn(3, 0.025)
     x *= 1 + p.get('am', 0.25) * np.sin(TAU * fs * t)
     if p.get('am2'):
         x *= 1 + p['am2'] * np.sin(TAU * 2 * fs * t + 0.8)
@@ -680,6 +692,9 @@ LIVELLO = {
     'scarico/scoppiettio': -1.1, 'valvola/stututu': -1.1,
     'limitatore/colpi': 3.2, 'limitatore/stutter': 2.4, 'mappa/crackle': 1.3, 'mappa/pop_bang': 2.5,
     'scarico/titanio': 1.6, 'valvola/gufo': 1.3,
+    # v0.142: anelli rifatti con l'aria intorno alle note, riportati poco sotto la sonorità di prima
+    # (chiave «kit:file» = solo quel file: qui i soli anelli, gli innesti restano com'erano)
+    'compressore/volumetrico:loop': 3.0, 'compressore/vite:loop': 2.5, 'compressore/centrifugo:loop': 1.5, 'cambio/denti_dritti:loop': 3.0, 'cambio/sequenziale:loop': 2.5,
 }
 
 
@@ -694,10 +709,11 @@ for k, p in FLUP.items():
     kit('valvola/' + k, main=lambda s, p=p: [flutter(I, s + i, p) for i, I in enumerate(I4)])
 kit('valvola/mezzo', main=lambda s: [mezzo(I, s + i, dict(bov=dict(BOVP['pssh'], len=0.45, tau=0.09), flu=dict(FLUP['stututu'], len=0.8, s=0, first=0.6), dt=0.13)) for i, I in enumerate(I4)])
 
-kit('turbo/fischio', loop=lambda s: [turbo_loop(s, dict(f=8600, parz=[(1.5, 0.05)], air=0.18, aw=0.04, whoosh=0.06, wf=3000))])
-kit('turbo/sibilo', loop=lambda s: [turbo_loop(s, dict(f=7400, parz=[(1.5, 0.12), (0.5, 0.04)], air=0.3, aw=0.06, whoosh=0.12, wf=2800))])
-kit('turbo/ululato', loop=lambda s: [turbo_loop(s, dict(f=5200, parz=[(0.5, 0.15), (1.5, 0.18), (2, 0.08)], air=0.5, aw=0.09, whoosh=0.3, wf=1800, tone=0.8))])
-kit('turbo/sirena', loop=lambda s: [turbo_loop(s, dict(f=4300, parz=[(1.012, 0.7), (0.5, 0.25), (1.5, 0.2), (2, 0.1)], air=0.45, aw=0.08, whoosh=0.35, wf=1500, vib=1.2))])
+# v0.142: note più basse (0,72 della frequenza delle pale, come la sintesi), aria intorno alla nota, corpo grave
+kit('turbo/fischio', loop=lambda s: [turbo_loop(s, dict(f=6200, bw=0.025, sb=0.35, tone=0.35, oct=0.18, corpo=0.25, cf=750, air=0.28, af=2400))])
+kit('turbo/sibilo', loop=lambda s: [turbo_loop(s, dict(f=5300, bw=0.035, sb=0.45, tone=0.3, oct=0.25, corpo=0.4, cf=700, air=0.45, af=2100))])
+kit('turbo/ululato', loop=lambda s: [turbo_loop(s, dict(f=3700, bw=0.045, sb=0.55, tone=0.25, oct=0.3, parz=[(0.5, 0.25)], corpo=0.7, cf=560, air=0.6, af=1500, lp=7000))])
+kit('turbo/sirena', loop=lambda s: [turbo_loop(s, dict(f=3100, bw=0.035, sb=0.4, tone=0.4, oct=0.3, parz=[(1.012, 0.8), (0.5, 0.25)], corpo=0.6, cf=520, air=0.5, af=1300, vib=1.0, lp=7500))])
 
 kit('compressore/volumetrico', loop=lambda s: [sc_loop(s, dict(f=2400, harm=[1, 0.6, 0.38, 0.22, 0.14, 0.08], am=0.3, am_f=600, air=0.25, hiss=0.08, hf=6000))])
 kit('compressore/centrifugo', loop=lambda s: [sc_loop(s, dict(f=8200, harm=[1, 0.05], air=0.35, hiss=0.25, hf=5000))])
@@ -791,8 +807,8 @@ def fai(kid, gdir=None):
             name = (str(i + 1) if g == 'main' else g + str(i + 1))
             files.append((name, s * (0.89 / pk)))
     out = []
-    kg = 10 ** (LIVELLO.get(kid, 0.0) / 20)
     for name, x in files:
+        kg = 10 ** (LIVELLO.get(kid + ':' + name, LIVELLO.get(kid, 0.0)) / 20)
         x = np.asarray(x, dtype=float)
         if kg > 1:
             x = 0.89 * np.tanh(kg * x / 0.89) / np.tanh(kg)

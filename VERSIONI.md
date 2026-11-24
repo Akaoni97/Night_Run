@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.141**
+**Versione attuale: v0.142**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -165,3 +165,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.139 · 24/11/2026 · proprietario · tre interruttori in Impostazioni → Grafica → Scritte sulla strada: scritte da fumetto (scoppi della marmitta, urti, frenate; era «Grafiche anime»), versi del pilota (le vignette sopra la testa) e pensieri (tutti, solo la storia, spenti)
 - v0.140 · 24/11/2026 · proprietario · quadri distinti per V40, Supra ed E30, chilometri della singola auto visibili anche nel quadro grande
 - v0.141 · 24/11/2026 · proprietario · interfaccia Street Racing, menu in pixel art, icone e banner distinti per tipo
+- v0.142 · 24/11/2026 · cognato · suono di turbo (girante vera, corpo, spool, nota che segue i giri), aria più cupa, cambiate, fischio degli ingranaggi e aspirazione rifatti; anelli di turbo, compressore e cambio rifatti; scarichi e collettori non toccati

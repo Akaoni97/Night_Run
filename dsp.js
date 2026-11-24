@@ -24,6 +24,17 @@ class BQ {
   }
 }
 
+// Turbo, aria e cambiate (v0.142): manopole del suono, in un posto solo. Scarichi e collettori non passano da qui.
+const DSP_TB = {
+  nota: 0.72,      // la nota della girante che si sente, rispetto alla frequenza delle pale (l'acuto lo mangiano chiocciola e tubi)
+  pale: 11,        // pale della girante: l'albero gira 11 volte più piano e fa le bande laterali (la nota «rolla»)
+  fischio: 1.2,    // livello del fischio
+  spool: 1.05,     // quanto più forte mentre la girante prende giri (a pressione ferma resta il 42 %)
+  corpo: 2.4,      // «vooosh» grave dell'aria messa in pressione
+  aria: 5.0,       // soffio dell'aria che passa nel compressore (prima 6,5 e tutto sopra i 5 kHz)
+};
+const DSP_CB = { clack: 0.25, botta: 0.17, leva: 0.04, ingr: 0.6 };   // cambiata: innesto metallico, botta della trasmissione, leva; ingr = fischio degli ingranaggi   // cambiata: innesto metallico, botta della trasmissione, leva
+
 class EngineDSP {
   constructor(sr) {
     this.sr = sr;
@@ -71,6 +82,10 @@ class EngineDSP {
     this.inLP = new BQ().set('lp', 1100, 0.7, sr);
     this.roarBP = new BQ().set('bp', 1350, 0.9, sr);
     this.whooshBP = new BQ().set('bp', 2600, 0.8, sr);
+    // v0.142: cassa del filtro che risuona (Helmholtz), tubo d'aspirazione (quarto d'onda), aria che pulsa con le
+    // aspirazioni dei cilindri, «whoomp» quando spalanchi la farfalla
+    this.inHB = new BQ().set('bp', 150, 2.2, sr); this.inTB = new BQ().set('bp', 520, 2.6, sr); this.inEnv = 0;
+    this.tipBP = new BQ().set('bp', 600, 1.1, sr); this.tipE = 0; this.tipT = 1; this.inThr = 0;
 
     // turbo
     this.tph = 0; this.tph2 = 0; this.lfo = 0;
@@ -79,7 +94,11 @@ class EngineDSP {
     this.wDrift = 0; this.wAmp = 0; this.wN = 0;
     // soffio dell'aria nel compressore (v0.106): due bande che salgono con la girante, sibilo d'aspirazione, soffio della wastegate
     this.whA = new BQ().set('bp', 1600, 0.9, sr); this.whB = new BQ().set('bp', 3000, 1.1, sr); this.whHP = new BQ().set('hp', 5200, 0.7, sr);
-    this.wgBP = new BQ().set('bp', 2300, 1.3, sr); this.tLift = 0; this.tThr = 0;
+    this.wgBP = new BQ().set('bp', 1600, 1.1, sr); this.tLift = 0; this.tThr = 0;
+    // v0.142: aria più cupa (terza banda bassa, sibilo tagliato), corpo della pressione, bande dell'albero, spool
+    this.whC = new BQ().set('bp', 420, 0.7, sr); this.airLP = new BQ().set('lp', 5200, 0.6, sr);
+    this.tbBody1 = new BQ().set('bp', 450, 0.8, sr); this.tbBody2 = new BQ().set('bp', 1100, 1.0, sr);
+    this.wPh = 0; this.shPh = 0; this.spool = 0; this.tuPrev = 0; this.tuSpd = 0;
     this.bovLP = new BQ().set('lp', 2600, 0.7, sr);
     // valvola: strati con filtri propri, scatto d'apertura, tremolio dell'aria
     this.bovAir = new BQ().set('hp', 3200, 0.6, sr); this.bovLow = new BQ().set('bp', 650, 1.1, sr); this.bovWob = 0; this.bovClick = new BQ().set('hp', 1800, 0.7, sr);
@@ -114,6 +133,9 @@ class EngineDSP {
     this.gPh = 0;
     this.grind = 0; this.grBP = new BQ().set('bp', 1700, 1.5, sr); this.grPh = 0;
     this.clunk = 0; this.clPh = 0; this.click = 0;
+    // v0.142: cambiata = innesto metallico (scatola che risuona), botta della trasmissione che scende di nota, leva
+    this.clR1 = new BQ().set('bp', 1450, 30, sr); this.clR2 = new BQ().set('bp', 2650, 38, sr); this.clR3 = new BQ().set('bp', 4100, 45, sr);
+    this.clT = 0; this.clK = 1; this.clLP = new BQ().set('lp', 380, 0.7, sr); this.gwBP = new BQ().set('bp', 1000, 10, sr);
 
     // riverbero (Schroeder/Freeverb ridotto)
     const sc = sr / 44100;
@@ -252,7 +274,7 @@ class EngineDSP {
       this.chirpPh = 0;
       this.bov.rate = 23;
     } else if (e.type === 'grind') this.grind = 1;
-    else if (e.type === 'clunk') this.clunk = 1;
+    else if (e.type === 'clunk') { this.clunk = 1; this.clT = 0; }
     else if (e.type === 'click') this.click = 1;
     else if (e.type === 'crash') this.hit(e.I || 0.6, e.kind || 'front');
     else if (e.type === 'bump') { this.bump = Math.min(1.5, (this.bump || 0) + (e.I || 0.6)); this.bumpPh = 0; if (e.hit) this.hit(Math.min(0.35, (e.I || 0.4) * 0.5), 'bump'); }   // la lamiera solo nei colpetti contro un'auto
@@ -475,6 +497,17 @@ class EngineDSP {
     S.rev += (T.rev - S.rev) * s;
     S.wg += (T.wg - S.wg) * f;
     S.sec += (T.sec - S.sec) * f;
+    // spool: quanto in fretta la girante sta prendendo giri (sale in ~60 ms, si calma in ~0,6 s)
+    const dtc = 32 / this.sr, du = (S.turbo - this.tuPrev) / dtc; this.tuPrev = S.turbo;
+    const spT = Math.min(1, Math.max(0, du * 2.2));
+    this.spool += (spT - this.spool) * (1 - Math.exp(-dtc / (spT > this.spool ? 0.06 : 0.6)));
+    const flN = Math.min(1, Math.max(0, S.rpm / (this.vc.hiRpm || 6500)));
+    this.tuSpd = S.turbo * (0.5 + 0.5 * flN) * (1 + 0.06 * Math.min(1, Math.max(0, S.boost)));
+    if (S.turbo > 0.01) {
+      this.whA.set('bp', 800 + 900 * S.turbo, 0.75, this.sr); this.whB.set('bp', 1600 + 1500 * S.turbo, 0.85, this.sr); this.whC.set('bp', 360 + 340 * S.turbo, 0.7, this.sr);
+      const pr = Math.min(1, Math.max(0, S.boost) / 1.5);
+      this.tbBody1.set('bp', 380 + 320 * pr, 0.8, this.sr); this.tbBody2.set('bp', 950 + 650 * pr, 1.0, this.sr);
+    }
     S.pump += (T.pump - S.pump) * s;
     S.rattle += (T.rattle - S.rattle) * f;
     const M = this.mix, MT = this.mixT;
@@ -652,39 +685,65 @@ class EngineDSP {
       this.tw = (this.tw + 1) & 255;
 
       // ---- aspirazione -------------------------------------------------------------
-      let intake = this.inLP.p(this.inPK.p(this.inHP.p(inn))) * 1.1 * tn.intake.in;
-      intake += this.roarBP.p(nz2) * S.air * Math.pow(rn, 1.5) * 0.12 * (1 - 0.5 * S.turbo) * tn.intake.roar;
+      // v0.142: corpo dalla cassa del filtro e dal tubo (risuonano sulle aspirazioni), l'aria che entra pulsa con i
+      // cilindri invece di essere un fruscio fermo, e a farfalla spalancata di colpo un «whoomp» grave che scende di nota
+      const inP = this.inHP.p(inn);
+      let intake = (this.inLP.p(this.inPK.p(inP)) * 0.5 + this.inHB.p(inP) * 1.1 + this.inTB.p(inP) * 1.9) * 1.0 * tn.intake.in;
+      this.inEnv += (Math.abs(inn) - this.inEnv) * 0.004;
+      const pul = Math.min(2.5, this.inEnv * 28);
+      intake += this.roarBP.p(nz2) * S.air * Math.pow(rn, 1.5) * 0.16 * (0.45 + 0.55 * pul) * (1 - 0.5 * S.turbo) * tn.intake.roar;
+      if (S.thr - this.inThr > 0.0006 && S.rpm > 400) { this.tipE = Math.min(1, this.tipE + (S.thr - this.inThr) * 18); this.tipT = 0; }
+      this.inThr = S.thr;
+      if (this.tipE > 1e-3) {
+        this.tipT += 1 / sr;
+        if ((this.tipT * sr | 0) % 64 === 0) this.tipBP.set('bp', 300 + 600 * Math.exp(-this.tipT / 0.05), 1.1, sr);
+        intake += this.tipBP.p(nz3) * this.tipE * 0.06 * (0.5 + 0.5 * tn.intake.roar) * (1 - 0.6 * S.turbo);
+        this.tipE *= Math.exp(-1 / (sr * 0.12));
+      }
       // farfalle singole: ogni cornetto risuona, a gas aperto un ululato tonale che sale coi giri
       if (this.howlK > 1e-3) { const hq = Math.tanh(inn * 1.6) * 0.3 + nz3 * Math.abs(inn) * 0.6; intake += (this.howlBP.p(hq) * 0.8 + this.howlBP2.p(hq) * 0.35) * this.howlK * (0.6 + 0.6 * tn.intake.in) * 0.85 * (1 + 0.3 / Math.max(0.1, M.intake)); }   // fuori dall'auto l'ululato si sente comunque
 
-      // ---- turbo: fischio della girante, soffio, valvola --------------------------
-      const tb = tn.tb, ft = tb.f0 + (tb.f1 - tb.f0) * S.turbo;
+      // ---- turbo (v0.142): girante vera, non un fischio da sintetizzatore ------------------------------------
+      // La nota della girante non è un seno: è aria stretta intorno a una nota che ondeggia, con le bande laterali
+      // dell'albero (pale e girante non sono mai perfette: la nota «rolla»), un'ottava sopra più leggera e sotto il corpo
+      // dell'aria messa in pressione. È forte mentre la girante prende giri e si calma a pressione ferma (DSP_TB.spool):
+      // non trapana le orecchie dopo mezzo minuto di autostrada.
+      // giri della girante: col turbo in pressione salgono ancora con l'aria che passa (giri del motore), quindi dentro ogni
+      // marcia la nota sale e alla cambiata cala un poco, invece di restare ferma come una sirena
+      const tb = tn.tb, ft = tb.f0 + (tb.f1 - tb.f0) * this.tuSpd;
       this.lfo += (nz * 0.002 - this.lfo * 0.0005);
       this.wDrift += (nz2 * 0.0006 - this.wDrift * 0.00025);            // deriva lenta (pochi Hz di variazione)
       this.wAmp += (nz3 * 0.004 - this.wAmp * 0.0012);                   // respiro del volume
       const ftv = ft * (1 + this.lfo + this.wDrift);
-      if ((this.wN = (this.wN + 1) & 31) === 0) { this.wBP.set('bp', ftv, 18, sr); this.wBP2.set('bp', ftv * 1.49, 12, sr); }
-      this.tph += ftv / sr; if (this.tph > 1) this.tph -= 1;
-      const band = this.wBP.p(nz) * 5.5 + this.wBP2.p(nz2) * 1.6;           // aria che fischia, non una sinusoide pura
-      let whistle = (0.42 * Math.sin(TAU * this.tph) + 0.08 * Math.sin(2 * TAU * this.tph) + band) * (1 + Math.max(-0.4, Math.min(0.4, this.wAmp * 6)));
+      const fw = ftv * DSP_TB.nota, fsh = fw / DSP_TB.pale;
+      if ((this.wN = (this.wN + 1) & 31) === 0) { this.wBP.set('bp', fw, 7, sr); this.wBP2.set('bp', fw * 2.01, 6, sr); }
+      this.tph += ftv / sr; if (this.tph > 1) this.tph -= 1;            // fase alla frequenza delle pale: la usano pompaggio e valvola
+      this.wPh += fw / sr; if (this.wPh > 1) this.wPh -= 1;
+      this.shPh += fsh / sr; if (this.shPh > 1) this.shPh -= 1;
+      const rot = 1 + 0.32 * Math.sin(TAU * this.shPh) + 0.12 * Math.sin(2 * TAU * this.shPh + 1.1);
+      const band = this.wBP.p(nz) * 4.2 + this.wBP2.p(nz2) * 1.0;        // aria intonata: la parte più grossa della nota
+      let whistle = (0.22 * Math.sin(TAU * this.wPh) * rot + 0.04 * Math.sin(2 * TAU * this.wPh + 0.6) + band * (0.8 + 0.2 * rot)) * (1 + Math.max(-0.35, Math.min(0.35, this.wAmp * 5)));
       if (tb.twin) {
-        this.tph2 += ft * 0.87 / sr; if (this.tph2 > 1) this.tph2 -= 1;
-        whistle += S.sec * 0.8 * Math.sin(TAU * this.tph2);
+        this.tph2 += fw * 0.87 / sr; if (this.tph2 > 1) this.tph2 -= 1;
+        whistle += S.sec * 0.4 * Math.sin(TAU * this.tph2) * rot;
       }
       // rilascio: la girante gira ancora a vuoto (valvola aperta), il fischio resta e cala con lei invece di sparire
       if (S.thr < this.tThr - 0.35 && S.turbo > 0.3) this.tLift = 0.85;
       this.tThr = S.thr; this.tLift *= this.tLiftDec || (this.tLiftDec = Math.exp(-1 / (sr * 0.9)));
       const load = Math.max(0.22 + 0.78 * S.thr, this.tLift);
-      const tAmp = Math.pow(S.turbo, 1.7) * load * tb.w * (0.6 + 0.4 * tn.intake.wh) * 1.8;
-      // soffio: l'aria che passa davvero nel compressore (girante, farfalla, pressione); bande che salgono con la girante
-      const fl = S.turbo * (0.2 + 0.8 * S.air) * (1 + 0.5 * Math.min(2, Math.max(0, S.boost)));
-      if (this.wN === 16) { this.whA.set('bp', 1400 + 1200 * S.turbo, 0.9, sr); this.whB.set('bp', 2600 + 1900 * S.turbo, 1.1, sr); }
-      const whK = Math.max(0.035, tb.wh) * tn.intake.wh * 6.5;
+      const tAmp = Math.pow(S.turbo, 1.5) * load * tb.w * (0.6 + 0.4 * tn.intake.wh) * DSP_TB.fischio * (0.42 + DSP_TB.spool * this.spool);
       let turbo = this.wLP.p(whistle * tAmp);
+      // corpo: l'aria spinta in pressione nel tubo dell'intercooler, un «vooosh» grave che cresce con i bar
+      const prs = Math.min(1, Math.max(0, S.boost) / 1.5);
+      turbo += (this.tbBody1.p(nz3) + this.tbBody2.p(nz) * 0.55) * S.turbo * (0.25 + 0.75 * S.thr) * (0.3 + 0.7 * prs) * (0.7 + 0.6 * this.spool) * tb.w * DSP_TB.corpo;
+      // soffio: l'aria che passa davvero nel compressore (girante, farfalla, pressione). v0.142: più cupo, tre bande che
+      // salgono con la girante e un filo di sibilo, niente più muro di fruscio sopra i 5 kHz
+      const fl = S.turbo * (0.2 + 0.8 * S.air) * (1 + 0.5 * Math.min(2, Math.max(0, S.boost)));
+      const whK = Math.max(0.035, tb.wh) * tn.intake.wh * DSP_TB.aria;
       // il soffio è aria, non il fischio: resta pieno anche quando il fischio lo fa il campione registrato (fxT lo abbassa)
-      let air = (this.whA.p(nz3) + this.whB.p(nz2) * 0.75) * fl * whK + this.whHP.p(nz) * fl * fl * whK * 0.5;
+      let air = this.airLP.p((this.whA.p(nz3) + this.whB.p(nz2) * 0.55 + this.whC.p(nz) * 0.75) * fl * whK + this.whHP.p(nz) * fl * fl * whK * 0.12);
       // wastegate che apre sotto carico: soffio di gas dal lato scarico, segue il tremolio della regolazione
-      if (S.wg > 0.01) air += this.wgBP.p(nz2) * S.wg * S.thr * whK * 0.55;
+      if (S.wg > 0.01) air += this.wgBP.p(nz2) * S.wg * S.thr * whK * 0.5;
 
       let bov = 0; this.flOn = 0; this.flPulse = 0;
       if (this.bov.env > 0) {
@@ -768,7 +827,9 @@ class EngineDSP {
       }
       const gr = Math.abs(S.gearRpm);
       this.gPh += gr / 60 * 31 / sr; if (this.gPh > 1) this.gPh -= 1;
-      let gear = Math.sin(TAU * this.gPh) * (0.006 * Math.min(1, S.drive) + S.rev * 0.05 * Math.min(1, gr / 500));
+      // fischio degli ingranaggi (denti elicoidali): poca nota pura e molta aria stretta attorno alla frequenza d'ingranamento
+      if ((this.gwN = ((this.gwN || 0) + 1) & 63) === 0) this.gwBP.set('bp', Math.max(60, gr / 60 * 31), 10, sr);
+      let gear = (Math.sin(TAU * this.gPh) * 0.45 + this.gwBP.p(nz2) * 2.2) * (0.006 * DSP_CB.ingr * Math.min(1, S.drive) + S.rev * 0.05 * Math.min(1, gr / 500));
       // cinghia dei servizi: l'alternatore gira 2,7 volte l'albero, fischio sottile con una seconda armonica
       this.beltPh += rn * 7000 / 60 * 2.7 / sr; if (this.beltPh > 1) this.beltPh -= 1;
       const belt = S.running > 0.5 ? (Math.sin(TAU * this.beltPh) + 0.35 * Math.sin(2 * TAU * this.beltPh)) * (0.0022 + 0.003 * rn) : 0;
@@ -777,11 +838,21 @@ class EngineDSP {
         gear += this.grBP.p(nz) * this.grind * (0.4 + 0.6 * this.grPh) * 0.5;
         this.grind *= Math.exp(-1 / (sr * 0.12));
       }
+      // cambiata (v0.142): i denti che entrano fanno risuonare la scatola (tre modi metallici, due contatti ravvicinati:
+      // dente e manicotto in battuta), poi la botta della trasmissione che si ricarica, una nota bassa che scende, e lo
+      // scatto della leva. Ogni cambiata un po' diversa, più piena quando la trasmissione è sotto coppia
       if (this.clunk > 1e-3) {
-        this.clPh += 58 / sr;
-        gear += Math.sin(TAU * this.clPh) * this.clunk * 0.12 + nz * this.clunk * this.clunk * 0.04;
-        this.clunk *= Math.exp(-1 / (sr * 0.03));
-      } else this.clPh = 0;
+        if (this.clT === 0) this.clK = 0.75 + 0.5 * Math.abs(nz);
+        this.clT += 1 / sr;
+        const t = this.clT;
+        const e1 = t < 0.0012 ? nz * (1 - t / 0.0012) : 0, e2 = t > 0.006 && t < 0.0072 ? nz2 * 0.6 : 0;
+        const metal = (this.clR1.p(e1 + e2) + this.clR2.p(e1 + e2) * 0.7 + this.clR3.p(e1) * 0.45) * Math.exp(-t / 0.04);
+        this.clPh += (95 - 35 * Math.min(1, t / 0.06)) / sr; if (this.clPh > 1) this.clPh -= 1;
+        const botta = (Math.sin(TAU * this.clPh) * 0.8 + this.clLP.p(nz3) * 1.6) * Math.exp(-t / 0.05) * Math.min(1, t / 0.002);
+        const leva = t < 0.003 ? this.tickHP.p(nz) * (1 - t / 0.003) : 0;
+        gear += (metal * DSP_CB.clack * 10 + botta * DSP_CB.botta + leva * DSP_CB.leva) * this.clK * (0.6 + 0.4 * Math.min(1, S.drive * 2));
+        if (t > 0.3) this.clunk = 0;
+      } else { this.clT = 0; this.clPh = 0; }
       // giunto della strada: tonfo sordo delle gomme e della sospensione
       if (this.bump > 1e-3) {
         this.bumpPh += 47 / sr;
@@ -819,6 +890,8 @@ class EngineDSP {
       // in abitacolo coi finestrini aperti lo scarico e la strada entrano più forti
       if (cab) out += (exh * M.exh * 0.6 + road * 0.45 + tire * 0.4) * wo;
       out = out * M.g + bur * this.burG * this.burK + 1e-18;       // il borbottio ha il suo livello, non passa dal mix del motore
+      // solo per le prove (strumenti/ascolta.mjs, SOLO=turbo|fischio|aria|aspirazione|cambio|valvola|scarico): un componente da solo
+      if (this.solo) { const st = { turbo: (turbo * this.fxT + air) * M.turbo + surge * (M.turbo + M.bov) * this.fxS, fischio: turbo * this.fxT * M.turbo, aria: air * M.turbo, aspirazione: intake * M.intake, cambio: gear * M.gear, valvola: bov * M.bov * this.fxB + surge * (M.turbo + M.bov) * this.fxS, scarico: exh * M.exh * cabK + boom * M.boom * cabK }; if (st[this.solo] !== undefined) out = st[this.solo] * M.g + 1e-18; }
       // urti: livello pari in tutti i punti d'ascolto (non passano dal mix del motore), poi riverbero dell'ambiente
       if (this.H) { const H = this.H; if (H.duck > 1e-3) { out *= 1 - H.duck; H.duck *= Math.exp(-1 / (sr * 0.3)); } out += this.hitSample(TAU, this.cfg.view) * 0.32; }
 
