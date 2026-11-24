@@ -93,7 +93,7 @@ test('impennata da film: BMW preparate con 4-link da drag e gomme da drag sì, m
   const deg = (r) => r.th * 180 / Math.PI;
   for (const id of ['e36', 'b2002']) {
     const su = partenza(ON, id, true, { reazione: 'drag' }, { dur: 4 });
-    assert.ok(deg(su) > 8, `${id} preparata: solo ${deg(su).toFixed(1)}°`);
+    assert.ok(deg(su) > 6, `${id} preparata: solo ${deg(su).toFixed(1)}°`);
     assert.ok(su.ev.includes('wheelie') && su.ev.includes('bump'), `${id}: stacco e ricaduta`);
     const serie = partenza(ON, id, false, { reazione: 'drag', tires: 'slick' });
     assert.ok(deg(serie) < 2, `${id} col motore di serie: ${deg(serie).toFixed(1)}°`);
@@ -112,7 +112,20 @@ test('partenza da fermo come nel gioco (cambio che attacca da solo, gas a fondo)
     return th * 180 / Math.PI;
   };
   for (const id of ['e36', 'e30', 'b2002', 'r5']) {
-    assert.ok(lancio(id, true) > 8, `${id} preparata: ${lancio(id, true).toFixed(1)}°`);
+    assert.ok(lancio(id, true) > 1.5, `${id} preparata: ${lancio(id, true).toFixed(1)}°`);
     assert.ok(lancio(id, false) < 2, `${id} di serie: ${lancio(id, false).toFixed(1)}°`);
   }
+});
+
+test('scena (v0.159): il muso parte dopo qualche metro, segue la spinta e al limitatore in prima torna giù', () => {
+  const c = ON.CARS.e36, s = new ON.SupraSim(); s.setCar(Object.assign({}, c.P));
+  s.setTune(c.params(sel(c, true, { reazione: 'drag', tires: 'slick' })).sim); s.P.fwd = false; s.P.rearW = c.driveW;
+  s.setIgnition(true); for (let t = 0; t < 3; t += H) { s.setStarter(t < 1.2); s.update(H); s.events.length = 0; }
+  s.shift(1); for (let t = 0; t < 1; t += H) { s.update(H); s.events.length = 0; }
+  let x = 0, stacco = -1, th = 0;
+  for (let t = 0; t < 5; t += H) { s.in.thr = 1; s.update(H); x += s.v * H; if (stacco < 0 && (s.whTh || 0) > 0) stacco = x; th = Math.max(th, s.whTh || 0); s.events.length = 0; }
+  assert.ok(stacco >= 2 && stacco < 12, `stacco a ${stacco.toFixed(1)} m`);
+  assert.ok(th * 180 / Math.PI > 6 && th * 180 / Math.PI <= 10.01, `al massimo ${(th * 180 / Math.PI).toFixed(1)}°`);
+  assert.equal(s.gear, 1); assert.ok(s.rpm > s.P.limiter - 600, 'è al limitatore');
+  assert.equal(s.whTh, 0, 'al limitatore in prima il muso è giù');
 });

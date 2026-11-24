@@ -2146,7 +2146,7 @@ class Street2D {
     // [IMPENNATA] muso su (sim.whTh, radianti): la cassa ruota attorno alle ruote dietro e quella davanti si stacca da terra.
     // Quasi su (whK sopra 0,85) il muso si alleggerisce: le molle davanti si allungano e la cassa sale un filo, la ruota resta giù
     st.whL = (st.whL || 0) + (Math.max(0, Math.min(1, ((s.whK || 0) - 0.85) / 0.15)) - (st.whL || 0)) * Math.min(1, dt * 8);
-    const whTh = (s.wheelie || 0) + st.whL * 0.014, skW = -Math.tan(whTh), whX0 = (this.geo().ax[0] || 0) * k;
+    const whTh = (s.wheelie || 0) + st.whL * 0.024, skW = -Math.tan(whTh), whX0 = (this.geo().ax[0] || 0) * k;
     const whY = (xl) => skW * (xl - whX0);                                    // quanto sale un punto della cassa a xl pixel dal bordo
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;

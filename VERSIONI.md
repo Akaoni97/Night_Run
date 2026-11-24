@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.158**
+**Versione attuale: v0.159**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -182,3 +182,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.156 · 24/11/2026 · cognato · i campioni dei pezzi si sentono di nuovo (livello generale da 1,1 a 3,2, +9 dB): erano 18-20 dB sotto il motore e i cursori dei volumi nella scheda Suoni non cambiavano niente all'orecchio
 - v0.157 · 24/11/2026 · cognato · lo schermo del banco prova da Luca Tuning mostra i dati veri dell'auto in uso (CV e giri, Nm e giri, limitatore, turbo o aspirato, peso, kg/CV) e le sue curve di CV e Nm, invece dei numeri a caso
 - v0.158 · 24/11/2026 · cognato · **scoppiettii coi pezzi di scarico**: di serie niente scoppi al rilascio, col primo livello di scarico o collettore cominciano e crescono fino al massimo; volumi a parte per scoppiettii e scoppi al limitatore nella scheda Suoni di Luca; launch spento = nessun limite di giri (lo stutter box limitava anche spento), si accende solo se la centralina lo ha
+- v0.159 · 24/11/2026 · cognato · **impennata rifatta sulla fisica**: niente più mossa da fermo; il muso si alza quando la spinta del momento supera quella che serve a quell'auto (baricentro, passo, peso dietro, 4-link, CV per tonnellata, gomme da drag): prima la cassa si siede, dopo qualche metro sale, cala al limitatore e nelle cambiate, col colpo di frizione in seconda a bassa velocità si alza, a 60 km/h fa solo cenno; tetto 10°

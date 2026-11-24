@@ -23,13 +23,15 @@ const IMP = {
   // Sul bagnato niente: una slick sull'acqua è una saponetta (−30 % in più del bagnato normale)
   DRAG: { slick: 1.6, radiale: 1.25 },
   // tetto dell'angolo e smorzamento (vedi SupraSim.impennata): senza wheelie bar sale finché il paraurti dietro tocca
-  // (sbalzo ~0,85 m, paraurti a ~0,3 m da terra: una dozzina di gradi)
-  barDeg: 3, maxDeg: 12, c: 2.2,
-  // impennata «da film» (SupraSim.impennata, v0.149): parte quando la fisica è oltre il 70 % del momento che serve
-  // (whK) con 4-link o 4-link da drag (G ≥ 1,3), gomme da drag, asciutto, gas oltre l'85 %, prima o seconda, sotto i 60 km/h;
-  // resta su finché whK sta sopra 0,5. Salita secca (v0.151): molla rigida e poco smorzata, il muso arriva su in un decimo e mezzo di secondo e rimbalza appena sul tetto. Angolo: dal 60 % del tetto (appena oltre la soglia) al tetto pieno (15 punti sopra)
-  // cvt / cvt2: CV per tonnellata che bastano per partire da fermi col 4-link da drag / col 4-link (v0.154); morde: m/s dello stacco
-  scena: { soglia: 0.7, tieni: 0.5, pieno: 0.15, min: 0.6, G: 1.3, vMax: 17, k: 150, c: 11, tau: 0.3, cvt: 280, cvt2: 380, morde: 0.8 },
+  // (sbalzo ~0,85 m, paraurti a ~0,3 m da terra: una dozzina di gradi; v0.159 tetto a 10° per non esagerare)
+  barDeg: 3, maxDeg: 10, c: 2.2,
+  // scena (v0.159): il muso si alza quando la spinta di adesso (accelerazione della cassa) supera quella che serve a
+  // quell'auto (peso × distanza del baricentro dall'asse dietro, contro accelerazione × altezza del baricentro × G × film).
+  // film = quanto manca alla fisica semplice del gioco (ponte che si torce, molle che rimbalzano); le gomme da drag ci
+  // aggiungono il 15 %, e cresce coi CV per tonnellata (pwRif 450 CV/t = ×1, da ×0,7 a ×1,2: il ponte si torce di più con
+  // più coppia). tauA = 0,4 s: la spinta deve durare, il primo colpo schiaccia solo la cassa (il muso parte dopo 3-5 m).
+  // pieno = di quanto sopra la soglia il muso arriva al tetto. Niente mosse: succede o non succede
+  scena: { film: 1.6, pieno: 0.3, k: 70, c: 10, tauA: 0.4, pwRif: 450, filmMin: 0.7, filmMax: 1.2, v0: 20, v1: 32, vCala: 0.6 },
 };
 (function impennataPezzi() {
   if (!IMP.on || typeof CARS === 'undefined') return;

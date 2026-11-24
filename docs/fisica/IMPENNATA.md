@@ -7,6 +7,13 @@ finta che parte da sola: se l'impennata arriva, è perché la macchina ha la cop
 Stato: **applicato in prova dalla v0.145**, spento di serie (Sviluppatori → «Progetto impennata»). La proposta
 originale è sotto (§1-7); l'esito delle prove è qui subito.
 
+## 0ter. Revisione v0.159: niente mosse, la spinta del momento
+Il muso si alza quando `ratio = m·a·h·G·film / (W·b)` supera 1, con `a` = accelerazione della cassa addolcita su 0,4 s e
+`film` = 1,6 × (CV/t ÷ 450, tra 0,7 e 1,2) × (1 − 0,6 tra 70 e 115 km/h) × 1,15 con gomme da drag. Angolo = 10° ×
+(ratio − 1) / 0,3, inseguito da una molla smorzata; tra 0,85 e 1 solo il muso leggero. Al limitatore e nelle cambiate `a`
+crolla e il muso scende; il colpo di frizione in seconda a bassa velocità lo alza. L'innesco «da fermo» della v0.154 e la
+salita a scatto della v0.151 sono tolti.
+
 ## 0bis. Revisione v0.149: gomme da drag e impennata da film
 Luca l'ha provata (E36 e 2002 Turbo preparate, «sembrava un aeroplano») e il muso non si muoveva. Aveva ragione lui su
 un punto: le «Gomme da drag slick» del gioco avevano μ ≈ 1,7-2 sempre, come una slick da pista. Una slick da drag calda

@@ -110,44 +110,37 @@ class SupraSim {
     const Mup = m * this.pz * cgE * G, th = this.whTh || 0;
     const Mdown = W * (b * Math.cos(th) - cgE * Math.sin(th));
     this.whK = Mdown > 0 ? SIM_CLAMP(Mup / Mdown, 0, 1.5) : 1.5;                  // quanto manca: sopra 0,85 il muso è leggero ("tentenna")
-    // [IMPENNATA] scena (v0.149): quando la fisica ci arriva quasi (whK oltre la soglia) e c'è tutto quello che serve
-    // (4-link, gomme da drag sull'asciutto, gas a fondo in prima o seconda sotto i 50 km/h), il muso sale deciso fino al tetto
-    // e ci resta finché si spinge: un'impennata da film. La salita è una molla smorzata verso un angolo che cresce con quanto
-    // si è oltre la soglia; finita la spinta il muso ricade col suo peso (la fisica sotto) e rimbalza.
+    // [IMPENNATA] scena (v0.159): niente mosse. Il muso si alza quando la spinta di adesso supera quella che serve a
+    // quell'auto, col suo baricentro, il suo passo, il suo peso dietro e la sua geometria (G). La spinta è l'accelerazione
+    // della cassa addolcita su un decimo di secondo (whPzS): sale col turbo che carica, col colpo di frizione anche da
+    // lanciati in seconda, con le gomme da drag che mordono; cala al limitatore, nella cambiata, se le gomme pattinano.
+    // «film» compensa quello che la fisica semplice del gioco non ha (il ponte che si torce e spinge la cassa in su, il
+    // rimbalzo delle molle nella partenza): senza, le accelerazioni del gioco (1,2-1,6 g) non alzerebbero mai una BMW.
+    // Sotto la soglia, tra 85 e 100 %, il muso si alleggerisce soltanto (whK, street2d.js): il «cenno».
     const thMax = (wl.bar ? (wl.barDeg || 2.5) : (wl.maxDeg || 7.5)) * Math.PI / 180, sc = wl.scena;
     if (sc) {
-      const ok0 = wl.drag > 1 && G >= (sc.G || 1.3) && (this.wet || 0) < 0.1 && this.running && this.in.thr > 0.85 && this.gear >= 1 && this.gear <= 2 && this.v < (sc.vMax || 14);
-      // conta la spinta che dura (media su ~0,3 s), non il colpo della frizione: senza cavalli veri il muso non sta su
-      this.whKf = (this.whKf || 0) + (this.whK - (this.whKf || 0)) * Math.min(1, h / (sc.tau || 0.3));
-      // partenza da fermo (v0.154): nel gioco si parte dal minimo col cambio che attacca da solo e il turbo che non ha ancora
-      // pressione, quindi la spinta del momento resta bassa anche su un'auto da 1.000 CV. Quello che decide se una vera
-      // impennerebbe è quanta potenza c'è per tonnellata con gomme da drag e 4-link: da fermi, gas a fondo, e il muso va su
-      // appena le gomme mordono. Soglia: 280 CV/t col 4-link da drag, 380 col 4-link (servono di più per la geometria peggiore)
-      if (Math.abs(this.v) < 1.2) this.whArm = true;                     // da fermi si arma
-      else if (!ok0 || this.v > (sc.vMax || 14)) this.whArm = false;      // in movimento: mollato il gas, terza o troppo veloci
-      let pwK = 0;
-      if (this.whArm && ok0) {
-        if (this._cvT !== this.tune.pw + '|' + this.P.limiter) { this._cvT = this.tune.pw + '|' + this.P.limiter; this._cv = this.estimatePeak().cv; }
-        const pw = this._cv / ((P.mass + 75) / 1000), pwMin = G >= 1.55 ? (sc.cvt || 280) : (sc.cvt2 || 380);
-        pwK = pw >= pwMin && this.v > (sc.morde || 0.8) ? SIM_CLAMP(0.6 + 0.4 * (pw - pwMin) / (pwMin * 0.6), 0.6, 1) : 0;
-      }
-      const daPw = !!(pwK || (this.whScena && this.whDaPw));
-      this.whScena = ok0 && (daPw || (this.whScena ? this.whKf > (sc.tieni || 0.5) : this.whKf > (sc.soglia || 0.75)));
-      if (this.whScena && pwK) this.whDaPw = true;
-      if (!this.whScena) this.whDaPw = false;
-      if (this.whScena) {
-        // l'angolo può solo crescere finché si spinge: niente su e giù a metà impennata
-        const kAng = Math.max(pwK, this.whKf > (sc.soglia || 0.75) ? SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1) : 0, this.whDaPw ? 0.6 : 0);
-        const tgt = this.whTgt = Math.max(this.whTgt || 0, thMax * kAng);
-        let v = (this.whV || 0) + h * ((sc.k || 55) * (tgt - th) - (sc.c || 8) * (this.whV || 0));
+      this.whPzS = (this.whPzS || 0) + (this.pz - (this.whPzS || 0)) * Math.min(1, h / (sc.tauA || 0.1));
+      // il ponte che si torce spinge di più quanta più coppia c'è: «film» cresce con i CV per tonnellata (rif. 450 CV/t)
+      if (this._cvT !== this.tune.pw + '|' + this.P.limiter) { this._cvT = this.tune.pw + '|' + this.P.limiter; this._cv = this.estimatePeak().cv; }
+      const filmK = SIM_CLAMP(this._cv / ((P.mass + 75) / 1000) / (sc.pwRif || 450), sc.filmMin || 0.7, sc.filmMax || 1.2);
+      // e conta nelle partenze e nei colpi a bassa velocità: oltre i 60 km/h svanisce (a 100 ne resta il 40 %), lì il muso al
+      // massimo si alleggerisce
+      const filmV = 1 - (sc.vCala || 0.6) * SIM_SS(sc.v0 || 11, sc.v1 || 25, Math.abs(this.v));
+      const need = W * b, push = m * Math.max(0, this.whPzS) * cgE * G * (sc.film || 1.5) * filmK * filmV * (1 + 0.15 * ((wl.drag || 1) > 1 ? 1 : 0));
+      const ratio = need > 0 ? push / need : 0;
+      this.whK = SIM_CLAMP(ratio, 0, 1.5);
+      const ok = this.running && (this.wet || 0) < 0.5;
+      const tgt = ok ? thMax * SIM_CLAMP((ratio - 1) / (sc.pieno || 0.3), 0, 1) : 0;
+      if (tgt > 0 || th > 0) {
+        let v = (this.whV || 0) + h * ((sc.k || 70) * (tgt - th) - (sc.c || 10) * (this.whV || 0));
         let t = th + h * v;
-        if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1, scena: 1 });
+        if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1 });
         if (t >= thMax) { if (v > 0.25) this.events.push({ type: wl.bar ? 'wheeliebar' : 'scrape', I: Math.min(1, v * 0.6) }); t = thMax; v = Math.min(0, -0.25 * v); }
-        if (t < 0) { t = 0; v = 0; }
+        if (t <= 0) { if (th > 0 && v < -0.12) this.events.push({ type: 'bump', I: Math.min(1, -v * 0.9), wheelie: 1 }); t = 0; v = 0; }
         this.whTh = t; this.whV = v;
-        return W * hopF;
+        if (t > 0) return W * hopF;
       }
-      this.whTgt = 0;
+      return SIM_CLAMP((Nr0 + m * this.pz * cgE / P.wb) * hopF, Nr0 * 0.3, W);
     }
     if (th > 0 || Mup > Mdown) {
       let v = (this.whV || 0) + h * ((Mup - Mdown) / Ir - (wl.c || 3) * (this.whV || 0));
