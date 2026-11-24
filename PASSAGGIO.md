@@ -32,6 +32,8 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 5. Prima di dire che una cosa è fatta, provala (test e browser) e dillo in modo chiaro, anche quando qualcosa non va.
 
 ## Com'è fatto il gioco oggi (in breve)
+
+- **Nottolino Racing (v0.153)**. In `#introMenu` la chiave del reel Turn the Key avvia il Viaggio al rilascio su START. Invio e Spazio avviano anche senza trascinare. Il menu usa lo stesso avvio per il prologo e per la ripresa di una partita salvata.
 - **Il Viaggio** (modalità principale, `viaggio.js` + `viaggio2d.js`): autostrada infinita dal km 0 sotto casa con
   una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Mario, Da Luca Tuning, Neon
   Kustom, Motel Ovunque con la cassa che ti segue), paesaggi che cambiano coi km, bisogni del guidatore (fame,

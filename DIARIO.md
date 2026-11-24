@@ -1,3 +1,6 @@
+## 24/11/2026 · proprietario · v0.153 (**nottolino Racing**)
+- Il blocchetto del reel Turn the Key prende il posto della chiave precedente. Il rilascio su START, Invio e Spazio richiamano l’avvio del Viaggio. Il menu conserva i tre salvataggi e il suono di avviamento.
+
 ## 24/11/2026 · cognato · v0.152 (**lo scoppio ti porta via di corsia**)
 - Idea di Luca: sopra gli 83 km/h (`FOR.sbandaKmh`) lo scoppio cambia corsia da solo, una a caso tra quelle accanto (dalla prima o dalla terza c'è solo una scelta), con l'avviso «La macchina ti scappa a destra/sinistra!». Se di là c'è qualcuno, l'urto lo fa il gioco come sempre. Niente col pilota automatico che accosta. `foraSbanda` in `forature.js`, un test in più in `test/forature.test.js`; 430 in tutto.
 
