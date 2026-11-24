@@ -77,8 +77,8 @@ test('quando si alza: tetto della wheelie bar, del paraurti, e ricade con una bo
   const sb = partenza(ON, 'r5', true, { reazione: 'drag', wheeliebar: 'si' }, { wl: { G: 3 } });
   const nb = partenza(ON, 'r5', true, { reazione: 'drag' }, { wl: { G: 3 } });
   const deg = (r) => r.th * 180 / Math.PI;
-  assert.ok(deg(sb) > 1 && deg(sb) <= 2.51, `con la wheelie bar ${deg(sb).toFixed(2)}°`);
-  assert.ok(deg(nb) > deg(sb) && deg(nb) <= 7.51, `senza ${deg(nb).toFixed(2)}°`);
+  assert.ok(deg(sb) > 1 && deg(sb) <= 3.01, `con la wheelie bar ${deg(sb).toFixed(2)}°`);
+  assert.ok(deg(nb) > deg(sb) && deg(nb) <= 12.01, `senza ${deg(nb).toFixed(2)}°`);
   assert.ok(nb.ev.includes('wheelie') && nb.ev.includes('bump'), 'eventi di stacco e ricaduta');
 });
 
@@ -86,4 +86,17 @@ test('le trazioni anteriori non si alzano mai, nemmeno con la geometria forzata'
   const id = Object.keys(ON.CARS).find((x) => ON.CARS[x].fwd && ON.CARS[x].tuning);
   const r = partenza(ON, id, true, {}, { wl: { G: 3 } });
   assert.equal(r.th, 0);
+});
+
+test('impennata da film: BMW preparate con 4-link da drag e gomme da drag sì, motore di serie o gomme normali no', () => {
+  const deg = (r) => r.th * 180 / Math.PI;
+  for (const id of ['e36', 'b2002']) {
+    const su = partenza(ON, id, true, { reazione: 'drag' });
+    assert.ok(deg(su) > 8, `${id} preparata: solo ${deg(su).toFixed(1)}°`);
+    assert.ok(su.ev.includes('wheelie') && su.ev.includes('bump'), `${id}: stacco e ricaduta`);
+    const serie = partenza(ON, id, false, { reazione: 'drag', tires: 'slick' });
+    assert.ok(deg(serie) < 2, `${id} col motore di serie: ${deg(serie).toFixed(1)}°`);
+    const gomme = partenza(ON, id, true, { reazione: 'drag', tires: ON.CARS[id].tuning.tires.items[2].id });
+    assert.ok(deg(gomme) < 2, `${id} con le semislick: ${deg(gomme).toFixed(1)}°`);
+  }
 });

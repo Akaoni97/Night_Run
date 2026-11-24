@@ -17,8 +17,18 @@ const IMP = {
     { id: 'no', bar: false, price: 0, km: 0, brand: '—', name: 'Niente wheelie bar', note: 'Se il muso sale, sale finché il paraurti posteriore tocca l\'asfalto (7-8 gradi).' },
     { id: 'si', bar: true, price: 900, km: 25, brand: 'Su misura', name: 'Wheelie bar', note: 'Due rotelline dietro il paraurti: il muso si ferma a 2-3 gradi e la spinta resta sulle gomme.' },
   ],
-  // tetto dell'angolo e smorzamento (vedi SupraSim.impennata)
-  barDeg: 2.5, maxDeg: 7.5, c: 3,
+  // gomma da drag in partenza (v0.149): sotto i 22 km/h tiene di più, fino agli 80 torna normale. Una slick da drag calda
+  // (fianco morbido che si accartoccia e poi stende il battistrada, mescola tenera, burnout) in partenza arriva a μ 2,5-3:
+  // le slick del gioco hanno μ ≈ 1,7-2 tutto il tempo, quindi in partenza ×1,6 (μ 2,7-3,1). Le radiali da drag (ET Street) ×1,25.
+  // Sul bagnato niente: una slick sull'acqua è una saponetta (−30 % in più del bagnato normale)
+  DRAG: { slick: 1.6, radiale: 1.25 },
+  // tetto dell'angolo e smorzamento (vedi SupraSim.impennata): senza wheelie bar sale finché il paraurti dietro tocca
+  // (sbalzo ~0,85 m, paraurti a ~0,3 m da terra: una dozzina di gradi)
+  barDeg: 3, maxDeg: 12, c: 2.2,
+  // impennata «da film» (SupraSim.impennata, v0.149): parte quando la fisica è oltre il 70 % del momento che serve
+  // (whK) con 4-link o 4-link da drag (G ≥ 1,3), gomme da drag, asciutto, gas oltre l'85 %, prima o seconda, sotto i 90 km/h;
+  // resta su finché whK sta sopra 0,5. Angolo: dal 40 % del tetto (appena oltre la soglia) al tetto pieno (15 punti sopra)
+  scena: { soglia: 0.7, tieni: 0.5, pieno: 0.15, min: 0.4, G: 1.3, vMax: 25, k: 55, c: 8 },
 };
 (function impennataPezzi() {
   if (!IMP.on || typeof CARS === 'undefined') return;
@@ -32,7 +42,9 @@ const IMP = {
     c.params = (sel, adj) => {
       const r = p0(sel, adj), s = sel || {};
       const G = tuningItemOf(c.tuning, 'reazione', s.reazione).sim.G, bar = tuningItemOf(c.tuning, 'wheeliebar', s.wheeliebar).sim.bar;
-      r.sim.wheelie = { G, bar, barDeg: IMP.barDeg, maxDeg: IMP.maxDeg, c: IMP.c };
+      const ty = tuningItemOf(c.tuning, 'tires', s.tires), tn = ((ty && ty.id) || '') + ' ' + ((ty && ty.name) || '');
+      const drag = /slick/i.test(tn) && /drag/i.test(tn) ? IMP.DRAG.slick : /et ?street|radiale da drag/i.test(tn) ? IMP.DRAG.radiale : 1;
+      r.sim.wheelie = { G, bar, drag, barDeg: IMP.barDeg, maxDeg: IMP.maxDeg, c: IMP.c, scena: IMP.scena };
       return r;
     };
   }

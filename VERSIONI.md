@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.149**
+**Versione attuale: v0.150**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -172,4 +172,5 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.146 · 24/11/2026 · cognato · testi delle chat riscritti in italiano più naturale (stessa trama, stessi bivi; 908 nodi in `chat_modifiche.js`), gatto di Elena Fufi al posto di Pasta, ritocchi agli epiloghi e ai sottotitoli delle incursioni
 - v0.147 · 24/11/2026 · cognato · **rulli dal vivo da Luca Tuning**: «Attiva rulli» mette l'auto sui rulli davanti al negozio con una barra del gas in basso; i pezzi si montano col motore in tiro e si sentono subito, fiamme e marmitta vere sulla macchina
 - v0.148 · 24/11/2026 · cognato · **da Luca Tuning il gas è libero**: appena entrato si sgasa (fermo, freno tirato, marcia in folle che torna uscendo) e i pezzi montati si sentono subito; il banco a rulli torna in fondo al pannello e apre la schermata grande
-- v0.149 · 24/11/2026 · cognato · forature in due: lenta ogni 15-20 km, scoppio ogni 42-45 km (± 5) con botto, PSSSHHH e gomma a terra che sbatte (`forature.js`)
+- v0.149 · 24/11/2026 · cognato · **impennata da film**: col progetto acceso le gomme da drag in partenza tengono come quelle vere (μ 2,5-3) e con 4-link, potenza vera e asciutto il muso sale fino a 12° e ci resta finché spingi; motore di serie, gomme normali o bagnato restano a terra
+- v0.150 · 24/11/2026 · cognato · forature in due: lenta ogni 15-20 km, scoppio ogni 42-45 km (± 5) con botto, PSSSHHH e gomma a terra che sbatte (`forature.js`)

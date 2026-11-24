@@ -47,7 +47,7 @@ class SupraSim {
   // insieme alla velocità si fermano ruote, trasmissione e gomma, la frizione si apre e il motore torna al minimo.
   // Azzerare solo v lasciava le ruote lanciate: gomme che fumavano e auto trascinata appena ripartiva la fisica
   ferma() {
-    Object.assign(this, { v: 0, ww: 0, wo: 0, phi: 0, kap: 0, acc: 0, pz: 0, pzV: 0, whTh: 0, whV: 0, whK: 0, hopE: 0, slipNow: 0, slipPow: 0, skid: 0,
+    Object.assign(this, { v: 0, ww: 0, wo: 0, phi: 0, kap: 0, acc: 0, pz: 0, pzV: 0, whTh: 0, whV: 0, whK: 0, whScena: false, hopE: 0, slipNow: 0, slipPow: 0, skid: 0,
       tcCut: 0, Tc: 0, lock: false, shiftSeq: null, flatCut: false, lockF: false, lockR: false, locked: false, lockPow: 0 });
     if (this.cfg && this.cfg.autoClutch) this.clutch = 1;
     this.we = this.running ? Math.min(this.we, (this.P.idle || 850) / 9.5493) : 0;
@@ -109,8 +109,28 @@ class SupraSim {
     const Mup = m * this.pz * cgE * G, th = this.whTh || 0;
     const Mdown = W * (b * Math.cos(th) - cgE * Math.sin(th));
     this.whK = Mdown > 0 ? SIM_CLAMP(Mup / Mdown, 0, 1.5) : 1.5;                  // quanto manca: sopra 0,85 il muso è leggero ("tentenna")
+    // [IMPENNATA] scena (v0.149): quando la fisica ci arriva quasi (whK oltre la soglia) e c'è tutto quello che serve
+    // (4-link, gomme da drag sull'asciutto, gas a fondo in prima o seconda sotto i 50 km/h), il muso sale deciso fino al tetto
+    // e ci resta finché si spinge: un'impennata da film. La salita è una molla smorzata verso un angolo che cresce con quanto
+    // si è oltre la soglia; finita la spinta il muso ricade col suo peso (la fisica sotto) e rimbalza.
+    const thMax = (wl.bar ? (wl.barDeg || 2.5) : (wl.maxDeg || 7.5)) * Math.PI / 180, sc = wl.scena;
+    if (sc) {
+      const ok0 = wl.drag > 1 && G >= (sc.G || 1.3) && (this.wet || 0) < 0.1 && this.running && this.in.thr > 0.85 && this.gear >= 1 && this.gear <= 2 && this.v < (sc.vMax || 14);
+      // conta la spinta che dura (media su ~0,3 s), non il colpo della frizione: senza cavalli veri il muso non sta su
+      this.whKf = (this.whKf || 0) + (this.whK - (this.whKf || 0)) * Math.min(1, h / (sc.tau || 0.3));
+      this.whScena = ok0 && (this.whScena ? this.whKf > (sc.tieni || 0.5) : this.whKf > (sc.soglia || 0.75));
+      if (this.whScena) {
+        const tgt = thMax * SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1);
+        let v = (this.whV || 0) + h * ((sc.k || 55) * (tgt - th) - (sc.c || 8) * (this.whV || 0));
+        let t = th + h * v;
+        if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1, scena: 1 });
+        if (t >= thMax) { if (v > 0.25) this.events.push({ type: wl.bar ? 'wheeliebar' : 'scrape', I: Math.min(1, v * 0.6) }); t = thMax; v = Math.min(0, -0.25 * v); }
+        if (t < 0) { t = 0; v = 0; }
+        this.whTh = t; this.whV = v;
+        return W * hopF;
+      }
+    }
     if (th > 0 || Mup > Mdown) {
-      const thMax = (wl.bar ? (wl.barDeg || 2.5) : (wl.maxDeg || 7.5)) * Math.PI / 180;
       let v = (this.whV || 0) + h * ((Mup - Mdown) / Ir - (wl.c || 3) * (this.whV || 0));
       let t = th + h * v;
       if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1 });
@@ -480,7 +500,8 @@ class SupraSim {
     const launchK = 1 + (((tn.susp || {}).launch || 1) - 1) * (1 - SIM_SS(4, 22, Math.abs(this.v)));
     this.bumpU = Math.max(0, (this.bumpU || 0) - h * 3.2);          // assetto duro o radente: dopo una buca la gomma molla per un attimo
     this.scrapeT = Math.max(0, (this.scrapeT || 0) - h);
-    const Fmax = P.mu * (P.tr ?? 1.08) * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK * (1 - this.bumpU);
+    const Fmax = P.mu * (P.tr ?? 1.08) * Nr * (1 - 0.08 * (Nr / Math.max(7260, Nr0 * 1.05) - 1)) * this.tireGrip() * dk * launchK * (1 - this.bumpU)
+      * (tn.wheelie && tn.wheelie.drag > 1 ? (1 + (tn.wheelie.drag - 1) * (1 - SIM_SS(6, 22, Math.abs(this.v))) * (1 - (this.wet || 0))) * (1 - 0.3 * (this.wet || 0)) : 1);   // [IMPENNATA] gomma da drag in partenza (impennata.js)
     // gomma: lo slittamento "visto" dal battistrada segue quello reale con un ritardo (lunghezza di rilassamento ~0,3 m),
     // poi curva di Pacejka della mescola: picco, e oltre la forza cala più o meno in fretta
     const ty = tn.tyre || { B: 20, C: 1.42, E: 0.1 };
