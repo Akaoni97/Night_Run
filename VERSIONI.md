@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.143**
+**Versione attuale: v0.144**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -167,3 +167,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.141 · 24/11/2026 · proprietario · interfaccia Street Racing, menu in pixel art, icone e banner distinti per tipo
 - v0.142 · 24/11/2026 · cognato · suono di turbo (girante vera, corpo, spool, nota che segue i giri), aria più cupa, cambiate, fischio degli ingranaggi e aspirazione rifatti; anelli di turbo, compressore e cambio rifatti; scarichi e collettori non toccati
 - v0.143 · 24/11/2026 · proprietario · fiamme dello scarico a scelta da Luca Tuning (scheda Fiamme dell'officina): Ossidrica blu, Lanciafiamme, Mitraglia, Smeraldo, Neon viola, più «come viene»; anteprima animata, si comprano una volta e si montano auto per auto
+- v0.144 · 24/11/2026 · cognato · **motore muto riparato**: dalla v0.142 il worklet non aveva le costanti DSP_TB/DSP_CB e il motore sintetizzato taceva (si sentivano solo i campioni); ora si copiano, rete di sicurezza che passa al motore sulla pagina se il worklet va in errore, test `test/worklet.test.js`

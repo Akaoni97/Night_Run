@@ -1410,7 +1410,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       node.connect(comp);
       audio.send = (m) => dsp.msg(m);
     };
-    const src = BQ.toString() + '\n' + EngineDSP.toString() + `
+    // nel worklet arriva solo il testo delle classi: le costanti che usa EngineDSP vanno copiate a parte (v0.144: senza
+    // DSP_TB e DSP_CB il motore andava in errore al primo campione e restava muto)
+    const dspConst = (typeof DSP_TB !== 'undefined' ? 'const DSP_TB = ' + JSON.stringify(DSP_TB) + ';\n' : '')
+      + (typeof DSP_CB !== 'undefined' ? 'const DSP_CB = ' + JSON.stringify(DSP_CB) + ';\n' : '');
+    const src = dspConst + '\n' + BQ.toString() + '\n' + EngineDSP.toString() + `
       class P extends AudioWorkletProcessor {
         constructor() { super(); this.d = new EngineDSP(sampleRate); this.port.onmessage = (e) => this.d.msg(e.data); }
         process(i, o) { const out = o[0]; this.d.render(out[0], out[1] || out[0], out[0].length); return true; }
@@ -1424,6 +1428,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         const node = new AudioWorkletNode(ctx, 'motore-2jz', { numberOfInputs: 0, outputChannelCount: [2] });
         node.connect(comp);
         audio.send = (m) => node.port.postMessage(m);
+        // rete di sicurezza: se il motore va in errore dentro il worklet, si passa al motore sulla pagina invece di restare muti
+        node.onprocessorerror = () => {
+          console.error('Motore audio: errore nel worklet, passo al motore sulla pagina');
+          try { node.disconnect(); } catch (e2) { /* già staccato */ }
+          fallback(); audio.send({ cfg: dspCfg() }); sentEnv = -1;
+        };
       } catch (e) { console.warn("AudioWorklet non disponibile, uso ScriptProcessor:", e && e.message); fallback(); }
       audio.ready = true;
       audio.send({ cfg: dspCfg() }); sentEnv = -1;   // il motore audio nuovo parte all'aperto: l'ambiente si rimanda al primo giro
