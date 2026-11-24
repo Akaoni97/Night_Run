@@ -1,3 +1,8 @@
+## 24/11/2026 · cognato · v0.145 (**progetto impennata, in prova**)
+- Fisica dell'impennata in `sim.js` (`SupraSim.impennata`, `[IMPENNATA]`): momento della spinta contro il peso attorno alle ruote dietro, inerzia di beccheggio, tetto della wheelie bar (2,5°) o del paraurti (7,5°), ricaduta con botta. Solo trazione posteriore, solo col progetto acceso. Pezzi in `impennata.js` (Ruote e telaio: barre di reazione → 4-link da drag, wheelie bar), grafica in `street2d.js`, niente cambio corsia col muso su, interruttore in Sviluppatori (ricarica la pagina). Test `test/impennata.test.js` (420).
+- Banco R&D `node strumenti/impennata.js`: il limite è la gomma, non il motore. Su strada solo la **R5 Turbo 2** tentenna (86-95 % della spinta che serve, si stacca per un attimo); Supra e BMW no (servirebbero 1,76 g, la gomma ne dà 1,3). Tabella e conclusioni in `docs/fisica/IMPENNATA.md` §0.
+- Aperto: provarla sul PC con la R5 (pezzi al massimo, slick calde, frizione a 3/4 dei giri). Se un giorno arriva una pista da drag preparata, le altre impennano da sole.
+
 ## 24/11/2026 · cognato · v0.144 (**motore muto riparato**)
 - Dalla v0.142 il motore sintetizzato era muto nel gioco (avviamento e motore spariti, restavano scoppi e turbina dei campioni): `index.html` manda al worklet solo il testo di `BQ` ed `EngineDSP`, e le costanti nuove `DSP_TB`/`DSP_CB` di `dsp.js` restavano fuori → errore al primo campione. Ora `dspConst` le copia; se il worklet va in errore (`onprocessorerror`) si passa al motore sulla pagina invece di restare muti. `test/worklet.test.js` ricostruisce il worklet com'è nel gioco e controlla che suoni (fallisce se manca una costante). **Regola**: una costante nuova usata da `EngineDSP` va aggiunta a `dspConst` in `index.html`.
 

@@ -185,6 +185,7 @@ class StreetGame {
   // cambio corsia del pilota: dir +1 a sinistra (verso la corsia 3), -1 a destra (verso la 1)
   steer(dir) {
     if (this.ap) return false;
+    if (this.sim && this.sim.whTh > 0.004) return false;                    // [IMPENNATA] ruote davanti per aria: non si sterza
     const nl = Math.max(1, Math.min(3, this.lane + dir));
     if (nl === this.lane) return false;
     this.lane = nl; this.manualT = this.autoLane ? 5 : 1e9;

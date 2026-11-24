@@ -1,10 +1,59 @@
-# Progetto impennata · proposta (da rivedere insieme prima di scrivere codice)
+# Progetto impennata · applicato in prova (v0.145)
 
 Scritta il 24/11/2026 da Claude su richiesta di Luca (il cognato). Obiettivo: un'auto che alza il muso in partenza
 **solo quando la fisica lo permette davvero**, con il mix giusto di pezzi, gomme, peso e trazione. Niente animazione
 finta che parte da sola: se l'impennata arriva, è perché la macchina ha la coppia, la presa e l'assetto per farla.
 
-Stato: **solo documento**. Nessuna riga del gioco è stata cambiata. Si lavora da qui.
+Stato: **applicato in prova dalla v0.145**, spento di serie (Sviluppatori → «Progetto impennata»). La proposta
+originale è sotto (§1-7); l'esito delle prove è qui subito.
+
+## 0. Esito delle prove (v0.145, banco `node strumenti/impennata.js`)
+Dove sta: fisica in `sim.js` (`SupraSim.impennata`, segnata `[IMPENNATA]`), pezzi e interruttore in `impennata.js`,
+grafica in `street2d.js` (cassa che ruota attorno alle ruote dietro, ruota davanti che si stacca, muso leggero),
+niente cambio corsia con le ruote davanti per aria (`game.steer`), test in `test/impennata.test.js`.
+
+Partenze vere col motore e le gomme del gioco: frizione lasciata a 3/4 del limitatore, gomme in temperatura,
+preparazione massima (slick, motore al massimo, volano pesante). «serve» = accelerazione della cassa che alza il muso
+col 4-link da drag (G 1,6); la percentuale = quanta ne arriva davvero.
+
+```
+% = quanta della coppia che serve per alzare il muso c'è (100 % = si alza). g = accelerazione massima
+auto       b/h  serve | di serie          | max, ponte serie   | max, 4-link        | max, 4-link drag   | drag + bar         | drag, bagnato      | drag + controllo trazione
+supra      2.82 1.76g | no 24%        0.66g | no 40%        1.24g | no 54%        1.24g | no 64%        1.24g | no 64%        1.24g | no 48%        0.92g | no 66%        1.28g
+r5         2.11 1.32g | no 35%        0.74g | no 63%        1.47g | no 86%        1.47g | SU 0.1° 0.00s 1.53g | SU 0.1° 0.00s 1.53g | no 75%        1.09g | no 95%        1.38g
+b2002      2.60 1.62g | no 23%        0.61g | no 38%        1.06g | no 51%        1.06g | no 60%        1.06g | no 60%        1.06g | no 45%        0.79g | no 62%        1.09g
+e30        2.83 1.77g | no 22%        0.63g | no 33%        1.02g | no 44%        1.02g | no 52%        1.02g | no 52%        1.02g | no 39%        0.76g | no 56%        1.09g
+e36        2.88 1.80g | no 23%        0.65g | no 33%        1.05g | no 45%        1.05g | no 53%        1.05g | no 53%        1.05g | no 40%        0.79g | no 57%        1.13g
+e34        2.87 1.79g | no 23%        0.65g | no 33%        1.04g | no 45%        1.04g | no 53%        1.04g | no 53%        1.04g | no 40%        0.78g | no 57%        1.11g
+bus        1.87 1.17g | no 32%        0.59g | no 58%        1.13g | no 78%        1.13g | no 93%        1.13g | no 93%        1.13g | no 69%        0.84g | no 93%        1.13g
+ambulanza  2.07 1.29g | no 26%        0.54g | no 45%        0.98g | no 61%        0.98g | no 72%        0.98g | no 72%        0.98g | no 54%        0.73g | no 75%        1.02g
+```
+
+Cosa dicono i numeri, da R&D:
+- **Il limite è la gomma, non il motore.** Già di serie la Supra pattina in prima: tutta la coppia in più finisce in
+  fumo. Con slick (μ ≈ 1,97) e il 47 % del peso dietro l'accelerazione massima possibile è μ·0,47/(1 − μ·h/wb) ≈ 1,47 g
+  in teoria, 1,24-1,28 g nel gioco (sensibilità al carico, gomma non sempre allo slittamento giusto). Per alzare il muso
+  ne servirebbero 1,76: **la Supra non impenna su strada, punto.** Le BMW (b/h 2,6-2,9) men che meno.
+- **La R5 Turbo 2 è l'unica che ci arriva**: motore centrale (60 % del peso sulle ruote che spingono), corta e leggera.
+  Col 4-link da drag il muso **tentenna**: si alleggerisce (86-95 %) e nella partenza migliore si stacca per un attimo
+  (0,1°). È quello che succederebbe a una vera.
+- **Bus** al 93 %: baricentro alto e peso dietro, ma la gomma non tiene abbastanza. Ambulanza 72 %.
+- **Bagnato**: −20 % di presa, nessuna ci va vicino. **Trazione anteriore**: mai, nemmeno forzando la geometria.
+- **Cosa servirebbe a una Supra**: una pista da drag preparata (μ 2,5 e oltre con gomme da drag) o il baricentro
+  spostato molto indietro. Nessuna delle due esiste nel gioco oggi: se un giorno arriva una pista da drag, l'impennata
+  arriva da sola.
+
+Una correzione rispetto alla proposta: G (la geometria del ponte) **non** aumenta il carico sulle gomme. Il peso che
+passa dietro dipende solo da accelerazione, baricentro e passo; la geometria cambia il colpo che la cassa riceve nella
+partenza. Nella prima versione G entrava anche nel carico e faceva tenere di più le gomme (R5 fino a 5°): non era vero
+e l'ho tolto. Il carico dietro in partenza ora può salire fino a tutto il peso (prima il tetto era 1,9 volte quello da
+fermo), ma solo con il progetto acceso.
+
+La grafica (prova nel browser forzando l'angolo): fino a 2,5° (wheelie bar) si legge pulito; a 7,5° la cassa a pixel
+fa i gradini della rotazione ma si capisce bene il muso su e la ruota davanti staccata. Il «muso leggero» sopra
+l'85 % è un filo di salita della cassa (0,8°) senza staccare la ruota.
+
+---
 
 ---
 

@@ -76,7 +76,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 31. [suono] **Turbo, cambiate e aspirazione rifatti** (v0.142, Luca): da ascoltare sul PC con un turbo grosso (Supra big single, V40 Drag 450) fuori e in abitacolo; manopole in `DSP_TB`/`DSP_CB` di `dsp.js` se qualcosa è troppo o troppo poco. (Luca)
 
-30. [fisica] **Progetto impennata** (proposta del 24/11, `docs/fisica/IMPENNATA.md`): da leggere e rispondere alle 5 domande del §7 prima di scrivere codice; interruttore in Sviluppatori, spento di serie. (Luca)
+30. [fisica] **Progetto impennata** (v0.145, in prova, spento di serie: Sviluppatori → «Progetto impennata»): da provare sul PC con la R5 Turbo 2 preparata (l'unica che su strada ci arriva vicino, vedi `docs/fisica/IMPENNATA.md` §0). Decidere poi se lasciarlo acceso per tutti. (Luca)
 
 28. [storia] **Bivi nella storia** (progetto futuro, da Luca il 23/11): qualche bivio inserito nella storia, dopo una capitale due uscite con prove diverse e il finale che ne tiene conto (proposta D di `docs/storia/PROPOSTA_CITTA.md`). Si fa dopo i collegamenti e i momenti forti delle capitali. (Luca, da confermare con Nico)
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)

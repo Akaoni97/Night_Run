@@ -2114,7 +2114,7 @@ class Street2D {
     }
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
-    g.fillStyle = 'rgba(2,3,8,.7)'; for (const wxs of this.geo().ax) this.span(g, left + wxs * k, y0, 14 * k, 2);   // contatto delle gomme
+    g.fillStyle = 'rgba(2,3,8,.7)'; this.geo().ax.forEach((wxs, q) => { if (q !== 1 || !(s.wheelie > 0.01)) this.span(g, left + wxs * k, y0, 14 * k, 2); });   // contatto delle gomme (la davanti in impennata no)
     const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita
@@ -2128,12 +2128,17 @@ class Street2D {
     st.trauma = Math.max(0, (st.trauma || 0) - dt * 1.6);                    // scossa degli urti: si spegne in poco più di mezzo secondo
     const heave = Math.round(-st.heave + idleShake * 0.6 - (st.popJolt > 0.3 ? 1 : 0) + (s.hop || 0) * 1.6 - st.crashJolt * 3 * Math.sin(st.crashJolt * 9));   // saltellamento dell'assale
     const skew = -st.pitch * 0.8;
+    // [IMPENNATA] muso su (sim.whTh, radianti): la cassa ruota attorno alle ruote dietro e quella davanti si stacca da terra.
+    // Quasi su (whK sopra 0,85) il muso si alleggerisce: le molle davanti si allungano e la cassa sale un filo, la ruota resta giù
+    st.whL = (st.whL || 0) + (Math.max(0, Math.min(1, ((s.whK || 0) - 0.85) / 0.15)) - (st.whL || 0)) * Math.min(1, dt * 8);
+    const whTh = (s.wheelie || 0) + st.whL * 0.014, skW = -Math.tan(whTh), whX0 = (this.geo().ax[0] || 0) * k;
+    const whY = (xl) => skW * (xl - whX0);                                    // quanto sale un punto della cassa a xl pixel dal bordo
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;
     this.fxParts(g, dt, wx, W, 0);                                             // fumo e vapore dietro l'auto
     g.save();
     g.imageSmoothingEnabled = false;
-    this.tf(g, 1, skew, 0, 1 - squash, left, top - skew * SW / 2 - (spr.img ? k : 0));
+    this.tf(g, 1, skew + skW, 0, 1 - squash, left, top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0));
     if (this.heroOutline && this.quality !== 'bassa') this.heroOutline(g, spr);   // il protagonista si stacca dallo sfondo
     this.body(g, spr, 0, 0);
     // luce di contorno: magenta e ciano dei neon che si alternano lungo la strada, bianca di giorno
@@ -2175,7 +2180,7 @@ class Street2D {
     // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
-    if (s.ign && s.lamps !== false) this.light(g, left + GE.head[0] * k, top + GE.head[1] * k, s.high ? 9 : 6, s.high ? 5 : 4, '#fff2c4', s.high ? 0.22 : 0.15, 3);
+    if (s.ign && s.lamps !== false) this.light(g, left + GE.head[0] * k, top + GE.head[1] * k + whY(GE.head[0] * k), s.high ? 9 : 6, s.high ? 5 : 4, '#fff2c4', s.high ? 0.22 : 0.15, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
     const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
@@ -2188,7 +2193,8 @@ class Street2D {
       // trazione posteriore (Supra, BMW...) dietro, trazione anteriore (V40, Panda, Golf...) davanti
       const fwd = !!s.fwd, spinV = Math.abs(s.ww * 0.322), rollV = Math.abs(s.v);
       wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, fwd ? st.front : st.spin, fwd ? rollV : spinV, true);
-      wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4), k, fwd ? st.spin : st.front, fwd ? spinV : rollV, false);
+      const whF = s.wheelie > 0 ? Math.max(0, -whY(GE.ax[1] * k) - 1.5 * k) : 0;   // la ruota davanti si stacca (penzola un po' sotto la cassa)
+      wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4) - whF, k, fwd ? st.spin : st.front, fwd ? spinV : rollV, false);
       if (this.brakeHot > 0.05) {                                     // il disco rosso si vede tra i raggi (brake); qui il riflesso a terra
         const hb = this.brakeHot, nt = 1 - (this.day || 0) * 0.8;
         for (const [q, b] of [[0, bR], [1, bF]]) {
@@ -2205,7 +2211,7 @@ class Street2D {
     g.globalAlpha = 1;
     // ---- luci in stile anime: striscia anamorfica dei fari, scie dei fanali, stella sul cromo
     if (s.ign) {
-      const GH = this.geo(), hx2 = left + GH.head[0] * k, hy2 = top + GH.head[1] * k, nt = 1 - (this.day || 0) * 0.75, tlx = left + (GH.tail[0] + 2) * k, tly = top + (GH.tail[1] + 3) * k;
+      const GH = this.geo(), hx2 = left + GH.head[0] * k, hy2 = top + GH.head[1] * k + whY(GH.head[0] * k), nt = 1 - (this.day || 0) * 0.75, tlx = left + (GH.tail[0] + 2) * k, tly = top + (GH.tail[1] + 3) * k;
       g.save(); g.globalCompositeOperation = 'lighter';
       const fl = (x1, y1, len, col, a, th) => { const gr = g.createLinearGradient(x1 - len, 0, x1 + len, 0); gr.addColorStop(0, `rgba(${col},0)`); gr.addColorStop(0.5, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.fillRect(x1 - len, y1 - th / 2, len * 2, th); };
       if (s.lamps !== false) {

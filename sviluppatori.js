@@ -122,6 +122,9 @@
 <h3>Modifiche</h3>
 <p class="hint">Sblocca tutti i pezzi dell'officina (motore, turbo, scarico, centralina, limitatore...) e tutta l'estetica, senza pagarli e senza i chilometri richiesti. Poi si montano come sempre.</p>
 <div class="dv"><button type="button" id="devUnlock" class="big">Sblocca tutto per questa auto</button><button type="button" id="devUnlockAll">Sblocca per tutte le auto del garage</button></div>
+<h3>Progetto impennata · in prova</h3>
+<p class="hint">Fisica del muso che si alza in partenza (docs/fisica/IMPENNATA.md). Acceso, le auto a trazione posteriore hanno in officina (Ruote e telaio) le barre di reazione / il 4-link e la wheelie bar. Si alza solo se gomme, peso e motore lo permettono davvero: su strada quasi nessuna ce la fa. Cambiarlo ricarica la pagina.</p>
+<label class="dvck"><input type="checkbox" id="devImp"><span>Progetto impennata</span></label>
 <p class="res" id="devRes" aria-live="polite"></p>`;
     const $ = (id) => box.querySelector('#' + id), say = (t) => { $('devRes').textContent = t; };
     const upd = () => { const g = G(); if (g && $('devCash')) $('devCash').textContent = '€ ' + fmt(g.s.money || 0); };
@@ -146,6 +149,12 @@
     $('devPol').addEventListener('change', (e) => { const r = polizia(e.target.checked); e.target.checked = r; say(r ? 'Polizia disabilitata: non ti ferma, non multa, non insegue.' : 'Polizia di nuovo in servizio.'); });
     $('devUnlock').addEventListener('click', () => { const g = G(), n = unlock(); say(`${n ? n + ' modifiche sbloccate' : 'Era già tutto sbloccato'} per ${g && g.car ? g.car : "quest'auto"}.`); });
     $('devUnlockAll').addEventListener('click', () => { const n = unlockAll(); say(n ? `${n} modifiche sbloccate in tutto il garage.` : 'Era già tutto sbloccato.'); });
+    $('devImp').checked = typeof IMP !== 'undefined' && !!IMP.on;
+    $('devImp').addEventListener('change', (e) => {
+      try { localStorage.setItem('nr_impennata', e.target.checked ? '1' : '0'); } catch (er) { /* niente localStorage */ }
+      say(e.target.checked ? 'Progetto impennata acceso: ricarico…' : 'Progetto impennata spento: ricarico…');
+      save(); setTimeout(() => location.reload(), 400);
+    });
     setInterval(() => { if (box.offsetParent) upd(); }, 500); upd();
     return box;
   }

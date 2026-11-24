@@ -47,7 +47,7 @@ class SupraSim {
   // insieme alla velocità si fermano ruote, trasmissione e gomma, la frizione si apre e il motore torna al minimo.
   // Azzerare solo v lasciava le ruote lanciate: gomme che fumavano e auto trascinata appena ripartiva la fisica
   ferma() {
-    Object.assign(this, { v: 0, ww: 0, wo: 0, phi: 0, kap: 0, acc: 0, pz: 0, pzV: 0, hopE: 0, slipNow: 0, slipPow: 0, skid: 0,
+    Object.assign(this, { v: 0, ww: 0, wo: 0, phi: 0, kap: 0, acc: 0, pz: 0, pzV: 0, whTh: 0, whV: 0, whK: 0, hopE: 0, slipNow: 0, slipPow: 0, skid: 0,
       tcCut: 0, Tc: 0, lock: false, shiftSeq: null, flatCut: false, lockF: false, lockR: false, locked: false, lockPow: 0 });
     if (this.cfg && this.cfg.autoClutch) this.clutch = 1;
     this.we = this.running ? Math.min(this.we, (this.P.idle || 850) / 9.5493) : 0;
@@ -95,6 +95,41 @@ class SupraSim {
   // potenza e coppia massime a regime stabilizzato, per la scheda del tuning
   // pressione massima in tubo: la mappa ECO / NORMALE / FORTE moltiplica quella del turbo, ma non supera il limite della centralina (`tc.cap`, se c'è)
   boostTop(tc) { const v = tc.max * (this.boostCtl || 1); return tc.cap > 0 ? Math.min(v, Math.max(tc.cap, tc.max)) : v; }
+  // [IMPENNATA] il muso che si alza (progetto in prova, docs/fisica/IMPENNATA.md). Momento attorno alle gomme posteriori:
+  // alza  m·a·h·G (a = accelerazione della cassa sulle molle, pz; G = il colpo in più che un ponte anti-squat dà alla cassa
+  // nella partenza, 1 di serie: è una semplificazione del transitorio, il carico sulle gomme non lo cambia)
+  // tiene giù  W·(b·cosθ − h·sinθ)  (b = baricentro → asse posteriore). Finché il muso è a terra il carico dietro è quello
+  // di sempre (fino a tutto il peso); quando la gomma davanti non porta più niente l'auto ruota attorno alle ruote dietro,
+  // con il momento d'inerzia di beccheggio, uno smorzamento e un tetto (rotelline della wheelie bar o paraurti). Ricade con
+  // una botta. Le gomme decidono tutto: la spinta che serve la danno solo se tengono (Fmax), quindi pioggia, gomme fredde o
+  // trazione anteriore non impennano da sole. Ritorna il carico sulle gomme posteriori.
+  impennata(h, m, lift, Nr0, cgE, hopF, wl) {
+    const P = this.P, W = m * 9.81 - lift, b = P.wb * (1 - P.rearW), G = wl.G || 1;
+    const Ir = m * ((wl.k || 1.1) ** 2 + b * b + cgE * cgE);
+    const Mup = m * this.pz * cgE * G, th = this.whTh || 0;
+    const Mdown = W * (b * Math.cos(th) - cgE * Math.sin(th));
+    this.whK = Mdown > 0 ? SIM_CLAMP(Mup / Mdown, 0, 1.5) : 1.5;                  // quanto manca: sopra 0,85 il muso è leggero ("tentenna")
+    if (th > 0 || Mup > Mdown) {
+      const thMax = (wl.bar ? (wl.barDeg || 2.5) : (wl.maxDeg || 7.5)) * Math.PI / 180;
+      let v = (this.whV || 0) + h * ((Mup - Mdown) / Ir - (wl.c || 3) * (this.whV || 0));
+      let t = th + h * v;
+      if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1 });
+      if (t >= thMax) {                                                   // rotelline o paraurti per terra
+        if (v > 0.25) this.events.push({ type: wl.bar ? 'wheeliebar' : 'scrape', I: Math.min(1, v * 0.6) });
+        t = thMax; v = Math.min(0, -0.25 * v);
+      }
+      if (t <= 0) {                                                       // il muso ricade sulla gomma davanti
+        if (v < -0.12) this.events.push({ type: 'bump', I: Math.min(1, -v * 0.9), wheelie: 1 });
+        t = 0; v = 0;
+      }
+      this.whTh = t; this.whV = v;
+    }
+    if (this.whTh > 0) return W * hopF;                                  // tutto il peso sulle ruote dietro
+    // il carico sulle gomme dipende solo da accelerazione e baricentro (G no: la geometria cambia il colpo sulla cassa,
+    // non il peso che passa dietro), ma qui può arrivare fino a tutto il peso invece del tetto di 1,9 volte
+    return SIM_CLAMP((Nr0 + m * this.pz * cgE / P.wb) * hopF, Nr0 * 0.3, W);
+  }
+
   estimatePeak() {
     const tn = this.tune, tc = tn.turbo, P = this.P;
     let best = { cv: 0, nm: 0, rpmCv: 0, rpmNm: 0 };
@@ -436,7 +471,9 @@ class SupraSim {
     const m = this.massNow(), lift = 0.5 * 1.2 * (P.cl ?? 0.1) * P.A * this.v * this.v;   // portanza: metà per asse
     const Nr0 = m * 9.81 * P.rearW - lift * 0.5;
     const cgE = P.cgH + ((tn.susp || {}).dcg || 0);                  // baricentro: scende con l'altezza da terra
-    const Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * m * this.pz * cgE / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
+    let Nr = SIM_CLAMP((Nr0 + (P.fwd ? -1 : 1) * m * this.pz * cgE / P.wb) * hopF, Nr0 * 0.3, Nr0 * 1.9);
+    // [IMPENNATA] progetto in prova (impennata.js): solo trazione posteriore e solo se l'auto ha tn.wheelie. Senza, tutto come sopra
+    if (tn.wheelie && !P.fwd) Nr = this.impennata(h, m, lift, Nr0, cgE, hopF, tn.wheelie);
     // differenziale: aperto (la ruota scarica gira a vuoto), Torsen (ripartisce), autobloccante (blocca)
     const dk = tn.diff === 'lsd' ? 1 : tn.diff === 'torsen' ? 0.96 : 0.87;
     // assetto: in partenza un posteriore che si "siede" (o un anteriore che non si alza) carica le ruote motrici
@@ -496,7 +533,7 @@ class SupraSim {
     // (attrito radente, circa tre quarti), finché il pedale non si alleggerisce. I dischi si scaldano e perdono efficacia.
     const ty2 = tn.tyre || {}, mu = (P.mu * 0.92 + 0.08) * this.tireGrip() * (ty2.brake || 1) * (1 - 0.6 * this.bumpU);
     const wf0 = P.fwd ? P.rearW : 1 - P.rearW, W = m * 9.81 - lift;
-    const Nf = SIM_CLAMP(W * wf0 - m * this.pz * cgE / P.wb, W * 0.15, W * 0.95), Nrb = W - Nf;
+    const Nf = this.whTh > 0 ? 0 : SIM_CLAMP(W * wf0 - m * this.pz * cgE / P.wb, W * 0.15, W * 0.95), Nrb = W - Nf;   // [IMPENNATA] muso su: davanti non frena
     const pads = (tn.maint || {}).pads ?? 1;
     const req = I.brake * m * 9.81 * (P.bk ?? 1.15) * (0.7 + 0.3 * Math.min(1, pads / 0.3)) * this.padK();
     if (pads < 0.1 && I.brake > 0.3 && Math.abs(this.v) > 3 && Math.random() < h * 3) this.events.push({ type: 'grind' });   // ferro su ferro
