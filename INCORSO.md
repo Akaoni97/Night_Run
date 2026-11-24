@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| proprietario (Nico), con Claude | Controllo dei comandi di disegno nella prova di fumo; schermata iniziale: telefono (sospeso 26), auto e sfondo più belli | `strumenti/fumo.js`, `strumenti/prova.js`, `titolo.js`, skill `night-run-pixel` | 24/11/2026 |
