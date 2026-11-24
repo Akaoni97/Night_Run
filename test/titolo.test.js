@@ -19,9 +19,60 @@ test('ogni animazione del CSS ha il suo @keyframes', () => {
   for (const k of usati) assert.ok(new RegExp('@keyframes ' + k + '[{ ]').test(src), 'manca @keyframes ' + k);
 });
 
-test('«Accendi e parti» gira la chiave solo con un clic o un tasto veri (le prove automatiche partono subito)', () => {
-  assert.ok(/e\.isTrusted/.test(src));
-  assert.ok(/window\.__ntVia/.test(src));
+const ignition = fs.readFileSync(path.join(R, 'img/nottolino/nottolino.js'), 'utf8');
+
+function accensione() {
+  const handlers = {};
+  const status = {};
+  const dial = {
+    style: { setProperty() {} }, dataset: {},
+    addEventListener(name, handler) { handlers[name] = handler; },
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 990, height: 708 }),
+    setPointerCapture() {},
+  };
+  const widget = { querySelector: (selector) => selector === '.nr-switch' ? dial : status };
+  class HTMLElement { appendChild() {} }
+  const window = {};
+  new Function('window', 'document', 'HTMLElement', 'setTimeout', ignition)(
+    window, { createElement: () => widget }, HTMLElement, () => {}
+  );
+  let avvii = 0;
+  const chiave = window.createRacingIgnition(new HTMLElement(), () => avvii++);
+  return { handlers, status, chiave, get avvii() { return avvii; } };
+}
+
+test('la chiave avvia una sola volta al rilascio su START', () => {
+  const prova = accensione();
+  const punto = (deg) => {
+    const rad = deg * Math.PI / 180;
+    return { clientX: 495 + 184 * Math.cos(rad), clientY: 365 + 184 * Math.sin(rad),
+      pointerId: 1, isPrimary: true, button: 0 };
+  };
+  prova.handlers.pointerdown(punto(-151));
+  prova.handlers.pointermove(punto(-114));
+  prova.handlers.pointerup(punto(-114));
+  assert.equal(prova.status.textContent, 'ACC');
+  assert.equal(prova.avvii, 0);
+  prova.handlers.pointerdown(punto(-114));
+  prova.handlers.pointermove(punto(-37));
+  assert.equal(prova.avvii, 0);
+  prova.handlers.pointerup(punto(-37));
+  prova.handlers.click({ detail: 1 });
+  prova.chiave.start();
+  assert.equal(prova.avvii, 1);
+});
+
+test('Invio e Spazio avviano la partita anche con il focus sulla chiave', () => {
+  for (const key of ['Enter', ' ']) {
+    const prova = accensione();
+    let fermato = false;
+    const e = { key, preventDefault() {}, stopPropagation() { fermato = true; } };
+    prova.handlers.keydown({ ...e, repeat: true });
+    assert.equal(prova.avvii, 0);
+    prova.handlers.keydown(e);
+    assert.equal(fermato, true);
+    assert.equal(prova.avvii, 1);
+  }
 });
 
 test('le schede delle partite dicono anche dove sei arrivato', () => {
