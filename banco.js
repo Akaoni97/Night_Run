@@ -9,6 +9,11 @@
 //  game.rulli = true: le ruote girano ma la strada non scorre (game.js); NightBanco.on: gas e freno li dà il banco
 //  (index.html, ciclo principale). Sui rulli niente aria (cd e portanza a zero, rimessi scendendo). Scendendo si frena
 //  finché le ruote non sono ferme, poi si torna al negozio.
+//  Rulli dal vivo (v0.147, di serie quando sali): il banco diventa una barra in basso (gas, marce, freno, giri, CV) e il
+//  pannello dell'officina resta aperto e toccabile: monti un pezzo e lo senti subito, col motore in tiro (game.canMount lo
+//  permette sui rulli). Al posto della scena dell'interno si vede la strada davanti al negozio con l'auto sui rulli
+//  (game.rulliVista, NightInterni.hide): fiamme, marmitta rovente e scarichi sono quelli veri di street2d.js.
+//  «Curve» apre il banco grande con la curva di potenza; «Barra» torna ai rulli dal vivo.
 //  window.NightBanco.panel(body) aggiunge la sezione al pannello; .open() / .close(); .on, .thr, .brake mentre si è sopra.
 // ============================================================================
 const BANCO = {
@@ -73,8 +78,14 @@ function bancoSim(sim, carId) {
 .banco .bc-gear{display:flex;align-items:center;gap:6px}
 .banco .bc-gear b{min-width:34px;text-align:center;font:400 30px/1 var(--f-display,Impact,sans-serif);color:#b8ff3a}
 .banco .bc-brk.on{background:#ff3a24;color:#fff}
+.banco.dock{inset:0;place-items:end stretch;padding:8px;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}
+.banco.dock .bc-card{width:100%;pointer-events:auto;padding:8px 10px;gap:6px;background:linear-gradient(180deg,rgba(29,26,20,.92),rgba(11,10,16,.94))}
+.banco.dock canvas,.banco.dock .bc-full,.banco.dock h2{display:none}
+.banco .bc-dk{display:none}.banco.dock .bc-dk{display:inline-block}
+.banco.dock .bc-live b{font-size:18px}.banco.dock .bc-live div{padding:4px 7px}
+.banco.dock .bc-foot span{display:none}
 .banco .bc-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font:400 12px/1.35 var(--f-data,monospace);color:#7d6d52}
-@media (max-width:700px){.banco .bc-live{grid-template-columns:repeat(3,minmax(0,1fr))}.banco .bc-ctl{grid-template-columns:1fr 1fr}.banco .bc-gas{grid-column:1/-1}}`;
+@media (max-width:700px){.banco.dock .bc-live div:nth-child(n+4){display:none}.banco.dock .bc-ctl{gap:6px}.banco .bc-live{grid-template-columns:repeat(3,minmax(0,1fr))}.banco .bc-ctl{grid-template-columns:1fr 1fr}.banco .bc-gas{grid-column:1/-1}}`;
   document.head.appendChild(css);
 
   const box = document.createElement('div'); box.className = 'banco'; box.hidden = true;
@@ -91,12 +102,27 @@ function bancoSim(sim, carId) {
       <div class="bc-gas"><label for="bcGas">ACCELERATORE <span id="bcGasV">0 %</span></label><input type="range" id="bcGas" min="0" max="100" step="5" value="0">
         <div class="bc-ticks">${[0, 25, 50, 75, 100].map((v) => `<button type="button" data-g="${v}">${v}</button>`).join('')}</div></div>
       <button type="button" class="kbtn bc-brk" id="bcBrk">FRENO</button>
-      <button type="button" class="kbtn" id="bcReset">AZZERA CURVE</button>
+      <button type="button" class="kbtn bc-full" id="bcReset">AZZERA CURVE</button>
     </div>
-    <div class="bc-foot"><span>Invio avvia · 0-9 e ↑ ↓ il gas · S frena (fa da carico) · E/Q marce. Curva registrata col gas oltre il 90 %. Potenza al motore; alla ruota circa l'85 %.</span><button type="button" class="kbtn" id="bcClose">Scendi dai rulli</button></div>
+    <div class="bc-foot"><span>Invio avvia · 0-9 e ↑ ↓ il gas · S frena (fa da carico) · E/Q marce. Curva registrata col gas oltre il 90 %. Potenza al motore; alla ruota circa l'85 %.</span><span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="kbtn" id="bcMode">Curve</button><button type="button" class="kbtn" id="bcClose">Scendi dai rulli</button></span></div>
   </div>`;
   document.body.appendChild(box);
 
+  let dock = true, posT = 0;
+  // rulli dal vivo: la barra sta sotto la parte di schermo lasciata libera dal pannello del negozio
+  // (a sinistra sul computer, sopra il pannello sul telefono)
+  function piazza() {
+    const pb = $('placeBox'), r = pb && !pb.hidden ? pb.getBoundingClientRect() : null, W = window.innerWidth, H = window.innerHeight;
+    if (!dock || !r || !r.width) { box.style.right = ''; box.style.bottom = ''; return; }
+    if (r.left > W * 0.3) { box.style.right = Math.round(W - r.left) + 'px'; box.style.bottom = '0px'; }
+    else { box.style.right = '0px'; box.style.bottom = Math.round(H - r.top) + 'px'; }
+  }
+  function modo(dk) {
+    dock = dk; box.classList.toggle('dock', dock);
+    if (dock) box.removeAttribute('aria-modal'); else box.setAttribute('aria-modal', 'true');
+    $('bcMode').textContent = dock ? 'Curve' : 'Barra';
+    piazza();
+  }
   let regT = 0, offT = 99, d = null, raf = 0, last = 0, gasCmd = 0, brk = false, curva = [], prima = null, regOn = false, ang = 0, back = null, aria = null, scendi = false;
   const NR = () => window.nightRun, B = () => window.NightBanco;
   const setGas = (v) => { gasCmd = Math.max(0, Math.min(100, Math.round(v / 5) * 5)); $('bcGas').value = gasCmd; $('bcGasV').textContent = gasCmd + ' %'; };
@@ -105,7 +131,8 @@ function bancoSim(sim, carId) {
     if (scendi) finish();
     d = n.sim; n.game.rulli = true; aria = { cd: d.P.cd, cl: d.P.cl }; d.P.cd = 0; d.P.cl = 0;
     const b = B(); b.on = true; b.thr = 0; b.brake = 0;
-    back = document.activeElement; box.hidden = false; curva = []; prima = null; regOn = false; setGas(0); brk = false;
+    n.game.rulliVista = true; if (window.NightInterni && NightInterni.hide) NightInterni.hide(true);
+    back = document.activeElement; box.hidden = false; curva = []; prima = null; regOn = false; setGas(0); brk = false; modo(true);
     last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); $('bcClose').focus();
   }
   // scendendo: gas a zero e freno finché le ruote non si fermano, poi la strada torna a scorrere
@@ -117,7 +144,8 @@ function bancoSim(sim, carId) {
   function finish() {
     const n = NR(), b = B(); cancelAnimationFrame(raf); raf = 0; scendi = false;
     if (d) { d.v = 0; d.ww = 0; d.wo = 0; if (aria) { d.P.cd = aria.cd; d.P.cl = aria.cl; } }
-    if (n && n.game) n.game.rulli = false;
+    if (n && n.game) { n.game.rulli = false; n.game.rulliVista = false; }
+    if (window.NightInterni && NightInterni.hide) NightInterni.hide(false);
     b.on = false; b.thr = 0; b.brake = 0; d = null;
   }
   // accensione e marce come in strada (anche la leva dell'automatico)
@@ -129,6 +157,7 @@ function bancoSim(sim, carId) {
   const shift = (k) => { const n = NR(); if (!n) return; if (k > 0 && n.shiftUp) n.shiftUp(); else if (k < 0 && n.shiftDown) n.shiftDown(); };
   function step(dt) {
     const b = B(), want = gasCmd / 100;
+    if (d.P.cd || d.P.cl) { aria = { cd: d.P.cd, cl: d.P.cl }; d.P.cd = 0; d.P.cl = 0; }   // montando un pezzo la fisica rimette l'aria: sui rulli non c'è
     b.thr += Math.max(-BANCO.gasVel * dt, Math.min(BANCO.gasVel * dt, want - b.thr));
     b.brake = brk ? 1 : 0;
     const rpm = d.rpm, nm = Math.max(0, d.Tnet || 0), cv = nm * rpm / 7023;
@@ -146,8 +175,10 @@ function bancoSim(sim, carId) {
     if (!d) return;
     const dt = Math.min(0.05, (t - last) / 1000); last = t;
     if (scendi) { if (Math.abs(d.v) < 0.3) { finish(); return; } raf = requestAnimationFrame(loop); return; }
+    const n0 = NR(); if (n0 && n0.game && !n0.game.inside) { close(); raf = requestAnimationFrame(loop); return; }   // uscito dal negozio: si scende
     const L = step(dt);
-    drawScene(); drawChart();
+    if (!dock) { drawScene(); drawChart(); }
+    if ((posT -= dt) <= 0) { posT = 0.5; piazza(); }
     $('bcRpm').textContent = fmt(L.rpm); $('bcKmh').textContent = fmt(d.v * 3.6);
     $('bcCv').textContent = fmt(L.cv); $('bcNm').textContent = fmt(L.nm);
     $('bcBoost').textContent = d.tune.turbo && d.tune.turbo.max > 0 ? fmt(Math.max(0, d.pipeP), 2) : '—';
@@ -232,12 +263,14 @@ function bancoSim(sim, carId) {
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) bb.addEventListener(ev, () => { brk = false; bb.classList.remove('on'); });
   $('bcReset').addEventListener('click', () => { curva = []; prima = null; });
   $('bcClose').addEventListener('click', close);
+  $('bcMode').addEventListener('click', () => modo(!dock));
+  window.addEventListener('resize', () => { if (!box.hidden) piazza(); });
   // finché il banco è aperto i tasti vanno al banco e non al gioco
   window.addEventListener('keydown', (e) => {
     if (box.hidden) return;
     e.stopImmediatePropagation();
     const k = e.key;
-    if (k === 'Escape') { e.preventDefault(); close(); return; }
+    if (k === 'Escape') { e.preventDefault(); if (!dock) modo(true); else close(); return; }
     if (e.target && e.target.tagName === 'INPUT' && (k === 'ArrowLeft' || k === 'ArrowRight')) return;   // il cursore si muove da sé
     if (/^[0-9]$/.test(k)) { e.preventDefault(); setGas(+k * 10 + (k === '0' && gasCmd >= 90 ? 100 : 0)); return; }
     if (k === 'ArrowUp' || k === 'w' || k === 'W') { e.preventDefault(); setGas(gasCmd + 5); return; }
@@ -252,10 +285,10 @@ function bancoSim(sim, carId) {
   // la sezione nel pannello del negozio
   function panel(body) {
     const sec = document.createElement('div'); sec.className = 'bc-panel';
-    sec.innerHTML = '<h4 style="margin:12px 0 4px">Banco prova a rulli</h4><p class="hint" style="margin:0 0 8px">Luca: «Sali sui rulli e vediamo quanti cavalli ci sono davvero, prima e dopo i pezzi.»</p>';
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Sali sui rulli'; b.addEventListener('click', open);
+    sec.innerHTML = '<h4 style="margin:12px 0 4px">Banco prova a rulli</h4><p class="hint" style="margin:0 0 8px">Luca: «Mettila sui rulli: dai gas e monta i pezzi mentre gira, li senti subito.» Avvia (Invio), gas col cursore o coi tasti 0-9 / ↑ ↓, marce E e Q. Le fiamme le vedi sulla macchina a sinistra. «Curve» apre la curva di potenza.</p>';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Attiva rulli'; b.addEventListener('click', () => { if (NR() && NR().game && NR().game.rulli) { modo(true); return; } open(); });
     sec.appendChild(b); body.appendChild(sec); return sec;
   }
-  window.NightBanco = { open, close, panel, on: false, thr: 0, brake: 0, get sim() { return d; }, get curva() { return curva; }, get prima() { return prima; }, setGas, engine, shift };
+  window.NightBanco = { open, close, panel, modo, get dock() { return dock; }, on: false, thr: 0, brake: 0, get sim() { return d; }, get curva() { return curva; }, get prima() { return prima; }, setGas, engine, shift };
 })();
 if (typeof window !== 'undefined') Object.assign(window, { BANCO, bancoRegistra, bancoPicco, bancoPulita, bancoSim });

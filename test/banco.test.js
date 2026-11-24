@@ -30,3 +30,12 @@ test('banco: la curva pulita toglie i buchi di un attimo e il primo punto basso'
   const c = [{ rpm: 1700, cv: 15, nm: 60 }, { rpm: 1800, cv: 50, nm: 190 }, { rpm: 1900, cv: 53, nm: 192 }, { rpm: 2000, cv: 20, nm: 60 }, { rpm: 2100, cv: 58, nm: 193 }, { rpm: 2200, cv: 60, nm: 193 }];
   assert.deepEqual(bancoPulita(c).map((p) => p.rpm), [1800, 1900, 2100, 2200]);
 });
+
+test('rulli dal vivo: sui rulli i pezzi si montano anche con le ruote che girano, in strada no', () => {
+  const s2 = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+  const E = new Function(s2 + ';return { SupraSim, StreetGame };')();
+  const sim = new E.SupraSim(), game = new E.StreetGame(sim, () => 0.5); game.mode = 'career';
+  sim.v = 20; assert.equal(game.canMount(), false, 'in strada a 72 km/h niente pezzi');
+  game.rulli = true; assert.equal(game.canMount(), true, 'sui rulli sì');
+  game.rulli = false; sim.v = 0; assert.equal(game.canMount(), true, 'da fermo sì');
+});

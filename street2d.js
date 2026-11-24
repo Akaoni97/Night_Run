@@ -1815,7 +1815,7 @@ class Street2D {
     // vibrazione al minimo: un fremito di un pixel ogni tanto (più fitto con le camme spinte), non un tremito continuo
     const idleShake = s.running && s.rpm < 1600 && (st.t * (2.2 + 5 * (s.lope || 0))) % 1 < 0.2 ? 1.7 : 0;
 
-    if (game && game.inside && game.inside.phase === 'shop') { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
+    if (game && game.inside && game.inside.phase === 'shop' && !game.rulliVista) { this.fxZoom = 1; this.drawInterior(g, game, s, dt); this.present(0, 0); return; }
     // ---- sfondo: cielo, tre piani di città, foschia
     this._bg = (game && game.loc && game.loc.bg) || this.bg || 'city';            // il cielo sa dove sei (fari e elicottero solo in città)
     if (this.setCity) this.setCity(game && game.loc && game.loc.cap ? game.loc.id : null);   // le capitali hanno i loro palazzi (citta2d.js)
@@ -2092,7 +2092,7 @@ class Street2D {
     for (const e of items) if (e._y < myY - 0.01) drawEnt(e); else front.push(e);   // dietro di noi chi è più lontano, davanti chi è più vicino
 
     // ---- la Supra
-    const IN = game && game.inside;
+    const IN = game && game.inside && !game.rulliVista ? game.inside : null;   // sui rulli dal vivo (banco.js) l'auto si vede in strada, davanti al negozio
     // entrata nel locale: la manovra nel piazzale la decide entrata2d.js (`entPose`); senza il file, quella di prima
     let entE = 0, EP = IN && this.entPose ? this.entPose(IN, wx, carX, dist) : null;
     if (IN && !EP) { const ez = (t) => t * t * (3 - 2 * Math.min(1, Math.max(0, t))); entE = IN.phase === 'in' ? ez(Math.min(1, IN.t / 1.3)) : IN.phase === 'out' ? 1 - ez(Math.min(1, IN.t / 1.1)) : 1; }
@@ -2115,6 +2115,21 @@ class Street2D {
     if (s.brake > 0.05) this.light(g, left - 30 * k, y0 - 1, 40, 5, '#ff2a2a', 0.1, 3);             // pozza degli stop
     this.fxShadow(g, spr, left, y0, (GE0.wy + GE0.wr) * k + 1, carX + entDX, lampX);
     g.fillStyle = 'rgba(2,3,8,.7)'; this.geo().ax.forEach((wxs, q) => { if (q !== 1 || !(s.wheelie > 0.01)) this.span(g, left + wxs * k, y0, 14 * k, 2); });   // contatto delle gomme (la davanti in impennata no)
+    if (game && game.rulli) {                                                // sui rulli del banco (banco.js): pedana e due rulli sotto ogni ruota, girano sotto le motrici
+      const GR = this.geo(), nA = GR.ax.length, fw = !!s.fwd, wrr = GR.wr * k, an = st.spin || 0;
+      GR.ax.forEach((ax, q) => {
+        const cx = left + ax * k, mot = fw ? q === nA - 1 : q !== nA - 1, rr = Math.max(3, wrr * 0.42);
+        g.fillStyle = '#07070a'; g.fillRect(Math.round(cx - wrr * 1.25), y0 - 1, Math.round(wrr * 2.5), Math.round(rr * 1.1) + 2);   // la buca
+        g.fillStyle = '#ffb000'; g.fillRect(Math.round(cx - wrr * 1.4), y0 - 1, Math.max(2, Math.round(wrr * 0.15)), 2); g.fillRect(Math.round(cx + wrr * 1.25), y0 - 1, Math.max(2, Math.round(wrr * 0.15)), 2);
+        for (const dx of [-0.55, 0.55]) {
+          const rx2 = cx + dx * wrr, ry2 = y0 + rr * 0.35;
+          g.fillStyle = '#5a5866'; g.beginPath(); g.arc(rx2, ry2, rr, 0, 7); g.fill();
+          g.strokeStyle = '#9a98a6'; g.lineWidth = Math.max(1, k * 0.6); g.beginPath();
+          for (let j = 0; j < 3; j++) { const a2 = (mot ? -an * wrr / rr : 0) + j * 2.094; g.moveTo(rx2, ry2); g.lineTo(rx2 + Math.cos(a2) * rr, ry2 + Math.sin(a2) * rr); }
+          g.stroke();
+        }
+      });
+    }
     const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita

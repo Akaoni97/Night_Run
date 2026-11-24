@@ -2759,11 +2759,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (window.NightJunk) NightJunk.panel(body, I, { flash, refresh: () => { if (placeOpen === I) { const y = body.scrollTop; openPlace(I); body.scrollTop = y; } }, save: () => { applySettings(); renderServices(); renderTrunk(); saveGame(); renderPlaceCash(); } });
     } else if (I.id === 'shop') {
       note('Luca: «Dimmi cosa vuoi tirare fuori da questa macchina.» Tocca un pezzo: ti dico cosa cambia. Lo monto quando premi il pulsante.');
+      if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js): in cima, si guida mentre si montano i pezzi
       if (window.NightOfficina) {                                       // officina semplice (officina.js): Modifiche e Swap motore
         const ctxO = { game, S, sim, flash, mount: (k, id) => mountPart(k, id, null), buy: (k, id) => { const r = game.buy(k, id); if (!r.ok) flash(r.why, 2.6); else { flash('Comprato: adesso è nel tuo magazzino, premi MONTA', 2.2); saveGame(); renderPlaceCash(); } }, adj: adjOf, setAdj: setSuspAdj, apply: applySettings, save: () => { saveGame(); renderPlaceCash(); }, after: () => { renderServices(); } };
         NightOfficina.panel(body, I, ctxO);
       }
-      if (window.NightBanco) NightBanco.panel(body);                  // banco prova a rulli (banco.js)
     } else if (I.id === 'niko') {
       const m = game.maint(), worst = Math.min(m.oil, m.plugs, m.pads);
       note(sim.damage > 0.2 ? 'Nico: «Eh, qui hai preso una bella botta. Te la raddrizzo io.»' : worst < 0.25 ? 'Nico: «Si sente da fuori che qualcosa non va: guardiamo olio, candele e freni.»' : m.dirt > 0.6 ? 'Nico: «Meccanica a posto. Ma una lavata gliela diamo?»' : 'Nico: «Tutto in ordine. Controllo veloce e vai.»');

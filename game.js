@@ -533,7 +533,7 @@ class StreetGame {
   partLocked(cat, id) { return this.mode === 'career' && !this.owns(cat, id) && this.odo < this.partKm(cat, id); }
   owns(cat, id) { return this.mode === 'free' || !TUNING[cat] || TUNING[cat].items[0].id === id || tuningItem(cat, id).price === 0 || !!this.s.owned[this.ownKey(cat + ':' + id)]; }
   price(cat, id) { return this.owns(cat, id) ? 0 : Math.round(tuningItem(cat, id).price * this.disc() / 10) * 10; }
-  canMount() { return this.mode === 'free' || Math.abs(this.sim.v) < 0.5; }
+  canMount() { return this.mode === 'free' || Math.abs(this.sim.v) < 0.5 || !!this.rulli; }   // sui rulli del banco i pezzi si montano anche col motore in tiro
   // con i luoghi in città (2D, carriera) i pezzi si montano solo dentro l'officina
   inShop() { return !!(this.inside && this.inside.id === 'shop' && this.inside.phase === 'shop'); }
   needsShop() { return this.mode === 'career' && this.placesOn && !this.inShop(); }

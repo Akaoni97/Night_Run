@@ -208,7 +208,7 @@
   }
   // inquadratura: la scena copre la parte di schermo che il pannello del locale lascia libera (a sinistra sul computer,
   // in alto sul telefono) e si centra sul punto importante della scena (focus: chi ti serve, la tua auto)
-  let lastKey = '', fitT = 0, fitDirty = true, fullT = 0;
+  let lastKey = '', fitT = 0, fitDirty = true, fullT = 0, vela = false;
   function resize() {
     if (!cv) return; const b = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = Math.max(2, Math.round(b.width * dpr)), h = Math.max(2, Math.round(b.height * dpr)); if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
@@ -231,7 +231,7 @@
     // misure della pagina 4 volte al secondo (e al cambio di finestra): leggerle a ogni fotogramma obbligava il browser a rifare l'impaginazione
     if (!(t - (fitT || 0) < 0.25) || fitDirty) { fitT = t; fitDirty = false; const k = fitKey(); if (k !== lastKey) { lastKey = k; resize(); } }
     alpha = closing ? Math.max(0, alpha - 0.06) : Math.min(1, alpha + 0.06);
-    cv.style.opacity = String(alpha);
+    cv.style.opacity = vela ? '0' : String(alpha); cv.style.pointerEvents = vela || closing ? 'none' : 'auto';   // vela: rulli dal vivo, si vede la strada
     if (alpha >= 1 && !closing) { if (!fullT) fullT = performance.now(); } else fullT = 0;
     og.setTransform(SSc, 0, 0, SSc, 0, 0); og.globalCompositeOperation = 'source-over'; og.globalAlpha = 1; og.imageSmoothingEnabled = false;
     og.drawImage(bg, 0, 0, W, H);
@@ -267,7 +267,8 @@
     close() { if (!cur) return; closing = true; AMB.stop(); },
     get current() { return cur && cur.id; },
     // la scena copre tutta la strada (piena e non in dissolvenza): street2d.js non presenta la strada sotto (prestazioni)
-    get covers() { return !!(cur && !closing && alpha >= 1 && fullT && performance.now() - fullT > 700); },   // 0,7 s: la dissolvenza CSS (0,45 s) è finita
+    hide(on) { vela = !!on; if (cv) { cv.style.opacity = vela ? '0' : String(alpha); cv.style.pointerEvents = vela ? 'none' : 'auto'; } },
+    get covers() { return !vela && !!(cur && !closing && alpha >= 1 && fullT && performance.now() - fullT > 700); },   // 0,7 s: la dissolvenza CSS (0,45 s) è finita
     // da coordinate della scena (640×360) a coordinate dello schermo (per le prove)
     point(x, y) { if (!cv) return null; const b = cv.getBoundingClientRect(), dpr = cv.width / b.width; return { x: b.left + (fit.ox + x * fit.s) / dpr, y: b.top + (fit.oy + y * fit.s) / dpr }; },
   };
