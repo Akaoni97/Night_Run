@@ -148,7 +148,9 @@
       if (p.k === 'fire') {
         // pallina di fuoco: bianca e gialla appena nata, poi arancio, rossa, e infine fuliggine
         if (L > 0.22) {
-          const pal = L > 0.7 ? ['#ff7a14', '#ffc832', '#fff4cc'] : L > 0.45 ? ['#e8380c', '#ff7a14', '#ffc832'] : ['#8a1c0c', '#e8380c', null];
+          const F = p.pal && FLAME_PAL[p.pal], B = F && F.b;                         // fiamme verdi o viola dei kit: palline dello stesso colore
+          const pal = B ? (L > 0.7 ? [B[1][0], B[2][0], B[3][0]] : L > 0.45 ? [B[0][0], B[1][0], B[2][0]] : [B[0][0], B[0][1], null])
+            : L > 0.7 ? ['#ff7a14', '#ffc832', '#fff4cc'] : L > 0.45 ? ['#e8380c', '#ff7a14', '#ffc832'] : ['#8a1c0c', '#e8380c', null];
           g.fillStyle = pal[0]; this.span(g, X, Y, p.r, p.r); g.fillStyle = pal[1]; this.span(g, X, Y, p.r * 0.62, p.r * 0.62);
           if (pal[2]) { g.fillStyle = pal[2]; this.span(g, X, Y, p.r * 0.3, p.r * 0.3); }
         } else { g.globalAlpha = Math.min(0.5, L * 3); const sp = this.puffSprite('soot', p.r + 1, 0); g.drawImage(sp, X - (sp.lw >> 1), Y - (sp.lw >> 1), sp.lw, sp.lw); g.globalAlpha = 1; }
@@ -210,7 +212,11 @@
     arancio: { b: [['#e8380c', '#e8380c'], ['#ff7a14', '#ff7a14'], ['#ffc832', '#ffc832'], ['#fff4cc', '#fff4cc']], o: 'rgba(110,18,8,.7)', l: '#ff7a20' },
     gialla: { b: [['#ff8a1a', '#f0601a'], ['#ffc832', '#ffb020'], ['#ffe97a', '#ffe060'], ['#fffbe8', '#fff6d0']], o: 'rgba(120,60,8,.6)', l: '#ffb040' },
     blu: { b: [['#2f5bff', '#ff5a14'], ['#4fb2ff', '#ff9a2a'], ['#bfe9ff', '#ffd65a'], ['#ffffff', '#fff4cc']], o: 'rgba(16,22,90,.6)', l: '#7aa8ff', cut: 0.42 },
+    // dei kit di Luca Tuning (fiamme.js, v0.143): g = colore della luce sull'asfalto
+    verde: { b: [['#0e8a3c', '#0e8a3c'], ['#22c95a', '#2fd26a'], ['#8cffb0', '#9cffc0'], ['#effff4', '#effff4']], o: 'rgba(4,46,20,.7)', l: '#46ff88', g: '#3ce07a' },
+    viola: { b: [['#7a1fd6', '#d0208a'], ['#b44bff', '#ff4fb8'], ['#e2a8ff', '#ffb0e0'], ['#ffffff', '#fff0fa']], o: 'rgba(40,8,70,.7)', l: '#c070ff', g: '#b858ff', cut: 0.5 },
   };
+  Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255' };   // luce della fiammata nella mappa di luce (street2d.js)
   S.fxFlame = function (g, rx, exY, k, fl, y0, pal, opt) {
     const P = FLAME_PAL[pal] || FLAME_PAL.arancio, O = opt || {};
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
@@ -254,7 +260,7 @@
     }
     const a = Math.min(1, f) * (O.dim || 1);
     flameLight(this, g, rx - L * 0.45, exY - 1, L * 0.95, H0 * 2.6 + 3, P.l, 0.13 * a, 3);              // alone
-    flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, '#ff8a20', 0.24 * a, 4);                  // luce sull'asfalto
+    flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, P.g || '#ff8a20', 0.24 * a, 4);           // luce sull'asfalto
     return L;
   };
   // le quattro versioni della fiamma libera (così l'occhio non vede sempre la stessa): 0 classica, 1 doppia lingua, 2 lunga e sottile, 3 corta e tozza
@@ -262,6 +268,7 @@
     if (v === 1) { const L1 = this.fxFlame(g, rx, exY - 1.3 * k, k * 0.82, fl * 0.8, y0, pal, { len: 0.92, th: 0.72, dim: 0.6 }), L2 = this.fxFlame(g, rx, exY + 1.4 * k, k * 0.82, fl * 0.55, y0, pal, { len: 0.62, th: 0.72, dim: 0.5 }); return Math.max(L1, L2); }
     if (v === 2) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.45, th: 0.55 });
     if (v === 3) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 0.68, th: 1.5 });
+    if (v === 4) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.7, th: 1.12 });            // il Lanciafiamme di Luca Tuning
     return this.fxFlame(g, rx, exY, k, fl, y0, pal);
   };
   // OSSIDRICA: getto sottile e dritto, velocissimo, blu con cuore bianco e i «diamanti» luminosi lungo il getto; la punta ogni tanto vira all'arancio
@@ -551,19 +558,21 @@
     st.popFlash = Math.max(0, (st.popFlash || 0) - dt * 6);
     // Il tipo di fiammata dipende da quanto è preparata l'auto (s.ftier: 0 leggero, 1 medio, 2 spinto) e dal momento (s.fkind):
     // ossidrica (torch), libera (free, quattro versioni), botto (bang). Senza livello (teaser, prove) resta la fiammata libera di sempre.
+    // Col kit delle fiamme di Luca Tuning (s.fkit, fiamme.js) tipo, colore, lunghezza e frequenza le decide il kit.
     const tier = s.ftier, tiered = tier !== undefined && typeof flameStyle === 'function';
+    const kit = tiered && s.fkit && typeof FIAMME_KIT !== 'undefined' ? FIAMME_KIT.find((q) => q.id === s.fkit) : null;
     st.torchT = Math.max(0, (st.torchT || 0) - dt); st.bangT = Math.max(0, (st.bangT || 0) - dt);
     // fiammella che resta accesa mentre c'è benzina che brucia nello scarico (rilascio, limitatore) e si spegne piano dopo:
     // tremola e cambia colore da sola; leggero niente, medio arancio e gialla, spinto blu
-    const susT = s.flame && !(tiered && tier === 0) ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
+    const susT = s.flame && (kit || !(tiered && tier === 0)) ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
     st.sus = susT > (st.sus || 0) ? (st.sus || 0) + (susT - (st.sus || 0)) * Math.min(1, dt * 10) : Math.max(0, (st.sus || 0) - dt * 1.6);
-    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
-    if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
-    const rateK = tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1;
+    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); if (kit) return fiammePal(kit, q); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
+    if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal && !kit ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
+    const rateK = (kit && kit.rate || 1) * (tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1);
     st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
     // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
     const spawn = (style) => {
-      if (style === 'torch' || (style === 'big' && tier >= 2)) {                    // ossidrica: breve, rapida, con scintille incandescenti
+      if (style === 'torch' || (style === 'big' && (kit ? kit.id === 'ossidrica' : tier >= 2))) {                    // ossidrica: breve, rapida, con scintille incandescenti
         st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
         for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
         if (style === 'torch') return;
@@ -575,25 +584,26 @@
         return;
       }
       // libera: la fiammata larga, in quattro versioni. Il livello medio (e il rilascio sotto i 5.000 giri) la fa meno decisa; la grossa è sempre piena
-      const grossa = style === 'big', med = !grossa && tiered && (tier === 1 || s.fkind === 'lift');
+      const grossa = style === 'big', med = !grossa && tiered && !kit && (tier === 1 || s.fkind === 'lift');
       const big = grossa || R() < (0.35 + s.flame * 0.3) * (med ? 0.55 : 1), sc = grossa ? 1.15 : med ? 0.85 : 1;
       st.fstyle = 'free'; st.flame = (big ? 1.1 + R() * 0.4 : 0.6 + R() * 0.4) * sc; st.popFlash = big ? 1 : 0.55; st.popJolt = big ? 1.2 : 0.5;
-      st.fv = tiered ? (grossa ? (R() < 0.6 ? 0 : 3) : flameVariant(tier, R())) : 0; st.flamePal = big && R() < 0.5 && !this.flamePal && !tiered ? 'blu' : pickPal();          // ogni scoppio col suo colore
+      st.fv = kit && kit.len ? 4 : tiered ? (grossa ? (R() < 0.6 ? 0 : 3) : flameVariant(tier, R())) : 0; st.flamePal = big && R() < 0.5 && !this.flamePal && !tiered ? 'blu' : pickPal();          // ogni scoppio col suo colore
       for (let q = 0; q < (grossa ? 8 : big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
     };
+    const scegli = (r) => kit ? fiammeScegli(kit, tier, s.fkind, r) : flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, r);   // il kit o la preparazione
     // appena si molla il gas (s.fkick conta i rilasci) il primo scoppio parte subito, non quando capita; sopra i 5.000 giri ne parte un secondo
     if (s.fkick !== undefined && s.fkick !== st.fkick) {
       st.fkick = s.fkick;
-      if (s.fkick && tiered) { spawn(flameStyle(tier, s.fkind, 0.6, R())); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
+      if (s.fkick && tiered) { spawn(scegli(R())); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
-    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(flameStyle(tier, s.fkind, 0.6, R())); }
-    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, R()) : 'free');
+    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R())); }
+    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
     if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
     if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang') {
       const L = this.fxFlameV(g, rx, exY, k, st.flame, y0, st.flamePal, st.fv || 0), fl = Math.min(1.5, st.flame);
-      if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1 });
+      if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1, pal: st.flamePal === 'verde' || st.flamePal === 'viola' ? st.flamePal : null });
     }
     else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0)) {
       // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
@@ -607,7 +617,7 @@
     if (!low) this.fxHaze(g, rx, exY, s, st, k);
     if (st.tipHeat > 0.03) { g.fillStyle = `rgba(255,${120 + (1 - st.tipHeat) * 80 | 0},40,${st.tipHeat * 0.8})`; g.fillRect(rx, exY - Math.round(k), Math.max(2, Math.round(5 * k)), Math.max(1, Math.round(2 * k))); }
     if ((s.marmitta || 0) > 0.01) this.fxMarmitta(g, rx, exY, k, s.marmitta, y0);                               // terminale rovente (fiamme.js)
-    if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
+    if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));
     // auto molto danneggiata: vapore dal cofano, fumo nero quando è quasi distrutta

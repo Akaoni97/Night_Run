@@ -262,6 +262,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
 .of-sw .st { color: #ffd27a; font: 700 12px/1.2 var(--f-data, monospace); text-align: right; white-space: nowrap; }
 .of-go { padding: 7px 12px; border: 1px solid #ffb347; border-radius: 8px; background: #ffb347; color: #1a1206; font: 700 12px/1 var(--f-data, monospace); cursor: pointer; }
 .of-go:disabled { background: #2a2636; color: #8a8478; border-color: #4a4458; cursor: not-allowed; }
+.of-fk { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; margin: 8px 0; }
+.of-fkc { display: flex; flex-direction: column; gap: 5px; padding: 8px; background: #1b1826; border: 1px solid #332e40; border-radius: 10px; }
+.of-fkc.cur { border-color: #2fd16a; box-shadow: 0 0 0 1px #2fd16a55 inset; }
+.of-fkc canvas { width: 100%; aspect-ratio: 200 / 64; border-radius: 7px; background: #07060c; image-rendering: pixelated; display: block; }
+.of-fkc b { font-size: 14px; display: flex; align-items: center; gap: 6px; } .of-fkc b small { margin-left: auto; font: 700 12px/1 ui-monospace, monospace; color: #ffd27a; }
+.of-fkc p { margin: 0; color: #b8b0a0; font-size: 12px; line-height: 1.35; flex: 1; }
 @media (max-width: 520px) { .of-sum { grid-template-columns: repeat(2, 1fr); } }`;
   let tab = 'mod', grp = 'motore', open = {}, pick = null;   // pick = il pezzo toccato: si guarda prima, si compra dopo
 
@@ -275,6 +281,14 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const i = e.target.closest('[data-i]'); if (i) { open[i.dataset.i] = !open[i.dataset.i]; render(); return; }
       const cp = e.target.closest('[data-cmp], [data-cmp-play], [data-cmp-i], [data-cmp-buy], [data-cmp-x], [data-cmp-v1]');            // scheda Suoni (campioni.js)
       if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
+      const fk = e.target.closest('[data-fk]');
+      if (fk) {                                                    // scheda Fiamme: compra (una volta) e monta il kit su quest'auto
+        const r = fiammeMonta(ctx.game.s, ctx.game.car, fk.dataset.fk, ctx.game.mode !== 'career');
+        if (!r.ok) { ctx.flash(r.why, 2.6); return; }
+        ctx.save && ctx.save(); ctx.after && ctx.after();
+        const k = FIAMME_KIT.find((q) => q.id === fk.dataset.fk);
+        ctx.flash(k.id === 'serie' ? 'Fiamme come vengono: le decide la preparazione' : 'Fiamme montate: ' + k.nome + (r.spesa ? ` · € ${fmt(r.spesa)}` : ''), 2.2); render(); return;
+      }
       const go = e.target.closest('[data-go]');
       if (go) {                                                    // pulsante della scheda: monta (e, se serve, compra)
         const k = go.dataset.go, id = go.dataset.id;
@@ -361,10 +375,69 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       if (est.nm > cl * 0.97) h += `<p class="of-warn" style="margin:6px 2px 2px;padding:6px 8px;border:1px solid #ff453a;border-radius:8px;color:#ffb3ad;font-size:12px;line-height:1.35">⚠ La frizione regge ${fmt(Math.round(cl))} Nm e il motore ne fa ${fmt(Math.round(est.nm / 5) * 5)}: slitta e i giri vanno al limitatore senza spingere. Vai in <b>Trasmissione</b> e monta una frizione più forte.</p>`; }
     const suoni = !!window.NightCampioni;                                            // campioni audio dei pezzi (campioni.js)
     if (tab === 'suoni' && !suoni) tab = 'mod';
+    const fiamme = typeof FIAMME_KIT !== 'undefined';                                // kit delle fiamme (fiamme.js)
+    if (tab === 'fiamme' && !fiamme) tab = 'mod';
     h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
-      + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '') + '</div>';
-    h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : drawSwap(ctx, carId, dId, career, money);
+      + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '')
+      + (fiamme ? `<button type="button" role="tab" data-tab="fiamme" aria-selected="${tab === 'fiamme'}">Fiamme${fiammeKit(g.s, carId) ? ' ✓' : ''}</button>` : '') + '</div>';
+    h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : tab === 'fiamme' ? drawFiamme(ctx, carId, career, money) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
+    if (tab === 'fiamme') fiammeAnima(box);
+  }
+
+  // ---------------------------------------------------------------- scheda Fiamme (kit di fiamme.js, v0.143)
+  function drawFiamme(ctx, carId, career, money) {
+    const f = ctx.game.s.fiamme || {}, own = f.own || {}, cur = (fiammeKit(ctx.game.s, carId) || { id: 'serie' }).id;
+    let h = '<p class="of-hint">Il kit decide <b>che fiamme escono dallo scarico</b>: al rilascio del gas e al limitatore, <b>su qualunque auto</b>, anche di serie. Lo compri una volta e lo rimonti gratis su ogni auto. Con la valvola dello scarico in silenzio non esce niente.</p><div class="of-fk">';
+    for (const k of FIAMME_KIT) {
+      const mont = k.id === cur, mio = !k.prezzo || own[k.id], poor = career && !mio && k.prezzo > money;
+      const stato = mont ? 'MONTATO' : mio ? (k.prezzo ? 'TUO' : 'GRATIS') : `€ ${fmt(k.prezzo)}`;
+      const label = mont ? 'Montato' : mio ? 'Monta' : poor ? `Mancano € ${fmt(k.prezzo - money)}` : `Compra e monta · € ${fmt(k.prezzo)}`;
+      h += `<div class="of-fkc${mont ? ' cur' : ''}"><canvas width="400" height="128" data-fkp="${k.id}" aria-hidden="true"></canvas>`
+        + `<b><span class="of-dot ${mont ? 'on' : mio ? 'own' : 'off'}"></span>${E(k.nome)}<small>${stato}</small></b><p>${E(k.testo)}</p>`
+        + `<button type="button" class="of-go" data-fk="${k.id}"${mont || poor ? ' disabled' : ''}>${label}</button></div>`;
+    }
+    return h + '</div>';
+  }
+  // l'anteprima: lo stesso disegno della strada (fxFlameV, fxTorch, fxBang di effetti2d.js) dietro un paraurti, a raffiche
+  // come un rilascio sopra i 5.000 giri e poi il limitatore, finché la scheda è aperta
+  function fiammeAnima(box) {
+    if (typeof Street2D === 'undefined' || !Street2D.prototype.fxFlameV) return;
+    const tele = [...box.querySelectorAll('canvas[data-fkp]')]; if (!tele.length) return;
+    const V = Object.create(Street2D.prototype); V.st = { t: 0 }; V.SS = 2;
+    const st = tele.map((c, i) => ({ c, g: c.getContext('2d'), kit: FIAMME_KIT.find((q) => q.id === c.dataset.fkp), flame: 0, torchT: 0, bangT: 0, fv: 0, pal: 'arancio', ph: i * 0.37 }));
+    const rx = 64, exY = 19, y0 = 26, k = 1;                          // scena di 100×32 unità, ingrandita ×4
+    const spawn = (s, kind) => {
+      const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random, style = kit ? fiammeScegli(kit, 1, kind, r()) : flameStyle(1, kind, 0.6, r());
+      if (style === 'torch' || (style === 'big' && kit && kit.id === 'ossidrica')) { s.torchT = 0.07 + r() * 0.09; s.torchF = 0.8 + r() * 0.7; if (style === 'torch') return; }
+      if (style === 'bang') { s.bangT = 0.24; return; }
+      const big = style === 'big' || r() < 0.45;
+      s.flame = big ? 1.1 + r() * 0.4 : 0.6 + r() * 0.4; s.fv = kit && kit.len ? 4 : (r() * 4) | 0;
+      s.pal = (kit && fiammePal(kit, r())) || flamePalFor(1, r());
+    };
+    let last = performance.now();
+    const passo = (now) => {
+      if (!box.isConnected || tab !== 'fiamme' || !tele[0].isConnected) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now; V.st.t += dt;
+      for (const s of st) {
+        const g = s.g; g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+        g.fillStyle = '#07060c'; g.fillRect(0, 0, 400, 128); g.setTransform(4, 0, 0, 4, 0, 0);
+        g.fillStyle = '#15131d'; g.fillRect(0, y0, 100, 6); g.fillStyle = '#2a2633'; g.fillRect(0, y0, 100, 0.5);      // asfalto
+        g.fillStyle = '#1d2230'; g.fillRect(rx + 3, 2, 40, 19); g.fillStyle = '#2c3446'; g.fillRect(rx + 3, 2, 40, 1.5);  // il retro dell'auto
+        g.fillStyle = '#b0141c'; g.fillRect(rx + 4, 7, 4, 3); g.fillStyle = '#0c0c10'; g.fillRect(rx + 3, 20, 40, 4);     // fanale e paraurti
+        g.fillStyle = '#1a1a1e'; g.beginPath(); g.arc(rx + 30, 24.5, 3.5, Math.PI, 0); g.fill();                          // la ruota che si vede
+        g.fillStyle = '#5a5e68'; g.fillRect(rx - 1, exY - 1, 6, 2); g.fillStyle = '#16161a'; g.fillRect(rx - 1, exY - 0.5, 0.5, 1);   // terminale
+        // ciclo di 2,6 s: raffica da rilascio, poi limitatore, poi pausa
+        const t = (V.st.t + s.ph) % 2.6, kind = t < 1 ? 'liftHigh' : 'limiter', rate = (s.kit && s.kit.rate) || 1;
+        if (t < 1.8 && Math.random() < dt * 9 * rate) spawn(s, kind);
+        s.flame = Math.max(0, s.flame - dt * 8); s.torchT = Math.max(0, s.torchT - dt); s.bangT = Math.max(0, s.bangT - dt);
+        if (s.torchT > 0) V.fxTorch(g, rx, exY, k, s.torchF, y0);
+        if (s.bangT > 0) V.fxBang(g, rx, exY, k, 1 - s.bangT / 0.24, y0);
+        if (s.flame > 0.05) V.fxFlameV(g, rx, exY, k, s.flame, y0, s.pal, s.fv);
+      }
+      requestAnimationFrame(passo);
+    };
+    requestAnimationFrame(passo);
   }
 
   function drawMod(ctx, career, money) {

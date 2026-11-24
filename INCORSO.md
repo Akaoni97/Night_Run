@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico) con Claude | Scelta delle fiamme dello scarico da Luca Tuning (5 tipi) | `fiamme.js`, `effetti2d.js`, `officina.js`, `index.html` | 24/11 |

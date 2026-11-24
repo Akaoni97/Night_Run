@@ -11,6 +11,7 @@
 //        'big'    GROSSA      la bella fiammata: libera e grande, con l'anello d'urto (e l'ossidrica insieme, nello spinto)
 //    kind = in che momento: 'limiter' (taglio d'accensione), 'lift' (rilascio sotto i 5.000 giri), 'liftHigh' (rilascio sopra), 'shift' (cambiata)
 //    marmittaPasso / marmittaRossa   il terminale che si arroventa tenendo i giri alti (MARMITTA)
+//    FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal   i kit delle fiamme di Luca Tuning (v0.143, scheda Fiamme)
 //  Leggero: soprattutto botti. Medio: fiammate libere, diverse tra loro. Spinto: ossidrica, e fiamma libera quando si rilascia
 //  ai giri medi; qualche botto nelle cambiate.
 // ============================================================================
@@ -70,4 +71,51 @@ function marmittaRossa(h, tier) {
   const u = Math.max(0, Math.min(1, ((h || 0) - a) / (b - a)));
   return u * u * (3 - 2 * u);
 }
-if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa });
+// ---------------------------------------------------------------- i kit delle fiamme (Da Luca Tuning, scheda Fiamme)
+// Il kit decide che fiamme escono dallo scarico, su qualunque auto: come i kit veri (candela nello scarico) le fa uscire anche
+// da un'auto di serie, al rilascio e al limitatore. Si compra una volta e resta tuo; si monta auto per auto (gratis).
+// w = pesi [ossidrica, libera, botto, grossa]; pal = colore (o colori a caso); len = fiamma libera più lunga; rate = più fitte.
+// Stato in game.s.fiamme = { own: { id: true }, mont: { auto: id } }. Senza kit (o «come viene») tutto come prima.
+const FIAMME_KIT = [
+  { id: 'serie', nome: 'Come viene', prezzo: 0, testo: 'Le fiamme le decide la preparazione: botti sull\'auto poco toccata, fiammate libere sulla media, ossidrica blu sulla spinta. Su un\'auto di serie niente fiamme.' },
+  { id: 'ossidrica', nome: 'Ossidrica blu', prezzo: 1800, w: [0.8, 0, 0.08, 0.12], pal: 'blu', testo: 'Getto sottile e dritto, blu col cuore bianco e i «diamanti». Secco al limitatore, una lama al rilascio.' },
+  { id: 'lancia', nome: 'Lanciafiamme', prezzo: 2600, w: [0, 0.5, 0, 0.5], pal: ['arancio', 'gialla'], len: 1.7, rate: 1.2, testo: 'Fiammata lunga e piena, arancio e gialla, con l\'anello d\'urto. Al rilascio sopra i 5.000 giri sembra un drago.' },
+  { id: 'mitraglia', nome: 'Mitraglia', prezzo: 1500, w: [0, 0.1, 0.9, 0], pal: 'arancio', rate: 2.2, testo: 'Poca fiamma e tanti botti a raffica, con le scintille. Al limitatore fa la mitragliatrice.' },
+  { id: 'smeraldo', nome: 'Smeraldo', prezzo: 3200, w: [0, 0.75, 0.05, 0.2], pal: 'verde', testo: 'Fiamme verdi, come quelle dei sali di rame. Alla Sosta 24 te le fotografano.' },
+  { id: 'neon', nome: 'Neon viola', prezzo: 3600, w: [0, 0.75, 0.05, 0.2], pal: ['viola', 'viola', 'blu'], testo: 'Fiamma viola e rosa con qualche lingua blu: si sposa col neon di Russian Kùstòm.' },
+];
+const fiammeDi = (id) => FIAMME_KIT.find((k) => k.id === id) || null;
+// il kit montato sull'auto (null = «come viene»)
+function fiammeKit(s, car) {
+  const f = s && s.fiamme, id = f && f.mont && f.mont[car], k = fiammeDi(id);
+  return k && k.id !== 'serie' ? k : null;
+}
+// compra (se non è tuo) e monta. gratis = partita libera. Dice { ok, why, spesa }
+function fiammeMonta(s, car, id, gratis) {
+  const k = fiammeDi(id); if (!k || !s) return { ok: false, why: 'Kit sconosciuto' };
+  const f = s.fiamme || (s.fiamme = { own: {}, mont: {} }); f.own = f.own || {}; f.mont = f.mont || {};
+  const mio = k.prezzo === 0 || f.own[id];
+  if (!mio && !gratis && (s.money || 0) < k.prezzo) return { ok: false, why: `Mancano € ${Math.ceil(k.prezzo - (s.money || 0)).toLocaleString('it-IT')}` };
+  const spesa = mio || gratis ? 0 : k.prezzo;
+  s.money = (s.money || 0) - spesa; if (k.prezzo) f.own[id] = true;
+  if (id === 'serie') delete f.mont[car]; else f.mont[car] = id;
+  return { ok: true, spesa };
+}
+// che fiammata esce col kit: come flameStyle, ma coi pesi del kit (al rilascio sopra i 5.000 giri la grossa conta il doppio)
+function fiammeScegli(kit, tier, kind, r) {
+  if (!kit || !kit.w) return flameStyle(tier, kind, 0.6, r);
+  const w = kit.w.slice();
+  if (kind === 'liftHigh') w[3] *= 2;
+  else if (kind === 'limiter') { w[0] *= 1.3; w[2] *= 1.2; }
+  let x = r * (w[0] + w[1] + w[2] + w[3]);
+  if ((x -= w[0]) < 0) return 'torch';
+  if ((x -= w[1]) < 0) return 'free';
+  if ((x -= w[2]) < 0) return 'bang';
+  return 'big';
+}
+// il colore della fiamma col kit (null = quello di sempre)
+function fiammePal(kit, r) {
+  if (!kit || !kit.pal) return null;
+  return Array.isArray(kit.pal) ? kit.pal[Math.min(kit.pal.length - 1, Math.floor(r * kit.pal.length))] : kit.pal;
+}
+if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa, FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal });
