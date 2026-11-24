@@ -494,6 +494,8 @@ class StreetGame {
       if (sim.damage < 0.01) return { ok: false, why: 'Non c\'è niente da raddrizzare' };
       sim.damage = Math.max(0, sim.damage - 0.15); it.uses -= 1; if (it.uses <= 0) this.s.trunk.splice(i, 1);
       this.say(`Martello e pazienza: danni al ${Math.round(sim.damage * 100)} %`, 'buy');
+    } else if (it.kind === 'scorta' && this.changeTyre) {
+      return this.changeTyre();                                          // cambio gomma animato (viaggio.js, cambiogomma.js)
     } else return { ok: false, why: it.kind === 'pacco' ? 'Il pacco va consegnato, non aperto' : 'Questo oggetto non si usa: puoi solo toglierlo' };
     this.applyMass(); return { ok: true };
   }

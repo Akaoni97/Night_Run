@@ -1675,7 +1675,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'z') toggleFs();
     else if (k >= '1' && k <= '4' && game.s.vg && !game.prompt) vgQuick(+k);
     else if (k === '8') toggleWindows();
-    else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Cambio la gomma: un quarto d\'ora di lavoro…' : r.why, 2); renderTrunk(); }
+    else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Accosto e cambio la gomma (U accelera)' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') cycleHud();
     else if (k === 'k') cycleMeteo();
@@ -2311,7 +2311,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     }
     shop.querySelectorAll('button').forEach((b) => { const I = INV[b.dataset.k]; b.innerHTML = `${IC(b.dataset.k)}${I.name}<small>${game.mode === 'career' ? '€ ' + fmt(I.price) + ' · ' : ''}${I.kg} kg</small>`; });
   }
-  $('itemUse').addEventListener('click', () => { const r = game.useItem(selItem); if (!r.ok) flash(r.why, 2.4); selItem = -1; renderTrunk(); saveGame(); });
+  $('itemUse').addEventListener('click', () => {
+    const it = (game.s.trunk || [])[selItem], r = game.useItem(selItem); if (!r.ok) flash(r.why, 2.4);
+    if (r.ok && it && it.kind === 'scorta') { if (window.gameMenu) window.gameMenu.close(); flash('Accosto e cambio la gomma (U accelera)', 2.4); }   // chiudi il menu: si guarda la scena
+    selItem = -1; renderTrunk(); saveGame();
+  });
   $('itemDrop').addEventListener('click', () => { if (Math.abs(sim.v) > 0.5) { flash('Per svuotare il bagagliaio fermati', 2); return; } const r = game.dropItem(selItem); if (!r.ok && r.why) flash(r.why, 2.4); selItem = -1; renderTrunk(); saveGame(); });
   function openTrunk() {
     if (window.gameMenu) window.gameMenu.open('bagagliaio'); else document.getElementById('trunkPanel').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
@@ -3830,6 +3834,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="garage.js"></script>
 <script src="lucagarage.js"></script>
 <script src="soccorso.js"></script>
+<script src="cambiogomma.js"></script>   <!-- il cambio gomma con la scorta: scendi e la cambi tu -->
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
 <script src="notte.js"></script>

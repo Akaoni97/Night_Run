@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato | Pulsante BAGAGLIAIO tra menu e telefono; cambio gomma animato (il protagonista scende e la cambia) | menu.js, premium.css, viaggio.js, cambiogomma.js, index.html | 24/11 sera |

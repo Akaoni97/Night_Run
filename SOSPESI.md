@@ -25,6 +25,9 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ## Priorità alta · cose nuove non ancora verificate (si fanno prima)
 
+### Bagagliaio e gomme
+32. [gomme] **Cambio gomma animato e pulsante BAGAGLIAIO** (v0.161, `cambiogomma.js`): da provare sul PC il ritmo (~15 s, U accelera), se si capisce che è in ginocchio, e se in corsia di destra il traffico da dietro si comporta bene con l'auto ferma. (cognato)
+
 ### Notte e storia
 5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)

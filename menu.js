@@ -157,6 +157,11 @@
   const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'menubtn'; mb.id = 'menuBtn'; mb.innerHTML = '<i aria-hidden="true"></i>MENU<kbd>Tab</kbd>';
   mb.addEventListener('click', () => (menu.hidden ? open() : close()));
   if (top) top.appendChild(mb);
+  // BAGAGLIAIO tra MENU e TELEFONO (telefono.js si aggiunge dopo): apre dritto la scheda del bagagliaio, un altro clic la chiude
+  const tb = document.createElement('button'); tb.type = 'button'; tb.className = 'menubtn'; tb.id = 'trunkBtn'; tb.title = 'Bagagliaio (B)';
+  tb.innerHTML = '<i aria-hidden="true"></i>BAGAGLIAIO<kbd>B</kbd>';
+  tb.addEventListener('click', () => { if (!menu.hidden && last === 'bagagliaio') close(); else open('bagagliaio'); });
+  if (top) top.appendChild(tb);
 
   // Tab apre e chiude, Esc chiude (prima degli altri tasti del gioco)
   window.addEventListener('keydown', (e) => {
@@ -273,8 +278,11 @@
   const dock = document.createElement('div'); dock.className = 'fsdock';
   dock.innerHTML = '<button type="button" data-a="menu" aria-label="Menu"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>'
     + '<button type="button" data-a="tel" aria-label="Telefono"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="1.5" width="8" height="13" rx="1.6"/><path d="M7 12.2h2"/></svg></button>';
+  dock.insertAdjacentHTML('beforeend', '<button type="button" data-a="trunk" aria-label="Bagagliaio"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 5.5l6-3 6 3v6l-6 3-6-3z"/><path d="M2 5.5l6 3 6-3M8 8.5v6"/></svg></button>');
+  dock.insertBefore(dock.lastChild, dock.children[1]);   // MENU, BAGAGLIAIO, TELEFONO
   dock.children[0].addEventListener('click', () => open());
-  dock.children[1].addEventListener('click', () => { const t = $('telBtn'); if (t) t.click(); else if (window.telefono && window.telefono.open) window.telefono.open(); });
+  dock.children[1].addEventListener('click', () => open('bagagliaio'));
+  dock.children[2].addEventListener('click', () => { const t = $('telBtn'); if (t) t.click(); else if (window.telefono && window.telefono.open) window.telefono.open(); });
   if (hud) hud.appendChild(dock);
 
   // telefono in verticale: la strada è larga e i comandi non ci stanno, si chiede di girarlo (si può giocare lo stesso)
