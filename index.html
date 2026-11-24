@@ -335,6 +335,12 @@ body.inplace .lanebtn { display: none; }
 .dash-btns button.a2.hot { background: #2ee6ff; }
 .dash-btns button:disabled { opacity: .35; cursor: default; }
 #hudP { width: 100%; aspect-ratio: 560 / 240; pointer-events: none; filter: drop-shadow(0 6px 18px rgba(0,0,0,.55)); }
+/* computer (v0.155, menu.js): una colonna in alto a sinistra con il riquadro del viaggio, il quadro e i pulsanti; dietro l'auto resta libero */
+.hud-col { position: absolute; left: 12px; top: 12px; width: 280px; display: flex; flex-direction: column; gap: 8px; transform-origin: top left; }
+.hud-col > .hud-l { position: static; }
+.hud-col > .dash { position: static; width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.hud-col > .dash #hudP { order: -1; }
+.hud-col > .dash .dash-btns button { min-height: 0; }
 body.inplace .dash { display: none; }
 @media (max-width: 600px) { .dash { width: min(64vw, 260px); left: 6px; bottom: 60px; } .dash-btns button { font-size: 9px; } }
 #hudG { position: absolute; right: 12px; bottom: 70px; width: clamp(190px, 26%, 320px); aspect-ratio: 160 / 84; pointer-events: none; image-rendering: pixelated; filter: drop-shadow(0 0 10px rgba(255,46,136,.25)); }

@@ -286,3 +286,25 @@
 
   window.dispatchEvent(new Event('resize'));
 })();
+
+// ---------------------------------------------------------------- computer: quadro e pulsanti in alto a sinistra (v0.155)
+// Prima stavano in basso a sinistra e coprivano l'auto, le fiamme dello scarico e chi arriva da dietro (volanti, traffico).
+// Ora c'è una colonna sola in alto a sinistra: il riquadro del viaggio, sotto il quadro strumenti (#hudP), sotto i pulsanti.
+// La colonna sta nel cielo e sui palazzi: se la finestra è stretta (la strada comincia più in alto) si rimpicciolisce da sola
+// finché non tocca la carreggiata. Al tocco (html.tdash) resta tutto come prima: lì ci sono STRUMENTI e DATI.
+(function cruscottoInAlto() {
+  if (typeof document === 'undefined' || document.documentElement.classList.contains('tdash')) return;
+  const dash = document.getElementById('dash'), hl = document.querySelector('.hud-l'), hud = hl && hl.parentElement;
+  if (!dash || !hl || !hud) return;
+  const col = document.createElement('div'); col.className = 'hud-col';
+  hud.insertBefore(col, hl); col.appendChild(hl); col.appendChild(dash);
+  // la carreggiata comincia a y 236 di 360 nella scena (il marciapiede lontano poco sopra): la colonna non scende oltre il marciapiede
+  const STRADA = 0.6;
+  const adatta = () => {
+    col.style.transform = '';
+    const h = col.offsetHeight, H = hud.clientHeight; if (!h || !H) return;
+    const k = Math.max(0.6, Math.min(1, (H * STRADA - 12) / h));
+    col.style.transform = k < 0.995 ? `scale(${k.toFixed(3)})` : '';
+  };
+  addEventListener('resize', adatta); setInterval(adatta, 700); adatta();   // anche quando il riquadro cambia (un lavoro, i bisogni, i comandi)
+})();

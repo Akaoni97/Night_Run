@@ -159,6 +159,9 @@
   -webkit-backdrop-filter: var(--p-blur); backdrop-filter: var(--p-blur);
 }
 :root:not(.classico):not(.tdash) .dash-btns.cmd { margin-top: 0; }
+:root:not(.classico) .hud-col > .hud-l { max-width: none; }
+:root:not(.classico):not(.tdash) .hud-col .dash-btns button { min-height: 34px; padding: 4px 2px 3px; gap: 3px; }
+:root:not(.classico):not(.tdash) .hud-col .dash-btns button::before { width: 15px; height: 15px; }
 :root:not(.classico):not(.tdash) .dash-btns button {
   display: grid; justify-items: center; align-content: center; gap: 4px; min-width: 0; min-height: 42px; padding: 6px 2px 5px;
   border-radius: 9px; font: 600 9px/1 var(--p-f-ui); letter-spacing: .12em; color: #cbc4d8; white-space: nowrap; overflow: hidden;
