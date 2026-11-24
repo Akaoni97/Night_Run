@@ -60,3 +60,12 @@ test('forature: tra gli eventi a caso della strada non c\'è più la gomma', () 
   try { for (let i = 0; i < 200; i++) { Math.random = () => (i % 100) / 100; game.ents = []; game.spawnRoadEvent(); } } finally { Math.random = r0; }
   assert.ok(T.leak.every((l) => !l), 'nessuna gomma bucata dagli eventi a caso');
 });
+
+test('forature: sopra gli 83 km/h lo scoppio ti butta in una corsia accanto, sotto no', () => {
+  const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip(); game.s.vg.firstDone = true;
+  game.lane = 2; sim.v = 30; game.ap = null; game.free = false;
+  const d = game.foraSbanda();
+  assert.ok(d === 1 || d === -1, 'cambia corsia'); assert.equal(game.lane, 2 + d);
+  game.lane = 3; sim.v = 30; assert.equal(game.foraSbanda(), -1, 'dalla terza può andare solo a destra'); assert.equal(game.lane, 2);
+  game.lane = 2; sim.v = 22; assert.equal(game.foraSbanda(), 0, 'a 79 km/h resta in corsia'); assert.equal(game.lane, 2);
+});

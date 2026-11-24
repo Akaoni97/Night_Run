@@ -5,6 +5,7 @@
 //    una ogni 15-20 km;
 //  - lo scoppio: la gomma esplode in corsa, un botto, l'aria che esce tutta (PSSSHHH) e poi la gomma a terra che
 //    sbatte sull'asfalto finché non ti fermi; uno ogni 42-45 km, sfasato di ±5 km (quindi tra 37 e 50).
+//  Sopra gli 83 km/h lo scoppio ti butta in una corsia accanto, a caso (foraSbanda).
 //  Solo nel Viaggio, e solo in movimento (lo scoppio sopra i 40 km/h): se scade da fermo aspetta che riparti.
 //  I km li conta qui, solo in avanti (s.forat). Prima c'era una foratura a caso ogni ~260 km in viaggio.js e la foratura
 //  lenta era uno degli eventi tra le tappe di strada.js: tolte tutte e due, ci pensa questo file.
@@ -20,6 +21,7 @@ const FOR = {
   vScoppio: 11,               // m/s minimi per lo scoppio (40 km/h)
   perdita: [0.008, 0.018],    // bar al secondo persi dalla foratura lenta (come prima)
   aTerra: 0.3,                // bar che restano dopo lo scoppio
+  sbandaKmh: 83,              // sopra questa velocità lo scoppio ti fa cambiare corsia (una a caso tra quelle accanto)
 };
 const FOR_NOMI = ['anteriore sinistra', 'anteriore destra', 'posteriore sinistra', 'posteriore destra'];
 
@@ -76,7 +78,19 @@ function forScegli(T, tipo, rnd) {
       if (this.vgThink) this.vgThink('Porca… è esplosa. Piano, piano, non inchiodare. Accosto.');
       if (this.fx) this.fx.push({ k: 'scoppio', i, v: Math.abs(this.sim.v) });
       if (this.statAdd) this.statAdd('scoppi');
+      this.foraSbanda();
       return true;
+    };
+    // sopra gli 83 km/h lo scoppio ti porta via di corsia: una a caso tra quelle accanto (idea di Luca, v0.152).
+    // Se di là c'è qualcuno, l'urto lo decide il gioco come sempre. Niente col pilota automatico che accosta.
+    P.foraSbanda = function () {
+      if (Math.abs(this.sim.v) * 3.6 <= FOR.sbandaKmh || this.ap || this.free) return 0;
+      const dirs = [-1, 1].filter((d) => this.lane + d >= 1 && this.lane + d <= 3);
+      if (!dirs.length) return 0;
+      const d = dirs[Math.floor(Math.random() * dirs.length) % dirs.length];
+      this.lane += d; this.manualT = this.autoLane ? 5 : 1e9;
+      this.say(d > 0 ? 'La macchina ti scappa a sinistra!' : 'La macchina ti scappa a destra!', 'bad');
+      return d;
     };
   }
 

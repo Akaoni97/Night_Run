@@ -1,3 +1,6 @@
+## 24/11/2026 · cognato · v0.152 (**lo scoppio ti porta via di corsia**)
+- Idea di Luca: sopra gli 83 km/h (`FOR.sbandaKmh`) lo scoppio cambia corsia da solo, una a caso tra quelle accanto (dalla prima o dalla terza c'è solo una scelta), con l'avviso «La macchina ti scappa a destra/sinistra!». Se di là c'è qualcuno, l'urto lo fa il gioco come sempre. Niente col pilota automatico che accosta. `foraSbanda` in `forature.js`, un test in più in `test/forature.test.js`; 430 in tutto.
+
 ## 24/11/2026 · cognato · v0.151 (**impennata secca**)
 - Luca: deve prendere, alzarsi e basta, di potenza. Molla della salita più rigida (k 150, c 11): da staccata a 12° in 0,2-0,3 s; l'angolo può solo crescere finché si spinge, quindi resta piantato su invece di fare su e giù. Il colpo della frizione da solo non basta ancora (media della spinta su 0,3 s): il motore di serie resta a terra.
 - La foto della v0.149 era una V40 solo perché è l'auto di partenza del browser di prova, con l'angolo forzato a mano: nel gioco le trazioni anteriori (V40, Golf, Panda...) non hanno i pezzi e la fisica non le alza nemmeno forzando la geometria (test). Impennano solo Supra, R5 Turbo 2 (motore centrale, trazione posteriore), 2002 Turbo, E30, E36, E34 (più bus e ambulanza).
