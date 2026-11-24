@@ -1,3 +1,6 @@
+## 24/11/2026 · proprietario (Nico) · **prova sul PC: 58-60 fps**
+- Dopo i tre giri sulle prestazioni (v0.131-v0.137) Nico misura **58-60 fps** sul suo PC (prima 11-24). Obiettivo raggiunto, sospeso 27 chiuso.
+
 ## 24/11/2026 · proprietario (Nico) · v0.137 (**prestazioni, terzo giro: meno comandi alla scheda video**)
 - Contati i comandi di disegno di un fotogramma (notte, pioggia, Roma): **3.877 `fillRect`**, 281 `drawImage`, 80 sfumature rifatte, ~2 tele nuove (gli sbuffi di fumo, finché la loro scorta non è piena). Una scheda video paga ogni comando: tanti rettangoli piccoli costano molto più dei loro pixel. Ora si riempiono in una figura sola: pioggia (1.300 → 1), `span` (le ellissi a righe: nuvole della pioggia, ombre, 760 → 1 per ellisse), riflessi sull'asfalto in 6 livelli di trasparenza (`vitaRiflessi`, ~350 → pochi), riflesso tremolante dei lampioni, sampietrini di Roma (~280 → 2). Totale ~900 `fillRect`. Stesso fotogramma prima e dopo: differenza media 0,1 su 255.
 - Nel browser di prova (senza scheda video, anche quella «emulata» è software) non cambia niente, come previsto: lì conta solo il numero di pixel. Sul PC vero conta il numero di comandi: va visto sul contatore.

@@ -65,8 +65,6 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 26. [telefono] **Schermata iniziale tagliata al telefono in orizzontale**: chiave, «Accendi e parti» e partite 2 e 3 escono a destra (Pixel 7 e iPhone 13, check del 23/11; da ricontrollare dopo la v0.125). Il gioco si prova anche dal telefono. (proprietario)
 
-27. [prestazioni] **Fps sul PC vero** (v0.137: meno comandi alla scheda video; serve la riga del Contatore FPS dal PC: fps, ms gioco/strada/browser, nome della scheda video. 30 fps esatti = fotogrammi appena sopra i 16,7 ms o browser senza scheda video) (v0.131-v0.134, prestazioni in due giri, Nico e Luca): guardare il contatore FPS (dice anche quale scheda video usa il browser) a 1080p di notte con la pioggia, in «Automatica» e a densità doppia. Nel browser di prova senza scheda video: gradino più basso ~47 fps, densità doppia ~18. Se resta sotto i 50, il prossimo passo sono carrozzerie e passanti. (tutti e due)
-
 ## In pausa fino alla fine (deciso da Luca il 21/11: non si tocca ora)
 
 ### Economia e guida
@@ -84,6 +82,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 24/11 (v0.131-v0.137, Nico e Luca): prestazioni in tre giri; **sul PC di Nico 58-60 fps** (erano 11-24). Il 27 è chiuso.
 - 23/11 notte (Luca): approvati suoni per auto e campioni, fisica vera, rimborso di Nico, schede, voci delle schede, aspetto dei personaggi, auto e camion nuovi, schermata iniziale, proposta delle capitali. Vignette a versi (v0.126).
 - 23/11, check (Luca con Claude): 408 test, prova di fumo, foto di schermata iniziale (computer e telefono), Roma e guida.
 - 23/11 (v0.113-v0.123, Nico): capitali più vere, video «di serie e preparate», fluidità di fiammate e scritte, livelli del 2D, protagonista in pixel art con nuvolette, schermata iniziale con la chiave, aggiornamenti subito (`sw.js`).
