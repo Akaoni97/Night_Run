@@ -3551,7 +3551,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, wheelie: sim.whTh || 0, whK: sim.whK || 0, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
         ign: sim.ign, brake: sim.in.brake, flame: flameT, fkind: fkind, ftier: ft.tier, fkit: fkit ? fkit.id : '', frpm: sim.rpm / sim.P.limiter, marmitta: typeof marmittaRossa === 'function' ? marmittaRossa(marmH, ft.tier) : 0, fkick: kick, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
         thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd };
-      garage.update(dt, vs, game);
+      garage.update(dt, vs, game); window.nightRun.fx = vs;   // lo stato del fotogramma (fiamme, marmitta...) anche per la scena da Luca (interni_hd.js)
       recordFrame(dt, vs);
     }
     for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); else if ((f.k === 'scoppio' || f.k === 'gommaLenta') && window.NightForature) NightForature.suono(audio, f, S.vol / 100, S.muted); }

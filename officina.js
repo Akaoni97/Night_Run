@@ -341,18 +341,19 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       const r = e.target.closest('[data-susp]'); if (!r || !ctx.setAdj) return;
       ctx.setAdj(r.dataset.susp === 'h' ? { h: +r.value } : { k: +r.value }, () => render()); ctx.after && ctx.after(); render();
     });
-    // anteprima: passando sopra un livello le barre in alto mostrano cosa cambierebbe (non compra niente)
+    // anteprima (v0.160): CV, Nm, kg/CV e 400 m stanno sullo schermo del banco nella scena (interni_hd.js), non più qui.
+    // Passando sopra un livello (o toccandolo) lo schermo mostra cosa cambierebbe: +2 CV in verde, −0,1 s... (non compra niente)
     let pv = null;
-    const sumEl = () => box.querySelector('.of-sum');
-    const pvOff = () => { clearTimeout(pv); if (box._pvOn) { box._pvOn = false; const s = sumEl(); if (s) s.outerHTML = summary(ctx); } };
+    const pickD = () => (pick ? offPreview(ctx.game, ctx.S.tune, pick.k, pick.id) : null);
+    const pvOff = () => { clearTimeout(pv); NightOfficina.anteprima = pickD(); };
     box.addEventListener('mouseover', (e) => {
       const c = e.target.closest('[data-k]'); if (!c) return pvOff();
       if (c.classList.contains('cur')) return pvOff();
       clearTimeout(pv);
-      pv = setTimeout(() => { const d = offPreview(ctx.game, ctx.S.tune, c.dataset.k, c.dataset.id), s = sumEl(); if (d && s) { box._pvOn = true; s.outerHTML = summary(ctx, d); } }, 90);
+      pv = setTimeout(() => { NightOfficina.anteprima = offPreview(ctx.game, ctx.S.tune, c.dataset.k, c.dataset.id); }, 90);
     });
     box.addEventListener('mouseleave', pvOff);
-    box.addEventListener('click', () => { clearTimeout(pv); box._pvOn = false; }, true);
+    box.addEventListener('click', () => { clearTimeout(pv); setTimeout(() => { NightOfficina.anteprima = pickD(); }, 0); }, true);
     render();
     return box;
   }
@@ -368,7 +369,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
 
   function draw(box, ctx) {
     const g = ctx.game, carId = g.car, career = g.mode === 'career', money = g.s.money, dId = offSwapOf(g, carId);
-    let h = summary(ctx);
+    let h = '';                                                   // CV, Nm, kg/CV e 400 m: sullo schermo del banco a sinistra (v0.160)
     const sch = typeof schedaTesto === 'function' ? schedaTesto(dId || carId) : '';   // scheda tecnica del motore montato (schede.js)
     if (sch) h += `<p class="of-sch" style="margin:6px 2px 2px;font-size:11px;color:#8a8478;line-height:1.35">${E(sch)}</p>`;
     { const est = ctx.sim.estimatePeak(), cl = ctx.sim.P.clutchMax;      // frizione più debole del motore: slitta e il motore sale al limitatore senza spingere
@@ -554,5 +555,5 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       + '<div class="of-swaps">' + row(carId, true) + list.map((id) => row(id, false)).join('') + '</div>';
   }
 
-  window.NightOfficina = { panel, OFF_GRUPPI };
+  window.NightOfficina = { panel, OFF_GRUPPI, anteprima: null };
 })();

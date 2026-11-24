@@ -563,7 +563,7 @@
   function dynoDati() {
     const nr = window.nightRun, sim = nr && nr.sim, game = nr && nr.game; if (!sim || !sim.P || !sim.tune || !sim.estimatePeak) return null;
     const tn = sim.tune, tc = tn.turbo || {}, P = sim.P;
-    const key = [game && game.car, tn.pw, P.limiter, P.mass, tc.max, tc.a, tc.b, tc.cap, tc.twin, tn.camLow, tn.camHigh, tn.boostK, sim.extraPw, sim.boostCtl].join('|');
+    const key = [game && game.car, tn.pw, P.limiter, P.mass, P.mu, tc.max, tc.a, tc.b, tc.cap, tc.twin, tn.camLow, tn.camHigh, tn.boostK, sim.extraPw, sim.boostCtl].join('|');
     if (key === dynoK && dynoV) return dynoV;
     const cvA = [], nmA = [];
     for (let rpm = 1000; rpm <= P.limiter; rpm += Math.max(25, (P.limiter - 1000) / 110)) {
@@ -578,12 +578,41 @@
     const nome = String((car && (car.short || car.name)) || 'LA TUA AUTO').toUpperCase().normalize('NFD').replace(/[^A-Z0-9 .\/-]/g, '').slice(0, 16);
     dynoK = key;
     dynoV = { nome, cv, nm: Math.round(e.nm), rpmCv: Math.round(e.rpmCv / 50) * 50, rpmNm: Math.round(e.rpmNm / 50) * 50, lim: Math.round(P.limiter),
+      et: 5.825 * Math.pow((kg + 75) * 2.2046 / (Math.max(10, cv) * 0.986), 1 / 3) + 0.45 + Math.max(0, 0.35 - ((P.mu || 1.1) - 1.1)), cvRaw: e.cv,   // 400 m come game.etEstimate
       turbo: bar ? 'TURBO ' + bar.toFixed(1).replace('.', ',') + ' BAR' : 'ASPIRATO', kg, kgcv: cv ? ((kg + 75) / cv).toFixed(1).replace('.', ',') : '-',   // col pilota, come nel riquadro dell'officina
       c: cvA.map((v) => v / mc), n: nmA.map((v) => v / mn) };
     return dynoV;
   }
 
+  // fiamme dello scarico sulla tua auto da Luca (v0.160): col gas libero nel negozio si sgasa e le fiamme devono uscire anche
+  // qui, non solo sulla strada coperta dalla scena. Stessi disegni della strada (effetti2d.js: fxFlameV, fxFlame, fxMarmitta)
+  // e stesso stato del fotogramma (nightRun.fx: flame, fkind, ftier, fkit, fkick, marmitta); scoppi a caso come sulla strada
+  function shopFiamme(g, t, S, cx, cy) {
+    const nr = window.nightRun, v2 = nr && nr.view2d, vs = nr && nr.fx; if (!v2 || !vs || !v2.fxFlame || !v2.geo) return;
+    const st = S.fx || (S.fx = { flame: 0, sus: 0, pal: 'arancio', v: 0, last: t, kick: vs.fkick });
+    const dt = Math.max(0, Math.min(0.1, t - st.last)); st.last = t;
+    const G = v2.geo(); if (!G || !G.ex) return;
+    const k = S.carK, lowPx = Math.round((G.low || 0) * k), up = Math.max(0, -lowPx), kS = k / SS;
+    const rx = cx + G.ex[0] * kS, exY = cy + (up + lowPx + G.ex[1] * k) / SS, y0 = 236;   // y0: il riflesso va sul pavimento sotto il ponte, non sulla pedana
+    const kit = vs.fkit && typeof FIAMME_KIT !== 'undefined' ? FIAMME_KIT.find((q) => q.id === vs.fkit) : null, tier = vs.ftier || 0, Rn = Math.random;
+    const pal = () => (kit && typeof fiammePal === 'function' ? fiammePal(kit, Rn()) : typeof flamePalFor === 'function' ? flamePalFor(tier, Rn()) : 'arancio');
+    const spawn = () => {
+      const big = Rn() < 0.35 + (vs.flame || 0) * 0.3;
+      st.flame = big ? 1.1 + Rn() * 0.4 : 0.6 + Rn() * 0.4; st.pal = pal();
+      st.v = kit && kit.len ? 4 : typeof flameVariant === 'function' ? flameVariant(tier, Rn()) : 0;
+    };
+    st.flame = Math.max(0, st.flame - dt * 8);
+    if (vs.fkick !== st.kick) { st.kick = vs.fkick; if (vs.fkick && vs.flame) spawn(); }
+    if (vs.flame && Rn() < Math.min(0.55, vs.flame * dt * 22 * ((kit && kit.rate) || 1))) spawn();
+    const susT = vs.flame && (kit || tier !== 0) ? 0.35 + 0.45 * Math.min(1, vs.flame) : 0;
+    st.sus = susT > st.sus ? st.sus + (susT - st.sus) * Math.min(1, dt * 10) : Math.max(0, st.sus - dt * 1.6);
+    if (st.flame > 0.05) v2.fxFlameV(g, rx, exY, kS, st.flame, y0, st.pal, st.v);
+    else if (st.sus > 0.03) v2.fxFlame(g, rx, exY, kS * 0.85, (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * Math.abs(Math.sin(t * 7.3))), y0, st.pal);
+    if ((vs.marmitta || 0) > 0.01 && v2.fxMarmitta) v2.fxMarmitta(g, rx, exY, kS, vs.marmitta, y0);   // terminale rovente
+  }
+
   // ---------------------------------------------------------------- DA LUCA TUNING (Luca)
+  const SHOP_MON = { dx: -348, dy: -24 };   // dove sta lo schermo del banco rispetto al disegno originale (a destra, x 468)
   HD.shop = {
     ss: SS, focus: 300, amb: 'shop', grade: '255,176,0', gradeA: 0.05,
     static(g, r, S) {
@@ -594,8 +623,11 @@
       R(g, 18, 18, 174, 94, INK); R(g, 20, 20, 170, 90, '#9a7a52'); for (let y = 24; y < 108; y += 5) for (let x = 24; x < 188; x += 5) P(g, x, y, '#5a4a3a', 1);
       const tools = [[30, 30, 5, 60, '#c8ccd4'], [42, 34, 4, 52, '#c42a1a'], [54, 30, 12, 26, '#c8ccd4'], [74, 30, 4, 58, '#ffb000'], [88, 40, 22, 8, '#c8ccd4'], [114, 30, 6, 48, '#2a6ad8'], [128, 32, 30, 10, '#c8ccd4'], [128, 52, 26, 8, '#c42a1a'], [164, 30, 8, 62, '#c8ccd4']];
       for (const [x, y, w, h, c] of tools) { R(g, x - 0.5, y - 0.5, w + 1, h + 1, '#3a2a1a'); R(g, x, y, w, h, c); R(g, x, y, 1, h, '#ffffff'); R(g, x + w - 1, y, 1, h, mix(c, '#000000', 0.4)); }
-      // schermo del banco prova
+      // schermo del banco prova (v0.160 spostato a sinistra, sopra il pannello degli attrezzi: col pannello del negozio
+      // aperto a destra prima restava coperto, ora porta CV, Nm, kg/CV e 400 m al posto del riquadro dell'officina)
+      g.save(); g.translate(SHOP_MON.dx, SHOP_MON.dy);
       R(g, 468, 28, 154, 84, INK); R(g, 470, 30, 150, 80, '#14161c'); R(g, 474, 34, 142, 72, '#0a1018'); for (let k = 0; k < 6; k++) R(g, 474, 40 + k * 12, 142, 0.5, '#1a2a3a');
+      g.restore();
       // rastrelliera delle gomme
       R(g, 520, 150, 4, 92, '#5a5e66'); R(g, 618, 150, 4, 92, '#5a5e66'); for (let k = 0; k < 3; k++) { R(g, 520, 170 + k * 26, 102, 2, '#8a8f9e'); for (let q = 0; q < 4; q++) { ell(g, 534 + q * 24, 162 + k * 26, 10, 10, INK); ell(g, 534 + q * 24, 162 + k * 26, 9, 9, '#1a1c22'); ell(g, 534 + q * 24, 162 + k * 26, 5, 5, ['#c8ccd4', '#ffb000', '#1a1a1a', '#c42a1a'][(q + k) % 4]); } }
       // pavimento di resina lucido, ponte sollevatore
@@ -613,9 +645,10 @@
       });
     },
     dyn(g, t, S) {
-      if (S.car) { const y = 152 - S.car.height / SS + Math.sin(t * 0.6) * 0.5; g.drawImage(S.car, 330 - S.car.width / SS / 2, y, S.car.width / SS, S.car.height / SS); R(g, 210, 153, 240, 4, '#8a8f9e'); R(g, 210, 153, 240, 1, '#d8dce4'); }
+      if (S.car) { const y = 152 - S.car.height / SS + Math.sin(t * 0.6) * 0.5, x = 330 - S.car.width / SS / 2; g.drawImage(S.car, x, y, S.car.width / SS, S.car.height / SS); R(g, 210, 153, 240, 4, '#8a8f9e'); R(g, 210, 153, 240, 1, '#d8dce4'); shopFiamme(g, t, S, x, y); }
       glow(g, 330, 162, 160, '255,190,110', 0.12, 0.4);
       // lo schermo del banco prova: i dati veri dell'auto che hai adesso (pezzi montati compresi) e le sue curve di CV e Nm
+      g.save(); g.translate(SHOP_MON.dx, SHOP_MON.dy);
       R(g, 474, 34, 142, 72, '#0a1018'); for (let k = 0; k < 6; k++) R(g, 474, 40 + k * 12, 142, 0.5, '#1a2a3a');
       const D = dynoDati();
       if (D) {
@@ -626,17 +659,30 @@
         t5(g, 'LIMITATORE ' + D.lim + ' GIRI', 477, 55.5, '#c8ccd4', 0.45);
         t5(g, D.turbo, 477, 60.5, '#c8ccd4', 0.45);
         t5(g, D.kg + ' KG  ' + D.kgcv + ' KG/CV', 477, 65.5, '#c8ccd4', 0.45);
+        t5(g, '400 M  ' + D.et.toFixed(1).replace('.', ',') + ' S', 477, 70.5, '#c8ccd4', 0.45);
+        // anteprima del pezzo sotto il puntatore o toccato in officina (officina.js): la differenza accanto a ogni numero
+        const A = window.NightOfficina && NightOfficina.anteprima;
+        if (A) {
+          const dl = (v, dec, unit, buonoSeNeg, x, y) => { if (Math.abs(v) < Math.pow(10, -dec) / 2) { t5(g, '=', x, y, '#8a92a0', 0.45); return; } const ok = buonoSeNeg ? v < 0 : v > 0;
+            t5(g, (v > 0 ? '+' : '-') + Math.abs(v).toFixed(dec).replace('.', ',') + unit, x, y, ok ? '#5dff8a' : '#ff6a5a', 0.5); };
+          const kgcv0 = (D.kg + 75) / Math.max(10, D.cvRaw), kgcv1 = (D.kg + 75) / Math.max(10, D.cvRaw + A.dcv);
+          dl(A.dcv, Math.abs(A.dcv) < 5 ? 1 : 0, ' CV', false, 477 + tw5(D.cv + ' CV', 0.8) + tw5('A ' + D.rpmCv + ' GIRI', 0.45) + 6, 44.5);
+          dl(A.dnm, Math.abs(A.dnm) < 5 ? 1 : 0, ' NM', false, 477 + tw5(D.nm + ' NM A ' + D.rpmNm + ' GIRI', 0.45) + 3, 50.5);
+          dl(kgcv1 - kgcv0, 2, '', true, 477 + tw5(D.kg + ' KG  ' + D.kgcv + ' KG/CV', 0.45) + 3, 65.5);
+          dl(A.det, 2, ' S', true, 477 + tw5('400 M  ' + D.et.toFixed(1).replace('.', ',') + ' S', 0.45) + 3, 70.5);
+        }
         const n = D.c.length, x0 = 476, w = 138, yb = 104, hh = 30;
         for (let i = 0; i < n; i++) { const x = x0 + i / (n - 1) * w; R(g, x, yb - D.c[i] * hh, 0.5, 0.5, '#ffb000'); R(g, x, yb - D.n[i] * hh * 0.85, 0.5, 0.5, '#2ee6ff'); }
         const cx = x0 + ((t * 0.12) % 1) * w; R(g, cx, 72, 0.5, 32, 'rgba(255,255,255,.18)');      // il cursore che scorre i giri
       } else t5(g, 'BANCO PROVA', 477, 36, '#9aa2ae', 0.45);
+      g.restore();
       const fl = Math.sin(t * 11) * Math.sin(t * 4.3) > 0.8 ? 0.15 : 1; { const wl = tw5('LUCA', 3), wt = tw5('TUNING', 1.8), x0 = 330 - (wl + 8 + wt) / 2; neon5(g, 'LUCA', x0, 16, '255,176,0', 3, fl); neon5(g, 'TUNING', x0 + wl + 8, 24, '255,90,40', 1.8, 1); }
       pg(g, 150, 330, 1.9, LOOK.luca, t, { seed: 5.5, pose: Math.floor(t / 7) % 3 === 1 ? 'pockets' : 'idle' });
       g.drawImage(S.front, 0, 0, W, H);
       for (const lx of [110, 330, 540]) tube(g, lx - 50, 2, 100);
       glow(g, 80, 272, 60, '255,210,150', 0.2);
     },
-    hot: [{ x: 200, y: 60, w: 260, h: 100, label: 'La tua auto', go: 'top' }, { x: 470, y: 30, w: 150, h: 80, label: 'Banco prova', go: 'top' }, { x: 0, y: 260, w: 230, h: 100, label: 'Pezzi', go: 'top' }],
+    hot: [{ x: 200, y: 60, w: 260, h: 100, label: 'La tua auto', go: 'top' }, { x: 470 + SHOP_MON.dx, y: 30 + SHOP_MON.dy, w: 150, h: 80, label: 'Banco prova', go: 'top' }, { x: 0, y: 260, w: 230, h: 100, label: 'Pezzi', go: 'top' }],
   };
 
   // ---------------------------------------------------------------- RUSSIAN KUSTOM: cabina di verniciatura, cerchi, vinile, l'artista con l'aerografo

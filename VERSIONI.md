@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.159**
+**Versione attuale: v0.160**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -183,3 +183,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.157 · 24/11/2026 · cognato · lo schermo del banco prova da Luca Tuning mostra i dati veri dell'auto in uso (CV e giri, Nm e giri, limitatore, turbo o aspirato, peso, kg/CV) e le sue curve di CV e Nm, invece dei numeri a caso
 - v0.158 · 24/11/2026 · cognato · **scoppiettii coi pezzi di scarico**: di serie niente scoppi al rilascio, col primo livello di scarico o collettore cominciano e crescono fino al massimo; volumi a parte per scoppiettii e scoppi al limitatore nella scheda Suoni di Luca; launch spento = nessun limite di giri (lo stutter box limitava anche spento), si accende solo se la centralina lo ha
 - v0.159 · 24/11/2026 · cognato · **impennata rifatta sulla fisica**: niente più mossa da fermo; il muso si alza quando la spinta del momento supera quella che serve a quell'auto (baricentro, passo, peso dietro, 4-link, CV per tonnellata, gomme da drag): prima la cassa si siede, dopo qualche metro sale, cala al limitatore e nelle cambiate, col colpo di frizione in seconda a bassa velocità si alza, a 60 km/h fa solo cenno; tetto 10°
+- v0.160 · 24/11/2026 · cognato · **Luca Tuning più pulito e con le fiamme**: CV, Nm, kg/CV e 400 m solo sullo schermo del banco (spostato a sinistra, dove si vede), con +6 CV / −0,2 s del pezzo sotto il puntatore; nel pannello a destra spariscono i doppioni; le fiamme dello scarico escono anche sulla macchina in officina mentre sgasi
