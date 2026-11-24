@@ -7,6 +7,38 @@ finta che parte da sola: se l'impennata arriva, è perché la macchina ha la cop
 Stato: **applicato in prova dalla v0.145**, spento di serie (Sviluppatori → «Progetto impennata»). La proposta
 originale è sotto (§1-7); l'esito delle prove è qui subito.
 
+## 0bis. Revisione v0.149: gomme da drag e impennata da film
+Luca l'ha provata (E36 e 2002 Turbo preparate, «sembrava un aeroplano») e il muso non si muoveva. Aveva ragione lui su
+un punto: le «Gomme da drag slick» del gioco avevano μ ≈ 1,7-2 sempre, come una slick da pista. Una slick da drag calda
+in partenza (fianco morbido che si accartoccia e poi stende il battistrada, mescola tenera, burnout) arriva a μ 2,5-3:
+è per questo che le auto da drag impennano. Cosa è cambiato (solo col progetto acceso):
+- **Gomma da drag in partenza** (`IMP.DRAG`, `sim.js` Fmax): slick da drag ×1,6 sotto i 22 km/h, che torna a ×1 verso
+  gli 80; radiali da drag (ET Street della Supra) ×1,25. Sul bagnato niente, anzi −30 % in più: una slick sull'acqua è
+  una saponetta.
+- **Impennata da film** (`IMP.scena`, `SupraSim.impennata`): quando la spinta che dura (media su 0,3 s, non il colpo della
+  frizione) supera il 70 % del momento che serve, con 4-link o 4-link da drag, gomme da drag, asciutto, gas oltre l'85 %,
+  prima o seconda, sotto i 90 km/h, il muso sale deciso (molla smorzata) fino al tetto e ci resta finché spinge; poi
+  ricade col suo peso e rimbalza. Angolo dal 40 % al 100 % del tetto secondo quanto si è oltre la soglia.
+- **Tetti**: senza wheelie bar 12° (paraurti dietro a terra: sbalzo ~0,85 m, paraurti a ~0,3 m), con la wheelie bar 3°.
+- Restano a terra: motore di serie anche con gomme e 4-link (la spinta non dura), semislick o gomme normali, bagnato,
+  trazione anteriore. Un motore enorme col turbo che non ha ancora pressione, partendo dal minimo, si siede: si parte
+  coi giri alti (launch control o frizione lasciata in alto), come i veri.
+
+Banco v0.149 (frizione lasciata a 3/4 dei giri, preparazione massima):
+
+```
+% = quanta della coppia che serve per alzare il muso c'è (100 % = si alza). g = accelerazione massima
+auto       b/h  serve | di serie          | max, ponte serie   | max, 4-link        | max, 4-link drag   | drag + bar         | drag, bagnato      | drag + controllo trazione
+supra      2.82 1.76g | no 24%        0.66g | no 82%        2.53g | SU 5.8° 0.89s 2.68g | SU 10.8° 1.08s 2.79g | SU 2.9° 0.97s 2.79g | no 31%        0.60g | SU 0.6° 0.20s 2.40g
+r5         2.11 1.32g | no 35%        0.74g | SU 0.1° 0.02s 2.52g | SU 7.6° 1.26s 2.57g | SU 12.0° 1.36s 2.60g | SU 3.0° 1.24s 2.60g | no 48%        0.70g | SU 5.5° 1.64s 2.42g
+b2002      2.60 1.62g | no 23%        0.61g | no 71%        2.01g | SU 11.2° 0.74s 2.15g | SU 12.0° 0.92s 2.39g | SU 3.0° 0.81s 2.39g | no 28%        0.49g | SU 0.2° 0.11s 1.99g
+e30        2.83 1.77g | no 22%        0.63g | no 63%        1.97g | SU 5.4° 0.71s 1.97g | SU 12.0° 0.94s 2.25g | SU 3.0° 0.82s 2.25g | no 26%        0.50g | SU 5.0° 0.55s 1.95g
+e36        2.88 1.80g | no 23%        0.65g | no 63%        1.98g | no 85%        1.98g | SU 12.0° 0.88s 2.18g | SU 3.0° 0.75s 2.18g | no 26%        0.52g | no 102%       2.02g
+e34        2.87 1.79g | no 23%        0.65g | no 62%        1.95g | no 84%        1.95g | SU 12.0° 0.86s 1.99g | SU 3.0° 0.73s 1.99g | no 26%        0.51g | no 102%       2.00g
+bus        1.87 1.17g | no 32%        0.59g | no 99%        1.92g | SU 0.7° 0.23s 1.92g | SU 4.3° 0.79s 1.94g | SU 1.7° 0.44s 1.94g | no 45%        0.55g | SU 4.0° 0.76s 1.91g
+ambulanza  2.07 1.29g | no 26%        0.54g | no 92%        2.00g | SU 11.3° 0.82s 2.12g | SU 12.0° 0.90s 2.14g | SU 3.0° 0.79s 2.14g | no 35%        0.48g | SU 10.9° 0.87s 2.09g
+```
+
 ## 0. Esito delle prove (v0.145, banco `node strumenti/impennata.js`)
 Dove sta: fisica in `sim.js` (`SupraSim.impennata`, segnata `[IMPENNATA]`), pezzi e interruttore in `impennata.js`,
 grafica in `street2d.js` (cassa che ruota attorno alle ruote dietro, ruota davanti che si stacca, muso leggero),
