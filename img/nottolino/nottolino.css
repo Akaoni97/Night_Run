@@ -1,0 +1,75 @@
+.night-run-ignition {
+  --nr-angle: -151deg;
+  --nr-light-x: 33.7%;
+  --nr-light-y: 38.9%;
+  display: block;
+  width: 100%;
+  margin-inline: auto;
+  color: #f1ece1;
+  text-align: center;
+}
+
+.night-run-ignition .nr-switch {
+  position: relative;
+  display: block;
+  width: min(100%, 340px, 54svh);
+  aspect-ratio: 990 / 708;
+  margin-inline: auto;
+  padding: 0;
+  background: #171719 url("./blocco.webp") center / 100% 100% no-repeat;
+  border: 1px solid #484244;
+  border-radius: .65rem;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  overflow: hidden;
+}
+.night-run-ignition .nr-switch:active { cursor: grabbing; }
+.night-run-ignition .nr-switch:disabled { cursor: default; }
+.night-run-ignition .nr-switch:focus-visible { outline: 2px solid #ff977f; outline-offset: 3px; }
+.night-run-ignition .nr-crown {
+  position: absolute;
+  width: 21.2121%;
+  aspect-ratio: 1;
+  left: 50%;
+  top: 51.5537%;
+  background: url("./testa-chiave.png") center / contain no-repeat;
+  transform: translate(-50%, -50%) rotate(var(--nr-angle));
+  transition: transform 115ms cubic-bezier(.24,.7,.24,1);
+  pointer-events: none;
+}
+.night-run-ignition .nr-switch[data-dragging] .nr-crown { transition: none; }
+.night-run-ignition .nr-led {
+  position: absolute;
+  width: 2%;
+  height: .62%;
+  left: var(--nr-light-x);
+  top: var(--nr-light-y);
+  border-radius: 1px;
+  background: #ff766c;
+  box-shadow: 0 0 .3rem .08rem #f4363f;
+  transform: translate(-50%, -50%) rotate(var(--nr-detent, -151deg));
+  pointer-events: none;
+}
+.night-run-ignition .nr-instructions,
+.night-run-ignition .nr-state {
+  display: block;
+  margin: .3rem 0;
+  font-size: .81rem;
+}
+.night-run-ignition .nr-state { color: #ff9c86; }
+@media (prefers-reduced-motion: reduce) {
+  .night-run-ignition .nr-crown { transition: none; }
+}
+
+#goBtn[hidden] { display: none; }
+
+#titleIgnition { width: 100%; }
+#titleIgnition:empty { display: none; }
+
+@media (max-height: 520px) {
+  .night-run-ignition .nr-switch { width: min(100%, 49svh); }
+  .night-run-ignition .nr-instructions,
+  .night-run-ignition .nr-state { font-size: .72rem; }
+}
