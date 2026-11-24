@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Claude) | Progetto impennata (fisica, pezzi, grafica, interruttore) | file nuovo `impennata.js`, `sim.js` (agganci), `cars.js`, `street2d.js`, `sviluppatori.js`, `index.html` | 24/11 19:10 |
