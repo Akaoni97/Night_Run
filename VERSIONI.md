@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.137**
+**Versione attuale: v0.138**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -161,3 +161,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.135 · 23/11/2026 · cognato · risposte di Luca alla proposta sulle capitali (`PROPOSTA_CITTA.md`), bivi come progetto futuro in `SOSPESI.md` (28, 29), avviso per Nico
 - v0.136 · 24/11/2026 · cognato · proposta del progetto impennata (`docs/fisica/IMPENNATA.md`): fisica, pezzi, grafica, interruttore, piano e domande; solo documento
 - v0.137 · 24/11/2026 · proprietario · prestazioni, terzo giro: i rettangoli disegnati uno a uno si riempiono in una figura sola (pioggia, nuvole della pioggia e tutte le ellissi a righe, riflessi sull'asfalto, riflesso dei lampioni, sampietrini di Roma): da ~3.900 a ~900 fillRect a fotogramma, stessi pixel
+- v0.138 · 24/11/2026 · proprietario · paesaggi fuori città disegnati in figure invece che pixel per pixel (da 3.100-6.700 a 830-1.900 comandi a fotogramma: autostrada, borgo, pianura, montagna, mare, deserto), scritte a pixel in una figura sola, controllo dei comandi nella prova di fumo (`comandi:2600`); schermata iniziale: al telefono in orizzontale non esce più dallo schermo (sospeso 26), l'auto prende la luce della scena, col contorno e il riflesso, la E36 blu del prologo per le partite nuove, foschia e bagliore all'orizzonte, riflessi della città sull'asfalto

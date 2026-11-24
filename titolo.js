@@ -62,6 +62,12 @@
   // cielo, luna, colline e città lontana (si ripete in orizzontale per lo scorrere lento)
   function cielo(x) {
     A.skyCity(x, 7, 226, true);
+    // v0.138: profondità. La foschia vela la città lontana (più chiara e meno contrastata verso il basso) e all'orizzonte
+    // c'è il bagliore delle luci di città, caldo in basso e viola sopra
+    { const hz = x.createLinearGradient(0, 120, 0, 226); hz.addColorStop(0, 'rgba(46,34,92,0)'); hz.addColorStop(0.65, 'rgba(46,34,92,.2)'); hz.addColorStop(1, 'rgba(70,46,110,.34)'); x.fillStyle = hz; x.fillRect(0, 120, W, 106);
+      x.save(); x.globalCompositeOperation = 'lighter';
+      const bg = x.createLinearGradient(0, 168, 0, 226); bg.addColorStop(0, 'rgba(255,110,140,0)'); bg.addColorStop(0.7, 'rgba(255,120,110,.07)'); bg.addColorStop(1, 'rgba(255,170,110,.13)'); x.fillStyle = bg; x.fillRect(0, 168, W, 58);
+      x.restore(); }
     // la luna dietro un velo di nuvole
     glow(x, 470, 70, 80, '#b8b0ff', 0.2); glow(x, 470, 70, 30, '#fff4dc', 0.25);
     const mg = x.createRadialGradient(465, 65, 2, 470, 70, 17); mg.addColorStop(0, '#fffaf0'); mg.addColorStop(0.7, '#ece4cc'); mg.addColorStop(1, '#c8bea4');
@@ -103,8 +109,14 @@
   let mia = null;
   const POS = { fl: [], head: null, phone: null };                                                                   // dove stanno frecce, fari e telefono (unità della scena)
   async function prepara() {
-    const G = window.nightRun && window.nightRun.game, id = (G && G.car) || 'v40';
+    // v0.138: partita nuova (il prologo non c'è ancora stato) = la E36 blu con cui arriva lui nel prologo, disegno ad alta
+    // definizione; partita cominciata = l'auto che guidi
+    const G = window.nightRun && window.nightRun.game, iniziata = !!(G && G.s && G.s.vg && G.s.vg.prologo);
+    const id = iniziata ? (G.car || 'v40') : 'e36';
     mia = (typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite) ? await A.carOf(id) : null;
+    if (mia && !iniziata && A.recolor && A.load) {                       // la E36 blu del prologo (stesso colore, stessa maschera della vernice)
+      try { const mask = await A.load(mia.D.paintHd || mia.D.paint || 'img/e36_paint.png'); mia.b = A.recolor(mia.b, mask, '#1c4ac4'); } catch (e) { /* resta del suo colore */ }
+    }
     if (!mia) mia = await A.carOf('v40');
   }
   const V = () => A.kit(g);
@@ -121,6 +133,37 @@
     g.restore();
   }
 
+  // ------------------------------------------------------------ l'auto in primo piano (v0.138, chiesta da Nico: «la qualità dell'auto»)
+  // La carrozzeria si disegna a parte e prende la luce della scena (fredda dal cielo sul tetto, calda dal lampione dietro),
+  // un contorno scuro di mezza unità che la stacca dallo sfondo come nel gioco, e il suo riflesso sull'asfalto, appena mosso.
+  function autoBella(x, gnd) {
+    const D = mia.D, M = 4, bw = Math.ceil(mia.b.width / mia.k) + M * 2, bh = Math.ceil(mia.b.height / mia.k) + M * 2, hh = D.wy + D.wr;
+    const tela = () => { const c = document.createElement('canvas'); c.width = bw * SS; c.height = bh * SS; const t = c.getContext('2d'); t.setTransform(SS, 0, 0, SS, 0, 0); return [c, t]; };
+    const [cc, cx] = tela(); A.drawCar(cx, mia, M, M + hh, 0, 1);
+    // la luce della scena, solo sulla carrozzeria
+    cx.save(); cx.globalCompositeOperation = 'source-atop';
+    const cielo = cx.createLinearGradient(0, M, 0, M + hh * 0.5); cielo.addColorStop(0, 'rgba(150,165,255,.3)'); cielo.addColorStop(1, 'rgba(150,165,255,0)'); cx.fillStyle = cielo; cx.fillRect(0, 0, bw, bh);
+    const lamp = cx.createRadialGradient(M - 40, M - 10, 4, M - 40, M - 10, bw * 0.75); lamp.addColorStop(0, 'rgba(255,205,150,.32)'); lamp.addColorStop(1, 'rgba(255,205,150,0)'); cx.fillStyle = lamp; cx.fillRect(0, 0, bw, bh);
+    cx.restore();
+    // il contorno: la sagoma scura spostata di mezza unità nelle quattro direzioni
+    const [sc, sx] = tela(); sx.setTransform(1, 0, 0, 1, 0, 0); sx.drawImage(cc, 0, 0); sx.globalCompositeOperation = 'source-in'; sx.fillStyle = INK; sx.fillRect(0, 0, sc.width, sc.height);
+    // il riflesso: capovolto, schiacciato, che sfuma e ondeggia a strisce
+    const [rc, rx] = tela(); rx.setTransform(1, 0, 0, -1, 0, rc.height); rx.drawImage(cc, 0, 0); rx.setTransform(1, 0, 0, 1, 0, 0);
+    const fd = rx.createLinearGradient(0, 0, 0, rc.height * 0.55); fd.addColorStop(0, 'rgba(0,0,0,.9)'); fd.addColorStop(1, 'rgba(0,0,0,0)');
+    rx.globalCompositeOperation = 'destination-in'; rx.fillStyle = fd; rx.fillRect(0, 0, rc.width, rc.height);
+    const X = x - M, Y = gnd - hh - M, top0 = (bh - M - hh) * SS;       // top0: dove comincia la carrozzeria capovolta nella tela del riflesso
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.globalAlpha = 0.3;
+    for (let r = 0; r < 24 * SS; r += 2) {                                   // strisce di un'unità schiacciate a 0,6, ognuna spostata di poco
+      const wob = Math.round(Math.sin(r * 0.5 + 1.3) * 0.8 * SS), sy = top0 + r / 0.6;
+      if (sy + 2 / 0.6 > rc.height) break;
+      g.drawImage(rc, 0, sy, rc.width, 2 / 0.6, X * SS + wob, (gnd + 0.5) * SS + r, rc.width, 2);
+    }
+    g.restore();
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = false; g.globalAlpha = 0.9;
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) g.drawImage(sc, X * SS + dx, Y * SS + dy);
+    g.globalAlpha = 1; g.drawImage(cc, X * SS, Y * SS); g.restore();
+  }
+
   // ------------------------------------------------------------ il quadro: si disegna una volta sola (e a ogni cambio di misura)
   function quadro() {
     g.setTransform(SS, 0, 0, SS, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.imageSmoothingEnabled = false; A.kit(g);
@@ -128,6 +171,8 @@
     paste(layer('cielo', cielo)); paste(layer('colline', colline));
     paste(layer('strada', strada));
     for (let k = 4; k < W; k += 64) R(g, k, 286, 32, 2, '#d8d4c6');                                                    // tratteggio
+    // v0.138: le luci della città e delle colline si specchiano appena sull'asfalto della corsia lontana
+    for (let i = 0; i < 14; i++) { const rx = 20 + hash(i * 13 + 7) * (W - 40); if (rx > 150 && rx < 430) continue; A.reflect(g, rx, 241, 26 + hash(i + 3) * 30, 2 + hash(i + 5) * 3, ['#ffcf7a', '#7fd8ff', '#ff8fb8', '#ffd9a0'][i % 4], 0.05 + hash(i + 9) * 0.05, t + i); }
     for (let gx = 6; gx < W + 50; gx += 50) R(g, gx, 222, 2, 14, '#3a3e4e');                                           // guardrail
     R(g, 0, 224, W, 4, '#5a5e70'); R(g, 0, 224, W, 1, '#8a90a8'); R(g, 0, 228, W, 1, '#2a2c38');
     // il cartello verde a bordo strada: ULTIMA USCITA (quello che non cambia mai)
@@ -144,14 +189,18 @@
       A.reflect(g, x + D.head[0], gnd + 2, 18, 12, '#ffe8b0', 0.16, t); A.reflect(g, x + D.tail[0] + 2, gnd + 2, 14, 7, '#ff3a2a', 0.14, t);
       A.shadowUnder(g, x, gnd, D.w, 0.7);
       A.beam(g, x + D.head[0], top + D.head[1] + 2, 80, 0.36);
-      A.drawCar(g, mia, x, gnd, 0, 1);
+      autoBella(x, gnd);
       const tl = D.tail; R(g, x + tl[0], top + tl[1], tl[2], tl[3], '#ff3a2a'); light(g, x + tl[0] + 2, top + tl[1] + 2, 16, 8, '#ff3020', 0.18);
       light(g, x + D.head[0], top + D.head[1], 12, 7, '#fff0c8', 0.3);
+      // il faro: una lama di luce orizzontale e una piccola stella (v0.138)
+      { const hx = x + D.head[0], hy = top + D.head[1] + 1; g.save(); g.globalCompositeOperation = 'lighter';
+        const fl = g.createLinearGradient(hx - 60, 0, hx + 60, 0); fl.addColorStop(0, 'rgba(255,236,190,0)'); fl.addColorStop(0.5, 'rgba(255,240,205,.55)'); fl.addColorStop(1, 'rgba(255,236,190,0)');
+        g.fillStyle = fl; g.fillRect(hx - 60, hy - 0.25, 120, 0.5); g.fillStyle = 'rgba(255,240,205,.35)'; g.fillRect(hx - 0.25, hy - 5, 0.5, 10); g.restore(); }
       for (const [fx, fy] of [[tl[0] + 1, tl[1] - 3], [D.head[0] - 4, D.head[1] + 3]]) { R(g, x + fx, top + fy, 3, 2, '#ffae2a'); light(g, x + fx + 1, top + fy + 1, 14, 8, '#ffae2a', 0.22); }   // le quattro frecce
       POS.fl = [[tl[0] + 1, tl[1] - 3], [D.head[0] - 4, D.head[1] + 3]].map(([fx, fy]) => [x + fx + 1.5, top + fy + 1]); POS.head = [x + D.head[0], top + D.head[1] + 2]; POS.tail = [x + tl[0] + 2, top + tl[1] + 2];
       // lui, appoggiato dietro l'auto, che guarda il telefono acceso
       if (typeof pgStanding === 'function') {
-        const px = x - 22, py = gnd + 4, look = window.NightPG ? NightPG.now() : null;
+        const px = x - 30, py = gnd + 4, look = window.NightPG ? NightPG.now() : null;
         g.save(); pgStanding(g, px, py, 0.82, 0, false, look, 0.15, 1.3, 'phone'); g.restore();
         light(g, px + 6, py - 50, 12, 10, '#7fd8ff', 0.2);
         POS.phone = [px + 6, py - 50];
@@ -207,7 +256,7 @@
 /* fari di ricerca nel cielo (ritagliati sopra la città), dirigibile, ruota panoramica, stelle cadenti, uccelli */
 .nt-scena>.nt-sk{left:0;top:0;width:100%;overflow:hidden;clip-path:inset(0);contain:paint}
 .nt-sk>*{position:absolute}
-.nt-sk .nt-faro{width:calc(var(--u)*34);height:calc(var(--u)*230);margin-left:calc(var(--u)*-17);background:linear-gradient(to top,rgba(236,228,255,.38),rgba(236,228,255,.14) 40%,rgba(236,228,255,.04) 75%,rgba(236,228,255,0));clip-path:polygon(47% 100%,53% 100%,100% 0,0 0);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
+.nt-sk .nt-faro{width:calc(var(--u)*34);height:calc(var(--u)*230);margin-left:calc(var(--u)*-17);background:linear-gradient(to top,rgba(236,228,255,.3),rgba(236,228,255,.1) 35%,rgba(236,228,255,.02) 62%,rgba(236,228,255,0) 80%);clip-path:polygon(47% 100%,53% 100%,100% 0,0 0);transform-origin:50% 100%;animation:ntFaro var(--d) ease-in-out var(--dl) infinite alternate}
 @keyframes ntFaro{from{transform:rotate(var(--a))}to{transform:rotate(var(--b))}}
 .nt-fbase{width:calc(var(--u)*9);height:calc(var(--u)*5);margin:calc(var(--u)*-2.5) 0 0 calc(var(--u)*-4.5);border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.9),rgba(236,228,255,0));animation:ntFB 3.4s ease-in-out var(--dl) infinite}
 @keyframes ntFB{0%,100%{opacity:.5}50%{opacity:1}}
@@ -333,7 +382,24 @@
 .gate.nt .nt-cont b{color:#ffb347;font-weight:600}
 @media (max-height:600px){.gate.nt .intro-title{top:14px}.gate.nt .intro-title .t1{font-size:clamp(34px,9vh,64px)}.gate.nt .intro-title .t3,.gate.nt .intro-title::after{display:none}}
 @media (max-height:520px){.gate.nt .intro-menu{bottom:8px;top:auto;max-height:calc(100% - 16px);overflow:auto;padding:12px 14px;gap:8px}.gate.nt .intro-menu ul,.gate.nt.nt-nuova .intro-menu ul,.gate.nt .intro-menu .keys{display:none!important}.gate.nt .intro-menu h2{font-size:18px}.gate.nt .nr-slots{margin:4px 0 0}}
-@media (max-height:520px) and (max-width:900px){.gate.nt .intro-title{display:none}}
+/* telefono in orizzontale e finestre basse (sospeso 26, v0.138): il cruscotto sta a destra, più piccolo, e non esce dallo schermo;
+   il titolo resta a sinistra, piccolo. Vince su .intro .intro-menu di index.html (left 50% e spostamento) e sulla regola dei 900 px */
+@media (max-height:520px){
+.gate.intro.nt .intro-menu,.gate.intro.nt.menu .intro-menu{left:auto!important;right:max(10px,env(safe-area-inset-right))!important;top:auto!important;bottom:6px!important;transform:none!important;width:min(250px,40vw)!important;max-height:calc(100% - 12px);overflow:visible!important}
+.gate.nt .nt-cr{gap:5px}
+.gate.nt .nt-cr .nr-slots{gap:6px;padding-top:9px}
+.gate.nt .nr-slot{padding:10px 6px 5px!important;font-size:10px}
+.gate.nt .nr-slot b{font-size:10.5px;letter-spacing:.02em;white-space:nowrap}
+.gate.nt .nr-slot .ed{display:none}
+.gate.nt .go.nt-sw{padding:7px 9px;gap:3px;border-radius:11px}
+.gate.nt .nt-spie{display:none}
+.gate.nt .nt-lab{display:none}
+.gate.nt .nt-stato{font-size:13px}
+.gate.nt .nt-pie{gap:10px}
+.gate.nt .intro-title{display:grid!important;left:max(14px,env(safe-area-inset-left));top:10px}
+.gate.nt .intro-title .t1{font-size:clamp(26px,9vh,46px)}
+.gate.nt .intro-title .t2{font-size:clamp(10px,2.6vh,15px)}
+.gate.nt .intro-title .t3,.gate.nt .intro-title::after{display:none}}
 @media (prefers-reduced-motion:reduce){.gate.nt .nt-bg{transition:none}.gate.nt.nt-on .nt-cam{animation:none}}`;
   const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
   gate.classList.add('nt');

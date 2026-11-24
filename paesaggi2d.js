@@ -171,12 +171,12 @@
         const cx = x + 300; for (let q = 0; q < 22; q++) this.pDot(g, cx + (rnd(i * 13 + q) - 0.5) * 120, 196 + rnd(i * 19 + q) * 8, rnd(q + i) < 0.7 ? '#ffc070' : '#d8e8ff', q % 4 ? 0 : 0.05, 3);
         // tornanti: una strada a zig-zag sul fianco, e due auto che salgono
         const sx = cx + 120, pts = [[0, 0], [50, -10], [0, -20], [50, -30], [0, -40]];
-        g.fillStyle = 'rgba(90,96,130,.5)'; for (let s = 0; s < pts.length - 1; s++) { const [ax, ay] = pts[s], [bx, by] = pts[s + 1]; for (let u = 0; u <= 25; u++) g.fillRect(Math.round(sx + ax + (bx - ax) * u / 25), Math.round(196 + ay + (by - ay) * u / 25), 1, 1); }
+        g.fillStyle = 'rgba(90,96,130,.5)'; g.beginPath(); for (let s = 0; s < pts.length - 1; s++) { const [ax, ay] = pts[s], [bx, by] = pts[s + 1]; for (let u = 0; u <= 25; u++) g.rect(Math.round(sx + ax + (bx - ax) * u / 25), Math.round(196 + ay + (by - ay) * u / 25), 1, 1); } g.fill();
         for (let c = 0; c < 2; c++) { const f = ((t * 0.08 + c * 0.5 + rnd(i)) % 1) * (pts.length - 1), s = Math.floor(f), u = f - s, [ax, ay] = pts[s], [bx, by] = pts[s + 1]; this.pDot(g, sx + ax + (bx - ax) * u, 196 + ay + (by - ay) * u - 1, c ? '#ff4a3a' : '#fff2c8', 0.1, 4, 2, 1); }
       });
       this.tileRun(dist * 0.03, 900, (i, x) => {   // antenna sulla cresta
         if (rnd(i * 8.8) < 0.5) return; const ax = x + 450, top = 150;
-        g.fillStyle = '#121626'; for (let y = top; y < 184; y++) { const w = Math.round((y - top) * 0.12); g.fillRect(ax - w, y, 1, 1); g.fillRect(ax + w, y, 1, 1); } g.fillRect(ax, top - 6, 1, 6);
+        g.fillStyle = '#121626'; g.beginPath(); for (let y = top; y < 184; y++) { const w = Math.round((y - top) * 0.12); g.rect(ax - w, y, 1, 1); g.rect(ax + w, y, 1, 1); } g.rect(ax, top - 6, 1, 6); g.fill();
         if (Math.floor(t * 1.4 + i) % 2) { this.pDot(g, ax - 1, top - 8, '#ff3a2a', 0.25, 7, 2, 2); this.pDot(g, ax - 1, top + 14, '#ff3a2a', 0.12, 4, 2, 1); }
       });
       return;
@@ -195,7 +195,7 @@
       }
       this.tileRun(dist * 0.015, 800, (i, x) => {
         if (rnd(i * 7.7) < 0.4) return; const ax = x + 400, top = 120;
-        g.fillStyle = '#1a1018'; for (let y = top; y < 196; y++) { const w = Math.round((y - top) * 0.08); g.fillRect(ax - w, y, 1, 1); g.fillRect(ax + w, y, 1, 1); if ((y - top) % 9 === 0) g.fillRect(ax - w, y, w * 2, 1); }
+        g.fillStyle = '#1a1018'; g.beginPath(); for (let y = top; y < 196; y++) { const w = Math.round((y - top) * 0.08); g.rect(ax - w, y, 1, 1); g.rect(ax + w, y, 1, 1); if ((y - top) % 9 === 0) g.rect(ax - w, y, w * 2, 1); } g.fill();
         if (Math.floor(t * 1.1 + i) % 2) for (const yy of [top - 2, top + 30, top + 56]) this.pDot(g, ax - 1, yy, '#ff3a2a', 0.18, 6, 2, 2);
       });
       this.pFarCars(g, 203, dist, t, 3, 0.9, 41);

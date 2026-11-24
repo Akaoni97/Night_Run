@@ -223,7 +223,7 @@ if (typeof VG_PLACE !== 'undefined') {
     const tx = X + 128, top = 98, arm = 168;
     g.fillStyle = ink; g.fillRect(tx - 7, top, 14, gy - top);
     g.fillStyle = '#c8a020'; g.fillRect(tx - 6, top, 2, gy - top); g.fillRect(tx + 4, top, 2, gy - top);
-    for (let y = top + 2; y < gy - 4; y += 10) { g.fillStyle = '#c8a020'; for (let q = 0; q < 10; q++) { g.fillRect(tx - 4 + q, y + q, 1, 1); g.fillRect(tx + 4 - q, y + q, 1, 1); } g.fillRect(tx - 4, y, 8, 1); }
+    g.fillStyle = '#c8a020'; g.beginPath(); for (let y = top + 2; y < gy - 4; y += 10) { for (let q = 0; q < 10; q++) { g.rect(tx - 4 + q, y + q, 1, 1); g.rect(tx + 4 - q, y + q, 1, 1); } g.rect(tx - 4, y, 8, 1); } g.fill();   // traliccio in una figura sola (v0.138)
     g.fillStyle = ink; g.fillRect(tx - arm, top - 4, arm + 44, 7); g.fillStyle = '#c8a020'; g.fillRect(tx - arm, top - 3, arm + 42, 5); g.fillStyle = '#8a6a10'; for (let q = tx - arm; q < tx + 40; q += 8) g.fillRect(q, top - 3, 1, 5);
     this.lcBox ? this.lcBox(g, tx + 26, top + 3, 16, 12, '#7a7470') : 0; g.fillStyle = '#5a5450'; g.fillRect(tx + 26, top + 8, 16, 1);   // contrappeso
     this.lcBox ? this.lcBox(g, tx - 12, top + 4, 14, 12, '#c8a020') : 0; g.fillStyle = n > 0.15 ? '#ffe2a0' : '#6a7a90'; g.fillRect(tx - 10, top + 6, 8, 5);   // cabina
@@ -242,7 +242,7 @@ if (typeof VG_PLACE !== 'undefined') {
     for (let q = L; q < Rr; q += 4) { const sh = (q / 4) % 2; g.fillStyle = sh ? '#5a5248' : '#6a6258'; g.fillRect(q, fT, 4, gy - fT); }
     for (let k = 0; k < 18; k++) { const rx = L + Math.floor(rnd(seed + k) * (Rr - L - 6)), ry = fT + Math.floor(rnd(seed + k * 3) * 16); g.fillStyle = 'rgba(140,66,26,.45)'; g.fillRect(rx, ry, 2 + (k % 3), 8 + Math.floor(rnd(k + 1) * 24)); }
     for (let q = L; q < Rr; q += 46) { g.fillStyle = ink; g.fillRect(q, fT - 8, 2, 10); }
-    g.fillStyle = '#8a8f9e'; for (let q = L; q < Rr; q++) { const y = fT - 5 + Math.round(Math.sin(q * 0.55) * 2); g.fillRect(q, y, 1, 1); if (q % 7 === 0) g.fillRect(q, y - 1, 1, 3); }
+    g.fillStyle = '#8a8f9e'; g.beginPath(); for (let q = L; q < Rr; q++) { const y = fT - 5 + Math.round(Math.sin(q * 0.55) * 2); g.rect(q, y, 1, 1); if (q % 7 === 0) g.rect(q, y - 1, 1, 3); } g.fill();
     // copricerchi inchiodati sulla lamiera
     for (let q = 0; q < 5; q++) { const cx = L + 18 + q * 15, cy = fT + 14 + (q % 2) * 6; g.fillStyle = ink; this.span(g, cx, cy, 6, 6); g.fillStyle = ['#c9ced6', '#9aa0aa', '#d9a82e', '#c9ced6', '#7a808a'][q]; this.span(g, cx, cy, 5, 5); g.fillStyle = 'rgba(0,0,0,.4)'; this.span(g, cx + 1, cy + 1, 2, 2); g.fillStyle = '#fff'; g.fillRect(cx - 3, cy - 3, 1, 1); }
     this.lcBox ? this.lcBox(g, L + 26, fT + 30, 40, 13, '#e8dcc0') : 0; this.text(g, 'ATTENTI', L + 32, fT + 32, '#b02a1a'); this.text(g, 'AL CANE', L + 32, fT + 38, '#2a2420');
@@ -253,7 +253,9 @@ if (typeof VG_PLACE !== 'undefined') {
     const oh = Math.round(gW * 0.9 * open), gx = gL + oh;
     g.save(); g.beginPath(); g.rect(gL, fT, gW, gy - fT); g.clip();
     g.fillStyle = ink; g.fillRect(gx, fT, gW, 2); g.fillRect(gx, gy - 2, gW, 2); g.fillRect(gx, fT, 2, gy - fT); g.fillRect(gx + gW - 2, fT, 2, gy - fT); g.fillRect(gx + gW / 2 - 1, fT, 2, gy - fT);
-    g.fillStyle = 'rgba(150,156,170,.55)'; for (let q = -48; q < gW; q += 5) for (let y = 0; y < 48; y += 1) { const a = gx + q + y, b = gx + q + 48 - y; if (a > gx && a < gx + gW) g.fillRect(a, fT + y, 1, 1); if (y % 2 === 0 && b > gx && b < gx + gW) g.fillRect(b, fT + y, 1, 1); }
+    g.fillStyle = 'rgba(150,156,170,.55)'; { const pa = new Path2D(), pb = new Path2D();   // le due diagonali della rete in due figure: dove si incrociano restano più chiare, come prima
+      for (let q = -48; q < gW; q += 5) for (let y = 0; y < 48; y += 1) { const a = gx + q + y, b = gx + q + 48 - y; if (a > gx && a < gx + gW) pa.rect(a, fT + y, 1, 1); if (y % 2 === 0 && b > gx && b < gx + gW) pb.rect(b, fT + y, 1, 1); }
+      g.fill(pa); g.fill(pb); }
     g.restore();
     // insegna dipinta su compensato, su due pali, con la lampada a collo d'oca
     const sL = X - 82, sT = fT - 40;

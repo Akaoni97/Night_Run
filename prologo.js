@@ -846,7 +846,7 @@ const PRO_NOTAIO_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente'
   }
 
   // gli attrezzi di disegno, anche per la schermata iniziale (titolo.js)
-  const arte = { W, H, SS, kit, carOf, drawCar, beam, shadowUnder, reflect, skyCity, light, glow, vignette, R, q, hash, ease, clamp, lerp, mix, rgba, prepare, IMG };
+  const arte = { W, H, SS, kit, carOf, recolor, load, drawCar, beam, shadowUnder, reflect, skyCity, light, glow, vignette, R, q, hash, ease, clamp, lerp, mix, rgba, prepare, IMG };
   window.NightPrologo = { play, shouldPlay: (game) => proShould(game && game.s), jump: (n, at = 0) => { if (root && g) { enterScene(n); T0 -= at * 1000; } }, get playing() { return !!root; }, arte, get ms() { return { draw: +MS.draw.toFixed(1), present: +MS.present.toFixed(1) }; }, finish };
 })();
 if (typeof window !== 'undefined') Object.assign(window, { PRO_LETTERA, PRO_NOTAIO, PRO_AUTO, PRO_NOTAIO_LOOK, proShould });

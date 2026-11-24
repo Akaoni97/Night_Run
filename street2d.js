@@ -66,12 +66,13 @@ class Street2D {
 
   text(g, str, x, y, color, sc = 1) {
     let cx = Math.round(x);
-    g.fillStyle = color;
+    g.fillStyle = color; g.beginPath();                              // v0.138: tutta la scritta in una figura sola
     for (const ch of String(str).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()) {   // le lettere accentate (Kùstòm) senza accento
       const m = PX_FONT[ch] || PX_FONT[' '];
-      for (let i = 0; i < 15; i++) if (m[i] === '1') g.fillRect(cx + (i % 3) * sc, Math.round(y) + Math.floor(i / 3) * sc, sc, sc);
+      for (let i = 0; i < 15; i++) if (m[i] === '1') g.rect(cx + (i % 3) * sc, Math.round(y) + Math.floor(i / 3) * sc, sc, sc);
       cx += 4 * sc;
     }
+    g.fill();
   }
   textW(str, sc = 1) { return (String(str).length * 4 - 1) * sc; }
 
@@ -1129,13 +1130,20 @@ class Street2D {
 
   // ---------------------------------------------------------------- luoghi della mappa del mondo: sfondi oltre la carreggiata (y < 232)
   // ogni tipo ha i suoi piani in parallasse; wx(m) porta i metri della strada sullo schermo (oggetti a bordo strada)
+  // v0.138: tanti rettangoli in poche figure, una per colore (un comando solo per la scheda video invece di uno per rettangolo).
+  // fn riceve r(colore, x, y, w, h); stessi pixel di prima (i rettangoli di un colore non si coprono tra loro).
+  batch(g, fn) {
+    const M = new Map();
+    fn((col, x, y, w, h) => { let p = M.get(col); if (!p) M.set(col, (p = new Path2D())); p.rect(x, y, w, h); });
+    for (const [col, p] of M) { g.fillStyle = col; g.fill(p); }
+  }
   ridge(g, off, base, amp, per, col, seed, step = 2) {
-    const W = this.LW; g.fillStyle = col;
-    for (let x = 0; x < W; x += step) {
+    const W = this.LW;
+    this.batch(g, (r) => { for (let x = 0; x < W; x += step) {
       const u = (x + off) / per;
       const h = amp * (0.55 + 0.25 * Math.sin(u * 1.7 + seed) + 0.15 * Math.sin(u * 4.3 + seed * 2) + 0.05 * Math.sin(u * 11 + seed * 3));
-      g.fillRect(x, Math.round(base - h), step, Math.round(h) + 1);
-    }
+      r(col, x, Math.round(base - h), step, Math.round(h) + 1);
+    } });
   }
   ridgeH(off, x, amp, per, seed) { const u = (x + off) / per; return amp * (0.55 + 0.25 * Math.sin(u * 1.7 + seed) + 0.15 * Math.sin(u * 4.3 + seed * 2) + 0.05 * Math.sin(u * 11 + seed * 3)); }
   tileRun(off, tileW, fn) { const i0 = Math.floor(off / tileW) - 1, n = Math.ceil(this.LW / tileW) + 3; for (let i = i0; i < i0 + n; i++) fn(i, Math.round(i * tileW - off)); }
@@ -1153,10 +1161,10 @@ class Street2D {
         const bx = x + 200, top = 96, deck = 166;
         g.fillStyle = '#1c2040';
         for (const tx of [bx, bx + 300]) { g.fillRect(tx - 3, top, 3, deck - top + 10); g.fillRect(tx + 9, top, 3, deck - top + 10); g.fillRect(tx - 3, top + 18, 15, 2); }
-        g.fillStyle = 'rgba(120,130,190,.35)';
-        for (const tx of [bx + 4, bx + 304]) for (let k = 1; k <= 7; k++) { const d = k * 20; for (let s = 0; s <= 20; s++) { const f = s / 20; g.fillRect(Math.round(tx + d * f), Math.round(top + 4 + (deck - top - 4) * f), 1, 1); g.fillRect(Math.round(tx - d * f), Math.round(top + 4 + (deck - top - 4) * f), 1, 1); } }
+        g.fillStyle = 'rgba(120,130,190,.35)'; g.beginPath();
+        for (const tx of [bx + 4, bx + 304]) for (let k = 1; k <= 7; k++) { const d = k * 20; for (let s = 0; s <= 20; s++) { const f = s / 20; g.rect(Math.round(tx + d * f), Math.round(top + 4 + (deck - top - 4) * f), 1, 1); g.rect(Math.round(tx - d * f), Math.round(top + 4 + (deck - top - 4) * f), 1, 1); } } g.fill();
         g.fillStyle = '#141830'; g.fillRect(bx - 160, deck, 620, 4);
-        for (let k = 0; k < 62; k++) { g.fillStyle = k % 2 ? '#fff2c4' : '#ff4a4a'; g.fillRect(bx - 160 + k * 10, deck - 1, 1, 1); }
+        this.batch(g, (r) => { for (let k = 0; k < 62; k++) r(k % 2 ? '#fff2c4' : '#ff4a4a', bx - 160 + k * 10, deck - 1, 1, 1); });
         g.fillStyle = '#ff3b3b'; if (Math.floor(t * 1.5 + i) % 2) { g.fillRect(bx + 4, top - 2, 2, 2); g.fillRect(bx + 304, top - 2, 2, 2); }
       });
       // acqua della baia
@@ -1183,9 +1191,10 @@ class Street2D {
     if (bg === 'mountain') {
       // Hakone: il Fuji lontano, creste di montagna e cedri, bosco scuro e guardrail a bordo strada
       const fx = Math.round(W * 0.62 - ((dist * 0.01) % (W + 700))) + (dist * 0.01 % (W + 700) > W * 0.62 + 260 ? W + 700 : 0);
-      g.fillStyle = '#1a2248';
-      for (let y = 0; y < 100; y++) { const half = Math.round(18 + y * 1.55 + (y > 70 ? (y - 70) * 1.4 : 0)); g.fillRect(fx - half, 92 + y, half * 2, 1); }
-      g.fillStyle = '#c8d2ec'; for (let y = 0; y < 26; y++) { const half = Math.round(18 + y * 1.55), j = (y > 14 ? Math.round(Math.sin(y * 3 + 1) * 4) : 0); g.fillRect(fx - half + Math.abs(j), 92 + y, half * 2 - Math.abs(j) * 2, 1); }
+      g.fillStyle = '#1a2248'; g.beginPath();
+      for (let y = 0; y < 100; y++) { const half = Math.round(18 + y * 1.55 + (y > 70 ? (y - 70) * 1.4 : 0)); g.rect(fx - half, 92 + y, half * 2, 1); }
+      g.fill();
+      g.fillStyle = '#c8d2ec'; g.beginPath(); for (let y = 0; y < 26; y++) { const half = Math.round(18 + y * 1.55), j = (y > 14 ? Math.round(Math.sin(y * 3 + 1) * 4) : 0); g.rect(fx - half + Math.abs(j), 92 + y, half * 2 - Math.abs(j) * 2, 1); } g.fill();
       g.fillStyle = '#e8eeff'; g.fillRect(fx - 14, 92, 28, 2);
       g.fillStyle = 'rgba(70,50,114,.25)'; g.fillRect(0, 150, W, 50);
       this.ridge(g, dist * 0.03, 206, 46, 140, '#141a38', 1.3);
@@ -1193,12 +1202,12 @@ class Street2D {
       this.ridge(g, off2, 214, 34, 90, '#0e1826', 4.1);
       for (let x = (-Math.round(off2) % 6 + 6) % 6; x < W; x += 6) {   // cedri sulla cresta
         const top = Math.round(214 - this.ridgeH(off2, x, 34, 90, 4.1)), hh = 8 + Math.floor(rnd(Math.round((x + off2) / 6)) * 10);
-        g.fillStyle = '#0b1420'; for (let r = 0; r < hh; r++) { const w = 1 + Math.floor(r / 2.5); g.fillRect(x - w, top - hh + r, w * 2 + 1, 1); }
+        g.fillStyle = '#0b1420'; g.beginPath(); for (let r = 0; r < hh; r++) { const w = 1 + Math.floor(r / 2.5); g.rect(x - w, top - hh + r, w * 2 + 1, 1); } g.fill();
       }
       g.fillStyle = '#0a111c'; g.fillRect(0, 206, W, 26);
       for (let m = Math.floor(visFrom / 2.2) * 2.2; m < visTo; m += 2.2) {   // bosco a ridosso della strada
         const x = wx(m), k = Math.round(m / 2.2), hh = 14 + Math.floor(rnd(k + 40) * 22);
-        g.fillStyle = k % 3 ? '#0c1622' : '#101c2a'; for (let r = 0; r < hh; r++) { const w = 1 + Math.floor(r / 2); g.fillRect(x - w, 222 - hh + r, w * 2 + 1, 1); }
+        g.fillStyle = k % 3 ? '#0c1622' : '#101c2a'; g.beginPath(); for (let r = 0; r < hh; r++) { const w = 1 + Math.floor(r / 2); g.rect(x - w, 222 - hh + r, w * 2 + 1, 1); } g.fill();
       }
       // guardrail a nastro e paletti con catarifrangente
       g.fillStyle = '#5c6386'; g.fillRect(0, 220, W, 3); g.fillStyle = '#8a93b0'; g.fillRect(0, 220, W, 1); g.fillStyle = '#2a2f45'; g.fillRect(0, 223, W, 2);
@@ -1253,10 +1262,11 @@ class Street2D {
       const offP = dist * 1.4, pw = 260;
       this.tileRun(offP, pw, (i, x) => {
         const top = 120, base = 194; g.fillStyle = '#20263e';
-        for (let y = top; y < base; y++) { const half = Math.round(2 + (y - top) * 0.12); g.fillRect(x - half, y, 1, 1); g.fillRect(x + half, y, 1, 1); if ((y - top) % 8 === 0) g.fillRect(x - half, y, half * 2, 1); }
+        g.beginPath(); for (let y = top; y < base; y++) { const half = Math.round(2 + (y - top) * 0.12); g.rect(x - half, y, 1, 1); g.rect(x + half, y, 1, 1); if ((y - top) % 8 === 0) g.rect(x - half, y, half * 2, 1); } g.fill();
         g.fillRect(x - 14, top + 6, 28, 2); g.fillRect(x - 10, top + 16, 20, 2);
-        g.fillStyle = 'rgba(60,70,110,.6)';
-        for (const [dy, dx] of [[7, -14], [7, 14], [17, -10], [17, 10]]) for (let s = 0; s <= pw; s += 3) { const f = s / pw; g.fillRect(x + dx + s, Math.round(top + dy + 14 * 4 * f * (1 - f)), 1, 1); }
+        g.fillStyle = 'rgba(60,70,110,.6)'; g.beginPath();
+        for (const [dy, dx] of [[7, -14], [7, 14], [17, -10], [17, 10]]) for (let s = 0; s <= pw; s += 3) { const f = s / pw; g.rect(x + dx + s, Math.round(top + dy + 14 * 4 * f * (1 - f)), 1, 1); }
+        g.fill();
       });
       // filari di pioppi e cascine
       const offT = dist * 3.2;
@@ -1264,7 +1274,7 @@ class Street2D {
         const r0 = rnd(i * 3.7);
         if (r0 < 0.55) for (let q = 0; q < 9; q++) {
           const tx = x + q * 13 + Math.round(rnd(i + q) * 4), hh = 30 + Math.floor(rnd(i * 9 + q) * 14);
-          g.fillStyle = '#0d1418'; for (let r = 0; r < hh; r++) { const w = Math.round(3.4 * Math.sin(Math.PI * Math.min(1, (r + 2) / hh)) + 0.5); g.fillRect(tx - w, 204 - hh + r, w * 2 + 1, 1); }
+          g.fillStyle = '#0d1418'; g.beginPath(); for (let r = 0; r < hh; r++) { const w = Math.round(3.4 * Math.sin(Math.PI * Math.min(1, (r + 2) / hh)) + 0.5); g.rect(tx - w, 204 - hh + r, w * 2 + 1, 1); } g.fill();
           g.fillStyle = '#0a0f12'; g.fillRect(tx, 200, 1, 5);
         } else if (r0 < 0.8) {
           const bx = x + 40; g.fillStyle = '#3a2420'; g.fillRect(bx, 176, 56, 28); g.fillStyle = '#4a2a22'; for (let r = 0; r < 8; r++) g.fillRect(bx - 3 + r, 168 + r, 62 - r * 2, 1);
@@ -1278,7 +1288,7 @@ class Street2D {
       g.fillStyle = 'rgba(190,196,214,.06)'; g.fillRect(0, 196, W, 14);
       // fosso con l'acqua e argine d'erba, paletti bianchi
       g.fillStyle = '#101820'; g.fillRect(0, 212, W, 8); g.fillStyle = 'rgba(140,150,200,.18)'; for (let x = (-Math.round(dist * 30) % 9 + 9) % 9; x < W; x += 9) g.fillRect(x, 215, 4, 1);
-      g.fillStyle = '#16221a'; g.fillRect(0, 220, W, 12); for (let x = 0; x < W; x += 3) { g.fillStyle = rnd(x + Math.floor(dist * 10)) < 0.5 ? '#1c2c20' : '#122016'; g.fillRect(x, 219 - Math.floor(rnd(x * 1.3) * 3), 1, 3); }
+      g.fillStyle = '#16221a'; g.fillRect(0, 220, W, 12); this.batch(g, (r) => { for (let x = 0; x < W; x += 3) r(rnd(x + Math.floor(dist * 10)) < 0.5 ? '#1c2c20' : '#122016', x, 219 - Math.floor(rnd(x * 1.3) * 3), 1, 3); });
       for (let m = Math.floor(visFrom / 50) * 50; m < visTo; m += 50) { const x = wx(m); g.fillStyle = '#e8e6df'; g.fillRect(x, 212, 3, 18); g.fillStyle = '#14161e'; g.fillRect(x, 215, 3, 3); g.fillStyle = '#ff9a1a'; g.fillRect(x, 213, 3, 1); }
       g.fillStyle = '#2a2f40'; g.fillRect(0, 230, W, 2);
       return;
@@ -1290,10 +1300,10 @@ class Street2D {
       for (let x = (-Math.round(offH) % 23 + 23) % 23; x < W; x += 23) {
         if (rnd(Math.round((x + offH) / 23)) < 0.4) continue;
         const top = Math.round(196 - this.ridgeH(offH, x, 34, 170, 0.7)), hh = 9 + Math.floor(rnd(Math.round((x + offH) / 23) + 3) * 6);
-        g.fillStyle = '#0c1020'; for (let r = 0; r < hh; r++) { const w = Math.round(1.6 * Math.sin(Math.PI * Math.min(1, (r + 1) / hh))); g.fillRect(x - w, top - hh + r, w * 2 + 1, 1); }
+        g.fillStyle = '#0c1020'; g.beginPath(); for (let r = 0; r < hh; r++) { const w = Math.round(1.6 * Math.sin(Math.PI * Math.min(1, (r + 1) / hh))); g.rect(x - w, top - hh + r, w * 2 + 1, 1); } g.fill();
       }
       const tx = Math.round(W * 0.35 - ((dist * 0.012) % (W + 600))) + ((dist * 0.012) % (W + 600) > W * 0.35 + 200 ? W + 600 : 0);
-      g.fillStyle = '#1a1830'; for (let c = -110; c < 110; c += 2) g.fillRect(tx + c, Math.round(176 - 22 * Math.cos(c / 70)), 2, 30);
+      g.fillStyle = '#1a1830'; g.beginPath(); for (let c = -110; c < 110; c += 2) g.rect(tx + c, Math.round(176 - 22 * Math.cos(c / 70)), 2, 30); g.fill();
       const tw = [[-70, 40], [-52, 52], [-38, 34], [-22, 58], [-8, 46], [6, 62], [20, 38], [34, 54], [50, 44], [66, 36], [-60, 30], [80, 28], [-86, 24], [92, 22]];
       for (const [dx, h] of tw) { g.fillStyle = '#221e34'; g.fillRect(tx + dx, 158 - h, 8, h + 4); g.fillStyle = '#2e2840'; g.fillRect(tx + dx, 158 - h, 8, 1); if (h > 40) win(tx + dx + 3, 160 - h + 8, 2, 3, true); }
       for (let q = 0; q < 26; q++) win(tx - 80 + Math.floor(rnd(q + 900) * 160), 160 + Math.floor(rnd(q + 901) * 14), 1, 1, true);
@@ -1328,12 +1338,12 @@ class Street2D {
         this.tileRun(dist * sp, 300, (i, x) => {
           if (rnd(i * 4.1 + seed) < 0.3) return;
           const w = 80 + Math.floor(rnd(i * 2 + seed) * 120), h = 20 + Math.floor(rnd(i * 3 + seed) * 36), x0 = x + Math.floor(rnd(i + seed) * 100);
-          g.fillStyle = col; for (let r = 0; r < h; r++) { const sl = r < 4 ? 0 : Math.round((r - 4) * 0.9); g.fillRect(x0 - sl, base - h + r, w + sl * 2, 1); }
+          g.fillStyle = col; g.beginPath(); for (let r = 0; r < h; r++) { const sl = r < 4 ? 0 : Math.round((r - 4) * 0.9); g.rect(x0 - sl, base - h + r, w + sl * 2, 1); } g.fill();
           g.fillStyle = Street2D.shade(col, 0.25); g.fillRect(x0, base - h, w, 1);
         });
       }
       g.fillStyle = '#20161c'; g.fillRect(0, 200, W, 32);
-      for (let k = 0; k < 140; k++) { const x = Math.round(((rnd(k + 500) * W * 2 - dist * 8) % (W * 2) + W * 2) % (W * 2)); if (x < W) { g.fillStyle = '#2c2026'; g.fillRect(x, 202 + Math.floor(rnd(k + 501) * 28), 2, 1); } }
+      g.fillStyle = '#2c2026'; g.beginPath(); for (let k = 0; k < 140; k++) { const x = Math.round(((rnd(k + 500) * W * 2 - dist * 8) % (W * 2) + W * 2) % (W * 2)); if (x < W) g.rect(x, 202 + Math.floor(rnd(k + 501) * 28), 2, 1); } g.fill();
       this.tileRun(dist * 6, 160, (i, x) => {
         if (rnd(i * 6.6) < 0.4) return;
         const bx = x + Math.floor(rnd(i) * 60), base = 212 + Math.floor(rnd(i + 1) * 12);
@@ -1347,7 +1357,7 @@ class Street2D {
       let prev = null;
       for (let m = Math.floor(visFrom / 40) * 40 - 40; m < visTo + 40; m += 40) {
         const x = wx(m); g.fillStyle = '#1a1214'; g.fillRect(x, 132, 3, 92); g.fillRect(x - 10, 138, 23, 2); g.fillRect(x - 6, 146, 15, 2);
-        if (prev !== null) { g.fillStyle = 'rgba(60,40,50,.9)'; for (const [dy, dx] of [[138, -9], [138, 11], [146, -5]]) for (let s = 0; s <= x - prev; s += 3) { const f = s / Math.max(1, x - prev); g.fillRect(prev + dx + s, Math.round(dy + 10 * 4 * f * (1 - f)), 1, 1); } }
+        if (prev !== null) { g.fillStyle = 'rgba(60,40,50,.9)'; g.beginPath(); for (const [dy, dx] of [[138, -9], [138, 11], [146, -5]]) for (let s = 0; s <= x - prev; s += 3) { const f = s / Math.max(1, x - prev); g.rect(prev + dx + s, Math.round(dy + 10 * 4 * f * (1 - f)), 1, 1); } g.fill(); }
         prev = x;
       }
       // motel col neon ogni 1,6 km
@@ -1572,7 +1582,7 @@ class Street2D {
       for (let m = Math.floor(visFrom / 12) * 12; m < visTo; m += 12) { const x = wx(m); g.fillStyle = '#ffb000'; g.fillRect(x, 344, 3, 2); this.light(g, x + 1, 345, 6, 3, '#ffb000', 0.2, 2); }
     } else if (bg === 'mountain' || bg === 'plain') {
       g.fillStyle = bg === 'mountain' ? '#0e1820' : '#142218'; g.fillRect(0, 339, W, 21);
-      for (let x = 0; x < W; x += 2) { const k = Math.floor((x + dist * PPM) / 2); g.fillStyle = rnd(k) < 0.5 ? '#1a2c22' : '#0e1a14'; g.fillRect(x, 339 + Math.floor(rnd(k + 1) * 4), 2, 3 + Math.floor(rnd(k + 2) * 5)); }
+      this.batch(g, (r) => { for (let x = 0; x < W; x += 2) { const k = Math.floor((x + dist * PPM) / 2); r(rnd(k) < 0.5 ? '#1a2c22' : '#0e1a14', x, 339 + Math.floor(rnd(k + 1) * 4), 2, 3 + Math.floor(rnd(k + 2) * 5)); } });
       g.fillStyle = '#5c6386'; g.fillRect(0, 343, W, 3); g.fillStyle = '#8a93b0'; g.fillRect(0, 343, W, 1);
       for (let m = Math.floor(visFrom / 4) * 4; m < visTo; m += 4) { const x = wx(m); g.fillStyle = '#3a3f58'; g.fillRect(x, 342, 3, 18); }
     } else if (bg === 'sea') {

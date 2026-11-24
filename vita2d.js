@@ -85,7 +85,7 @@
             const px = cx + Math.cos(an) * rr, py = cy + Math.sin(an) * rr * 0.9 + drop;
             const tw = e > 1.2 ? (Math.sin(t * 40 + i) > 0 ? 1 : 0.3) : 1, c2 = i % 3 ? col : col2;
             g.fillStyle = `rgba(255,255,240,${fade * tw})`; g.fillRect(Math.round(px), Math.round(py), 1, 1);
-            g.fillStyle = `rgba(${c2},${fade * tw})`; g.fillRect(Math.round(px) - 1, Math.round(py), 1, 1); g.fillRect(Math.round(px) + 1, Math.round(py), 1, 1); g.fillRect(Math.round(px), Math.round(py) - 1, 1, 1); g.fillRect(Math.round(px), Math.round(py) + 1, 1, 1);
+            g.fillStyle = `rgba(${c2},${fade * tw})`; g.beginPath(); g.rect(Math.round(px) - 1, Math.round(py), 1, 1); g.rect(Math.round(px) + 1, Math.round(py), 1, 1); g.rect(Math.round(px), Math.round(py) - 1, 1, 1); g.rect(Math.round(px), Math.round(py) + 1, 1, 1); g.fill();
             for (let q = 1; q < 5; q++) { g.fillStyle = `rgba(${c2},${0.4 * fade * (1 - q / 5)})`; g.fillRect(Math.round(px - Math.cos(an) * q * 2.2), Math.round(py - Math.sin(an) * q * 2.2 - q * 0.6), 1, 1); }   // codina
             if (i % 4 === 0) glow(g, px, py, 5, c2, 0.5 * fade * tw);
           }
