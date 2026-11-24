@@ -1398,7 +1398,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const synth = eng ? 1 - S.mix / 100 : 1;
     const has = (r) => (player && eng && player.has(r) ? 1 : 0);
     const cmp = window.NightCampioni ? NightCampioni.sync(game, TP, S.tune) : {};   // campioni dei pezzi montati (campioni.js): cosa suona e cosa abbassare nella sintesi
-    return { tune: TP.dsp, pops: TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
+    // scoppiettii dai pezzi di scarico (tuning.js scoppiPop, v0.158) e loro volume dalla scheda Suoni di Luca (campioni.js, slot «scoppi»)
+    const tuneD = typeof scoppiPop === 'function' ? Object.assign({}, TP.dsp, { cat: Object.assign({}, TP.dsp.cat, { pop: scoppiPop(TUNING, S.tune, TP.sim) }) }) : TP.dsp;
+    const popVol = typeof cmpVolSlot === 'function' ? cmpVolSlot('scoppi') : 1, limPopVol = typeof cmpLimG === 'function' ? cmpLimG() : 1;
+    return { tune: tuneD, popVol, limPopVol, pops: TP.sim.ecuPops && !exhClosed() ? 1 : 0, view: viewNow(), vol: S.muted ? 0 : S.vol / 100 * synth * (exhClosed() ? 0.72 : exhValve() ? 1.25 : 1),
       fx: { bov: has('bov') | has('flutter'), pop: has('pop'), turbo: has('whine'), valv: cmp.valv | 0, turb: cmp.turb | 0, bur: cmp.bur | 0 } };
   }
   function ensureAudio() {
@@ -1514,11 +1517,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       $('limRpm').max = limMax; $('limRpm').value = limR; $('limOut').textContent = limR; $('lchRpm').max = limR - 400; $('lchRpm').value = sim.P.launchRpm; $('lchOut').textContent = sim.P.launchRpm;
       $('tLaunchL').textContent = `${lt === 'stutter' ? 'Stutter box' : 'Launch control'} ${sim.P.launchRpm}`;
       $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : '') + (lt === 'soft' ? ' Il soft cut non taglia a colpi: discesa e durata non servono.' : ' Discesa e durata: la benzina riparte quando i giri sono scesi e il tempo è passato. Discesa 0 = cadenza fissa a tempo; durata “solo giri” = rimbalzo deciso dai giri.'); }
-    Object.assign(sim.cfg, { pops: !!TP.sim.ecuPops && !exhClosed(), launch: S.launch, autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
+    Object.assign(sim.cfg, { pops: !!TP.sim.ecuPops && !exhClosed(), launch: !!S.launch && launchOk(), autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
     if (garage) { garage.setTips(TP.dsp.ex.tips); garage.setPaint(S.paint); }
     if (street2d) { street2d.setCosmetics(cosView()); street2d.setCar(carId, TP.look, carPaint()); }
     renderTuning();
-    $('tPops').disabled = true; $('tLaunch').disabled = !TP.sim.ecuLaunch;
+    $('tPops').disabled = true; $('tLaunch').disabled = !launchOk();
     $('ecuHint').textContent = (TP.sim.ecuPops ? 'Mappa pop & bang montata: scoppi in rilascio (si smonta da Luca Tuning, reparto Centralina). ' : 'Gli scoppi in rilascio vogliono la mappa pop & bang: da Luca Tuning, reparto Centralina. ') + (TP.sim.ecuLaunch ? '' : 'Per il launch serve un limitatore 2-step (reparto Limitatore) o una centralina programmabile.');
     if (!S.autoClutch) sim.lock = false;
     if (themeReady && S.ui === 'orig' && TH.name !== 'Originale ' + carId) applyTheme('orig');   // quadro dell'auto appena scelta
@@ -1534,7 +1537,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     });
     game.autoLane = autoMode() > 0; $('tLane').checked = autoMode() > 0; $('tTc').checked = S.tc !== false;
     $('tBox').checked = S.gearbox === 'auto'; $('tAuto').disabled = S.gearbox === 'auto';
-    $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = !!TP.sim.ecuPops; $('tLaunch').checked = S.launch;
+    $('tAuto').checked = S.autoClutch; $('tRev').checked = S.revMatch; $('tPops').checked = !!TP.sim.ecuPops; $('tLaunch').checked = !!S.launch && launchOk();
     $('tRev').disabled = !S.autoClutch;
     $('vol').value = S.vol; $('volOut').textContent = S.muted ? 'muto' : S.vol;
     const pre = TUNING_PRESETS.find((p) => Object.keys(p.sel).every((k) => p.sel[k] === S.tune[k]));
@@ -1601,6 +1604,12 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   const shiftDown = () => { if (S.gearbox === 'auto') { levaStep(-1); return; } const g = sim.shiftSeq ? sim.shiftSeq.target : sim.gear; if (g > 0) shiftTo(g - 1); };
 
   function ignToggle() { ensureAudio(); sim.setIgnition(!sim.ign); }
+  // launch control (v0.158): si accende solo se la centralina lo ha (o c'è lo stutter box); spento non limita niente
+  function launchOk() { return !!(TP && TP.sim && (TP.sim.ecuLaunch || TP.sim.limType === 'stutter')); }
+  function launchToggle() {
+    if (!S.launch && !launchOk()) { flash('Launch control: la centralina non lo ha. Da Luca Tuning serve una centralina col launch (o lo stutter box)', 3); return; }
+    S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2);
+  }
   function startOn() {
     ensureAudio(); if (sim.running) return;
     if (S.gearbox === 'auto' && leva !== 'P' && leva !== 'N' && !(game.inShop() && Math.abs(sim.v) < 0.5)) { flash('Per avviare metti la leva in P o in N (Q)', 1.8); return; }
@@ -1672,7 +1681,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'k') cycleMeteo();
     else if (k === 'x') takePhoto();
     else if (k === 'y') startReplay();
-    else if (k === 'l') { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); }
+    else if (k === 'l') launchToggle();
     else if (k === 'm') { S.muted = !S.muted; applySettings(); }
   });
   window.addEventListener('keyup', (e) => {
@@ -3040,7 +3049,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // pulsanti accanto al cruscotto
   function dashBtns() {
     const set = (id, on, hot) => { const b = $(id); if (!b) return; b.setAttribute('aria-pressed', String(!!on)); b.classList.toggle('hot', !!hot); };
-    set('dbWin', sim.winT > 0.5, sim.winMot); setAutoBtn(); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', S.launch && TP.sim.ecuLaunch, sim.launchArmed);
+    set('dbWin', sim.winT > 0.5, sim.winMot); setAutoBtn(); set('dbTc', S.tc !== false, sim.tcAct); set('dbLaunch', !!S.launch && launchOk(), sim.launchArmed);
     $('dbLaunch').disabled = !TP.sim.ecuLaunch;
     set('dbEngine', sim.running, !sim.running); { const t = sim.running ? 'SPEGNI' : 'AVVIA'; if ($('dbEngine').textContent !== t) $('dbEngine').textContent = t; }
     set('dbFlash', lightsMode() > 0, lightsMode() === 2); if ($('dbFlash').textContent !== LIGHTS_NAME[lightsMode()]) $('dbFlash').textContent = LIGHTS_NAME[lightsMode()];
@@ -3057,7 +3066,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   });
   $('dbTc').addEventListener('click', () => { S.tc = S.tc === false; applySettings(); flash(S.tc ? 'Controllo di trazione inserito' : 'Controllo di trazione spento', 1.4); });
-  $('dbLaunch').addEventListener('click', () => { S.launch = !S.launch; applySettings(); flash(S.launch ? 'Launch control inserito' : 'Launch control disinserito', 1.2); });
+  $('dbLaunch').addEventListener('click', launchToggle);
   $('dbHud').addEventListener('click', cycleHud);
   $('dbMap').addEventListener('click', () => toggleWorldMap());
   $('dbWin').addEventListener('click', toggleWindows);
@@ -3230,7 +3239,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const liftT = sm.cfg.pops ? 2.8 : 1.1, spark = TP.sim.sparkCut;
     let rate = 0, big = false;
     if ((sm.cut === 2 || sm.cut === 3) && spark) { rate = sm.cfg.pops ? 9 : 6; big = true; }
-    else if (sm.cut === 1 && sm.ovr < liftT && sm.rpm > 2200) rate = (sm.cfg.pops ? 3 : 1.3) * (1 - sm.ovr / liftT) * Math.min(1, sm.rpm / 4500) * TP.dsp.cat.pop * (player.surging() ? 0.25 : 1);
+    else if (sm.cut === 1 && sm.ovr < liftT && sm.rpm > 2200) rate = (sm.cfg.pops ? 3 : 1.3) * (1 - sm.ovr / liftT) * Math.min(1, sm.rpm / 4500) * (typeof scoppiPop === 'function' ? scoppiPop(TUNING, S.tune, TP.sim) : TP.dsp.cat.pop) * (player.surging() ? 0.25 : 1);
     if (exhClosed()) { rate *= 0.12; big = false; }                       // valvola chiusa: ogni tanto uno scoppio smorzato, niente raffica
     if (rate && Math.random() < rate * dt) {
       const k = Math.random();

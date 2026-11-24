@@ -269,6 +269,9 @@ function cmpVolScrivi(o) {
 function cmpVol() { const v = cmpVolLeggi().vol; return Math.max(0, Math.min(1.5, v)); }
 // volume del singolo componente (valvola, turbo, scarico...): moltiplica ogni suo colpo e anello, anche nell'ascolto
 function cmpVolSlot(slot) { const v = cmpVolLeggi().slot[slot]; return Number.isFinite(v) ? Math.max(0, Math.min(CMP_VOL_MAX, v)) : 1; }
+// scoppi al limitatore e nel 2-step/3-step (sintesi e campioni «pop & bang» e «limitatore»), v0.158: il livello di prima era
+// troppo forte e copriva il motore; quello diventa il massimo del cursore (200 %, un pelo sotto), il 100 % è la metà
+function cmpLimG() { return 0.95 * cmpVolSlot('scoppiLim') / 2; }
 function cmpVolSet(slot, v) {
   const o = cmpVolLeggi(), n = Math.max(0, Math.min(slot ? CMP_VOL_MAX : 1.5, +v || 0));
   if (slot) { const sl = Object.assign({}, o.slot); if (Math.abs(n - 1) < 1e-6) delete sl[slot]; else sl[slot] = n; cmpVolScrivi({ vol: o.vol, slot: sl }); }
@@ -440,7 +443,7 @@ class CampioniPlayer {
         const lvl = 0.5 + (X.decat ? 0.35 : 0) + (sim.cfg && sim.cfg.pops ? 0.35 : 0), env = Math.exp(-(sim.ovr || 0) / (1.0 + 1.2 * lvl));
         st.burT -= dt;
         if (st.burT <= 0 && env > 0.08) {
-          const k = Math.min(1, rpm / 4500), d = this.shotPick('scarico', R.scarico, G.scarico * Math.pow(env, 0.6) * (0.55 + 0.45 * k) * (0.8 + 0.4 * Math.random()) * (X.decat ? 1.25 : 1), { rate: 0.94 + 0.12 * k });
+          const k = Math.min(1, rpm / 4500), d = this.shotPick('scarico', R.scarico, G.scarico * Math.pow(env, 0.6) * (0.55 + 0.45 * k) * (0.8 + 0.4 * Math.random()) * (X.decat ? 1.25 : 1) * cmpVolSlot('scoppi'), { rate: 0.94 + 0.12 * k });
           st.burT = d ? d * (0.45 + 0.35 * Math.random()) : 0.25;
         }
       } else if (!lift && st.cut === 1 && thr > 0.12) this.fade('scarico', 0.08);   // ridai gas: il borbottio si zittisce
@@ -462,7 +465,7 @@ class CampioniPlayer {
         let rate = 0;
         if (lift && (sim.ovr || 0) < 2.8 && st.burR > CMP.popRpm) rate = P.rate * (1 - (sim.ovr || 0) / 2.8) * Math.min(1, rpm / 5000);
         else if (cut === 2 && X.spark) rate = P.rate * 1.6;
-        if (rate > 0 && t >= st.popBusy && Math.random() < rate * dt) { const d = this.shotPick('mappa', R.mappa, G.mappa * (0.75 + 0.25 * Math.random())); st.popBusy = t + (d ? d * P.over : 0.2); }
+        if (rate > 0 && t >= st.popBusy && Math.random() < rate * dt) { const d = this.shotPick('mappa', R.mappa, G.mappa * (0.75 + 0.25 * Math.random()) * (cut === 2 ? cmpLimG() : cmpVolSlot('scoppi'))); st.popBusy = t + (d ? d * P.over : 0.2); }
       }
       if (!lift && st.cut === 1 && thr > 0.12) this.fade('mappa', 0.06);
     }
@@ -471,7 +474,7 @@ class CampioniPlayer {
       const P = CMP_KIT[R.limitatore].trig;
       if (t - st.limLast > P.mi) {
         const p = cut === 2 ? P.e2 : still ? P.e3 : P.flat;
-        if (Math.random() < p) { this.shotPick('limitatore', R.limitatore, G.limitatore * (cut === 3 && !still ? 1.15 : 1) * (0.8 + 0.2 * Math.random())); st.limLast = t; }
+        if (Math.random() < p) { this.shotPick('limitatore', R.limitatore, G.limitatore * (cut === 3 && !still ? 1.15 : 1) * (0.8 + 0.2 * Math.random()) * cmpLimG()); st.limLast = t; }
       }
     }
     // aspirazione: gas spalancato di colpo
@@ -585,6 +588,12 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
     const vol = Math.round(cmpVol() * 100);
     let h = '<p class="of-hint">Ogni pezzo montato porta la sua voce, sopra il motore. Qui le ascolti (▶), le cambi con un altro kit dello stesso componente o le spegni. Non cambiano un cavallo: cambiano la faccia della gente quando passi. Il kit che arriva col pezzo è gratis; gli altri si comprano una volta e valgono su tutte le auto.</p>';
     h += `<div class="cmp-vol"><span>VOLUME CAMPIONI</span><input type="range" data-cmp-vol="" min="0" max="150" step="5" value="${vol}" aria-label="Volume dei campioni"><b id="cmpVolOut">${vol} %</b></div>`;
+    { const sv = Math.round(cmpVolSlot('scoppi') * 100);             // scoppiettii al rilascio del motore sintetizzato (dsp.js, v0.158)
+      h += `<div class="cmp-vol"><span>VOLUME SCOPPIETTII</span><input type="range" data-cmp-vol="scoppi" min="0" max="${CMP_VOL_MAX * 100}" step="5" value="${sv}" aria-label="Volume degli scoppiettii al rilascio"><b id="cmpVolOut-scoppi">${sv} %</b></div>`
+        + '<p class="of-hint" style="margin-top:-4px">Gli scoppiettii al rilascio li fanno <b>scarico</b> e <b>catalizzatore / collettore</b>: di serie niente, col primo livello cominciano, poi sempre di più. Qui ne regoli solo il volume.</p>';
+      const lv = Math.round(cmpVolSlot('scoppiLim') * 100);
+      h += `<div class="cmp-vol"><span>SCOPPI AL LIMITATORE</span><input type="range" data-cmp-vol="scoppiLim" min="0" max="${CMP_VOL_MAX * 100}" step="5" value="${lv}" aria-label="Volume degli scoppi al limitatore, nel 2-step e nel 3-step"><b id="cmpVolOut-scoppiLim">${lv} %</b></div>`
+        + '<p class="of-hint" style="margin-top:-4px">I botti al limitatore col taglio d\'accensione e la mappa pop &amp; bang, nel launch (2-step) e nelle cambiate (3-step). Al 200 % sono forti come prima.</p>'; }
     for (const S of CMP_SLOT) {
       const why = cmpServe(S.id, x), auto = cmpAuto(S.id, x), now = res[S.id], v = m[S.id] || 'auto';
       const spenta = S.id === 'mappa' && now && !((NR().sim || {}).cfg || {}).pops;                 // valvola dello scarico chiusa: niente botti
@@ -651,6 +660,7 @@ if (typeof window !== 'undefined') Object.assign(window, { CMP, CMP_SLOT, CMP_KI
     const o = document.getElementById(slot ? 'cmpVolOut-' + slot : 'cmpVolOut'); if (o) o.textContent = v + ' %';
     const b = slot && el.parentNode && el.parentNode.querySelector('[data-cmp-v1]'); if (b) b.disabled = v === 100;
     // si sente subito: se il kit di quel componente sta suonando nell'ascolto il volume cambia dal vivo, se no riparte
+    if (slot === 'scoppi' || slot === 'scoppiLim') { if (NR().audioCfg) NR().audioCfg(); return; }   // al motore: vale subito
     const id = slot && cur && cur.res[slot]; if (!id) return;
     if (player && player.prevId === id && player.ctx.currentTime < (player.prevEnd || 0)) player.prev.gain.setTargetAtTime((player.prevBase || 0.77) * cmpVolSlot(slot), player.ctx.currentTime, 0.03);
     else preview(id);

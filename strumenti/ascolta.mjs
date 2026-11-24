@@ -17,7 +17,7 @@ import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'suoni.js', 'cars.js'].map((f) => readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
-const { EngineDSP, SupraSim, CARS } = new Function(src + ';return { EngineDSP, SupraSim, CARS };')();
+const { EngineDSP, SupraSim, CARS, scoppiPop } = new Function(src + ';return { EngineDSP, SupraSim, CARS, scoppiPop };')();
 
 const [id = 'v40', copione = 'allungo', out = 'ascolto.wav', vista = '0', amb = '0'] = process.argv.slice(2);
 const c = CARS[id];
@@ -26,7 +26,10 @@ if (!c) { console.error('auto sconosciuta: ' + id + '\nauto: ' + Object.keys(CAR
 const SR = 48000, B = 128, dt = B / SR;
 // PRESET=<id> sceglie la preparazione (es. single per la Supra), POPS=1 accende la mappa pop & bang
 const pr = (process.env.PRESET && c.presets.find((q) => q.id === process.env.PRESET)) || c.presets[0];
-const tp = c.params(pr.sel);
+// EX=<scarico> CAT=<catalizzatore> cambiano quei due pezzi (gli scoppiettii al rilascio dipendono da loro, v0.157)
+const sel = Object.assign({}, pr.sel, process.env.EX ? { exhaust: process.env.EX } : {}, process.env.CAT ? { cat: process.env.CAT } : {});
+const tp = c.params(sel);
+tp.dsp = Object.assign({}, tp.dsp, { cat: Object.assign({}, tp.dsp.cat, { pop: scoppiPop(c.tuning, sel, tp.sim) }) });   // come dspCfg nel gioco
 const sim = new SupraSim();
 sim.setCar(id === 'supra' ? null : Object.assign({}, c.P));
 sim.setTune(tp.sim); sim.P.mass = c.mass; sim.P.fwd = c.fwd; sim.P.rearW = c.driveW;

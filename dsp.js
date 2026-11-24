@@ -378,6 +378,9 @@ class EngineDSP {
     if (this.cfg.fx && this.cfg.fx.pop) a *= 0.3;
     if (this.bov.env > 0 && this.tn.bov.v === 2) a *= 0.35;   // lascia sentire lo stu-tu-tu
     if (this.T.cut === 1) a *= 0.7;        // scoppi registrati caricati: qui resta solo il crepitio
+    a *= 0.55 + 0.45 * Math.min(1.6, this.tn.cat.pop || 0);   // v0.158: più è preparato lo scarico, più forte lo scoppio
+    // volumi della scheda Suoni da Luca (v0.158): scoppi al limitatore e nel 2-step/3-step a parte, gli altri (rilascio) a parte
+    a *= this.T.cut === 2 || this.T.cut === 3 ? (this.cfg.limPopVol ?? 1) : (this.cfg.popVol ?? 1);
     // ognuno un po' diverso: nota ±17 %, durata, schiocco, rumore più o meno cupo, colpo sordo; le grosse più lunghe e basse
     const B = this.popB, k = B.vary, rr = () => this.r() * k;
     const f = 68 * B.f * Math.exp(0.16 * rr()) * (big ? 0.92 : 1), len = B.len * Math.max(0.45, 1 + 0.35 * rr()) * (big ? 1.3 : 1);
@@ -406,7 +409,7 @@ class EngineDSP {
     if (this.pops.length > 12) return;
     const sr = this.sr, r = () => Math.abs(this.r()), B = this.popB;
     const one = (d, a, len, f) => this.pops.push({ vb: 1, d: Math.max(1, d), a, len, f, nz: 0.45 + 0.5 * r() });
-    const a0 = (0.55 + 0.45 * r()) * (0.8 + 0.3 * lvl) * (0.6 + 0.4 * hi);
+    const a0 = (0.55 + 0.45 * r()) * (0.8 + 0.3 * lvl) * (0.6 + 0.4 * hi) * (this.cfg.popVol ?? 1);   // volume degli scoppiettii (v0.158)
     const f = 82 * B.f * (0.8 + 0.4 * r());
     one(Math.round((0.002 + 0.01 * r()) * sr), a0, B.len * (0.8 + 0.8 * r()), f);
     this.flu += 0.06 + 0.05 * lvl;                                       // piccolo strappo dell'albero: il regime balla un attimo
@@ -457,19 +460,19 @@ class EngineDSP {
       const hi = Math.min(1, (S.rpm - 1600) / 4000);
       if (T.cut === 1) ch = (this.cfg.pops ? 0.12 * Math.exp(-T.ovr / 2.2) + 0.015 : (0.06 * Math.exp(-T.ovr / 0.8) + 0.003) * (0.4 + 0.6 * hi)) * pm;
       if (T.cut === 1 && Math.abs(this.r()) < ch * 0.2) big = true;
-      else if (T.cut === 2) { ch = sp ? (this.cfg.pops ? 0.34 : 0.16) * pm : 0.02; big = true; }
-      else if (T.cut === 3) { ch = (this.cfg.pops ? 0.55 : 0.3) * pm; big = true; }
+      else if (T.cut === 2) { ch = sp ? (this.cfg.pops ? 0.34 : 0.16) * Math.max(pm, this.cfg.pops ? 1 : 0.5) : 0.02 * Math.min(1, pm); big = true; }   // v0.158: di serie niente; col taglio d'accensione ci sono sempre
+      else if (T.cut === 3) { ch = (this.cfg.pops ? 0.55 : 0.3) * Math.max(pm, this.cfg.pops ? 1 : 0.5); big = true; }
       if (Math.abs(this.r()) < ch) this.addPop(big || Math.abs(this.r()) < 0.15);
     }
     // borbottio al rilascio: dopo aver mollato il gas ad alti giri il motore gorgoglia a raffiche (si spegne in qualche secondo, più lungo con le mappe pop & bang)
-    if (!fire && run && T.cut === 1 && S.rpm > 1300) {
-      const pm = this.tn.cat.pop, lvl = 0.55 + (this.cfg.pops ? 0.5 : 0) + (this.tn.spark ? 0.2 : 0) + 0.35 * Math.min(1.5, Math.max(0, pm - 1));
+    if (!fire && run && T.cut === 1 && S.rpm > 1300 && this.tn.cat.pop > 0.01) {   // v0.158: scarico e collettori di serie, niente borbottio
+      const pm = this.tn.cat.pop, lvl = 0.25 + 0.3 * Math.min(1, pm / 0.7) + (this.cfg.pops ? 0.5 : 0) + (this.tn.spark ? 0.2 : 0) + 0.35 * Math.min(1.5, Math.max(0, pm - 1));
       const env = Math.exp(-T.ovr / (0.9 + 1.5 * lvl)), hi = Math.min(1, (S.rpm - 1300) / 3500);
       const cps = Math.max(12, S.rpm / 60 * this.nCyl / 2);                // scoppi al secondo: serve a contare il tempo dentro il ciclo
       const bb = this.bb || (this.bb = { on: false, t: 0 });
       bb.t -= 1 / cps;
       if (bb.t <= 0) { bb.on = !bb.on; bb.t = bb.on ? 0.05 + 0.16 * Math.abs(this.r()) : 0.04 + 0.2 * Math.abs(this.r()) * (1.3 - Math.min(1, lvl * 0.6)); }
-      const rate = (7 + 8 * lvl) * env * (0.35 + 0.65 * hi);              // colpetti al secondo a gas mollato, a raffiche, metà del tempo
+      const rate = (7 + 8 * lvl) * env * (0.35 + 0.65 * hi) * Math.min(1, 0.3 + pm / 0.8);   // primi pezzi: qualche colpetto, poi sempre più fitto              // colpetti al secondo a gas mollato, a raffiche, metà del tempo
       if (bb.on && Math.abs(this.r()) < Math.min(0.9, rate / (0.5 * cps))) {
         this.addBurble(lvl, hi);
         if (Math.abs(this.r()) < 0.05 * lvl * env) this.addPop(true);      // ogni tanto un colpo grosso

@@ -283,6 +283,21 @@ function applyLimiter(out, item, ecuSim) {
   return out;
 }
 
+// scoppiettii al rilascio (v0.158): li decidono scarico e catalizzatore/collettore. Tutti e due di serie = niente scoppi;
+// il primo livello di uno dei due ne fa qualcuno, poi sempre di più fino al massimo (scarico da gara + decat).
+// q = (livello scarico + livello cat) / (livelli massimi); pop = min + (max − min)·q, ×turbo; la mappa pop & bang tiene almeno «mappa»
+const SCOPPI = { min: 0.25, max: 1.6, turbo: 1.2, mappa: 1.4 };
+function scoppiPop(catalog, sel, sim) {
+  let num = 0, den = 0;
+  for (const k of ['exhaust', 'cat']) {
+    const c = catalog && catalog[k]; if (!c || !c.items || c.items.length < 2) continue;
+    num += Math.max(0, c.items.findIndex((x) => x.id === (sel || {})[k])); den += c.items.length - 1;
+  }
+  const q = den ? num / den : 0;
+  let pop = q > 0 ? (SCOPPI.min + (SCOPPI.max - SCOPPI.min) * q) * (sim && sim.turbo && sim.turbo.max > 0 ? SCOPPI.turbo : 1) : 0;
+  if (sim && sim.ecuPops) pop = Math.max(pop, SCOPPI.mappa);
+  return pop;
+}
 // parametri dell'auto in uso (le altre auto registrano la loro funzione in cars.js)
 function tuningParams(sel, adj) {
   const car = typeof ACTIVE_CAR !== 'undefined' ? ACTIVE_CAR : 'supra';

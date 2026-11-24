@@ -396,7 +396,8 @@ class SupraSim {
         if (this.cutLim) { if (rpm < hard - 100) this.cutLim = false; } else if (rpm > hard) this.cutLim = true;
       } else if (this.cutLim) { this.cutT = (this.cutT || 0) + h; if (rpm < lim - hyst && this.cutT >= holdT) this.cutLim = false; } else if (rpm > lim) { this.cutLim = true; this.cutT = 0; }
       // stutter box: da fermo (o in folle) limita ai giri di launch con un taglio a tempo, regolare come una mitragliatrice
-      this.stutter = lt === 'stutter' && Math.abs(this.v) < 1.5 && (this.gear === 0 || this.launchArmed) && I.thr > 0.5;
+      // v0.158: solo col launch inserito (prima in folle limitava i giri anche col launch spento)
+      this.stutter = lt === 'stutter' && cfg.launch && Math.abs(this.v) < 1.5 && (this.gear === 0 || this.launchArmed) && I.thr > 0.5;
       if (this.stutter) { this.stuT = ((this.stuT || 0) + h) % 0.13; this.cutLaunch = rpm > P.launchRpm - 350 && (this.stuT < 0.065 || rpm > P.launchRpm); }
       else if (this.launchArmed) { if (this.cutLaunch) { if (rpm < P.launchRpm - 150) this.cutLaunch = false; } else if (rpm > P.launchRpm) this.cutLaunch = true; }
       else this.cutLaunch = false;

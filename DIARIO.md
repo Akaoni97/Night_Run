@@ -1,3 +1,9 @@
+## 24/11/2026 · cognato · v0.158 (**scoppiettii coi pezzi di scarico, volumi, launch**)
+- Scoppiettii al rilascio decisi da **scarico + catalizzatore/collettore** (`SCOPPI`, `scoppiPop` in `tuning.js`, usato da `dspCfg`): tutti e due di serie = niente scoppi e niente borbottio, il primo livello di uno dei due ne fa qualcuno, poi crescono di numero e di forza fino al massimo (scarico da gara + decat). Misurato con `ascolta.mjs` sulla E36 (sgasate, 10 s): di serie 0 colpi, terminale + cat sportivo 46, gara + decat 114, niente saturazione. La mappa pop & bang scoppietta anche con lo scarico di serie.
+- Scheda **Suoni** da Luca: «Volume scoppiettii» (rilascio, sintesi e campioni di scarico e pop & bang) e «Scoppi al limitatore» (taglio d'accensione, 2-step, 3-step). Il livello di prima dei botti al limitatore è il 200 % (un pelo sotto), di serie al 100 % = metà. Si sentono subito.
+- **Launch**: spento non limita più niente (lo stutter box limitava i giri in folle anche col launch spento); si accende solo se la centralina ha il launch (o c'è lo stutter box), altrimenti un avviso. Test `test/launch.test.js`.
+- Aperto: ascoltarli sul PC (i numeri dicono che non è rotto, non che è bello).
+
 ## 24/11/2026 · cognato · v0.157 (**il banco prova da Luca dice la verità**)
 - Lo schermo BANCO PROVA nell'interno di Da Luca Tuning (`interni_hd.js`, `dynoDati`) mostrava «280 ± 40 CV» a caso. Adesso: nome dell'auto, CV e a che giri, Nm e a che giri, limitatore, turbo con i bar (mappa ECO/FORTE compresa) o aspirato, peso e kg/CV (col pilota, come nel riquadro dell'officina), e le curve vere di CV (arancio) e Nm (azzurro) da 1.000 giri al limitatore, con un cursore che le scorre. Stessi conti di `estimatePeak` di `sim.js`; si ricalcola solo quando cambiano auto o pezzi. Tutto a sinistra perché il pannello del negozio copre la parte destra dello schermo.
 
