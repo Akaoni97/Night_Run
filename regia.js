@@ -10,7 +10,7 @@ const REGIA_EPI = {
 "B1": [
 [
 "ELENA",
-"Ho messo un posto in più. È venuta zia Irene."
+"Ho aggiunto un posto a tavola. È venuta zia Irene."
 ],
 [
 "TU",
@@ -18,7 +18,7 @@ const REGIA_EPI = {
 ],
 [
 "ELENA",
-"La vedova di Claudio. È qui, non la sto inventando."
+"La vedova di Claudio. È qui, mica me la sto inventando."
 ],
 [
 "TU",
@@ -26,19 +26,19 @@ const REGIA_EPI = {
 ],
 [
 "ELENA",
-"Sì. Era sulla porta. Perché me lo chiedi così?"
+"Sì. Era fuori dalla porta. Perché me lo chiedi con quel tono?"
 ],
 [
 "TU, PENSIERO",
-"Ho aperto senza finire le domande. Adesso è a tavola."
+"Ho aperto prima di aver finito le domande. E adesso è seduta a tavola."
 ],
 [
 "TU, PENSIERO",
-"Nel fascicolo Irene è scomparsa da anni. Claudio non lasciò una moglie."
+"Nelle carte Irene risulta scomparsa da anni. Claudio non ha lasciato nessuna moglie."
 ],
 [
 "ELENA",
-"Vieni? Non voglio lasciarla sola in cucina."
+"Allora vieni? Non voglio lasciarla da sola in cucina."
 ]
 ],
 "B2": [
@@ -52,15 +52,15 @@ const REGIA_EPI = {
 ],
 [
 "LIVIA",
-"Aspetta. Non riesco neanche a decidere cosa chiederti prima."
+"Aspetta. Non so neanche da dove cominciare a chiederti le cose."
 ],
 [
 "TU, PENSIERO",
-"Sapevo chi avrebbe attraversato con noi. Non è una voce sbagliata."
+"Sapevo chi avrebbe attraversato con noi. Non è uno scambio di voci."
 ],
 [
 "LIVIA",
-"Entra. La cena possiamo anche rovinarla, stasera."
+"Entra. Per stasera la cena possiamo anche rovinarla."
 ],
 [
 "PRESENZA COME OTTAVIO",
@@ -68,11 +68,11 @@ const REGIA_EPI = {
 ],
 [
 "TU, PENSIERO",
-"Mi aveva chiesto di non portarle un sostituto. L’ho fatto lo stesso."
+"Mi aveva chiesto di non portarle un sostituto. E io l’ho fatto lo stesso."
 ],
 [
 "TU, PENSIERO",
-"Elena è al sicuro. Non è il suo posto quello che ho venduto."
+"Elena è al sicuro. Il posto che ho venduto non era il suo."
 ]
 ]
 };

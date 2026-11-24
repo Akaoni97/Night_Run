@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.145**
+**Versione attuale: v0.146**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -169,3 +169,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.143 · 24/11/2026 · proprietario · fiamme dello scarico a scelta da Luca Tuning (scheda Fiamme dell'officina): Ossidrica blu, Lanciafiamme, Mitraglia, Smeraldo, Neon viola, più «come viene»; anteprima animata, si comprano una volta e si montano auto per auto
 - v0.144 · 24/11/2026 · cognato · **motore muto riparato**: dalla v0.142 il worklet non aveva le costanti DSP_TB/DSP_CB e il motore sintetizzato taceva (si sentivano solo i campioni); ora si copiano, rete di sicurezza che passa al motore sulla pagina se il worklet va in errore, test `test/worklet.test.js`
 - v0.145 · 24/11/2026 · cognato · **progetto impennata in prova**: fisica del muso che si alza (sim.js, solo trazione posteriore), barre di reazione/4-link e wheelie bar in officina, grafica, interruttore in Sviluppatori (spento di serie), banco `strumenti/impennata.js`: su strada solo la R5 ci arriva vicino
+- v0.146 · 24/11/2026 · cognato · testi delle chat riscritti in italiano più naturale (stessa trama, stessi bivi; 908 nodi in `chat_modifiche.js`), gatto di Elena Fufi al posto di Pasta, ritocchi agli epiloghi e ai sottotitoli delle incursioni

@@ -20,21 +20,21 @@ const STORIA_BEATS = [
 ];
 // le quattro incursioni: lampade (una ogni `lampT` secondi di gioco attivo), metri da fare fino alla porta, sottotitoli (mai più di otto parole)
 const STORIA_INC = {
-  1: { nome: 'Il passaggio', lampade: 5, lampT: 16, metri: 1300, from: 'Rosa', sub: ['Corsia libera. Tieni la destra.', 'Una lampada è andata.', 'Non guardare indietro.', 'Ancora due. Spingi.', 'Ultima lampada. Vai!'], ok: 'La porta è aperta. Passi prima che si chiuda.' },
-  2: { nome: 'Tornare con qualcuno', lampade: 6, lampT: 16, metri: 1500, from: 'Rosa', sub: ['Marco è dietro. Non frenare.', 'Si spegne la prima.', 'Resta nella corsia.', 'Dai, ce la fate.', 'Quasi buio.', 'Ultima. Adesso.'], ok: 'Marco è fuori, con te. Respira piano.' },
-  3: { nome: 'Recuperare chi è stato lasciato', lampade: 4, lampT: 16, metri: 1100, from: 'Rosa', sub: ['Il percorso sta cambiando.', 'Più veloce. Prima che muti.', 'Ancora poco.', 'Ora o mai.'], ok: 'Il punto d\'attesa. Qualcuno è ancora lì.' },
-  4: { nome: 'Il varco della presenza', lampade: 5, lampT: 15, metri: 1600, from: 'Sconosciuto', sub: ['Il confine è davanti a te.', 'Scegli tu chi passa.', 'La luce cala.', 'Non è più la tua strada.', 'Decidi adesso.'], ok: 'Sei al confine. Decidere tocca a te.' },
+  1: { nome: 'Il passaggio', lampade: 5, lampT: 16, metri: 1300, from: 'Rosa', sub: ['Corsia libera. Tieni la destra.', 'Se n\'è andata una lampada.', 'Non guardarti indietro.', 'Ne mancano due. Spingi!', 'Ultima lampada. Vai!'], ok: 'La porta è aperta. Passa prima che si chiuda.' },
+  2: { nome: 'Tornare con qualcuno', lampade: 6, lampT: 16, metri: 1500, from: 'Rosa', sub: ['Marco è dietro. Non frenare.', 'Si è spenta la prima.', 'Resta in corsia.', 'Dai, ce la fate!', 'È quasi buio.', 'L\'ultima. Adesso!'], ok: 'Marco è fuori, insieme a te. Respira piano.' },
+  3: { nome: 'Recuperare chi è stato lasciato', lampade: 4, lampT: 16, metri: 1100, from: 'Rosa', sub: ['La strada sta cambiando.', 'Più veloce, prima che cambi.', 'Manca poco.', 'Adesso o mai più.'], ok: 'Il punto dove aspettare. C\'è ancora qualcuno.' },
+  4: { nome: 'Il varco della presenza', lampade: 5, lampT: 15, metri: 1600, from: 'Sconosciuto', sub: ['Il confine è lì davanti.', 'Chi passa lo scegli tu.', 'La luce cala.', 'Questa non è più la tua strada.', 'Decidi adesso.'], ok: 'Sei al confine. Adesso tocca a te decidere.' },
 };
 const STORIA_EPI = {
-  A: [['ELENA', 'Sono io. Chiedimi una cosa stupida.'], ['TU', 'Come si chiama il tuo gatto?'], ['ELENA', 'Pasta. Non fare quella faccia, è un nome serio.'],
-    ['TU, PENSIERO', 'Non ho dovuto controllare niente. Questa volta mi è bastato ascoltare.'], ['ELENA', 'Hai una voce stanca. Dove sei, adesso?'], ['TU', 'Quasi a casa. Dimmi una cosa vera.'],
-    ['ELENA', 'Mi sei mancato. Ecco, l\'ho detta. Ora non farci caso.'], ['TU, PENSIERO', 'Rosa è rimasta su una strada che io non faccio più. Le scriverò, appena mi viene da dire qualcosa.']],
-  C: [['TU, PENSIERO', 'La porta è ferma. Dall\'altra parte i colpi non si fermano.'], ['TU', 'Irene.'], ['TU', 'Ho la foto. So come ti chiamavi, e dove hai smesso di essere cercata.'],
-    ['TU, PENSIERO', 'Il rumore si fa più piano, come una mano che si stanca.'], ['LIVIA', 'Dimmi che l\'hai detto ad alta voce.'], ['TU', 'L\'ho detto. Non ha risposto.'],
-    ['TU, PENSIERO', 'La porta non si apre più. Mi accorgo dopo che manca una voce che conoscevo.'], ['LIVIA', 'Chi è uscito, e chi no, lo sapremo da chi risponde al telefono.']],
-  D: [['TU, PENSIERO', 'Rosa torna a casa. Io resto vicino al varco: qualcuno deve.'], ['ELENA', 'Pronto? Chi parla? Mi sembra di conoscere questa linea.'], ['TU', 'Mi sono sbagliato di numero. Scusa.'],
-    ['TU, PENSIERO', 'Non insisto. Se insisto, le tolgo il sonno.'], ['TU', 'Hai l\'auto in panne? Spegni, aspetta un minuto, riaccendi. A volte basta.'],
-    ['TU, PENSIERO', 'Non sono la presenza. Sono un uomo che ha scelto un posto.'], ['TU, PENSIERO', 'La strada davanti è libera. Poi comincia la guida di sempre.'], ['TU, PENSIERO', 'Domani ci sarà un altro viaggiatore.']],
+  A: [['ELENA', 'Sono io. Dai, chiedimi una cosa stupida.'], ['TU', 'Come si chiama il tuo gatto?'], ['ELENA', 'Fufi. E non fare quella faccia, è un nome serissimo.'],
+    ['TU, PENSIERO', 'Non ho dovuto controllare niente. Stavolta mi è bastato ascoltarla.'], ['ELENA', 'Hai la voce stanca. Dove sei, adesso?'], ['TU', 'Quasi a casa. Dimmi una cosa vera.'],
+    ['ELENA', 'Mi sei mancato. Ecco, l\'ho detto. Adesso fai finta di niente.'], ['TU, PENSIERO', 'Rosa è rimasta su una strada che io non faccio più. Le scriverò, appena trovo qualcosa da dirle.']],
+  C: [['TU, PENSIERO', 'La porta non si muove. Dall\'altra parte continuano a bussare.'], ['TU', 'Irene.'], ['TU', 'Ho la foto. So come ti chiamavi, e dove hanno smesso di cercarti.'],
+    ['TU, PENSIERO', 'I colpi si fanno più deboli, come una mano che si stanca.'], ['LIVIA', 'Dimmi che l\'hai detto ad alta voce.'], ['TU', 'L\'ho detto. Non ha risposto.'],
+    ['TU, PENSIERO', 'La porta non si apre più. Solo dopo mi accorgo che manca una voce che conoscevo.'], ['LIVIA', 'Chi è uscito e chi no lo sapremo da chi risponde al telefono.']],
+  D: [['TU, PENSIERO', 'Rosa torna a casa. Io resto vicino al varco: qualcuno deve farlo.'], ['ELENA', 'Pronto? Chi parla? Questo numero mi sembra di conoscerlo.'], ['TU', 'Ho sbagliato numero. Mi scusi.'],
+    ['TU, PENSIERO', 'Non insisto. Se insisto, stanotte non dorme.'], ['TU', 'Ha la macchina in panne? Spenga, aspetti un minuto e riaccenda. A volte basta.'],
+    ['TU, PENSIERO', 'Non sono la presenza. Sono uno che ha scelto dove stare.'], ['TU, PENSIERO', 'La strada davanti è libera. Poi si ricomincia a guidare, come sempre.'], ['TU, PENSIERO', 'Domani arriverà un altro viaggiatore.']],
 };
 const STORIA_FINALI = { A: 'Rientro', B1: 'Ospite inconsapevole', B2: 'Ospite consapevole', C: 'Chiusura', D: 'Il viaggio continua' };
 

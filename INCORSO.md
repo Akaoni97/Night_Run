@@ -10,5 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| cognato (Luca), chat di Luca | Riscrittura dei testi delle chat in italiano più naturale (stessa trama e stessi bivi), gatto Pasta → Fufi | `chat_modifiche.js`, `storia.js` (testi), `regia.js` (testi) | 24/11 19:15 |
 | cognato (Claude) | Banco a rulli da Luca Tuning: accelerare e sentire le modifiche dal vivo, con le fiamme | `officina.js`, `index.html`, `interni.js` (scena Luca), forse `game.js` | 24/11 19:25 |
