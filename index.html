@@ -924,6 +924,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 </style>
 <!-- estetica premium di layout, banner e icone (tutto sotto :root:not(.classico); Impostazioni → Grafica → Premium o Classico) -->
 <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="img/nottolino/nottolino.css">
 <script src="leggero.js"></script>   <!-- niente scritture inutili sulla pagina (prestazioni) -->
 <script src="premium.js"></script>
 </head>
@@ -1223,11 +1224,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <li><i aria-hidden="true">🌙</i><span>Mangia, bevi, dormi al Motel 4Ever. E tieni d'occhio il telefono (tasto 0).</span></li>
     </ul>
     <div class="keys"><span><kbd>I</kbd> quadro</span><span><kbd>Invio</kbd> tenuto: avvia</span><span><kbd>E</kbd> marcia</span><span><kbd>W</kbd> gas</span><span><kbd>A</kbd><kbd>D</kbd> corsie</span><span><kbd>U</kbd> entra</span><span><kbd>Tab</kbd> menu</span></div>
+    <div id="titleIgnition"></div>
     <button class="go" id="goBtn" type="button">Accendi e parti</button>
     <small>Il viaggio si salva in questo browser. Dal menu (Tab) ci sono anche le modalità libere: città libera e montagna.</small>
   </div>
 </div>
 
+<script src="img/nottolino/nottolino.js"></script>
 <script src="dsp.js"></script>
 <script src="sim.js"></script>
 <script src="tuning.js"></script>
@@ -1622,7 +1625,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const gt = $('gate');
     if (gt && !gt.hidden) {                    // alla schermata iniziale Invio o Spazio iniziano, gli altri tasti non fanno niente
-      if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); $('goBtn').click(); }
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (!e.repeat) {
+          if (window.titleIgnition) window.titleIgnition.start();
+          else $('goBtn').click();
+        }
+      }
       return;
     }
     if (rp.on && !e.repeat) { stopReplay(); return; }
@@ -3551,9 +3560,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   }
 
   // ---------------------------------------------------------------- avvio
-  // schermata iniziale: titolo e menu; il pulsante dà il primo tocco che i browser vogliono per l'audio
+  // Chiave, tastiera e pulsante di riserva usano lo stesso avvio, durante il gesto che sblocca l'audio.
   function hideGate() { const g = $('gate'); g.classList.add('out'); setTimeout(() => { g.hidden = true; }, 700); }
-  $('goBtn').addEventListener('click', () => {
+  const goBtn = $('goBtn');
+  goBtn.addEventListener('click', () => {
+    if ($('gate').hidden || $('gate').classList.contains('out')) return;
     ensureAudio(); hideGate(); setTimeout(() => $('btnIgn').focus(), 50);
     const startRadio = () => { if (radio && !radio.on) { radio.setMaster(S.vol / 100, S.muted); radio.start(audio.ctx); renderRadio(false); } };
     // all'inizio di un Viaggio nuovo c'è prima il prologo (lettera, E36, notaio, scelta dell'auto, autostrada); la radio parte dopo
@@ -3573,6 +3584,13 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       else prologo();
     } else setTimeout(startRadio, 700);
   });
+  if (typeof window.createRacingIgnition === 'function') {
+    window.titleIgnition = window.createRacingIgnition($('titleIgnition'), () => {
+      if (window.NightTitolo) NightTitolo.avviamento();
+      goBtn.click();
+    });
+    goBtn.hidden = true;
+  }
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver((es) => { const r = es[es.length - 1].contentRect; cvVis = r.width > 0 && r.height > 0 ? 1 : 0; if (Math.abs(cv.clientWidth - W) > 1) layout(); }).observe(cv);
   if (game.mode === 'career') for (const k of Object.keys(S.tune)) if (!game.owns(k, S.tune[k])) S.tune[k] = TUNING[k].items[0].id;

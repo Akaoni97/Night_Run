@@ -9,7 +9,7 @@
 //  CSS (fatta dalla scheda video: non ridisegna niente, non può scattare). Si ridisegna solo se cambia la finestra.
 //  Sopra: il logo nuovo (NIGHT RUN · THE LAST HIGHWAY) e il pannello (i tre salvataggi di salvataggi.js, il pulsante
 //  che dice «Continua il viaggio» se la partita è già cominciata, i comandi, Crediti). Stessi id di prima (#gate,
-//  #introMenu, #goBtn): index.html e gli altri file non cambiano. La scena si ferma quando la schermata si chiude.
+//  #introMenu, #titleIgnition). La scena si ferma quando la schermata si chiude.
 //  Prova: NightTitolo.foto() ridisegna il quadro.
 //  v0.121 (chiesta da Nico: «lavorare tanto sulla schermata iniziale»): la scena ora vive, ma sempre con animazioni CSS fatte dalla
 //  scheda video (nessun ridisegno: lo scatto della v0.103 non torna). Sopra il quadro fermo c'è uno strato (`.nt-scena`, grande come la
@@ -29,7 +29,7 @@
 
   // ------------------------------------------------------------ la tela e la presentazione (come il gioco)
   const cv = document.createElement('canvas'); cv.className = 'nt-bg'; cv.setAttribute('aria-hidden', 'true');
-  const push = document.createElement('div'); push.className = 'nt-push'; push.setAttribute('aria-hidden', 'true');       // la spinta in avanti di «Accendi e parti»
+  const push = document.createElement('div'); push.className = 'nt-push'; push.setAttribute('aria-hidden', 'true');       // la spinta in avanti all’avviamento
   const cam = document.createElement('div'); cam.className = 'nt-cam';                                                      // la telecamera lenta (zoom CSS)
   const scena = document.createElement('div'); scena.className = 'nt-scena';                                                // gli strati animati, in scala con la scena
   cam.append(cv, scena); push.appendChild(cam); gate.insertBefore(push, gate.firstChild);
@@ -331,38 +331,8 @@
 .nt-pop h3{margin:0 0 8px;font:400 15px/1 "Saira Stencil One",Impact,sans-serif;letter-spacing:.08em;color:#ffb347}
 .nt-pop p{margin:0 0 10px;font:500 13px/1.45 "Barlow Semi Condensed",system-ui,sans-serif;color:#e0d8c8}
 .gate.nt .nt-pop .keys{display:flex!important;flex-wrap:wrap;gap:6px 12px;margin:0}
-/* il blocchetto d'accensione: pannello «ACCENSIONE» in metallo spazzolato, spie, quadrante con la chiave vista da sopra, stato e barra */
-.gate.nt .go.nt-sw{all:unset;box-sizing:border-box;position:relative;display:grid;gap:8px;width:100%;padding:12px 14px 12px;border-radius:14px;background:linear-gradient(#1d1f27,#0e0f15);box-shadow:inset 0 0 0 1px #2c2f3a,inset 0 1px 0 rgba(255,255,255,.06),0 14px 30px rgba(0,0,0,.62);cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent;user-select:none}
-.gate.nt .go.nt-sw:active{cursor:grabbing}
-.gate.nt .go.nt-sw::after,.gate.nt .go.nt-sw::before{display:none!important;animation:none!important}
-.gate.nt .go.nt-sw:focus-visible{box-shadow:inset 0 0 0 1px #ffb347,0 0 18px rgba(255,170,60,.35),0 14px 30px rgba(0,0,0,.62)}
-.nt-ph{display:flex;align-items:center;justify-content:space-between}
-.nt-ph b{font:600 10px/1 "Share Tech Mono",monospace;letter-spacing:.2em;color:#cfc8b6}
-.nt-svg{width:100%;height:auto;display:block;overflow:visible}
-.nt-svg .nt-k,.nt-svg .nt-ad{transform-origin:170px 116px;transform:rotate(var(--g,-59deg))}
-.nt-svg .nt-k{filter:drop-shadow(2px 4px 3px rgba(0,0,0,.7))}
-.gate.nt .nt-sw.nt-molla .nt-k,.gate.nt .nt-sw.nt-molla .nt-ad{transition:transform .38s cubic-bezier(.3,1.6,.5,1)}
-.nt-svg .nt-tk{fill:#bdb6a4;font:600 13px "Barlow Semi Condensed",system-ui,sans-serif;letter-spacing:.04em;transition:fill .2s}
-.nt-sw:not([data-fase]) .nt-tk.lock,.nt-sw[data-fase=""] .nt-tk.lock,.nt-sw[data-fase="acc"] .nt-tk.acc,.nt-sw[data-fase="on"] .nt-tk.on,.nt-sw[data-fase="start"] .nt-tk.start{fill:#ffc674}
-.nt-svg .nt-ad circle{fill:#ffb347;filter:drop-shadow(0 0 4px #ff9a2a)}
-.nt-spie{display:flex;gap:6px}
-.nt-spie i{display:inline-flex;align-items:center;gap:5px;font:400 9px/1 "Share Tech Mono",monospace;letter-spacing:.08em;padding:5px 7px;border-radius:5px;background:#12131a;color:#666a78;box-shadow:inset 0 0 0 1px #262833;font-style:normal;transition:color .15s,background .15s,box-shadow .15s}
-.nt-spie i::before{content:"";width:4px;height:4px;border-radius:50%;background:#3a3d4a;transition:background .15s,box-shadow .15s}
-.nt-sw.nt-acceso .nt-spie i.b{color:#ff7a6a;background:#2a0f0c;box-shadow:inset 0 0 0 1px #6a2018}.nt-sw.nt-acceso .nt-spie i.b::before{background:#ff4a3a;box-shadow:0 0 6px #ff4a3a}
-.nt-sw.nt-acceso .nt-spie i.o,.nt-sw.nt-acceso .nt-spie i.m{color:#ffcf7a;background:#2a1d08;box-shadow:inset 0 0 0 1px #6a4a14}.nt-sw.nt-acceso .nt-spie i.o::before,.nt-sw.nt-acceso .nt-spie i.m::before{background:#ffb12a;box-shadow:0 0 6px #ffb12a}
-.nt-pf{display:flex;align-items:center;justify-content:space-between;padding:0 2px}
-.nt-pt{display:flex;align-items:center;gap:8px;font:400 10px/1 "Share Tech Mono",monospace;letter-spacing:.14em;color:#b9b2a0}
-.nt-pt em{font-style:normal}
-.nt-pt u{width:5px;height:5px;border-radius:50%;background:#ffb347;box-shadow:0 0 6px rgba(255,170,60,.7)}
-.nt-sg{display:flex;gap:2px}.nt-sg s{width:4px;height:11px;background:#2c2e38;transition:background .12s}.nt-sg s.l{background:#ffb347;box-shadow:0 0 5px rgba(255,170,60,.6)}
-.nt-sw.nt-tremo .nt-svg{animation:ntTremo .07s linear infinite}
-@keyframes ntTremo{0%{transform:translate(.8px,-.5px)}50%{transform:translate(-.8px,.6px)}100%{transform:translate(.6px,.4px)}}
-.nt-lab{margin-top:2px;font:600 11px/1.2 "Share Tech Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#a8936a;text-align:center;white-space:nowrap;min-height:14px;font-size:10px;letter-spacing:.1em}
-.nt-stato{font:400 17px/1.1 "Saira Stencil One","Russo One",Impact,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#ffb347;text-align:center;text-shadow:0 0 14px rgba(255,170,60,.45)}
-.nt-sw.nt-prova .nt-lab{color:#ff9a6a}
-.gate.nt.nt-avvio .nt-cr .nr-slots,.gate.nt.nt-avvio .nt-pie,.gate.nt.nt-avvio .nt-lab,.gate.nt.nt-avvio .nt-stato{opacity:0;transition:opacity .5s}
-@media (max-width:900px){.gate.nt .intro-menu{right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}}
-@media (max-height:700px) and (min-width:900px){.gate.nt .go.nt-sw{width:300px;justify-self:center}}
+.gate.nt.nt-avvio .nt-cr .nr-slots,.gate.nt.nt-avvio .nt-pie{opacity:0;transition:opacity .5s}
+@media (max-width:900px){.gate.nt .intro-menu{left:auto;right:50%;transform:translateX(50%);bottom:10px;width:min(96vw,440px)}}
 /* girare la chiave: il pannello scende e sparisce, il logo si accende */
 .gate.nt .intro-menu{transition:opacity .45s,transform .45s}
 .gate.nt.nt-avvio .intro-menu{pointer-events:none}
@@ -391,10 +361,6 @@
 .gate.nt .nr-slot{padding:10px 6px 5px!important;font-size:10px}
 .gate.nt .nr-slot b{font-size:10.5px;letter-spacing:.02em;white-space:nowrap}
 .gate.nt .nr-slot .ed{display:none}
-.gate.nt .go.nt-sw{padding:7px 9px;gap:3px;border-radius:11px}
-.gate.nt .nt-spie{display:none}
-.gate.nt .nt-lab{display:none}
-.gate.nt .nt-stato{font-size:13px}
 .gate.nt .nt-pie{gap:10px}
 .gate.nt .intro-title{display:grid!important;left:max(14px,env(safe-area-inset-left));top:10px}
 .gate.nt .intro-title .t1{font-size:clamp(26px,9vh,46px)}
@@ -408,7 +374,6 @@
   function pannello() {
     const G = window.nightRun && window.nightRun.game, s = G && G.s, vg = s && s.vg, iniziata = !!(vg && vg.prologo);
     gate.classList.toggle('nt-nuova', !iniziata);
-    if (stato) stato.textContent = iniziata ? 'Continua il viaggio' : 'Accendi e parti';
     if (iniziata) {
       const C = typeof CARS !== 'undefined' && CARS[G.car], km = Math.max(0, (s.dist || 0) / 1000);
       cont.innerHTML = `Riparti da dove eri: <b>${C ? C.name : G.car}</b>, km <b>${km.toLocaleString('it-IT', { maximumFractionDigits: 1 })}</b>, in tasca <b>€ ${Math.round(s.money || 0).toLocaleString('it-IT')}</b>.`;
@@ -503,40 +468,11 @@
 
   // ------------------------------------------------------------ il cruscotto: il blocchetto d'accensione e i portachiavi
   const goBtn = document.getElementById('goBtn');
-  // il blocchetto d'accensione: ghiera cromata, targa scura con le posizioni (LOCK, ACC, ON, START), chiave con la testa in gomma nera e l'anima in ottone
-  const A_LOCK = -59, A_ACC = -18, A_ON = 22, A_START = 65;
-  const SVG = (() => {
-    const CX = 170, CY = 116, P = (a, r) => [(CX + Math.sin(a * Math.PI / 180) * r).toFixed(1), (CY - Math.cos(a * Math.PI / 180) * r).toFixed(1)];
-    const R = 78, [x0, y0] = P(A_LOCK, R), [x1, y1] = P(A_START, R);
-    let tk = ''; for (const a of [A_ACC, A_ON, A_START]) { const [p, q] = P(a, R - 3), [u, v] = P(a, R + 7); tk += `<path d="M${p} ${q}L${u} ${v}" stroke="#9a9484" stroke-width="1.6" stroke-linecap="round"/>`; }
-    let lb = ''; for (const [cl, a, t, an, r] of [['lock', A_LOCK, 'LOCK', 'end', 98], ['acc', A_ACC, 'ACC', 'middle', 96], ['on', A_ON, 'ON', 'middle', 96], ['start', A_START, 'START', 'start', 98]]) { const [x, y] = P(a, r); lb += `<text class="nt-tk ${cl}" x="${x}" y="${(+y + 4).toFixed(1)}" text-anchor="${an}">${t}</text>`; }
-    let sc = ''; for (const [x, y] of [[16, 16], [324, 16], [16, 198], [324, 198]]) sc += `<circle cx="${x}" cy="${y}" r="5.5" fill="url(#ntSc)" stroke="#0a0b0f"/><path d="M${x - 3.2} ${y + 1.5}L${x + 3.2} ${y - 1.5}" stroke="#14151b" stroke-width="1.4"/>`;
-    let rg = ''; for (let i = 0; i < 9; i++) rg += `<path d="M${(CX - 17).toFixed(1)} ${(CY - 41 + i * 4.4).toFixed(1)}h34" stroke="rgba(255,255,255,.34)" stroke-width="1.5"/><path d="M${(CX - 17).toFixed(1)} ${(CY - 39.5 + i * 4.4).toFixed(1)}h34" stroke="rgba(0,0,0,.45)" stroke-width="1"/>`;
-    return `<svg class="nt-svg" viewBox="0 0 340 214" aria-hidden="true"><defs>
-    <linearGradient id="ntPl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23252d"/><stop offset="1" stop-color="#14151b"/></linearGradient>
-    <pattern id="ntBr" width="6" height="2" patternUnits="userSpaceOnUse"><rect width="6" height="1" fill="rgba(255,255,255,.035)"/><rect y="1" width="6" height="1" fill="rgba(0,0,0,.08)"/></pattern>
-    <radialGradient id="ntSc" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#6a6d78"/><stop offset="1" stop-color="#2a2c34"/></radialGradient>
-    <linearGradient id="ntRi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8c909e"/><stop offset=".35" stop-color="#2c2e38"/><stop offset=".7" stop-color="#1a1b22"/><stop offset="1" stop-color="#7d818f"/></linearGradient>
-    <radialGradient id="ntKn" cx="40%" cy="32%" r="80%"><stop offset="0" stop-color="#1b1c23"/><stop offset=".7" stop-color="#0c0d11"/><stop offset="1" stop-color="#050609"/></radialGradient>
-    <linearGradient id="ntKe" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b5b9c6"/><stop offset=".3" stop-color="#5f6372"/><stop offset=".6" stop-color="#2a2c36"/><stop offset="1" stop-color="#8d91a0"/></linearGradient>
-    <radialGradient id="ntCe" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#e6e9f1"/><stop offset=".5" stop-color="#8a8fa0"/><stop offset="1" stop-color="#3a3d4a"/></radialGradient></defs>
-    <rect x=".5" y=".5" width="339" height="213" rx="10" fill="url(#ntPl)" stroke="#2c2f3a"/><rect x=".5" y=".5" width="339" height="213" rx="10" fill="url(#ntBr)"/><rect x="7" y="7" width="326" height="200" rx="7" fill="none" stroke="rgba(255,255,255,.08)"/>${sc}
-    <path d="M${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1"/>${tk}${lb}
-    <circle cx="${CX}" cy="${CY}" r="64" fill="#07080b" stroke="url(#ntRi)" stroke-width="4"/><circle cx="${CX}" cy="${CY}" r="58" fill="url(#ntKn)" stroke="rgba(255,255,255,.08)"/><circle cx="${CX}" cy="${CY}" r="52" fill="none" stroke="rgba(255,255,255,.05)"/>
-    <g class="nt-ad"><circle cx="${CX}" cy="${CY - R}" r="4"/></g>
-    <g class="nt-k"><rect x="${CX - 20}" y="${CY - 47}" width="40" height="94" rx="20" fill="url(#ntKe)" stroke="#07080b" stroke-width="2"/><rect x="${CX - 16}" y="${CY - 43}" width="32" height="86" rx="16" fill="#1c1d25" stroke="rgba(255,255,255,.12)"/>${rg}
-      <circle cx="${CX}" cy="${CY + 14}" r="12" fill="url(#ntCe)" stroke="#12131a" stroke-width="1.5"/><rect x="${CX - 3}" y="${CY + 5}" width="6" height="18" rx="2" fill="#0c0d12"/></g></svg>`;
-  })();
-  let lab = null, stato = null, sw = null, ptx = null, segs = [];
   function cruscotto() {
-    if (!goBtn || goBtn.classList.contains('nt-sw')) return;
-    goBtn.classList.add('nt-sw'); sw = goBtn; goBtn.setAttribute('aria-label', 'Accendi e parti: tieni premuto per girare la chiave');
-    goBtn.innerHTML = '<span class="nt-ph"><b>ACCENSIONE</b><span class="nt-spie" aria-hidden="true"><i class="b">BAT</i><i class="o">OLIO</i><i class="m">MOT</i></span></span>' + SVG + '<span class="nt-pf"><span class="nt-pt"><u></u><em>QUADRO SPENTO</em></span><span class="nt-sg">' + '<s></s>'.repeat(10) + '</span></span><span class="nt-lab">Tieni premuto: gira la chiave</span><span class="nt-stato"></span>';
-    ptx = goBtn.querySelector('.nt-pt em'); segs = [...goBtn.querySelectorAll('.nt-sg s')]; chiaveA(A_LOCK);
-    lab = goBtn.querySelector('.nt-lab'); stato = goBtn.querySelector('.nt-stato');
+    if (!goBtn) return;
     const cr = document.createElement('div'); cr.className = 'nt-cr';
     const slots = menu.querySelector('.nr-slots'); if (slots) cr.appendChild(slots);
-    cr.appendChild(goBtn);
+    cr.append(document.getElementById('titleIgnition'), goBtn);
     const pie = document.createElement('div'); pie.className = 'nt-pie';
     const aiuto = document.createElement('button'); aiuto.type = 'button'; aiuto.className = 'nt-aiuto'; aiuto.textContent = 'Come si gioca';
     const pop = document.createElement('div'); pop.className = 'nt-pop';
@@ -581,19 +517,18 @@
       fetta();
     } catch (e) { rendendo = false; SUONO = null; }
   }
-  // riproduzione: parte quando il motorino comincia a girare (tenendo premuta la chiave); fermabile
-  let AC = null, SRC = null, GAIN = null;
-  function suona(da) {
+  // Riproduzione all’avvio della partita, con un avviamento semplice finché il motore reso non è pronto.
+  let AC = null;
+  function suona() {
     try {
       const Ctor = window.AudioContext || window.webkitAudioContext; if (!Ctor) return;
       AC = AC || new Ctor(); if (AC.state === 'suspended') AC.resume();
       if (SUONO) {
         const b = AC.createBuffer(2, SUONO.L.length, SUONO.sr); b.copyToChannel(SUONO.L, 0); b.copyToChannel(SUONO.R, 1);
-        SRC = AC.createBufferSource(); SRC.buffer = b; GAIN = AC.createGain(); GAIN.gain.value = 1; SRC.connect(GAIN); GAIN.connect(AC.destination); SRC.start(0, da || 0);
+        const src = AC.createBufferSource(); src.buffer = b; src.connect(AC.destination); src.start();
       } else semplice(AC);                                        // il motore vero non è pronto: un avviamento semplice
     } catch (e) { /* senza audio si parte lo stesso */ }
   }
-  function ferma() { try { if (GAIN && AC) { GAIN.gain.setTargetAtTime(0, AC.currentTime, 0.04); const s = SRC; setTimeout(() => { try { s.stop(); } catch (e) { /* già fermo */ } }, 220); } } catch (e) { /* niente */ } SRC = GAIN = null; }
   function semplice(ac) {                                         // riserva: motorino a scatti e un minimo semplice
     const t0 = ac.currentTime + 0.03, out = ac.createGain(); out.gain.value = 0.5; out.connect(ac.destination);
     const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 480; lp.connect(out);
@@ -604,67 +539,10 @@
     eg.gain.setValueAtTime(0, t0 + 0.85); eg.gain.linearRampToValueAtTime(0.7, t0 + 1.0); eg.gain.linearRampToValueAtTime(0, t0 + 2.4); e.connect(eg); eg.connect(lp); e.start(t0 + 0.85); e.stop(t0 + 2.5);
   }
 
-  // ------------------------------------------------------------ girare la chiave: si tiene premuto
-  // 0 → 0,38 s: la chiave va su ACC e ON, si accendono le spie; 0,38 → 1,33 s: START, il motorino gira (se la molli prima il motore non prende e la chiave torna indietro);
-  // al 1,33 s il motore prende, le spie si spengono, la chiave resta su ON, la scena spinge in avanti e dopo ~1,1 s parte il gioco.
-  const T_ACC = 380, T_START = 1330;
-  let tenuta = null, via = false;
-  const angolo = (ms) => ms < T_ACC ? A_LOCK + (A_ON - A_LOCK) * (ms / T_ACC) : A_ON + (A_START - A_ON) * Math.min(1, (ms - T_ACC) / (T_START - T_ACC));
-  const FASE_TXT = { '': 'QUADRO SPENTO', acc: 'ACCESSORI', on: 'QUADRO ACCESO', start: 'AVVIAMENTO IN CORSO' };
-  function fase(f) { if (!sw) return; sw.dataset.fase = f; if (ptx) ptx.textContent = FASE_TXT[f] || ''; }
-  function chiaveA(deg) { if (!sw) return; sw.style.setProperty('--g', deg.toFixed(1) + 'deg'); const n = Math.max(0, Math.min(10, Math.round((deg - A_LOCK) / (A_START - A_LOCK) * 10))); segs.forEach((e, i) => e.classList.toggle('l', i < n)); }
-  function giraTieni(da) {
-    if (via || tenuta) return;
-    rendiMotore();
-    const t0 = performance.now(); tenuta = { t0, suono: false, raf: 0 };
-    sw.classList.remove('nt-molla', 'nt-prova'); if (lab) lab.textContent = 'Tieni premuto…';
-    const passo = () => {
-      if (!tenuta) return; const ms = performance.now() - t0;
-      chiaveA(angolo(ms) + (ms > T_ACC ? Math.sin(ms * 0.09) * 1.6 : 0));
-      if (ms > 120 && !sw.classList.contains('nt-acceso')) { sw.classList.add('nt-acceso'); fase('acc'); }
-      if (ms >= T_ACC && !tenuta.suono) { tenuta.suono = true; fase('start'); sw.classList.add('nt-tremo'); suona(0); }
-      if (ms >= T_START) { accendi(); return; }
-      tenuta.raf = requestAnimationFrame(passo);
-    };
-    tenuta.raf = requestAnimationFrame(passo);
+  function avviamento() {
+    gate.classList.add('nt-avvio');
+    suona();
   }
-  function rilascia() {
-    if (!tenuta || via) return;
-    const ms = performance.now() - tenuta.t0; cancelAnimationFrame(tenuta.raf);
-    if (ms < T_ACC) { tenuta.suono = false; tenuta = null; accendiDaSolo(); return; }                  // un clic (non una pressione lunga): gira da sola fino in fondo
-    tenuta = null; ferma(); sw.classList.remove('nt-tremo', 'nt-acceso'); sw.classList.add('nt-molla', 'nt-prova'); chiaveA(A_LOCK); fase('');
-    if (lab) lab.textContent = 'Ancora un po’: tieni premuto';
-  }
-  // un clic: la chiave gira da sola (stessi tempi, senza tenerla)
-  function accendiDaSolo() {
-    if (via) return; rendiMotore(); const t0 = performance.now(); tenuta = { t0, suono: false, raf: 0, auto: true };
-    sw.classList.remove('nt-molla', 'nt-prova'); sw.classList.add('nt-acceso'); fase('acc'); if (lab) lab.textContent = 'Gira la chiave…';
-    const passo = () => {
-      if (!tenuta) return; const ms = performance.now() - t0;
-      chiaveA(angolo(ms) + (ms > T_ACC ? Math.sin(ms * 0.09) * 1.6 : 0));
-      if (ms >= T_ACC && !tenuta.suono) { tenuta.suono = true; fase('start'); sw.classList.add('nt-tremo'); suona(0); }
-      if (ms >= T_START) { accendi(); return; }
-      tenuta.raf = requestAnimationFrame(passo);
-    };
-    tenuta.raf = requestAnimationFrame(passo);
-  }
-  function accendi() {
-    via = true; tenuta = null; sw.classList.remove('nt-tremo', 'nt-molla'); sw.classList.remove('nt-acceso'); sw.classList.add('nt-molla'); chiaveA(A_ON); fase('on'); if (ptx) ptx.textContent = 'MOTORE ACCESO';
-    gate.classList.add('nt-avvio'); if (lab) lab.textContent = '';
-    setTimeout(() => { window.__ntVia = true; goBtn.click(); }, 1150);
-  }
-  if (goBtn) {
-    goBtn.addEventListener('pointerdown', (e) => { if (!e.isTrusted || e.button > 0 || window.__ntVia) return; e.preventDefault(); try { goBtn.setPointerCapture(e.pointerId); } catch (er) { /* niente */ } giraTieni(); });
-    goBtn.addEventListener('pointerup', (e) => { if (e.isTrusted) rilascia(); });
-    goBtn.addEventListener('pointercancel', () => rilascia());
-    goBtn.addEventListener('click', (e) => { if (window.__ntVia || !e.isTrusted || gate.hidden) return; e.preventDefault(); e.stopImmediatePropagation(); }, true);   // i clic veri li gestisce la chiave; le prove automatiche partono subito
-  }
-  window.addEventListener('keydown', (e) => {
-    if (window.__ntVia || !e.isTrusted || gate.hidden || (e.key !== 'Enter' && e.key !== ' ')) return;
-    if (e.metaKey || e.ctrlKey || e.altKey || (e.target.closest && e.target.closest('input, textarea'))) return;
-    e.preventDefault(); e.stopImmediatePropagation(); if (!e.repeat) giraTieni();
-  }, true);
-  window.addEventListener('keyup', (e) => { if (!window.__ntVia && !gate.hidden && (e.key === 'Enter' || e.key === ' ') && tenuta && !tenuta.auto) { e.preventDefault(); e.stopImmediatePropagation(); rilascia(); } }, true);
 
   function avvia() {
     cruscotto(); pannello(); setTimeout(rendiMotore, 1800);
@@ -673,5 +551,8 @@
   if (document.readyState === 'complete') setTimeout(avvia, 0); else window.addEventListener('load', avvia);
 
   // per le prove: ridisegna il quadro subito
-  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, accendi: accendiDaSolo };
+  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, avviamento, accendi: () => {
+    if (window.titleIgnition) window.titleIgnition.start();
+    else if (goBtn) goBtn.click();
+  } };
 })();
