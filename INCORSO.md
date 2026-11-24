@@ -10,3 +10,4 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
+| cognato (Claude) | Suono di turbo, cambiate e aspirazione (non scarichi né collettori) | `dsp.js` (parti turbo, valvola, aspirazione, cambiata), `campioni.js`, `strumenti/campioni_pezzi.py`, `audio/campioni/` | 24/11 15:00 |
