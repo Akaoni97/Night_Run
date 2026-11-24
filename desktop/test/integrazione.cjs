@@ -41,7 +41,7 @@ async function chiudi() {
 }
 const leggi = () => JSON.parse(fs.readFileSync(FILE, 'utf8'));
 async function parti() {
-  await page.click('#goBtn');
+  await page.locator('#titleIgnition button').press('Enter');
   await page.waitForTimeout(700);
   await page.evaluate(() => document.querySelector('.pged .pg-go')?.click());
   await page.waitForTimeout(700);
