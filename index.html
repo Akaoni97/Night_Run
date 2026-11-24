@@ -2038,7 +2038,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         ctx.fillText(lit ? fmt(Math.round(disp.kmh)) : '', g.x, g.y + R * 0.59);
         ctx.fillStyle = lit ? COL.muted : '#2b2f35';
         ctx.font = `500 ${Math.round(R * 0.07)}px ${FM}`;
-        ctx.fillText(lit ? 'ODO ' + fmt(sim.odo, 1) : '', g.x, g.y + R * 0.83);
+        if (cl0?.hud && typeof HudPro !== 'undefined') {
+          ctx.fillText('KM AUTO', g.x, g.y + R * 0.73);
+          HudPro.odometer(ctx, g.x, g.y + R * 0.84, R * 0.62, R * 0.14, game.odo, cl0, lit);
+        } else ctx.fillText(lit ? 'ODO ' + fmt(game.odo, 1) : '', g.x, g.y + R * 0.83);
         drawNeedle(g, disp.kmh, lit);
       } else {
         lcd(g.x, g.y + R * 0.58, R * 0.62, R * 0.3, R);
@@ -3076,7 +3079,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const red = cl.varRed ? (sim.oilT < 50 ? 4.5 : sim.oilT < 65 ? 5.5 : sim.oilT < 78 ? 6.5 : cl.red) : cl.red;
     const L = sim.fuel * sim.P.tank;
     return { lit, kmh: Math.abs(sim.v) * 3.6, rpm, red, gear: gearLabel(true), over, shiftNow: inZone && blink, lights,
-      odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
+      odoValue: game.odo, tripValue: trip, odo: fmt(game.odo, 1) + ' km', tripName: game.s.vg ? 'VIAGGIO' : 'PARZIALE', trip: fmt(trip, 1) + ' km',
       range: c.range !== null ? fmt(c.range, 0) + ' km' : '—', cons: c.per100 !== null ? fmt(c.per100, 1) + ' L/100' : '—',
       fuel: sim.fuel, liters: fmt(L, 1) + ' L', tyres: T.p.map((p) => p * heat), waterT: sim.waterT, pods,
       warn: [['TRC', '#ffb000', sim.tcAct], ['ABS', '#ffb000', sim.abs], ['LIMIT', '#ff3a24', lit && sim.cut === 2], [sim.flatCut ? '3-STEP' : '2-STEP', '#2ee6ff', lit && sim.cut === 3]],

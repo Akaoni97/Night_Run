@@ -232,6 +232,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra
   (corsia 1 = la più vicina = in basso); inquadratura vicina da fermi che si allarga con la velocità.
+  Da v0.140, V40, Supra ed E30 hanno geometrie dedicate nel quadro in strada; i km dell’auto restano distinti dal viaggio.
 - **Nico e il motore**: il vecchio banco dei motori di Nico (cartella `pistone/`: livelli, magazzino, banco di lavoro, motori
   costruiti a pezzi) è stato **cancellato il 21/11 sera** su decisione di Luca (il cognato); se servisse, è nella storia di git
   (commit prima della v0.74). Da Luca resta l'officina semplice (`officina.js`), che ne ha preso il peso del motore per lo swap

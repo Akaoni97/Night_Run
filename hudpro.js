@@ -1,8 +1,7 @@
 // ============================================================================
 //  Night Run · cruscotto in gioco "Originale" in alta definizione (non a pixel)
-//  Tachimetro e contagiri nello stile del quadro vero di ogni auto (CLUSTERS in cars.js), con benzina e acqua
-//  dentro i quadranti come sulle auto vere; al centro il display: marcia, km, parziale, autonomia, consumo medio,
-//  pressione delle gomme; sotto gli strumenti tuning scelti dal pilota (turbo, olio, acqua, pressione olio, volt, AFR).
+//  Strumenti ispirati ai quadri delle singole auto (CLUSTERS in cars.js).
+//  Le lancette e la telemetria cambiano in tempo reale sulle cornici in cache.
 // ============================================================================
 const HUD_PODS = {
   boost: { name: 'Turbo', unit: 'bar', min: -1, max: 2, red: 1.6, fmt: (v) => (v >= 0 ? '+' : '') + v.toFixed(2) },
@@ -14,7 +13,15 @@ const HUD_PODS = {
 };
 const HUD_PODS_DEFAULT = ['boost', 'oilT', 'waterT', 'oilP'];
 
+// Geometria indipendente dalle scale: le lancette usano sempre i dati di CLUSTERS e della simulazione.
+const HUD_ORIGINALS = {
+  v40: { model: 'V40 · 2.0 16V', speed: [130, 112, 77], tach: [321, 112, 65], aux: 467, odo: [130, 162, 78], radius: 15, shell: ['#303c3c', '#0a1316'] },
+  supra: { model: 'SUPRA · 2JZ-GTE', speed: [119, 118, 64], tach: [286, 110, 80], aux: 440, odo: [119, 162, 72], radius: 27, shell: ['#333239', '#100b09'] },
+  e30: { model: 'E30 · S14 2.3', speed: [129, 113, 73], tach: [298, 113, 73], aux: 464, odo: [129, 162, 84], radius: 8, shell: ['#342821', '#100a07'] },
+};
+
 const HudPro = {
+  plates: new Map(),
   cache: new Map(),
   // quadrante fisso (in cache): cornice, scala, numeri, zona rossa, scritte
   face(kind, cl, R, red, max, dpr) {
@@ -32,7 +39,7 @@ const HudPro = {
     // zona rossa
     if (red) { g.beginPath(); g.arc(0, 0, R * 0.9, A(red), A(max)); g.lineWidth = R * 0.07; g.strokeStyle = '#e8281e'; g.stroke(); }
     // tacche e numeri
-    const major = kind === 'tach' ? 1000 : max <= 200 ? 20 : 20, label = kind === 'tach' ? 1000 : max <= 200 ? 20 : 40;
+    const major = kind === 'tach' ? 1000 : 20, label = kind === 'tach' ? 1000 : max <= 200 ? 20 : 40;
     g.shadowColor = cl.glow; g.shadowBlur = R * 0.06;
     for (let v = 0; v <= max + 1e-6; v += major / 2) {
       const a = A(v), maj = Math.abs(v / major - Math.round(v / major)) < 1e-6, r0 = R * (maj ? 0.8 : 0.86);
@@ -45,11 +52,17 @@ const HudPro = {
     }
     g.shadowBlur = 0;
     g.fillStyle = cl.num; g.globalAlpha = 0.8; g.textAlign = 'center';
-    g.font = `700 ${Math.round(R * 0.11)}px ${cl.font}`; g.fillText(kind === 'tach' ? cl.brand : cl.brand.split(' ')[0], 0, -R * 0.36);
-    g.font = `500 ${Math.round(R * 0.075)}px ${cl.font}`; g.fillText(kind === 'tach' ? '× 1000 r/min' : 'km/h', 0, -R * 0.22);
+    if (!cl.hud) {
+      g.font = `700 ${Math.round(R * 0.11)}px ${cl.font}`;
+      g.fillText(kind === 'tach' ? cl.brand : cl.brand.split(' ')[0], 0, -R * 0.36);
+    }
+    g.font = `500 ${Math.round(R * (cl.hud ? 0.095 : 0.075))}px ${cl.font}`;
+    g.fillText(kind === 'tach' ? '× 1000 r/min' : 'km/h', 0, -R * 0.22);
     g.globalAlpha = 1;
     if (kind === 'tach' && cl.m) [['#5bc0ff', -1], ['#1a3d9a', 0], ['#e8281e', 1]].forEach(([col, k]) => { g.fillStyle = col; g.fillRect(k * R * 0.08 - R * 0.035, -R * 0.13, R * 0.07, R * 0.03); });
-    this.cache.set(key, c); return c;
+    this.cache.set(key, c);
+    if (this.cache.size > 96) this.cache.delete(this.cache.keys().next().value);
+    return c;
   },
   needle(g, cx, cy, R, frac, col, glow) {
     const a = Math.PI * 0.75 + Math.PI * 1.5 * Math.max(0, Math.min(1.02, frac));
@@ -97,9 +110,156 @@ const HudPro = {
     else if (id === 'benzina') { g.strokeRect(-0.8 * r, -0.75 * r, 1 * r, 1.55 * r); g.fillRect(-0.65 * r, -0.6 * r, 0.7 * r, 0.4 * r); P([[0.2, -0.3], [0.65, -0.3], [0.65, 0.5], [0.9, 0.5], [0.9, -0.5], [0.6, -0.8]]); g.stroke(); }
     g.restore();
   },
+  // La cornice, i quadranti e le targhette stanno su una sola tela riutilizzata.
+  originalPlate(cl, spec, W, H, red, dpr) {
+    const key = [cl.hud, W, H, red, dpr].join('|');
+    const cached = this.plates.get(key); if (cached) return cached;
+    const c = document.createElement('canvas');
+    c.width = Math.ceil(W * dpr); c.height = Math.ceil(H * dpr);
+    const g = c.getContext('2d'); g.scale(dpr, dpr);
+    const box = (x, y, w, h, radius, fill, edge) => {
+      g.beginPath(); g.roundRect(x, y, w, h, radius);
+      g.fillStyle = fill; g.fill();
+      if (edge) { g.strokeStyle = edge; g.lineWidth = 1; g.stroke(); }
+    };
+    const shell = g.createLinearGradient(0, 10, 0, H);
+    shell.addColorStop(0, spec.shell[0]); shell.addColorStop(.2, '#181c20'); shell.addColorStop(1, spec.shell[1]);
+    box(1, 15, W - 2, H - 17, spec.radius, shell, cl.bez[0]);
+    box(8, 26, W - 16, 170, spec.radius * .55, '#080a0d', '#ffffff15');
+
+    if (cl.hud === 'v40') {
+      box(17, 36, W - 34, 150, 5, '#152020', '#283a35');
+      box(29, 41, 373, 143, 5, '#0b1012');
+      box(411, 41, 109, 143, 4, '#0b1414', '#41605775');
+    } else if (cl.hud === 'supra') {
+      for (const [x, y, r] of [spec.speed, spec.tach, [spec.aux, 105, 64]]) {
+        g.beginPath(); g.arc(x, y, r + 8, 0, Math.PI * 2);
+        g.fillStyle = '#121318'; g.fill(); g.strokeStyle = '#665344'; g.stroke();
+      }
+    } else {
+      box(19, 35, 521, 151, 5, '#201712', '#65503e');
+      box(25, 41, 509, 139, 3, '#110e0c');
+      for (const x of [29, 531]) {
+        g.beginPath(); g.arc(x, 47, 2.4, 0, Math.PI * 2); g.fillStyle = '#817466'; g.fill();
+        g.fillStyle = '#23201d'; g.fillRect(x - 2, 46.5, 4, 1);
+      }
+    }
+
+    for (const [kind, dial, max, startRed] of [['speed', spec.speed, cl.speed, 0], ['tach', spec.tach, cl.tach * 1000, red]]) {
+      const [x, y, r] = dial, size = r * 2 + 12;
+      g.drawImage(this.face(kind, cl, r, startRed, max, dpr), x - r - 6, y - r - 6, size, size);
+    }
+    const ink = cl.num;
+    g.font = '700 12px "Barlow Semi Condensed", sans-serif'; g.fillStyle = ink; g.textBaseline = 'middle';
+    g.textAlign = 'left'; g.fillText(cl.brand, 23, 23);
+    g.font = '600 10px "Share Tech Mono", monospace';
+    g.textAlign = 'right'; g.fillText(spec.model, W - 23, 23);
+    g.textAlign = 'center';
+    box(spec.aux - 40, 53, 80, 116, 7, '#101216', '#ffffff21');
+    g.fillStyle = '#ffffff20'; g.fillRect(spec.aux - 31, 108, 62, 1);
+    g.fillStyle = ink; g.fillText('BENZINA', spec.aux, 72); g.fillText('ACQUA', spec.aux, 124);
+
+    // I numeri rimangono leggibili sul pannello anche con gli strumenti tuning visibili.
+    box(20, 201, 128, 30, 3, '#08090b', '#ffffff1f');
+    box(W - 160, 201, 140, 30, 3, '#08090b', '#ffffff1f');
+    g.textAlign = 'left'; g.fillStyle = ink; g.fillText('MARCIA', W - 153, 209);
+    g.font = '600 9px "Barlow Semi Condensed", sans-serif';
+    g.fillText('AUTONOMIA', 26, 209); g.fillText('MEDIA', 26, 223);
+    g.textAlign = 'center'; g.fillText('GOMME · bar', W - 65, 207);
+    for (let i = 0; i < 5; i++) {
+      const x = W / 2 - 38 + i * 19;
+      g.beginPath(); g.arc(x, 14, 5, 0, Math.PI * 2); g.fillStyle = '#111317'; g.fill();
+      g.strokeStyle = '#ffffff28'; g.stroke();
+    }
+    const [x, y] = spec.odo;
+    g.font = '600 8px "Barlow Semi Condensed", sans-serif';
+    g.textAlign = 'center'; g.fillStyle = ink; g.fillText('KM AUTO', x, y - 11);
+    this.plates.set(key, c);
+    if (this.plates.size > 24) this.plates.delete(this.plates.keys().next().value);
+    return c;
+  },
+  // Il display varia per epoca: numeri a rulli sulla E30, display integrato per Volvo e Toyota.
+  odometer(g, x, y, w, h, km, cl, lit, decimal = false) {
+    const mechanical = cl.hud === 'e30';
+    const value = Number.isFinite(km) ? Math.max(0, km) : 0;
+    const n = decimal ? Math.floor(value * 10 + 1e-7) : Math.floor(value);
+    const label = decimal ? Math.floor(n / 10) + ',' + n % 10 : String(n);
+    g.save(); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = mechanical ? '#302820' : cl.hud === 'v40' ? '#101e18' : '#1c130d';
+    g.fillRect(x - w / 2, y - h / 2, w, h);
+    g.strokeStyle = mechanical ? '#79624b' : cl.hud === 'v40' ? '#426052' : '#6c4930';
+    g.lineWidth = Math.max(.65, h / 17); g.strokeRect(x - w / 2, y - h / 2, w, h);
+    g.font = (mechanical ? '700 ' : '600 ') + Math.round(h * .89) + 'px "Share Tech Mono", monospace';
+    if (mechanical) {
+      const digits = label.padStart(6, '0');
+      const cell = (w - 4) / digits.length, left = x - w / 2 + 2;
+      g.fillStyle = lit ? '#493528' : '#26211c'; g.fillRect(left, y - h / 2 + 1, w - 4, h - 2);
+      g.beginPath();
+      for (let i = 1; i < digits.length; i++) { g.moveTo(left + cell * i, y - h / 2 + 1); g.lineTo(left + cell * i, y + h / 2 - 1); }
+      g.strokeStyle = '#171411'; g.lineWidth = Math.max(.7, h / 16); g.stroke();
+      g.fillStyle = lit ? '#ffe3b7' : '#a29787';
+      if (cell < h * .48) g.font = '700 ' + Math.floor(cell * 1.85) + 'px "Share Tech Mono", monospace';
+      for (let i = 0; i < digits.length; i++) g.fillText(digits[i], left + cell * (i + .5), y + h * .06);
+    } else if (lit) {
+      g.fillStyle = cl.lcd; g.fillText(label, x, y + h * .06, w - 5);
+    }
+    g.restore();
+  },
+  originalDraw(g, W, H, d, cl, dpr) {
+    const spec = HUD_ORIGINALS[cl.hud], lit = d.lit;
+    g.drawImage(this.originalPlate(cl, spec, W, H, d.red * 1000, dpr), 0, 0, W, H);
+    this.needle(g, ...spec.speed, d.kmh / cl.speed, lit ? cl.needle : '#5a2a14', cl.glow);
+    this.needle(g, ...spec.tach, d.rpm / (cl.tach * 1000), lit ? cl.needle : '#5a2a14', cl.glow);
+    this.subArc(g, spec.aux, 80, 27, lit ? d.fuel : 0, cl, 'E', 'F', lit && d.fuel < .12);
+    this.subArc(g, spec.aux, 132, 27, lit ? (d.waterT - 40) / 90 : 0, cl, 'C', 'H', lit && d.waterT > 108);
+    const [x, y, w] = spec.odo;
+    this.odometer(g, x, y, w, 15, d.odoValue, cl, lit);
+    this.odometer(g, x, y + 18, w, 13, d.tripValue, cl, lit, true);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '600 9px "Barlow Semi Condensed", sans-serif';
+    g.fillStyle = cl.num; g.fillText(d.tripName, x, y + 30);
+    g.font = '700 16px "Share Tech Mono", monospace';
+    g.fillStyle = d.shiftNow ? '#b8ff3a' : d.over ? '#ff3a24' : lit ? cl.lcd : '#747479'; g.fillText(d.gear, W - 133, 222);
+    const valueColor = lit ? cl.lcd : '#747479';
+    g.font = '600 10px "Share Tech Mono", monospace'; g.fillStyle = valueColor;
+    g.fillText(d.liters, spec.aux, 59);
+    g.textAlign = 'right'; g.fillText(d.range, 142, 209); g.fillText(d.cons, 142, 223);
+    g.textAlign = 'center';
+    d.tyres.forEach((p, i) => {
+      g.fillStyle = !lit ? valueColor : p < 1 ? '#ff3a24' : p < 1.9 ? '#ffb000' : valueColor;
+      g.fillText(p.toFixed(1), W - (i % 2 ? 43 : 87), i < 2 ? 217 : 226);
+    });
+    d.lights.forEach((on, i) => {
+      if (!on) return;
+      g.beginPath(); g.arc(W / 2 - 38 + i * 19, 14, 4, 0, Math.PI * 2);
+      g.fillStyle = on; g.fill();
+    });
+    this.status(g, W, H, d, cl, W - 156, 132, 185, 10);
+  },
+  // Valori di guida e spie condivisi con gli altri quadri.
+  status(g, W, H, d, cl, start, width, y, inset = 0) {
+    const lit = d.lit, pods = d.pods, pr = 23, n = pods.length;
+    pods.forEach((p, i) => { const P = HUD_PODS[p.id]; if (!P) return; this.pod(g, W / 2 - inset + (i - (n - 1) / 2) * (pr * 2 + 10), H - pr - 10, pr, P, p.v, cl, lit && p.on !== false); });
+    const blink = Math.floor(performance.now() / 300) % 2;
+    if (d.spie) {
+      const n = d.spie.length, step = Math.min(19, width / n), s0 = start + (width - step * n) / 2;
+      d.spie.forEach((sp, i) => {
+        const on = sp.on && (!sp.blink || blink), x = s0 + i * step + step / 2;
+        this.spia(g, sp.id, x, y, Math.min(8.5, step * 0.42), on ? sp.col : 'rgba(255,255,255,.07)', on);
+      });
+    }
+    g.font = '700 11px "Barlow Semi Condensed", sans-serif'; g.textAlign = 'left'; g.textBaseline = 'middle';
+    let wx = cl.hud ? 151 : 14;
+    for (const [txt, c2, on] of d.warn) {
+      if (!on) continue;
+      if (c2 === '#ff3a24' && !blink) { wx += 44; continue; }
+      g.fillStyle = c2; g.fillText(txt, wx, cl.hud ? 25 : 30); wx += 44;
+    }
+  },
   // disegna tutto il cruscotto su un canvas logico W×H (già scalato per il DPR)
   draw(g, W, H, d, cl, dpr) {
     g.clearRect(0, 0, W, H);
+    if (HUD_ORIGINALS[cl.hud]) { this.originalDraw(g, W, H, d, cl, dpr); return; }
     const lit = d.lit;
     // palpebra del cruscotto
     const pg = g.createLinearGradient(0, 0, 0, H); pg.addColorStop(0, 'rgba(10,10,12,.86)'); pg.addColorStop(1, 'rgba(4,4,6,.94)');
@@ -145,20 +305,7 @@ const HudPro = {
       g.fillText(p.toFixed(1), x, y + 9);
     });
     g.font = `500 8px "Barlow Semi Condensed", sans-serif`; g.fillStyle = dim; g.fillText('GOMME · bar', px, py - 4);
-    // strumenti tuning
-    const pods = d.pods, pr = 23, n = pods.length;
-    pods.forEach((p, i) => { const P = HUD_PODS[p.id]; if (!P) return; this.pod(g, W / 2 + (i - (n - 1) / 2) * (pr * 2 + 10), H - pr - 10, pr, P, p.v, cl, lit && p.on !== false); });
-    // spie dello stato dell'auto: una fila sotto il display centrale, spente al buio, accese nel loro colore
-    const blink = Math.floor(performance.now() / 300) % 2;
-    if (d.spie) {
-      const n = d.spie.length, step = Math.min(19, cw / n), s0 = cx0 + (cw - step * n) / 2;
-      d.spie.forEach((sp, i) => {
-        const on = sp.on && (!sp.blink || blink), x = s0 + i * step + step / 2, y = cy0 + 106 + 16;
-        this.spia(g, sp.id, x, y, Math.min(8.5, step * 0.42), on ? sp.col : 'rgba(255,255,255,.07)', on);
-      });
-    }
-    g.font = `700 11px "Barlow Semi Condensed", sans-serif`; g.textAlign = 'left';
-    let wx = 14; for (const [txt, c2, on] of d.warn) { if (!on) continue; if (c2 === '#ff3a24' && !blink) { wx += 44; continue; } g.fillStyle = c2; g.fillText(txt, wx, 30); wx += 44; }
+    this.status(g, W, H, d, cl, cx0, cw, cy0 + 122);
   },
 };
 if (typeof window !== 'undefined') Object.assign(window, { HudPro, HUD_PODS, HUD_PODS_DEFAULT });

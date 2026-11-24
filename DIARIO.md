@@ -1,3 +1,7 @@
+## 24/11/2026 · proprietario (Nico) · v0.140 (**quadri originali di V40, Supra ed E30**)
+- Tre quadri in **Originale dell’auto**: Volvo con display verde e strumenti a destra, Supra con contagiri centrale, BMW con scala ambra e contachilometri a rulli. Le cornici e i quadranti fissi sono memorizzati in cache.
+- Il totale dei chilometri legge il salvataggio della singola auto anche nel quadro grande; il contatore del viaggio continua a mostrare la distanza della partita.
+
 ## 24/11/2026 · proprietario (Nico) · v0.139 (**scritte sulla strada: tre interruttori**)
 - Impostazioni → Grafica → **Scritte sulla strada** (riquadro nuovo, `menu.js`): **Scritte da fumetto** (gli sticker che escono dalla marmitta, urti, frenate e il lampo PERFETTA!; è il vecchio «Grafiche anime», `S.anime`), **Versi del pilota** (le vignette «VRAAAAM!» sopra la testa e la faccia stupita, `S.reazioni` → `street2d.reaOn` in `reazioni.js`; prima si spegnevano insieme ai fumetti: chi li aveva spenti li trova ancora spenti), **Pensieri** (tutti / solo la storia / spenti, `S.pensieri` → `game.pensMode` in `pensieri.js`).
 - «Solo la storia» tiene i pensieri della trama (capitali, eventi strani, Jeshka, la notte: `vgThink(testo, true)`). Con «spenti» gli eventi strani che erano un pensiero escono nel riquadro della domanda, e le frasi di Jeshka e dello specchietto come avviso: la storia non si perde. Test nuovo in `test/pensieri.test.js` (410).
