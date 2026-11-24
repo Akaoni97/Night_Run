@@ -94,8 +94,9 @@ const STATO = () => {
       // come il giocatore fermo davanti alla porta: 2 m prima della tappa più vicina, senza accosto automatico
       await page.evaluate(() => { const g = nightRun.game, n = Math.round((g.s.dist - VG_STOP0) / VG_STEP); g.s.dist = VG.stopX(n) - 2; g.sim.v = 0; });
       await page.waitForTimeout(300);
-      await page.evaluate((w) => { const g = nightRun.game; if (g.inside) return true; const q = g.nearPlace(); if (q && q.ok !== false) g.enterPlace(q.twin ? NightPiazza.sub(q, +w || 0) : q); return true; }, a);   // piazzetta: entra:1 il secondo negozio
-      await page.waitForFunction(() => { const I = nightRun.game.inside; return !I || I.phase === 'shop'; }, null, { timeout: 15000 }).catch(() => {});   // manovra, camminata e buio (entrata2d.js)
+      await page.evaluate((w) => { const g = nightRun.game; if (g.inside && g.inside.phase !== 'out') return true; const q = g.nearPlace(); if (q && q.ok !== false) g.enterPlace(q.twin ? NightPiazza.sub(q, +w || 0) : q); return true; }, a);   // piazzetta: entra:1 il secondo negozio
+      // aspetta di essere dentro davvero: subito dopo l'entrata `inside` non c'è ancora (prima l'auto si ferma), e «niente locale» passava per fatto
+      await page.waitForFunction(() => { const g = nightRun.game, I = g.inside; return (I && I.phase === 'shop') || (!I && !g.ap); }, null, { timeout: 15000 }).catch(() => {});   // manovra, camminata e buio (entrata2d.js)
       await page.waitForTimeout(900);
       const dentro = await page.evaluate(() => { const g = nightRun.game; return g.inside ? g.inside.id : null; });
       log(dentro ? 'entrato: ' + dentro : 'entra: nessun locale vicino');
@@ -114,6 +115,8 @@ const STATO = () => {
       log(`comandi di disegno a fotogramma: ${r.tot} (tetto ${tetto}) ${JSON.stringify(r.o)}`);
       if (r.tot > tetto) errs.push(`troppi comandi di disegno: ${r.tot} a fotogramma (tetto ${tetto}). Qualcosa disegna pixel per pixel a ogni fotogramma: va fatto una volta e copiato, o raggruppato in una figura sola`);
     } else if (k === 'esci') { await page.evaluate(() => nightRun.game.exitPlace()); await page.waitForTimeout(2000);
+      // aspetta che sia finita anche la camminata di uscita (entrata2d.js): prima il passo dopo vedeva ancora il locale di prima
+      await page.waitForFunction(() => !nightRun.game.inside, null, { timeout: 15000 }).catch(async () => log('esci: ancora dentro dopo 15 s', await page.evaluate(() => { const g = nightRun.game, I = g.inside; return JSON.stringify({ id: I && I.id, fase: I && I.phase, t: I && +I.t.toFixed(1), domanda: g.prompt && g.prompt.title, pausa: !!window.__nrPausaM, menu: !!(window.gameMenu && window.gameMenu.isOpen) }); })));
     } else if (k === 'soldi') { await page.evaluate((m) => { nightRun.game.s.money = m; }, +a);
     } else if (k === 'tel') {
       if (!a) await page.keyboard.press('Digit0');

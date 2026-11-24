@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**24/11 sera, check (Luca con Claude)**: nuovi il 32 (cambio gomma e pulsante bagagliaio), il 33 (Luca Tuning coi rulli dal vivo), il 34 (quadro in alto a sinistra), il 35 (forature: ogni quanto). Gli altri numeri invariati.
+
 **23/11 notte (Luca)**: approvati e tolti 1, 2, 3, 4, 8, 9, 12, 17, 19, 23; il 25 fatto come chiesto (vignette a versi, v0.126). Nuovo il 26 (schermata iniziale al telefono, staccata dal 19). Gli altri numeri non cambiano.
 
 **23/11 sera, check (Luca con Claude)**: il 19 cambia (ora è la schermata iniziale con la chiave, col problema del telefono); nuovi il 24 (capitali da guardare) e il 25 (fiamme, marmitta, nuvolette, vapore). Nessun altro numero è cambiato.
@@ -27,6 +29,11 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
 ### Bagagliaio e gomme
 32. [gomme] **Cambio gomma animato e pulsante BAGAGLIAIO** (v0.161, `cambiogomma.js`): da provare sul PC il ritmo (~15 s, U accelera), se si capisce che è in ginocchio, e se in corsia di destra il traffico da dietro si comporta bene con l'auto ferma. (cognato)
+
+### Luca Tuning e quadro
+33. [officina] **Luca Tuning dal vivo** (v0.147-v0.160): rulli dentro il negozio, gas libero mentre monti i pezzi, numeri solo sullo schermo del banco, fiamme anche in officina. Visto nel check (foto): lo schermo del banco si legge. Da provare sul PC sgasando con un kit di fiamme. (cognato)
+34. [interfaccia] **Quadro e pulsanti in alto a sinistra** (v0.155): visto nel check su 1280×720, non copre la strada. Da guardare su una finestra stretta del PC (si rimpicciolisce fino a 0,6). (tutti e due)
+35. [gomme] **Forature: ogni quanto?** (v0.149-v0.152): una lenta ogni 15-20 km e uno scoppio ogni 37-50 km. Coi 4 tamponamenti in 94 km del 22 rischia di essere troppo: da decidere giocando. (tutti e due)
 
 ### Notte e storia
 5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
@@ -85,6 +92,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 24/11 sera, check (Luca con Claude): 437 test verdi, prova di fumo verde in tutti gli 11 locali, nessun errore in console; foto di strada, Luca e Nico al computer e al telefono. **Sistemata la prova di fumo**: «entra» non aspettava l'entrata vera (subito dopo il clic il locale non esiste ancora) ed «esci» non aspettava la camminata, così alcune tappe risultavano «ok» senza entrarci (`strumenti/prova.js`). Il gioco era a posto.
+- 24/11 (v0.161, Luca): pulsante BAGAGLIAIO e cambio gomma animato.
 - 24/11 (v0.138, Nico): schermata iniziale al telefono sistemata (sospeso 26 chiuso), auto e sfondo più belli; paesaggi fuori città da 3.100-6.700 a 830-1.900 comandi a fotogramma; controllo dei comandi nella prova di fumo.
 - 24/11 (v0.131-v0.137, Nico e Luca): prestazioni in tre giri; **sul PC di Nico 58-60 fps** (erano 11-24). Il 27 è chiuso.
 - 23/11 notte (Luca): approvati suoni per auto e campioni, fisica vera, rimborso di Nico, schede, voci delle schede, aspetto dei personaggi, auto e camion nuovi, schermata iniziale, proposta delle capitali. Vignette a versi (v0.126).
