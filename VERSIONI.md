@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.147**
+**Versione attuale: v0.148**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -171,3 +171,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.145 · 24/11/2026 · cognato · **progetto impennata in prova**: fisica del muso che si alza (sim.js, solo trazione posteriore), barre di reazione/4-link e wheelie bar in officina, grafica, interruttore in Sviluppatori (spento di serie), banco `strumenti/impennata.js`: su strada solo la R5 ci arriva vicino
 - v0.146 · 24/11/2026 · cognato · testi delle chat riscritti in italiano più naturale (stessa trama, stessi bivi; 908 nodi in `chat_modifiche.js`), gatto di Elena Fufi al posto di Pasta, ritocchi agli epiloghi e ai sottotitoli delle incursioni
 - v0.147 · 24/11/2026 · cognato · **rulli dal vivo da Luca Tuning**: «Attiva rulli» mette l'auto sui rulli davanti al negozio con una barra del gas in basso; i pezzi si montano col motore in tiro e si sentono subito, fiamme e marmitta vere sulla macchina
+- v0.148 · 24/11/2026 · cognato · **da Luca Tuning il gas è libero**: appena entrato si sgasa (fermo, freno tirato, marcia in folle che torna uscendo) e i pezzi montati si sentono subito; il banco a rulli torna in fondo al pannello e apre la schermata grande

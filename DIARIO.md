@@ -1,3 +1,7 @@
+## 24/11/2026 · cognato · v0.148 (**da Luca Tuning il gas è libero**)
+- Richiesta di Luca: nel negozio di Luca Tuning, appena entrato, l'acceleratore funziona come in strada. L'auto resta ferma col freno tirato, al primo colpo di gas la marcia va in folle (si rimette uscendo) e il motore sale di giri: monti un pezzo e lo senti subito. Col cambio automatico si avvia anche con la leva in D. (`game.control`, `game.gasMarcia`, `levaApply`/`startOn` in `index.html`.) Solo da Luca: negli altri locali il gas resta fermo.
+- Il banco a rulli torna com'era: in fondo al pannello, «Sali sui rulli» apre la schermata grande (la barra in basso resta come opzione, pulsante «Barra»). Test in `test/banco.test.js` (422).
+
 ## 24/11/2026 · cognato · v0.147 (**rulli dal vivo da Luca Tuning**)
 - Da Luca Tuning, in cima al pannello, **Attiva rulli**: la macchina va sui rulli davanti al negozio (si vede la strada al posto della scena dell'interno, con pedana e rulli sotto le ruote) e in basso c'è la barra del banco: avvia, marce, gas a cursore o tasti 0-9 / ↑ ↓, freno, giri, CV, Nm. Il pannello dell'officina resta aperto: **monti un pezzo col motore in tiro e lo senti subito**; fiamme, kit e marmitta rovente sono quelli veri. «Curve» apre il banco grande di prima con la curva di potenza. (`banco.js`, `street2d.js`, `interni.js` `hide`, `game.canMount`; test in `test/banco.test.js`, 421.)
 - Aperto: provarlo sul PC col suono; sul telefono in verticale la barra è stretta (il gioco chiede comunque di girarlo).

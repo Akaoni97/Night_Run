@@ -677,7 +677,15 @@ class StreetGame {
           if ((this.sim.gear > 1 || this.sim.gear === -1) && this.sim.cfg.autoClutch) this.sim.shift(1);
           if (ap.onStop) ap.onStop();
         }
-      } else { out.brake = 1; ap.t += dt; if (ap.tick) ap.tick(dt); }
+      } else {
+        out.brake = 1; ap.t += dt; if (ap.tick) ap.tick(dt);
+        // da Luca Tuning il gas resta tuo (v0.148): fermo col freno tirato, si sgasa in folle mentre si montano i pezzi e si sentono subito.
+        // Al primo colpo di gas la marcia va in folle (si rimette uscendo, in update)
+        if (this.inShop() && !this.rulli && inp.thr > 0.02) {
+          if (this.sim.gear !== 0 && !this.sim.shiftSeq) { this.gasMarcia = this.sim.gear; this.sim.shift(0); }
+          if (this.sim.gear === 0) out.thr = inp.thr;
+        }
+      }
     }
     return out;
   }
@@ -685,6 +693,7 @@ class StreetGame {
   update(dt) {
     const sim = this.sim, d0 = this.s.dist;
     if (dt > 0) { this.meAcc = this.meV === undefined ? 0 : (sim.v - this.meV) / dt; this.meV = sim.v; }
+    if (this.gasMarcia && !this.inShop() && !this.rulli) { if (sim.gear === 0) sim.shift(this.gasMarcia); this.gasMarcia = 0; }   // uscendo da Luca: la marcia di prima
     if (this.rulli) { /* sui rulli del banco prova (banco.js): le ruote girano ma l'auto resta ferma nel negozio */ }
     else if (sim.v > 0) this.s.dist += sim.v * dt;
     else if (sim.v < 0) {                  // retromarcia: si torna indietro di poco, l'autostrada resta a senso unico

@@ -39,3 +39,17 @@ test('rulli dal vivo: sui rulli i pezzi si montano anche con le ruote che girano
   game.rulli = true; assert.equal(game.canMount(), true, 'sui rulli sì');
   game.rulli = false; sim.v = 0; assert.equal(game.canMount(), true, 'da fermo sì');
 });
+
+test('da Luca Tuning il gas è libero: fermo col freno, la marcia va in folle e torna uscendo', () => {
+  const s2 = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+  const E = new Function(s2 + ';return { SupraSim, StreetGame };')();
+  const sim = new E.SupraSim(), game = new E.StreetGame(sim, () => 0.5);
+  sim.cfg.autoClutch = true; sim.gear = 1; sim.clutch = 1;
+  game.inside = { id: 'shop', phase: 'shop', t: 0 }; game.ap = { stopped: true, t: 0 };
+  let o; for (let i = 0; i < 120; i++) { o = game.control({ thr: 1, brake: 0 }, 1 / 60); sim.in.thr = o.thr; sim.in.brake = o.brake; sim.update(1 / 60); }
+  assert.equal(o.thr, 1, 'il gas passa'); assert.equal(o.brake, 1, 'il freno resta tirato'); assert.equal(sim.gear, 0, 'in folle');
+  const o2 = (game.inside.id = 'bar', game.control({ thr: 1, brake: 0 }, 0.016));
+  assert.equal(o2.thr, 0, 'negli altri locali il gas no');
+  game.inside = null; game.ap = null; game.update(0.016); for (let i = 0; i < 120; i++) sim.update(1 / 60);
+  assert.equal(sim.gear, 1, 'uscendo torna la marcia di prima');
+});

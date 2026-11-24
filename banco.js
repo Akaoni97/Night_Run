@@ -108,7 +108,7 @@ function bancoSim(sim, carId) {
   </div>`;
   document.body.appendChild(box);
 
-  let dock = true, posT = 0;
+  let dock = false, posT = 0;
   // rulli dal vivo: la barra sta sotto la parte di schermo lasciata libera dal pannello del negozio
   // (a sinistra sul computer, sopra il pannello sul telefono)
   function piazza() {
@@ -132,7 +132,7 @@ function bancoSim(sim, carId) {
     d = n.sim; n.game.rulli = true; aria = { cd: d.P.cd, cl: d.P.cl }; d.P.cd = 0; d.P.cl = 0;
     const b = B(); b.on = true; b.thr = 0; b.brake = 0;
     n.game.rulliVista = true; if (window.NightInterni && NightInterni.hide) NightInterni.hide(true);
-    back = document.activeElement; box.hidden = false; curva = []; prima = null; regOn = false; setGas(0); brk = false; modo(true);
+    back = document.activeElement; box.hidden = false; curva = []; prima = null; regOn = false; setGas(0); brk = false; modo(false);
     last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); $('bcClose').focus();
   }
   // scendendo: gas a zero e freno finché le ruote non si fermano, poi la strada torna a scorrere
@@ -270,7 +270,7 @@ function bancoSim(sim, carId) {
     if (box.hidden) return;
     e.stopImmediatePropagation();
     const k = e.key;
-    if (k === 'Escape') { e.preventDefault(); if (!dock) modo(true); else close(); return; }
+    if (k === 'Escape') { e.preventDefault(); close(); return; }
     if (e.target && e.target.tagName === 'INPUT' && (k === 'ArrowLeft' || k === 'ArrowRight')) return;   // il cursore si muove da sé
     if (/^[0-9]$/.test(k)) { e.preventDefault(); setGas(+k * 10 + (k === '0' && gasCmd >= 90 ? 100 : 0)); return; }
     if (k === 'ArrowUp' || k === 'w' || k === 'W') { e.preventDefault(); setGas(gasCmd + 5); return; }
@@ -285,8 +285,8 @@ function bancoSim(sim, carId) {
   // la sezione nel pannello del negozio
   function panel(body) {
     const sec = document.createElement('div'); sec.className = 'bc-panel';
-    sec.innerHTML = '<h4 style="margin:12px 0 4px">Banco prova a rulli</h4><p class="hint" style="margin:0 0 8px">Luca: «Mettila sui rulli: dai gas e monta i pezzi mentre gira, li senti subito.» Avvia (Invio), gas col cursore o coi tasti 0-9 / ↑ ↓, marce E e Q. Le fiamme le vedi sulla macchina a sinistra. «Curve» apre la curva di potenza.</p>';
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Attiva rulli'; b.addEventListener('click', () => { if (NR() && NR().game && NR().game.rulli) { modo(true); return; } open(); });
+    sec.innerHTML = '<h4 style="margin:12px 0 4px">Banco prova a rulli</h4><p class="hint" style="margin:0 0 8px">Luca: «Sali sui rulli e vediamo quanti cavalli ci sono davvero, prima e dopo i pezzi.» Anche senza rulli, qui il gas è tuo: sgasa mentre monti i pezzi e li senti subito.</p>';
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Sali sui rulli'; b.addEventListener('click', () => { if (NR() && NR().game && NR().game.rulli) { modo(false); return; } open(); });
     sec.appendChild(b); body.appendChild(sec); return sec;
   }
   window.NightBanco = { open, close, panel, modo, get dock() { return dock; }, on: false, thr: 0, brake: 0, get sim() { return d; }, get curva() { return curva; }, get prima() { return prima; }, setGas, engine, shift };
