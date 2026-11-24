@@ -24,6 +24,20 @@ description: Regole per disegnare in pixel art nel 2D di Night Run (Street2D) - 
   `Math.random` solo per cose che si muovono e non devono restare uguali (scintille).
 - Animazioni con il tempo `t` passato al disegno, non con contatori di fotogrammi.
 
+## Prestazioni: i 60 fps (regola dal 24/11/2026, v0.137-v0.138)
+La scheda video paga **ogni comando**, anche un rettangolo di un pixel: 6.000 `fillRect` a fotogramma bastavano a stare
+sotto i 60 fps, anche se i pixel erano pochi. Quindi:
+- **Niente forme disegnate a righe o a pixel a ogni fotogramma con un `fillRect` per riga.** Una forma di un colore è una
+  figura sola: `g.beginPath(); ... g.rect(x, y, w, h); ... g.fill();`. Più colori insieme: `this.batch(g, (r) => { r(colore, x, y, w, h); })`
+  (un comando per colore). `this.span`, `this.ridge` e `this.text` lo fanno già.
+- Quello che non cambia (palazzi, insegne, monumenti, sprite): si disegna **una volta** in una tela e poi si copia con
+  `drawImage` (tessere in cache, `this.sprite(...)`, `tileOf` di `nitido2d.js`).
+- Niente tele nuove (`document.createElement('canvas')`) né cambi di misura (`c.width = ...`) a ogni fotogramma: si tengono.
+- Niente `getImageData` a ogni fotogramma su una tela che sta sulla scheda video (se proprio serve: tela con `willReadFrequently: true`).
+- Trasparenze che si sovrappongono (due linee che si incrociano) vanno in due figure diverse, se l'incrocio deve restare più chiaro.
+- Controllo: `node strumenti/prova.js km:69 comandi:2600` conta i comandi a fotogramma; la prova di fumo fallisce sopra 2.600.
+  Per trovare chi li fa: `node strumenti/misura_fps.js --sonda` e il conteggio per riga descritto in `DIARIO.md` (v0.137).
+
 ## Auto
 - Solo dai disegni del proprietario (`img/<id>.png`, `_wheel.png`, `_paint.png`). **Mai inventare un veicolo**:
   se serve un camion e non c'è, si chiede lo zip.
