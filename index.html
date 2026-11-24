@@ -808,6 +808,7 @@ html.tdash .tpan-dati .hud-tag { max-width: none; width: auto; }
 .gm-logo { padding: 4px 10px 10px; font: 400 30px/1 var(--f-display); font-style: italic; letter-spacing: .03em; text-transform: uppercase; color: #fff; text-shadow: 0 0 18px color-mix(in srgb, var(--acc) 60%, transparent), 2px 2px 0 #241d30; border-bottom: 1px solid rgba(255,255,255,.07); }
 .gm-logo em { color: var(--acc); font-style: italic; transition: color .25s; }
 .gm-logo small { display: block; margin-top: 6px; font: 500 11px/1 var(--f-data); letter-spacing: .3em; color: var(--muted); font-style: normal; text-shadow: none; }
+.gm-px, .gm-mark { display: none; }
 .gm-tabs { display: grid; align-content: start; gap: 4px; overflow-y: auto; scrollbar-width: none; min-height: 0; }
 .gm-tabs button { --tc: #ffb347; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; align-items: center; text-align: left; border: 0; padding: 9px 10px; border-radius: 10px; background: transparent; color: var(--fg); position: relative; transition: background .15s, transform .15s; }
 .gm-tabs button[hidden] { display: none; }
@@ -1442,16 +1443,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   // leggere (un attimo più un tanto per lettera); in fila al massimo tre, senza doppioni
   let msgT = 0, msgShown = 0; const msgQ = [];
   const msgRead = (t) => 1.2 + t.length * 0.035;
+  const TOAST_LABEL = { police: 'Polizia', lose: 'Perdita', bad: 'Attenzione', money: 'Contanti', buy: 'Acquisto', job: 'Lavoro', fuel: 'Carburante', tip: 'Guida' };
   const toastQ = [], TOAST_PRI = { police: 3, lose: 3, bad: 3, money: 2 }; let toastGap = 0;
-  function showMsg(text, sec) { const m = $('msg'); m.textContent = text; m.classList.add('show'); msgT = sec; msgShown = 0; }
-  function flash(text, sec = 2.2) {
+  function showMsg(text, sec, kind) {
+    const m = $('msg'); m.textContent = text; m.dataset.kind = kind; m.classList.add('show'); msgT = sec; msgShown = 0;
+  }
+  function flash(text, sec = 2.2, kind = 'info') {
     const m = $('msg');
     if (msgT > 0 && m.textContent === text) { msgT = Math.max(msgT, sec); return; }
     if (msgT > 0 && msgShown < Math.min(msgRead(m.textContent), msgT + msgShown)) {
-      if (!msgQ.some((q) => q.text === text)) { msgQ.push({ text, sec }); if (msgQ.length > 3) msgQ.shift(); }
+      if (!msgQ.some((q) => q.text === text)) { msgQ.push({ text, sec, kind }); if (msgQ.length > 3) msgQ.shift(); }
       return;
     }
-    showMsg(text, sec);
+    showMsg(text, sec, kind);
   }
 
   // ---------------------------------------------------------------- impostazioni
@@ -3302,8 +3306,11 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const gt0 = document.getElementById('gate'), sulTitolo = (gt0 && !gt0.hidden && !gt0.classList.contains('out')) || (window.NightPrologo && NightPrologo.playing);   // sul titolo e nel prologo gli avvisi aspettano
       if (toastQ.length && toastGap <= 0 && box.children.length < 2 && !sulTitolo) {
         const m = toastQ.shift(), t = document.createElement('div'); t.className = 'toast ' + m.kind; t.textContent = m.text;
+        if (TOAST_LABEL[m.kind]) t.dataset.label = TOAST_LABEL[m.kind];
+        const life = toastQ.length > 2 ? 3600 : 5200;
+        t.style.setProperty('--toast-life', life + 'ms');
         box.append(t); toastGap = 0.5;
-        setTimeout(() => t.remove(), toastQ.length > 2 ? 3600 : 5200);
+        setTimeout(() => t.remove(), life);
       }
     }
     // sirena bitonale
@@ -3512,7 +3519,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (msgT > 0) {
       msgT -= dt; msgShown += dt;
       if (msgQ.length && msgShown >= msgRead($('msg').textContent)) msgT = 0;   // letto: tocca al prossimo in fila
-      if (msgT <= 0) { if (msgQ.length) { const q = msgQ.shift(); showMsg(q.text, q.sec); } else $('msg').classList.remove('show'); }
+      if (msgT <= 0) { if (msgQ.length) { const q = msgQ.shift(); showMsg(q.text, q.sec, q.kind); } else $('msg').classList.remove('show'); }
     }
     // la scelta del cambio: una volta per Viaggio, al km 0 appena finito il prologo (anche nelle partite già avviate)
     if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
@@ -3642,7 +3649,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     $('meteoSel').value = S.meteo; $('clockSel').value = S.clock;
     try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (e) { /* ignora */ }
   }
-  function cycleMeteo() { ensureAudio(); S.meteo = { auto: 'pioggia', pioggia: 'nebbia', nebbia: 'neve', neve: 'vento', vento: 'sereno', sereno: 'auto' }[S.meteo] || 'auto'; applyMeteo(); flash('Meteo: ' + { auto: 'dinamico', pioggia: 'pioggia', sereno: 'sereno', nebbia: 'nebbia', neve: 'neve', vento: 'vento' }[S.meteo], 1.6); }
+  function cycleMeteo() { ensureAudio(); S.meteo = { auto: 'pioggia', pioggia: 'nebbia', nebbia: 'neve', neve: 'vento', vento: 'sereno', sereno: 'auto' }[S.meteo] || 'auto'; applyMeteo(); flash('Meteo: ' + { auto: 'dinamico', pioggia: 'pioggia', sereno: 'sereno', nebbia: 'nebbia', neve: 'neve', vento: 'vento' }[S.meteo], 1.6, 'weather'); }
   $('meteoSel').addEventListener('change', (e) => { S.meteo = e.target.value; applyMeteo(); });
   $('clockSel').addEventListener('change', (e) => { S.clock = e.target.value; if (FIXED[S.clock]) ATM.hour = FIXED[S.clock]; applyMeteo(); });
   const sm01 = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };

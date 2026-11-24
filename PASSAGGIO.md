@@ -228,6 +228,7 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
   di `index.html` (stessi id), spostati nelle schede all'avvio: se aggiungi un pannello, aggiungilo anche a `TABS`.
   Menu di pausa con sezioni a icone e colori (`ICO`, `TABS` in `menu.js`; stile in fondo allo `<style>` di
   `index.html`, blocco "Menu di pausa"), riassunto della partita (`summary()`).
+- **Street Racing** (v0.141, `premium.css`, `premium.js`, `menu.js`): menu Partita fotografabile col garage in pixel art, auto del salvataggio e obiettivo sopra le statistiche. Icone e colori distinguono avvisi, quartieri e traguardi. Lo stile Classico si trova in Impostazioni → Grafica.
 - **Gallerie** (`galleria2d.js`) dove cambia il paesaggio; **guidatore** visibile nei vetri (`pilota2d.js`).
 - **Schermata**: cruscotto in alta definizione in basso a sinistra (`hudpro.js`) nello stile del quadro di ogni
   auto (`CLUSTERS`), con pulsanti AUTO, TC, LAUNCH, STRUM., FARI, MAPPA; radar delle corsie in alto a destra

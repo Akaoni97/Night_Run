@@ -18,12 +18,11 @@
     garage: '<path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.6 2.6-2.4-.6-.6-2.4z"/>',
     bagagliaio: '<path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9"/>',
     guida: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M3.6 10.5h6.2M14.2 10.5h6.2M12 14.2V20.5"/>',
-    vista: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
     quadro: '<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
     svil: '<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 5l-3 14"/>',
-    extra: '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
     imp: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
   };
+  const PIXEL_TABS = { partita: 'flag', garage: 'wrench', bagagliaio: 'box', guida: 'wheel', quadro: 'gauge', imp: 'settings', svil: 'code' };
   // pezzi della pagina che si spostano: un riquadro col titolo, e il blocco (.field) che contiene un controllo
   const panel = (title, els, cls = '') => { const box = document.createElement('div'); box.className = 'panel ' + cls; const h = document.createElement('h2'); h.textContent = title; box.appendChild(h); for (const el of els) if (el) box.appendChild(el); return box; };
   const fieldOf = (id) => { const el = $(id); return el ? el.closest('.field') || el : null; };
@@ -97,13 +96,15 @@
   menu.setAttribute('role', 'dialog'); menu.setAttribute('aria-modal', 'true'); menu.setAttribute('aria-labelledby', 'gmTitle');
   menu.innerHTML = '<div class="gm-shell"><aside class="gm-rail"><div class="gm-logo">Night <em>Run</em><small>in pausa</small></div><nav class="gm-tabs" role="tablist" aria-label="Sezioni"></nav>'
     + '<button type="button" class="gm-back" id="gmClose"><b>Torna in strada</b><kbd>Tab</kbd><kbd>Esc</kbd></button></aside>'
-    + '<main class="gm-main"><header class="gm-head"><h2 id="gmTitle">Partita</h2><p id="gmSub"></p></header><div class="gm-body"></div></main></div>';
+    + '<main class="gm-main"><header class="gm-head"><h2 id="gmTitle">Partita</h2><p id="gmSub"></p><i class="gm-mark" aria-hidden="true"></i></header><div class="gm-body"></div></main></div>';
   document.body.appendChild(menu);
   const nav = menu.querySelector('.gm-tabs'), body = menu.querySelector('.gm-body'), pages = {};
   for (const [id, title, sub, col, get] of TABS) {
     const els = get().filter(Boolean); if (!els.length) continue;
     const b = document.createElement('button'); b.type = 'button'; b.role = 'tab'; b.dataset.tab = id; b.setAttribute('aria-selected', 'false'); b.style.setProperty('--tc', col);
-    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICO[id] || ''}</svg><span><b>${title}</b><small>${sub}</small></span>`;
+    b.setAttribute('aria-label', title);
+    if (window.NightPremium) b.style.setProperty('--menu-px', NightPremium.url(PIXEL_TABS[id]));
+    b.innerHTML = `<i class="gm-px" aria-hidden="true"></i><svg viewBox="0 0 24 24" aria-hidden="true">${ICO[id] || ''}</svg><span><b>${title}</b><small>${sub}</small></span>`;
     b.addEventListener('click', () => show(id)); nav.appendChild(b);
     const pg = document.createElement('section'); pg.className = 'gm-page'; pg.hidden = true; pg.dataset.tab = id;
     for (const el of els) pg.appendChild(el);
@@ -115,7 +116,9 @@
     if (!pages[id] || pages[id].b.hidden) id = Object.keys(pages)[0];
     last = id;
     for (const k in pages) { const on = k === id; pages[k].pg.hidden = !on; pages[k].b.setAttribute('aria-selected', on ? 'true' : 'false'); }
-    menu.style.setProperty('--acc', pages[id].col); $('gmTitle').textContent = pages[id].title; $('gmSub').textContent = pages[id].sub;
+    menu.style.setProperty('--acc', pages[id].col);
+    if (window.NightPremium) menu.style.setProperty('--menu-px', NightPremium.url(PIXEL_TABS[id]));
+    $('gmTitle').textContent = pages[id].title; $('gmSub').textContent = pages[id].sub;
     if (id === 'partita') summary();
     body.scrollTop = 0;
     window.dispatchEvent(new Event('resize'));          // il quadro grande e i grafici si ridisegnano alla misura nuova
@@ -133,8 +136,8 @@
     el.innerHTML = `<div class="gs-car"><canvas width="10" height="10" aria-hidden="true"></canvas><div><small>${vg ? 'Il Viaggio' : g.mode === 'free' ? 'Città libera' : 'Città'}</small><b>${car.name}</b><span>${car.engine || ''}</span></div></div>`
       + '<div class="gs-stats">' + stat('Contanti', '€ ' + fmt(s.money), 'money') + stat(vg ? 'Km del viaggio' : 'Km', fmt((s.dist || 0) / 1000, 1))
       + (vg ? stat('Lavori fatti', fmt(vg.jobs)) + stat('Guadagnato', '€ ' + fmt(vg.earned)) : '') + '</div>'
-      + (g.statList ? '<div class="gs-nums"><h3>Statistiche</h3>' + g.statList().map((x) => stat(x.nome, x.testo)).join('') + '</div>' : '')
-      + (goal ? `<div class="gs-goal"><small>${goal.title}</small><b>${goal.text}</b><span>${goal.left > 0.05 ? 'tra ' + fmt(goal.left, 1) + ' km · ' : ''}paga € ${fmt(goal.pay)}${goal.note ? ' · ' + goal.note : ''}</span></div>` : '');
+      + (goal ? `<div class="gs-goal"><small>${goal.title}</small><b>${goal.text}</b><span>${goal.left > 0.05 ? 'tra ' + fmt(goal.left, 1) + ' km · ' : ''}paga € ${fmt(goal.pay)}${goal.note ? ' · ' + goal.note : ''}</span></div>` : '')
+      + (g.statList ? '<div class="gs-nums"><h3>Statistiche</h3>' + g.statList().map((x) => stat(x.nome, x.testo)).join('') + '</div>' : '');
     // l'auto: lo stesso disegno della strada, ingrandito a pixel netti
     const cv = el.querySelector('canvas');
     try {

@@ -19,6 +19,8 @@ Prima di vendere il gioco conviene far vedere questa pagina a un avvocato (propr
 | Skill in `.claude/skills/` | Va bene | Apache 2.0 con NOTICE (strumenti di sviluppo, non vanno nel gioco). |
 | Come pubblicarlo (gioco da installare, Steam) | **Piano scritto** | Percorso con Electron, costi ed esempi sulla stabilità: [`docs/pubblicazione/PERCORSO.md`](docs/pubblicazione/PERCORSO.md) (punto 9). |
 
+**Garage del menu (v0.141).** `img/garage-notte.webp` è un'illustrazione originale generata per Night Run con ImageGen e ridotta a 480×160 per il gioco. Raffigura una serranda industriale di notte in pixel art, senza marchi, scritte o asset presi da altri giochi.
+
 ## 1. Il nome del gioco
 Su Steam c'è [*Night Run*](https://store.steampowered.com/app/2496340) di Thousand Ant (in arrivo, con playtest) e su
 Epic Games Store una versione gratuita già uscita: moto ad alta velocità in una città cyberpunk di notte. Stesso

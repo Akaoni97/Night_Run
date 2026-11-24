@@ -1,3 +1,7 @@
+## 24/11/2026 · proprietario (Nico) · v0.141 (**interfaccia Street Racing**)
+- Riquadro Partita con garage notturno e sprite dell’auto, obiettivo prima delle statistiche, navigazione a pixel e barra compatta al tocco. Lo stile si sceglie in Impostazioni → Grafica.
+- Avvisi, domande, quartieri, capitali e traguardi usano pannelli opachi con icone a pixel, titoli leggibili e colori per tipo. Gli avvisi usano la stessa scadenza per la barra visiva e per la coda.
+
 ## 24/11/2026 · proprietario (Nico) · v0.140 (**quadri originali di V40, Supra ed E30**)
 - Tre quadri in **Originale dell’auto**: Volvo con display verde e strumenti a destra, Supra con contagiri centrale, BMW con scala ambra e contachilometri a rulli. Le cornici e i quadranti fissi sono memorizzati in cache.
 - Il totale dei chilometri legge il salvataggio della singola auto anche nel quadro grande; il contatore del viaggio continua a mostrare la distanza della partita.

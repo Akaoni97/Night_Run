@@ -93,8 +93,51 @@ const PREM_EMBLEM = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"
   + '<circle cx="22.4" cy="7.6" r="3.2" fill="url(#o)"/><circle cx="23.9" cy="6.6" r="2.8" fill="#29223f"/>'
   + '<circle cx="8.2" cy="6.2" r=".7" fill="#efc46a" opacity=".8"/><circle cx="12.4" cy="4.4" r=".5" fill="#efc46a" opacity=".6"/></svg>';
 
+// Sprite da 10×10 pixel, con un pixel di margine. # = luce, + = mezzotono.
+const PI_PIXEL = {
+  menu:   '.......... .###..###. .#++..#+#. .###..###. .......... .###..###. .#+#..++#. .###..###. .......... ..........',
+  road:   '...#..#... ...#..#... ..#.#..#.. ..#.#..#.. ..#....#.. .#..#...#. .#..#...#. #........# #...##...# #...##...#',
+  flag:   '.########. .##+##+##. .#+##+##.. .###++###. .########. .##....... .##....... .##....... .##....... .##.......',
+  wrench: '.....##..# ....##..## ....##.### ....##+##. ....#####. ...####... ..####.... .###...... .##....... ..........',
+  box:    '..######.. .########. .#+###++#. .########. .#..#...#. .#..##..#. .#..##..#. .#......#. .########. ..........',
+  wheel:  '...####... ..##++##.. .##....##. ##......## ########## ##..##..## .##.##.##. ..######.. ...####... ..........',
+  gauge:  '.......... ...####... .###..###. .#..#...#. ##.....### ##....##.# #....##..# #...##...# ########## ..........',
+  gear:   '..#....#.. ..#....#.. ..#....#.. ..######.. ..#..#.#.. ..#..#.#.. ..#..#.#.. ..#..#.#.. ..#..#.#.. ..........',
+  settings:'....##.... ..#.##.#.. .########. ..##..##.. ####..#### ####..#### ..##..##.. .########. ..#.##.#.. ....##....',
+  code:   '......##.. .....##... ..#..##..# .##.##..## ##..##.##. .##.##..## ..###....# ...##..... ...##..... ..........',
+  siren:  '#...##...# .#......#. ....##.... ..######.. ..##++##.. ..#+++##.. ..######.. .########. .########. ..........',
+  fuel:   '.######... .#++++#.#. .#++++#.## .######..# .##..##..# .##..##### .##..##... .##..##... #######... ..........',
+  coin:   '...####... ..##++##.. .##..+###. .#..##++#. .#.##...#. .#..##..#. .##..+###. ..##++##.. ...####... ..........',
+  info:   '...####... ..##++##.. .##+##+##. .#+....+#. .#+.##.+#. .#+.##.+#. .##+##+##. ..######.. ...####... ..........',
+  alert:  '....##.... ...####... ...####... ..##..##.. ..##..##.. .###..###. .########. ####..#### ########## ..........',
+  bag:    '...####... ..##..##.. ..##..##.. .########. .##++++##. .##++++##. .##++++##. .##++++##. .########. ..........',
+  pin:    '...####... ..######.. .##....##. .##....##. .##....##. ..######.. ..######.. ...####... ....##.... ..........',
+  map:    '.......### ...#####.# ####..#..# #.+#++#..# #..#..#+.# #.+#..#..# #..#+.#..# #..#..#### #.#####... ###.......',
+  power:  '....##.... .#..##..#. .##.##.##. ##..##..## ##......## ##......## .##....##. ..######.. ...####... ..........',
+  clock:  '...####... ..######.. .##.##.##. .#..##..#. .#..##..#. .#...##.#. .##....##. ..######.. ...####... ..........',
+  chat:   '.......... .########. ########## ##..#...## ########## ##...#..## ########## .#######.. .###...... .#........',
+  trophy: '.......... .########. ###++++### #.######.# #.##++##.# .###++###. ...####... ....##.... ..######.. ..........',
+  phone:  '..######.. ..######.. ..##..##.. ..##++##.. ..##++##.. ..##++##.. ..##++##.. ..##..##.. ..######.. ..######..',
+  keys:   '.......... .########. ########## #.#.#.#.## ########## #.####..## ########## .########. .......... ..........',
+  weather:'.......... ....###... ...#####.. .########. ########## .########. ..#..#..#. .#..#..#.. .......... ..........',
+  xcircle:'...####... ..######.. .##....##. .#.#..#.#. .#..##..#. .#..##..#. .##....##. ..######.. ...####... ..........',
+};
+
+function pixelPath(sprite, ink) {
+  return sprite.split(' ').map((row, y) => {
+    let path = '';
+    for (let x = 0; x < row.length; x++) {
+      if (row[x] === ink) path += `M${(x + 1) * 2} ${(y + 1) * 2}h2v2h-2z`;
+    }
+    return path;
+  }).join('');
+}
+for (const [name, sprite] of Object.entries(PI_PIXEL)) {
+  PI[name] = `<path class="pd" d="${pixelPath(sprite, '+')}"/><path class="pf" d="${pixelPath(sprite, '#')}"/>`;
+}
+
 // un'icona come documento svg di un colore solo (per le maschere va bene il nero: conta solo quanto è pieno)
-const piDoc = (name, col = '#000') => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="' + col
+const piDoc = (name, col = '#000') => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"' + (PI_PIXEL[name] ? ' shape-rendering="crispEdges"' : '') + ' fill="none" stroke="' + col
   + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
   + PI[name].replace(/class="pd"/g, 'fill="' + col + '" fill-opacity=".3" stroke="none"').replace(/class="pf"/g, 'fill="' + col + '" stroke="none"') + '</svg>';
 const piUrl = (name, col) => 'url("data:image/svg+xml,' + encodeURIComponent(piDoc(name, col)) + '")';
@@ -166,8 +209,8 @@ const premPhoneCss = () => ':host(.prem) .ph{background:linear-gradient(150deg,#
     if (sec && !sec.querySelector('.p-stile')) {
       const f = document.createElement('div'); f.className = 'field p-stile';
       f.innerHTML = '<span>Pannelli, avvisi e icone</span><div class="seg" role="group" aria-label="Stile di pannelli, avvisi e icone">'
-        + '<button type="button" data-v="premium">Premium</button><button type="button" data-v="classico">Classico</button></div>'
-        + '<p class="hint">Premium: vetro scuro, icone disegnate, avvisi con l\'icona e il tempo che scorre, titoli dei quartieri e delle capitali. Classico: lo stile di prima. Il quadro strumenti si sceglie qui sotto.</p>';
+        + '<button type="button" data-v="premium">Street Racing</button><button type="button" data-v="classico">Classico</button></div>'
+        + '<p class="hint">Street Racing usa icone a pixel, pannelli scuri e avvisi colorati per tipo. Classico ripristina l\'interfaccia originale. Il quadro strumenti si sceglie qui sotto.</p>';
       const h = sec.querySelector('h2'); if (h) h.after(f); else sec.prepend(f);
       f.addEventListener('click', (e) => { const b = e.target.closest('button[data-v]'); if (b) set(b.dataset.v === 'premium'); });
     }

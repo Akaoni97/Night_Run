@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.140**
+**Versione attuale: v0.141**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -164,3 +164,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.138 · 24/11/2026 · proprietario · paesaggi fuori città disegnati in figure invece che pixel per pixel (da 3.100-6.700 a 830-1.900 comandi a fotogramma: autostrada, borgo, pianura, montagna, mare, deserto), scritte a pixel in una figura sola, controllo dei comandi nella prova di fumo (`comandi:2600`); schermata iniziale: al telefono in orizzontale non esce più dallo schermo (sospeso 26), l'auto prende la luce della scena, col contorno e il riflesso, la E36 blu del prologo per le partite nuove, foschia e bagliore all'orizzonte, riflessi della città sull'asfalto
 - v0.139 · 24/11/2026 · proprietario · tre interruttori in Impostazioni → Grafica → Scritte sulla strada: scritte da fumetto (scoppi della marmitta, urti, frenate; era «Grafiche anime»), versi del pilota (le vignette sopra la testa) e pensieri (tutti, solo la storia, spenti)
 - v0.140 · 24/11/2026 · proprietario · quadri distinti per V40, Supra ed E30, chilometri della singola auto visibili anche nel quadro grande
+- v0.141 · 24/11/2026 · proprietario · interfaccia Street Racing, menu in pixel art, icone e banner distinti per tipo
