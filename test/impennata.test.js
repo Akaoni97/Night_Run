@@ -20,7 +20,7 @@ function sel(c, max, extra) {
   return Object.assign(s, extra);
 }
 // frizione lasciata a 3/4 del limitatore, gomme in temperatura, gas a fondo per 2 s
-function partenza(E, id, max, extra, { wet = 0, wl } = {}) {
+function partenza(E, id, max, extra, { wet = 0, wl, dur = 2 } = {}) {
   const c = E.CARS[id], s = new E.SupraSim();
   if (c.P) s.setCar(Object.assign({}, c.P));
   const tn = c.params(sel(c, max, extra)).sim; if (wl) tn.wheelie = Object.assign({}, tn.wheelie, wl);
@@ -32,7 +32,7 @@ function partenza(E, id, max, extra, { wet = 0, wl } = {}) {
   const giri = s.P.idle + (s.P.limiter - s.P.idle) * 0.7;
   for (let t = 0; t < 1.5; t += H) { s.in.thr = s.rpm < giri ? 1 : 0.15; s.update(H); s.events.length = 0; }
   const r = { th: 0, k: 0, ev: [] };
-  for (let t = 0; t < 2; t += H) {
+  for (let t = 0; t < dur; t += H) {
     s.in.clutch = Math.max(0, 1 - t / 0.08); s.in.thr = 1; s.update(H);
     for (const e of s.events) r.ev.push(e.type);
     s.events.length = 0; r.th = Math.max(r.th, s.whTh || 0); r.k = Math.max(r.k, s.whK || 0);
@@ -75,7 +75,7 @@ test('col bagnato le gomme slittano e il muso resta giù', () => {
 test('quando si alza: tetto della wheelie bar, del paraurti, e ricade con una botta', () => {
   // geometria esagerata per forzare il muso su: si prova solo il tetto e la ricaduta
   const sb = partenza(ON, 'r5', true, { reazione: 'drag', wheeliebar: 'si' }, { wl: { G: 3 } });
-  const nb = partenza(ON, 'r5', true, { reazione: 'drag' }, { wl: { G: 3 } });
+  const nb = partenza(ON, 'r5', true, { reazione: 'drag' }, { wl: { G: 3 }, dur: 4 });
   const deg = (r) => r.th * 180 / Math.PI;
   assert.ok(deg(sb) > 1 && deg(sb) <= 3.01, `con la wheelie bar ${deg(sb).toFixed(2)}°`);
   assert.ok(deg(nb) > deg(sb) && deg(nb) <= 12.01, `senza ${deg(nb).toFixed(2)}°`);
@@ -91,7 +91,7 @@ test('le trazioni anteriori non si alzano mai, nemmeno con la geometria forzata'
 test('impennata da film: BMW preparate con 4-link da drag e gomme da drag sì, motore di serie o gomme normali no', () => {
   const deg = (r) => r.th * 180 / Math.PI;
   for (const id of ['e36', 'b2002']) {
-    const su = partenza(ON, id, true, { reazione: 'drag' });
+    const su = partenza(ON, id, true, { reazione: 'drag' }, { dur: 4 });
     assert.ok(deg(su) > 8, `${id} preparata: solo ${deg(su).toFixed(1)}°`);
     assert.ok(su.ev.includes('wheelie') && su.ev.includes('bump'), `${id}: stacco e ricaduta`);
     const serie = partenza(ON, id, false, { reazione: 'drag', tires: 'slick' });

@@ -120,7 +120,8 @@ class SupraSim {
       this.whKf = (this.whKf || 0) + (this.whK - (this.whKf || 0)) * Math.min(1, h / (sc.tau || 0.3));
       this.whScena = ok0 && (this.whScena ? this.whKf > (sc.tieni || 0.5) : this.whKf > (sc.soglia || 0.75));
       if (this.whScena) {
-        const tgt = thMax * SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1);
+        // l'angolo può solo crescere finché si spinge: niente su e giù a metà impennata
+        const tgt = this.whTgt = Math.max(this.whTgt || 0, thMax * SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1));
         let v = (this.whV || 0) + h * ((sc.k || 55) * (tgt - th) - (sc.c || 8) * (this.whV || 0));
         let t = th + h * v;
         if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1, scena: 1 });
@@ -129,6 +130,7 @@ class SupraSim {
         this.whTh = t; this.whV = v;
         return W * hopF;
       }
+      this.whTgt = 0;
     }
     if (th > 0 || Mup > Mdown) {
       let v = (this.whV || 0) + h * ((Mup - Mdown) / Ir - (wl.c || 3) * (this.whV || 0));

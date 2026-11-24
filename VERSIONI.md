@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.150**
+**Versione attuale: v0.151**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -174,3 +174,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.148 · 24/11/2026 · cognato · **da Luca Tuning il gas è libero**: appena entrato si sgasa (fermo, freno tirato, marcia in folle che torna uscendo) e i pezzi montati si sentono subito; il banco a rulli torna in fondo al pannello e apre la schermata grande
 - v0.149 · 24/11/2026 · cognato · **impennata da film**: col progetto acceso le gomme da drag in partenza tengono come quelle vere (μ 2,5-3) e con 4-link, potenza vera e asciutto il muso sale fino a 12° e ci resta finché spingi; motore di serie, gomme normali o bagnato restano a terra
 - v0.150 · 24/11/2026 · cognato · forature in due: lenta ogni 15-20 km, scoppio ogni 42-45 km (± 5) con botto, PSSSHHH e gomma a terra che sbatte (`forature.js`)
+- v0.151 · 24/11/2026 · cognato · **impennata secca**: il muso va su in un quinto di secondo e resta piantato al tetto finché spingi (niente su e giù); confermato che le trazioni anteriori non impennano mai

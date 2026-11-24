@@ -27,8 +27,8 @@ const IMP = {
   barDeg: 3, maxDeg: 12, c: 2.2,
   // impennata «da film» (SupraSim.impennata, v0.149): parte quando la fisica è oltre il 70 % del momento che serve
   // (whK) con 4-link o 4-link da drag (G ≥ 1,3), gomme da drag, asciutto, gas oltre l'85 %, prima o seconda, sotto i 90 km/h;
-  // resta su finché whK sta sopra 0,5. Angolo: dal 40 % del tetto (appena oltre la soglia) al tetto pieno (15 punti sopra)
-  scena: { soglia: 0.7, tieni: 0.5, pieno: 0.15, min: 0.4, G: 1.3, vMax: 25, k: 55, c: 8 },
+  // resta su finché whK sta sopra 0,5. Salita secca (v0.151): molla rigida e poco smorzata, il muso arriva su in un decimo e mezzo di secondo e rimbalza appena sul tetto. Angolo: dal 60 % del tetto (appena oltre la soglia) al tetto pieno (15 punti sopra)
+  scena: { soglia: 0.7, tieni: 0.5, pieno: 0.15, min: 0.6, G: 1.3, vMax: 25, k: 150, c: 11, tau: 0.3 },
 };
 (function impennataPezzi() {
   if (!IMP.on || typeof CARS === 'undefined') return;

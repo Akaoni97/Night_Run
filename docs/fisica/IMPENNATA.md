@@ -19,6 +19,8 @@ in partenza (fianco morbido che si accartoccia e poi stende il battistrada, mesc
   frizione) supera il 70 % del momento che serve, con 4-link o 4-link da drag, gomme da drag, asciutto, gas oltre l'85 %,
   prima o seconda, sotto i 90 km/h, il muso sale deciso (molla smorzata) fino al tetto e ci resta finché spinge; poi
   ricade col suo peso e rimbalza. Angolo dal 40 % al 100 % del tetto secondo quanto si è oltre la soglia.
+- **Salita secca** (v0.151): molla k 150, c 11, da staccata a 12° in 0,2-0,3 s; l'angolo durante la spinta può solo
+  crescere (resta piantato al tetto).
 - **Tetti**: senza wheelie bar 12° (paraurti dietro a terra: sbalzo ~0,85 m, paraurti a ~0,3 m), con la wheelie bar 3°.
 - Restano a terra: motore di serie anche con gomme e 4-link (la spinta non dura), semislick o gomme normali, bagnato,
   trazione anteriore. Un motore enorme col turbo che non ha ancora pressione, partendo dal minimo, si siede: si parte
