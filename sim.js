@@ -91,6 +91,7 @@ class SupraSim {
     this.P.shiftK = this.P.shiftK0 * (t.shiftMul || 1);              // cambio sport o da corsa: cambiate più rapide (Supra e V40 non lo passano)
     if (this.tune.tyre && this.tune.tyre.crr) this.P.crr = this.tune.tyre.crr;
     this.cfg.valve = this.tune.valve;
+    this._cvT = null;                                                   // [IMPENNATA] potenza da ricalcolare
   }
   // potenza e coppia massime a regime stabilizzato, per la scheda del tuning
   // pressione massima in tubo: la mappa ECO / NORMALE / FORTE moltiplica quella del turbo, ma non supera il limite della centralina (`tc.cap`, se c'è)
@@ -118,10 +119,26 @@ class SupraSim {
       const ok0 = wl.drag > 1 && G >= (sc.G || 1.3) && (this.wet || 0) < 0.1 && this.running && this.in.thr > 0.85 && this.gear >= 1 && this.gear <= 2 && this.v < (sc.vMax || 14);
       // conta la spinta che dura (media su ~0,3 s), non il colpo della frizione: senza cavalli veri il muso non sta su
       this.whKf = (this.whKf || 0) + (this.whK - (this.whKf || 0)) * Math.min(1, h / (sc.tau || 0.3));
-      this.whScena = ok0 && (this.whScena ? this.whKf > (sc.tieni || 0.5) : this.whKf > (sc.soglia || 0.75));
+      // partenza da fermo (v0.154): nel gioco si parte dal minimo col cambio che attacca da solo e il turbo che non ha ancora
+      // pressione, quindi la spinta del momento resta bassa anche su un'auto da 1.000 CV. Quello che decide se una vera
+      // impennerebbe è quanta potenza c'è per tonnellata con gomme da drag e 4-link: da fermi, gas a fondo, e il muso va su
+      // appena le gomme mordono. Soglia: 280 CV/t col 4-link da drag, 380 col 4-link (servono di più per la geometria peggiore)
+      if (Math.abs(this.v) < 1.2) this.whArm = true;                     // da fermi si arma
+      else if (!ok0 || this.v > (sc.vMax || 14)) this.whArm = false;      // in movimento: mollato il gas, terza o troppo veloci
+      let pwK = 0;
+      if (this.whArm && ok0) {
+        if (this._cvT !== this.tune.pw + '|' + this.P.limiter) { this._cvT = this.tune.pw + '|' + this.P.limiter; this._cv = this.estimatePeak().cv; }
+        const pw = this._cv / ((P.mass + 75) / 1000), pwMin = G >= 1.55 ? (sc.cvt || 280) : (sc.cvt2 || 380);
+        pwK = pw >= pwMin && this.v > (sc.morde || 0.8) ? SIM_CLAMP(0.6 + 0.4 * (pw - pwMin) / (pwMin * 0.6), 0.6, 1) : 0;
+      }
+      const daPw = !!(pwK || (this.whScena && this.whDaPw));
+      this.whScena = ok0 && (daPw || (this.whScena ? this.whKf > (sc.tieni || 0.5) : this.whKf > (sc.soglia || 0.75)));
+      if (this.whScena && pwK) this.whDaPw = true;
+      if (!this.whScena) this.whDaPw = false;
       if (this.whScena) {
         // l'angolo può solo crescere finché si spinge: niente su e giù a metà impennata
-        const tgt = this.whTgt = Math.max(this.whTgt || 0, thMax * SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1));
+        const kAng = Math.max(pwK, this.whKf > (sc.soglia || 0.75) ? SIM_CLAMP((this.whKf - (sc.soglia || 0.75)) / (sc.pieno || 0.25), sc.min || 0.4, 1) : 0, this.whDaPw ? 0.6 : 0);
+        const tgt = this.whTgt = Math.max(this.whTgt || 0, thMax * kAng);
         let v = (this.whV || 0) + h * ((sc.k || 55) * (tgt - th) - (sc.c || 8) * (this.whV || 0));
         let t = th + h * v;
         if (th === 0 && t > 0) this.events.push({ type: 'wheelie', on: 1, scena: 1 });

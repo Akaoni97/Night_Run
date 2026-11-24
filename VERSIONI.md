@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.153**
+**Versione attuale: v0.154**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -177,3 +177,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.151 · 24/11/2026 · cognato · **impennata secca**: il muso va su in un quinto di secondo e resta piantato al tetto finché spingi (niente su e giù); confermato che le trazioni anteriori non impennano mai
 - v0.152 · 24/11/2026 · cognato · lo scoppio della gomma sopra gli 83 km/h ti butta in una corsia accanto, a caso (`foraSbanda` in `forature.js`)
 - v0.153 · 24/11/2026 · proprietario · **Nottolino Racing** al titolo: trascina fino a START e rilascia, oppure premi Invio o Spazio.
+- v0.154 · 24/11/2026 · cognato · **impennata in partenza da fermo**: nel gioco vero (dal minimo, cambio che attacca da solo, turbo senza pressione) non partiva mai; ora decide la potenza per tonnellata con gomme da drag e 4-link: da fermi, gas a fondo, il muso va su appena le gomme mordono e resta su fino a circa 60 km/h

@@ -1,3 +1,7 @@
+## 24/11/2026 · cognato · v0.154 (**impennata in partenza da fermo**)
+- Luca: BMW preparata, il muso non accenna. Provato nel browser come lui (dal minimo, automatico, W a fondo): la E36 da 1.400 CV parte a 1.500 giri, il turbo non ha pressione fino ai 6.000 e il controllo di trazione taglia, quindi la spinta del momento non arrivava mai alla soglia. Ora in partenza da fermo decide la **potenza per tonnellata** (con gomme da drag, asciutto, gas a fondo): almeno 280 CV/t col 4-link da drag, 380 col 4-link. Il muso va su appena le gomme mordono (5-9 km/h), arriva a 12° e resta su fino a ~60 km/h, poi ricade. Provato nel browser: E36 ed R5 su a 12°, con l'urlo del pilota. Motori di serie restano a terra (test, 432).
+- R5 che «slitta»: con la bidisco da corsa (1.140 Nm, il motore al massimo ne fa 675) la frizione non slitta; in seconda e terza sono le gomme dietro che pattinano (600 CV su 970 kg): giri che salgono e velocità che non segue. Con la frizione di serie (380 Nm) o rinforzata (570) e il motore spinto slitta davvero: l'officina lo dice in rosso.
+
 ## 24/11/2026 · proprietario · v0.153 (**nottolino Racing**)
 - Il blocchetto del reel Turn the Key prende il posto della chiave precedente. Il rilascio su START, Invio e Spazio richiamano l’avvio del Viaggio. Il menu conserva i tre salvataggi e il suono di avviamento.
 

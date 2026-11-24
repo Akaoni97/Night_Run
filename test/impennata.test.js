@@ -37,6 +37,7 @@ function partenza(E, id, max, extra, { wet = 0, wl, dur = 2 } = {}) {
     for (const e of s.events) r.ev.push(e.type);
     s.events.length = 0; r.th = Math.max(r.th, s.whTh || 0); r.k = Math.max(r.k, s.whK || 0);
   }
+  for (let t = 0; t < 1.5; t += H) { s.in.thr = 0; s.update(H); for (const e of s.events) r.ev.push(e.type); s.events.length = 0; }   // si molla: il muso ricade
   return r;
 }
 
@@ -98,5 +99,20 @@ test('impennata da film: BMW preparate con 4-link da drag e gomme da drag sì, m
     assert.ok(deg(serie) < 2, `${id} col motore di serie: ${deg(serie).toFixed(1)}°`);
     const gomme = partenza(ON, id, true, { reazione: 'drag', tires: ON.CARS[id].tuning.tires.items[2].id });
     assert.ok(deg(gomme) < 2, `${id} con le semislick: ${deg(gomme).toFixed(1)}°`);
+  }
+});
+
+test('partenza da fermo come nel gioco (cambio che attacca da solo, gas a fondo): con la potenza va su, di serie no', () => {
+  const lancio = (id, max) => {
+    const c = ON.CARS[id], s = new ON.SupraSim(); s.setCar(Object.assign({}, c.P));
+    s.setTune(c.params(sel(c, max, { reazione: 'drag', tires: 'slick' })).sim); s.P.fwd = !!c.fwd; s.P.rearW = c.driveW;
+    s.setIgnition(true); for (let t = 0; t < 3; t += H) { s.setStarter(t < 1.2); s.update(H); s.events.length = 0; }
+    s.shift(1); for (let t = 0; t < 1; t += H) { s.update(H); s.events.length = 0; }
+    let th = 0; for (let t = 0; t < 3; t += H) { s.in.thr = 1; s.update(H); s.events.length = 0; th = Math.max(th, s.whTh || 0); }
+    return th * 180 / Math.PI;
+  };
+  for (const id of ['e36', 'e30', 'b2002', 'r5']) {
+    assert.ok(lancio(id, true) > 8, `${id} preparata: ${lancio(id, true).toFixed(1)}°`);
+    assert.ok(lancio(id, false) < 2, `${id} di serie: ${lancio(id, false).toFixed(1)}°`);
   }
 });

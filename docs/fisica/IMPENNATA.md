@@ -21,6 +21,9 @@ in partenza (fianco morbido che si accartoccia e poi stende il battistrada, mesc
   ricade col suo peso e rimbalza. Angolo dal 40 % al 100 % del tetto secondo quanto si è oltre la soglia.
 - **Salita secca** (v0.151): molla k 150, c 11, da staccata a 12° in 0,2-0,3 s; l'angolo durante la spinta può solo
   crescere (resta piantato al tetto).
+- **Partenza da fermo** (v0.154): nel gioco si parte dal minimo con la frizione automatica e il turbo vuoto, la spinta
+  del momento non basta mai. Da fermi decide la potenza per tonnellata (≥ 280 CV/t col 4-link da drag, ≥ 380 col 4-link),
+  con gomme da drag, asciutto e gas a fondo: il muso va su quando le gomme mordono e resta su fino a ~60 km/h.
 - **Tetti**: senza wheelie bar 12° (paraurti dietro a terra: sbalzo ~0,85 m, paraurti a ~0,3 m), con la wheelie bar 3°.
 - Restano a terra: motore di serie anche con gomme e 4-link (la spinta non dura), semislick o gomme normali, bagnato,
   trazione anteriore. Un motore enorme col turbo che non ha ancora pressione, partendo dal minimo, si siede: si parte
