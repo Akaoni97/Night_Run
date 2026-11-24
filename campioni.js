@@ -19,7 +19,7 @@
 const CMP_VER = 5;                         // alzalo quando cambi un file audio: i browser che l'hanno in memoria (sw.js) lo riscaricano
 const CMP_DIR = 'audio/campioni/';
 const CMP = {
-  k: 1.1,                                  // livello generale dei campioni sopra il motore sintetizzato (misurato con strumenti/ascolta_campioni.js)
+  k: 3.2,                                  // livello generale dei campioni sopra il motore sintetizzato (misurato con strumenti/ascolta_campioni.js). v0.156: era 1,1 e dopo il motore rifatto della v0.142 i campioni stavano 18-20 dB sotto: i cursori dei volumi non si sentivano
   voci: 14,                                // colpi insieme al massimo
   // livello di ogni componente (i file sono normalizzati a -1 dB sul più forte del kit)
   g: { valvola: 1.1, turbo: 0.5,  compressore: 0.36, wastegate: 0.42, aspirazione: 0.45, scarico: 0.55, mappa: 0.6, limitatore: 0.65, cambio: 0.24, spurgo: 0.5,

@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.155**
+**Versione attuale: v0.156**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -179,3 +179,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.153 · 24/11/2026 · proprietario · **Nottolino Racing** al titolo: trascina fino a START e rilascia, oppure premi Invio o Spazio.
 - v0.154 · 24/11/2026 · cognato · **impennata in partenza da fermo**: nel gioco vero (dal minimo, cambio che attacca da solo, turbo senza pressione) non partiva mai; ora decide la potenza per tonnellata con gomme da drag e 4-link: da fermi, gas a fondo, il muso va su appena le gomme mordono e resta su fino a circa 60 km/h
 - v0.155 · 24/11/2026 · proprietario · sul computer quadro strumenti e pulsanti (AVVIA, AUTO, TC, LAUNCH...) salgono in alto a sinistra sotto il riquadro del viaggio: dietro l'auto restano libere fiamme e volanti; la colonna si rimpicciolisce da sola nelle finestre strette
+- v0.156 · 24/11/2026 · cognato · i campioni dei pezzi si sentono di nuovo (livello generale da 1,1 a 3,2, +9 dB): erano 18-20 dB sotto il motore e i cursori dei volumi nella scheda Suoni non cambiavano niente all'orecchio
