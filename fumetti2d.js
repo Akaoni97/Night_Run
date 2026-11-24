@@ -23,6 +23,7 @@
     colpoDietro: { voci: ['BANG!', 'SBAM!', 'BAM!', 'TUMP!', 'WHAM!', 'KRAK!'], size: 5, col: '#ff2e4d', col2: '#ff6a4d', burst: '#ffd23f', shadow: null, shape: 'jag', sparks: 6, rays: true, life: 1.1 },
     colpoLieve: { voci: ['BONK!', 'TOC!', 'TUMP!', 'BUMP!', 'TONK!', 'PUF!'], size: 3, col: '#ff8a4d', col2: '#ffb000', burst: '#ffe9a0', shadow: null, shape: 'star', sparks: 2, life: 0.85 },
     strisciata: { voci: ['SCRAAAPE!', 'SKREEEK!', 'FRRRSH!', 'KRRRRK!', 'SCRIIIK!'], size: 3, col: '#ffb000', col2: '#fff0c0', burst: null, shadow: null, shape: 'none', sparks: 0, life: 0.9 },
+    gomma: { voci: ['BANG!', 'BOOM!', 'PSSSHHH!', 'BLAM!', 'PAM! PSSSH!', 'KABOOM!'], size: 4, col: '#ffffff', col2: '#cfd6ff', burst: '#ff2e1a', shadow: null, shape: 'jag', sparks: 5, rays: true, life: 1.2 },   // scoppio di una gomma (forature.js)
     sfiato: { voci: ['PSSSH!', 'PSHHH!', 'TSSS!', 'FSSSH!', 'SHHHT!', 'PFFFT!', 'TSHHH!'], size: 3, col: '#2ee6ff', col2: '#b8f4ff', burst: null, shadow: null, shape: 'puff', sparks: 0, life: 0.9 },
     cambio: { voci: ['GRRRK!', 'KRRRK!', 'GRAAAK!', 'CRRRK!', 'KRUNCH!'], size: 3, col: '#ffb000', col2: '#ff8a2a', burst: null, shadow: null, shape: 'none', sparks: 3, life: 0.9 },
     clacson: { voci: ['BEEEP!', 'HONK!', 'PEEEP!', 'TUUUT!', 'BIP BIP!', 'BEEP!'], size: 2, col: '#ffe14d', col2: '#ffb000', burst: null, shadow: null, shape: 'rays', sparks: 0, life: 0.9 },

@@ -44,10 +44,10 @@ function stCat(id) { for (const k in ST_CAT) if (ST_CAT[k].includes(id)) return 
   };
 
   // ------------------------------------------------------------ eventi tra le tappe, uno ogni 8-10 km: incidente o controllo
-  // della polizia in prima corsia, una gomma che comincia a perdere, uno che ha fretta e ti sfanala da dietro
+  // della polizia in prima corsia, uno che ha fretta e ti sfanala da dietro (la gomma che perde, 'gomma', si chiama ancora a mano)
   P.spawnRoadEvent = function (kind) {
     const d = this.s.dist, x = d + 650 + Math.random() * 250, r = Math.random();
-    kind = kind || (r < 0.35 ? 'crash' : r < 0.6 ? 'stop' : r < 0.8 ? 'gomma' : 'fretta');
+    kind = kind || (r < 0.42 ? 'crash' : r < 0.74 ? 'stop' : 'fretta');   // la foratura lenta non è più tra questi: la decide forature.js, ogni 15-20 km
     if (kind === 'gomma') {                       // foratura lenta: la pressione scende piano (viaggio.js), si vede sul quadro
       if (!this.tyres) return;
       const T = this.tyres(), i = Math.floor(Math.random() * 4); if (T.leak[i]) return;

@@ -1268,6 +1268,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="game.js"></script>
 <script src="viaggio.js"></script>
 <script src="strada.js"></script>
+<script src="forature.js"></script>   <!-- foratura lenta ogni 15-20 km, scoppio ogni 42-45 km, col loro suono -->
 <script src="missioni.js"></script>
 <script src="pensieri.js"></script>
 <script src="suggerimenti.js"></script>
@@ -3529,7 +3530,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       garage.update(dt, vs, game);
       recordFrame(dt, vs);
     }
-    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); }
+    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); else if ((f.k === 'scoppio' || f.k === 'gommaLenta') && window.NightForature) NightForature.suono(audio, f, S.vol / 100, S.muted); }
+    if (window.NightForature) NightForature.tick(audio, game, sim, S.vol / 100, S.muted || !!window.__nrPausaM);   // la gomma a terra che sbatte
     game.fx.length = 0;
     if (msgT > 0) {
       msgT -= dt; msgShown += dt;

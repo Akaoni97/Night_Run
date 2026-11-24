@@ -273,13 +273,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   P.tyreUpdate = function (dt, dkm) {
     const T = this.tyres(), sim = this.sim;
     for (let i = 0; i < 4; i++) if (T.leak[i] > 0) T.p[i] = Math.max(0.1, T.p[i] - T.leak[i] * dt * (Math.abs(sim.v) > 1 ? 1 : 0.4));
-    // forature: solo nel viaggio, rare, più probabili con le gomme consumate e dopo le botte
-    if (vgOn(this) && dkm > 0 && Math.random() < dkm / 260 * (1 + 2 * (sim.tireWear || 0))) {
-      const i = Math.floor(Math.random() * 4); if (!T.leak[i]) {
-        const fast = Math.random() < 0.3; T.leak[i] = fast ? 0.22 : 0.01 + Math.random() * 0.02;
-        this.say(fast ? `Foratura! Gomma ${TYRE_NAMES[i]} a terra: fermati e cambiala (9)` : `La gomma ${TYRE_NAMES[i]} perde pressione piano piano`, 'bad');
-      }
-    }
+    // forature: le decide forature.js (lenta ogni 15-20 km, scoppio ogni 42-45 ± 5 km), non più a caso qui
     // effetto sulla guida: meno aderenza e più attrito di rotolamento; a terra in velocità si rovina il cerchio
     const f = (q) => Math.max(0.3, Math.min(1, (q - 0.3) / 1.6));
     const drive = sim.P.fwd ? [0, 1] : [2, 3];
