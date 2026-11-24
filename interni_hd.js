@@ -557,6 +557,32 @@
     hot: [{ x: 200, y: 160, w: 270, h: 110, label: 'La tua auto', go: 'top' }, { x: 40, y: 220, w: 150, h: 120, label: 'Nico', go: 'top' }, { x: 560, y: 160, w: 60, h: 76, label: 'Gomme', go: 'top' }],
   };
 
+  // dati del banco prova per lo schermo da Luca: la fisica vera dell'auto in uso (come estimatePeak di sim.js), ricalcolati
+  // solo quando cambiano auto o pezzi; c e n = curve di CV e Nm da 1.000 giri al limitatore, da 0 a 1
+  let dynoK = '', dynoV = null;
+  function dynoDati() {
+    const nr = window.nightRun, sim = nr && nr.sim, game = nr && nr.game; if (!sim || !sim.P || !sim.tune || !sim.estimatePeak) return null;
+    const tn = sim.tune, tc = tn.turbo || {}, P = sim.P;
+    const key = [game && game.car, tn.pw, P.limiter, P.mass, tc.max, tc.a, tc.b, tc.cap, tc.twin, tn.camLow, tn.camHigh, tn.boostK, sim.extraPw, sim.boostCtl].join('|');
+    if (key === dynoK && dynoV) return dynoV;
+    const cvA = [], nmA = [];
+    for (let rpm = 1000; rpm <= P.limiter; rpm += Math.max(25, (P.limiter - 1000) / 110)) {
+      const frac = tc.twin ? SIM_SS(tc.a, tc.b, rpm) * 0.6 + 0.4 * SIM_SS(3800, 4400, rpm) : Math.pow(SIM_SS(tc.a, tc.b, rpm), 1.3);
+      const boost = sim.boostTop(tc) * Math.min(1, frac * 1.18);
+      const camK = SIM_SS(3000, 5500, rpm), camF = tn.camLow * (1 - camK) + tn.camHigh * camK;
+      const T = Math.max(0, sim.tqAt(rpm) * tn.pw * (sim.extraPw || 1) * camF * Math.max(0, (1 + 0.78 * (tn.boostK || 1) * boost) - 0.1) / 0.9 - (16 + 0.0035 * rpm + 0.9e-6 * rpm * rpm));
+      nmA.push(T); cvA.push(T * rpm / 7023);
+    }
+    const e = sim.estimatePeak(), mc = Math.max(1, ...cvA), mn = Math.max(1, ...nmA), cv = Math.round(e.cv), kg = Math.round(P.mass || 0);
+    const car = (typeof CARS !== 'undefined' && game && CARS[game.car]) || null, bar = tc.max > 0.02 ? sim.boostTop(tc) : 0;
+    const nome = String((car && (car.short || car.name)) || 'LA TUA AUTO').toUpperCase().normalize('NFD').replace(/[^A-Z0-9 .\/-]/g, '').slice(0, 16);
+    dynoK = key;
+    dynoV = { nome, cv, nm: Math.round(e.nm), rpmCv: Math.round(e.rpmCv / 50) * 50, rpmNm: Math.round(e.rpmNm / 50) * 50, lim: Math.round(P.limiter),
+      turbo: bar ? 'TURBO ' + bar.toFixed(1).replace('.', ',') + ' BAR' : 'ASPIRATO', kg, kgcv: cv ? ((kg + 75) / cv).toFixed(1).replace('.', ',') : '-',   // col pilota, come nel riquadro dell'officina
+      c: cvA.map((v) => v / mc), n: nmA.map((v) => v / mn) };
+    return dynoV;
+  }
+
   // ---------------------------------------------------------------- DA LUCA TUNING (Luca)
   HD.shop = {
     ss: SS, focus: 300, amb: 'shop', grade: '255,176,0', gradeA: 0.05,
@@ -589,9 +615,21 @@
     dyn(g, t, S) {
       if (S.car) { const y = 152 - S.car.height / SS + Math.sin(t * 0.6) * 0.5; g.drawImage(S.car, 330 - S.car.width / SS / 2, y, S.car.width / SS, S.car.height / SS); R(g, 210, 153, 240, 4, '#8a8f9e'); R(g, 210, 153, 240, 1, '#d8dce4'); }
       glow(g, 330, 162, 160, '255,190,110', 0.12, 0.4);
+      // lo schermo del banco prova: i dati veri dell'auto che hai adesso (pezzi montati compresi) e le sue curve di CV e Nm
       R(g, 474, 34, 142, 72, '#0a1018'); for (let k = 0; k < 6; k++) R(g, 474, 40 + k * 12, 142, 0.5, '#1a2a3a');
-      for (let x = 0; x < 140; x += 0.5) { const v = 0.5 + 0.35 * Math.sin((x + t * 30) * 0.06) + 0.1 * Math.sin((x + t * 30) * 0.21); P(g, 475 + x, 100 - v * 56, '#ffb000', 0.7); P(g, 475 + x, 108 - v * 46, '#2ee6ff', 0.7); }
-      t5(g, 'BANCO PROVA', 478, 36, '#9aa2ae', 0.55); t5(g, Math.round(280 + 40 * Math.sin(t * 0.3)) + ' CV', 578, 36, '#ffb000', 0.7);
+      const D = dynoDati();
+      if (D) {
+        // tutto in una colonna a sinistra: col pannello del negozio aperto la parte destra dello schermo resta coperta
+        t5(g, 'BANCO PROVA  ' + D.nome, 477, 36, '#9aa2ae', 0.45);
+        t5(g, D.cv + ' CV', 477, 42, '#ffb000', 0.8); t5(g, 'A ' + D.rpmCv + ' GIRI', 477 + tw5(D.cv + ' CV', 0.8) + 3, 44.5, '#ffb000', 0.45);
+        t5(g, D.nm + ' NM A ' + D.rpmNm + ' GIRI', 477, 50.5, '#2ee6ff', 0.45);
+        t5(g, 'LIMITATORE ' + D.lim + ' GIRI', 477, 55.5, '#c8ccd4', 0.45);
+        t5(g, D.turbo, 477, 60.5, '#c8ccd4', 0.45);
+        t5(g, D.kg + ' KG  ' + D.kgcv + ' KG/CV', 477, 65.5, '#c8ccd4', 0.45);
+        const n = D.c.length, x0 = 476, w = 138, yb = 104, hh = 30;
+        for (let i = 0; i < n; i++) { const x = x0 + i / (n - 1) * w; R(g, x, yb - D.c[i] * hh, 0.5, 0.5, '#ffb000'); R(g, x, yb - D.n[i] * hh * 0.85, 0.5, 0.5, '#2ee6ff'); }
+        const cx = x0 + ((t * 0.12) % 1) * w; R(g, cx, 72, 0.5, 32, 'rgba(255,255,255,.18)');      // il cursore che scorre i giri
+      } else t5(g, 'BANCO PROVA', 477, 36, '#9aa2ae', 0.45);
       const fl = Math.sin(t * 11) * Math.sin(t * 4.3) > 0.8 ? 0.15 : 1; { const wl = tw5('LUCA', 3), wt = tw5('TUNING', 1.8), x0 = 330 - (wl + 8 + wt) / 2; neon5(g, 'LUCA', x0, 16, '255,176,0', 3, fl); neon5(g, 'TUNING', x0 + wl + 8, 24, '255,90,40', 1.8, 1); }
       pg(g, 150, 330, 1.9, LOOK.luca, t, { seed: 5.5, pose: Math.floor(t / 7) % 3 === 1 ? 'pockets' : 'idle' });
       g.drawImage(S.front, 0, 0, W, H);

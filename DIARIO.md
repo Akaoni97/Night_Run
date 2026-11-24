@@ -1,3 +1,6 @@
+## 24/11/2026 · cognato · v0.157 (**il banco prova da Luca dice la verità**)
+- Lo schermo BANCO PROVA nell'interno di Da Luca Tuning (`interni_hd.js`, `dynoDati`) mostrava «280 ± 40 CV» a caso. Adesso: nome dell'auto, CV e a che giri, Nm e a che giri, limitatore, turbo con i bar (mappa ECO/FORTE compresa) o aspirato, peso e kg/CV (col pilota, come nel riquadro dell'officina), e le curve vere di CV (arancio) e Nm (azzurro) da 1.000 giri al limitatore, con un cursore che le scorre. Stessi conti di `estimatePeak` di `sim.js`; si ricalcola solo quando cambiano auto o pezzi. Tutto a sinistra perché il pannello del negozio copre la parte destra dello schermo.
+
 ## 24/11/2026 · cognato · v0.156 (**i cursori dei suoni da Luca tornano a contare**)
 - Luca: nella scheda Suoni dell'officina, volumi al minimo o al massimo non cambiavano niente in strada. I cursori erano collegati bene (misurato: a 0 % i campioni spariscono, a 200 % salgono di 6 dB), ma i campioni stavano 18-20 dB sotto il motore sintetizzato (rifatto più forte nella v0.142), quindi non si sentivano comunque. `CMP.k` in `campioni.js` da 1,1 a 3,2: col turbo e lo scarico della V40 i campioni ora stanno ~9 dB sotto il motore (prima ~19), a 200 % sono quasi alla pari. Saturazione del mix 0,004 % al 100 %. A 200 % su tutto il mix può toccare lo zero: lì decide l'orecchio.
 
