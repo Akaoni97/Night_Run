@@ -90,12 +90,17 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     const i = deck.pop(); p.deck[key] = deck; (p.lastIdx = p.lastIdx || {})[key] = i; return pool[i];
   };
   // il pensiero a schermo: da 8 a 10 secondi secondo la lunghezza
-  P.vgThink = function (text) {
+  // storia = true per i pensieri della trama (capitali, eventi strani, Jeshka, la notte): restano anche con «solo la storia».
+  // Dice se il pensiero esce: con i pensieri spenti (Impostazioni → Grafica → Pensieri, game.pensMode) no.
+  P.vgThink = function (text, storia) {
+    const m = this.pensMode;
+    if (m === 'no' || (m === 'storia' && !storia)) return false;
     const p = stato(this);
     this.thoughtN = (this.thoughtN || 0) + 1;
     text = typeof vgTesto === 'function' ? vgTesto(this, text) : text;
     this.thought = { text, left: Math.max(8, Math.min(10, 7.5 + text.length * 0.025)), id: this.thoughtN };
     p.last = p.t;
+    return true;
   };
 
   P.vgPensTick = function (dt) {
@@ -103,7 +108,8 @@ const PENS_RIPETI = 420;                  // se il bisogno resta, lo ripete (con
     p.t += dt;
     if (this.thought && this.thought.left > 0) this.thought.left -= dt;
     // non si pensa in un locale, durante una domanda, in gara, o da fermi
-    if (this.prompt || this.inside || Math.abs(this.sim.v) < 2 || p.t - p.last < PENS_PAUSA) return;
+    // pensieri spenti o solo la storia: i pensieri di tutti i giorni non si pescano nemmeno (restano per quando si riaccendono)
+    if ((this.pensMode && this.pensMode !== 'si') || this.prompt || this.inside || Math.abs(this.sim.v) < 2 || p.t - p.last < PENS_PAUSA) return;
     const km = vgKm(this);
     // 1. un pensiero scritto, a un certo km
     const k = PENS_KM.find((q) => km >= q.km && !p.seen[q.id]);

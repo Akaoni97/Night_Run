@@ -566,7 +566,7 @@ const CAP_DOVE = { bar: 'bar', autogrill: 'grill', benzinaio: 'fuel', motel: 'mo
         v.capEvKm = km;
       } else if (v.capIdx !== undefined && v.capIdx >= 0 && v.capIdx < CAP_PENS.length) {
         const k = 'tratto' + v.capIdx; v.capPens = v.capPens || {};
-        if (!v.capPens[k] && this.vgThink) { v.capPens[k] = 1; this.vgThink(CAP_PENS[v.capIdx]); }
+        if (!v.capPens[k] && this.vgThink) { v.capPens[k] = 1; this.vgThink(CAP_PENS[v.capIdx], true); }
         v.capIdx = -1; v.capSigns = [];
       }
     }

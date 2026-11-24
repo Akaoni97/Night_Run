@@ -137,7 +137,7 @@ function regia([w, h]) {
   // ogni momento: niente cartelloni e oggetti della storia, niente polizia che ti insegue, la scena come la vuole la ripresa
   setInterval(() => {
     const s = R.shot; if (!s) return;
-    g.siren = false; v2.comicsOn = !!window.__COMICS; v2.day = s.day || 0; v2.sunset = s.sunset || 0; v2.slow = false; v2.tAvg = 0; v2.rainOn = !!s.rain;
+    g.siren = false; v2.comicsOn = v2.reaOn = !!window.__COMICS; v2.day = s.day || 0; v2.sunset = s.sunset || 0; v2.slow = false; v2.tAvg = 0; v2.rainOn = !!s.rain;
     sim.fuel = Math.max(sim.fuel, 0.7); sim.damage = 0; sim.tireWear = 0; g.lane = s.lane; g.ap = null; g.blocked = false;
     if (g.prompt) try { g.answer(0); } catch (e) { /* niente */ }
     if (g.ents) g.ents = g.ents.filter((e) => e.kind === 'place' || e.kind === 'station' || e._teaser

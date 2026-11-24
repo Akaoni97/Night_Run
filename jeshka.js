@@ -93,7 +93,7 @@ function jlFatto(g, scena, k, I) {
       if (J.colpi.length >= JL.segnale) {
         J.segnale = true; J.colpi = [];
         this.say('Cinque lampi sul portone. Dentro l\'officina si accende una luce, poi un\'altra.', 'info');
-        if (this.vgThink) this.vgThink('Jeshka si è tolta la cintura e non scende. Entro io per primo, con lei dietro.');
+        if (this.vgThink) this.vgThink('Jeshka si è tolta la cintura e non scende. Entro io per primo, con lei dietro.', true);
       } else if (J.colpi.length === 1) this.say('Jeshka conta sottovoce: «Odin…»', 'info');
     }
     return r;
@@ -114,7 +114,7 @@ function jlFatto(g, scena, k, I) {
       J.sms = true;
       if (typeof window !== 'undefined' && window.telefono && window.telefono.sms) window.telefono.sms('Numero sconosciuto', 'Ti tengo compagnia.', { bad: true });
       this.say('Jeshka legge il messaggio sul tuo telefono e lo gira a faccia in giù.', 'bad');
-      if (this.vgThink) this.vgThink('Jeshka: «Non è lui. Lui quella frase non la finisce mai: si addormenta prima.»');
+      { const t = 'Jeshka: «Non è lui. Lui quella frase non la finisce mai: si addormenta prima.»'; if (!(this.vgThink && this.vgThink(t, true))) this.say(t, 'info'); }
       return;
     }
     if (km >= (J.chKm || 1e9) && (J.ch || 0) < JL_CHIACCHIERE.length) {

@@ -631,7 +631,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     if (o.gives && typeof INV !== 'undefined' && INV[o.gives]) v.cassa.push({ kind: o.gives, kg: INV[o.gives].kg });
     if (o.radio && typeof window !== 'undefined' && window.NightNotte && window.NightNotte.disturbo) window.NightNotte.disturbo(sub(o.radio));
     const text = sub(o.text);
-    const show = () => { if (o.pens && this.vgThink) this.vgThink(text); else this.ask({ kind: 'odd', title: o.title, text, time: o.radio ? 18 : 22, options: [{ label: '…' }] }); };
+    const show = () => { if (!(o.pens && this.vgThink && this.vgThink(text, true))) this.ask({ kind: 'odd', title: o.title, text, time: o.radio ? 18 : 22, options: [{ label: '…' }] }); };
     if (o.radio) { setTimeout(show, 2600); return; }
     if (where === 'road' && (o.sign || o.cippo || o.parked || o.twin)) { setTimeout(show, 6000); return; }
     show();
@@ -641,7 +641,7 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
     for (const e of this.ents) {
       if (e.kind !== 'ghost' || !e.mirror) continue;
       e.ttl -= dt; e.x = this.s.dist - e.gap; e.v = Math.max(0, this.sim.v);
-      if (this.lane !== e.lane0) { e.gone = true; const o = VG_ODD.find((x) => x.id === e.mirror); if (o && this.vgThink) this.vgThink(vgTesto(this, o.text)); }
+      if (this.lane !== e.lane0) { e.gone = true; const o = VG_ODD.find((x) => x.id === e.mirror); if (o && this.vgThink && !this.vgThink(vgTesto(this, o.text), true)) this.say(vgTesto(this, o.text), 'info'); }
       else if (e.ttl <= 0) e.gone = true;
     }
     if (this.ents.some((e) => e.gone)) this.ents = this.ents.filter((e) => !e.gone);

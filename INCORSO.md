@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico) con Claude | Interruttori per scritte da fumetto, versi del pilota e pensieri | `index.html`, `menu.js`, `pensieri.js`, `reazioni.js` | 24/11 |

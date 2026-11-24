@@ -1050,7 +1050,9 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       <label class="kbtn qsel">Qualità <select id="q3d" aria-label="Qualità grafica"><option value="alta">alta · bloom</option><option value="media">media</option><option value="bassa">bassa</option><option value="leggera">leggera · prove da telefono</option></select></label>
       <label class="kbtn qsel">Interfaccia <select id="hudModeSel" aria-label="Quanta interfaccia sulla strada"><option value="mecc">meccanico · tutto</option><option value="ess">essenziale</option></select></label>
       <label class="kbtn qsel">Pausa se esci <select id="pausaSel" aria-label="Pausa quando la finestra perde il fuoco"><option value="si">sì</option><option value="no">no</option></select></label>
-      <label class="kbtn qsel">Grafiche anime <select id="animeSel" aria-label="Scritte da fumetto e lampi in stile anime"><option value="si">accese</option><option value="no">spente</option></select></label>
+      <label class="kbtn qsel">Scritte da fumetto <select id="animeSel" aria-label="Scritte da fumetto sulla strada (scoppi della marmitta, urti, frenate) e lampi sulle cambiate perfette"><option value="si">accese</option><option value="no">spente</option></select></label>
+      <label class="kbtn qsel">Versi del pilota <select id="reaSel" aria-label="Vignette coi versi del protagonista quando l'auto spinge"><option value="si">accesi</option><option value="no">spenti</option></select></label>
+      <label class="kbtn qsel">Pensieri <select id="pensSel" aria-label="Pensieri del protagonista scritti sulla strada"><option value="si">tutti</option><option value="storia">solo la storia</option><option value="no">spenti</option></select></label>
       <label class="kbtn qsel">Contatore FPS <select id="fpsSel" aria-label="Contatore dei fotogrammi al secondo"><option value="no">spento</option><option value="si">acceso</option></select></label>
       <label class="kbtn qsel">Suggerimenti <select id="suggSel" aria-label="Suggerimenti dei primi minuti"><option value="si">accesi</option><option value="no">spenti</option></select></label>
     </div>
@@ -2365,8 +2367,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   if (window.ResizeObserver) new ResizeObserver(() => garage && garage.resize()).observe($('roadStage'));
   S.look = '2d';                                              // le partite salvate con la vista 3D tornano al 2D
   if (S.paint === 'model') S.paint = PAINTS[0][0];            // "colore del modello" c'era solo coi modelli 3D
+  // versi del pilota: chi aveva spento le grafiche anime (prima spegnevano anche questi) li trova spenti
+  function reaOn() { return S.reazioni !== undefined ? S.reazioni !== false : S.anime !== false; }
   function applyLook() {
-    garage = street2d || (street2d = new Street2D($('g2d'))); street2d.comicsOn = S.anime !== false; street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
+    garage = street2d || (street2d = new Street2D($('g2d'))); street2d.comicsOn = S.anime !== false; street2d.reaOn = reaOn(); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
     garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint); garage.setTips(TP.dsp.ex.tips);
   }
   applyLook();
@@ -2375,9 +2379,16 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   $('pausaSel').addEventListener('change', (e) => { S.pausa = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   $('suggSel').value = S.sugg === false ? 'no' : 'si';
   $('suggSel').addEventListener('change', (e) => { S.sugg = e.target.value !== 'no'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
-  // grafiche anime: scritte da fumetto (BANG!, CRASH!...) sulla strada e lampi sulle cambiate perfette
+  // scritte da fumetto (BANG!, CRASH!...) sulla strada e lampi sulle cambiate perfette (S.anime, il nome di prima)
   $('animeSel').value = S.anime === false ? 'no' : 'si';
-  $('animeSel').addEventListener('change', (e) => { S.anime = e.target.value !== 'no'; if (street2d) street2d.comicsOn = S.anime; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } flash(S.anime ? 'Grafiche anime accese' : 'Grafiche anime spente', 1.4); });
+  $('animeSel').addEventListener('change', (e) => { S.anime = e.target.value !== 'no'; if (street2d) street2d.comicsOn = S.anime; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } flash(S.anime ? 'Scritte da fumetto accese' : 'Scritte da fumetto spente', 1.4); });
+  // versi del pilota (reazioni.js): le vignette «VRAAAAM!» sopra la testa e la faccia stupita
+  $('reaSel').value = reaOn() ? 'si' : 'no';
+  $('reaSel').addEventListener('change', (e) => { S.reazioni = e.target.value !== 'no'; if (street2d) street2d.reaOn = S.reazioni; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } flash(S.reazioni ? 'Versi del pilota accesi' : 'Versi del pilota spenti', 1.4); });
+  // pensieri (pensieri.js): tutti, solo quelli della storia (capitali, eventi strani, Jeshka, la notte) o nessuno
+  game.pensMode = S.pensieri || 'si';
+  $('pensSel').value = game.pensMode;
+  $('pensSel').addEventListener('change', (e) => { S.pensieri = game.pensMode = e.target.value; if (game.pensMode !== 'si' && game.thought) game.thought.left = 0; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } flash(game.pensMode === 'si' ? 'Pensieri accesi' : game.pensMode === 'storia' ? 'Pensieri: solo la storia' : 'Pensieri spenti', 1.4); });
   $('fpsSel').value = S.fps ? 'si' : 'no';
   $('fpsSel').addEventListener('change', (e) => { S.fps = e.target.value === 'si'; try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });
   $('q3d').addEventListener('change', (e) => { S.q = e.target.value; if (street2d) { street2d.quality = S.q; if (street2d.slowReset) street2d.slowReset(); } try { localStorage.setItem('banco2jz', JSON.stringify(S)); } catch (err) { /* ignora */ } });

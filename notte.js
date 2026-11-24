@@ -75,7 +75,7 @@ const NOTTE_DIETRO = {
     }
     if (D.smsT !== undefined && !this.prompt) { D.smsT -= 1 / 30; if (D.smsT <= 0) { D.smsT = undefined; if (typeof window !== 'undefined' && window.telefono && window.telefono.sms) window.telefono.sms('Numero sconosciuto', NOTTE_DIETRO.sms, { bad: 1 }); else this.say('Numero sconosciuto: «' + NOTTE_DIETRO.sms + '»', 'bad'); } }
     // appena ti allontani l'altra non c'è più
-    if (D.e && d - D.d0 > 80) { const i = this.ents.indexOf(D.e); if (i >= 0) this.ents.splice(i, 1); D.e = null; if (this.vgThink) this.vgThink(NOTTE_DIETRO.via); }
+    if (D.e && d - D.d0 > 80) { const i = this.ents.indexOf(D.e); if (i >= 0) this.ents.splice(i, 1); D.e = null; if (this.vgThink) this.vgThink(NOTTE_DIETRO.via, true); }
     if (!D.e && D.smsT === undefined && !this.prompt) this._dietro = null;
   };
 

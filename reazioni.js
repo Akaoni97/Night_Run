@@ -7,7 +7,7 @@
 //  momento e il suono vero dell'auto (famiglia del motore in `REA_FAM`: tre cilindri «TRATRATRA», diesel «BRUUU», sei
 //  cilindri «UUUAAAH»...) e gli scoppi secondo quanto è preparata (`REA_BOTTO`: POP! → PUPUPU! → TRATATAN!). Le lettere escono
 //  una alla volta come se le dicesse, ballano e negli urli tremano; scoppi, limitatore e partenze hanno la vignetta a punte.
-//  Si spegne con Impostazioni → Grafica → Grafiche anime (`street2d.comicsOn`, come le scritte da fumetto).
+//  Si spegne con Impostazioni → Grafica → Scritte sulla strada → Versi del pilota (`street2d.reaOn`, `S.reazioni`), a parte dalle scritte da fumetto.
 //  Parte pura (provata in test/reazioni.test.js): REA_LINES, REA_FAM, REA_BOTTO, reaFam, reaPick, reaAccelStep. Disegno: agganciato a Street2D.drawComics.
 //  La posizione della testa la scrive pilota2d.js (`_drvHead`), la faccia legge `_rea.awe`.
 //  Prova a mano: `nightRun.view2d.reaSay('accel')` (tipi: accel, launch1, launch2, sorpasso, botto, giri, turbo).
@@ -102,7 +102,7 @@ function reaAccelStep(S, v, dt) {
     if (R.bub) { R.bub.t += dt; if (R.bub.t > R.bub.life) R.bub = null; }
     const NR = typeof window !== 'undefined' && window.nightRun, sim = NR && NR.sim, g = NR && NR.game;
     if (!sim || !g || dt <= 0 || dt > 0.25) return;
-    if (g.inside || !sim.running || this.comicsOn === false || this.quality === 'bassa') return;
+    if (g.inside || !sim.running || this.reaOn === false || this.quality === 'bassa') return;
     const v = Math.abs(sim.v || 0), thr = sim.thr || 0;
     // accelerazione forte: oltre 2,6 m/s² a gas aperto per mezzo secondo (una V40 a gas pieno ci arriva, una preparata molto prima e più spesso)
     const a = reaAccelStep(R.A, v, dt);

@@ -77,3 +77,16 @@ test('pensieri: com\'è messa l\'auto (fari rotti, rosso, ricercato) si dice qua
   game.prompt = null; game.inside = null; p.last = -999; game.vgPensTick(1);
   assert.ok(PENS_STATO.luci.frasi.includes(game.thought.text) || PENS_STATO.motore.frasi.includes(game.thought.text), game.thought.text);
 });
+
+test('pensieri: si spengono tutti o restano solo quelli della storia (Impostazioni → Grafica → Pensieri)', () => {
+  const g = nuova(1.2); g.pensMode = 'no'; passa(g, 30);
+  assert.equal(g.thought, undefined, 'spenti: nemmeno la radio');
+  assert.equal(g.vgThink('Una frase della storia.', true), false, 'spenti: nemmeno la storia');
+  g.pensMode = 'storia'; passa(g, 30);
+  assert.equal(g.thought, undefined, 'solo la storia: niente pensieri di tutti i giorni');
+  assert.equal(g.vgThink('Pensiero qualunque.'), false);
+  assert.equal(g.vgThink('Una frase della storia.', true), true);
+  assert.equal(g.thought.text, 'Una frase della storia.');
+  g.pensMode = 'si'; g.s.vg.pens.last = -999; passa(g, 1);
+  assert.ok(/radio/i.test(g.thought.text), 'riaccesi: la radio che era rimasta da dire');
+});

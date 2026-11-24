@@ -1,7 +1,7 @@
 // Scritte da fumetto in stile anime (dopo effetti2d.js, prima di meteo2d.js che si aggancia a drawComics).
 // Le scritte sono le stesse di sempre (BANG!, CRASH!, PSSSH!...), ma ora hanno più voci per ogni rumore, più forme
 // (scoppio a stella, esplosione irregolare, nuvoletta, strisce di velocità, raggi), testo a due colori con ombra e riflesso,
-// puntini da retino, scintille e raggi d'urto. Impostazioni → Grafica → Grafiche anime le spegne (`street2d.comicsOn`).
+// puntini da retino, scintille e raggi d'urto. Impostazioni → Grafica → Scritte sulla strada → Scritte da fumetto le spegne (`street2d.comicsOn`, `S.anime`).
 //
 //   Street2D.prototype.comicEv(tipo, x, y, pot)   scrive la scritta di un evento: sceglie voce, colori e forma
 //   Street2D.prototype.comic(testo, x, y, col, size, burst, opzioni)   scritta a mano (opzioni: col2, shadow, shape, ...)
