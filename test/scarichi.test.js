@@ -7,8 +7,8 @@ import { readFileSync } from 'node:fs';
 import { inflateSync } from 'node:zlib';
 
 const dir = new URL('../', import.meta.url);
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'suoni.js', 'cars.js', 'samples.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
-const { CARS } = new Function(src + ';return { CARS }')();
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'schede.js', 'suoni.js', 'cars.js', 'samples.js', 'street2d.js'].map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
+const { CARS, TUNING_SUPRA, Street2D } = new Function(src + ';return { CARS, TUNING_SUPRA, Street2D }')();
 
 // PNG a 8 bit senza interlacciatura: basta l'alfa (tipo 6 RGBA, tipo 4 grigio+alfa)
 function alfa(file) {
@@ -49,4 +49,35 @@ test('scarichi: il punto delle fiamme sta sulla carrozzeria, nella metà dietro,
     n++;
   }
   assert.ok(n >= 50, 'controllati ' + n + ' disegni');
+});
+
+test('scarichi di profilo: il tubo e l’innesto restano dietro la gomma posteriore con qualsiasi pezzo e kit', () => {
+  const v = Object.create(Street2D.prototype);
+  v.v40Ready = true;
+  for (const [id, car] of Object.entries(CARS)) {
+    v.carId = id;
+    for (const kit of ['none', ...(car.spriteT ? ['tuning'] : []), ...(id === 'v40' ? ['kit'] : [])]) {
+      v.cos = { kit };
+      const geo = v.geo(), D = v.genDef(), [x, y] = geo.ex;
+      let raggio = geo.wr;
+      if (D) {
+        const a = alfa(D.wheel);
+        let r = 0;
+        for (let yy = 0; yy < a.H; yy++) for (let xx = 0; xx < a.W; xx++) {
+          if (a.a(xx, yy) > 64) r = Math.max(r, Math.hypot(xx + .5 - a.W / 2, yy + .5 - a.H / 2));
+        }
+        raggio = Math.max(raggio, r * Street2D.scalaRuota(D));
+        const carrozzeria = alfa(D.img);
+        assert.ok([0, 1, 2].some((dy) => carrozzeria.a(Math.round(x), Math.round(y) - dy) > 64),
+          `${id} ${kit}: innesto lontano dal paraurti`);
+      }
+      for (const pezzo of (car.tuning || TUNING_SUPRA).exhaust.items) {
+        v.carLook = car.params({ ...car.presets[0].sel, exhaust: pezzo.id }).look;
+        const tubo = v.scarico(geo);
+        assert.ok(tubo.lunghezza > 0);
+        assert.ok(x + tubo.lunghezza * tubo.scala + .3 < geo.ax[0] - raggio,
+          `${id} ${kit} ${pezzo.id}: il terminale raggiunge la gomma`);
+      }
+    }
+  }
 });
