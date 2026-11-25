@@ -1,3 +1,9 @@
+## 25/11/2026 · proprietario (Nico) · v0.164 (**Fiat Uno Turbo i.e. e Punto prima serie**)
+- Dai disegni di Nico (zip del 25/11) due auto nuove, sprite normali e ad alta definizione con `strumenti/disegni_hd.py` (ruota ritagliata dal disegno stesso; sfondo già trasparente, quindi niente `sfondo_via.py`, che si mangiava il contorno nero). Maschera della vernice dell'Uno fatta a mano: si ricolora solo la parte grigia, la fascia scura sotto resta.
+- **Uno Turbo i.e.** (`uno`, € 16.000 dal km 90, piccole sportive): 1.3 con **turbo IHI VL2 vero** (0,6 bar, ritardo e valvola come R5 e 2002 Turbo; la curva di `GEN_DATA` è quella senza pressione), 105 CV a 5750 e 147 Nm a 3200, 845 kg, C510 3,909/2,267/1,44/1,029/0,875, finale 3,353, 175/60 R13; due kit turbo suoi. Prova: 0-100 in 8,7 s, 203 km/h (vera 8,3 s, ~200).
+- **Punto 75** (`punto1`, € 4.500 dal km 5, utilitarie): 1.2 Fire 8V da 73 CV e 106 Nm, 860 kg, 3,909/2,158/1,48/1,121/0,897, finale 3,733, 165/65 R14. Prova: 12,2 s, 171 km/h (vera ~12 s, 170). Le due auto entrano nel test delle prestazioni (`test/telaio.test.js`).
+- Aperto: i rapporti e la pressione dell'Uno sono «media» (le fonti non sono d'accordo su terza, quarta e bar); WAV dell'allungo mandati a Nico per sentirle.
+
 ## 25/11/2026 · proprietario · v0.163 (**righe sotto le auto e ruote fuori scala**)
 - Tolti i residui del fondo da dieci disegni di auto, la riga piena del sottoscocca al neon e il bordo duro dell’ombra di contatto. Il neon illumina l’asfalto e la luce proietta ancora l’ombra della carrozzeria.
 - Corretti i raggi grafici in base al passo e alle misure delle gomme, anche per il traffico e le versioni con kit. Prove in Chromium su desktop e mobile, 437 test passati.

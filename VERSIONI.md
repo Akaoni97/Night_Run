@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.163**
+**Versione attuale: v0.164**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -187,3 +187,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.161 · 24/11/2026 · cognato · **Bagagliaio a portata di mano e cambio gomma vero**: pulsante BAGAGLIAIO tra MENU e TELEFONO (anche a schermo intero); «Usa» sulla ruota di scorta (o 9) e l'auto accosta a destra, il protagonista scende, prende la scorta dal bagagliaio, crick e bulloni alla ruota forata, rimette la forata nel bagagliaio e risale (U accelera)
 - v0.162 · 25/11/2026 · proprietario · **Nottolino a due posizioni**: tieni premuto per girare la chiave da OFF a START e sentire il motore accendersi.
 - v0.163 · 25/11/2026 · proprietario · **Auto 2D**: rimosse le righe sotto la carrozzeria e riallineate le dimensioni delle ruote sui modelli fuori scala.
+- v0.164 · 25/11/2026 · proprietario · due auto nuove dai disegni: Fiat Uno Turbo i.e. prima serie (turbo IHI vero da 0,6 bar, 105 CV, cambio C510) e Fiat Punto 75 prima serie (1.2 8V da 73 CV), con telaio, rapporti, gomme, freni, scheda, pezzi propri, traffico e Autosalone

@@ -88,7 +88,7 @@ const VG_SHOP = [
 
 // le auto del pacchetto del giocatore si comprano alla concessionaria del motel; posti a sedere secondo la carrozzeria
 for (const c of GEN_CARS) if (c.buy && !VG_SHOP.some((q) => q.id === c.id)) VG_SHOP.push({ id: c.id, name: c.name, price: c.buy.price, km: c.buy.km, car: true, note: c.tag });
-Object.assign(VG_SEATS, { a80: 4, a3: 4, a112: 3, panda: 4, punto: 4, golf: 4, corsa: 4, p205: 4, p206: 4, p308: 4, clio: 4, williams: 4, taxi: 4, v850: 4, polo: 4, panda141: 4, ax: 4, twingo: 4, sandero: 5, aygo: 4, doblo: 4, ambulanza: 2, polizia: 4 });
+Object.assign(VG_SEATS, { a80: 4, a3: 4, a112: 3, panda: 4, punto: 4, golf: 4, corsa: 4, p205: 4, p206: 4, p308: 4, clio: 4, williams: 4, taxi: 4, v850: 4, polo: 4, panda141: 4, uno: 4, punto1: 4, ax: 4, twingo: 4, sandero: 5, aygo: 4, doblo: 4, ambulanza: 2, polizia: 4 });
 
 // ---------------------------------------------------------------- persone: autostoppisti normali e quelli che ricorderai
 const VG_NAMES = ['Marco', 'Giulia', 'Sergio', 'Elena', 'Tommaso', 'Rita', 'Kenji', 'Aiko', 'Bruno', 'Lucia', 'Dario', 'Nadia', 'Hiro', 'Ada', 'Walter', 'Sofia'];

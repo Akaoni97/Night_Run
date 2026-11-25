@@ -7,9 +7,9 @@
 
 // categorie delle auto (le usano il Garage e i documenti: una Panda e una M5 non sono nella stessa classe)
 const ST_CAT = {
-  utilitaria: ['panda', 'punto', 'polo', 'corsa', 'clio', 'a112', 'panda141', 'ax', 'twingo', 'sandero', 'aygo'],
+  utilitaria: ['panda', 'punto', 'punto1', 'polo', 'corsa', 'clio', 'a112', 'panda141', 'ax', 'twingo', 'sandero', 'aygo'],
   familiare: ['v40', 'a80', 'a3', 'p308', 'v850', 'taxi'],
-  hot: ['golf', 'p205', 'p206', 'williams', 'r5'],
+  hot: ['golf', 'uno', 'p205', 'p206', 'williams', 'r5'],
   sportiva: ['e30', 'e36', 'e34', 'b2002', 'supra'],
   lavoro: ['bus', 'van', 'doblo', 'ambulanza', 'polizia'],
 };

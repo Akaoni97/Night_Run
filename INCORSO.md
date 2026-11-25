@@ -10,4 +10,3 @@ Chi sta lavorando su cosa, adesso. Serve a non toccare gli stessi file nello ste
 
 | Chi | Cosa | File che tocca | Da quando |
 | --- | --- | --- | --- |
-| proprietario (Nico) con Claude | Fiat Uno Turbo i.e. e Punto prima serie dai disegni | `cars.js`, `schede.js`, `img/`, `game.js`, `pilota2d.js` | 25/11 |

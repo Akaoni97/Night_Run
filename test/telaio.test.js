@@ -60,7 +60,7 @@ test('Supra e V40 restano come prima', () => {
 
 test('velocità massima e 0-100 vicini ai dati veri', () => {
   // [0-100 min, max, velocità massima min, max] dalle prove su strada (con un margine: il modello è semplice)
-  const att = { e30: [6.3, 7.3, 228, 245], panda: [13, 15.5, 152, 170], polo: [14.5, 18, 155, 176], ax: [11, 14, 155, 168], aygo: [12, 15, 150, 168], golf: [7.8, 9.2, 178, 192], p205: [7.4, 8.6, 198, 214], williams: [7.4, 8.6, 205, 220], v850: [6.5, 7.6, 235, 260] };
+  const att = { e30: [6.3, 7.3, 228, 245], panda: [13, 15.5, 152, 170], polo: [14.5, 18, 155, 176], ax: [11, 14, 155, 168], aygo: [12, 15, 150, 168], uno: [7.9, 9.4, 192, 212], punto1: [11, 13.5, 162, 180], golf: [7.8, 9.2, 178, 192], p205: [7.4, 8.6, 198, 214], williams: [7.4, 8.6, 205, 220], v850: [6.5, 7.6, 235, 260] };
   for (const [id, [a, b, c, d]] of Object.entries(att)) {
     const r = corsa(id);
     assert.ok(r.t100 > a && r.t100 < b, `${id}: 0-100 in ${r.t100.toFixed(1)} s, atteso tra ${a} e ${b}`);
