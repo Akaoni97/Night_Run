@@ -171,7 +171,7 @@ retrotreno (più trazione, più lenta in accelerazione). Tanica (+10 L), kit di 
 fermo), ruota di scorta, zavorra, i pacchi delle consegne (non si buttano durante il lavoro).
 Si compra e si butta dal pannello del bagagliaio.
 
-**Schermata iniziale.** All'apertura c'è il titolo NIGHT RUN e il menu del Viaggio con il nottolino Racing. Gira la chiave fino a **START** e rilasciala, oppure premi **Invio** o **Spazio**. La sigla con la Supra e la canzone è stata tolta: adesso a inizio Viaggio c'è il **prologo**
+**Schermata iniziale.** All'apertura c'è il titolo NIGHT RUN e il menu del Viaggio con il nottolino Racing. Tieni premuta la chiave per girarla da **OFF** a **START** e sentire il motore accendersi. Puoi anche premere **Invio** o **Spazio**. La sigla con la Supra e la canzone è stata tolta: adesso a inizio Viaggio c'è il **prologo**
 (`prologo.js`). La canzone *Redline at Midnight* resta come stazione dell'autoradio.
 
 ## La carriera

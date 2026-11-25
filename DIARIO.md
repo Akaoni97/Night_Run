@@ -1,3 +1,7 @@
+## 25/11/2026 · proprietario · v0.162 (**nottolino OFF e START**)
+- La chiave gira mentre la tieni premuta. Il motorino parte con il gesto e dopo 1,2 secondi si entra nel Viaggio. Se molli prima, torna su OFF e il suono sfuma. Invio e Spazio fanno partire la sequenza.
+- Provati mouse, touch e tastiera nel browser. 437 test passati.
+
 ## 24/11/2026 · cognato · v0.161 (**pulsante bagagliaio, cambio gomma animato**)
 - Pulsante **BAGAGLIAIO** (tasto B) nella barra in alto tra MENU e TELEFONO (`menu.js`, icona `box` in `premium.css`): apre dritto la scheda del bagagliaio, un altro clic la chiude; anche nel dock a schermo intero.
 - **Cambio gomma** (`cambiogomma.js`, nuovo; `changeTyre` di `viaggio.js`; «Usa» sulla scorta in `game.js`): ora si fa anche in corsa, l'auto va nella corsia di destra e si ferma, poi il protagonista (il tuo aspetto) scende, va al bagagliaio (CLAC), porta la scorta alla ruota, in ginocchio: crick, TAC TAC TAC, cambio, giù; torna con la forata (SBAM), risale. ~15 s, U accelera ×3. La gomma torna buona solo a lavoro finito. Il menu si chiude da solo per guardare la scena. Provato nel browser (V40 in corsa, foto); test `test/cambiogomma.test.js` (437).

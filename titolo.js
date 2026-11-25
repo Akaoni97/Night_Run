@@ -517,31 +517,39 @@
       fetta();
     } catch (e) { rendendo = false; SUONO = null; }
   }
-  // Riproduzione all’avvio della partita, con un avviamento semplice finché il motore reso non è pronto.
-  let AC = null;
-  function suona() {
-    try {
-      const Ctor = window.AudioContext || window.webkitAudioContext; if (!Ctor) return;
-      AC = AC || new Ctor(); if (AC.state === 'suspended') AC.resume();
-      if (SUONO) {
-        const b = AC.createBuffer(2, SUONO.L.length, SUONO.sr); b.copyToChannel(SUONO.L, 0); b.copyToChannel(SUONO.R, 1);
-        const src = AC.createBufferSource(); src.buffer = b; src.connect(AC.destination); src.start();
-      } else semplice(AC);                                        // il motore vero non è pronto: un avviamento semplice
-    } catch (e) { /* senza audio si parte lo stesso */ }
+  // Parte quando si preme. Se la chiave torna su OFF, il motorino sfuma.
+  function motorino(ctx, volume) {
+    if (!ctx || volume <= 0) return;
+    const uscita = ctx.createGain();
+    uscita.gain.value = volume;
+    uscita.connect(ctx.destination);
+    let fine;
+    if (SUONO) {
+      const b = ctx.createBuffer(2, SUONO.L.length, SUONO.sr);
+      b.copyToChannel(SUONO.L, 0); b.copyToChannel(SUONO.R, 1);
+      const src = ctx.createBufferSource(); src.buffer = b; src.connect(uscita); src.start();
+      fine = src;
+    } else fine = semplice(ctx, uscita);
+    fine.onended = () => uscita.disconnect();
+    return () => {
+      const ora = ctx.currentTime;
+      uscita.gain.setTargetAtTime(0, ora, 0.02);
+      setTimeout(() => uscita.disconnect(), 120);
+    };
   }
-  function semplice(ac) {                                         // riserva: motorino a scatti e un minimo semplice
-    const t0 = ac.currentTime + 0.03, out = ac.createGain(); out.gain.value = 0.5; out.connect(ac.destination);
+  function semplice(ac, destinazione) {                                         // riserva: motorino a scatti e un minimo semplice
+    const t0 = ac.currentTime + 0.03, out = ac.createGain(); out.gain.value = 0.5; out.connect(destinazione);
     const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 480; lp.connect(out);
     const m = ac.createOscillator(), mg = ac.createGain(); m.type = 'sawtooth'; m.frequency.value = 30; mg.gain.value = 0; m.connect(mg); mg.connect(lp);
     for (let i = 0; i < 6; i++) { const a = t0 + i * 0.14; mg.gain.setValueAtTime(0, a); mg.gain.linearRampToValueAtTime(0.7, a + 0.04); mg.gain.linearRampToValueAtTime(0.2, a + 0.12); }
     mg.gain.setValueAtTime(0, t0 + 0.86); m.start(t0); m.stop(t0 + 0.9);
     const e = ac.createOscillator(), eg = ac.createGain(); e.type = 'sawtooth'; e.frequency.setValueAtTime(40, t0 + 0.85); e.frequency.linearRampToValueAtTime(52, t0 + 1.2);
     eg.gain.setValueAtTime(0, t0 + 0.85); eg.gain.linearRampToValueAtTime(0.7, t0 + 1.0); eg.gain.linearRampToValueAtTime(0, t0 + 2.4); e.connect(eg); eg.connect(lp); e.start(t0 + 0.85); e.stop(t0 + 2.5);
+    return e;
   }
 
   function avviamento() {
     gate.classList.add('nt-avvio');
-    suona();
   }
 
   function avvia() {
@@ -551,7 +559,7 @@
   if (document.readyState === 'complete') setTimeout(avvia, 0); else window.addEventListener('load', avvia);
 
   // per le prove: ridisegna il quadro subito
-  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, avviamento, accendi: () => {
+  window.NightTitolo = { foto: () => { quadro(); present(); }, pannello, meteo, NT_FRASI, avviamento, motorino, accendi: () => {
     if (window.titleIgnition) window.titleIgnition.start();
     else if (goBtn) goBtn.click();
   } };

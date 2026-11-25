@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.161**
+**Versione attuale: v0.162**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -185,3 +185,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.159 · 24/11/2026 · cognato · **impennata rifatta sulla fisica**: niente più mossa da fermo; il muso si alza quando la spinta del momento supera quella che serve a quell'auto (baricentro, passo, peso dietro, 4-link, CV per tonnellata, gomme da drag): prima la cassa si siede, dopo qualche metro sale, cala al limitatore e nelle cambiate, col colpo di frizione in seconda a bassa velocità si alza, a 60 km/h fa solo cenno; tetto 10°
 - v0.160 · 24/11/2026 · cognato · **Luca Tuning più pulito e con le fiamme**: CV, Nm, kg/CV e 400 m solo sullo schermo del banco (spostato a sinistra, dove si vede), con +6 CV / −0,2 s del pezzo sotto il puntatore; nel pannello a destra spariscono i doppioni; le fiamme dello scarico escono anche sulla macchina in officina mentre sgasi
 - v0.161 · 24/11/2026 · cognato · **Bagagliaio a portata di mano e cambio gomma vero**: pulsante BAGAGLIAIO tra MENU e TELEFONO (anche a schermo intero); «Usa» sulla ruota di scorta (o 9) e l'auto accosta a destra, il protagonista scende, prende la scorta dal bagagliaio, crick e bulloni alla ruota forata, rimette la forata nel bagagliaio e risale (U accelera)
+- v0.162 · 25/11/2026 · proprietario · **Nottolino a due posizioni**: tieni premuto per girare la chiave da OFF a START e sentire il motore accendersi.

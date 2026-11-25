@@ -25,52 +25,59 @@ function accensione() {
   const handlers = {};
   const status = {};
   const dial = {
-    style: { setProperty() {} }, dataset: {},
+    dataset: {},
     addEventListener(name, handler) { handlers[name] = handler; },
-    getBoundingClientRect: () => ({ left: 0, top: 0, width: 990, height: 708 }),
     setPointerCapture() {},
   };
   const widget = { querySelector: (selector) => selector === '.nr-switch' ? dial : status };
   class HTMLElement { appendChild() {} }
-  const window = {};
-  new Function('window', 'document', 'HTMLElement', 'setTimeout', ignition)(
-    window, { createElement: () => widget }, HTMLElement, () => {}
+  let timer = null;
+  const window = { addEventListener(name, handler) { handlers[name] = handler; } };
+  new Function('window', 'document', 'HTMLElement', 'setTimeout', 'clearTimeout', ignition)(
+    window, { createElement: () => widget }, HTMLElement,
+    (callback) => { timer = callback; return 1; }, () => { timer = null; }
   );
-  let avvii = 0;
-  const chiave = window.createRacingIgnition(new HTMLElement(), () => avvii++);
-  return { handlers, status, chiave, get avvii() { return avvii; } };
+  let avvii = 0, suoni = 0, silenzi = 0;
+  const chiave = window.createRacingIgnition(new HTMLElement(), () => avvii++, () => {
+    suoni++;
+    return () => silenzi++;
+  });
+  return { handlers, status, chiave, fine: () => timer?.(),
+    get avvii() { return avvii; }, get suoni() { return suoni; }, get silenzi() { return silenzi; } };
 }
 
-test('la chiave avvia una sola volta al rilascio su START', () => {
+test('il rilascio anticipato riporta la chiave su OFF e sfuma il motorino', () => {
   const prova = accensione();
-  const punto = (deg) => {
-    const rad = deg * Math.PI / 180;
-    return { clientX: 495 + 184 * Math.cos(rad), clientY: 365 + 184 * Math.sin(rad),
-      pointerId: 1, isPrimary: true, button: 0 };
-  };
-  prova.handlers.pointerdown(punto(-151));
-  prova.handlers.pointermove(punto(-114));
-  prova.handlers.pointerup(punto(-114));
-  assert.equal(prova.status.textContent, 'ACC');
-  assert.equal(prova.avvii, 0);
-  prova.handlers.pointerdown(punto(-114));
-  prova.handlers.pointermove(punto(-37));
-  assert.equal(prova.avvii, 0);
-  prova.handlers.pointerup(punto(-37));
+  const pointer = { pointerId: 1, isPrimary: true, button: 0 };
+  prova.handlers.pointerdown(pointer);
+  assert.equal(prova.status.textContent, 'START');
+  assert.equal(prova.suoni, 1);
+  prova.handlers.pointerup(pointer);
   prova.handlers.click({ detail: 1 });
+  prova.fine();
+  assert.equal(prova.status.textContent, 'OFF');
+  assert.equal(prova.silenzi, 1);
+  assert.equal(prova.avvii, 0);
+  prova.handlers.pointerdown(pointer);
+  prova.fine();
+  prova.handlers.pointerup(pointer);
   prova.chiave.start();
   assert.equal(prova.avvii, 1);
+  assert.equal(prova.silenzi, 1);
 });
 
-test('Invio e Spazio avviano la partita anche con il focus sulla chiave', () => {
+test('Invio e Spazio riproducono la sequenza una volta anche con il focus sulla chiave', () => {
   for (const key of ['Enter', ' ']) {
     const prova = accensione();
     let fermato = false;
     const e = { key, preventDefault() {}, stopPropagation() { fermato = true; } };
     prova.handlers.keydown({ ...e, repeat: true });
-    assert.equal(prova.avvii, 0);
+    assert.equal(prova.suoni, 0);
     prova.handlers.keydown(e);
     assert.equal(fermato, true);
+    assert.equal(prova.suoni, 1);
+    assert.equal(prova.avvii, 0);
+    prova.fine();
     assert.equal(prova.avvii, 1);
   }
 });
