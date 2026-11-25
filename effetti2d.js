@@ -387,7 +387,16 @@
   // hg = altezza nello sprite della linea di terra.
   S.fxShadow = function (g, spr, left, y0, hg, cx, lampX) {
     const day = this.day || 0, night = 1 - day;
-    this.shadow(g, cx, y0, spr.width * 0.45, 3, 0.5);
+    if (!Street2D._ombraAuto) {
+      const c = document.createElement('canvas'); c.width = 96; c.height = 96;
+      const x = c.getContext('2d'), grad = x.createRadialGradient(48, 48, 0, 48, 48, 48);
+      grad.addColorStop(0, 'rgba(4,5,12,.44)');
+      grad.addColorStop(0.52, 'rgba(4,5,12,.3)');
+      grad.addColorStop(1, 'rgba(4,5,12,0)');
+      x.fillStyle = grad; x.fillRect(0, 0, 96, 96);
+      Street2D._ombraAuto = c;
+    }
+    g.drawImage(Street2D._ombraAuto, cx - spr.width * 0.49, y0 - 4, spr.width * 0.98, 9);
     if (this.quality === 'bassa' || !spr.getContext) return;
     const sil = this.silOf(spr);
     const cast = (sx, sy, a) => {

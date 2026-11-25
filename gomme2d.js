@@ -90,8 +90,8 @@
   const gen = S.genWheel;
   S.genWheel = function (g, cx, cy, k, ang, speed = 0, rear = false) {
     gen.call(this, g, cx, cy, k, ang, speed, rear);
-    const D = this.genDef(), G = Street2D.gen && Street2D.gen[this.carId], ri = rimInfo(G && G.wheel);
-    if (D) this.tireFx(g, cx, cy, D.wr * k + 0.5, ang, speed, { rim: ri && ri.frac, rgb: ri && ri.rgb, press: pressOf(rear), wear: wearOf() });
+    const D = this.genDef(), G = Street2D.gen && Street2D.gen[this.genKey()], ri = rimInfo(G && G.wheel);
+    if (D) this.tireFx(g, cx, cy, Street2D.raggioGrafico(D) * k, ang, speed, { rim: ri && ri.frac, rgb: ri && ri.rgb, press: pressOf(rear), wear: wearOf() });
   };
   // la V40 di serie: la ruota disegnata dal proprietario (copricerchio a dieci fori); coi cerchi in lega resta il disegno a codice
   const v40Img = () => { if (!Street2D._v40w) { const im = new Image(); im.src = 'img/v40_wheel.png'; Street2D._v40w = im; } return Street2D._v40w; };
@@ -99,7 +99,7 @@
   S.v40Wheel = function (g, cx, cy, k, ang, speed = 0, rear = false) {
     const style = (this.cos || {}).wheels, im = v40Img();
     if ((!style || style === 'none') && im.complete && im.naturalWidth) {
-      const s2 = im.width * k;
+      const s2 = im.width * k * Street2D.scalaRuota(CARS.v40.sprite);
       if (this.wheelDraw) this.wheelDraw(g, im, cx, cy, s2, ang, speed); else {   // gira liscia (nitido2d.js)
       g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));
       if (speed > 9) { for (let i = 0; i < 4; i++) { g.save(); g.globalAlpha = i ? 0.35 : 1; g.rotate(ang + i * Math.PI / 10); g.drawImage(im, -s2 / 2, -s2 / 2, s2, s2); g.restore(); } }
@@ -107,7 +107,7 @@
       g.restore(); }
     } else v40.call(this, g, cx, cy, k, ang, speed, rear);
     const ri = im.complete && im.naturalWidth ? rimInfo(im) : null;
-    this.tireFx(g, cx, cy, 14.4 * k + 0.6, ang, speed, { rim: ri ? ri.frac : 0.66, rgb: ri && ri.rgb, press: pressOf(rear), wear: wearOf() });
+    this.tireFx(g, cx, cy, 14.4 * k, ang, speed, { rim: ri ? ri.frac : 0.66, rgb: ri && ri.rgb, press: pressOf(rear), wear: wearOf() });
   };
   const sup = S.supraWheel;
   S.supraWheel = function (g, cx, cy, k, ang, speed = 0, rear = false) {

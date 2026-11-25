@@ -33,6 +33,8 @@ stessi del sito aperto in quel browser. L'exe vero (Electron, per Steam) è per 
 
 ## Com'è fatto il gioco oggi (in breve)
 
+- **Auto 2D (v0.163)**. I raggi grafici delle ruote sono in `RAGGI_GRAFICI` di `cars.js`. Le righe del fondo rimaste in alcuni PNG sono mascherate in `Street2D.RIGHE_SOTTO_AUTO` alle due risoluzioni.
+
 - **Nottolino Racing (v0.162)**. In `#introMenu` la chiave gira da OFF a START mentre la tieni premuta. Il motorino suona subito e il Viaggio parte dopo 1,2 secondi. Invio e Spazio fanno partire la sequenza. Il menu usa lo stesso avvio per il prologo e per la ripresa di una partita salvata.
 - **Il Viaggio** (modalità principale, `viaggio.js` + `viaggio2d.js`): autostrada infinita dal km 0 sotto casa con
   una V40 di serie. Tappe ogni 3,2 km (bar, Benzina 24H, autogrill Sosta 24, Officina Mario, Da Luca Tuning, Neon

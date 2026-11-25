@@ -78,10 +78,10 @@
       const top = cy - (G.wy + G.wr) * sc;
       g.save(); g.translate(Math.round(cx), Math.round(top)); if (dir < 0) g.scale(-1, 1);
       const left = -tw / 2; g.imageSmoothingEnabled = false;
+      g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(0, (G.wy + G.wr) * sc, tw * 0.44, Math.max(0.5, sc * 3), 0, 0, Math.PI * 2); g.fill();
       g.drawImage(spr.hd || spr, left, 0, tw, ch);
-      const wi = spr.wheelImg, ws = wi && wi.width ? wi.width * sc : 0;
+      const wi = spr.wheelImg, ws = wi && wi.width ? wi.width * sc * G.scalaRuota : 0;
       for (const ax of G.ax) { const wx = left + ax * sc, wy = G.wy * sc; if (ws) g.drawImage(wi, wx - ws / 2, wy - ws / 2, ws, ws); else { R(g, wx - 3, wy - 3, 6, 6, '#111'); } }
-      g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(left + 2, (G.wy + G.wr) * sc - 1, tw - 4, 2);   // ombra sotto
       g.restore();
       glow(g, cx + dir * tw / 2, top + ch * 0.55, 22, '255,240,200', 0.4); glow(g, cx - dir * tw / 2, top + ch * 0.5, 9, '255,40,40', 0.45);
     }

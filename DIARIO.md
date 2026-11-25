@@ -1,3 +1,7 @@
+## 25/11/2026 · proprietario · v0.163 (**righe sotto le auto e ruote fuori scala**)
+- Tolti i residui del fondo da dieci disegni di auto, la riga piena del sottoscocca al neon e il bordo duro dell’ombra di contatto. Il neon illumina l’asfalto e la luce proietta ancora l’ombra della carrozzeria.
+- Corretti i raggi grafici in base al passo e alle misure delle gomme, anche per il traffico e le versioni con kit. Prove in Chromium su desktop e mobile, 437 test passati.
+
 ## 25/11/2026 · proprietario · v0.162 (**nottolino OFF e START**)
 - La chiave gira mentre la tieni premuta. Il motorino parte con il gesto e dopo 1,2 secondi si entra nel Viaggio. Se molli prima, torna su OFF e il suono sfuma. Invio e Spazio fanno partire la sequenza.
 - Provati mouse, touch e tastiera nel browser. 437 test passati.

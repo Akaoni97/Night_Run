@@ -427,6 +427,12 @@ function genParamsBase(c) {
     };
   };
 }
+// Raggi grafici verificati sul passo e sulle gomme di serie, in pixel dello sprite.
+const RAGGI_GRAFICI = {
+  a112: 12.1, doblo: 14, punto: 13.5, corsa: 13.7, p206: 13.3,
+  clio: 13.9, williams: 13.3, v850: 13.8, polo: 13.4,
+  ambulanza: 16.3, ax: 12.2, twingo: 12.2, sandero: 13.8,
+};
 function genCar(c) {
   const d = GEN_DATA[c.id];
   c.P.shiftK = c.shiftK || 1; c.P.hesK = c.hesK ?? 0.3;       // tempo di cambiata ed esitazione in apertura di gas
@@ -442,6 +448,11 @@ function genCar(c) {
       { id: 'tuning', name: 'Kit completo: labbro, diffusore, minigonne, scarico laterale, prese d\'aria e spoiler', price: 1600 } ] } });
   }
   if (!d.sprite.fixed) c.sprite.wy = Math.round((d.sprite.wy + d.sprite.wr) * 10) / 10;   // dati vecchi: "wy" era il bordo alto della gomma (strumenti/ripara_ruote.py li porta al centro)
+  const raggio = RAGGI_GRAFICI[c.id];
+  if (raggio) {
+    c.sprite.wrView = Math.min(c.sprite.wr, raggio);
+    if (c.spriteT) c.spriteT.wrView = Math.min(c.spriteT.wr, raggio);
+  }
   // auto fatte a mano: restano il loro scarico di serie, il catback e quello da gara, e in mezzo ci sono il terminale e lo scarico senza centrale
   if (!c.exTer && typeof suonoMix === 'function' && c.exStock) {
     const cb = GEN_EX[c.cyl >= 5 ? 'sport6' : 'sport4'];
@@ -651,7 +662,7 @@ const CARS = {
     // disegno per il traffico: carrozzeria del giocatore, ruota e maschera ricavate da strumenti/v40_traffico.py
     // (la V40 guidata dal giocatore si disegna a parte in street2d.js: v40Base, v40Wheel)
     sprite: { img: 'img/v40.png', wheel: 'img/v40_wheel.png', paint: 'img/v40_paint.png', w: 200, h: 71, wy: 56, wr: 14.4, ax: [41, 156], head: [190, 40], tail: [2, 26, 6, 7],
-      ex: [3, 54], hx: 112, hy: 3, refL: 62.2, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] }, ws: 31, fixed: 1 },
+      ex: [3, 54], hx: 112, hy: 3, refL: 62.2, wk: 0.96, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] }, ws: 31, fixed: 1 },
     // fisica: 2.0 aspirato da 140 CV a 6000 giri e ~185 Nm a 4500, trazione anteriore, 5 marce
     P: {
       idle: 800, limiter: 6500, launchRpm: 3800, Ie: 0.16, mass: 1290, r: 0.308, cd: 0.33, A: 2.08, mu: 1.0, cgH: 0.52, wb: 2.56,

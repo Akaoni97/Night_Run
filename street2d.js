@@ -54,6 +54,36 @@ class Street2D {
   // ---------------------------------------------------------------- utilità
   static WHEEL_FIX = {};   // cerchi fuori asse rispetto alla gomma (vedi wheelConc): con le ruote disegnate a parte (21/11) non ce ne sono più
   // lo sprite di un veicolo del traffico: un'auto (CARS) o un mezzo pesante (CAMION, cars.js)
+  // Righe isolate rimaste sotto le minigonne nei ritagli a 1× e 2×.
+  // I rettangoli sono in pixel del PNG, misurati separatamente per le due versioni.
+  static RIGHE_SOTTO_AUTO = {
+    'img/panda_tuning_hd.png': [[72, 151, 164, 4], [274, 154, 21, 1]],
+    'img/corsa_tuning_hd.png': [[87, 161, 173, 1], [308, 161, 27, 1]],
+    'img/p205_tuning.png': [[38, 61, 87, 2], [144, 62, 11, 1]],
+    'img/p205_tuning_hd.png': [[91, 123, 150, 2]],
+    'img/p206_tuning.png': [[46, 69, 80, 1]],
+    'img/p206_tuning_hd.png': [[91, 139, 161, 1]],
+    'img/polo_hd.png': [[83, 148, 173, 5], [19, 151, 20, 2], [300, 151, 29, 2]],
+    'img/polo_tuning_hd.png': [[303, 153, 27, 1]],
+    'img/van_tuning_hd.png': [[20, 179, 26, 1], [330, 179, 28, 1]],
+    'img/ambulanza_hd.png': [[461, 247, 24, 4], [59, 249, 23, 2]],
+    'img/ambulanza_tuning_hd.png': [[140, 251, 267, 2], [53, 252, 31, 1]],
+    'img/panda141_hd.png': [[270, 127, 26, 4], [79, 129, 153, 2], [17, 130, 25, 1]],
+  };
+  static spritePuliti = new WeakMap();
+  static spritePulito(img, file) {
+    const righe = Street2D.RIGHE_SOTTO_AUTO[file];
+    if (!righe || !img.width) return img;
+    const cached = Street2D.spritePuliti.get(img);
+    if (cached) return cached;
+    const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+    for (const riga of righe) x.clearRect(...riga);
+    Street2D.spritePuliti.set(img, c);
+    return c;
+  }
+  static raggioGrafico(D) { return D.wrView ?? D.wr; }
+  static scalaRuota(D) { return Street2D.raggioGrafico(D) / D.wr * (D.wk || 1); }
   static defOf(id) { return (typeof CARS !== 'undefined' && CARS[id] && CARS[id].sprite) || (typeof CAMION !== 'undefined' && CAMION[id] && CAMION[id].sprite) || null; }
   static rnd(i) { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   static shade(hex, k) {
@@ -162,7 +192,7 @@ class Street2D {
     const W = D.w * m, H = D.h * m, c = document.createElement('canvas'); c.width = W; c.height = H;
     if (!G.ready) return c;
     const img = m > 1 ? G.imgHd : G.img, paint = m > 1 ? G.paintHd : G.paint;
-    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, W, H);
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(Street2D.spritePulito(img, m > 1 ? D.imgHd : D.img), 0, 0, W, H);
     if (hex !== 'orig' && paint.width) {
       // vernice: i pixel della maschera prendono il nuovo colore conservando luci e ombre del disegno
       const mc = document.createElement('canvas'); mc.width = W; mc.height = H; const mx = mc.getContext('2d', { willReadFrequently: true }); mx.drawImage(paint, 0, 0, W, H);
@@ -245,8 +275,8 @@ class Street2D {
   }
   genWheel(g, cx, cy, k, ang, speed = 0, rear = false) {
     const wi = this.genWheelImg(), D = this.genDef(); if (!wi) return;
-    this.brake(g, Math.round(cx), Math.round(cy), k * D.wr / 15, ang, rear);
-    const s2 = wi.width * k * (D.wk || 1);                          // wk: il disegno della ruota più piccolo (kit carrozzeria di alcune auto: gomme troppo grandi)
+    this.brake(g, Math.round(cx), Math.round(cy), k * Street2D.raggioGrafico(D) / 15, ang, rear);
+    const s2 = wi.width * k * Street2D.scalaRuota(D);                          // wk: il disegno della ruota più piccolo (kit carrozzeria di alcune auto: gomme troppo grandi)
     const wh = D.wheelHd && this.SS > 1 ? this.genWheelImg(2) : null;   // la ruota disegnata a parte, a densità doppia
     if (this.wheelDraw) { this.wheelDraw(g, wh || wi, cx, cy, s2, ang, speed); return; }   // gira liscia (nitido2d.js)
     g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(cx), Math.round(cy));
@@ -258,7 +288,7 @@ class Street2D {
   geo() {
     const low = ((this.carLook || {}).low || 0) * 0.75;
     const D = this.genDef();
-    if (D) return { h: D.h, wy: D.wy, wr: D.wr, ax: D.ax, hx: D.hx, hy: D.hy, tail: D.tail, head: D.head, ex: D.ex, low, slots: D.slots,
+    if (D) return { h: D.h, wy: D.wy, wr: Street2D.raggioGrafico(D), ax: D.ax, hx: D.hx, hy: D.hy, tail: D.tail, head: D.head, ex: D.ex, low, slots: D.slots,
       blinkF: [D.head[0] - 6, D.head[1] + 5, 5, 2], blinkR: [D.tail[0] + 1, D.tail[1] + 6, 4, 2] };
     if (this.carId === 'v40') return this.v40Ready
       ? { h: 71, wy: 56, wr: 14.4, ax: [41, 156], hx: 112, hy: 3, tail: [2, 26, 6, 7], blinkF: [173, 46, 7, 2], blinkR: [19, 44, 6, 2], ex: [3, 54], head: [190, 40], low, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] } }
@@ -573,7 +603,7 @@ class Street2D {
       const bk = 'trafb' + m + id + hex; if (this.spr[bk]) return this.spr[bk];
       const img = m > 1 ? G.imgHd : G.img, paint = m > 1 ? G.paintHd : G.paint, W = D.w * m, H = D.h * m;
       const base = document.createElement('canvas'); base.width = W; base.height = H;
-      const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, W, H);
+      const x = base.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = false; x.drawImage(Street2D.spritePulito(img, m > 1 ? D.imgHd : D.img), 0, 0, W, H);
       if (paint.width && hex !== 'orig') {
         const m2 = document.createElement('canvas'); m2.width = W; m2.height = H; const mx = m2.getContext('2d', { willReadFrequently: true }); mx.drawImage(paint, 0, 0, W, H);
         const d = x.getImageData(0, 0, W, H), p = d.data, mk = mx.getImageData(0, 0, W, H).data, n = parseInt(hex.slice(1), 16), R = n >> 16, Gc = (n >> 8) & 255, B = n & 255;
@@ -589,7 +619,7 @@ class Street2D {
     const base = mkBase(1);
     const c = document.createElement('canvas'); c.width = Math.ceil(D.w * k); c.height = Math.ceil(D.h * k);
     const cx = c.getContext('2d', { willReadFrequently: true }); cx.imageSmoothingEnabled = false; cx.drawImage(base, 0, 0, c.width, c.height);
-    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: D.wr, gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
+    c.geo = { w: D.w, ax: D.ax, wy: D.wy, wr: Street2D.raggioGrafico(D), scalaRuota: Street2D.scalaRuota(D), gen: true, hx: D.hx, tail: D.tail, head: D.head }; c.wheelImg = Street2D.wheelConc(G.wheel, id); c.k = k; c.hd = base;
     if (D.imgHd && G.imgHd && G.imgHd.width) { c.hd2 = mkBase(2); if (G.wheelHd && G.wheelHd.width) { G.wheelHd._hd = 2; c.wheelHd = G.wheelHd; } }   // densità doppia
     return (this.spr[key] = c);
   }
@@ -1743,7 +1773,7 @@ class Street2D {
     const GI = this.geo(), spr = this.carSprite(K), left = Math.round(cx - 100 * K), top = Math.round(gy - (GI.wy + GI.wr) * K - lift + GI.low * K);
     const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
     this.shadow(g, cx, gy, 120, 6);
-    if (glow) { this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4); g.fillStyle = glow; g.fillRect(cx - 84, gy - 5 - lift, 168, 1); }
+    if (glow) this.light(g, cx, gy - 1, 170, 14, glow, 0.35, 4);
     g.imageSmoothingEnabled = false; this.body(g, spr, left, top);
     if (spr.img) { const wf = this.wheelFn(); const wyI = gy - lift - GI.wr * K; wf(g, left + GI.ax[0] * K, wyI, K, 0, 0, true); wf(g, left + GI.ax[1] * K, wyI, K, 0, 0, false); for (let q = 2; q < GI.ax.length; q++) wf(g, left + GI.ax[q] * K, wyI, K, 0, 0, false); }
     if (I.id === 'style') this.light(g, cx + 20, top + 10, 60, 10, '#ffffff', 0.04 + 0.03 * Math.sin(t * 2), 3);   // riflesso che scorre
@@ -2052,11 +2082,11 @@ class Street2D {
         g.save(); g.globalAlpha = hzA; g.drawImage(this.hazeOf(spr, DM ? DM.haze.map((v) => Math.min(255, v + 40)).join(',') : '110,100,150'), left, sy, w, spr.height); g.restore();
       }
       if (this.quality !== 'bassa' && (this.day || 0) < 0.7) { const bl = []; for (const lx of lampX) { const dx = lx + 18 - left; if (dx > -40 && dx < w + 40) bl.push({ x: dx, w: 38 * k, a: 0.3 * (1 - (this.day || 0)) }); } if (bl.length) { g.save(); g.translate(left, sy); this.fxBodyLight(g, spr, bl); g.restore(); } }
-      const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k : 0, wiD = this.SS > 1 && spr.wheelHd ? spr.wheelHd : wi;
+      const ang = -(e.x / 0.32), wi = spr.wheelImg, ws = wi && wi.width ? wi.width * k * GG.scalaRuota : 0, wiD = this.SS > 1 && spr.wheelHd ? spr.wheelHd : wi;
       for (const ax of GG.ax) {
         const wx2 = left + ax * k, wy2 = sy + GG.wy * k;
         if (ws) { if (this.wheelDraw) this.wheelDraw(g, wiD, wx2, wy2, ws, ang, 0, Math.PI / 12); else { g.save(); g.translate(Math.round(wx2), Math.round(wy2)); g.rotate(Math.round(ang / (Math.PI / 12)) * (Math.PI / 12)); g.imageSmoothingEnabled = false; g.drawImage(wi, -ws / 2, -ws / 2, ws, ws); g.restore(); }
-          if (this.tireFx) { const ri = this.tireRim(wi); this.tireFx(g, wx2, wy2, GG.wr * k + 0.5, Math.round(ang / (Math.PI / 12)) * (Math.PI / 12), e.v || 0, { rim: ri && ri.frac, rgb: ri && ri.rgb }); } }   // gomme (gomme2d.js)
+          if (this.tireFx) { const ri = this.tireRim(wi); this.tireFx(g, wx2, wy2, GG.wr * k, Math.round(ang / (Math.PI / 12)) * (Math.PI / 12), e.v || 0, { rim: ri && ri.frac, rgb: ri && ri.rgb }); } }   // gomme (gomme2d.js)
         else this.wheel(g, wx2, wy2, Math.max(6, Math.round(GG.wr * k)), ang, e.v || 0);
       }
       // luci dei freni accese quando frena (e.acc, game.js); fari che lampeggiano quando sfanala (e.flashT, strada.js)
@@ -2131,7 +2161,7 @@ class Street2D {
       });
     }
     const glow = !this.neonOff && this.cos && this.cos.glow && this.cos.glow !== 'none' ? this.cos.glow : null;
-    if (glow && s.ign) { this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4); g.fillStyle = glow; g.fillRect(left + Math.round(SW * 0.18), y0 - 4, Math.round(SW * 0.64), 1); }
+    if (glow && s.ign) this.light(g, left + SW / 2, y0 - 1, SW * 0.62, 9, glow, 0.3 * entA, 4);
     // asfalto bagnato: la Supra si specchia sulla strada, sbiadita
     if (this.rainOn && spr.img) {
       const hgt = spr.height;

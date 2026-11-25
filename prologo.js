@@ -97,12 +97,18 @@ const PRO_NOTAIO_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente'
   // { b: carrozzeria, w: ruota, D: misure dello sprite, k: pixel dell'immagine per unità }
   async function carOf(id) {
     const D = spriteOf(id); if (!D) return null;
-    let [b, w] = await Promise.all([load(D.imgHd || D.img || `img/${id}.png`), load(D.wheelHd || D.wheel || `img/${id}_wheel.png`)]);
-    if (!okImg(b) && D.imgHd) [b, w] = await Promise.all([load(D.img), load(D.wheel)]);
+    let file = D.imgHd || D.img || `img/${id}.png`;
+    let [b, w] = await Promise.all([load(file), load(D.wheelHd || D.wheel || `img/${id}_wheel.png`)]);
+    if (!okImg(b) && D.imgHd) {
+      file = D.img;
+      [b, w] = await Promise.all([load(file), load(D.wheel)]);
+    }
     if (!okImg(b)) return null;
+    const scalaRuota = Street2D.scalaRuota(D);
+    b = Street2D.spritePulito(b, file);
     let k = b.width / D.w;
     if (k < 1.5 && typeof Street2D !== 'undefined' && Street2D.x2) { try { b = Street2D.x2(b); if (okImg(w)) w = Street2D.x2(w); k *= 2; } catch (e) { /* va bene anche senza Scale2x */ } }
-    return { b, w, D, k };
+    return { b, w, D: { ...D, wr: Street2D.raggioGrafico(D) }, k, scalaRuota };
   }
   // ridipinge le parti di vernice (maschera del proprietario) di un colore, tenendo luci e ombre del disegno
   function recolor(body, mask, col) {
@@ -152,7 +158,7 @@ const PRO_NOTAIO_LOOK = { pelle: 1, capelli: 'corti', capCol: 5, testa: 'niente'
     x = q(x); const D = C.D, top = ground - (D.wy + D.wr) * s, bw = C.b.width / C.k * s, bh = C.b.height / C.k * s;
     g.save(); g.imageSmoothingEnabled = s < 0.99 || s > 1.01; g.imageSmoothingQuality = 'high';
     if (okImg(C.w)) {
-      const ws = C.w.width / C.k * s;
+      const ws = C.w.width / C.k * C.scalaRuota * s;
       for (const ax of D.ax) { g.save(); g.translate(x + ax * s, top + D.wy * s); g.rotate(ang); g.drawImage(C.w, -ws / 2, -ws / 2, ws, ws); g.restore(); }
     }
     g.drawImage(body || C.b, x, q(top), bw, bh);
