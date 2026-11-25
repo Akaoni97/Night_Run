@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**25/11 mattina, check (Nico con Claude)**: niente di nuovo su `main` dal check di Luca; nuovi il 36 (proposta di Luca sul quadro, decide Nico) e il 37 (tasto B). Gli altri numeri invariati.
+
 **24/11 sera, check (Luca con Claude)**: nuovi il 32 (cambio gomma e pulsante bagagliaio), il 33 (Luca Tuning coi rulli dal vivo), il 34 (quadro in alto a sinistra), il 35 (forature: ogni quanto). Gli altri numeri invariati.
 
 **23/11 notte (Luca)**: approvati e tolti 1, 2, 3, 4, 8, 9, 12, 17, 19, 23; il 25 fatto come chiesto (vignette a versi, v0.126). Nuovo il 26 (schermata iniziale al telefono, staccata dal 19). Gli altri numeri non cambiano.
@@ -38,6 +40,10 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 ### Notte e storia
 5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
+
+### Quadro (decide Nico)
+36. [interfaccia] **Proposta di Luca sul quadro in alto a sinistra** (avviso del 24/11): invertire quadro e blocco dei pulsanti (pulsanti sopra, quadro sotto) e un tasto in Strumenti che **ingrandisce il quadro** (un clic grande, un altro torna piccolo). (proprietario)
+37. [menu] **Tasto B**: apre il bagagliaio ma, col menu aperto, un secondo B non lo chiude (si chiude col pulsante, Tab o Esc). Visto nel check del 25/11: da far chiudere anche col B? (cognato)
 
 ## Priorità media · decisioni e tarature
 
@@ -92,12 +98,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 25/11 mattina, check (Nico con Claude): niente di nuovo dal check di Luca; 437 test verdi; nel browser (1920×1080) strada col quadro in alto a sinistra, pulsante BAGAGLIAIO e cambio gomma animato (l'auto accosta, il protagonista scende con la ruota), nessun errore in console.
 - 24/11 sera, check (Luca con Claude): 437 test verdi, prova di fumo verde in tutti gli 11 locali, nessun errore in console; foto di strada, Luca e Nico al computer e al telefono. **Sistemata la prova di fumo**: «entra» non aspettava l'entrata vera (subito dopo il clic il locale non esiste ancora) ed «esci» non aspettava la camminata, così alcune tappe risultavano «ok» senza entrarci (`strumenti/prova.js`). Il gioco era a posto.
 - 24/11 (v0.161, Luca): pulsante BAGAGLIAIO e cambio gomma animato.
 - 24/11 (v0.138, Nico): schermata iniziale al telefono sistemata (sospeso 26 chiuso), auto e sfondo più belli; paesaggi fuori città da 3.100-6.700 a 830-1.900 comandi a fotogramma; controllo dei comandi nella prova di fumo.
 - 24/11 (v0.131-v0.137, Nico e Luca): prestazioni in tre giri; **sul PC di Nico 58-60 fps** (erano 11-24). Il 27 è chiuso.
-- 23/11 notte (Luca): approvati suoni per auto e campioni, fisica vera, rimborso di Nico, schede, voci delle schede, aspetto dei personaggi, auto e camion nuovi, schermata iniziale, proposta delle capitali. Vignette a versi (v0.126).
-- 23/11, check (Luca con Claude): 408 test, prova di fumo, foto di schermata iniziale (computer e telefono), Roma e guida.
-- 23/11 (v0.113-v0.123, Nico): capitali più vere, video «di serie e preparate», fluidità di fiammate e scritte, livelli del 2D, protagonista in pixel art con nuvolette, schermata iniziale con la chiave, aggiornamenti subito (`sw.js`).
-- 23/11 (v0.120, Luca): fiamme allineate allo scarico, marmitta rovente.
-- 22/11 (v0.85, Luca): cinque auto iniziali all'Autosalone.
