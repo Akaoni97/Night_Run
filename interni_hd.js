@@ -589,6 +589,7 @@
   // e stesso stato del fotogramma (nightRun.fx: flame, fkind, ftier, fkit, fkick, marmitta); scoppi a caso come sulla strada
   function shopFiamme(g, t, S, cx, cy) {
     const nr = window.nightRun, v2 = nr && nr.view2d, vs = nr && nr.fx; if (!v2 || !vs || !v2.fxFlame || !v2.geo) return;
+    if (S.car.spriteAuto !== v2.carSprite(1)) return;   // aspettare la carrozzeria aggiornata quando si cambia pezzo o kit
     const st = S.fx || (S.fx = { flame: 0, sus: 0, pal: 'arancio', v: 0, last: t, kick: vs.fkick });
     const dt = Math.max(0, Math.min(0.1, t - st.last)); st.last = t;
     const G = v2.geo(); if (!G || !G.ex) return;
@@ -606,9 +607,12 @@
     if (vs.flame && Rn() < Math.min(0.55, vs.flame * dt * 22 * ((kit && kit.rate) || 1))) spawn();
     const susT = vs.flame && (kit || tier !== 0) ? 0.35 + 0.45 * Math.min(1, vs.flame) : 0;
     st.sus = susT > st.sus ? st.sus + (susT - st.sus) * Math.min(1, dt * 10) : Math.max(0, st.sus - dt * 1.6);
-    if (st.flame > 0.05) v2.fxFlameV(g, rx, exY, kS, st.flame, y0, st.pal, st.v);
-    else if (st.sus > 0.03) v2.fxFlame(g, rx, exY, kS * 0.85, (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * Math.abs(Math.sin(t * 7.3))), y0, st.pal);
     if ((vs.marmitta || 0) > 0.01 && v2.fxMarmitta) v2.fxMarmitta(g, rx, exY, kS, vs.marmitta, y0);   // terminale rovente
+    if (st.flame > 0.05) v2.fxFlameV(g, rx, exY, kS, st.flame, y0, st.pal, st.v, v2.golaScarico(kS));
+    else if (st.sus > 0.03) {
+      const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * Math.abs(Math.sin(t * 7.3)));
+      v2.fxFlame(g, rx, exY, kS * 0.85, fl, y0, st.pal, { gola: v2.golaScarico(kS) });
+    }
   }
 
   // ---------------------------------------------------------------- DA LUCA TUNING (Luca)

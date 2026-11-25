@@ -1518,7 +1518,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       $('tLaunchL').textContent = `${lt === 'stutter' ? 'Stutter box' : 'Launch control'} ${sim.P.launchRpm}`;
       $('limHint').textContent = `Limitatore montato: ${li.brand} ${li.name}${lt === 'spark' && li.id === 'oem' ? ' (la centralina taglia l’accensione)' : ''}.` + (TP.sim.flatShift ? ' 3-step: in salita tieni il gas a fondo mentre cambi.' : '') + (lt === 'stutter' ? ' Da fermo, in folle, gas a fondo.' : '') + (lt === 'soft' ? ' Il soft cut non taglia a colpi: discesa e durata non servono.' : ' Discesa e durata: la benzina riparte quando i giri sono scesi e il tempo è passato. Discesa 0 = cadenza fissa a tempo; durata “solo giri” = rimbalzo deciso dai giri.'); }
     Object.assign(sim.cfg, { pops: !!TP.sim.ecuPops && !exhClosed(), launch: !!S.launch && launchOk(), autoClutch: S.autoClutch, revMatch: S.revMatch, tc: S.tc !== false });
-    if (garage) { garage.setTips(TP.dsp.ex.tips); garage.setPaint(S.paint); }
+    if (garage) garage.setPaint(S.paint);
     if (street2d) { street2d.setCosmetics(cosView()); street2d.setCar(carId, TP.look, carPaint()); }
     renderTuning();
     $('tPops').disabled = true; $('tLaunch').disabled = !launchOk();
@@ -2420,7 +2420,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
   function reaOn() { return S.reazioni !== undefined ? S.reazioni !== false : S.anime !== false; }
   function applyLook() {
     garage = street2d || (street2d = new Street2D($('g2d'))); street2d.comicsOn = S.anime !== false; street2d.reaOn = reaOn(); street2d.setRain(!!S.rain); street2d.quality = S.q || 'alta'; street2d.camFx = true; street2d.setCosmetics(cosView());
-    garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint); garage.setTips(TP.dsp.ex.tips);
+    garage.visible = garageOn; garage.resize(); garage.setPaint(S.paint);
   }
   applyLook();
   $('q3d').value = S.q || 'alta';

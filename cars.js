@@ -170,7 +170,7 @@ function v40ParamsBase(sel, adj) {
       intake: inn.dsp, scream: 0, lope: cm.dsp.lope, rattle: volanoRattle(g('flywheel'), cl), spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
     },
     look: {
-      low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0,
+      low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, scarico: ex.id,
       turbo: hasT, turbo2: tb.id === 'td04_19t' || tb.id === 'big15', badge: (tb.look || {}).badge || '', fmic: hasT && !!(ic.look || {}).fmic,
     },
   };
@@ -423,7 +423,7 @@ function genParamsBase(c) {
         intake: inn.dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: volanoRattle(g('flywheel'), cl), spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
         voice: vo,
       },
-      look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, badge: (tb.look || {}).badge || '' },
+      look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, scarico: ex.id, badge: (tb.look || {}).badge || '' },
     };
   };
 }
