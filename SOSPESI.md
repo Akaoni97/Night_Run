@@ -9,6 +9,8 @@ numerazione continua in tutta la lista.** Così si risponde con «punto 3 voglio
 rapporto della sera e in ogni risposta sui sospesi: un punto = una cosa da decidere, frasi corte, niente paragrafi.
 Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 
+**25/11 sera (Nico)**: fatti il 36 (quadro sotto i pulsanti e tasto ⤢), il 37 (B chiude) e il 39 (scritte della chiave), v0.166. Gli altri numeri invariati.
+
 **25/11 sera, check (Nico con Claude)**: nuovi il 38 (Uno Turbo e Punto 75: da sentire) e il 39 (schermata iniziale: due scritte poco leggibili). Gli altri numeri invariati.
 
 **25/11 mattina, check (Nico con Claude)**: niente di nuovo su `main` dal check di Luca; nuovi il 36 (proposta di Luca sul quadro, decide Nico) e il 37 (tasto B). Gli altri numeri invariati.
@@ -43,13 +45,8 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 5. [storia] **Anomalie di Luca** (fatte nella v0.100, otto su tre livelli in `VG_ODD`): i testi brevi li ha scritti Claude dalle idee di Luca, **da rivedere da Luca**; da provare giocando se sono troppo rare o troppo frequenti. (cognato)
 6. [notte] **La notte** (v0.89, `notte.js`): di notte meno volanti e più cose strane, radio che disturba, scena «Quella dietro» al benzinaio, interfaccia Essenziale, buio nelle incursioni. Provato nel check: interfaccia e radio funzionano; i caratteri del fruscio (▒) che uscivano come spazi vuoti ora sono segni che si vedono (# % * / ~, v0.100). Da provare giocando un'incursione intera e la scena del benzinaio. (tutti e due)
 
-### Quadro (decide Nico)
-36. [interfaccia] **Proposta di Luca sul quadro in alto a sinistra** (avviso del 24/11): invertire quadro e blocco dei pulsanti (pulsanti sopra, quadro sotto) e un tasto in Strumenti che **ingrandisce il quadro** (un clic grande, un altro torna piccolo). (proprietario)
-37. [menu] **Tasto B**: apre il bagagliaio ma, col menu aperto, un secondo B non lo chiude (si chiude col pulsante, Tab o Esc). Visto nel check del 25/11: da far chiudere anche col B? (cognato)
-
 ### Auto nuove e schermata iniziale (25/11)
 38. [auto] **Fiat Uno Turbo i.e. e Punto 75** (v0.164): viste nel check sulla strada a 1920×1080, ferme e in corsa, disegno pulito e ruote in scala, nessun errore. Da sentire sul PC i WAV dell'allungo; i rapporti e la pressione dell'Uno sono una media tra fonti che non concordano: vanno bene così? (proprietario)
-39. [titolo] **Blocchetto della chiave** (v0.162): funziona su computer e telefono. Due dettagli: sul PC il link «Come si gioca» sotto il blocchetto è scuro su scuro e quasi non si vede; al telefono in orizzontale la scritta «Tieni premuta la chiave…» passa sopra la riga bianca della strada. Da sistemare? (proprietario)
 
 ## Priorità media · decisioni e tarature
 
@@ -104,6 +101,7 @@ Quando una voce cambia numero, si dice nel rapporto («il 7 ora è il 5»).
 29. [città] **Capitali, risposte di Luca** (`PROPOSTA_CITTA.md`, sezione 5): collegamenti veri all'inizio e strani più avanti; momenti forti a Roma (Colosseo), Washington (obelisco), Tokyo (torre di luci), Vienna da decidere; da confermare con Nico. (tutti e due)
 
 ## Fatto di recente (si toglie al prossimo controllo)
+- 25/11 sera (v0.166, Nico): 36 quadro sotto i pulsanti col tasto ⤢ per ingrandirlo (da guardare sul PC), 37 il B chiude il bagagliaio, 39 scritte sotto la chiave su fondo scuro.
 - 25/11 sera, check (Nico con Claude): 6 commit nuovi (v0.162-v0.164, tutti di Nico), 437 test verdi, nessun file eliminato. Nel browser: schermata iniziale col blocchetto nuovo (computer e telefono), Uno Turbo e Punto 75 ferme e in corsa a 1920×1080, nessun errore in console.
 - 25/11 (v0.162, Nico): chiave da tenere premuta sulla schermata iniziale (OFF/START, anche Invio e Spazio).
 - 25/11 (v0.163, Nico): tolte le righe sotto dieci auto e corrette le ruote fuori scala.

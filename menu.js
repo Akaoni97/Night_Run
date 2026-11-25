@@ -150,7 +150,7 @@
   function close() { menu.hidden = true; window.dispatchEvent(new Event('resize')); }
   menu.addEventListener('click', (e) => { if (e.target === menu) close(); });
   $('gmClose').addEventListener('click', close);
-  window.gameMenu = { open, close, get isOpen() { return !menu.hidden; } };
+  window.gameMenu = { open, close, get isOpen() { return !menu.hidden; }, get tab() { return last; } };
 
   // pulsante MENU nella barra in alto
   const top = q('header.top');
@@ -297,22 +297,40 @@
 
 // ---------------------------------------------------------------- computer: quadro e pulsanti in alto a sinistra (v0.155)
 // Prima stavano in basso a sinistra e coprivano l'auto, le fiamme dello scarico e chi arriva da dietro (volanti, traffico).
-// Ora c'è una colonna sola in alto a sinistra: il riquadro del viaggio, sotto il quadro strumenti (#hudP), sotto i pulsanti.
+// Ora c'è una colonna sola in alto a sinistra: il riquadro del viaggio, sotto i pulsanti, sotto il quadro strumenti (#hudP)
+// (v0.166, proposta di Luca: prima il quadro stava sopra i pulsanti). Il tasto ⤢ sull'angolo del quadro lo ingrandisce
+// (il doppio) e lo rimette piccolo; la scelta si ricorda in localStorage nr_quadro_grande.
 // La colonna sta nel cielo e sui palazzi: se la finestra è stretta (la strada comincia più in alto) si rimpicciolisce da sola
-// finché non tocca la carreggiata. Al tocco (html.tdash) resta tutto come prima: lì ci sono STRUMENTI e DATI.
+// finché non tocca la carreggiata (col quadro grande può scendere di più). Al tocco (html.tdash) resta tutto come prima:
+// lì ci sono STRUMENTI e DATI.
 (function cruscottoInAlto() {
   if (typeof document === 'undefined' || document.documentElement.classList.contains('tdash')) return;
   const dash = document.getElementById('dash'), hl = document.querySelector('.hud-l'), hud = hl && hl.parentElement;
   if (!dash || !hl || !hud) return;
   const col = document.createElement('div'); col.className = 'hud-col';
   hud.insertBefore(col, hl); col.appendChild(hl); col.appendChild(dash);
-  // la carreggiata comincia a y 236 di 360 nella scena (il marciapiede lontano poco sopra): la colonna non scende oltre il marciapiede
-  const STRADA = 0.6;
-  const adatta = () => {
+  // il quadro grande: un clic lo raddoppia, un altro lo rimette com'era
+  const zb = document.createElement('button'); zb.type = 'button'; zb.className = 'q-zoom'; zb.textContent = '⤢';
+  const leggi = () => { try { return localStorage.getItem('nr_quadro_grande') === '1'; } catch (e) { return false; } };
+  const metti = (on) => {
+    col.classList.toggle('qgrande', on);
+    zb.setAttribute('aria-pressed', String(on)); zb.title = on ? 'Quadro piccolo' : 'Ingrandisci il quadro';
+    zb.setAttribute('aria-label', zb.title);
+    try { localStorage.setItem('nr_quadro_grande', on ? '1' : '0'); } catch (e) { /* niente */ }
+    adatta(); window.dispatchEvent(new Event('resize'));     // il quadro si ridisegna alla misura nuova
+  };
+  zb.addEventListener('click', (e) => { e.stopPropagation(); metti(!col.classList.contains('qgrande')); zb.blur(); });
+  dash.appendChild(zb);
+  // la carreggiata comincia a y 236 di 360 nella scena (il marciapiede lontano poco sopra): la colonna non scende oltre il marciapiede;
+  // col quadro grande (scelto dal giocatore) può arrivare più in basso, sulla corsia lontana
+  const STRADA = 0.6, STRADA_GRANDE = 0.82;
+  function adatta() {
     col.style.transform = '';
     const h = col.offsetHeight, H = hud.clientHeight; if (!h || !H) return;
-    const k = Math.max(0.6, Math.min(1, (H * STRADA - 12) / h));
+    const lim = col.classList.contains('qgrande') ? STRADA_GRANDE : STRADA;
+    const k = Math.max(0.6, Math.min(1, (H * lim - 12) / h));
     col.style.transform = k < 0.995 ? `scale(${k.toFixed(3)})` : '';
-  };
+  }
+  if (leggi()) metti(true);
   addEventListener('resize', adatta); setInterval(adatta, 700); adatta();   // anche quando il riquadro cambia (un lavoro, i bisogni, i comandi)
 })();

@@ -1,3 +1,9 @@
+## 25/11/2026 · proprietario (Nico) · v0.166 (**quadro sotto i pulsanti, B che chiude, scritte della chiave**)
+- Sospeso 36 (proposta di Luca, approvata da Nico): sul computer nella colonna in alto a sinistra ora vengono prima i pulsanti (AVVIA, AUTO, TC...) e sotto il quadro. Accanto all'angolo del quadro il tasto ⤢ lo porta da 280 a 560 px e indietro; si ricorda in `localStorage` `nr_quadro_grande` (`menu.js`, CSS in `index.html`). Col quadro grande la colonna può scendere fino all'82 % dell'altezza (prima 60 %): su finestre piccole copre un po' il retro dell'auto, è voluto.
+- Sospeso 37: un secondo B chiude il bagagliaio se il menu è aperto su quella scheda (`gameMenu.tab`).
+- Sospeso 39: «Tieni premuta la chiave…», OFF e «Come si gioca» sotto il blocchetto hanno un fondo scuro (`titolo.js`): la riga della strada non li copre più, al PC e al telefono.
+- Provato: 438 test verdi, foto a 1920×1080 e 1280×720 e al telefono in orizzontale, nessun errore in console. Da guardare sul PC vero: il quadro grande.
+
 ## 25/11/2026 · proprietario (Nico) · v0.164 (**Fiat Uno Turbo i.e. e Punto prima serie**)
 - Dai disegni di Nico (zip del 25/11) due auto nuove, sprite normali e ad alta definizione con `strumenti/disegni_hd.py` (ruota ritagliata dal disegno stesso; sfondo già trasparente, quindi niente `sfondo_via.py`, che si mangiava il contorno nero). Maschera della vernice dell'Uno fatta a mano: si ricolora solo la parte grigia, la fascia scura sotto resta.
 - **Uno Turbo i.e.** (`uno`, € 16.000 dal km 90, piccole sportive): 1.3 con **turbo IHI VL2 vero** (0,6 bar, ritardo e valvola come R5 e 2002 Turbo; la curva di `GEN_DATA` è quella senza pressione), 105 CV a 5750 e 147 Nm a 3200, 845 kg, C510 3,909/2,267/1,44/1,029/0,875, finale 3,353, 175/60 R13; due kit turbo suoi. Prova: 0-100 in 8,7 s, 203 km/h (vera 8,3 s, ~200).

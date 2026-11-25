@@ -324,7 +324,10 @@
 .nt-pie{display:flex;gap:14px;align-items:center;justify-content:center;font:500 12px/1 "Barlow Semi Condensed",system-ui,sans-serif;color:#9a927e}
 .gate.nt .nt-pie small{font-size:0;color:inherit;display:inline}
 .gate.nt .nt-pie small a{font-size:12px;color:#b9ae94}
-.nt-aiuto{all:unset;cursor:pointer;font:500 12px/1 "Barlow Semi Condensed",system-ui,sans-serif;color:#b9ae94;border-bottom:1px dotted #6a6252}
+.nt-aiuto{all:unset;cursor:pointer;font:500 13px/1 "Barlow Semi Condensed",system-ui,sans-serif;color:#ece2c8;border-bottom:1px dotted #a89a7c}
+/* v0.166: le scritte sotto il blocchetto stanno sulla strada (righe bianche, fari): un fondo scuro le tiene leggibili */
+.gate.nt .night-run-ignition .nr-instructions,.gate.nt .night-run-ignition .nr-state{width:fit-content;max-width:100%;box-sizing:border-box;margin:.35rem auto;padding:3px 10px;border-radius:6px;background:rgba(8,9,16,.8);text-shadow:0 1px 2px #000}
+.gate.nt .nt-pie{width:fit-content;margin:0 auto;padding:6px 12px;border-radius:8px;background:rgba(8,9,16,.8)}
 .nt-aiuto:hover,.nt-aiuto:focus-visible{color:#ffb347}
 .nt-pop{position:absolute;right:0;bottom:calc(100% + 10px);width:min(440px,90vw);padding:14px 16px;border-radius:12px;background:rgba(10,10,18,.94);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),0 12px 34px rgba(0,0,0,.6);display:none;z-index:5}
 .nt-pop.on{display:block}

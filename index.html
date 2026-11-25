@@ -339,7 +339,16 @@ body.inplace .lanebtn { display: none; }
 .hud-col { position: absolute; left: 12px; top: 12px; width: 280px; display: flex; flex-direction: column; gap: 8px; transform-origin: top left; }
 .hud-col > .hud-l { position: static; }
 .hud-col > .dash { position: static; width: 100%; display: flex; flex-direction: column; gap: 6px; }
-.hud-col > .dash #hudP { order: -1; }
+.hud-col > .dash #hudP { order: 2; }   /* v0.166: il quadro sotto i pulsanti (proposta di Luca) */
+.hud-col > .dash { position: relative; }
+.hud-col.qgrande { width: auto; }
+.hud-col.qgrande > .hud-l, .hud-col.qgrande > .dash .dash-btns { width: 280px; }
+.hud-col.qgrande > .dash #hudP { width: 560px; }
+.q-zoom { position: absolute; left: calc(100% + 6px); bottom: 2px; z-index: 2; width: 26px; height: 26px; padding: 0; border-radius: 6px; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(10,12,22,.72); color: #ffd36b; font: 700 15px/24px system-ui, sans-serif; cursor: pointer; opacity: .75; }
+.q-zoom:hover, .q-zoom:focus-visible, .q-zoom[aria-pressed="true"] { opacity: 1; border-color: #ffb000; }
+.hud-col > .dash:has(#hudP[hidden]) .q-zoom { display: none; }
+html.tdash .q-zoom { display: none; }
 .hud-col > .dash .dash-btns button { min-height: 0; }
 body.inplace .dash { display: none; }
 @media (max-width: 600px) { .dash { width: min(64vw, 260px); left: 6px; bottom: 60px; } .dash-btns button { font-size: 9px; } }
@@ -1669,7 +1678,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'v') { S.view = (+S.view + 1) % 4; applySettings(); flash('Ascolto: ' + ['abitacolo', 'esterno', 'vano motore', 'automatico (segue la telecamera)'][S.view], 1.2); }
     else if (k === 'f') sfanala();
     else if (k === 'h') hornOn();
-    else if (k === 'b') openTrunk();
+    else if (k === 'b') { if (window.gameMenu && gameMenu.isOpen && gameMenu.tab === 'bagagliaio') gameMenu.close(); else openTrunk(); }   // un secondo B lo chiude
     else if (k === 'p') radioNext();
     else if (k === 'u') placeKey();
     else if (k === 'z') toggleFs();
