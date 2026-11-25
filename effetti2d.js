@@ -222,13 +222,15 @@
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
     const L = Math.max(8, Math.round((18 + f * 44) * k * (0.82 + 0.36 * vn(t * 31)) * (O.len || 1))), H0 = (3.4 + f * 4.2) * k * (O.th || 1), fr = Math.floor(t * 30);
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS;                   // densità doppia: colonne e altezze a mezze unità
-    const cut = P.cut || 0;
+    const cut = P.cut || 0, gola = O.gola ?? Infinity;
     const cols = [];
     for (let i = 0; i < L; i += u1) {
-      const u = i / L, x = rx - 1 - i, env = (u < 0.14 ? 0.55 + u / 0.14 * 0.45 : 1) * Math.pow(1 - u, 0.7);
+      const u = i / L, x = rx - u1 - i, env = (u < 0.14 ? 0.55 + u / 0.14 * 0.45 : 1) * Math.pow(1 - u, 0.7);
       const half = H0 * env * (0.78 + 0.44 * vn(i * 0.2 - t * 15));
-      cols.push([x, exY - u * u * 9 * k * (0.6 + 0.4 * f) + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k,
-        half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40)), half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90)), u,
+      const apertura = gola + i * 0.8;
+      const centro = exY + Math.sin(i * 0.5 - t * 26) * 0.9 * u * k;
+      cols.push([x, centro,
+        Math.min(apertura, half * (0.8 + 0.5 * vn(i * 0.3 - t * 19 + 40))), Math.min(apertura, half * (0.62 + 0.36 * vn(i * 0.26 - t * 13 + 90))), u,
         cut && u > cut + 0.06 * Math.sin(x * 0.7 + fr) ? 1 : 0]);
     }
     g.fillStyle = P.o;                                                           // contorno scuro: stacca la fiamma dallo sfondo
@@ -250,6 +252,10 @@
       if (height) g.fillRect(left, top, right - left, height);
     };
     band(P.b[0], 1, 0); band(P.b[1], 0.74, 0.25); band(P.b[2], 0.5, 0.6); band(P.b[3], 0.27, 1.1);
+    if (gola < Infinity) {
+      g.fillStyle = P.b[3][0];
+      g.fillRect(rx - u1, rq(exY - u1 / 2), u1, u1);
+    }
     if (big) {
       // scoppi grossi: radice azzurra alla bocca e nodi bianchi lungo il getto
       g.fillStyle = '#a8e4ff'; for (const c of cols) if (c[4] < 0.16) g.fillRect(c[0], rq(c[1]), u1, 1);
@@ -263,22 +269,22 @@
     flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.2 + 16, 6, P.g || '#ff8a20', 0.24 * a, 4);           // luce sull'asfalto
     return L;
   };
-  // le quattro versioni della fiamma libera (così l'occhio non vede sempre la stessa): 0 classica, 1 doppia lingua, 2 lunga e sottile, 3 corta e tozza
-  S.fxFlameV = function (g, rx, exY, k, fl, y0, pal, v) {
-    if (v === 1) { const L1 = this.fxFlame(g, rx, exY - 1.3 * k, k * 0.82, fl * 0.8, y0, pal, { len: 0.92, th: 0.72, dim: 0.6 }), L2 = this.fxFlame(g, rx, exY + 1.4 * k, k * 0.82, fl * 0.55, y0, pal, { len: 0.62, th: 0.72, dim: 0.5 }); return Math.max(L1, L2); }
-    if (v === 2) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.45, th: 0.55 });
-    if (v === 3) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 0.68, th: 1.5 });
-    if (v === 4) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.7, th: 1.12 });            // il Lanciafiamme di Luca Tuning
-    return this.fxFlame(g, rx, exY, k, fl, y0, pal);
+  // le quattro versioni della fiamma libera (così l'occhio non vede sempre la stessa): 0 classica, 1 breve, 2 lunga e sottile, 3 corta e tozza
+  S.fxFlameV = function (g, rx, exY, k, fl, y0, pal, v, gola) {
+    if (v === 1) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: .92, th: .81, dim: .76, gola });
+    if (v === 2) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.45, th: 0.55, gola });
+    if (v === 3) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 0.68, th: 1.5, gola });
+    if (v === 4) return this.fxFlame(g, rx, exY, k, fl, y0, pal, { len: 1.7, th: 1.12, gola });            // il Lanciafiamme di Luca Tuning
+    return this.fxFlame(g, rx, exY, k, fl, y0, pal, { gola });
   };
   // OSSIDRICA: getto sottile e dritto, velocissimo, blu con cuore bianco e i «diamanti» luminosi lungo il getto; la punta ogni tanto vira all'arancio
-  S.fxTorch = function (g, rx, exY, k, f, y0) {
+  S.fxTorch = function (g, rx, exY, k, f, y0, gola = Infinity) {
     const t = this.st.t, SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, fr = Math.floor(t * 70);
     const L = Math.round((20 + Math.min(1.4, f) * 30) * k * (0.78 + 0.44 * rnd(fr * 1.3))), th = 1.25 * k;
     const rows = (x, yc, half, col) => { const y1 = rq(yc - half), y2 = rq(yc + half); g.fillStyle = col; g.fillRect(x, y1, u1, Math.max(u1, y2 - y1)); };
     for (let i = 0; i < L; i += u1) {
-      const u = i / L, env = (u < 0.07 ? 0.55 + u / 0.07 * 0.45 : 1) * Math.pow(1 - u, 0.5), x = rx - 1 - i;
-      const yc = exY + Math.sin(i * 0.95 - t * 80) * 0.3 * u * k, half = th * env * (0.82 + 0.34 * rnd(i * 1.9 + fr));
+      const u = i / L, env = (u < 0.07 ? 0.55 + u / 0.07 * 0.45 : 1) * Math.pow(1 - u, 0.5), x = rx - u1 - i;
+      const yc = exY + Math.sin(i * 0.95 - t * 80) * 0.3 * u * k, half = Math.min(gola + i * 0.8, th * env * (0.82 + 0.34 * rnd(i * 1.9 + fr)));
       rows(x, yc, half + u1, 'rgba(16,22,110,.55)');
       rows(x, yc, half, u > 0.82 && rnd(i * 3.3 + fr) < 0.5 ? '#ff7a1c' : '#2f62ff');
       rows(x, yc, half * 0.66, u > 0.9 && rnd(i + fr * 2) < 0.4 ? '#ffb347' : '#63c8ff');
@@ -286,55 +292,26 @@
     }
     g.fillStyle = '#ffffff';                                                       // i diamanti del getto
     for (let n = 1; n <= 4; n++) { const i = n * L / 5.2, x = rx - 1 - i, hh = th * (0.95 - n * 0.12); if (hh > 0.3) g.fillRect(rq(x - 1), rq(exY - hh), 3, Math.max(u1, rq(hh * 2))); }
-    g.fillStyle = '#e8f8ff'; g.fillRect(rx - 1, rq(exY - th * 1.4), 2, Math.max(1, rq(th * 2.8)));   // radice alla bocca
+    const radice = Math.min(gola, th * 1.4);
+    g.fillStyle = '#e8f8ff'; g.fillRect(rx - u1, rq(exY - radice), u1, Math.max(u1, rq(radice * 2)));   // radice alla bocca
     const a = Math.min(1, f);
     flameLight(this, g, rx - L * 0.45, exY - 1, L, th * 5 + 3, '#7aa8ff', 0.17 * a, 3);
     flameLight(this, g, rx - L * 0.4, y0 + 1, L * 1.1 + 12, 5, '#6aa0ff', 0.18 * a, 3);
     return L;
   };
-  // BOTTO: niente fiamma, un piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito)
-  // Terminale rovente (v0.129): il metallo si scalda a pixel, come ferro alla forgia. h 0-1 da marmittaRossa di fiamme.js.
-  // - Colore dal corpo nero: rosso ciliegia scuro → rosso → arancio → giallo quasi bianco solo alla bocca e al massimo.
-  // - La bocca (prima colonna e il bordo) è la parte più calda, il tubo si spegne a scalini andando sotto la carrozzeria,
-  //   la riga di mezzo è più chiara (il metallo è più spesso sopra e sotto), il contorno del terminale si fa rosso cupo.
-  // - Il buco della bocca resta scuro finché non è bello caldo, poi brilla dei gas dentro.
-  // - Il calore tremola cella per cella; al massimo staccano faville minuscole.
-  // - Luce: niente alone grande; di notte un bagliore stretto sulla bocca e il riflesso sull'asfalto, di giorno solo il metallo.
-  const MARM_COL = [[0, 0, 0], [62, 6, 6], [128, 14, 9], [196, 30, 12], [240, 72, 18], [255, 138, 40], [255, 206, 112], [255, 244, 210]];
-  const marmCol = (u) => { const x = Math.max(0, Math.min(1, u)) * (MARM_COL.length - 1), i = Math.min(MARM_COL.length - 2, Math.floor(x)), f = x - i, a = MARM_COL[i], b = MARM_COL[i + 1]; return [0, 1, 2].map((q) => Math.round(a[q] + (b[q] - a[q]) * f)); };
+  // Semialtezza interna della bocca visibile, alla stessa scala del terminale.
+  S.golaScarico = function (k, altezza = 1) {
+    const scarico = this.scarico();
+    return scarico.altezza * .315 * scarico.scala * k * altezza;
+  };
+
+  // Il calore arriva da marmittaRossa. Si colora la sagoma del terminale montato.
   const MARM = { notte: 0.35, alone: 0.16, asfalto: 0.12, faville: 0.78 };
-  S.fxMarmitta = function (g, rx, exY, k, h, y0) {
-    const L = (this.carId === 'v40' ? this.v40Look : this.carLook) || {}, tip = L.exhaust || 0, v40 = this.carId === 'v40';
-    const len = (tip === 2 ? 10 : tip ? 8 : 5) + (v40 && tip ? 2 : 0), half = tip === 2 ? 2 : 1;   // parte del tubo che si vede, unità del disegno
+  S.fxMarmitta = function (g, rx, exY, k, h, y0, pendenza = 0, altezza = 1) {
+    this.disegnaScarico(g, rx, exY, k, h, pendenza, altezza);
     const SS = this.SS || 1, t = this.st.t || 0, rq = (v) => Math.round(v * SS) / SS;
-    const cs = Math.max(1 / SS, rq(k / 2)), x0 = rq(rx - k), y1 = rq(exY - half * k);                    // celle da mezzo pixel del disegno
-    const nx = Math.max(3, Math.round(len * k / cs)), ny = Math.max(3, Math.round((half * 2 + 1) * k / cs)), mid = (ny - 1) / 2;
     const night = Math.max(0, Math.min(1, 1 - (this.day || 0)));
-    const cell = (i, j, T, a) => { if (T <= 0.02 || a <= 0.01) return; const c = marmCol(T); g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${Math.min(1, a)})`; g.fillRect(x0 + i * cs, y1 + j * cs, cs, cs); };
     g.save();
-    if (!tip) { g.fillStyle = `rgba(30,32,38,${Math.min(1, h * 5)})`; g.fillRect(x0, y1, nx * cs, ny * cs); }    // senza terminale: il tubo che spunta
-    // contorno rosso cupo (sopra, sotto e il bordo della bocca)
-    const rim = h * 0.42;
-    for (let i = 0; i < nx; i++) { const f = 1 - i / nx; cell(i, -1, rim * f, 0.75 * h); cell(i, ny, rim * f, 0.75 * h); }
-    for (let j = -1; j <= ny; j++) cell(-1, j, rim * 1.1, 0.85 * h);
-    // il tubo, cella per cella
-    for (let i = 0; i < nx; i++) {
-      const u = i / (nx - 1), lungo = Math.max(0.05, 0.9 - Math.pow(u, 0.8) * 0.62 - (u > 0.85 ? (u - 0.85) * 1.5 : 0));   // si spegne verso la carrozzeria
-      for (let j = 0; j < ny; j++) {
-        const v = 1 - Math.abs(j - mid) / (mid + 0.6) * 0.38;                                           // più chiaro al centro
-        const fl = 0.93 + 0.07 * Math.sin(t * 9.3 + i * 1.7 + j * 2.9) * Math.sin(t * 3.1 + i * 0.6);    // tremolio del calore
-        let T = h * lungo * v * fl;
-        if (i === 0) T = Math.min(1, T * 1.18 + 0.04 * h);                                               // il bordo della bocca
-        cell(i, j, Math.max(T, 0.16 * Math.min(1, h * 6)), Math.min(1, h * 5));                         // opaco: metallo scuro che arrossa, non vernice rosa
-      }
-    }
-    // il buco della bocca: scuro da freddo, brilla dei gas da caldo
-    const hb = Math.max(1, ny - 2 * Math.max(1, Math.round(ny / 4)));
-    const yb = Math.round((ny - hb) / 2), gas = Math.max(0, (h - 0.45) / 0.55);
-    for (let j = yb; j < yb + hb; j++) {
-      if (gas > 0) cell(0, j, 0.55 + 0.45 * gas * (0.9 + 0.1 * Math.sin(t * 17 + j)), 1);
-      else { g.fillStyle = 'rgba(16,6,4,0.9)'; g.fillRect(x0, y1 + j * cs, cs, cs); }
-    }
     // faville: al massimo, poche e minuscole, cadono dietro la bocca
     if (h > MARM.faville && this.quality !== 'bassa') {
       const n = 3, pot = (h - MARM.faville) / (1 - MARM.faville);
@@ -342,19 +319,19 @@
         const ph = t * 1.4 + q * 0.413, ciclo = Math.floor(ph), p = ph - ciclo;
         if (Street2D.rnd(ciclo * 7 + q * 131) > 0.35 + 0.5 * pot) continue;
         const dx = -(2 + p * (10 + 8 * Street2D.rnd(ciclo + q))) * k, dy = (-1 + p * p * 7 + (Street2D.rnd(ciclo * 3 + q) - 0.5) * 3) * k;
-        const c = marmCol(0.95 - p * 0.35); g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${(1 - p) * pot})`;
-        g.fillRect(rq(x0 + dx), rq(exY + dy), 1 / SS, 1 / SS);
+        g.fillStyle = `rgba(255,${Math.round(194 - p * 115)},55,${(1 - p) * pot})`;
+        g.fillRect(rq(rx + dx), rq(exY + dy), 1 / SS, 1 / SS);
       }
     }
     g.restore();
     // luce: solo di notte e stretta sulla bocca; il riflesso sull'asfalto resta (più tenue di giorno)
-    if (night > 0.05) {
-      flameLight(this, g, x0 + cs, exY + k * 0.5, (2.2 + 2.6 * h) * k, (1.4 + 1.6 * h) * k, h > 0.7 ? '#ff6a22' : '#ff3014', MARM.alone * h * night, 3);
-      if (this.lightAdd) this.lightAdd(x0 + 2 * k, exY + k, (5 + 6 * h) * k, (3 + 3 * h) * k, h > 0.7 ? '255,96,36' : '255,48,24', MARM.notte * h * night);
-    }
-    this.light(g, x0 + len * k * 0.4, y0, (9 + 9 * h) * k, 4, '#ff4018', MARM.asfalto * h * (0.3 + 0.7 * night), 3);
+    if (night > 0.05) flameLight(this, g, rx, exY, (2.2 + 2.6 * h) * k, (1.4 + 1.6 * h) * k,
+      h > 0.7 ? '#ff6a22' : '#ff3014', MARM.alone * h * night, 3);
+    if (night > 0.05 && this.lightAdd) this.lightAdd(rx, exY, (5 + 6 * h) * k, (3 + 3 * h) * k, h > 0.7 ? '255,96,36' : '255,48,24', MARM.notte * h * night);
+    this.light(g, rx, y0, (9 + 9 * h) * k, 4, '#ff4018', MARM.asfalto * h * (0.3 + 0.7 * night), 3);
   };
 
+  // Piccolo scoppio quasi circolare dietro il tubo. ph = 0 (inizio) … 1 (finito).
   S.fxBang = function (g, rx, exY, k, ph, y0) {
     const SS = this.SS || 1, u1 = 1 / SS, rq = (v) => Math.round(v * SS) / SS, a = Math.max(0, 1 - ph);
     const r = (2.4 + ph * 10.5) * k, cx = rx - (3 + ph * 5) * k, n = Math.max(18, Math.round(r * 5 * SS));
@@ -516,7 +493,7 @@
   // ---------------------------------------------------------------- effetti dell'auto del giocatore
   // Segni di gomma, fumo dalle ruote motrici, spruzzi, scintille, scoppi e fiammate. c = posizioni calcolate in update().
   S.fxCar = function (g, dt, s, game, c) {
-    const st = this.st, { left, SW, k, y0, GE, carX, dist, rx, exY, top } = c, R = Math.random, low = this.quality === 'bassa';
+    const st = this.st, { left, SW, k, y0, GE, carX, dist, rx, exY, top, pendenza = 0, altezza = 1 } = c, R = Math.random, low = this.quality === 'bassa';
     const mOf = (px) => dist + (px - carX) / PPM, v = Math.abs(s.v), spin = s.spin || 0;
     const drv = s.fwd ? 1 : 0, wD = left + GE.ax[drv] * k, wO = left + GE.ax[1 - drv] * k;   // ruota motrice e l'altra
     const emit = (key, rate, fn) => { st[key] = (st[key] || 0) + rate * dt; let n = 0; while (st[key] >= 1 && n++ < 8) { st[key] -= 1; fn(); } if (st[key] > 1) st[key] = 0; };
@@ -608,24 +585,27 @@
     }
     if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R())); }
     if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
-    if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0);
+    // Scaldare il metallo prima dei getti lascia visibile la radice dentro la bocca.
+    st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
+    if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
+    const calore = Math.max(s.marmitta || 0, st.tipHeat * .28);
+    if (calore > 0.01) this.fxMarmitta(g, rx, exY, k, calore, y0, pendenza, altezza);
+    const gola = st.torchT > 0 || st.flame > 0.05 || st.sus > 0.03 ? this.golaScarico(k, altezza) : 0;
+    if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0, gola);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
     if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang') {
-      const L = this.fxFlameV(g, rx, exY, k, st.flame, y0, st.flamePal, st.fv || 0), fl = Math.min(1.5, st.flame);
+      const L = this.fxFlameV(g, rx, exY, k, st.flame, y0, st.flamePal, st.fv || 0, gola);
+      const fl = Math.min(1.5, st.flame);
       if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1, pal: st.flamePal === 'verde' || st.flamePal === 'viola' ? st.flamePal : null });
     }
     else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0)) {
       // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
       const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * vn(st.t * 7.3)) * (vn(st.t * 2.1 + 9) < 0.18 ? 0.5 : 1);
-      this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal);
+      this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal, { gola });
     }
-    // anello d'urto alla bocca negli scoppi grossi; la punta cromata si arroventa
-    st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
-    if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
+    // anello d'urto alla bocca negli scoppi grossi
     if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
     if (!low) this.fxHaze(g, rx, exY, s, st, k);
-    if (st.tipHeat > 0.03) { g.fillStyle = `rgba(255,${120 + (1 - st.tipHeat) * 80 | 0},40,${st.tipHeat * 0.8})`; g.fillRect(rx, exY - Math.round(k), Math.max(2, Math.round(5 * k)), Math.max(1, Math.round(2 * k))); }
-    if ((s.marmitta || 0) > 0.01) this.fxMarmitta(g, rx, exY, k, s.marmitta, y0);                               // terminale rovente (fiamme.js)
     if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));

@@ -333,6 +333,6 @@ function supraParamsBase(sel, g, adj) {
       voice: inn.dsp.howl ? { howl: inn.dsp.howl, howlF: inn.dsp.howlF } : undefined,
       rattle: volanoRattle(fly, cl), spark: ecu.sim.spark ? 1 : 0, cabin: g('weight').sim.cabin,
     },
-    look: { low: su.low, susp: su.susp.pitch },
+    look: { low: su.low, susp: su.susp.pitch, scarico: g('exhaust').id },
   };
 }

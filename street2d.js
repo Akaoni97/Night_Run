@@ -28,7 +28,7 @@ class Street2D {
     this.lo = document.createElement('canvas');
     this.g = this.lo.getContext('2d');
     this.LH = 360;
-    this.paintHex = '#c81d11'; this.dual = false;
+    this.paintHex = '#c81d11';
     this.st = { heave: 0, hv: 0, pitch: 0, pv: 0, spin: 0, front: 0, t: 0, flame: 0, lz: 3.5, head: 0, hdv: 0 };
     this.parts = [];
     this.comics = []; this.cool = {}; this.marks = []; this.sparkT = 0;
@@ -57,7 +57,9 @@ class Street2D {
   // Righe isolate rimaste sotto le minigonne nei ritagli a 1× e 2×.
   // I rettangoli sono in pixel del PNG, misurati separatamente per le due versioni.
   static RIGHE_SOTTO_AUTO = {
-    'img/panda_tuning_hd.png': [[72, 151, 164, 4], [274, 154, 21, 1]],
+    'img/panda_tuning_hd.png': [[72, 151, 164, 4], [274, 154, 21, 1], [21, 154, 13, 1]],
+    'img/p308_hd.png': [[33, 144, 5, 7]],
+    'img/p308_tuning.png': [[21, 78, 1, 1]],
     'img/corsa_tuning_hd.png': [[87, 161, 173, 1], [308, 161, 27, 1]],
     'img/p205_tuning.png': [[38, 61, 87, 2], [144, 62, 11, 1]],
     'img/p205_tuning_hd.png': [[91, 123, 150, 2]],
@@ -210,10 +212,8 @@ class Street2D {
     x.setTransform(m, 0, 0, m, 0, 0);                            // sporco, scarico, scritte e adesivi nelle unità dello sprite
     const ink = this.C.ink, px = (col, a, b, w = 1, h = 1) => { x.fillStyle = col; x.fillRect(Math.round(a), Math.round(b), w, h); };
     if ((C0.dirt || 0) > 0.3) this.dirtLayer(x, W, H, Math.round(D.wy - D.wr * 0.9), Math.round(D.wy + D.wr * 0.6), (C0.dirt - 0.25) * 1.3, D.ax.map((a) => [a, D.wy]));
-    // terminale dello scarico: centrato sul punto da cui escono le fiamme (D.ex), la bocca a sinistra, il tubo sotto la carrozzeria
-    const ex0 = Math.round(D.ex[0]) - 2, ey = Math.round(D.ex[1]);
-    if (L.exhaust === 2) { px(ink, ex0, ey - 3, 12, 7); px('#c9ced6', ex0 + 1, ey - 2, 10, 5); px('#f4f1e6', ex0 + 2, ey - 2, 7, 1); px('#1a1c22', ex0 + 1, ey - 1, 3, 3); }
-    else if (L.exhaust) { px(ink, ex0, ey - 2, 10, 5); px('#c9ced6', ex0 + 1, ey - 1, 8, 3); px('#f4f1e6', ex0 + 2, ey - 1, 5, 1); px('#2a2d34', ex0 + 1, ey, 2, 1); }
+    this.copriScaricoDipinto(x, D);
+    this.montaScarico(x, this.geo());
     if (L.badge) { const bx = Math.round(D.ax[0] + D.wr + 4), by = Math.round(D.wy - D.wr * 0.75); this.text(x, L.badge, bx + 1, by + 1, ink); this.text(x, L.badge, bx, by, '#e8ecf2'); }
     this.drawStickers(x);
     return (this.spr[key] = c);
@@ -255,6 +255,176 @@ class Street2D {
     x.putImageData(out, 0, 0);
     return (im._conc = c2);
   }
+  // Misure in pixel dello sprite: profilo sportivo/catback e scala del terminale per carrozzeria.
+  static SCARICHI_AUTO = {
+    supra: ['ovale', 'doppio', 1.16], v40: ['ovale', 'doppio', 1],
+    r5: ['tondo', 'doppio', .91], b2002: ['tondo', 'doppio', .87],
+    e30: ['doppio', 'doppio', .94], e36: ['doppio', 'doppio', 1],
+    e34: ['doppio', 'doppio', 1.05], a80: ['ovale', 'doppio', .93],
+    a3: ['ovale', 'doppio', 1], a112: ['tondo', 'tondo', .72],
+    bus: ['curvo', 'curvo', 1.18], doblo: ['curvo', 'ovale', .9],
+    panda: ['curvo', 'tondo', .72], punto: ['ovale', 'tondo', .83],
+    golf: ['doppio', 'doppio', .88], corsa: ['ovale', 'taglio', .84],
+    p205: ['tondo', 'taglio', .79], p206: ['ovale', 'taglio', .88],
+    p308: ['piatto', 'doppio', .96], clio: ['ovale', 'taglio', .9],
+    williams: ['tondo', 'taglio', .88], taxi: ['piatto', 'ovale', .86],
+    v850: ['ovale', 'doppio', 1.07], polo: ['ovale', 'doppio', .83],
+    van: ['curvo', 'curvo', .94], ambulanza: ['curvo', 'curvo', 1.05],
+    polizia: ['piatto', 'doppio', .96], panda141: ['curvo', 'tondo', .69],
+    ax: ['tondo', 'tondo', .72], twingo: ['curvo', 'ovale', .76],
+    sandero: ['ovale', 'piatto', .84], aygo: ['curvo', 'tondo', .7],
+  };
+  // Lunghezza del collo, altezza e larghezza proiettata della bocca vista di lato.
+  // Nei terminali doppi il tubo lontano è coperto da quello vicino.
+  static TUBI = {
+    serie: [3.8, 2.6, 1.3],
+    tondo: [5.2, 3.6, 1.55],
+    ovale: [4.9, 3.4, 1.7],
+    piatto: [4.9, 2.7, 1.8],
+    doppio: [5.1, 3.25, 1.5],
+    taglio: [5.55, 3.55, 1.4],
+    curvo: [4.15, 2.9, 1.3],
+    diretto: [6.1, 3.9, 1.55],
+  };
+  static terminali = new Map();
+  static SCARICHI_DI_SERIE = { v40: 'ovale', p308: 'piatto' };
+  static SCARICHI_RETRO_SERIE = { p308: [5.1, 67.7], aygo: [5.3, 47.9], uno: [5.25, 62] };
+  // I kit che avevano lo scarico appena davanti alla ruota posteriore:
+  // la nuova uscita è sul bordo basso del paraurti, libera verso sinistra.
+  static SCARICHI_RETRO_KIT = {
+    e36: [8.5, 52.2], e34: [8.5, 55.3], a80: [7.5, 60.9], a112: [7.4, 64.3],
+    doblo: [8.5, 88.9], punto: [7.8, 73.2], golf: [10.5, 60], williams: [7.2, 71.4],
+    v850: [6.4, 62.1], polo: [5.5, 72.8], van: [6.5, 84.3],
+  };
+  // Contorni dei vecchi terminali impressi nei disegni di serie di queste auto.
+  static SCARICHI_DIPINTI = { r5: [3, 47.5, 9, 5], b2002: [2, 49, 10, 4.5], a112: [4, 56.9, 9, 4.4] };
+
+  scarico(geo = this.geo()) {
+    const id = this.carId, look = this.carLook || {};
+    const [sport, catback, scala] = Street2D.SCARICHI_AUTO[id] || ['curvo', 'ovale', 1];
+    let forma, metallo;
+    switch (look.scarico) {
+      case 'terminale': forma = sport; break;
+      case 'catback': forma = catback; break;
+      case 'centrale': forma = 'taglio'; break;
+      case 'turboback': forma = 'ovale'; break;
+      case 'race': case 'straight': forma = 'diretto'; break;
+      case 'hks': forma = 'tondo'; break;
+      case 'apexi': case 'blitz': forma = 'doppio'; break;
+      case 'tomei': forma = 'taglio'; metallo = 'titanio'; break;
+      default: forma = look.exhaust === 2 ? 'diretto' : look.exhaust ? catback : sport === 'curvo' ? 'curvo' : 'serie';
+    }
+    const originale = !look.exhaust && (!look.scarico || look.scarico === 'oem');
+    const profiloOriginale = Street2D.SCARICHI_DI_SERIE[id];
+    if (originale && profiloOriginale) forma = profiloOriginale;
+    const misura = originale && (profiloOriginale || forma === 'curvo') ? scala * .82 : scala;
+    const [len, altezza, bocca] = Street2D.TUBI[forma];
+    // Lascia un margine anche quando varia l'altezza della scocca rispetto alla ruota.
+    const spazio = geo.ax[0] - geo.wr - 2 - geo.ex[0];
+    const lunghezza = Math.min(len, Math.floor(spazio / misura * 4) / 4);
+    return { forma, scala: misura, lunghezza, altezza, bocca,
+      metallo: metallo || (originale ? 'acciaio' : forma === 'diretto' ? 'brunito' : 'inox') };
+  }
+
+  copriScaricoDipinto(g, D) {
+    const id = this.carId, kit = this.cos?.kit === 'tuning';
+    let zona = Street2D.SCARICHI_DIPINTI[id];
+    if (kit) {
+      if (id === 'bus' || id === 'ambulanza') return;
+      const [x, y] = D.ex, larghezza = Street2D.SCARICHI_RETRO_KIT[id] ? 10.6 : 9.3;
+      zona = [x - 1.15, y - 2.35, larghezza, 5];
+    }
+    if (!zona) return;
+    const [x, y, w, h] = zona;
+    g.save();
+    g.globalCompositeOperation = 'source-atop';
+    const ombra = g.createLinearGradient(0, y, 0, y + h);
+    ombra.addColorStop(0, '#262a32');
+    ombra.addColorStop(.38, '#171a20');
+    ombra.addColorStop(1, '#101216');
+    g.fillStyle = ombra;
+    g.beginPath(); g.roundRect(x, y, w, h, 1.25); g.fill();
+    g.restore();
+  }
+
+  montaScarico(g, geo) {
+    const scarico = this.scarico(geo), [x, y] = geo.ex;
+    const w = scarico.lunghezza * scarico.scala, h = scarico.altezza * scarico.scala;
+    g.save();
+    g.translate(x, y);
+    // L'incavo rimane scuro oltre il bordo del tubo, anche quando il metallo si arroventa.
+    g.fillStyle = '#101319';
+    g.beginPath();
+    g.moveTo(-.3, -h * .52);
+    g.lineTo(w * .77, -h * .68);
+    g.lineTo(w + .3, -h * .29);
+    g.lineTo(w + .3, h * .18);
+    g.lineTo(w * .66, h * .48);
+    g.lineTo(-.3, h * .46);
+    g.closePath(); g.fill();
+    g.restore();
+    this.disegnaScarico(g, x, y, 1, 0, 0, 1, scarico);
+  }
+
+  // Stessa sagoma a freddo e a caldo. Cache per profilo e livello di incandescenza.
+  static spriteScarico({ forma, metallo, lunghezza, altezza, bocca }, calore) {
+    const grado = Math.round(Math.max(0, Math.min(1, calore)) * 16);
+    const key = forma + '/' + metallo + '/' + grado + '/' + lunghezza;
+    if (Street2D.terminali.has(key)) return Street2D.terminali.get(key);
+    const c = document.createElement('canvas'); c.width = 88; c.height = 48;
+    const g = c.getContext('2d'); g.setTransform(4, 0, 0, 4, 20, 24);
+    const h = grado / 16;
+    const colori = {
+      acciaio: ['#34343a', '#88848a', '#55555c', '#242329', '#aaa7ac'],
+      inox: ['#262b35', '#dce6ee', '#7c8b9c', '#383f4e', '#f7eee0'],
+      titanio: ['#322e4d', '#c7c9ed', '#628adb', '#554079', '#edc28d'],
+      brunito: ['#261e26', '#97808b', '#594c59', '#342b35', '#a997a5'],
+    };
+    const freddo = colori[metallo];
+    const rovente = ['#9a2011', '#ffe1a0', '#ff732a', '#6e130d', '#fff1c5'];
+    const rosso = ['#61110c', '#f34c29', '#c12a17', '#4a0908', '#ff8750'];
+    const metal = freddo.map((col, i) => {
+      const [lo, hi] = h < .55 ? [col, rosso[i]] : [rosso[i], rovente[i]];
+      const a = Street2D.rgb(lo).split(',').map(Number), b = Street2D.rgb(hi).split(',').map(Number);
+      const t = h < .55 ? h / .55 : (h - .55) / .45;
+      return 'rgb(' + a.map((x, q) => Math.round(x + (b[q] - x) * t)).join(',') + ')';
+    });
+    const r = altezza / 2, len = lunghezza;
+    const finitura = g.createLinearGradient(0, -r, 0, r);
+    finitura.addColorStop(0, metal[0]);
+    finitura.addColorStop(.24, metal[2]);
+    finitura.addColorStop(.41, metal[1]);
+    finitura.addColorStop(.68, metal[2]);
+    finitura.addColorStop(1, metal[3]);
+    g.fillStyle = finitura;
+    g.beginPath();
+    g.moveTo(0, -r); g.lineTo(len, -r * .59); g.lineTo(len, r * .59); g.lineTo(0, r);
+    g.closePath(); g.fill();
+    g.save(); g.clip();
+    const ombra = g.createLinearGradient(0, 0, len, 0);
+    ombra.addColorStop(0, 'rgba(12,14,19,.04)');
+    ombra.addColorStop(.45, 'rgba(12,14,19,.28)');
+    ombra.addColorStop(1, '#0d1015');
+    g.fillStyle = ombra; g.fillRect(0, -r, len, altezza);
+    g.restore();
+    const anello = (rx, ry, colore) => {
+      g.fillStyle = colore; g.beginPath(); g.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); g.fill();
+    };
+    anello(bocca * .62, r + .15, metal[0]);
+    anello(bocca * .48, r * .94, metal[2]);
+    anello(bocca * .28, r * .63, h > .58 ? metal[3] : '#111218');
+    g.strokeStyle = metal[1]; g.lineWidth = .38;
+    g.beginPath(); g.ellipse(0, 0, bocca * .46, r * .84, 0, Math.PI * 1.02, Math.PI * 1.66); g.stroke();
+    Street2D.terminali.set(key, c);
+    return c;
+  }
+  disegnaScarico(g, x, y, k, calore = 0, inclinazione = 0, schiacciamento = 1, scarico = this.scarico()) {
+    const s = k * scarico.scala, img = Street2D.spriteScarico(scarico, calore);
+    g.save(); g.transform(1, inclinazione, 0, schiacciamento, x, y);
+    g.drawImage(img, -5 * s, -6 * s, 22 * s, 12 * s);
+    g.restore();
+  }
+
   // ruota del disegno che gira: i vuoti scuri tra le razze diventano trasparenti (dietro c'è il freno), colore cerchi a scelta
   genWheelImg(m = 1) {
     const G = this.genImgs(), D = this.genDef(), col = this.cos && this.cos.rims && this.cos.rims !== 'none' ? this.cos.rims : '';
@@ -288,10 +458,17 @@ class Street2D {
   geo() {
     const low = ((this.carLook || {}).low || 0) * 0.75;
     const D = this.genDef();
-    if (D) return { h: D.h, wy: D.wy, wr: Street2D.raggioGrafico(D), ax: D.ax, hx: D.hx, hy: D.hy, tail: D.tail, head: D.head, ex: D.ex, low, slots: D.slots,
-      blinkF: [D.head[0] - 6, D.head[1] + 5, 5, 2], blinkR: [D.tail[0] + 1, D.tail[1] + 6, 4, 2] };
+    if (D) {
+      const kit = this.cos?.kit === 'tuning', wr = Street2D.raggioGrafico(D);
+      const [x, y] = kit
+        ? (this.carId === 'p308' ? [11.1, 72.3] : Street2D.SCARICHI_RETRO_KIT[this.carId]) || D.ex
+        : Street2D.SCARICHI_RETRO_SERIE[this.carId] || D.ex;
+      const ex = [Math.min(x, D.ax[0] - wr - 6), y];
+      return { h: D.h, wy: D.wy, wr, ax: D.ax, hx: D.hx, hy: D.hy, tail: D.tail, head: D.head, ex, low, slots: D.slots,
+        blinkF: [D.head[0] - 6, D.head[1] + 5, 5, 2], blinkR: [D.tail[0] + 1, D.tail[1] + 6, 4, 2] };
+    }
     if (this.carId === 'v40') return this.v40Ready
-      ? { h: 71, wy: 56, wr: 14.4, ax: [41, 156], hx: 112, hy: 3, tail: [2, 26, 6, 7], blinkF: [173, 46, 7, 2], blinkR: [19, 44, 6, 2], ex: [3, 54], head: [190, 40], low, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] } }
+      ? { h: 71, wy: 56, wr: 14.4, ax: [41, 156], hx: 112, hy: 3, tail: [2, 26, 6, 7], blinkF: [173, 46, 7, 2], blinkR: [19, 44, 6, 2], ex: [3.25, 55.8], head: [190, 40], low, slots: { st_door: [124, 42, 30, 12], st_rear: [30, 38, 22, 11], st_glass: [72, 21, 22, 7] } }
       : { h: 71, wy: 56, wr: 14.4, ax: [41, 156], hx: 110, hy: 6, tail: [1, 28, 5, 10], blinkF: [188, 47, 6, 2], blinkR: [1, 47, 4, 2], ex: [6, 64], head: [192, 39], low, slots: { st_door: [118, 40, 30, 12], st_rear: [26, 40, 20, 10], st_glass: [70, 20, 22, 7] } };
     return { h: 58, wy: 42, wr: 15, ax: [48, 158], hx: 92, hy: 0, tail: [7, 18, 5, 5], blinkF: [176, 37, 7, 3], blinkR: [19, 33, 4, 3], ex: [7, 46], head: [192, 34], low, slots: { st_door: [114, 34, 30, 11], st_rear: [30, 31, 18, 9], st_glass: [80, 12, 18, 6] } };
   }
@@ -373,7 +550,9 @@ class Street2D {
     if (L.kit) {
       px(ink, 58, 62, 82, 4); px(sh(-0.1), 59, 62, 80, 3);                                     // minigonne
       px(ink, 176, 64, 24, 3); px('#1a1d24', 177, 64, 22, 2);                                 // labbro anteriore
-      px(ink, 0, 64, 18, 3); for (let q = 2; q < 16; q += 3) px('#3a4048', q, 64, 1, 2);       // diffusore
+      const diffusoreY = this.v40Ready ? 55 : 64, diffusoreX = this.v40Ready ? 5 : 0;
+      px(ink, diffusoreX, diffusoreY, 18, 3);
+      for (let q = 2; q < 16; q += 3) px('#3a4048', diffusoreX + q, diffusoreY, 1, 2);
       px(sh(0.05), 180, 52, 20, 10); px(ink, 184, 57, 14, 4);                                  // paraurti in tinta con presa
     }
     if (L.spoiler) { const sy = this.v40Ready ? 2 : 6; px(ink, 0, sy, 20, 5); px(sh(0.05), 1, sy + 1, 18, 3); px(sh(0.35), 1, sy + 1, 18, 1); px(ink, 15, sy + 4, 3, 3); }
@@ -381,10 +560,7 @@ class Street2D {
     if (L.badge) { this.text(x, L.badge, 6, 36, ink, 2); this.text(x, L.badge, 5, 35, '#d8dde6', 2); }                                      // sigla sul portellone
     if (L.turbo2) { this.text(x, 'TURBO', 61, 37, ink, 2); this.text(x, 'TURBO', 60, 36, '#e8ecf2', 2); px('#c41a1a', 60, 47, 38, 2); }
     if ((C0.dirt || 0) > 0.7) this.dirtLayer(x, W, H, 40, 66, (C0.dirt - 0.6) * 1.6, [[41, 56], [156, 56]]);
-    const ey = this.v40Ready ? 52 : 63;
-    if (L.exhaust === 2) { px(ink, 1, ey - 1, 14, 7); px('#c9ced6', 2, ey, 12, 5); px('#f4f1e6', 3, ey, 9, 1); px('#1a1c22', 3, ey + 1, 4, 3); }
-    else if (L.exhaust) { px(ink, 2, ey, 12, 5); px('#c9ced6', 3, ey + 1, 10, 3); px('#f4f1e6', 4, ey + 1, 7, 1); px('#2a2d34', 3, ey + 2, 2, 2); }
-    else { px('#2a2d34', 5, ey + 1, 5, 2); }
+    this.montaScarico(x, this.geo());
     this.drawStickers(x);
     return (this.spr[key] = c);
   }
@@ -422,7 +598,8 @@ class Street2D {
   }
   // carrozzeria ricolorata: i pixel rosso vernice prendono il colore scelto mantenendo luci e ombre
   supraBase(hex) {
-    if (this.paintBase[hex]) return this.paintBase[hex];
+    const key = hex + (this.carLook?.scarico || 'oem');
+    if (this.paintBase[key]) return this.paintBase[key];
     const c = document.createElement('canvas'); c.width = 200; c.height = 58; const x = c.getContext('2d', { willReadFrequently: true });
     x.drawImage(this.sImg, 0, 0);
     const cos = this.cos || {}, stripe = cos.stripe && cos.stripe !== 'none' ? parseInt(cos.stripe.slice(1), 16) : null;
@@ -454,7 +631,8 @@ class Street2D {
     }
     if ((cos.dirt || 0) > 0.3) this.dirtLayer(x, 200, 58, 32, 50, (cos.dirt - 0.25) * 1.3, [[48, 42], [158, 42]]);
     this.drawStickers(x);
-    return (this.paintBase[hex] = c);
+    this.montaScarico(x, this.geo());
+    return (this.paintBase[key] = c);
   }
   supraSprite(hex, k) {
     const key = 'img' + hex + k;
@@ -625,7 +803,7 @@ class Street2D {
   }
 
   vehicle(type, P, k) {
-    const key = type + P + k + (type === 'supra' && this.dual ? 'd' : '');
+    const key = type + P + k;
     if (this.spr[key]) return this.spr[key];
     const geo = Street2D.GEO[type === 'police' ? 'sedan' : type], top = geo.top || 0;
     const D = Street2D.shade(P, -0.38), DD = Street2D.shade(P, -0.62), L = Street2D.shade(P, 0.3), LL = Street2D.shade(P, 0.6);
@@ -672,8 +850,8 @@ class Street2D {
         px('#14161e', 66, 51, 74, 2); px(DD, 66, 50, 74, 1);
         px('#14161e', 4, 49, 18, 4); for (let n = 0; n < 4; n++) px('#4a5070', 7 + n * 4, 50, 1, 3);
         if (type === 'supra') {
-          px('#d6dbe4', 0, 46, 6, 5); px('#8a93a6', 0, 49, 6, 2); px('#14161e', 1, 47, 3, 3);
-          if (this.dual) { px('#d6dbe4', 14, 47, 5, 4); px('#14161e', 15, 48, 3, 2); }
+          const geo = this.geo();
+          x.save(); x.scale(k, k); this.montaScarico(x, geo); x.restore();
           px(L, 0, 12, 36, 1); px(DD, 0, 16, 36, 1);
           if (k > 0.6) { this.text(x, '2JZ', Math.round(100 * k), Math.round(38 * k), LL); this.text(x, 'TURBO', Math.round(146 * k), Math.round(35 * k), Street2D.shade(P, 0.15)); }
         }
@@ -751,7 +929,6 @@ class Street2D {
     const k = JSON.stringify(c || {}); if (k === this.cosKey) return;
     this.cosKey = k; this.cos = Object.assign({}, c); this.spr = {}; this.paintBase = {}; this.rimImg = null;
   }
-  setTips(n) { this.dual = n > 1; }
   setRain(on) { this.rainOn = on; }
   setDaylight(d, ss) { this.day = d; this.sunset = ss; }
   resetCamera() {}
@@ -2180,10 +2357,12 @@ class Street2D {
     const whY = (xl) => skW * (xl - whX0);                                    // quanto sale un punto della cassa a xl pixel dal bordo
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;
+    const pendenza = skew + skW, altezza = 1 - squash;
+    const origineY = top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0);
     this.fxParts(g, dt, wx, W, 0);                                             // fumo e vapore dietro l'auto
     g.save();
     g.imageSmoothingEnabled = false;
-    this.tf(g, 1, skew + skW, 0, 1 - squash, left, top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0));
+    this.tf(g, 1, pendenza, 0, altezza, left, origineY);
     if (this.heroOutline && this.quality !== 'bassa') this.heroOutline(g, spr);   // il protagonista si stacca dallo sfondo
     this.body(g, spr, 0, 0);
     // luce di contorno: magenta e ciano dei neon che si alternano lungo la strada, bianca di giorno
@@ -2282,9 +2461,10 @@ class Street2D {
       if (this.fxFariBagnato) this.fxFariBagnato(g, fx, y0, left + GE.tail[0] * k + 2, s, night, st.t);   // riflessi dei fari sull'asfalto (vita2d.js)
     }
     // ---- effetti
-    const rx = Math.round(left + GE.ex[0] * k), exY = Math.round(top - skew * SW / 2 + skew * GE.ex[0] * k + GE.ex[1] * k * (1 - squash) - (spr.img ? k : 0));   // come il disegno (- k): la fiamma esce proprio da GE.ex
-    // segni di gomma, fumo, spruzzi, scintille, scoppi e fiammate: effetti2d.js
-    this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, lampX, wx, W });
+    const rx = left + GE.ex[0] * k;
+    const exY = origineY + pendenza * GE.ex[0] * k + GE.ex[1] * k * altezza;
+    // Stessa trasformazione della carrozzeria, anche durante un’impennata.
+    this.fxCar(g, dt, s, game, { left, SW, k, y0, top, GE, carX, dist, rx, exY, pendenza, altezza, lampX, wx, W });
     if (this.lightAdd && (st.flame > 0.05 || (st.popFlash || 0) > 0.02 || (st.sus || 0) > 0.03)) this.lightAdd(rx - 20, exY, 90, 40, st.flame > 0.05 && (Street2D.FLAME_LUCE || {})[st.flamePal] || '255,140,50', Math.min(1, Math.max(st.flame, st.popFlash || 0, (st.sus || 0) * 0.45)) * 0.9);
     if (s.v > 16) {
       // linee di velocità affusolate (più fitte e lunghe con la velocità)
