@@ -15,7 +15,7 @@
 //  scheda video (nessun ridisegno: lo scatto della v0.103 non torna). Sopra il quadro fermo c'è uno strato (`.nt-scena`, grande come la
 //  scena e in scala con lei, 1 unità = `--u` px) con: auto del traffico che passano (fanali rossi e fari bianchi con la scia), le quattro
 //  frecce che lampeggiano, il lampione spento che ogni tanto sfarfalla, il telefono che pulsa, le stelle che brillano e il tempo
-//  (sereno, pioggia o nebbia, a caso a ogni avvio; `?meteo=pioggia` o `NightTitolo.meteo('nebbia')` per provarli). Il logo ha scintille
+//  (sereno o nebbia, a caso a ogni avvio; dalla v0.167 la pioggia solo a mano con `?meteo=pioggia` o `NightTitolo.meteo('nebbia')` per provarli). Il logo ha scintille
 //  e sotto una frase che cambia (`NT_FRASI`). «Accendi e parti» gira la chiave: pannello giù, frecce spente, spinta in avanti sul
 //  muso e un avviamento sintetizzato (`chiave`), poi parte il gioco di sempre. Solo se il clic o il tasto sono veri (le prove
 //  automatiche partono subito). Le partite sono schede con auto, dove sei arrivato, soldi e ultima volta (`salvataggi.js`).
@@ -457,7 +457,7 @@
   // il tempo di questo avvio
   const METEO = ['sereno', 'pioggia', 'nebbia'];
   function meteo(m) {
-    if (!METEO.includes(m)) { const r = Math.random(); m = r < 0.5 ? 'sereno' : r < 0.78 ? 'pioggia' : 'nebbia'; }
+    if (!METEO.includes(m)) m = Math.random() < 0.65 ? 'sereno' : 'nebbia';   // v0.167: niente pioggia a caso (le righe che attraversano lo schermo, tolte da Nico); resta con ?meteo=pioggia
     for (const q of METEO) gate.classList.toggle('nt-m-' + q, q === m); return m;
   }
   try { const q = new URLSearchParams(location.search).get('meteo'); meteo(q); } catch (e) { meteo(); }

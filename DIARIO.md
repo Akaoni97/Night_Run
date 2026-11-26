@@ -1,3 +1,7 @@
+## 26/11/2026 · proprietario (Nico) · v0.167 (**schermata iniziale senza pioggia**)
+- Nico ha chiesto di togliere le righe che attraversano la schermata iniziale: era la pioggia, sorteggiata a caso più o meno una volta su quattro. Ora il tempo del titolo è sereno (65 %) o nebbia (`titolo.js`, `meteo`); la pioggia resta solo a mano con `?meteo=pioggia`. Fasci dei fari di ricerca nel cielo lasciati come sono.
+- Provato: 20 avvii senza pioggia, nessun errore; test del titolo verdi. Fatte anche tre immagini pulite del gioco per un video di Gemini (fuori dal repository).
+
 ## 25/11/2026 · proprietario (Nico) · v0.166 (**quadro sotto i pulsanti, B che chiude, scritte della chiave**)
 - Sospeso 36 (proposta di Luca, approvata da Nico): sul computer nella colonna in alto a sinistra ora vengono prima i pulsanti (AVVIA, AUTO, TC...) e sotto il quadro. Accanto all'angolo del quadro il tasto ⤢ lo porta da 280 a 560 px e indietro; si ricorda in `localStorage` `nr_quadro_grande` (`menu.js`, CSS in `index.html`). Col quadro grande la colonna può scendere fino all'82 % dell'altezza (prima 60 %): su finestre piccole copre un po' il retro dell'auto, è voluto.
 - Sospeso 37: un secondo B chiude il bagagliaio se il menu è aperto su quella scheda (`gameMenu.tab`).

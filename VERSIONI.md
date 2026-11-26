@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.166**
+**Versione attuale: v0.167**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -190,3 +190,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.164 · 25/11/2026 · proprietario · due auto nuove dai disegni: Fiat Uno Turbo i.e. prima serie (turbo IHI vero da 0,6 bar, 105 CV, cambio C510) e Fiat Punto 75 prima serie (1.2 8V da 73 CV), con telaio, rapporti, gomme, freni, scheda, pezzi propri, traffico e Autosalone
 - v0.165 · 25/11/2026 · proprietario · **Scarichi nella vista laterale**: terminali integrati nel disegno, con la verifica che restino lontani dalle gomme
 - v0.166 · 25/11/2026 · proprietario · **Quadro, bagagliaio e schermata iniziale**: sul computer i pulsanti sopra e il quadro sotto (proposta di Luca), tasto ⤢ che raddoppia il quadro e lo rimette piccolo; B apre e chiude il bagagliaio; scritte sotto la chiave leggibili su un fondo scuro
+- v0.167 · 26/11/2026 · proprietario · **Schermata iniziale senza pioggia**: il tempo a caso è solo sereno o nebbia, niente più righe della pioggia che attraversano lo schermo (resta con `?meteo=pioggia`)
