@@ -111,7 +111,7 @@
           p.life -= dt * (p.rate || (p.k === 'spray' ? 2.6 : 1.5)); p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy += (p.k === 'spark' ? 210 : 90) * dt;
           if (p.gy !== undefined && p.y > p.gy && p.vy > 0) { p.y = p.gy; p.vy *= -0.38; p.dx *= 0.6; }   // rimbalza sull'asfalto
         } else if (p.k === 'fire') {
-          p.life -= dt * 3; p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy -= 24 * dt; p.r += dt * 5;
+          p.life -= dt * (p.rate || 3); p.m += p.dx / PPM * dt; p.y += p.vy * dt; p.vy -= 24 * dt; p.r += dt * (p.gr ?? 5);
         } else {
           const K = KIND[p.k] || KIND.tyre;
           p.life -= dt * (p.rate || K.rate);
@@ -216,6 +216,7 @@
     verde: { b: [['#0e8a3c', '#0e8a3c'], ['#22c95a', '#2fd26a'], ['#8cffb0', '#9cffc0'], ['#effff4', '#effff4']], o: 'rgba(4,46,20,.7)', l: '#46ff88', g: '#3ce07a' },
     viola: { b: [['#7a1fd6', '#d0208a'], ['#b44bff', '#ff4fb8'], ['#e2a8ff', '#ffb0e0'], ['#ffffff', '#fff0fa']], o: 'rgba(40,8,70,.7)', l: '#c070ff', g: '#b858ff', cut: 0.5 },
   };
+  Street2D.fxHelp = { FLAME_PAL, flameLight, vn };     // per fiamme2d.js (le scene delle fiamme)
   Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255' };   // luce della fiammata nella mappa di luce (street2d.js)
   S.fxFlame = function (g, rx, exY, k, fl, y0, pal, opt) {
     const P = FLAME_PAL[pal] || FLAME_PAL.arancio, O = opt || {};
@@ -557,7 +558,13 @@
     const rateK = (kit && kit.rate || 1) * (tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1);
     st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
     // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
-    const spawn = (style) => {
+    // scene delle fiamme (fiamme2d.js): ogni carattere (burble, tuner, rally, drag, race, drago, mitraglia) è una scena che cambia forma
+    const nuovo = tiered && typeof fiammaTipo === 'function' && typeof this.scenaNuova === 'function' && !Street2D.fiammeVecchie;
+    const spawn = (style, forza) => {
+      if (nuovo && style !== 'torch' && FIAMME_TIPI.includes(style)) {
+        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R()), forza })) st.fstyle = 'scena';
+        return;
+      }
       if (style === 'torch' || (style === 'big' && (kit ? kit.id === 'ossidrica' : tier >= 2))) {                    // ossidrica: breve, rapida, con scintille incandescenti
         st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
         for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
@@ -577,13 +584,13 @@
       for (let q = 0; q < (grossa ? 8 : big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
     };
-    const scegli = (r) => kit ? fiammeScegli(kit, tier, s.fkind, r) : flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, r);   // il kit o la preparazione
+    const scegli = (r) => nuovo ? fiammaTipo(tier, s.fkind, kit, { turbo: s.fturbo }, r) : kit ? fiammeScegli(kit, tier, s.fkind, r) : flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, r);   // il kit o la preparazione
     // appena si molla il gas (s.fkick conta i rilasci) il primo scoppio parte subito, non quando capita; sopra i 5.000 giri ne parte un secondo
     if (s.fkick !== undefined && s.fkick !== st.fkick) {
       st.fkick = s.fkick;
-      if (s.fkick && tiered) { spawn(scegli(R())); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
+      if (s.fkick && tiered) { spawn(scegli(R()), true); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
-    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R())); }
+    if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R()), true); }
     if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
     // Scaldare il metallo prima dei getti lascia visibile la radice dentro la bocca.
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
@@ -591,14 +598,15 @@
     const calore = Math.max(s.marmitta || 0, st.tipHeat * .28);
     if (calore > 0.01) this.fxMarmitta(g, rx, exY, k, calore, y0, pendenza, altezza);
     const gola = st.torchT > 0 || st.flame > 0.05 || st.sus > 0.03 ? this.golaScarico(k, altezza) : 0;
+    const scAct = nuovo ? this.scenaTick(g, dt, { st, rx, exY, k, y0, gola: this.golaScarico(k, altezza), v, mOf, R, parts: this.parts }) : 0;
     if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0, gola);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
-    if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang') {
+    if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang' && st.fstyle !== 'scena') {
       const L = this.fxFlameV(g, rx, exY, k, st.flame, y0, st.flamePal, st.fv || 0, gola);
       const fl = Math.min(1.5, st.flame);
       if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1, pal: st.flamePal === 'verde' || st.flamePal === 'viola' ? st.flamePal : null });
     }
-    else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0)) {
+    else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0) && !scAct) {
       // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
       const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * vn(st.t * 7.3)) * (vn(st.t * 2.1 + 9) < 0.18 ? 0.5 : 1);
       this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal, { gola });
