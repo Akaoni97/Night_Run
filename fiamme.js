@@ -164,55 +164,95 @@ function fiammaPalTipo(tipo, kit, r) {
   if (tipo === 'race') return r < 0.7 ? 'gialla' : 'blu';
   return r < 0.65 ? 'arancio' : 'gialla';                                        // rally, drago, mitraglia
 }
-const FIAMMA_POP = { t: 0, d: 0.15, len: 20, th: 3, ang: 0, bulb: 1.3, grow: 0.3, detach: 0.55, taper: 0.8, rag: 0, curl: 0.5, wob: 1, diam: 0, cone: 0, jag: 0,
-  flick: 0, cut: 0, sparks: 0, sparkV: 1, clumps: 0, soot: 0, ring: 0, star: 0, luce: 1 };
-// la scena: { tipo, dur, cool (secondi prima della prossima), pops: [...] }. rn() = numeri a caso in [0,1) (nei test, un generatore con seme)
+const FIAMMA_POP = { t: 0, d: 0.15, len: 20, th: 3, ang: 0, dy: 0, ph0: 0, bulb: 1.3, grow: 0.3, detach: 0.55, taper: 0.8, rag: 0, curl: 0.5, wob: 1, diam: 0, cone: 0, jag: 0,
+  lick: 0.5, flick: 0, cut: 0, sparks: 0, sparkV: 1, clumps: 0, soot: 0, ring: 0, star: 0, luce: 1 };
+// la scena: { tipo, v (la variante), dur, cool (secondi prima della prossima), pops: [...] }. rn() = numeri a caso in [0,1) (nei test, un generatore con seme).
+// Ogni carattere ha più varianti (v0.170): la stessa preparazione non rifà due volte di fila la stessa fiammata.
+const FIAMMA_SCALA = { len: 1.25, th: 1.2 };                                      // misura generale: le fiamme della v0.169 erano troppo piccole sull'auto
 function fiammaCopione(tipo, tier, rn) {
-  const pop = (t, o) => Object.assign({}, FIAMMA_POP, { t }, o);
-  const pops = []; let cool = 0.2, t = 0;
+  const pop = (t, o) => { const q = Object.assign({}, FIAMMA_POP, { t }, o); q.len *= FIAMMA_SCALA.len; q.th *= FIAMMA_SCALA.th; return q; };
+  const pops = []; let cool = 0.2, t = 0, v = '';
   const fine = () => pops.reduce((m, p) => Math.max(m, p.t + p.d), 0);
+  const pick = (a) => a[Math.min(a.length - 1, Math.floor(rn() * a.length))];
+  const ang = (m) => (rn() - 0.5) * m;
   if (tipo === 'burble') {
-    const n = 3 + Math.floor(rn() * 4);
-    for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.12 + 0.08 * rn(), len: 5 + 7 * rn(), th: 1.5 + 1.2 * rn(), ang: (rn() - 0.5) * 0.2, bulb: 1.3, grow: 0.3, detach: 0.6, rag: 0.25, curl: 0.5 + rn() * 0.4, cut: 0.35, luce: 0.3 })); t += 0.05 + 0.08 * rn(); }
-    cool = 0.1 + 0.12 * rn();
-  } else if (tipo === 'tuner') {
-    const n = 2 + Math.floor(rn() * 3) + (tier >= 2 ? 1 : 0);
-    for (let i = 0; i < n; i++) {
-      const g = i === 0 ? 0.6 + 0.4 * rn() : 0.3 + 0.7 * rn();
-      pops.push(pop(t, { d: 0.1 + 0.07 * rn(), len: 9 + 16 * g, th: 2.4 + 2.2 * g, ang: (rn() - 0.5) * 0.28, bulb: 1.5, grow: 0.28, detach: 0.42, rag: 0.45,
-        curl: 0.7 + rn() * 0.6, wob: 1.3, jag: 0.12, cut: rn() < 0.25 ? 0.35 : 0, sparks: g > 0.6 ? 2 + Math.floor(rn() * 3) : Math.floor(rn() * 2), soot: i === 0 ? 1 : 0, luce: 0.5 + 0.5 * g }));
-      t += 0.035 + 0.07 * rn();
+    v = pick(['fiammella', 'sbuffo', 'tremolio']);
+    if (v === 'sbuffo') { pops.push(pop(0, { d: 0.22, len: 12 + 8 * rn(), th: 3 + rn(), bulb: 1.5, grow: 0.3, detach: 0.5, rag: 0.3, curl: 0.8, cut: 0.35, luce: 0.45, lick: 0.4 })); cool = 0.22 + 0.2 * rn(); }
+    else {
+      const n = v === 'tremolio' ? 6 + Math.floor(rn() * 4) : 3 + Math.floor(rn() * 4), gap = v === 'tremolio' ? 0.03 + 0.04 * rn() : 0.05 + 0.08 * rn();
+      for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.12 + 0.08 * rn(), len: (v === 'tremolio' ? 4 : 5) + 7 * rn(), th: 1.5 + 1.2 * rn(), ang: ang(0.2), bulb: 1.3, detach: 0.6, rag: 0.25, curl: 0.5 + rn() * 0.4, cut: 0.35, luce: 0.3, lick: 0.4 })); t += gap; }
+      cool = 0.1 + 0.12 * rn();
     }
-    cool = 0.16 + 0.2 * rn();
+  } else if (tipo === 'tuner') {
+    v = pick(['crackle', 'sparata', 'colpo']);
+    if (v === 'colpo') {
+      pops.push(pop(0, { d: 0.2 + 0.08 * rn(), len: 22 + 14 * rn(), th: 5 + 2 * rn(), ang: ang(0.2), bulb: 1.5, grow: 0.25, detach: 0.4, rag: 0.4, curl: 0.9, wob: 1.2, jag: 0.1, cut: rn() < 0.3 ? 0.35 : 0, sparks: 4 + Math.floor(rn() * 3), soot: 1, ring: rn() < 0.5 ? 1 : 0, luce: 0.9 }));
+      cool = 0.25 + 0.2 * rn();
+    } else {
+      const n = v === 'crackle' ? 4 + Math.floor(rn() * 3) : 2 + Math.floor(rn() * 2) + (tier >= 2 ? 1 : 0), big = v === 'crackle' ? 9 : 14;
+      for (let i = 0; i < n; i++) {
+        const g = i === 0 ? 0.6 + 0.4 * rn() : 0.3 + 0.7 * rn();
+        pops.push(pop(t, { d: 0.1 + 0.07 * rn(), len: big - 3 + big * g, th: 2.4 + 2.2 * g, ang: ang(0.3), dy: ang(1.2), bulb: 1.5, grow: 0.28, detach: 0.42, rag: 0.45, curl: 0.7 + rn() * 0.6, wob: 1.3, jag: 0.12,
+          cut: rn() < 0.25 ? 0.35 : 0, sparks: g > 0.6 ? 2 + Math.floor(rn() * 3) : Math.floor(rn() * 2), soot: i === 0 ? 1 : 0, luce: 0.5 + 0.5 * g }));
+        t += (v === 'crackle' ? 0.03 : 0.05) + 0.06 * rn();
+      }
+      cool = 0.16 + 0.2 * rn();
+    }
   } else if (tipo === 'rally') {
-    pops.push(pop(0, { d: 0.3 + 0.14 * rn(), len: 46 + 26 * rn(), th: 5.5 + 3 * rn(), bulb: 1.4, grow: 0.22, detach: 0.34, taper: 0.6, rag: 0.8, curl: 1.2, wob: 1.6, jag: 0.1,
-      sparks: 10 + Math.floor(rn() * 10), sparkV: 1.2, clumps: 5 + Math.floor(rn() * 6), soot: 1, ring: rn() < 0.6 ? 1 : 0, luce: 1 }));
-    t = 0.09 + 0.07 * rn();
-    pops.push(pop(t, { d: 0.2 + 0.08 * rn(), len: 28 + 14 * rn(), th: 4 + 2 * rn(), ang: (rn() - 0.5) * 0.2, bulb: 1.3, grow: 0.25, detach: 0.4, taper: 0.7, rag: 0.7, curl: 1, wob: 1.4, sparks: 5, clumps: 2, luce: 0.8 }));
-    if (rn() < 0.4) pops.push(pop(t + 0.1 + 0.06 * rn(), { d: 0.16, len: 16 + 10 * rn(), th: 3 + rn(), ang: (rn() - 0.5) * 0.3, bulb: 1.4, rag: 0.6, curl: 0.9, sparks: 3, luce: 0.6 }));
+    v = pick(['cannone', 'raffica', 'lingua']);
+    if (v === 'cannone') {
+      pops.push(pop(0, { d: 0.3 + 0.14 * rn(), len: 46 + 26 * rn(), th: 5.5 + 3 * rn(), bulb: 1.4, grow: 0.22, detach: 0.34, taper: 0.6, rag: 0.8, curl: 1.2, wob: 1.6, jag: 0.1, lick: 0.7,
+        sparks: 10 + Math.floor(rn() * 10), sparkV: 1.2, clumps: 5 + Math.floor(rn() * 6), soot: 1, ring: rn() < 0.6 ? 1 : 0, luce: 1 }));
+      t = 0.09 + 0.07 * rn();
+      pops.push(pop(t, { d: 0.2 + 0.08 * rn(), len: 28 + 14 * rn(), th: 4 + 2 * rn(), ang: ang(0.2), bulb: 1.3, grow: 0.25, detach: 0.4, taper: 0.7, rag: 0.7, curl: 1, wob: 1.4, lick: 0.7, sparks: 5, clumps: 2, luce: 0.8 }));
+      if (rn() < 0.4) pops.push(pop(t + 0.1 + 0.06 * rn(), { d: 0.16, len: 16 + 10 * rn(), th: 3 + rn(), ang: ang(0.3), bulb: 1.4, rag: 0.6, curl: 0.9, sparks: 3, luce: 0.6 }));
+    } else if (v === 'raffica') {
+      const n = 4 + Math.floor(rn() * 3);
+      for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.18 + 0.08 * rn(), len: 26 + 20 * rn(), th: 4 + 2 * rn(), ang: ang(0.3), dy: ang(1.4), bulb: 1.4, grow: 0.25, detach: 0.4, rag: 0.75, curl: 1, wob: 1.4, lick: 0.7, sparks: 4, clumps: 2, soot: i === 0 ? 1 : 0, luce: 0.8 })); t += 0.06 + 0.04 * rn(); }
+    } else {
+      pops.push(pop(0, { d: 0.42 + 0.16 * rn(), len: 70 + 30 * rn(), th: 4 + rn(), ang: 0.05, bulb: 1.3, grow: 0.3, detach: 0.5, taper: 0.55, rag: 0.6, curl: 1.8, wob: 1.6, lick: 0.8, sparks: 14, sparkV: 1.3, clumps: 3, soot: 1, luce: 1 }));
+    }
     cool = 0.14 + 0.16 * rn();
   } else if (tipo === 'drag') {
-    pops.push(pop(0, { d: 0.3 + 0.22 * rn(), len: 70 + 38 * rn(), th: 2.3 + 0.9 * rn(), bulb: 1.2, grow: 0.16, detach: 0.82, taper: 0.55, rag: 0.1, curl: 0.25, wob: 0.6,
-      diam: 4, flick: 22 + rn() * 10, cut: 0.42, sparks: 2 + Math.floor(rn() * 3), luce: 1 }));
-    if (rn() < 0.6) pops.push(pop(pops[0].d * 0.8, { d: 0.12 + 0.05 * rn(), len: 22 + 14 * rn(), th: 1.8 + 0.6 * rn(), bulb: 1.4, grow: 0.3, detach: 0.5, rag: 0.3, curl: 0.5, cut: 0.4, sparks: 1, luce: 0.6 }));
-    cool = pops[0].d * 0.7;
+    v = pick(['foglio', 'doppio', 'pennacchio']);
+    if (v === 'doppio') {
+      const d = 0.3 + 0.18 * rn(), L = 60 + 30 * rn();
+      pops.push(pop(0, { d, len: L, th: 2.4 + 0.6 * rn(), dy: -2.2, bulb: 1.2, grow: 0.16, detach: 0.82, taper: 0.55, rag: 0.1, curl: 0.25, wob: 0.6, diam: 3, flick: 20 + rn() * 10, ph0: 1, cut: 0.42, lick: 0.3, luce: 1 }));
+      pops.push(pop(0.02, { d: d * 0.95, len: L * 0.9, th: 2.4 + 0.6 * rn(), dy: 2.2, bulb: 1.2, grow: 0.16, detach: 0.82, taper: 0.55, rag: 0.1, curl: 0.2, wob: 0.6, diam: 3, flick: 22 + rn() * 10, ph0: 4, cut: 0.42, lick: 0.3, sparks: 2, luce: 0.9 }));
+    } else if (v === 'pennacchio') {
+      pops.push(pop(0, { d: 0.32 + 0.2 * rn(), len: 40 + 20 * rn(), th: 4 + 1.5 * rn(), bulb: 1.3, grow: 0.2, detach: 0.7, taper: 0.6, rag: 0.35, curl: 1.1, wob: 1, flick: 14, cut: 0.5, lick: 0.8, sparks: 3 + Math.floor(rn() * 3), luce: 1 }));
+    } else {
+      pops.push(pop(0, { d: 0.3 + 0.22 * rn(), len: 70 + 38 * rn(), th: 3.4 + 1.2 * rn(), bulb: 1.3, grow: 0.16, detach: 0.82, taper: 0.5, rag: 0.12, curl: 0.25, wob: 0.6,
+        diam: 4, flick: 22 + rn() * 10, cut: 0.42, lick: 0.3, sparks: 2 + Math.floor(rn() * 3), luce: 1 }));
+      if (rn() < 0.6) pops.push(pop(pops[0].d * 0.8, { d: 0.12 + 0.05 * rn(), len: 22 + 14 * rn(), th: 1.8 + 0.6 * rn(), bulb: 1.4, grow: 0.3, detach: 0.5, rag: 0.3, curl: 0.5, cut: 0.4, sparks: 1, luce: 0.6 }));
+    }
+    cool = fine() * 0.7;
   } else if (tipo === 'race') {
-    pops.push(pop(0, { d: 0.17 + 0.08 * rn(), len: 24 + 12 * rn(), th: 8 + 3 * rn(), cone: 1, bulb: 1.1, grow: 0.24, detach: 0.5, taper: 0.9, rag: 0.3, jag: 0.5, curl: 0.4, wob: 0.5,
-      star: 1, ring: 1, sparks: 6 + Math.floor(rn() * 6), soot: 1, luce: 1.2 }));
-    if (rn() < 0.5) pops.push(pop(0.1 + 0.05 * rn(), { d: 0.14, len: 14 + 8 * rn(), th: 4 + 2 * rn(), cone: 1, ang: (rn() - 0.5) * 0.3, jag: 0.5, rag: 0.3, sparks: 3, luce: 0.7 }));
+    v = pick(['palla', 'cono', 'doppio']);
+    if (v === 'cono') {
+      pops.push(pop(0, { d: 0.24 + 0.08 * rn(), len: 38 + 14 * rn(), th: 9 + 3 * rn(), cone: 1, bulb: 1.1, grow: 0.3, detach: 0.55, taper: 0.9, rag: 0.25, jag: 0.4, curl: 0.4, wob: 0.5, diam: 3, ring: 1, sparks: 6 + Math.floor(rn() * 4), soot: 1, luce: 1.2 }));
+    } else {
+      pops.push(pop(0, { d: 0.17 + 0.08 * rn(), len: 24 + 12 * rn(), th: 8 + 3 * rn(), cone: 1, bulb: 1.1, grow: 0.24, detach: 0.5, taper: 0.9, rag: 0.3, jag: 0.5, curl: 0.4, wob: 0.5, star: 1, ring: 1, sparks: 6 + Math.floor(rn() * 6), soot: 1, luce: 1.2 }));
+      if (v === 'doppio' || rn() < 0.4) pops.push(pop(0.09 + 0.05 * rn(), { d: 0.15, len: 18 + 10 * rn(), th: 6 + 2 * rn(), cone: 1, ang: ang(0.3), jag: 0.5, rag: 0.3, star: v === 'doppio' ? 1 : 0, sparks: 3, luce: 0.8 }));
+    }
     cool = 0.25 + 0.2 * rn();
   } else if (tipo === 'drago') {
-    pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 92 + 36 * rn(), th: 6 + 2.5 * rn(), bulb: 1.25, grow: 0.34, detach: 0.5, taper: 0.5, rag: 0.5, curl: 2.4, wob: 1.3,
-      sparks: 8, clumps: 8, soot: 2, ring: 1, luce: 1.2 }));
-    pops.push(pop(0.18 + 0.1 * rn(), { d: 0.4, len: 56 + 20 * rn(), th: 5, ang: 0.08, bulb: 1.3, grow: 0.3, detach: 0.45, rag: 0.55, curl: 2.8, wob: 1.5, clumps: 4, sparks: 4, luce: 0.9 }));
+    v = pick(['rotolo', 'getto']);
+    if (v === 'getto') {
+      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 120 + 30 * rn(), th: 5 + rn(), bulb: 1.2, grow: 0.3, detach: 0.7, taper: 0.5, rag: 0.3, curl: 1.2, wob: 0.8, diam: 5, flick: 12, lick: 0.7, sparks: 6, clumps: 4, soot: 2, ring: 1, luce: 1.2 }));
+    } else {
+      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 92 + 36 * rn(), th: 6 + 2.5 * rn(), bulb: 1.25, grow: 0.34, detach: 0.5, taper: 0.5, rag: 0.5, curl: 2.4, wob: 1.3, lick: 0.9, sparks: 8, clumps: 8, soot: 2, ring: 1, luce: 1.2 }));
+      pops.push(pop(0.18 + 0.1 * rn(), { d: 0.4, len: 56 + 20 * rn(), th: 5, ang: 0.08, bulb: 1.3, grow: 0.3, detach: 0.45, rag: 0.55, curl: 2.8, wob: 1.5, lick: 0.9, clumps: 4, sparks: 4, luce: 0.9 }));
+    }
     cool = pops[0].d * 0.85;
   } else if (tipo === 'mitraglia') {
-    const n = 6 + Math.floor(rn() * 5);
-    for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.09 + 0.04 * rn(), len: 7 + 9 * rn(), th: 1.8 + 1.4 * rn(), ang: (rn() - 0.5) * 0.4, bulb: 1.6, grow: 0.25, detach: 0.4, rag: 0.3, jag: 0.15, curl: 0.5, sparks: 2 + Math.floor(rn() * 2), luce: 0.5 })); t += 0.045 + 0.04 * rn(); }
+    v = pick(['raffica', 'sventagliata']);
+    const n = v === 'raffica' ? 6 + Math.floor(rn() * 5) : 10 + Math.floor(rn() * 5), am = v === 'raffica' ? 0.4 : 1;
+    for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.09 + 0.04 * rn(), len: 7 + 9 * rn(), th: 1.8 + 1.4 * rn(), ang: ang(am), dy: v === 'sventagliata' ? ang(2.4) : 0, bulb: 1.6, grow: 0.25, detach: 0.4, rag: 0.3, jag: 0.15, curl: 0.5, sparks: 2 + Math.floor(rn() * 2), luce: 0.5 })); t += 0.04 + 0.035 * rn(); }
     cool = fine() * 0.9;
   } else return null;
   const dur = fine() + 0.04;
-  return { tipo, dur, cool: Math.max(cool, 0.08), pops };
+  return { tipo, v, dur, cool: Math.max(cool, 0.08), pops };
 }
 // generatore con seme (mulberry32): per le prove e per riprodurre una scena
 function fiammaRnd(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }

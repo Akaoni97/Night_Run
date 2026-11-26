@@ -159,10 +159,10 @@ test('fiamme: i caratteri hanno forme davvero diverse (lunghezza, spessore, raff
   assert.ok(med('drag', lungo) > med('rally', lungo) && med('drag', lungo) > 70, 'il drag è un foglio lungo');
   assert.ok(med('drago', lungo) > med('drag', lungo), 'il lanciafiamme è più lungo di tutti');
   assert.ok(med('tuner', n) >= 2.5 && med('burble', n) >= 3.5 && med('mitraglia', n) >= 7, 'rafficata di scoppietti');
-  assert.ok(med('tuner', lungo) < 30 && med('mitraglia', lungo) < 20, 'i botti sono piccoli');
-  assert.ok(med('rally', (c) => Math.max(...c.pops.map((p) => p.clumps))) >= 5, 'il rally lancia grumi di fuoco');
-  assert.ok(med('drag', (c) => c.pops[0].diam) >= 4 && med('race', (c) => c.pops[0].star) === 1, 'diamanti del drag e stella del botto');
-  assert.ok(med('rally', (c) => c.pops[0].rag) > 0.6 && med('drag', (c) => c.pops[0].rag) < 0.2, 'il rally si spezza, il drag no');
+  assert.ok(med('tuner', lungo) < 40 && med('mitraglia', lungo) < 26, 'i botti sono piccoli');
+  assert.ok(med('rally', (c) => Math.max(...c.pops.map((p) => p.clumps))) >= 2.5, 'il rally lancia grumi di fuoco');
+  assert.ok(med('drag', (c) => c.pops[0].diam) >= 2 && med('race', (c) => c.pops[0].star) >= 0.3, 'diamanti del drag e stella del botto (secondo la variante)');
+  assert.ok(med('rally', (c) => c.pops[0].rag) > 0.55 && med('drag', (c) => c.pops[0].rag) < 0.25, 'il rally si spezza, il drag no');
 });
 
 test('fiamme: il carattere segue livello, momento e turbo', () => {
@@ -188,4 +188,13 @@ test('fiamme: i kit di Luca scelgono il loro carattere e il loro colore', () => 
   const o = qTipo(0, 'limiter', kit('ossidrica'), {}); assert.ok(o.torch > 0.5 && o.drag > 0.3, 'ossidrica: getto e foglio blu');
   assert.equal(C.fiammaPalTipo('rally', kit('smeraldo'), 0.4), 'verde', 'il kit comanda sul colore');
   assert.equal(C.fiammaPalTipo('drag', null, 0.4), 'blu'); assert.ok(['arancio', 'gialla'].includes(C.fiammaPalTipo('rally', null, 0.4)));
+});
+
+test('fiamme: ogni carattere ha più varianti e la stessa preparazione non rifà sempre la stessa fiammata', () => {
+  for (const tipo of ['burble', 'tuner', 'rally', 'drag', 'race', 'drago', 'mitraglia']) {
+    const v = new Set(); for (let i = 0; i < 80; i++) v.add(C.fiammaCopione(tipo, 1, C.fiammaRnd(i + 1)).v);
+    assert.ok(v.size >= 2 && !v.has(''), `${tipo}: varianti ${[...v]}`);
+  }
+  const lunghezze = new Set(); for (let i = 0; i < 40; i++) lunghezze.add(Math.round(C.fiammaCopione('rally', 2, C.fiammaRnd(i + 1)).pops[0].len));
+  assert.ok(lunghezze.size > 15, 'le lunghezze cambiano a ogni scena');
 });

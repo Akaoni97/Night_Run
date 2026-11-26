@@ -147,6 +147,7 @@
       }
       if (p.k === 'fire') {
         // pallina di fuoco: bianca e gialla appena nata, poi arancio, rossa, e infine fuliggine
+        if (p.blob && this._fireBlob) { this._fireBlob(g, X, Y, p, L); continue; }
         if (L > 0.22) {
           const F = p.pal && FLAME_PAL[p.pal], B = F && F.b;                         // fiamme verdi o viola dei kit: palline dello stesso colore
           const pal = B ? (L > 0.7 ? [B[1][0], B[2][0], B[3][0]] : L > 0.45 ? [B[0][0], B[1][0], B[2][0]] : [B[0][0], B[0][1], null])
@@ -584,7 +585,7 @@
       for (let q = 0; q < (grossa ? 8 : big ? 5 : 2); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 4, vy: -10 - R() * 70, dx: v * PPM * 0.5 - 40 - R() * 110, life: 1, rate: 1.2 + R() * 1.2, gy: y0 });
       this.parts.push({ k: 'soot', m: mOf(rx - 12), y: exY - 2, vy: -8 - R() * 8, r: 2.5 + R() * 2, life: 1, dx: v * PPM * 0.2 - 24, v: (R() * 3) | 0 });
     };
-    const scegli = (r) => nuovo ? fiammaTipo(tier, s.fkind, kit, { turbo: s.fturbo }, r) : kit ? fiammeScegli(kit, tier, s.fkind, r) : flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, r);   // il kit o la preparazione
+    const scegli = (r) => nuovo && Street2D.fiammaForzata ? Street2D.fiammaForzata : nuovo ? fiammaTipo(tier, s.fkind, kit, { turbo: s.fturbo }, r) : kit ? fiammeScegli(kit, tier, s.fkind, r) : flameStyle(tier, s.fkind, s.frpm === undefined ? 0.6 : s.frpm, r);   // il kit o la preparazione
     // appena si molla il gas (s.fkick conta i rilasci) il primo scoppio parte subito, non quando capita; sopra i 5.000 giri ne parte un secondo
     if (s.fkick !== undefined && s.fkick !== st.fkick) {
       st.fkick = s.fkick;
@@ -606,7 +607,7 @@
       const fl = Math.min(1.5, st.flame);
       if (R() < fl * dt * 14) this.parts.push({ k: 'fire', m: mOf(rx - L * (0.5 + R() * 0.5)), y: exY - (2 + R() * 4) * k, vy: -10 - R() * 16, dx: v * PPM * 0.4 - 50 - R() * 50, r: (2 + R() * 1.8) * k, life: 1, pal: st.flamePal === 'verde' || st.flamePal === 'viola' ? st.flamePal : null });
     }
-    else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0) && !scAct) {
+    else if (st.sus > 0.03 && !(st.torchT > 0) && !(st.bangT > 0) && !scAct && !nuovo) {
       // fiammella: corta e mobile, più o meno lunga a sbalzi (si "accende" e si "abbassa"), col suo colore
       const fl = (0.12 + 0.28 * st.sus) * (0.7 + 0.6 * vn(st.t * 7.3)) * (vn(st.t * 2.1 + 9) < 0.18 ? 0.5 : 1);
       this.fxFlame(g, rx, exY, k * 0.85, fl, y0, st.susPal, { gola });
