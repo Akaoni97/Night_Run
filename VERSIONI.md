@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.167**
+**Versione attuale: v0.168**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -191,3 +191,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.165 · 25/11/2026 · proprietario · **Scarichi nella vista laterale**: terminali integrati nel disegno, con la verifica che restino lontani dalle gomme
 - v0.166 · 25/11/2026 · proprietario · **Quadro, bagagliaio e schermata iniziale**: sul computer i pulsanti sopra e il quadro sotto (proposta di Luca), tasto ⤢ che raddoppia il quadro e lo rimette piccolo; B apre e chiude il bagagliaio; scritte sotto la chiave leggibili su un fondo scuro
 - v0.167 · 26/11/2026 · proprietario · **Schermata iniziale senza pioggia**: il tempo a caso è solo sereno o nebbia, niente più righe della pioggia che attraversano lo schermo (resta con `?meteo=pioggia`)
+- v0.168 · 26/11/2026 · proprietario · **Sigla Twin Turbo Maniacs**: aprendo il gioco il logo del duo in pixel art si compone da poche scie di luce sempre più fitte, lampo e «PRESENTA», poi la schermata iniziale (si salta con un tasto o un clic, una volta per scheda)

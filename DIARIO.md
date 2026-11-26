@@ -1,3 +1,8 @@
+## 26/11/2026 · proprietario (Nico) · v0.168 (**sigla Twin Turbo Maniacs**)
+- Il nome del duo è **Twin Turbo Maniacs**. Logo fatto a codice (due chiocciole del turbo speculari con la targhetta del 2, «TWIN TURBO» e «MANIACS» al neon, colori di Night Run), con la versione quadrata «TTM» per icona e social: i file stanno fuori dal repository (mandati a Nico).
+- Nel gioco: `sigla.js` (subito dopo `leggero.js`) e `img/ttm/logo.png` (200×117, il logo portato a pixel con una tavolozza fissa). Aprendo la pagina un fanale lampeggia finché il gioco si carica, poi i pixel arrivano da destra e sinistra con la scia, prima pochi e poi fitti, lampo, bagliore e «PRESENTA», ~4 s; un tasto o un clic la saltano e i tasti non arrivano al gioco. Una volta per scheda (`sessionStorage` `nr_sigla`), mai nelle prove automatiche (`navigator.webdriver`), `?sigla=1` per riguardarla, `?sigla=0` o `localStorage` `nr_sigla_off = '1'` per spegnerla. Test in `test/sigla.test.js`.
+- Provato: 440 test verdi, prova di fumo verde, foto della sigla a vari tempi, nessun errore in console. Da guardare sul PC vero: fluidità del volo (qui la macchina senza scheda video fa 13-14 fotogrammi anche senza sigla).
+
 ## 26/11/2026 · proprietario (Nico) · v0.167 (**schermata iniziale senza pioggia**)
 - Nico ha chiesto di togliere le righe che attraversano la schermata iniziale: era la pioggia, sorteggiata a caso più o meno una volta su quattro. Ora il tempo del titolo è sereno (65 %) o nebbia (`titolo.js`, `meteo`); la pioggia resta solo a mano con `?meteo=pioggia`. Fasci dei fari di ricerca nel cielo lasciati come sono.
 - Provato: 20 avvii senza pioggia, nessun errore; test del titolo verdi. Fatte anche tre immagini pulite del gioco per un video di Gemini (fuori dal repository).
