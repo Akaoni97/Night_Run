@@ -136,3 +136,56 @@ test('fiamme: ogni kit ha il suo carattere', () => {
   assert.ok(['arancio', 'gialla'].includes(K.fiammePal(kitDi('lancia'), 0.7)));
   assert.equal(K.fiammePal(null, 0.5), null, 'senza kit il colore di sempre');
 });
+
+// ---------------------------------------------------------------- i caratteri delle fiamme (v0.169)
+const C = new Function(src + ';return { FIAMME_TIPI, fiammaTipo, fiammaPalTipo, fiammaCopione, fiammaRnd, FIAMME_KIT };')();
+const qTipo = (tier, kind, kit, ctx) => { const q = {}, N = 3000; for (let i = 0; i < N; i++) { const t = C.fiammaTipo(tier, kind, kit, ctx, (i + 0.5) / N); q[t] = (q[t] || 0) + 1 / N; } return q; };
+
+test('fiamme: ogni carattere ha una scena con più spari ordinati nel tempo, diversa a ogni seme', () => {
+  for (const tipo of C.FIAMME_TIPI.filter((t) => t !== 'torch')) {
+    const a = C.fiammaCopione(tipo, 1, C.fiammaRnd(5)), b = C.fiammaCopione(tipo, 1, C.fiammaRnd(5)), c = C.fiammaCopione(tipo, 1, C.fiammaRnd(99));
+    assert.ok(a && a.pops.length >= 1 && a.dur > 0.1 && a.cool > 0, tipo);
+    assert.deepEqual(a, b, `${tipo}: stesso seme, stessa scena`);
+    assert.notDeepEqual(a, c, `${tipo}: un altro seme, un'altra scena`);
+    for (let i = 1; i < a.pops.length; i++) assert.ok(a.pops[i].t >= a.pops[i - 1].t, `${tipo}: spari in ordine`);
+    for (const p of a.pops) assert.ok(p.t + p.d <= a.dur + 1e-9 && p.len > 0 && p.th > 0 && p.grow > 0 && p.detach < 1, `${tipo}: sparo dentro la scena`);
+  }
+  assert.equal(C.fiammaCopione('torch', 1, C.fiammaRnd(1)), null, 'l\'ossidrica resta quella di sempre');
+});
+
+test('fiamme: i caratteri hanno forme davvero diverse (lunghezza, spessore, raffica)', () => {
+  const med = (tipo, f) => { let s = 0; for (let i = 0; i < 40; i++) s += f(C.fiammaCopione(tipo, 1, C.fiammaRnd(i + 1))); return s / 40; };
+  const lungo = (c) => Math.max(...c.pops.map((p) => p.len)), n = (c) => c.pops.length;
+  assert.ok(med('drag', lungo) > med('rally', lungo) && med('drag', lungo) > 70, 'il drag è un foglio lungo');
+  assert.ok(med('drago', lungo) > med('drag', lungo), 'il lanciafiamme è più lungo di tutti');
+  assert.ok(med('tuner', n) >= 2.5 && med('burble', n) >= 3.5 && med('mitraglia', n) >= 7, 'rafficata di scoppietti');
+  assert.ok(med('tuner', lungo) < 30 && med('mitraglia', lungo) < 20, 'i botti sono piccoli');
+  assert.ok(med('rally', (c) => Math.max(...c.pops.map((p) => p.clumps))) >= 5, 'il rally lancia grumi di fuoco');
+  assert.ok(med('drag', (c) => c.pops[0].diam) >= 4 && med('race', (c) => c.pops[0].star) === 1, 'diamanti del drag e stella del botto');
+  assert.ok(med('rally', (c) => c.pops[0].rag) > 0.6 && med('drag', (c) => c.pops[0].rag) < 0.2, 'il rally si spezza, il drag no');
+});
+
+test('fiamme: il carattere segue livello, momento e turbo', () => {
+  const l = qTipo(0, 'lift', null, { turbo: false });
+  assert.ok(l.burble > 0.7 && !l.rally && !l.drag && !l.race && !l.torch, 'di serie: solo borbottii e scoppietti');
+  const s = qTipo(2, 'shift', null, { turbo: true });
+  assert.ok(s.drag > 0.5, 'cambiata spinta: la fiammata da drag');
+  const t = qTipo(2, 'lift', null, { turbo: true }), n = qTipo(2, 'lift', null, { turbo: false });
+  assert.ok(t.rally > n.rally * 3 && t.rally > 0.4, 'l\'anti-lag da rally è roba da turbo');
+  assert.ok(n.race > t.race, 'sull\'aspirato il botto secco');
+  const m = qTipo(1, 'liftHigh', null, { turbo: true });
+  assert.ok(m.tuner > 0.15 && m.rally > 0.2 && m.race > 0.15, 'la media ha più caratteri insieme');
+  for (const tier of [0, 1, 2]) for (const k of ['limiter', 'lift', 'liftHigh', 'shift']) {
+    const q = qTipo(tier, k, null, {}); assert.ok(Math.abs(Object.values(q).reduce((a, b) => a + b, 0) - 1) < 1e-6, `${tier} ${k}`);
+    for (const nome of Object.keys(q)) assert.ok(C.FIAMME_TIPI.includes(nome), nome);
+  }
+});
+
+test('fiamme: i kit di Luca scelgono il loro carattere e il loro colore', () => {
+  const kit = (id) => C.FIAMME_KIT.find((q) => q.id === id);
+  assert.ok(qTipo(0, 'liftHigh', kit('lancia'), {}).drago > 0.7, 'lanciafiamme');
+  assert.ok(qTipo(0, 'limiter', kit('mitraglia'), {}).mitraglia > 0.7, 'mitraglia');
+  const o = qTipo(0, 'limiter', kit('ossidrica'), {}); assert.ok(o.torch > 0.5 && o.drag > 0.3, 'ossidrica: getto e foglio blu');
+  assert.equal(C.fiammaPalTipo('rally', kit('smeraldo'), 0.4), 'verde', 'il kit comanda sul colore');
+  assert.equal(C.fiammaPalTipo('drag', null, 0.4), 'blu'); assert.ok(['arancio', 'gialla'].includes(C.fiammaPalTipo('rally', null, 0.4)));
+});

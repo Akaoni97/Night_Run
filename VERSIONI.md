@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.168**
+**Versione attuale: v0.169**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -192,3 +192,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.166 · 25/11/2026 · proprietario · **Quadro, bagagliaio e schermata iniziale**: sul computer i pulsanti sopra e il quadro sotto (proposta di Luca), tasto ⤢ che raddoppia il quadro e lo rimette piccolo; B apre e chiude il bagagliaio; scritte sotto la chiave leggibili su un fondo scuro
 - v0.167 · 26/11/2026 · proprietario · **Schermata iniziale senza pioggia**: il tempo a caso è solo sereno o nebbia, niente più righe della pioggia che attraversano lo schermo (resta con `?meteo=pioggia`)
 - v0.168 · 26/11/2026 · proprietario · **Sigla Twin Turbo Maniacs**: aprendo il gioco il logo del duo in pixel art si compone da poche scie di luce sempre più fitte, lampo e «PRESENTA», poi la schermata iniziale (si salta con un tasto o un clic, una volta per scheda)
+- v0.169 · 26/11/2026 · cognato · **Fiamme con carattere**: ogni fiammata è una scena che cambia forma mentre vive (nasce, si gonfia, si stacca dal tubo, si sfrangia) e ha un carattere preso dalle auto vere: borbottio, crackle da strada, anti-lag da rally con grumi di fuoco e scintille, foglio blu da drag con i diamanti, botto da supercar con la stella, lanciafiamme, mitraglia (`fiamme2d.js`, `fiammaTipo` e `fiammaCopione` in `fiamme.js`)

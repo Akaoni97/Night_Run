@@ -406,10 +406,16 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     if (typeof Street2D === 'undefined' || !Street2D.prototype.fxFlameV) return;
     const tele = [...box.querySelectorAll('canvas[data-fkp]')]; if (!tele.length) return;
     const V = Object.create(Street2D.prototype); V.st = { t: 0 }; V.SS = 2;
-    const st = tele.map((c, i) => ({ c, g: c.getContext('2d'), kit: FIAMME_KIT.find((q) => q.id === c.dataset.fkp), flame: 0, torchT: 0, bangT: 0, fv: 0, pal: 'arancio', ph: i * 0.37 }));
+    const st = tele.map((c, i) => ({ c, g: c.getContext('2d'), kit: FIAMME_KIT.find((q) => q.id === c.dataset.fkp), flame: 0, torchT: 0, bangT: 0, fv: 0, pal: 'arancio', ph: i * 0.37, sc: { t: 0, flame: 0, popFlash: 0, ring: 0 } }));
     const rx = 64, exY = 19, y0 = 26, k = 1;                          // scena di 100×32 unità, ingrandita ×4
     const spawn = (s, kind) => {
-      const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random, style = kit ? fiammeScegli(kit, 1, kind, r()) : flameStyle(1, kind, 0.6, r());
+      const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random;
+      if (V.scenaNuova && typeof fiammaTipo === 'function') {            // le scene (fiamme2d.js): ogni carattere con la sua forma
+        const tipo = fiammaTipo(2, kind, kit, { turbo: true }, r());
+        if (tipo !== 'torch') { V.scenaNuova(s.sc, tipo, { R: r, tier: 2, pal: fiammaPalTipo(tipo, kit, r()) }); return; }
+        s.torchT = 0.07 + r() * 0.09; s.torchF = 0.8 + r() * 0.7; return;
+      }
+      const style = kit ? fiammeScegli(kit, 1, kind, r()) : flameStyle(1, kind, 0.6, r());
       if (style === 'torch' || (style === 'big' && kit && kit.id === 'ossidrica')) { s.torchT = 0.07 + r() * 0.09; s.torchF = 0.8 + r() * 0.7; if (style === 'torch') return; }
       if (style === 'bang') { s.bangT = 0.24; return; }
       const big = style === 'big' || r() < 0.45;
@@ -435,6 +441,12 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
         if (s.torchT > 0) V.fxTorch(g, rx, exY, k, s.torchF, y0);
         if (s.bangT > 0) V.fxBang(g, rx, exY, k, 1 - s.bangT / 0.24, y0);
         if (s.flame > 0.05) V.fxFlameV(g, rx, exY, k, s.flame, y0, s.pal, s.fv);
+        if (V.scenaTick) {
+          s.sc.t = V.st.t; V.parts = []; const sc = s.sc, nr = sc.scene && sc.scene.length;
+          V.scenaTick(g, dt, { st: sc, rx, exY, k, y0, gola: 1.2, v: 0, mOf: (px) => px / 30, R: Math.random, parts: V.parts });
+          if (nr) { sc.flame = Math.max(0, sc.flame - dt * 8); }
+          if (sc.ring > 0.02) { sc.ring = Math.max(0, sc.ring - dt * 5); }
+        }
       }
       requestAnimationFrame(passo);
     };
