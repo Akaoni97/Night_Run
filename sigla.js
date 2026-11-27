@@ -1,6 +1,6 @@
 'use strict';
-// La sigla di Twin Turbo Maniacs (v0.168): appena si apre il gioco, prima della schermata iniziale.
-// Il logo in pixel art (img/ttm/logo.png, 200×117, fatto dal logo vettoriale) si compone pixel per pixel:
+// La sigla di Duo Maniacs Studio (v0.168, marchio nuovo nella v0.172): appena si apre il gioco, prima della schermata iniziale.
+// Il logo in pixel art (img/dms/logo.png, 200×120: stemma esagonale col monogramma DM e la gemma viola, DUO MANIACS e STUDIO in oro, fatto dal logo vettoriale) si compone pixel per pixel:
 // all'inizio un punto solo che lampeggia come un fanale lontano, poi pochi pixel che arrivano di corsa da
 // destra e sinistra con la scia, sempre più fitti, finché il logo è intero; lampo, bagliore rosa e «PRESENTA».
 // Finché il gioco si carica resta solo il fanale che lampeggia (gli script pesanti farebbero andare a scatti il volo):
@@ -10,7 +10,7 @@
 // Va caricato subito dopo leggero.js: l'ascoltatore dei tasti deve venire prima di tutti gli altri.
 (function () {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  const SIG = { img: 'img/ttm/logo.png', attesa: 8, buio: 0.35, arrivo: 1.75, volo: 0.75, lampo: 2.75, fine: 4.3, sfuma: 0.55 };
+  const SIG = { img: 'img/dms/logo.png', attesa: 8, buio: 0.35, arrivo: 1.75, volo: 0.75, lampo: 2.75, fine: 4.3, sfuma: 0.55 };
   let off = false;
   try {
     off = !!navigator.webdriver || /[?&]sigla=0\b/.test(location.search) || localStorage.getItem('nr_sigla_off') === '1' || sessionStorage.getItem('nr_sigla') === '1';
@@ -29,7 +29,7 @@
 
   const ov = document.createElement('div');
   ov.id = 'sigla';
-  ov.setAttribute('role', 'img'); ov.setAttribute('aria-label', 'Twin Turbo Maniacs presenta');
+  ov.setAttribute('role', 'img'); ov.setAttribute('aria-label', 'Duo Maniacs Studio presenta');
   ov.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#07060d;cursor:pointer;transition:opacity .55s ease;touch-action:none';
   const cv = document.createElement('canvas');
   cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated';
