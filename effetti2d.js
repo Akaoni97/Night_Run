@@ -216,9 +216,11 @@
     // dei kit di Luca Tuning (fiamme.js, v0.143): g = colore della luce sull'asfalto
     verde: { b: [['#0e8a3c', '#0e8a3c'], ['#22c95a', '#2fd26a'], ['#8cffb0', '#9cffc0'], ['#effff4', '#effff4']], o: 'rgba(4,46,20,.7)', l: '#46ff88', g: '#3ce07a' },
     viola: { b: [['#7a1fd6', '#d0208a'], ['#b44bff', '#ff4fb8'], ['#e2a8ff', '#ffb0e0'], ['#ffffff', '#fff0fa']], o: 'rgba(40,8,70,.7)', l: '#c070ff', g: '#b858ff', cut: 0.5 },
+    rosa: { b: [['#c4165a', '#c4165a'], ['#ff3d8f', '#ff3d8f'], ['#ff9cc6', '#ff9cc6'], ['#fff2f8', '#fff2f8']], o: 'rgba(80,6,40,.7)', l: '#ff5aa0', g: '#ff4a92' },
+    ciano: { b: [['#1580b8', '#1580b8'], ['#34c4f0', '#34c4f0'], ['#a6ecff', '#a6ecff'], ['#f4ffff', '#f4ffff']], o: 'rgba(6,40,70,.7)', l: '#60d8ff', g: '#4cc8f4' },
   };
   Street2D.fxHelp = { FLAME_PAL, flameLight, vn };     // per fiamme2d.js (le scene delle fiamme)
-  Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255' };   // luce della fiammata nella mappa di luce (street2d.js)
+  Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255', rosa: '255,110,170', ciano: '110,220,255' };   // luce della fiammata nella mappa di luce (street2d.js)
   S.fxFlame = function (g, rx, exY, k, fl, y0, pal, opt) {
     const P = FLAME_PAL[pal] || FLAME_PAL.arancio, O = opt || {};
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
@@ -554,19 +556,23 @@
     // tremola e cambia colore da sola; leggero niente, medio arancio e gialla, spinto blu
     const susT = s.flame && (kit || !(tiered && tier === 0)) ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
     st.sus = susT > (st.sus || 0) ? (st.sus || 0) + (susT - (st.sus || 0)) * Math.min(1, dt * 10) : Math.max(0, (st.sus || 0) - dt * 1.6);
-    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); if (kit) return fiammePal(kit, q); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
+    const pickPal = () => { if (this.flamePal) return this.flamePal; if (s.fcol) return s.fcol; const q = R(); if (kit) return fiammePal(kit, q); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
     if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal && !kit ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
     const rateK = (kit && kit.rate || 1) * (tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1);
     st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
     // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
     // scene delle fiamme (fiamme2d.js): ogni carattere (burble, tuner, rally, drag, race, drago, mitraglia) è una scena che cambia forma
     const nuovo = tiered && typeof fiammaTipo === 'function' && typeof this.scenaNuova === 'function' && !Street2D.fiammeVecchie;
-    const spawn = (style, forza) => {
+    // scoppi e fiamme insieme (v0.175): con l'audio acceso ogni botto del motore (s.fpop) fa uscire la sua fiamma; una fiamma che nasce da sola (kit, cambiata,
+    // primo scoppio al rilascio) chiede il suo botto, così non c'è né fiamma muta né botto senza fuoco
+    const sync = nuovo && s.fpop !== undefined, chiedi = (style) => { if (sync && window.nightRun && nightRun.askPop) nightRun.askPop(style !== 'burble' && style !== 'tuner' && style !== 'mitraglia'); };
+    const spawn = (style, forza, daBotto) => {
       if (nuovo && style !== 'torch' && FIAMME_TIPI.includes(style)) {
-        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R()), forza })) st.fstyle = 'scena';
+        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R(), s.fcol), forza, scala: (kit && kit.scala || 1) * (0.72 + 0.5 * Math.min(1, s.frpm === undefined ? 0.6 : s.frpm)) })) { st.fstyle = 'scena'; if (!daBotto) chiedi(style); }
         return;
       }
       if (style === 'torch' || (style === 'big' && (kit ? kit.id === 'ossidrica' : tier >= 2))) {                    // ossidrica: breve, rapida, con scintille incandescenti
+        if (!daBotto) chiedi('torch');
         st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
         for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
         if (style === 'torch') return;
@@ -592,14 +598,19 @@
       if (s.fkick && tiered) { spawn(scegli(R()), true); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
     if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R()), true); }
-    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
+    if (sync) {
+      if (st.fpopSeen === undefined) st.fpopSeen = s.fpop;
+      const n = s.fpop - st.fpopSeen; st.fpopSeen = s.fpop;
+      if (n > 0) { st.popT = st.t; if (s.flame > 0.02 && s.fkind && tiered) for (let q = 0; q < Math.min(2, n); q++) spawn(scegli(R()), false, true); }   // un botto sentito: esce la fiamma
+      else if ((kit || s.fkind === 'shift') && s.flame && st.t - (st.popT || 0) > 0.3 && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(scegli(R()));   // da sola: chiede il botto
+    } else if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
     // Scaldare il metallo prima dei getti lascia visibile la radice dentro la bocca.
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
-    if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
+    if (st.flame > 1.05 && !(st.ringLock > st.t)) { if (!nuovo) st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
     const calore = Math.max(s.marmitta || 0, st.tipHeat * .28);
     if (calore > 0.01) this.fxMarmitta(g, rx, exY, k, calore, y0, pendenza, altezza);
     const gola = st.torchT > 0 || st.flame > 0.05 || st.sus > 0.03 ? this.golaScarico(k, altezza) : 0;
-    const scAct = nuovo ? this.scenaTick(g, dt, { st, rx, exY, k, y0, gola: this.golaScarico(k, altezza), v, mOf, R, parts: this.parts }) : 0;
+    const scAct = nuovo ? this.scenaTick(g, dt, { st, rx, exY, k, y0, gola: this.golaScarico(k, altezza), v, mOf, R, parts: this.parts, pend: pendenza }) : 0;
     if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0, gola);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
     if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang' && st.fstyle !== 'scena') {
@@ -615,7 +626,7 @@
     // anello d'urto alla bocca negli scoppi grossi
     if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
     if (!low) this.fxHaze(g, rx, exY, s, st, k);
-    if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
+    if (st.popFlash > 0.02 && !nuovo) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));
     // auto molto danneggiata: vapore dal cofano, fumo nero quando è quasi distrutta

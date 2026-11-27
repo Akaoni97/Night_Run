@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.174**
+**Versione attuale: v0.175**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -198,3 +198,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.172 · 27/11/2026 · proprietario · **Il duo diventa Duo Maniacs Studio**: marchio nuovo viola e oro (stemma esagonale col monogramma DM e la gemma viola, niente più turbine), anche nella sigla prima della schermata iniziale
 - v0.173 · 28/11/2026 · proprietario · **Marchio Duo Maniacs Studio scelto**: due anelli intrecciati (grigio acciaio e rosso cupo) su nero e grigio antracite, scritte spaziate; nuovo anche nella sigla del gioco
 - v0.174 · 28/11/2026 · proprietario · **Schermata iniziale viva**: dietro il nottolino Roma di notte disegnata dal gioco in tempo reale (via del Corso, la cupola, passanti e traffico), con la tua auto che passa piano
+- v0.175 · 27/11/2026 · cognato · **Fiamme più vere e scelta del tipo**: fiamma disegnata con bagliore morbido (nucleo netto e bruciato + due aloni sfocati), luce sulla strada senza gradini, fuliggine rada, niente stella e anello a fumetto; la scheda Fiamme di Luca sceglie il **tipo** (Borbottio, Botto, Fiammata media, grossa, spinta, anti-lag da rally, cambiata da drag, ossidrica, lanciafiamme, mitraglia) e, in una piccola sezione, il **colore** (naturale, blu, verde, viola, rosa, ghiaccio); i vecchi kit Smeraldo e Neon diventano Fiammata media verde e viola; coerenza con la meccanica (diesel senza fiamme tranne il Lanciafiamme, anti-lag solo col turbo, fiamma e botto sincronizzati, fiamma inclinata col telaio e mai sotto l'asfalto, grandezza coi giri) e più fotogrammi per fiammata (accensione, colpo, coda; 3-5 varianti per tipo)

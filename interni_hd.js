@@ -597,6 +597,21 @@
     const rx = cx + G.ex[0] * kS, exY = cy + (up + lowPx + G.ex[1] * k) / SS, y0 = 236;   // y0: il riflesso va sul pavimento sotto il ponte, non sulla pedana
     const kit = vs.fkit && typeof FIAMME_KIT !== 'undefined' ? FIAMME_KIT.find((q) => q.id === vs.fkit) : null, tier = vs.ftier || 0, Rn = Math.random;
     const pal = () => (kit && typeof fiammePal === 'function' ? fiammePal(kit, Rn()) : typeof flamePalFor === 'function' ? flamePalFor(tier, Rn()) : 'arancio');
+    if (v2.scenaNuova && v2.scenaTick && typeof fiammaTipo === 'function' && !Street2D.fiammeVecchie) {      // le scene di fiamme2d.js, come sulla strada
+      const sc = st.sc || (st.sc = { t: 0, flame: 0, popFlash: 0, scene: [], torchT: 0 }); sc.t = v2.st.t;
+      if (vs.fkick !== st.kick) { st.kick = vs.fkick; if (vs.fkick && vs.flame) st.vai = 1; }
+      if ((vs.flame && Rn() < Math.min(0.55, vs.flame * dt * 22 * ((kit && kit.rate) || 1))) || st.vai) {
+        const forza = !!st.vai; st.vai = 0;
+        const tipo = Street2D.fiammaForzata || fiammaTipo(tier, vs.fkind, kit, { turbo: vs.fturbo }, Rn());
+        if (tipo === 'torch') sc.torchT = 0.07 + Rn() * 0.09;
+        else v2.scenaNuova(sc, tipo, { R: Rn, tier, pal: fiammaPalTipo(tipo, kit, Rn(), vs.fcol), forza, scala: kit && kit.scala });
+      }
+      sc.torchT = Math.max(0, sc.torchT - dt); sc.flame = Math.max(0, sc.flame - dt * 8); sc.popFlash = Math.max(0, sc.popFlash - dt * 6);
+      if ((vs.marmitta || 0) > 0.01 && v2.fxMarmitta) v2.fxMarmitta(g, rx, exY, kS, vs.marmitta, y0);   // terminale rovente
+      if (sc.torchT > 0) v2.fxTorch(g, rx, exY, kS, 1, y0, v2.golaScarico(kS));
+      v2.scenaTick(g, dt, { st: sc, rx, exY, k: kS, y0, gola: v2.golaScarico(kS), v: 0, mOf: (px) => px / 30, R: Rn, parts: [] });
+      return;
+    }
     const spawn = () => {
       const big = Rn() < 0.35 + (vs.flame || 0) * 0.3;
       st.flame = big ? 1.1 + Rn() * 0.4 : 0.6 + Rn() * 0.4; st.pal = pal();
