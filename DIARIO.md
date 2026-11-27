@@ -1,3 +1,8 @@
+## 28/11/2026 · proprietario (Nico) · v0.173 (**marchio scelto: gli anelli, nero e antracite**)
+- Fatti cinque prototipi di marchio per Duo Maniacs Studio (pixel art HD con due faccine, minimal con due anelli intrecciati, adesivo street, insegna al neon, sigillo vintage): Nico ha scelto il **minimal**, in versione scura. Marchio: due anelli intrecciati per davvero (in alto passa sopra il rosso, in basso il grigio), uno grigio acciaio e uno rosso cupo, su fondo nero che sfuma nel grigio antracite; «DUO MANIACS» grigio chiaro molto spaziato, un filo, «STUDIO» rosso, «GAMES · MMXXVI». Fatti anche l'icona «DMS» e il biglietto da visita (fronte nero, retro antracite, campi segnaposto): i file stanno fuori dal repository.
+- Nel gioco: `img/dms/logo.png` (200×99, tavolozza grigi e rossi) nella sigla; in `sigla.js` fanale rosso, «PRESENTA» grigio, fondo nero neutro.
+- Provato: 447 test verdi, foto della sigla a vari tempi, nessun errore in console.
+
 ## 27/11/2026 · proprietario (Nico) · v0.172 (**Duo Maniacs Studio**)
 - Il nome del duo cambia: **Duo Maniacs Studio** (non più Twin Turbo Maniacs). Marchio generico, non legato alle auto: stemma esagonale a doppio filo d'oro con la ghiera di tacche e la trama incisa, monogramma DM a spigoli vivi (la gamba destra della D è la prima della M) in oro cesellato, gemma viola nella V; «DUO MANIACS» in oro, «STUDIO» tra due fili, «EST. MMXXVI». Fatti a codice anche l'icona quadrata «DMS» e il biglietto da visita fronte e retro (campi segnaposto): i file stanno fuori dal repository.
 - Nel gioco: `img/dms/logo.png` (200×120, tavolozza viola e oro) al posto di `img/ttm/` nella sigla (`sigla.js`); stesso comportamento di prima.

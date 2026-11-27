@@ -1,6 +1,6 @@
 'use strict';
 // La sigla di Duo Maniacs Studio (v0.168, marchio nuovo nella v0.172): appena si apre il gioco, prima della schermata iniziale.
-// Il logo in pixel art (img/dms/logo.png, 200×120: stemma esagonale col monogramma DM e la gemma viola, DUO MANIACS e STUDIO in oro, fatto dal logo vettoriale) si compone pixel per pixel:
+// Il logo in pixel art (img/dms/logo.png, 200×99: due anelli intrecciati grigio acciaio e rosso cupo su nero, DUO MANIACS grigio chiaro e STUDIO rosso, v0.173, fatto dal logo vettoriale) si compone pixel per pixel:
 // all'inizio un punto solo che lampeggia come un fanale lontano, poi pochi pixel che arrivano di corsa da
 // destra e sinistra con la scia, sempre più fitti, finché il logo è intero; lampo, bagliore rosa e «PRESENTA».
 // Finché il gioco si carica resta solo il fanale che lampeggia (gli script pesanti farebbero andare a scatti il volo):
@@ -30,7 +30,7 @@
   const ov = document.createElement('div');
   ov.id = 'sigla';
   ov.setAttribute('role', 'img'); ov.setAttribute('aria-label', 'Duo Maniacs Studio presenta');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#07060d;cursor:pointer;transition:opacity .55s ease;touch-action:none';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:#0a0a0b;cursor:pointer;transition:opacity .55s ease;touch-action:none';
   const cv = document.createElement('canvas');
   cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated';
   ov.appendChild(cv);
@@ -79,11 +79,11 @@
     // scala intera: il logo occupa circa metà della larghezza
     const k = Math.max(1, Math.floor(Math.min(W * 0.52 / LW, H * 0.5 / LH)));
     const ox = Math.round((W - LW * k) / 2), oy = Math.round((H - LH * k) / 2 - H * 0.04);
-    g.fillStyle = '#07060d'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#0a0a0b'; g.fillRect(0, 0, W, H);
     // il fanale lontano che lampeggia al centro
     if (t < SIG.buio + 0.4) {
       const tb = (now - inizio) / 1000, on = Math.sin(tb * 9) > -0.2 ? 1 : 0.3, a = Math.min(1, tb / 0.12) * on;
-      g.fillStyle = `rgba(255,179,71,${a})`; g.fillRect(Math.round(W / 2 - k), Math.round(oy + LH * k * 0.42), k * 2, k * 2);
+      g.fillStyle = `rgba(226,50,59,${a})`; g.fillRect(Math.round(W / 2 - k), Math.round(oy + LH * k * 0.42), k * 2, k * 2);
     }
     if (t < SIG.lampo) {
       // particelle in volo con la scia, a un pixel l'una sulla tela piccola
@@ -113,7 +113,7 @@
       if (n > 0) {
         const fs = Math.max(12, Math.round(k * 7));
         g.font = `${fs}px "Share Tech Mono", monospace`; g.textAlign = 'center'; g.textBaseline = 'top';
-        g.fillStyle = '#9b8fc7'; g.letterSpacing = `${Math.round(fs * 0.6)}px`;
+        g.fillStyle = '#8d8f95'; g.letterSpacing = `${Math.round(fs * 0.6)}px`;
         g.fillText(txt.slice(0, n), W / 2, oy + LH * k + k * 8);
         g.letterSpacing = '0px';
       }
