@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const dir = new URL('../', import.meta.url);
-const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'forature.js', 'missioni.js', 'cambiogomma.js']
+const src = ['dsp.js', 'sim.js', 'tuning.js', 'cars.js', 'samples.js', 'game.js', 'viaggio.js', 'strada.js', 'forature.js', 'missioni.js', 'soccorso.js', 'cambiogomma.js']
   .map((f) => readFileSync(new URL(f, dir), 'utf8')).join('\n');
 const { SupraSim, StreetGame, CG, cgTimeline, cgAt, GAME_LANE_Z } = new Function(src + ';return { SupraSim, StreetGame, CG, cgTimeline, cgAt, GAME_LANE_Z };')();
 
@@ -22,6 +22,26 @@ test('cambio gomma: la sequenza va porta → bagagliaio → ruota → bagagliaio
   assert.ok(cgTimeline(2).end < cgTimeline(0).end, 'la posteriore è più vicina al bagagliaio');
 });
 
+test('cambio gomma: il protagonista usa sempre il lato strada per la portiera e aggira la coda se serve', () => {
+  for (let i = 0; i < 4; i++) {
+    const tl = cgTimeline(i);
+    const posa = (segmento, u) => {
+      const { t0, t1 } = tl.segs[segmento];
+      return cgAt(tl, t0 + (t1 - t0) * u);
+    };
+    for (const s of [0, 1, 7, 8]) {
+      const m = posa(s, 0.5);
+      assert.equal(m.lato, 'strada');
+      assert.ok(m.z < 0);
+    }
+    assert.ok(Math.abs(posa(3, 0.01).z) < 0.01, 'inizia il giro dietro il paraurti');
+    assert.equal(posa(4, 0.5).lato, i % 2 ? 'vicino' : 'strada');
+    assert.equal(posa(4, 0.5).smontata, true);
+    assert.equal(posa(4, 0.5).lift, 1);
+    assert.ok(posa(4, 0.99).lift < 0.02, 'il cric scende prima di tornare al baule');
+  }
+});
+
 test('cambio gomma: da «Usa» sulla scorta, a destra, poi la gomma torna buona a lavoro finito', () => {
   const sim = new SupraSim(), game = new StreetGame(sim, () => 0.5); game.startTrip();
   const T = game.tyres(); T.p[1] = 0.3; game.lane = 1; game.laneZ = GAME_LANE_Z[1];
@@ -30,13 +50,33 @@ test('cambio gomma: da «Usa» sulla scorta, a destra, poi la gomma torna buona 
   assert.equal(r.ok, true, r.why);
   assert.equal(game.lane, 3, 'va nella corsia di destra');
   assert.ok(game.ap && game.ap.gomma, 'pilota automatico col cambio gomma');
-  assert.ok(!game.s.trunk.some((x) => x.kind === 'scorta'), 'la scorta è uscita dal bagagliaio');
+  assert.equal(game.s.trunk[si].kind, 'scorta', 'se interrompi la partita la scorta resta disponibile');
+  assert.equal(game.dropItem(si).ok, false, 'la scorta usata in scena è riservata');
   const G = game.ap.gomma, end = G.tl.end;
-  game.ap.stopped = true; game.laneZ = GAME_LANE_Z[3];
+  game.ap.stopped = true;
+  game.ap.tick(1); assert.equal(G.go, false, 'aspetta la corsia di destra');
+  game.laneZ = GAME_LANE_Z[3]; sim.v = 1;
+  game.ap.tick(1); assert.equal(G.go, false, 'aspetta l’auto ferma');
+  sim.v = 0;
   for (let t = 0; t < end - 0.5; t += 0.1) game.ap.tick(0.1);
   assert.ok(T.p[1] < 1, 'a metà lavoro la gomma è ancora a terra');
   for (let t = 0; t < 1; t += 0.1) if (game.ap) game.ap.tick(0.1);
   assert.equal(game.ap, null, 'auto di nuovo tua');
   assert.ok(T.p[1] > 1.9, 'gomma cambiata');
-  assert.ok(game.s.trunk.some((x) => x.kind === 'forata'), 'la forata nel bagagliaio');
+  assert.equal(game.s.trunk[si].kind, 'forata', 'la forata prende il posto della scorta nel bagagliaio');
+});
+
+test('cambio gomma: l’avviso della foratura offre il montaggio solo con una scorta', () => {
+  const game = new StreetGame(new SupraSim(), () => 0.5); game.startTrip();
+  game.prompt = null; game.tyres().p[3] = 0.2;
+  game.socGuasto();
+  assert.match(game.prompt.options[0].label, /Monta la ruota di scorta/);
+  game.answer(0);
+  assert.equal(game.prompt, null);
+  assert.equal(game.ap.gomma.i, 3);
+
+  game.ap = null; game._socAsk = null;
+  game.s.trunk = game.s.trunk.filter((it) => it.kind !== 'scorta');
+  game.socGuasto();
+  assert.ok(game.prompt.options.every((opzione) => !opzione.label.includes('scorta')));
 });
