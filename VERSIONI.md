@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.170**
+**Versione attuale: v0.171**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -194,3 +194,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.168 · 26/11/2026 · proprietario · **Sigla Twin Turbo Maniacs**: aprendo il gioco il logo del duo in pixel art si compone da poche scie di luce sempre più fitte, lampo e «PRESENTA», poi la schermata iniziale (si salta con un tasto o un clic, una volta per scheda)
 - v0.169 · 26/11/2026 · cognato · **Fiamme con carattere**: ogni fiammata è una scena che cambia forma mentre vive (nasce, si gonfia, si stacca dal tubo, si sfrangia) e ha un carattere preso dalle auto vere: borbottio, crackle da strada, anti-lag da rally con grumi di fuoco e scintille, foglio blu da drag con i diamanti, botto da supercar con la stella, lanciafiamme, mitraglia (`fiamme2d.js`, `fiammaTipo` e `fiammaCopione` in `fiamme.js`)
 - v0.170 · 26/11/2026 · cognato · **Fiamme dell'auto rifatte**: le fiamme che escono dallo scarico (non quelle dell'anteprima) hanno volume e sfumature a sette bande, lingue che guizzano, bordo a puntini, scintille dalla cresta; i grumi di fuoco sono piccole fiamme a goccia; più grandi, più varianti per carattere (rotolo, getto, doppio, pennacchio, cono, sventagliata...) e niente più la fiammella dritta tra una scena e l'altra
+- v0.171 · 27/11/2026 · cognato · **Cambio gomma dal lato strada**: il protagonista scende e risale dietro la carrozzeria, prende la scorta, usa il cric, smonta e rimonta la ruota. Il cambio parte anche dall'avviso «Gomma a terra».

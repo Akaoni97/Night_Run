@@ -502,6 +502,7 @@ class StreetGame {
   }
   dropItem(i) {
     const it = this.s.trunk[i]; if (!it) return { ok: false };
+    if (this.ap?.gomma?.scorta === it) return { ok: false, why: 'Stai usando questa ruota di scorta' };
     this.s.trunk.splice(i, 1); this.applyMass(); this.say(`${this.itemName(it)} lasciato sul marciapiede`); return { ok: true };
   }
 

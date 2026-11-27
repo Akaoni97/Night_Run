@@ -293,30 +293,42 @@ const vgKm = (game) => (game.s.dist || 0) / 1000;
   };
   // cambio gomma con la ruota di scorta: anche in corsa, l'auto accosta a destra e si ferma da sola
   P.changeTyre = function () {
-    const T = this.tyres(), sim = this.sim, i = T.p.indexOf(Math.min(...T.p));
-    if (T.p[i] > 1.9 && !T.leak[i]) return { ok: false, why: 'Le gomme sono a posto' };
-    const si = this.s.trunk.findIndex((it) => it.kind === 'scorta');
-    if (si < 0) return { ok: false, why: 'Non hai la ruota di scorta: bomboletta, soccorso, o la compri al benzinaio' };
-    if (this.ap) return { ok: false, why: 'Aspetta' };
-    this.s.trunk.splice(si, 1); this.applyMass(); this.say('Accosto a destra: crick, bulloni, ruota di scorta…', 'buy');
+    if (this.ap) return { ok: false, why: 'Aspetta che finisca la manovra' };
+    if (this.inside) return { ok: false, why: 'Torna sulla strada prima di cambiare la gomma' };
+    const T = this.tyres(), sim = this.sim;
+    let i = T.p.indexOf(Math.min(...T.p));
+    if (T.p[i] > 1.9 && !T.leak[i]) {
+      i = T.leak.findIndex((perdita) => perdita > 0);
+      if (i < 0) return { ok: false, why: 'Le gomme sono a posto' };
+    }
+    const scorta = this.s.trunk.find((it) => it.kind === 'scorta');
+    if (!scorta) return { ok: false, why: 'Non hai la ruota di scorta: bomboletta, soccorso, o la compri al benzinaio' };
+    if (this.prompt?.kind === 'soccorso') this.prompt = null;
+    this.say('Accosto a destra: cric, bulloni, ruota di scorta…', 'buy');
     // l'auto va nella corsia di destra e si ferma; poi scendi e la cambi tu (cambiogomma.js: `ap.gomma`)
     this.lane = 3; this.manualT = 0;
     this.stopAt(null, () => {});
     const ap = this.ap, TL = typeof cgTimeline === 'function' ? cgTimeline(i) : null;
     ap.enter = true;                                                          // a destra decisi, anche piano (come davanti a un locale)
-    ap.gomma = { i, tl: TL, t: 0, go: false, fast: 1 };
+    ap.gomma = { i, tl: TL, t: 0, go: false, fast: 1, scorta, colpo: 0 };
     const fine = () => {
+      // Lo stesso posto riceve la forata. Finché non hai finito, un salvataggio conserva la scorta.
+      const slot = this.s.trunk.indexOf(scorta);
+      if (slot < 0) { this.ap = null; return; }
+      this.s.trunk[slot] = { kind: 'forata', kg: INV.forata.kg };
       T.p[i] = TYRE_P; T.leak[i] = 0; this.ap = null;
-      if (!this.addItem('forata')) this.say('La gomma forata non ci sta nel bagagliaio: la lasci sul ciglio della strada');
       this.applyMass(); this.say(`Gomma ${TYRE_NAMES[i]} cambiata. Fai riparare quella forata da Nico.`, 'buy');
     };
     ap.tick = (dt) => {
       if (this.ap !== ap) return;
       const G = ap.gomma;
       if (!TL) { if (ap.t > 14) fine(); return; }
-      // scende solo quando l'auto è arrivata nella corsia di destra (o dopo 3 s comunque)
-      if (!G.go) { const z3 = typeof GAME_LANE_Z !== 'undefined' ? GAME_LANE_Z[3] : this.laneZ; if (Math.abs(this.laneZ - z3) < 0.08 || ap.t > 3) G.go = true; else return; }
+      // Un urto può spostare di corsia l'auto mentre accosta. Il pilota torna a destra prima di farti scendere.
+      this.lane = 3;
+      if (Math.abs(this.laneZ - GAME_LANE_Z[3]) >= 0.08 || Math.abs(sim.v) >= 0.25) return;
+      G.go = true;
       G.t += (dt || 0) * (G.fast || 1);
+      while (G.colpo < TL.colpi.length && TL.colpi[G.colpo].t <= G.t) this.fx.push({ k: 'cambioGomma', nome: TL.colpi[G.colpo++].nome });
       if (G.t >= TL.end) fine();
     };
     return { ok: true };

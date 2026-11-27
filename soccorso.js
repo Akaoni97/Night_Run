@@ -236,9 +236,12 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
     const T = this.tyres(), key = Math.min(...T.p) < 0.5 ? 'gomma' : null;
     if (!key) { this._socAsk = null; return; }
     if (this._socAsk === key) return; this._socAsk = key;
+    const scorta = this.s.trunk.some((it) => it.kind === 'scorta');
+    const options = [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }];
+    if (scorta) options.unshift({ label: 'Monta la ruota di scorta', act: () => { const r = this.changeTyre(); if (!r.ok) this.say(r.why, 'info'); } });
     this.ask({ kind: 'soccorso', title: 'Gomma a terra', time: 30,
-      text: 'Una gomma è a terra. Nico arriva col furgone e te la sistema sul posto.',
-      options: [{ label: 'Chiama il soccorso (app)', act: () => { if (typeof window !== 'undefined') { if (window.socPre) window.socPre(['tyres']); if (window.telefono && window.telefono.show) window.telefono.show('soc'); } } }, { label: 'Lascio stare', act: () => {} }],
+      text: scorta ? 'Hai una ruota di scorta. Puoi cambiarla qui o chiamare Nico.' : 'Una gomma è a terra. Nico arriva col furgone e te la sistema sul posto.',
+      options,
       onTimeout: () => {} });
   };
 })();

@@ -1975,6 +1975,8 @@ class Street2D {
     }
     st.t += dt;
     const dist = game ? game.s.dist : (this.dist || 0) + s.v * dt; this.dist = dist;
+    const cambio = !game?.inside && this.cgStart?.(game?.ap?.gomma);
+    this.cgCamera = null;
     // telecamera viva: in velocità l'auto scivola indietro sullo schermo (si vede più strada davanti),
     // in accelerazione resta un attimo indietro, in frenata va avanti
     let camT = 0.41 - Math.min(0.08, Math.abs(s.v) * 0.0017) - Math.max(-8, Math.min(8, s.acc || 0)) * 0.005;
@@ -1984,7 +1986,8 @@ class Street2D {
       if (p) camT = Math.max(0.3, Math.min(0.5, 0.64 - (p.x - dist) * 30 / W));   // non sotto 0,3: l'auto resta fuori dal quadro strumenti
       if (p && p.twin) camT = Math.max(0.16, Math.min(0.5, (W * 0.5 - (p.x - dist) * 30) / W));   // piazzetta (piazzetta.js): si punta al centro dei due negozi, che stanno ai due lati di p.x
     }
-    st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * 1.6);
+    if (cambio) camT = 0.52;
+    st.cam = (st.cam ?? camT) + (camT - (st.cam ?? camT)) * Math.min(1, dt * (cambio ? 3 : 1.6));
     if (this.camHold) st.cam = this.camHold(st.cam, dist, W);   // telecamera ferma nel mondo (video teaser: l'auto esce dallo schermo)
     const PPM = 30, carX = Math.round(W * st.cam), K0 = 0.78;
     const kq = (y) => Math.round(K0 * this.laneS(y) / 0.04) * 0.04;   // scala quantizzata: pochi sprite in cache
@@ -2308,6 +2311,7 @@ class Street2D {
     const entDX = EP ? EP.dx : IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
     const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
     const spr0 = this.carSprite(k), spr = (s.damage || 0) > 0.01 ? this.damaged(spr0, s.damage, this.geo()) : spr0, SW = spr.width, left = Math.round(carX + entDX - SW / 2);
+    if (cambio) this.cgCamera = { x: carX - 7 * k, y: y0 - 48 * k, z: Math.max(1, Math.min(1.68, W / (SW + 68))) };
     const hlK = (s.damage || 0) > 0.35 ? (Math.sin(st.t * 37) + Math.sin(st.t * 13.7) > 0.3 ? 0.45 : 0.12) : 1;   // faro rotto: debole e tremolante
     if (game && game.s && game.s.vg && game.s.vg.trailerOn && this.drawTrailer && !(typeof VG_CARGO !== 'undefined' && VG_CARGO[game.car])) this.drawTrailer(g, left, y0, k, s, st);
     g.globalAlpha = entA;
@@ -2357,9 +2361,20 @@ class Street2D {
     const whY = (xl) => skW * (xl - whX0);                                    // quanto sale un punto della cassa a xl pixel dal bordo
     const squash = Math.max(-0.06, Math.min(0.08, -st.pitch * 0.35));
     const GE = this.geo(), archY = GE.wy * k + 1, top = y0 - GE.wr * k - archY * (1 - squash) + heave + GE.low * k;
-    const pendenza = skew + skW, altezza = 1 - squash;
-    const origineY = top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0);
+    const wr = Math.max(6, Math.round(GE.wr * k));
+    const whF = s.wheelie > 0 ? Math.max(0, -whY(GE.ax[1] * k) - 1.5 * k) : 0;
+    const anteriore = cambio && game.ap.gomma.i < 2;
+    const asse = anteriore ? 1 : 0;
+    const lift = cambio?.lift ? wr * 0.46 * cambio.lift : 0;
+    const jackSlope = lift ? -lift / ((GE.ax[asse] - GE.ax[1 - asse]) * k) : 0;
+    const pendenza = skew + skW + jackSlope, altezza = 1 - squash;
+    const origineY = top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0) - jackSlope * GE.ax[1 - asse] * k;
+    const cgCar = cambio && { left, ground: y0, scale: k, radius: wr,
+      rear: left + GE.ax[0] * k, front: left + GE.ax[1] * k, door: left + (GE.hx ?? 108) * k,
+      wheel: left + GE.ax[asse] * k,
+      hubY: y0 - wr - Math.max(0, (anteriore ? bF : bR) * 0.4) - (anteriore ? whF : 0) - lift };
     this.fxParts(g, dt, wx, W, 0);                                             // fumo e vapore dietro l'auto
+    if (cambio) this.cgDraw(g, cambio, cgCar, true);
     g.save();
     g.imageSmoothingEnabled = false;
     this.tf(g, 1, pendenza, 0, altezza, left, origineY);
@@ -2383,7 +2398,7 @@ class Street2D {
     }
     // il guidatore dentro l'abitacolo (pilota2d.js): luce dei lampioni che gli passano sopra, riflessi sul vetro che scorrono
     st.reflOff = (st.reflOff || 0) + Math.abs(s.v) * dt * 30 * 0.9;
-    if (spr.hd && this.drawDriver && this.quality !== 'bassa') {
+    if (!cambio && spr.hd && this.drawDriver && this.quality !== 'bassa') {
       const dxw = left + (GE.hx ?? 108) * k; let lmp = 0;
       for (const lx of lampX) lmp = Math.max(lmp, 1 - Math.abs(lx + 18 - dxw) / 70);
       this._drvLamp = lmp * (1 - (this.day || 0));
@@ -2391,7 +2406,7 @@ class Street2D {
     }
     if (spr.img) g.translate(0, k);
     const P = (col, xx, yy, w, h) => { g.fillStyle = col; g.fillRect(Math.round(xx * k) + 1, Math.round(yy * k) + 1, Math.max(1, Math.round(w * k)), Math.max(1, Math.round(h * k))); };
-    if (!spr.hd || !this.drawDriver || this.quality === 'bassa') {
+    if (!cambio && (!spr.hd || !this.drawDriver || this.quality === 'bassa')) {
       // qualità bassa: il pilota è solo un'ombra controluce
       const hx = (spr.img ? GE.hx : 108) + st.head * 0.8, hy = GE.hy, hx0 = hx - st.head * 0.8, sh = 'rgba(4,5,12,.82)', sh2 = 'rgba(4,5,12,.55)';
       P(sh2, hx0 - 6, 13 + hy, 4, 10); P(sh, hx - 1, 13 + hy, 8, 9); P(sh, hx, 12 + hy, 6, 1); P(sh, hx + 7, 16 + hy, 1, 3);
@@ -2399,14 +2414,13 @@ class Street2D {
     }
     if (this.carId === 'supra' && !spr.hd) for (let n = 0; n < 6; n++) P('rgba(111,216,255,.55)', 121 + n, 14 + n, 1, 1);
     if (s.brake > 0.05) { if (spr.img) { P('#ff2a2a', GE.tail[0], GE.tail[1], GE.tail[2], GE.tail[3]); P('#ffd0c8', GE.tail[0] + 1, GE.tail[1] + 1, 2, 2); } else { P('#ff2a2a', 1, 31, 5, 7); P('#ffd0c8', 2, 32, 2, 2); } }
-    const blinkOn = s.signal && Math.floor(st.t * 3) % 2 === 0;
+    const blinkOn = (s.signal || cambio) && Math.floor(st.t * 3) % 2 === 0;
     if (blinkOn) { P('#ffa020', GE.blinkF[0], GE.blinkF[1], GE.blinkF[2], GE.blinkF[3]); P('#ffe0a0', GE.blinkF[0] + 2, GE.blinkF[1], 3, 1); if (spr.img) P('#ffa020', GE.blinkR[0], GE.blinkR[1], GE.blinkR[2], GE.blinkR[3]); else P('#ffa020', 2, 39, 4, 3); }
     // i danni sono nello sprite stesso (dettagli2d.js: damaged)
     g.restore();
     if (s.brake > 0.05) this.light(g, left + 2, top + 34 * k, 12, 9, '#ff2a2a', 0.2, 3);
     if (s.ign && s.lamps !== false) this.light(g, left + GE.head[0] * k, top + GE.head[1] * k + whY(GE.head[0] * k), s.high ? 9 : 6, s.high ? 5 : 4, '#fff2c4', s.high ? 0.22 : 0.15, 3);
     if (s.signal && Math.floor(st.t * 3) % 2 === 0) { this.light(g, left + 178 * k, top + 38 * k, 10, 6, '#ffa020', 0.25, 3); this.light(g, left + 4, top + 40 * k, 8, 6, '#ffa020', 0.25, 3); }
-    const wr = Math.max(6, Math.round(GE.wr * k));
     if (spr.img) {
       // dischi roventi: la temperatura vera dei freni (sim.brakeT). Il ferro comincia a vedersi rosso cupo verso i 420 °C,
       // ciliegia a 550, arancio oltre i 650; di notte si vede molto di più. Senza il dato, la vecchia stima dalle frenate.
@@ -2416,9 +2430,12 @@ class Street2D {
       // le ruote motrici girano con la fisica (pattinano, si bloccano), le altre rotolano con l'auto:
       // trazione posteriore (Supra, BMW...) dietro, trazione anteriore (V40, Panda, Golf...) davanti
       const fwd = !!s.fwd, spinV = Math.abs(s.ww * 0.322), rollV = Math.abs(s.v);
-      wfn(g, left + GE.ax[0] * k, y0 - wr - Math.max(0, bR * 0.4), k, fwd ? st.front : st.spin, fwd ? rollV : spinV, true);
-      const whF = s.wheelie > 0 ? Math.max(0, -whY(GE.ax[1] * k) - 1.5 * k) : 0;   // la ruota davanti si stacca (penzola un po' sotto la cassa)
-      wfn(g, left + GE.ax[1] * k, y0 - wr - Math.max(0, bF * 0.4) - whF, k, fwd ? st.spin : st.front, fwd ? spinV : rollV, false);
+      for (let q = 0; q < 2; q++) {
+        const motrice = fwd ? q === 1 : q === 0;
+        const x = left + GE.ax[q] * k, y = y0 - wr - Math.max(0, (q === 1 ? bF : bR) * 0.4) - (q === 1 ? whF : 0) - (q === asse ? lift : 0);
+        if (q === asse && cambio?.lato === 'vicino' && cambio.smontata) this.brake(g, x, y, k * 0.86, 0, q === 0);
+        else wfn(g, x, y, k, motrice ? st.spin : st.front, motrice ? spinV : rollV, q === 0);
+      }
       if (this.brakeHot > 0.05) {                                     // il disco rosso si vede tra i raggi (brake); qui il riflesso a terra
         const hb = this.brakeHot, nt = 1 - (this.day || 0) * 0.8;
         for (const [q, b] of [[0, bR], [1, bF]]) {
@@ -2431,6 +2448,7 @@ class Street2D {
       this.wheel(g, left + 1 + 48 * k, y0 - wr - Math.max(0, bR * 0.4), wr, -st.spin, Math.abs(s.ww * 0.322));
       this.wheel(g, left + 1 + 158 * k, y0 - wr - Math.max(0, bF * 0.4), wr, -st.front, Math.abs(s.v));
     }
+    if (cambio) this.cgDraw(g, cambio, cgCar, false);
 
     g.globalAlpha = 1;
     // ---- luci in stile anime: striscia anamorfica dei fari, scie dei fanali, stella sul cromo
@@ -2582,6 +2600,7 @@ class Street2D {
     // ---- segnalatore della corsia (radar delle tre corsie)
     if (game && game.s && game.s.vg && this.drawTripFx) this.drawTripFx(g, game, st.t);
     if (game && game.track === 'city' && !game.inside && this.laneRadar !== false) this.drawLaneRadar(g, game, dist, st.t);
+    if (cambio) this.cgStatus(g, cambio, cgCar.left + SW / 2, Math.round(y0 - Math.max(98, spr.height + 38)));
 
     // ---- su schermo
     if (!this.visible) return;
@@ -2633,9 +2652,10 @@ class Street2D {
     this.fitScreen();
     if (typeof NightInterni !== 'undefined' && NightInterni.covers) return;   // dentro un locale la scena dell'interno copre tutto: niente lavoro per una strada che non si vede
     const c = this.ctx, SS = this.SS || 1; c.imageSmoothingEnabled = false;
-    if (shake || shakeX || this.padBottom || this.bars > 0.001 || (this.zoom || 1) * (this.fxZoom || 1) > 1.001) { c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height); }   // solo se resta un bordo scoperto (v0.134)
+    const shotZoom = this.cgCamera?.z ?? (this.zoom || 1) * (this.fxZoom || 1);
+    if (shake || shakeX || this.padBottom || this.bars > 0.001 || shotZoom > 1.001) { c.fillStyle = '#04060b'; c.fillRect(0, 0, this.canvas.width, this.canvas.height); }   // solo se resta un bordo scoperto (v0.134)
     // inquadratura: zoom su un punto (sigla) o scena intera
-    const z = Math.max(1, (this.zoom || 1) * (this.fxZoom || 1)), pad = this.padBottom || 0;
+    const z = Math.max(1, shotZoom), pad = this.padBottom || 0;
     // senza zoom bagliore, colori e vignettatura si fanno sulla tela interna, prima dell'ingrandimento (prestazioni, 23/11/2026):
     // sono sfumature larghe, a schermo pieno costavano da 2 a 4 volte i pixel per lo stesso risultato. Con lo zoom come prima.
     // v0.134: anche con lo zoom della ripresa (tra 60 e 160 km/h c'è quasi sempre, 1,00-1,02, e fermi fino a 1,3): lo zoom ritaglia
@@ -2645,7 +2665,7 @@ class Street2D {
     let src = [0, 0, this.LW, this.LH];
     if (z > 1.001 || pad) {
       // padBottom: la ripresa può scendere sotto la scena (lì c'è la banda nera della sigla)
-      const sw = this.LW / z, sh = this.LH / z, f = this.zoomFocus || this.fxFocus || { x: this.LW / 2, y: this.LH / 2 };
+      const sw = this.LW / z, sh = this.LH / z, f = this.cgCamera || this.zoomFocus || this.fxFocus || { x: this.LW / 2, y: this.LH / 2 };
       const sx = Math.max(0, Math.min(this.LW - sw, f.x - sw / 2)), sy = Math.max(0, Math.min(this.LH - sh + pad, f.y - sh / 2));
       src = [sx, sy, sw, sh];
       if (this.blit) this.blit(c, (sx + shakeX / z) * SS, (sy + shake / z) * SS, sw * SS, sh * SS, 0, 0, this.canvas.width, this.canvas.height);   // ingrandimento nitido (nitido2d.js)

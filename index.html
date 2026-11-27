@@ -1210,7 +1210,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         <div><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></div><div>Rispondi alle proposte (altrimenti: marcia diretta)</div>
         <div><kbd>U</kbd> <kbd>0</kbd> <kbd>Tab</kbd> <kbd>P</kbd></div><div>Entra nella tappa · telefono · menu · stazione radio</div>
         <div><kbd>A</kbd> <kbd>D</kbd></div><div>Corsia a sinistra · a destra</div>
-        <div><kbd>9</kbd></div><div>Cambia la gomma forata con la ruota di scorta (da fermo, serve la scorta nel bagagliaio)</div>
+        <div><kbd>9</kbd></div><div>Accosta a destra e cambia la gomma con la scorta nel bagagliaio. Durante la scena, U cambia la velocità.</div>
         <div><kbd>8</kbd></div><div>Finestrini giù / su (aperti si sente l'aria, lo scarico e l'eco della strada)</div>
         <div><kbd>F</kbd> <kbd>H</kbd> <kbd>B</kbd></div><div>Abbaglianti · clacson · bagagliaio</div>
         <div><kbd>N</kbd> <kbd>R</kbd> <kbd>Spazio</kbd></div><div>Folle · retro · frizione (manuale)</div>
@@ -1686,7 +1686,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     else if (k === 'z') toggleFs();
     else if (k >= '1' && k <= '4' && game.s.vg && !game.prompt) vgQuick(+k);
     else if (k === '8') toggleWindows();
-    else if (k === '9') { const r = game.changeTyre(); flash(r.ok ? 'Accosto e cambio la gomma (U accelera)' : r.why, 2); renderTrunk(); }
+    else if (k === '9') { const r = game.changeTyre(); if (r.ok && window.gameMenu?.isOpen) gameMenu.close(); flash(r.ok ? 'Accosto e cambio la gomma (U accelera)' : r.why, 2); renderTrunk(); }
     else if (k === 't') toggleWorldMap();
     else if (k === 'j') cycleHud();
     else if (k === 'k') cycleMeteo();
@@ -3569,7 +3569,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       garage.update(dt, vs, game); window.nightRun.fx = vs;   // lo stato del fotogramma (fiamme, marmitta...) anche per la scena da Luca (interni_hd.js)
       recordFrame(dt, vs);
     }
-    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); else if ((f.k === 'scoppio' || f.k === 'gommaLenta') && window.NightForature) NightForature.suono(audio, f, S.vol / 100, S.muted); }
+    for (const f of game.fx) { if (f.k === 'honk') carHorn(); else if (f.k === 'pass') passSound(f.dv, f.near); else if (f.k === 'skid') skidSound(f.I, f.rel); else if ((f.k === 'scoppio' || f.k === 'gommaLenta') && window.NightForature) NightForature.suono(audio, f, S.vol / 100, S.muted); else if (f.k === 'cambioGomma') cgAudio(audio, f.nome, S.vol / 100, S.muted); }
     if (window.NightForature) NightForature.tick(audio, game, sim, S.vol / 100, S.muted || !!window.__nrPausaM);   // la gomma a terra che sbatte
     game.fx.length = 0;
     if (msgT > 0) {
@@ -3578,7 +3578,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       if (msgT <= 0) { if (msgQ.length) { const q = msgQ.shift(); showMsg(q.text, q.sec, q.kind); } else $('msg').classList.remove('show'); }
     }
     // la scelta del cambio: una volta per Viaggio, al km 0 appena finito il prologo (anche nelle partite già avviate)
-    if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
+    if (game.s.vg && game.s.vg.cambio === undefined && !game.prompt && !game.inside && !game.ap?.gomma && $('gate').hidden && !(window.NightPrologo && NightPrologo.playing)) {
       const pick = (m) => () => { game.s.vg.cambio = m; setGearbox(m); saveGame(); };
       game.ask({ kind: 'story', title: 'Il cambio', time: 900,
         text: 'Come vuoi guidare l\'auto dello zio?\n\nAutomatico: leva P R N D S (E la sposta verso D e S, che è sport e tiene i giri più alti; Q verso P), poi gas e freno: le marce le cambia lei.\nManuale: le marce le metti tu, E per salire e Q per scalare; in folle il gas fa solo salire i giri.\n\nPuoi cambiare idea quando vuoi dal menu (Tab), scheda Guida.',

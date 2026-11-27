@@ -198,18 +198,25 @@ function pgPaint(g, L, pose, f, blink) {
   const jeans = ab ? '#23232e' : '#2a3556', jeansSh = ab ? '#15151c' : '#1c2440', jeansHi = ab ? '#34344a' : '#3d4c78', shoe = ab ? '#120c0a' : '#16141c', sole = ab ? '#2a1c16' : '#c8c0b0';
   // posa: angoli di gambe e braccia (0 = giù dritto, positivo = in avanti), respiro, testa
   const P = { bob: 0, lA: 0, lK: 0, rA: 0, rK: 0, bArm: 0.08, bEl: 0.25, fArm: -0.05, fEl: 0.3, head: 0, eyeDown: 0, mouth: 0, phone: false, pockets: false, wave: 0 };
-  if (pose === 'walk') {
+  if (pose === 'walk' || pose === 'tyreCarry') {
     const p = (f % 8) / 8 * Math.PI * 2, s = Math.sin(p);
     Object.assign(P, { lA: s * 0.5, rA: -s * 0.5, lK: Math.max(0, -Math.sin(p + 0.9)) * 0.75, rK: Math.max(0, Math.sin(p + 0.9)) * 0.75, bArm: -s * 0.45, fArm: s * 0.45, bEl: 0.35, fEl: 0.35, bob: Math.abs(Math.cos(p)) > 0.7 ? 0 : 1 });
+    if (pose === 'tyreCarry') Object.assign(P, { bArm: 0.85, bEl: 0.85, fArm: 1.1, fEl: 0.85, eyeDown: 1 });
+  } else if (pose === 'tyreWork') {
+    const pull = (1 - Math.cos((f % 8) * Math.PI / 4)) / 2;
+    Object.assign(P, { kneel: true, bArm: 0.95, bEl: 0.3, fArm: 0.95 + pull * 0.43, fEl: 0.25 + pull * 0.35, head: 1, eyeDown: 2 });
   } else if (pose === 'wave') { Object.assign(P, { fArm: -2.5, fEl: -0.6 + Math.sin(f * 1.6) * 0.5, mouth: 1, bob: f % 4 < 2 ? 0 : 1 });
   } else if (pose === 'phone') { Object.assign(P, { fArm: -1.05, fEl: 2.45, head: 1, eyeDown: 1, phone: true, bob: f % 4 < 2 ? 0 : 1 });
   } else if (pose === 'pockets') { Object.assign(P, { pockets: true, bArm: 0.12, fArm: 0.15, bob: f % 4 < 2 ? 0 : 1, eyeDown: f % 16 > 12 ? 1 : 0 });
   } else { Object.assign(P, { bob: f % 4 < 2 ? 0 : 1, lA: f % 32 < 16 ? 0.04 : 0, rA: f % 32 < 16 ? 0 : -0.04, eyeDown: f % 24 > 20 ? 1 : 0 }); }
-  const B = P.bob, X = 20;                                    // X = asse del corpo
+  const B = P.bob + (P.kneel ? 14 : 0), X = 20;                 // X = asse del corpo
   const hipY = 53 + B, shY = 26 + B;
   // gamba: anca → ginocchio → caviglia, scarpa verso destra
-  const leg = (a, k, col, hi) => {
-    const kx = X + Math.sin(a) * 14, ky = hipY + Math.cos(a) * 14, sa = a - k, ax = kx + Math.sin(sa) * 14, ay = Math.min(PG_FOOT - 3, ky + Math.cos(sa) * 14);
+  const leg = (a, k, col, hi, back) => {
+    const kx = P.kneel ? X + (back ? -5 : 12) : X + Math.sin(a) * 14;
+    const ky = P.kneel ? (back ? 80 : 71) : hipY + Math.cos(a) * 14, sa = a - k;
+    const ax = P.kneel ? X + (back ? -14 : 11) : kx + Math.sin(sa) * 14;
+    const ay = P.kneel ? 81 : Math.min(PG_FOOT - 3, ky + Math.cos(sa) * 14);
     limb(X, hipY, kx, ky, 8, jeansSh); limb(kx, ky, ax, ay, 7, jeansSh); limb(X, hipY, kx, ky, 6, col); limb(kx, ky, ax, ay, 5, col); limb(X + 2, hipY + 1, kx + 2, ky, 1, hi);
     rect(ax - 3, ay, 9, 3, shoe); rect(ax - 3, ay + 2, 9, 1, sole); rect(ax + 3, ay - 1, 3, 1, shoe);
   };
@@ -229,7 +236,7 @@ function pgPaint(g, L, pose, f, blink) {
   // dietro: capelli lunghi, gamba e braccio lontani (più scuri)
   if (L.capelli === 'lunghi') rect(X - 9, 6 + B, 6, 26, C.hair);
   if (L.sopra === 'felpa') rect(X - 9, shY - 6, 8, 8, C.jacketSh);                                  // il cappuccio dietro il collo
-  leg(P.rA, P.rK, jeansSh, jeansSh);
+  leg(P.rA, P.rK, jeansSh, jeansSh, true);
   if (!P.pockets) arm(P.bArm, P.bEl, C.jacketSh, C.skinSh, C.jacketSh, true); else limb(X - 1, shY + 2, X - 3, shY + 14, 5, C.jacketSh);
   // busto
   let rows = [[-4, 4], [-6, 6], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 7], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-7, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6], [-6, 6]];
@@ -323,8 +330,9 @@ function pgPaint(g, L, pose, f, blink) {
   if (Xs.pazzo) for (const [a, b] of [[-10, 1], [-11, 6], [-10, 11], [-8, -3], [-5, -5], [-1, -6], [3, -5], [6, -3], [8, 0]]) { rect(hx + a, hy + b, 3, 2, C.hair); px(hx + a + 1, hy + b, C.hairHi); }   // capelli sparati in aria
 }
 function pgStanding(g, x, y, s, ph, walking, look, light = 0, t = 0, pose) {
-  const P = walking ? 'walk' : pose || 'idle';
-  const f = walking ? Math.floor(((ph % 1) + 1) % 1 * 8) : Math.floor(t * 4) % 32;
+  const P = pose || (walking ? 'walk' : 'idle');
+  const stepped = walking || P === 'tyreWork' || P === 'tyreCarry';
+  const f = stepped ? Math.floor(((ph % 1) + 1) % 1 * 8) : Math.floor(t * 4) % 32;
   const blink = !walking && P !== 'phone' && (t % 3.7) < 0.14;
   const spr = pgSprite(look, P, f, blink, light); if (!spr) return;
   const k = s * 1.1;
