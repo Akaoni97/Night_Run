@@ -85,12 +85,27 @@ const FIAMME_KIT = [
   { id: 'media', nome: 'Fiammata media', prezzo: 1300, w: [0.04, 0.8, 0.12, 0.04], tipi: { tuner: 0.45, rally: 0.35, race: 0.2 }, scala: 1, testo: 'Fiammate arancio e gialle di mezzo metro, a raffiche brevi: l\'auto da strada ben fatta che sputa al rilascio.' },
   { id: 'grossa', nome: 'Fiammata grossa', prezzo: 2000, w: [0.05, 0.25, 0.1, 0.6], tipi: { rally: 0.5, race: 0.3, drag: 0.2 }, scala: 1.3, testo: 'Fiammata piena e larga, un metro e passa, con scintille e pezzi di fuoco: la fiammata da officina che fa girare la gente.' },
   { id: 'spinta', nome: 'Fiammata spinta', prezzo: 2800, w: [0.4, 0.2, 0.1, 0.3], tipi: { drag: 0.35, torch: 0.2, rally: 0.25, race: 0.2 }, scala: 1.15, rate: 1.25, testo: 'Quella delle auto da 600 CV: foglio lungo di cambiata con i diamanti, anti-lag, ossidrica blu e botti secchi al limitatore.' },
-  { id: 'rally', nome: 'Anti-lag da rally', prezzo: 2400, w: [0, 0.4, 0.1, 0.5], tipi: { rally: 1 }, scala: 1.1, rate: 1.2, testo: 'Fiamma larga e a brandelli che sale, con grumi di fuoco e doccia di scintille: il turbo tenuto in pressione da un Gruppo B.' },
+  { id: 'rally', nome: 'Anti-lag da rally', prezzo: 2400, turbo: true, w: [0, 0.4, 0.1, 0.5], tipi: { rally: 1 }, scala: 1.1, rate: 1.2, testo: 'Fiamma larga e a brandelli che sale, con grumi di fuoco e doccia di scintille: il turbo tenuto in pressione da un Gruppo B.' },
   { id: 'drag', nome: 'Cambiata da drag', prezzo: 2200, w: [0.3, 0.2, 0.1, 0.4], tipi: { drag: 1 }, scala: 1.1, testo: 'Foglio lungo e sottile, blu alla radice e arancio in punta, coi diamanti: la fiammata di cambiata e di 2-step.' },
   { id: 'ossidrica', nome: 'Ossidrica blu', prezzo: 1800, w: [0.8, 0, 0.08, 0.12], tipi: { torch: 0.55, drag: 0.45 }, scala: 1, testo: 'Getto sottile e dritto, blu col cuore bianco e i «diamanti». Secco al limitatore, una lama al rilascio.' },
   { id: 'lancia', nome: 'Lanciafiamme', prezzo: 2600, w: [0, 0.5, 0, 0.5], len: 1.7, rate: 1.2, tipi: { drago: 0.75, race: 0.25 }, scala: 1, testo: 'Fuoco lunghissimo che ribolle e sale a grumi. Al rilascio sopra i 5.000 giri sembra un drago.' },
   { id: 'mitraglia', nome: 'Mitraglia', prezzo: 1500, w: [0, 0.1, 0.9, 0], rate: 2.2, tipi: { mitraglia: 0.8, tuner: 0.2 }, scala: 1, testo: 'Poca fiamma e tanti botti a raffica, con le scintille. Al limitatore fa la mitragliatrice.' },
 ];
+// Coerenza con la meccanica (v0.175): un diesel non ha niente che accenda la miscela nello scarico (niente candele, niente scoppi: il gioco lo dice già
+// alla centralina), quindi sui diesel funziona solo il Lanciafiamme, che è proprio un kit con la sua candela nello scarico (quello dei camion americani);
+// l'anti-lag da rally brucia benzina dentro la turbina: senza turbo non esiste. info = { diesel, turbo } dell'auto (fiammeInfo).
+function fiammeAdatta(kit, info) {
+  if (!kit) return { ok: true };
+  const i = info || {};
+  if (i.diesel && kit.id !== 'lancia') return { ok: false, why: 'Sui diesel non c\'è niente che accenda la miscela: niente scoppi. Funziona solo il Lanciafiamme (candela nello scarico).' };
+  if (kit.turbo && !i.turbo) return { ok: false, why: 'Serve il turbo: l\'anti-lag brucia benzina dentro la turbina.' };
+  return { ok: true };
+}
+// com'è fatta quest'auto per le fiamme: diesel (CARS[..].voice.diesel) e turbo montato (sim.tune.turbo.max)
+function fiammeInfo(carId, sim) {
+  const c = typeof CARS !== 'undefined' ? CARS[carId] : null, t = sim && sim.tune && sim.tune.turbo;
+  return { diesel: !!(c && c.voice && c.voice.diesel), turbo: ((t && t.max) || 0) > 0 };
+}
 // il colore vale per ogni tipo: pal = tavolozza di effetti2d.js (FLAME_PAL); naturale = quello del carattere (arancio, giallo, blu alla radice)
 const FIAMME_COLORI = [
   { id: 'naturale', nome: 'Naturale', prezzo: 0, pal: null, testo: 'Quello vero: arancio e giallo, blu alla radice dove la miscela è magra.' },
@@ -189,11 +204,12 @@ const FT_PESI = {
 // ctx = { turbo: l'auto ha il turbo } : l'anti-lag è roba da turbo, il botto secco da aspirato
 function fiammaTipo(tier, kind, kit, ctx, r) {
   let nomi, w;
-  if (kit && kit.tipi) { nomi = Object.keys(kit.tipi); w = nomi.map((n) => kit.tipi[n]); }
-  else {
+  const turbo = !ctx || ctx.turbo !== false;
+  if (kit && kit.tipi) {
+    nomi = Object.keys(kit.tipi); w = nomi.map((n) => kit.tipi[n] * (n === 'rally' ? (turbo ? 1 : 0.25) : n === 'race' ? (turbo ? 0.8 : 1.25) : 1));   // l'anti-lag è da turbo, il botto secco da aspirato
+  } else {
     const t = Math.max(0, Math.min(2, tier | 0)), tab = FT_PESI[t][kind] || FT_PESI[t].lift;
     nomi = FIAMME_TIPI.slice(0, 6); w = tab.slice();
-    const turbo = !ctx || ctx.turbo !== false;
     w[2] *= turbo ? 1.7 : 0.35; w[4] *= turbo ? 0.75 : 1.4;
   }
   const tot = w.reduce((a, b) => a + b, 0) || 1;
@@ -216,25 +232,33 @@ const FIAMMA_POP = { t: 0, d: 0.15, len: 20, th: 3, ang: 0, dy: 0, ph0: 0, bulb:
 // Ogni carattere ha più varianti (v0.170): la stessa preparazione non rifà due volte di fila la stessa fiammata.
 const FIAMMA_SCALA = { len: 1.25, th: 1.2 };                                      // misura generale: le fiamme della v0.169 erano troppo piccole sull'auto
 function fiammaCopione(tipo, tier, rn, scala) {
-  const sk = scala || 1;                                                         // la misura del tipo scelto (kit.scala: media 1, grossa 1,3...)
+  const sk = scala || 1;                                                         // la misura del tipo scelto (kit.scala: media 1, grossa 1,3...) per i giri del motore
   const pop = (t, o) => { const q = Object.assign({}, FIAMMA_POP, { t }, o); q.len *= FIAMMA_SCALA.len * sk; q.th *= FIAMMA_SCALA.th * (0.5 + 0.5 * sk); return q; };
   const pops = []; let cool = 0.2, t = 0, v = '';
   const fine = () => pops.reduce((m, p) => Math.max(m, p.t + p.d), 0);
   const pick = (a) => a[Math.min(a.length - 1, Math.floor(rn() * a.length))];
   const ang = (m) => (rn() - 0.5) * m;
   if (tipo === 'burble') {
-    v = pick(['fiammella', 'sbuffo', 'tremolio']);
+    v = pick(['fiammella', 'sbuffo', 'tremolio', 'sussurro']);
     if (v === 'sbuffo') { pops.push(pop(0, { d: 0.22, len: 12 + 8 * rn(), th: 3 + rn(), bulb: 1.5, grow: 0.3, detach: 0.5, rag: 0.3, curl: 0.8, cut: 0.35, luce: 0.45, lick: 0.4 })); cool = 0.22 + 0.2 * rn(); }
     else {
-      const n = v === 'tremolio' ? 6 + Math.floor(rn() * 4) : 3 + Math.floor(rn() * 4), gap = v === 'tremolio' ? 0.03 + 0.04 * rn() : 0.05 + 0.08 * rn();
-      for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.12 + 0.08 * rn(), len: (v === 'tremolio' ? 4 : 5) + 7 * rn(), th: 1.5 + 1.2 * rn(), ang: ang(0.2), bulb: 1.3, detach: 0.6, rag: 0.25, curl: 0.5 + rn() * 0.4, cut: 0.35, luce: 0.3, lick: 0.4 })); t += gap; }
+      const n = v === 'sussurro' ? 8 + Math.floor(rn() * 5) : v === 'tremolio' ? 6 + Math.floor(rn() * 4) : 3 + Math.floor(rn() * 4), gap = v === 'sussurro' ? 0.05 + 0.05 * rn() : v === 'tremolio' ? 0.03 + 0.04 * rn() : 0.05 + 0.08 * rn();
+      for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.12 + 0.08 * rn(), len: (v === 'tremolio' ? 4 : 5) + 7 * rn() * (v === 'sussurro' ? 0.6 : 1), th: 1.5 + 1.2 * rn(), ang: ang(0.2), dy: ang(0.8), bulb: 1.3, detach: 0.6, rag: 0.25, curl: 0.5 + rn() * 0.4, cut: 0.35, luce: 0.3, lick: 0.4 })); t += gap; }
       cool = 0.1 + 0.12 * rn();
     }
   } else if (tipo === 'tuner') {
-    v = pick(['crackle', 'sparata', 'colpo']);
+    v = pick(['crackle', 'sparata', 'colpo', 'rimbalzo', 'doppietta']);
     if (v === 'colpo') {
-      pops.push(pop(0, { d: 0.2 + 0.08 * rn(), len: 22 + 14 * rn(), th: 5 + 2 * rn(), ang: ang(0.2), bulb: 1.5, grow: 0.25, detach: 0.4, rag: 0.4, curl: 0.9, wob: 1.2, jag: 0.1, cut: rn() < 0.3 ? 0.35 : 0, sparks: 4 + Math.floor(rn() * 3), soot: 1, ring: rn() < 0.5 ? 1 : 0, luce: 0.9 }));
+      pops.push(pop(0, { d: 0.2 + 0.08 * rn(), len: 22 + 14 * rn(), th: 5 + 2 * rn(), ang: ang(0.2), bulb: 1.5, grow: 0.25, detach: 0.4, rag: 0.4, curl: 0.9, wob: 1.2, jag: 0.1, cut: rn() < 0.3 ? 0.35 : 0, sparks: 4 + Math.floor(rn() * 3), soot: 1, luce: 0.9 }));
       cool = 0.25 + 0.2 * rn();
+    } else if (v === 'doppietta') {
+      const L = 14 + 10 * rn();
+      for (let i = 0; i < 2; i++) pops.push(pop(i * (0.055 + 0.03 * rn()), { d: 0.14 + 0.05 * rn(), len: L * (i ? 0.85 : 1), th: 3.4 + rn(), ang: ang(0.25), dy: ang(1), bulb: 1.5, grow: 0.28, detach: 0.42, rag: 0.4, curl: 0.8, wob: 1.2, jag: 0.12, sparks: 2, soot: i ? 0 : 1, luce: 0.75 }));
+      cool = 0.2 + 0.15 * rn();
+    } else if (v === 'rimbalzo') {                                               // come una pallina che rimbalza: i colpi si fanno più piccoli e più radi
+      const n = 4 + Math.floor(rn() * 2);
+      for (let i = 0; i < n; i++) { const f = 1 - i / (n + 1); pops.push(pop(t, { d: 0.1 + 0.05 * rn(), len: (8 + 14 * f) * (0.8 + 0.4 * rn()), th: 2 + 2.2 * f, ang: ang(0.3), dy: ang(1.2), bulb: 1.5, grow: 0.28, detach: 0.42, rag: 0.45, curl: 0.8, wob: 1.3, jag: 0.12, sparks: i < 2 ? 2 : 0, soot: i === 0 ? 1 : 0, luce: 0.35 + 0.5 * f })); t += 0.04 + 0.035 * i + 0.03 * rn(); }
+      cool = 0.2 + 0.2 * rn();
     } else {
       const n = v === 'crackle' ? 4 + Math.floor(rn() * 3) : 2 + Math.floor(rn() * 2) + (tier >= 2 ? 1 : 0), big = v === 'crackle' ? 9 : 14;
       for (let i = 0; i < n; i++) {
@@ -246,61 +270,87 @@ function fiammaCopione(tipo, tier, rn, scala) {
       cool = 0.16 + 0.2 * rn();
     }
   } else if (tipo === 'rally') {
-    v = pick(['cannone', 'raffica', 'lingua']);
+    v = pick(['cannone', 'raffica', 'lingua', 'continuo', 'esplosione']);
     if (v === 'cannone') {
       pops.push(pop(0, { d: 0.3 + 0.14 * rn(), len: 46 + 26 * rn(), th: 5.5 + 3 * rn(), bulb: 1.4, grow: 0.22, detach: 0.34, taper: 0.6, rag: 0.8, curl: 1.2, wob: 1.6, jag: 0.1, lick: 0.7,
-        sparks: 10 + Math.floor(rn() * 10), sparkV: 1.2, clumps: 5 + Math.floor(rn() * 6), soot: 1, ring: rn() < 0.6 ? 1 : 0, luce: 1 }));
+        sparks: 10 + Math.floor(rn() * 10), sparkV: 1.2, clumps: 5 + Math.floor(rn() * 6), soot: 1, luce: 1 }));
       t = 0.09 + 0.07 * rn();
       pops.push(pop(t, { d: 0.2 + 0.08 * rn(), len: 28 + 14 * rn(), th: 4 + 2 * rn(), ang: ang(0.2), bulb: 1.3, grow: 0.25, detach: 0.4, taper: 0.7, rag: 0.7, curl: 1, wob: 1.4, lick: 0.7, sparks: 5, clumps: 2, luce: 0.8 }));
       if (rn() < 0.4) pops.push(pop(t + 0.1 + 0.06 * rn(), { d: 0.16, len: 16 + 10 * rn(), th: 3 + rn(), ang: ang(0.3), bulb: 1.4, rag: 0.6, curl: 0.9, sparks: 3, luce: 0.6 }));
     } else if (v === 'raffica') {
       const n = 4 + Math.floor(rn() * 3);
       for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.18 + 0.08 * rn(), len: 26 + 20 * rn(), th: 4 + 2 * rn(), ang: ang(0.3), dy: ang(1.4), bulb: 1.4, grow: 0.25, detach: 0.4, rag: 0.75, curl: 1, wob: 1.4, lick: 0.7, sparks: 4, clumps: 2, soot: i === 0 ? 1 : 0, luce: 0.8 })); t += 0.06 + 0.04 * rn(); }
+    } else if (v === 'continuo') {                                               // l'anti-lag che chiacchiera: spari sovrapposti, il fuoco non si spegne mai del tutto
+      const n = 7 + Math.floor(rn() * 3);
+      for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.2 + 0.1 * rn(), len: 36 + 24 * rn(), th: 3.4 + 2 * rn(), ang: ang(0.3), dy: ang(1.6), bulb: 1.35, grow: 0.25, detach: 0.45, rag: 0.7, curl: 1, wob: 1.5, lick: 0.8, sparks: 3, clumps: i % 3 === 0 ? 2 : 0, soot: i === 0 ? 1 : 0, luce: 0.7 })); t += 0.07 + 0.06 * rn(); }
+    } else if (v === 'esplosione') {                                             // un colpo solo, enorme, con un secondo dopo
+      pops.push(pop(0, { d: 0.45 + 0.1 * rn(), len: 80 + 25 * rn(), th: 9 + 3 * rn(), bulb: 1.5, grow: 0.2, detach: 0.3, taper: 0.55, rag: 0.7, curl: 1.4, wob: 1.8, jag: 0.15, lick: 0.9, sparks: 18, sparkV: 1.4, clumps: 9, soot: 2, luce: 1.2 }));
+      pops.push(pop(0.12 + 0.05 * rn(), { d: 0.25, len: 40 + 15 * rn(), th: 6, ang: ang(0.2), bulb: 1.3, rag: 0.7, curl: 1.2, lick: 0.8, sparks: 6, clumps: 3, luce: 0.9 }));
     } else {
       pops.push(pop(0, { d: 0.42 + 0.16 * rn(), len: 70 + 30 * rn(), th: 4 + rn(), ang: 0.05, bulb: 1.3, grow: 0.3, detach: 0.5, taper: 0.55, rag: 0.6, curl: 1.8, wob: 1.6, lick: 0.8, sparks: 14, sparkV: 1.3, clumps: 3, soot: 1, luce: 1 }));
     }
     cool = 0.14 + 0.16 * rn();
   } else if (tipo === 'drag') {
-    v = pick(['foglio', 'doppio', 'pennacchio']);
+    v = pick(['foglio', 'doppio', 'pennacchio', 'pulsante']);
     if (v === 'doppio') {
-      const d = 0.3 + 0.18 * rn(), L = 60 + 30 * rn();
+      const d = 0.3 + 0.18 * rn(), L = 66 + 30 * rn();
       pops.push(pop(0, { d, len: L, th: 2.4 + 0.6 * rn(), dy: -2.2, bulb: 1.2, grow: 0.16, detach: 0.82, taper: 0.55, rag: 0.1, curl: 0.25, wob: 0.6, diam: 3, flick: 20 + rn() * 10, ph0: 1, cut: 0.42, lick: 0.3, luce: 1 }));
       pops.push(pop(0.02, { d: d * 0.95, len: L * 0.9, th: 2.4 + 0.6 * rn(), dy: 2.2, bulb: 1.2, grow: 0.16, detach: 0.82, taper: 0.55, rag: 0.1, curl: 0.2, wob: 0.6, diam: 3, flick: 22 + rn() * 10, ph0: 4, cut: 0.42, lick: 0.3, sparks: 2, luce: 0.9 }));
     } else if (v === 'pennacchio') {
-      pops.push(pop(0, { d: 0.32 + 0.2 * rn(), len: 40 + 20 * rn(), th: 4 + 1.5 * rn(), bulb: 1.3, grow: 0.2, detach: 0.7, taper: 0.6, rag: 0.35, curl: 1.1, wob: 1, flick: 14, cut: 0.5, lick: 0.8, sparks: 3 + Math.floor(rn() * 3), luce: 1 }));
+      pops.push(pop(0, { d: 0.32 + 0.2 * rn(), len: 44 + 20 * rn(), th: 4 + 1.5 * rn(), bulb: 1.3, grow: 0.2, detach: 0.7, taper: 0.6, rag: 0.35, curl: 1.1, wob: 1, flick: 14, cut: 0.5, lick: 0.8, sparks: 3 + Math.floor(rn() * 3), luce: 1 }));
+    } else if (v === 'pulsante') {                                               // tre pulsazioni, come la cambiata senza alzare il piede
+      for (let i = 0; i < 3; i++) { pops.push(pop(t, { d: 0.2 + 0.05 * rn(), len: 62 + 24 * rn() - i * 8, th: 3 + rn(), bulb: 1.35, grow: 0.14, detach: 0.78, taper: 0.55, rag: 0.12, curl: 0.3, wob: 0.7, diam: 3, flick: 18 + rn() * 10, ph0: i, cut: 0.42, lick: 0.4, sparks: 2, luce: 0.9 - i * 0.12 })); t += 0.17 + 0.05 * rn(); }
     } else {
-      pops.push(pop(0, { d: 0.3 + 0.22 * rn(), len: 70 + 38 * rn(), th: 3.4 + 1.2 * rn(), bulb: 1.3, grow: 0.16, detach: 0.82, taper: 0.5, rag: 0.12, curl: 0.25, wob: 0.6,
+      pops.push(pop(0, { d: 0.3 + 0.22 * rn(), len: 78 + 38 * rn(), th: 3.4 + 1.2 * rn(), bulb: 1.3, grow: 0.16, detach: 0.82, taper: 0.5, rag: 0.12, curl: 0.25, wob: 0.6,
         diam: 4, flick: 22 + rn() * 10, cut: 0.42, lick: 0.3, sparks: 2 + Math.floor(rn() * 3), luce: 1 }));
       if (rn() < 0.6) pops.push(pop(pops[0].d * 0.8, { d: 0.12 + 0.05 * rn(), len: 22 + 14 * rn(), th: 1.8 + 0.6 * rn(), bulb: 1.4, grow: 0.3, detach: 0.5, rag: 0.3, curl: 0.5, cut: 0.4, sparks: 1, luce: 0.6 }));
     }
     cool = fine() * 0.7;
   } else if (tipo === 'race') {
-    v = pick(['palla', 'cono', 'doppio']);
+    v = pick(['palla', 'cono', 'doppio', 'lampo']);
     if (v === 'cono') {
-      pops.push(pop(0, { d: 0.24 + 0.08 * rn(), len: 38 + 14 * rn(), th: 9 + 3 * rn(), cone: 1, bulb: 1.1, grow: 0.3, detach: 0.55, taper: 0.9, rag: 0.25, jag: 0.4, curl: 0.4, wob: 0.5, diam: 3, ring: 1, sparks: 6 + Math.floor(rn() * 4), soot: 1, luce: 1.2 }));
+      pops.push(pop(0, { d: 0.3 + 0.08 * rn(), len: 38 + 14 * rn(), th: 7 + 2 * rn(), cone: 1, bulb: 1.1, grow: 0.42, detach: 0.58, taper: 0.9, rag: 0.25, jag: 0.35, curl: 0.4, wob: 0.5, diam: 3, sparks: 6 + Math.floor(rn() * 4), soot: 1, luce: 1.2 }));
+    } else if (v === 'lampo') {                                                  // il botto secco: tutto in pochi fotogrammi, più luce che fuoco
+      pops.push(pop(0, { d: 0.16 + 0.04 * rn(), len: 16 + 8 * rn(), th: 7 + 2 * rn(), cone: 1, bulb: 1.2, grow: 0.4, detach: 0.6, taper: 0.9, rag: 0.2, jag: 0.4, curl: 0.3, wob: 0.4, star: 1, sparks: 5, soot: 1, luce: 1.3 }));
     } else {
-      pops.push(pop(0, { d: 0.17 + 0.08 * rn(), len: 24 + 12 * rn(), th: 8 + 3 * rn(), cone: 1, bulb: 1.1, grow: 0.24, detach: 0.5, taper: 0.9, rag: 0.3, jag: 0.5, curl: 0.4, wob: 0.5, star: 1, ring: 1, sparks: 6 + Math.floor(rn() * 6), soot: 1, luce: 1.2 }));
-      if (v === 'doppio' || rn() < 0.4) pops.push(pop(0.09 + 0.05 * rn(), { d: 0.15, len: 18 + 10 * rn(), th: 6 + 2 * rn(), cone: 1, ang: ang(0.3), jag: 0.5, rag: 0.3, star: v === 'doppio' ? 1 : 0, sparks: 3, luce: 0.8 }));
+      pops.push(pop(0, { d: 0.24 + 0.08 * rn(), len: 24 + 12 * rn(), th: 6.5 + 2.5 * rn(), cone: 1, bulb: 1.1, grow: 0.4, detach: 0.52, taper: 0.9, rag: 0.3, jag: 0.4, curl: 0.4, wob: 0.5, star: 1, sparks: 6 + Math.floor(rn() * 6), soot: 1, luce: 1.2 }));
+      if (v === 'doppio' || rn() < 0.4) pops.push(pop(0.09 + 0.05 * rn(), { d: 0.2, len: 18 + 10 * rn(), th: 5 + 2 * rn(), cone: 1, ang: ang(0.3), grow: 0.4, jag: 0.4, rag: 0.3, star: v === 'doppio' ? 1 : 0, sparks: 3, luce: 0.8 }));
     }
     cool = 0.25 + 0.2 * rn();
   } else if (tipo === 'drago') {
-    v = pick(['rotolo', 'getto']);
+    v = pick(['rotolo', 'getto', 'sbuffo']);
     if (v === 'getto') {
-      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 120 + 30 * rn(), th: 5 + rn(), bulb: 1.2, grow: 0.3, detach: 0.7, taper: 0.5, rag: 0.3, curl: 1.2, wob: 0.8, diam: 5, flick: 12, lick: 0.7, sparks: 6, clumps: 4, soot: 2, ring: 1, luce: 1.2 }));
+      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 120 + 30 * rn(), th: 5 + rn(), bulb: 1.2, grow: 0.3, detach: 0.7, taper: 0.5, rag: 0.3, curl: 1.2, wob: 0.8, diam: 5, flick: 12, lick: 0.7, sparks: 6, clumps: 4, soot: 2, luce: 1.2 }));
+    } else if (v === 'sbuffo') {
+      pops.push(pop(0, { d: 0.3 + 0.1 * rn(), len: 60 + 20 * rn(), th: 5.5, bulb: 1.4, grow: 0.28, detach: 0.5, taper: 0.55, rag: 0.4, curl: 1.6, wob: 1.2, lick: 0.9, sparks: 5, clumps: 3, soot: 1, luce: 1 }));
     } else {
-      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 92 + 36 * rn(), th: 6 + 2.5 * rn(), bulb: 1.25, grow: 0.34, detach: 0.5, taper: 0.5, rag: 0.5, curl: 2.4, wob: 1.3, lick: 0.9, sparks: 8, clumps: 8, soot: 2, ring: 1, luce: 1.2 }));
+      pops.push(pop(0, { d: 0.55 + 0.25 * rn(), len: 92 + 36 * rn(), th: 6 + 2.5 * rn(), bulb: 1.25, grow: 0.34, detach: 0.5, taper: 0.5, rag: 0.5, curl: 2.4, wob: 1.3, lick: 0.9, sparks: 8, clumps: 8, soot: 2, luce: 1.2 }));
       pops.push(pop(0.18 + 0.1 * rn(), { d: 0.4, len: 56 + 20 * rn(), th: 5, ang: 0.08, bulb: 1.3, grow: 0.3, detach: 0.45, rag: 0.55, curl: 2.8, wob: 1.5, lick: 0.9, clumps: 4, sparks: 4, luce: 0.9 }));
     }
     cool = pops[0].d * 0.85;
   } else if (tipo === 'mitraglia') {
-    v = pick(['raffica', 'sventagliata']);
-    const n = v === 'raffica' ? 6 + Math.floor(rn() * 5) : 10 + Math.floor(rn() * 5), am = v === 'raffica' ? 0.4 : 1;
-    for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.09 + 0.04 * rn(), len: 7 + 9 * rn(), th: 1.8 + 1.4 * rn(), ang: ang(am), dy: v === 'sventagliata' ? ang(2.4) : 0, bulb: 1.6, grow: 0.25, detach: 0.4, rag: 0.3, jag: 0.15, curl: 0.5, sparks: 2 + Math.floor(rn() * 2), luce: 0.5 })); t += 0.04 + 0.035 * rn(); }
+    v = pick(['raffica', 'sventagliata', 'martellata']);
+    const n = v === 'raffica' ? 6 + Math.floor(rn() * 5) : v === 'martellata' ? 9 + Math.floor(rn() * 4) : 10 + Math.floor(rn() * 5), am = v === 'sventagliata' ? 1 : 0.4;
+    for (let i = 0; i < n; i++) { pops.push(pop(t, { d: 0.09 + 0.04 * rn(), len: v === 'martellata' ? 11 : 7 + 9 * rn(), th: v === 'martellata' ? 2.6 : 1.8 + 1.4 * rn(), ang: ang(am), dy: v === 'sventagliata' ? ang(2.4) : 0, bulb: 1.6, grow: 0.25, detach: 0.4, rag: 0.3, jag: 0.15, curl: 0.5, sparks: 2 + Math.floor(rn() * 2), luce: 0.5 })); t += v === 'martellata' ? 0.035 : 0.04 + 0.035 * rn(); }
     cool = fine() * 0.9;
   } else return null;
+  // Una fiammata vera ha un prima e un dopo, e sono i fotogrammi che la fanno sembrare viva: PRIMA una scintilla blu-bianca alla bocca (la candela,
+  // il gas che prende), POI la coda: fiammelle sempre più piccole che si spengono dopo il colpo, il fuoco che non muore di colpo (v0.175).
+  const conAccensione = ['rally', 'race', 'drag', 'drago'].includes(tipo) || (tipo === 'tuner' && (v === 'colpo' || v === 'sparata'));
+  if (conAccensione) {
+    for (const q of pops) q.t += 0.05;
+    pops.unshift(pop(0, { d: 0.07, len: 4.5, th: 1.8, bulb: 1.9, grow: 0.4, detach: 0.95, rag: 0, curl: 0, lick: 0, cut: 0.15, luce: 0.5 }));
+  }
+  const coda = { rally: [4, 20], race: [3, 11], drag: [4, 18], drago: [5, 24], tuner: [v === 'colpo' ? 3 : 2, 9] }[tipo];
+  if (coda) {
+    const tc = fine() * 0.82;
+    for (let i = 0; i < coda[0]; i++) { const f = 1 - i / (coda[0] + 0.5); pops.push(pop(tc + i * (0.05 + 0.04 * rn()), { d: 0.08 + 0.05 * rn(), len: coda[1] * f * (0.7 + 0.5 * rn()), th: 1.3 + 1.4 * f, ang: ang(0.25), dy: ang(0.8), bulb: 1.5, grow: 0.3, detach: 0.55, rag: 0.25, curl: 0.6, wob: 1, cut: 0.4, lick: 0.4, luce: 0.12 + 0.28 * f })); }
+    cool = Math.max(cool, 0.1);
+  }
+  pops.sort((x, y) => x.t - y.t);
   const dur = fine() + 0.04;
   return { tipo, v, dur, cool: Math.max(cool, 0.08), pops };
 }
 // generatore con seme (mulberry32): per le prove e per riprodurre una scena
 function fiammaRnd(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa, FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal, FIAMME_COLORI, fiammeColore, fiammeColoreMonta, fiammeMigra, FIAMME_TIPI, fiammaTipo, fiammaPalTipo, fiammaCopione, fiammaRnd });
+if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa, FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal, FIAMME_COLORI, fiammeAdatta, fiammeInfo, fiammeColore, fiammeColoreMonta, fiammeMigra, FIAMME_TIPI, fiammaTipo, fiammaPalTipo, fiammaCopione, fiammaRnd });

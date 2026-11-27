@@ -355,6 +355,7 @@ class CampioniPlayer {
   }
   // un colpo: dà la durata (s) o 0 se non c'è (file non ancora scaricato, troppe voci)
   shot(slot, id, f, gain, o = {}) {
+    if (slot === 'mappa' || slot === 'limitatore' || slot === 'scarico') { const n = typeof window !== 'undefined' ? window.nightRun : null; if (n && n.popEvent) n.popEvent(slot !== 'scarico'); }   // un botto sentito: la fiamma esce insieme (index.html, popBus)
     gain *= cmpVolSlot(slot);
     const b = this.get(id, f); if (!b || gain <= 0) return 0;
     this.voci = this.voci.filter((v) => v.end > this.now());

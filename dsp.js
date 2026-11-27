@@ -177,6 +177,7 @@ class EngineDSP {
   g() { return (this.r() + this.r() + this.r()) * 0.577; }
 
   msg(m) {
+    if (m.pop !== undefined) this.addPop(!!m.pop);                       // uno scoppio chiesto dal gioco (fiamma da kit o da cambiata: ogni fiamma ha il suo botto)
     if (m.p) Object.assign(this.T, m.p);
     if (m.cfg) this.configure(Object.assign(this.cfg, m.cfg));
     if (m.env !== undefined || m.cfg) this.setEnv(m.env !== undefined ? m.env : this.env);
@@ -395,6 +396,7 @@ class EngineDSP {
     }
     const P = { bk, bfm, blm, d: Math.max(1, d), a, f, tf: 88 * B.f * Math.exp(0.09 * rr()), len, br: B.crack * Math.max(0.3, 1 + 0.38 * rr()), nc: Math.max(0.3, 1 - 0.5 * Math.abs(rr())), tk: B.thump * (big ? 1.15 : 0.9 + 0.2 * Math.abs(rr())) };
     this.pops.push(P);
+    this.popN = (this.popN || 0) + 1; this.popBig = !!big; this.popA = a;      // v0.175: il gioco li legge (dal worklet arrivano per messaggio) e fa uscire la fiamma insieme al botto
     if (Math.abs(this.r()) < 0.22 * k) this.pops.push(Object.assign({}, P, { d: P.d + Math.round((0.006 + 0.008 * Math.abs(this.r())) * this.sr), a: a * (0.35 + 0.25 * Math.abs(this.r())), f: f * 1.06, len: len * 0.7 }));   // doppio colpo: pa-pam
     else if (!big && Math.abs(this.r()) < 0.12 * k) {     // crepitio: tre-cinque schiocchi piccoli in fila
       let dd = P.d; const n = 3 + Math.floor(Math.abs(this.r()) * 3);
@@ -412,6 +414,7 @@ class EngineDSP {
     const a0 = (0.55 + 0.45 * r()) * (0.8 + 0.3 * lvl) * (0.6 + 0.4 * hi) * (this.cfg.popVol ?? 1);   // volume degli scoppiettii (v0.158)
     const f = 82 * B.f * (0.8 + 0.4 * r());
     one(Math.round((0.002 + 0.01 * r()) * sr), a0, B.len * (0.8 + 0.8 * r()), f);
+    this.popN = (this.popN || 0) + 1; this.popBig = false; this.popA = a0;
     this.flu += 0.06 + 0.05 * lvl;                                       // piccolo strappo dell'albero: il regime balla un attimo
     if (r() < 0.2 + 0.2 * lvl) {                                          // raffica "brrrap": tre-sei colpetti ravvicinati che calano
       let dd = 0; const n = 3 + Math.floor(r() * 4);

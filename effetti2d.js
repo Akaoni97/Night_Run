@@ -563,12 +563,16 @@
     // una fiammata: style = ossidrica, botto, libera o grossa (la grossa è la libera al massimo, con l'ossidrica insieme se l'auto è spinta)
     // scene delle fiamme (fiamme2d.js): ogni carattere (burble, tuner, rally, drag, race, drago, mitraglia) è una scena che cambia forma
     const nuovo = tiered && typeof fiammaTipo === 'function' && typeof this.scenaNuova === 'function' && !Street2D.fiammeVecchie;
-    const spawn = (style, forza) => {
+    // scoppi e fiamme insieme (v0.175): con l'audio acceso ogni botto del motore (s.fpop) fa uscire la sua fiamma; una fiamma che nasce da sola (kit, cambiata,
+    // primo scoppio al rilascio) chiede il suo botto, così non c'è né fiamma muta né botto senza fuoco
+    const sync = nuovo && s.fpop !== undefined, chiedi = (style) => { if (sync && window.nightRun && nightRun.askPop) nightRun.askPop(style !== 'burble' && style !== 'tuner' && style !== 'mitraglia'); };
+    const spawn = (style, forza, daBotto) => {
       if (nuovo && style !== 'torch' && FIAMME_TIPI.includes(style)) {
-        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R(), s.fcol), forza, scala: kit && kit.scala })) st.fstyle = 'scena';
+        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R(), s.fcol), forza, scala: (kit && kit.scala || 1) * (0.72 + 0.5 * Math.min(1, s.frpm === undefined ? 0.6 : s.frpm)) })) { st.fstyle = 'scena'; if (!daBotto) chiedi(style); }
         return;
       }
       if (style === 'torch' || (style === 'big' && (kit ? kit.id === 'ossidrica' : tier >= 2))) {                    // ossidrica: breve, rapida, con scintille incandescenti
+        if (!daBotto) chiedi('torch');
         st.fstyle = 'torch'; st.torchT = 0.07 + R() * 0.09; st.torchF = 0.7 + R() * 0.7 + (style === 'big' ? 0.4 : 0); st.flame = Math.max(st.flame, 0.34); st.popFlash = 0.35;
         for (let q = 0; q < 3 + ((R() * 4) | 0); q++) this.parts.push({ k: 'spark', m: mOf(rx), y: exY + (R() - 0.5) * 3, vy: -8 - R() * 60, dx: v * PPM * 0.5 - 60 - R() * 150, life: 1, rate: 1.1 + R() * 1.3, gy: y0 });
         if (style === 'torch') return;
@@ -594,14 +598,19 @@
       if (s.fkick && tiered) { spawn(scegli(R()), true); if (s.fkind === 'liftHigh') st.kickT = 0.09; }
     }
     if (st.kickT > 0) { st.kickT -= dt; if (st.kickT <= 0 && tiered) spawn(scegli(R()), true); }
-    if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
+    if (sync) {
+      if (st.fpopSeen === undefined) st.fpopSeen = s.fpop;
+      const n = s.fpop - st.fpopSeen; st.fpopSeen = s.fpop;
+      if (n > 0) { st.popT = st.t; if (s.flame > 0.02 && s.fkind && tiered) for (let q = 0; q < Math.min(2, n); q++) spawn(scegli(R()), false, true); }   // un botto sentito: esce la fiamma
+      else if ((kit || s.fkind === 'shift') && s.flame && st.t - (st.popT || 0) > 0.3 && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(scegli(R()));   // da sola: chiede il botto
+    } else if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
     // Scaldare il metallo prima dei getti lascia visibile la radice dentro la bocca.
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
     if (st.flame > 1.05 && !(st.ringLock > st.t)) { if (!nuovo) st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
     const calore = Math.max(s.marmitta || 0, st.tipHeat * .28);
     if (calore > 0.01) this.fxMarmitta(g, rx, exY, k, calore, y0, pendenza, altezza);
     const gola = st.torchT > 0 || st.flame > 0.05 || st.sus > 0.03 ? this.golaScarico(k, altezza) : 0;
-    const scAct = nuovo ? this.scenaTick(g, dt, { st, rx, exY, k, y0, gola: this.golaScarico(k, altezza), v, mOf, R, parts: this.parts }) : 0;
+    const scAct = nuovo ? this.scenaTick(g, dt, { st, rx, exY, k, y0, gola: this.golaScarico(k, altezza), v, mOf, R, parts: this.parts, pend: pendenza }) : 0;
     if (st.torchT > 0) this.fxTorch(g, rx, exY, k, st.torchF || 1, y0, gola);
     if (st.bangT > 0) this.fxBang(g, rx, exY, k, 1 - st.bangT / 0.24, y0);
     if (st.flame > 0.05 && st.fstyle !== 'torch' && st.fstyle !== 'bang' && st.fstyle !== 'scena') {

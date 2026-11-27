@@ -100,7 +100,8 @@
     const H0 = p.th * k * bulb * fade * flick, tg = Math.tan(p.ang), span = Lc - tail;
     const drift = ph > p.detach ? Math.min(40 * k, vel * PPM * 0.55 * (ph - p.detach) * p.d) : 0;       // la parte staccata resta indietro con l'aria
     const gola = tail > 0 ? Infinity : E.gola, cutAt = p.cut || P.cut || 0, R7 = ramp(P);
-    const centroAt = (i) => { const wf = i / Lfull; return exY - p.curl * vento * (0.06 * Lfull + 1.5 * k) * wf * wf - i * tg + Math.sin(i * 0.5 - t * 26 + sd) * 0.9 * ((i - tail) / span) * k * p.wob; };
+    const pend = (E.pend || 0) * 0.8;                                                                      // la fiamma esce lungo il tubo: segue l'inclinazione della macchina (accelerando la coda si abbassa)
+    const centroAt = (i) => { const wf = i / Lfull; return exY - p.curl * vento * (0.06 * Lfull + 1.5 * k) * wf * wf - i * tg - i * pend + Math.sin(i * 0.5 - t * 26 + sd) * 0.9 * ((i - tail) / span) * k * p.wob; };
     const cols = [];
     for (let i = tail; i < Lc; i += u1) {
       const w2 = (i - tail) / span;
@@ -108,12 +109,12 @@
         : (w2 < 0.12 ? 0.55 + w2 / 0.12 * 0.45 : 1) * Math.pow(1 - w2, p.taper);
       const tailEnv = tail > 0 ? Math.min(1, (i - tail) / (Lfull * 0.2 + 1)) : 1;
       let half = H0 * env * tailEnv * (0.74 + 0.5 * vn(i * 0.2 - t * 15 + sd * 3) + 0.18 * (vn(i * 0.7 - t * 33 + sd) - 0.5));        // due ottave di turbolenza
-      if (p.jag) half *= 1 - p.jag * rnd(Math.floor(i * SS * 0.7) + fr * 91 + sd);                      // bordo spigoloso
+      if (p.jag) half *= 1 - p.jag * Math.pow(vn(i * 0.9 + fr * 0.37 + sd * 3), 1.4);                    // bordo grumoso (rumore morbido: prima erano aghi verticali come le barre di un equalizzatore)
       if (p.rag) { const q = (vn(i * 0.22 + sd * 9 - t * 11) - p.rag * 0.38) / 0.16; half *= 0.1 + 0.9 * Math.max(0, Math.min(1, q)); }   // strozzature: grumi dai bordi morbidi
       // lingue che guizzano in alto: picchi che corrono verso la punta
-      const lick = p.lick ? 1 + p.lick * Math.pow(Math.max(0, Math.sin(i * 0.85 - t * 38 + sd)), 3) * Math.min(1, w2 * 3.2) : 1;
-      const ap = gola + i * 0.8, x = rx - u1 - i - (drift && i >= tail ? drift : 0), yc = centroAt(i);
-      cols.push([x, yc, Math.min(ap, half * lick * (0.85 + 0.5 * vn(i * 0.3 - t * 19 + 40 + sd))), Math.min(ap, half * (0.56 + 0.34 * vn(i * 0.26 - t * 13 + 90 + sd))), w2,
+      const lick = p.lick ? 1 + p.lick * 2.2 * (Math.pow(Math.max(0, vn(i * 0.3 - t * 21 + sd * 5) - 0.4), 1.3) + 0.5 * Math.pow(Math.max(0, vn(i * 0.11 - t * 9 + sd * 2) - 0.5), 1.2)) * Math.min(1, w2 * 3.2) : 1;   // picchi irregolari che corrono verso la punta (non periodici)
+      const ap = gola + i * 0.8, x = rx - u1 - i - (drift && i >= tail ? drift : 0), yc = Math.min(centroAt(i), E.y0 - 2 * k), suolo = Math.max(u1, E.y0 - yc - u1);   // mai sotto l'asfalto
+      cols.push([x, yc, Math.min(ap, half * lick * (0.85 + 0.5 * vn(i * 0.3 - t * 19 + 40 + sd))), Math.min(ap, suolo, half * (0.56 + 0.34 * vn(i * 0.26 - t * 13 + 90 + sd))), w2,
         cutAt && w2 > cutAt + 0.06 * Math.sin(x * 0.7 + fr) ? 1 : 0]);
     }
     g.fillStyle = P.o;

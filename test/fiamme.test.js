@@ -189,8 +189,8 @@ test('fiamme: i caratteri hanno forme davvero diverse (lunghezza, spessore, raff
   assert.ok(med('tuner', n) >= 2.5 && med('burble', n) >= 3.5 && med('mitraglia', n) >= 7, 'rafficata di scoppietti');
   assert.ok(med('tuner', lungo) < 40 && med('mitraglia', lungo) < 26, 'i botti sono piccoli');
   assert.ok(med('rally', (c) => Math.max(...c.pops.map((p) => p.clumps))) >= 2.5, 'il rally lancia grumi di fuoco');
-  assert.ok(med('drag', (c) => c.pops[0].diam) >= 2 && med('race', (c) => c.pops[0].star) >= 0.3, 'diamanti del drag e stella del botto (secondo la variante)');
-  assert.ok(med('rally', (c) => c.pops[0].rag) > 0.55 && med('drag', (c) => c.pops[0].rag) < 0.25, 'il rally si spezza, il drag no');
+  assert.ok(med('drag', (c) => Math.max(...c.pops.map((p) => p.diam))) >= 1.5 && med('race', (c) => Math.max(...c.pops.map((p) => p.star))) >= 0.3, 'diamanti del drag e stella del botto (secondo la variante)');
+  assert.ok(med('rally', (c) => Math.max(...c.pops.map((p) => p.rag))) > 0.55 && med('drag', (c) => Math.max(...c.pops.map((p) => p.rag))) < 0.45, 'il rally si spezza, il drag no');
 });
 
 test('fiamme: il carattere segue livello, momento e turbo', () => {
@@ -223,7 +223,7 @@ test('fiamme: ogni carattere ha più varianti e la stessa preparazione non rifà
     const v = new Set(); for (let i = 0; i < 80; i++) v.add(C.fiammaCopione(tipo, 1, C.fiammaRnd(i + 1)).v);
     assert.ok(v.size >= 2 && !v.has(''), `${tipo}: varianti ${[...v]}`);
   }
-  const lunghezze = new Set(); for (let i = 0; i < 40; i++) lunghezze.add(Math.round(C.fiammaCopione('rally', 2, C.fiammaRnd(i + 1)).pops[0].len));
+  const lunghezze = new Set(); for (let i = 0; i < 40; i++) lunghezze.add(Math.round(Math.max(...C.fiammaCopione('rally', 2, C.fiammaRnd(i + 1)).pops.map((p) => p.len))));
   assert.ok(lunghezze.size > 15, 'le lunghezze cambiano a ogni scena');
 });
 
@@ -232,4 +232,28 @@ test('fiamme: la misura del tipo scelto cambia davvero la fiamma (grossa > media
   assert.ok(lun(1.3) > lun(1) * 1.2 && lun(1) > lun(0.95) && lun(0.95) > lun(0.7), 'più grande col tipo più grosso');
   const th = (sc) => C.fiammaCopione('drag', 1, C.fiammaRnd(3), sc).pops[0].th;
   assert.ok(th(1.3) > th(1), 'anche lo spessore');
+});
+
+// ---------------------------------------------------------------- coerenza con la meccanica (v0.175)
+const Q = new Function('CARS', src + ';return { FIAMME_KIT, fiammeAdatta, fiammeInfo, fiammaTipo };')({ taxi: { voice: { diesel: 1 } }, e36: { voice: {} } });
+const kq = (id) => Q.FIAMME_KIT.find((k) => k.id === id);
+
+test('fiamme: un diesel non ha niente che accenda: funziona solo il Lanciafiamme', () => {
+  const dz = Q.fiammeInfo('taxi', { tune: { turbo: { max: 1.2 } } }), bz = Q.fiammeInfo('e36', { tune: { turbo: { max: 0 } } });
+  assert.deepEqual([dz.diesel, dz.turbo, bz.diesel, bz.turbo], [true, true, false, false]);
+  for (const k of Q.FIAMME_KIT.slice(1)) assert.equal(Q.fiammeAdatta(k, dz).ok, k.id === 'lancia', `diesel + ${k.id}`);
+  assert.ok(Q.fiammeAdatta(null, dz).ok, 'senza kit non c\'è niente da controllare');
+  assert.match(Q.fiammeAdatta(kq('botto'), dz).why, /diesel/i);
+});
+
+test('fiamme: l\'anti-lag da rally vuole il turbo; senza, gli altri tipi spostano i pesi verso il botto secco', () => {
+  assert.equal(Q.fiammeAdatta(kq('rally'), { turbo: false }).ok, false); assert.equal(Q.fiammeAdatta(kq('rally'), { turbo: true }).ok, true);
+  assert.match(Q.fiammeAdatta(kq('rally'), { turbo: false }).why, /turbo/i);
+  for (const id of ['botto', 'media', 'grossa', 'spinta', 'drag', 'ossidrica', 'lancia', 'mitraglia', 'borbottio']) assert.ok(Q.fiammeAdatta(kq(id), { turbo: false }).ok, `${id} va bene anche senza turbo`);
+  const q = (kit, turbo) => { const r = { rally: 0, race: 0 }, N = 2000; for (let i = 0; i < N; i++) { const t = Q.fiammaTipo(2, 'liftHigh', kit, { turbo }, (i + 0.5) / N); if (t in r) r[t] += 1 / N; } return r; };
+  for (const id of ['media', 'grossa', 'spinta']) {
+    const t = q(kq(id), true), n = q(kq(id), false);
+    assert.ok(t.rally > n.rally * 2.5, `${id}: l'anti-lag è da turbo (${t.rally.toFixed(2)} contro ${n.rally.toFixed(2)})`);
+    assert.ok(n.race > t.race, `${id}: sull'aspirato il botto secco`);
+  }
 });

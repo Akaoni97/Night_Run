@@ -1392,6 +1392,15 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 
   // ---------------------------------------------------------------- audio
   const audio = { ctx: null, send: () => {}, ready: false, starting: null };
+  // scoppi e fiamme insieme (v0.175): ogni botto del motore audio (sintesi, registrazioni, campioni dei pezzi) conta qui, e la fiamma esce con lui
+  // (`fpop` nello stato di render, effetti2d.js); le fiamme che nascono da sole (kit, cambiata) chiedono il loro botto (`askPop`)
+  const popBus = {
+    n: 0, big: false, ask: 0, askT: 0,
+    get vivo() { return !!(audio.ready && audio.ctx && audio.ctx.state === 'running'); },     // finché l'audio non gira le fiamme escono come prima, da sole
+    on(m) { if (!m || !m.pop) return; if (this.ask > 0 && performance.now() - this.askT < 500) { this.ask--; return; } this.ask = 0; this.n += m.pop; this.big = !!m.big; },
+    ev(big) { this.n++; this.big = !!big; },
+    askPop(big) { if (!this.vivo) return; this.ask++; this.askT = performance.now(); audio.send({ pop: big ? 1 : 0 }); },
+  };
   let player = null;
   // punto d'ascolto: 3 = automatico, segue la telecamera (interna → abitacolo, le altre → da fuori)
   const viewNow = () => (+S.view === 3 ? 1 : +S.view);
@@ -1431,7 +1440,8 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const fallback = () => {
       const dsp = new EngineDSP(ctx.sampleRate);
       const node = ctx.createScriptProcessor(1024, 1, 2);
-      node.onaudioprocess = (ev) => { const b = ev.outputBuffer; dsp.render(b.getChannelData(0), b.getChannelData(1), b.length); };
+      let pn = 0;
+      node.onaudioprocess = (ev) => { const b = ev.outputBuffer; dsp.render(b.getChannelData(0), b.getChannelData(1), b.length); const n = dsp.popN | 0; if (n !== pn) { popBus.on({ pop: n - pn, big: dsp.popBig }); pn = n; } };
       node.connect(comp);
       audio.send = (m) => dsp.msg(m);
     };
@@ -1441,8 +1451,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       + (typeof DSP_CB !== 'undefined' ? 'const DSP_CB = ' + JSON.stringify(DSP_CB) + ';\n' : '');
     const src = dspConst + '\n' + BQ.toString() + '\n' + EngineDSP.toString() + `
       class P extends AudioWorkletProcessor {
-        constructor() { super(); this.d = new EngineDSP(sampleRate); this.port.onmessage = (e) => this.d.msg(e.data); }
-        process(i, o) { const out = o[0]; this.d.render(out[0], out[1] || out[0], out[0].length); return true; }
+        constructor() { super(); this.d = new EngineDSP(sampleRate); this.pn = 0; this.port.onmessage = (e) => this.d.msg(e.data); }
+        process(i, o) { const out = o[0]; this.d.render(out[0], out[1] || out[0], out[0].length);
+          const n = this.d.popN | 0; if (n !== this.pn) { this.port.postMessage({ pop: n - this.pn, big: this.d.popBig }); this.pn = n; }   // i botti tornano alla pagina: la fiamma esce con loro
+          return true; }
       }
       registerProcessor('motore-2jz', P);`;
     audio.starting = (async () => {
@@ -1453,6 +1465,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
         const node = new AudioWorkletNode(ctx, 'motore-2jz', { numberOfInputs: 0, outputChannelCount: [2] });
         node.connect(comp);
         audio.send = (m) => node.port.postMessage(m);
+        node.port.onmessage = (e) => popBus.on(e.data);
         // rete di sicurezza: se il motore va in errore dentro il worklet, si passa al motore sulla pagina invece di restare muti
         node.onprocessorerror = () => {
           console.error('Motore audio: errore nel worklet, passo al motore sulla pagina');
@@ -3259,6 +3272,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     if (rate && Math.random() < rate * dt) {
       const k = Math.random();
       player.shot('pop', (big ? 0.6 : k < 0.15 ? 0.45 : 0.18 + 0.2 * k) * (sm.cfg.pops ? 1 : 0.75) * (exhClosed() ? 0.45 : 1), { rate: big ? 0.92 : 1.05 });
+      popBus.ev(big);
     }
   }
   // suono registrato di serie: anelli ricavati da "Import car revs on chassis dyno with turbo" di editboy23
@@ -3440,7 +3454,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
     const okSito = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     if ('serviceWorker' in navigator && okSito && window.top === window) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
   } catch (e) { /* niente: il gioco va lo stesso */ }
-  window.nightRun = { exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT, tier: flameTier(sim, TP.dsp.cat.pop || 0) }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
+  window.nightRun = { popEvent: (b) => popBus.ev(b), askPop: (b) => popBus.askPop(b), exh: () => ({ valve: exhValve(), closed: exhClosed(), flame: flameT, tier: flameTier(sim, TP.dsp.cat.pop || 0) }), leva: (L) => setLeva(L), get levaNow() { return S.gearbox === 'auto' ? leva : null; }, gearLabel: (short) => gearLabel(short), get radioOn() { return !!(radio && radio.on && !S.muted); },
     get radioPlaying() { const st = radio && radio.station; return !!(radio && radio.on && !S.muted && st && st.id !== 'off' && (st.gen || (radio.el && !radio.el.paused))); },
     get radioTrack() { const st = radio && radio.station, e = radio && radio.on && st && !st.gen && st.id !== 'off' && radio.el; return e && e.duration ? { t: e.currentTime, d: e.duration } : null; }, pgSave: (look) => { if (game.s.vg) { game.s.vg.pg = look; saveGame(); } }, sim, game, get view() { return street3d; }, get view2d() { return street2d; }, get player() { return player; }, save: () => saveGame(), engineTap: () => engineTap(), applySettings: () => applySettings(), autoState: () => ({ on: auto.on, assist: auto.assist, mode: autoMode(), v: auto.v }), audioCfg: () => { if (audio.ready) audio.send({ cfg: dspCfg() }); },
     audioOn: () => ensureAudio(), get tp() { return TP; }, get sel() { return S.tune; } };   // per i campioni dei pezzi (campioni.js): accendere l'audio dall'officina, parti montate
@@ -3547,15 +3561,19 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       // Rilascio: sotto i 5.000 giri (letti quando molli) fiamme di livello medio, sopra una bella fiammata grossa; la prima parte subito.
       // Che tipo di fiammata esce lo decide il tuning (fiamme.js: ossidrica, libera, botto, grossa).
       // kit delle fiamme di Luca Tuning (fiamme.js): come quelli veri le fa uscire da qualunque auto, al limitatore e al rilascio
-      const fkit = typeof fiammeKit === 'function' ? fiammeKit(game.s, game.car) : null;
-      const spark = (sim.cut === 2 || sim.cut === 3) && (TP.sim.sparkCut || !!fkit), pot = exhValve(), catPop = TP.dsp.cat.pop || 0;
+      // coerenza con la meccanica (fiamme.js, v0.175): il kit vale solo se l'auto lo regge (anti-lag = serve il turbo) e un diesel non ha niente che accenda
+      // la miscela: niente fiamme, salvo il Lanciafiamme (candela nello scarico)
+      const finfo = typeof fiammeInfo === 'function' ? fiammeInfo(game.car, sim) : { diesel: false, turbo: false };
+      const fkit0 = typeof fiammeKit === 'function' ? fiammeKit(game.s, game.car) : null;
+      const fkit = fkit0 && fiammeAdatta(fkit0, finfo).ok ? fkit0 : null, spento = finfo.diesel && !(fkit && fkit.id === 'lancia');
+      const spark = !spento && (sim.cut === 2 || sim.cut === 3) && (TP.sim.sparkCut || !!fkit), pot = exhValve(), catPop = TP.dsp.cat.pop || 0;
       const ft = flameTier(sim, catPop);
       if (sim.cut === 1 && flameCut !== 1) { flameRpm0 = sim.rpm; flameKick++; }                            // appena molli il gas
       flameCut = sim.cut;
       const liftHigh = flameRpm0 >= FLAME_BIG_RPM, liftT = sim.cfg.pops ? 2.8 : liftHigh ? 2 : 1.6;
-      const armed = pot || ft.tier > 0 || game.car === 'supra' || TP.sim.ecuPops || !!fkit;                         // auto toccata dal tuning (o Supra)
+      const armed = !spento && (pot || ft.tier > 0 || game.car === 'supra' || TP.sim.ecuPops || !!fkit);                         // auto toccata dal tuning (o Supra)
       const lift = !spark && sim.cut === 1 && sim.ovr < liftT && sim.rpm > 2200 && armed;
-      const shift = !spark && !lift && pot && ft.tier > 0 && !!sim.shiftSeq && sim.rpm > 3500;
+      const shift = !spento && !spark && !lift && pot && ft.tier > 0 && !!sim.shiftSeq && sim.rpm > 3500;
       const fkind = spark ? 'limiter' : lift ? (liftHigh ? 'liftHigh' : 'lift') : shift ? 'shift' : '';
       flameT = exhClosed() ? 0 : spark ? 1
         : lift ? (liftHigh ? 0.85 : 0.5) * (sim.cfg.pops ? 1.2 : 1) * (1 - sim.ovr / liftT) * (0.6 + 0.4 * Math.min(1, sim.rpm / 4500))
@@ -3565,7 +3583,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       const kick = exhClosed() || !lift ? 0 : flameKick;                                                   // il primo scoppio non aspetta il caso
       const vs = { v: sim.v, ww: sim.ww, acc: sim.acc, pz: sim.pz, wheelie: sim.whTh || 0, whK: sim.whK || 0, hop: (sim.hopE || 0) * Math.sin((sim.hopPh || 0) * 6.2832), rpm: sim.rpm, running: sim.running, lope: TP.sim.lope, torque: sim.Tc,
         ign: sim.ign, brake: sim.in.brake, flame: flameT, fkind: fkind, ftier: ft.tier, fkit: fkit ? fkit.id : '', fcol: (typeof fiammeColore === 'function' && fiammeColore(game.s, game.car)) || '', frpm: sim.rpm / sim.P.limiter, marmitta: typeof marmittaRossa === 'function' ? marmittaRossa(marmH, ft.tier) : 0, fkick: kick, spin: Math.min(1, Math.max(0, (Math.abs(sim.ww * sim.P.r - sim.v) - 1.5) / 5)),
-        thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd, fturbo: ((sim.tune && sim.tune.turbo && sim.tune.turbo.max) || 0) > 0 };
+        thr: sim.thr, events: ev, skid: sim.skid, locked: sim.locked, win: sim.winPos || 0, brakeT: sim.brakeT, waterT: sim.waterT, lockF: sim.lockF, lockR: sim.lockR, abs: sim.abs, damage: sim.damage, tireT: sim.tireT, gear: sim.gear, signal: game.signal ? game.signal.dir : null, high: !!S.flash || lightsMode() === 2, lamps: lightsMode() !== 0 || !!S.flash, fwd: !!sim.P.fwd, fturbo: finfo.turbo, fdiesel: finfo.diesel, fpop: popBus.vivo ? popBus.n : undefined, fpopBig: popBus.big };
       garage.update(dt, vs, game); window.nightRun.fx = vs;   // lo stato del fotogramma (fiamme, marmitta...) anche per la scena da Luca (interni_hd.js)
       recordFrame(dt, vs);
     }

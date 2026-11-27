@@ -290,6 +290,8 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       if (cp && window.NightCampioni) { if (NightCampioni.click(cp, ctx)) render(); return; }
       const fk = e.target.closest('[data-fk]');
       if (fk) {                                                    // scheda Fiamme: compra (una volta) e monta il kit su quest'auto
+        const ad = fiammeAdatta(FIAMME_KIT.find((q) => q.id === fk.dataset.fk), fiammeInfo(ctx.game.car, ctx.sim));
+        if (!ad.ok) { ctx.flash(ad.why, 3); return; }
         const r = fiammeMonta(ctx.game.s, ctx.game.car, fk.dataset.fk, ctx.game.mode !== 'career');
         if (!r.ok) { ctx.flash(r.why, 2.6); return; }
         ctx.save && ctx.save(); ctx.after && ctx.after();
@@ -398,22 +400,28 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
       + (fiamme ? `<button type="button" role="tab" data-tab="fiamme" aria-selected="${tab === 'fiamme'}">Fiamme${fiammeKit(g.s, carId) || fiammeColore(g.s, carId) ? ' ✓' : ''}</button>` : '') + '</div>';
     h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : tab === 'fiamme' ? drawFiamme(ctx, carId, career, money) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
-    if (tab === 'fiamme') fiammeAnima(box, () => fiammeColore(g.s, carId));
+    if (tab === 'fiamme') fiammeAnima(box, () => fiammeColore(g.s, carId), { ...fiammeInfo(carId, ctx.sim), tier: flameTier(ctx.sim, 0).tier, armato: fiammeArmata(ctx.sim, flameTier(ctx.sim, 0).tier) });
   }
 
   // ---------------------------------------------------------------- scheda Fiamme (kit di fiamme.js, v0.143)
+  // l'auto «tocca» abbastanza da sputare fiamme anche senza kit? (come `armed` in index.html: valvola dello scarico, livello, mappa pop & bang)
+  const fiammeArmata = (sim, tier) => tier > 0 || ((sim.tune && sim.tune.pw) || 1) >= 1.05 || (sim.extraPw || 1) > 1 || !!(sim.tune && sim.tune.ecuPops);
   const FIAMME_SW = { naturale: 'linear-gradient(135deg,#ff7a14,#ffc832)', blu: '#4fb2ff', verde: '#22c95a', viola: 'linear-gradient(135deg,#b44bff,#ff4fb8)', rosa: '#ff3d8f', ghiaccio: '#a6ecff' };
   function drawFiamme(ctx, carId, career, money) {
     const f = ctx.game.s.fiamme || {}, own = f.own || {}, cur = (fiammeKit(ctx.game.s, carId) || { id: 'serie' }).id;
     const palCur = fiammeColore(ctx.game.s, carId), curCol = (FIAMME_COLORI.find((c) => c.pal === palCur) || FIAMME_COLORI[0]).id;
-    let h = '<p class="of-hint">Scegli <b>che fiammata esce dallo scarico</b>: botto, media, grossa, spinta, anti-lag da rally... Escono al rilascio del gas e al limitatore, <b>su qualunque auto</b>, anche di serie. La compri una volta e la rimonti gratis su ogni auto. Con la valvola dello scarico in silenzio non esce niente.</p><div class="of-fk">';
+    const info = fiammeInfo(carId, ctx.sim), ft = flameTier(ctx.sim, 0), armato = fiammeArmata(ctx.sim, ft.tier);
+    let h = (info.diesel ? '<p class="of-warn" style="margin:6px 2px;padding:6px 8px;border:1px solid #ff9f0a;border-radius:8px;color:#ffd9a0;font-size:12px;line-height:1.35">Questo è un <b>diesel</b>: non ha niente che accenda la miscela nello scarico, quindi niente scoppi e niente fiamme. Funziona solo il <b>Lanciafiamme</b>, che ha la sua candela nello scarico.</p>' : '')
+      + '<p class="of-hint">Scegli <b>che fiammata esce dallo scarico</b>: botto, media, grossa, spinta, anti-lag da rally... Escono al rilascio del gas e al limitatore, <b>su qualunque auto a benzina</b>, anche di serie (i diesel no: non c\'è niente che accenda). La compri una volta e la rimonti gratis su ogni auto. Con la valvola dello scarico in silenzio non esce niente.</p><div class="of-fk">';
     for (const k of FIAMME_KIT) {
+      const ad = k.id === 'serie' ? { ok: true } : fiammeAdatta(k, info);
       const mont = k.id === cur, mio = !k.prezzo || own[k.id], poor = career && !mio && k.prezzo > money;
-      const stato = mont ? 'MONTATA' : mio ? (k.prezzo ? 'TUA' : 'GRATIS') : `€ ${fmt(k.prezzo)}`;
-      const label = mont ? 'Montata' : mio ? 'Monta' : poor ? `Mancano € ${fmt(k.prezzo - money)}` : `Compra e monta · € ${fmt(k.prezzo)}`;
-      h += `<div class="of-fkc${mont ? ' cur' : ''}"><canvas width="400" height="128" data-fkp="${k.id}" aria-hidden="true"></canvas>`
-        + `<b><span class="of-dot ${mont ? 'on' : mio ? 'own' : 'off'}"></span>${E(k.nome)}<small>${stato}</small></b><p>${E(k.testo)}</p>`
-        + `<button type="button" class="of-go" data-fk="${k.id}"${mont || poor ? ' disabled' : ''}>${label}</button></div>`;
+      const stato = !ad.ok ? 'NON ADATTA' : mont ? 'MONTATA' : mio ? (k.prezzo ? 'TUA' : 'GRATIS') : `€ ${fmt(k.prezzo)}`;
+      const label = !ad.ok ? (info.diesel ? 'Non per i diesel' : 'Serve il turbo') : mont ? 'Montata' : mio ? 'Monta' : poor ? `Mancano € ${fmt(k.prezzo - money)}` : `Compra e monta · € ${fmt(k.prezzo)}`;
+      const nota = k.id === 'serie' ? (info.diesel ? 'Un diesel non fa fiamme.' : !armato ? 'La tua auto è di serie: niente fiamme finché non la prepari (più potenza, scarico, centralina con taglio d\'accensione, turbo).' : `La tua auto è preparata (livello ${['leggero', 'medio', 'spinto'][ft.tier]}): le fiamme le decide lei.`) : '';
+      h += `<div class="of-fkc${mont ? ' cur' : ''}"${ad.ok ? '' : ' style="opacity:.6"'}><canvas width="400" height="128" data-fkp="${k.id}" aria-hidden="true"></canvas>`
+        + `<b><span class="of-dot ${mont ? 'on' : mio ? 'own' : 'off'}"></span>${E(k.nome)}<small>${stato}</small></b><p>${E(k.testo)}${nota ? ' <i>' + E(nota) + '</i>' : ''}${ad.ok ? '' : ' <i style="color:#ffb3ad">' + E(ad.why) + '</i>'}</p>`
+        + `<button type="button" class="of-go" data-fk="${k.id}"${mont || poor || !ad.ok ? ' disabled' : ''}>${label}</button></div>`;
     }
     h += '</div><div class="of-fsub">Colore della fiamma</div><div class="of-fc">';
     for (const c of FIAMME_COLORI) {
@@ -424,7 +432,7 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
   }
   // l'anteprima: lo stesso disegno della strada (fxFlameV, fxTorch, fxBang di effetti2d.js) dietro un paraurti, a raffiche
   // come un rilascio sopra i 5.000 giri e poi il limitatore, finché la scheda è aperta
-  function fiammeAnima(box, colFn) {
+  function fiammeAnima(box, colFn, car) {
     if (typeof Street2D === 'undefined' || !Street2D.prototype.fxFlameV) return;
     const tele = [...box.querySelectorAll('canvas[data-fkp]')]; if (!tele.length) return;
     const V = Object.create(Street2D.prototype); V.st = { t: 0 }; V.SS = 2;
@@ -433,8 +441,11 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     const spawn = (s, kind) => {
       const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random;       // «come viene» (kit nullo): la preparazione media
       if (V.scenaNuova && typeof fiammaTipo === 'function') {            // le scene (fiamme2d.js): ogni carattere con la sua forma
-        const tipo = fiammaTipo(2, kind, kit, { turbo: true }, r());
-        if (tipo !== 'torch') { V.scenaNuova(s.sc, tipo, { R: r, tier: 2, pal: fiammaPalTipo(tipo, kit, r(), colFn && colFn()), scala: kit && kit.scala }); return; }
+        // l'anteprima mostra quello che farebbe QUESTA auto: «Come viene» col suo livello (di serie niente), un tipo col suo turbo (o senza)
+        const info = car || { turbo: true, tier: 2 }, tier = kit ? 2 : info.tier;
+        if ((!kit && !info.armato) || info.diesel && !(kit && kit.id === 'lancia') || (kit && !fiammeAdatta(kit, info).ok)) return;
+        const tipo = fiammaTipo(tier, kind, kit, { turbo: info.turbo }, r());
+        if (tipo !== 'torch') { V.scenaNuova(s.sc, tipo, { R: r, tier, pal: fiammaPalTipo(tipo, kit, r(), colFn && colFn()), scala: kit && kit.scala }); return; }
         s.torchT = 0.07 + r() * 0.09; s.torchF = 0.8 + r() * 0.7; return;
       }
       const style = kit ? fiammeScegli(kit, 1, kind, r()) : flameStyle(1, kind, 0.6, r());
