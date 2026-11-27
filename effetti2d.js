@@ -216,9 +216,11 @@
     // dei kit di Luca Tuning (fiamme.js, v0.143): g = colore della luce sull'asfalto
     verde: { b: [['#0e8a3c', '#0e8a3c'], ['#22c95a', '#2fd26a'], ['#8cffb0', '#9cffc0'], ['#effff4', '#effff4']], o: 'rgba(4,46,20,.7)', l: '#46ff88', g: '#3ce07a' },
     viola: { b: [['#7a1fd6', '#d0208a'], ['#b44bff', '#ff4fb8'], ['#e2a8ff', '#ffb0e0'], ['#ffffff', '#fff0fa']], o: 'rgba(40,8,70,.7)', l: '#c070ff', g: '#b858ff', cut: 0.5 },
+    rosa: { b: [['#c4165a', '#c4165a'], ['#ff3d8f', '#ff3d8f'], ['#ff9cc6', '#ff9cc6'], ['#fff2f8', '#fff2f8']], o: 'rgba(80,6,40,.7)', l: '#ff5aa0', g: '#ff4a92' },
+    ciano: { b: [['#1580b8', '#1580b8'], ['#34c4f0', '#34c4f0'], ['#a6ecff', '#a6ecff'], ['#f4ffff', '#f4ffff']], o: 'rgba(6,40,70,.7)', l: '#60d8ff', g: '#4cc8f4' },
   };
   Street2D.fxHelp = { FLAME_PAL, flameLight, vn };     // per fiamme2d.js (le scene delle fiamme)
-  Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255' };   // luce della fiammata nella mappa di luce (street2d.js)
+  Street2D.FLAME_LUCE = { blu: '150,170,255', verde: '90,255,140', viola: '200,120,255', rosa: '255,110,170', ciano: '110,220,255' };   // luce della fiammata nella mappa di luce (street2d.js)
   S.fxFlame = function (g, rx, exY, k, fl, y0, pal, opt) {
     const P = FLAME_PAL[pal] || FLAME_PAL.arancio, O = opt || {};
     const t = this.st.t, f = Math.min(1.5, fl), big = f > 0.85;
@@ -554,7 +556,7 @@
     // tremola e cambia colore da sola; leggero niente, medio arancio e gialla, spinto blu
     const susT = s.flame && (kit || !(tiered && tier === 0)) ? 0.35 + 0.45 * Math.min(1, s.flame) : 0;
     st.sus = susT > (st.sus || 0) ? (st.sus || 0) + (susT - (st.sus || 0)) * Math.min(1, dt * 10) : Math.max(0, (st.sus || 0) - dt * 1.6);
-    const pickPal = () => { if (this.flamePal) return this.flamePal; const q = R(); if (kit) return fiammePal(kit, q); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
+    const pickPal = () => { if (this.flamePal) return this.flamePal; if (s.fcol) return s.fcol; const q = R(); if (kit) return fiammePal(kit, q); return tiered ? flamePalFor(tier, q) : q < 0.4 ? 'arancio' : q < 0.68 ? 'gialla' : 'blu'; };   // flamePal: colore fisso (prove, teaser)
     if (st.sus > 0.03 && !(st.susPalT > st.t)) { st.susPal = tiered && tier >= 2 && !this.flamePal && !kit ? (R() < 0.8 ? 'blu' : 'arancio') : pickPal(); st.susPalT = st.t + 0.3 + R() * 0.6; }
     const rateK = (kit && kit.rate || 1) * (tiered && s.fkind === 'limiter' ? [0.7, 1, 1.7][tier] : 1);
     st.fk = s.fkind; st.ft = s.ftier;                                              // per le prove: quale momento e quale livello stanno guidando la fiamma
@@ -563,7 +565,7 @@
     const nuovo = tiered && typeof fiammaTipo === 'function' && typeof this.scenaNuova === 'function' && !Street2D.fiammeVecchie;
     const spawn = (style, forza) => {
       if (nuovo && style !== 'torch' && FIAMME_TIPI.includes(style)) {
-        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R()), forza })) st.fstyle = 'scena';
+        if (this.scenaNuova(st, style, { R, tier, pal: this.flamePal || fiammaPalTipo(style, kit, R(), s.fcol), forza, scala: kit && kit.scala })) st.fstyle = 'scena';
         return;
       }
       if (style === 'torch' || (style === 'big' && (kit ? kit.id === 'ossidrica' : tier >= 2))) {                    // ossidrica: breve, rapida, con scintille incandescenti
@@ -595,7 +597,7 @@
     if (s.flame && R() < Math.min(0.55, s.flame * dt * 22 * rateK)) spawn(tiered ? scegli(R()) : 'free');
     // Scaldare il metallo prima dei getti lascia visibile la radice dentro la bocca.
     st.ring = Math.max(0, (st.ring || 0) - dt * 5); st.tipHeat = Math.max(0, (st.tipHeat || 0) - dt * 0.6);
-    if (st.flame > 1.05 && !(st.ringLock > st.t)) { st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
+    if (st.flame > 1.05 && !(st.ringLock > st.t)) { if (!nuovo) st.ring = 1; st.ringLock = st.t + 0.25; st.tipHeat = Math.min(1, st.tipHeat + 0.35); }
     const calore = Math.max(s.marmitta || 0, st.tipHeat * .28);
     if (calore > 0.01) this.fxMarmitta(g, rx, exY, k, calore, y0, pendenza, altezza);
     const gola = st.torchT > 0 || st.flame > 0.05 || st.sus > 0.03 ? this.golaScarico(k, altezza) : 0;
@@ -615,7 +617,7 @@
     // anello d'urto alla bocca negli scoppi grossi
     if (st.ring > 0.02) { const rr = (1 - st.ring) * 14 * k + 2; g.strokeStyle = `rgba(255,240,200,${st.ring * 0.8})`; g.lineWidth = 1; g.beginPath(); g.ellipse(rx - 2, exY, rr * 0.6, rr, 0, 0, Math.PI * 2); g.stroke(); }
     if (!low) this.fxHaze(g, rx, exY, s, st, k);
-    if (st.popFlash > 0.02) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
+    if (st.popFlash > 0.02 && !nuovo) this.light(g, rx - 20, y0, 70 * st.popFlash, 8, kit && (FLAME_PAL[st.flamePal] || {}).g || '#ff8a20', 0.22 * st.popFlash, 3);   // lampo sull'asfalto
     // scarico: sbuffi scuri al minimo, più radi in marcia
     if (s.running) emit('ePuff', s.rpm < 1500 ? 2.5 : 0.7, () => this.parts.push({ k: 'puff', m: mOf(rx), y: exY, vy: -5, r: 1.5 + R(), life: 1, dx: v * PPM * 0.3 - 12, v: (R() * 3) | 0 }));
     // auto molto danneggiata: vapore dal cofano, fumo nero quando è quasi distrutta

@@ -268,6 +268,13 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
 .of-fkc canvas { width: 100%; aspect-ratio: 200 / 64; border-radius: 7px; background: #07060c; image-rendering: pixelated; display: block; }
 .of-fkc b { font-size: 14px; display: flex; align-items: center; gap: 6px; } .of-fkc b small { margin-left: auto; font: 700 12px/1 ui-monospace, monospace; color: #ffd27a; }
 .of-fkc p { margin: 0; color: #b8b0a0; font-size: 12px; line-height: 1.35; flex: 1; }
+.of-fsub { margin: 14px 2px 4px; font-size: 13px; color: #ffd27a; letter-spacing: .04em; text-transform: uppercase; }
+.of-fc { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.of-chip { display: inline-flex; flex-direction: row; align-items: center; gap: 7px; width: auto; height: auto; aspect-ratio: auto; padding: 7px 12px; background: #1b1826; border: 1px solid #332e40; border-radius: 999px; color: #e8e2d4; font-weight: 600; font-size: 12px; line-height: 1; white-space: nowrap; cursor: pointer; }
+.of-chip:hover:not(:disabled) { border-color: #6a5f80; } .of-chip:disabled { opacity: .55; cursor: default; }
+.of-chip.cur { border-color: #2fd16a; box-shadow: 0 0 0 1px #2fd16a55 inset; }
+.of-chip i { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 6px currentColor; flex: none; }
+.of-chip small { color: #ffd27a; font: 700 11px/1 ui-monospace, monospace; }
 @media (max-width: 520px) { .of-sum { grid-template-columns: repeat(2, 1fr); } }`;
   let tab = 'mod', grp = 'motore', open = {}, pick = null;   // pick = il pezzo toccato: si guarda prima, si compra dopo
 
@@ -287,7 +294,15 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
         if (!r.ok) { ctx.flash(r.why, 2.6); return; }
         ctx.save && ctx.save(); ctx.after && ctx.after();
         const k = FIAMME_KIT.find((q) => q.id === fk.dataset.fk);
-        ctx.flash(k.id === 'serie' ? 'Fiamme come vengono: le decide la preparazione' : 'Fiamme montate: ' + k.nome + (r.spesa ? ` · € ${fmt(r.spesa)}` : ''), 2.2); render(); return;
+        ctx.flash(k.id === 'serie' ? 'Fiamme come vengono: le decide la preparazione' : 'Fiammata montata: ' + k.nome + (r.spesa ? ` · € ${fmt(r.spesa)}` : ''), 2.2); render(); return;
+      }
+      const fc = e.target.closest('[data-fc]');
+      if (fc) {                                                    // piccola sezione Colore: compra (una volta) e monta il colore su quest'auto
+        const r = fiammeColoreMonta(ctx.game.s, ctx.game.car, fc.dataset.fc, ctx.game.mode !== 'career');
+        if (!r.ok) { ctx.flash(r.why, 2.6); return; }
+        ctx.save && ctx.save(); ctx.after && ctx.after();
+        const c = FIAMME_COLORI.find((q) => q.id === fc.dataset.fc);
+        ctx.flash(c.id === 'naturale' ? 'Fiamme del colore naturale' : 'Fiamme ' + c.nome.toLowerCase() + (r.spesa ? ` · € ${fmt(r.spesa)}` : ''), 2.2); render(); return;
       }
       const go = e.target.closest('[data-go]');
       if (go) {                                                    // pulsante della scheda: monta (e, se serve, compra)
@@ -380,39 +395,46 @@ if (typeof window !== 'undefined') Object.assign(window, { OFF, OFF_GRUPPI, offC
     if (tab === 'fiamme' && !fiamme) tab = 'mod';
     h += `<div class="of-tabs" role="tablist"><button type="button" role="tab" data-tab="mod" aria-selected="${tab === 'mod'}">Modifiche</button><button type="button" role="tab" data-tab="swap" aria-selected="${tab === 'swap'}">Swap motore${dId ? ' ✓' : ''}</button>`
       + (suoni ? `<button type="button" role="tab" data-tab="suoni" aria-selected="${tab === 'suoni'}">Suoni</button>` : '')
-      + (fiamme ? `<button type="button" role="tab" data-tab="fiamme" aria-selected="${tab === 'fiamme'}">Fiamme${fiammeKit(g.s, carId) ? ' ✓' : ''}</button>` : '') + '</div>';
+      + (fiamme ? `<button type="button" role="tab" data-tab="fiamme" aria-selected="${tab === 'fiamme'}">Fiamme${fiammeKit(g.s, carId) || fiammeColore(g.s, carId) ? ' ✓' : ''}</button>` : '') + '</div>';
     h += tab === 'mod' ? drawMod(ctx, career, money) : tab === 'suoni' ? NightCampioni.html(ctx) : tab === 'fiamme' ? drawFiamme(ctx, carId, career, money) : drawSwap(ctx, carId, dId, career, money);
     box.innerHTML = h;
-    if (tab === 'fiamme') fiammeAnima(box);
+    if (tab === 'fiamme') fiammeAnima(box, () => fiammeColore(g.s, carId));
   }
 
   // ---------------------------------------------------------------- scheda Fiamme (kit di fiamme.js, v0.143)
+  const FIAMME_SW = { naturale: 'linear-gradient(135deg,#ff7a14,#ffc832)', blu: '#4fb2ff', verde: '#22c95a', viola: 'linear-gradient(135deg,#b44bff,#ff4fb8)', rosa: '#ff3d8f', ghiaccio: '#a6ecff' };
   function drawFiamme(ctx, carId, career, money) {
     const f = ctx.game.s.fiamme || {}, own = f.own || {}, cur = (fiammeKit(ctx.game.s, carId) || { id: 'serie' }).id;
-    let h = '<p class="of-hint">Il kit decide <b>che fiamme escono dallo scarico</b>: al rilascio del gas e al limitatore, <b>su qualunque auto</b>, anche di serie. Lo compri una volta e lo rimonti gratis su ogni auto. Con la valvola dello scarico in silenzio non esce niente.</p><div class="of-fk">';
+    const palCur = fiammeColore(ctx.game.s, carId), curCol = (FIAMME_COLORI.find((c) => c.pal === palCur) || FIAMME_COLORI[0]).id;
+    let h = '<p class="of-hint">Scegli <b>che fiammata esce dallo scarico</b>: botto, media, grossa, spinta, anti-lag da rally... Escono al rilascio del gas e al limitatore, <b>su qualunque auto</b>, anche di serie. La compri una volta e la rimonti gratis su ogni auto. Con la valvola dello scarico in silenzio non esce niente.</p><div class="of-fk">';
     for (const k of FIAMME_KIT) {
       const mont = k.id === cur, mio = !k.prezzo || own[k.id], poor = career && !mio && k.prezzo > money;
-      const stato = mont ? 'MONTATO' : mio ? (k.prezzo ? 'TUO' : 'GRATIS') : `€ ${fmt(k.prezzo)}`;
-      const label = mont ? 'Montato' : mio ? 'Monta' : poor ? `Mancano € ${fmt(k.prezzo - money)}` : `Compra e monta · € ${fmt(k.prezzo)}`;
+      const stato = mont ? 'MONTATA' : mio ? (k.prezzo ? 'TUA' : 'GRATIS') : `€ ${fmt(k.prezzo)}`;
+      const label = mont ? 'Montata' : mio ? 'Monta' : poor ? `Mancano € ${fmt(k.prezzo - money)}` : `Compra e monta · € ${fmt(k.prezzo)}`;
       h += `<div class="of-fkc${mont ? ' cur' : ''}"><canvas width="400" height="128" data-fkp="${k.id}" aria-hidden="true"></canvas>`
         + `<b><span class="of-dot ${mont ? 'on' : mio ? 'own' : 'off'}"></span>${E(k.nome)}<small>${stato}</small></b><p>${E(k.testo)}</p>`
         + `<button type="button" class="of-go" data-fk="${k.id}"${mont || poor ? ' disabled' : ''}>${label}</button></div>`;
+    }
+    h += '</div><div class="of-fsub">Colore della fiamma</div><div class="of-fc">';
+    for (const c of FIAMME_COLORI) {
+      const mont = c.id === curCol, mio = !c.prezzo || own[c.id], poor = career && !mio && c.prezzo > money;
+      h += `<button type="button" class="of-chip${mont ? ' cur' : ''}" data-fc="${c.id}" title="${E(c.testo)}"${mont || poor ? ' disabled' : ''}><i style="background:${FIAMME_SW[c.id] || '#fff'};color:${(FIAMME_SW[c.id] || '#fff').startsWith('#') ? FIAMME_SW[c.id] : '#ffa030'}"></i>${E(c.nome)}<small>${mont ? '✓' : mio ? (c.prezzo ? 'TUO' : '') : poor ? `mancano € ${fmt(c.prezzo - money)}` : `€ ${fmt(c.prezzo)}`}</small></button>`;
     }
     return h + '</div>';
   }
   // l'anteprima: lo stesso disegno della strada (fxFlameV, fxTorch, fxBang di effetti2d.js) dietro un paraurti, a raffiche
   // come un rilascio sopra i 5.000 giri e poi il limitatore, finché la scheda è aperta
-  function fiammeAnima(box) {
+  function fiammeAnima(box, colFn) {
     if (typeof Street2D === 'undefined' || !Street2D.prototype.fxFlameV) return;
     const tele = [...box.querySelectorAll('canvas[data-fkp]')]; if (!tele.length) return;
     const V = Object.create(Street2D.prototype); V.st = { t: 0 }; V.SS = 2;
     const st = tele.map((c, i) => ({ c, g: c.getContext('2d'), kit: FIAMME_KIT.find((q) => q.id === c.dataset.fkp), flame: 0, torchT: 0, bangT: 0, fv: 0, pal: 'arancio', ph: i * 0.37, sc: { t: 0, flame: 0, popFlash: 0, ring: 0 } }));
     const rx = 64, exY = 19, y0 = 26, k = 1;                          // scena di 100×32 unità, ingrandita ×4
     const spawn = (s, kind) => {
-      const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random;
+      const kit = s.kit && s.kit.w ? s.kit : null, r = Math.random;       // «come viene» (kit nullo): la preparazione media
       if (V.scenaNuova && typeof fiammaTipo === 'function') {            // le scene (fiamme2d.js): ogni carattere con la sua forma
         const tipo = fiammaTipo(2, kind, kit, { turbo: true }, r());
-        if (tipo !== 'torch') { V.scenaNuova(s.sc, tipo, { R: r, tier: 2, pal: fiammaPalTipo(tipo, kit, r()) }); return; }
+        if (tipo !== 'torch') { V.scenaNuova(s.sc, tipo, { R: r, tier: 2, pal: fiammaPalTipo(tipo, kit, r(), colFn && colFn()), scala: kit && kit.scala }); return; }
         s.torchT = 0.07 + r() * 0.09; s.torchF = 0.8 + r() * 0.7; return;
       }
       const style = kit ? fiammeScegli(kit, 1, kind, r()) : flameStyle(1, kind, 0.6, r());

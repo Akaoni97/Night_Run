@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.173**
+**Versione attuale: v0.174**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -197,3 +197,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.171 · 27/11/2026 · cognato · **Cambio gomma dal lato strada**: il protagonista scende e risale dietro la carrozzeria, prende la scorta, usa il cric, smonta e rimonta la ruota. Il cambio parte anche dall'avviso «Gomma a terra».
 - v0.172 · 27/11/2026 · proprietario · **Il duo diventa Duo Maniacs Studio**: marchio nuovo viola e oro (stemma esagonale col monogramma DM e la gemma viola, niente più turbine), anche nella sigla prima della schermata iniziale
 - v0.173 · 28/11/2026 · proprietario · **Marchio Duo Maniacs Studio scelto**: due anelli intrecciati (grigio acciaio e rosso cupo) su nero e grigio antracite, scritte spaziate; nuovo anche nella sigla del gioco
+- v0.174 · 27/11/2026 · cognato · **Fiamme più vere e scelta del tipo**: fiamma disegnata con bagliore morbido (nucleo netto e bruciato + due aloni sfocati), luce sulla strada senza gradini, fuliggine rada, niente stella e anello a fumetto; la scheda Fiamme di Luca sceglie il **tipo** (Borbottio, Botto, Fiammata media, grossa, spinta, anti-lag da rally, cambiata da drag, ossidrica, lanciafiamme, mitraglia) e, in una piccola sezione, il **colore** (naturale, blu, verde, viola, rosa, ghiaccio); i vecchi kit Smeraldo e Neon diventano Fiammata media verde e viola

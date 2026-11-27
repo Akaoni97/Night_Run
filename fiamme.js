@@ -71,29 +71,64 @@ function marmittaRossa(h, tier) {
   const u = Math.max(0, Math.min(1, ((h || 0) - a) / (b - a)));
   return u * u * (3 - 2 * u);
 }
-// ---------------------------------------------------------------- i kit delle fiamme (Da Luca Tuning, scheda Fiamme)
-// Il kit decide che fiamme escono dallo scarico, su qualunque auto: come i kit veri (candela nello scarico) le fa uscire anche
-// da un'auto di serie, al rilascio e al limitatore. Si compra una volta e resta tuo; si monta auto per auto (gratis).
-// w = pesi [ossidrica, libera, botto, grossa]; pal = colore (o colori a caso); len = fiamma libera più lunga; rate = più fitte.
-// Stato in game.s.fiamme = { own: { id: true }, mont: { auto: id } }. Senza kit (o «come viene») tutto come prima.
+// ---------------------------------------------------------------- i tipi di fiammata e i colori (Da Luca Tuning, scheda Fiamme)
+// v0.174: la scheda Fiamme ha due scelte separate. Il TIPO di fiammata (FIAMME_KIT: botto, media, grossa, spinta, anti-lag da rally,
+// cambiata da drag, ossidrica, lanciafiamme, mitraglia, borbottio) decide che fiamme escono dallo scarico, su qualunque auto, al rilascio
+// e al limitatore; il COLORE (FIAMME_COLORI: naturale, blu, verde, viola, rosa, ghiaccio) è una piccola sezione a parte e vale per ogni tipo.
+// Si compra una volta e resta tuo; si monta auto per auto (gratis). Stato in game.s.fiamme = { own: { id: true }, mont: { auto: tipo }, col: { auto: colore } }.
+// tipi = pesi dei caratteri di fiamme2d.js (burble, tuner, rally, drag, race, torch, drago, mitraglia); scala = misura generale (media 1, grossa 1,3...);
+// w = pesi del vecchio disegno [ossidrica, libera, botto, grossa] (solo con `Street2D.fiammeVecchie`); rate = più fitte; len = fiamma libera più lunga (vecchio disegno).
 const FIAMME_KIT = [
-  { id: 'serie', nome: 'Come viene', prezzo: 0, testo: 'Le fiamme le decide la preparazione: botti sull\'auto poco toccata, fiammate libere sulla media, ossidrica blu sulla spinta. Su un\'auto di serie niente fiamme.' },
-  { id: 'ossidrica', nome: 'Ossidrica blu', prezzo: 1800, w: [0.8, 0, 0.08, 0.12], pal: 'blu', tipi: { torch: 0.55, drag: 0.45 }, testo: 'Getto sottile e dritto, blu col cuore bianco e i «diamanti». Secco al limitatore, una lama al rilascio.' },
-  { id: 'lancia', nome: 'Lanciafiamme', prezzo: 2600, w: [0, 0.5, 0, 0.5], pal: ['arancio', 'gialla'], len: 1.7, rate: 1.2, tipi: { drago: 0.75, race: 0.25 }, testo: 'Fiammata lunga e piena, arancio e gialla, con l\'anello d\'urto. Al rilascio sopra i 5.000 giri sembra un drago.' },
-  { id: 'mitraglia', nome: 'Mitraglia', prezzo: 1500, w: [0, 0.1, 0.9, 0], pal: 'arancio', rate: 2.2, tipi: { mitraglia: 0.8, tuner: 0.2 }, testo: 'Poca fiamma e tanti botti a raffica, con le scintille. Al limitatore fa la mitragliatrice.' },
-  { id: 'smeraldo', nome: 'Smeraldo', prezzo: 3200, w: [0, 0.75, 0.05, 0.2], pal: 'verde', tipi: { drag: 0.25, tuner: 0.25, race: 0.25, rally: 0.25 }, testo: 'Fiamme verdi, come quelle dei sali di rame. Alla Sosta 24 te le fotografano.' },
-  { id: 'neon', nome: 'Neon viola', prezzo: 3600, w: [0, 0.75, 0.05, 0.2], pal: ['viola', 'viola', 'blu'], tipi: { tuner: 0.3, drag: 0.3, race: 0.2, rally: 0.2 }, testo: 'Fiamma viola e rosa con qualche lingua blu: si sposa col neon di Russian Kùstòm.' },
+  { id: 'serie', nome: 'Come viene', prezzo: 0, testo: 'Le fiamme le decide la preparazione: botti sull\'auto poco toccata, fiammate medie sulla media, foglio lungo e ossidrica sulla spinta. Su un\'auto di serie niente fiamme.' },
+  { id: 'borbottio', nome: 'Borbottio', prezzo: 500, w: [0, 0.2, 0.8, 0], tipi: { burble: 1 }, scala: 1, testo: 'Lingue basse, blu alla radice e arancio in punta, a gas mollato: lo scarico libero di un\'aspirata.' },
+  { id: 'botto', nome: 'Botto', prezzo: 900, w: [0, 0.1, 0.9, 0], tipi: { race: 0.55, tuner: 0.45 }, scala: 0.95, testo: 'Un colpo secco dal tubo: palla di fuoco corta e larga con un lampo che illumina la strada, come il backfire di un\'auto che sputa.' },
+  { id: 'media', nome: 'Fiammata media', prezzo: 1300, w: [0.04, 0.8, 0.12, 0.04], tipi: { tuner: 0.45, rally: 0.35, race: 0.2 }, scala: 1, testo: 'Fiammate arancio e gialle di mezzo metro, a raffiche brevi: l\'auto da strada ben fatta che sputa al rilascio.' },
+  { id: 'grossa', nome: 'Fiammata grossa', prezzo: 2000, w: [0.05, 0.25, 0.1, 0.6], tipi: { rally: 0.5, race: 0.3, drag: 0.2 }, scala: 1.3, testo: 'Fiammata piena e larga, un metro e passa, con scintille e pezzi di fuoco: la fiammata da officina che fa girare la gente.' },
+  { id: 'spinta', nome: 'Fiammata spinta', prezzo: 2800, w: [0.4, 0.2, 0.1, 0.3], tipi: { drag: 0.35, torch: 0.2, rally: 0.25, race: 0.2 }, scala: 1.15, rate: 1.25, testo: 'Quella delle auto da 600 CV: foglio lungo di cambiata con i diamanti, anti-lag, ossidrica blu e botti secchi al limitatore.' },
+  { id: 'rally', nome: 'Anti-lag da rally', prezzo: 2400, w: [0, 0.4, 0.1, 0.5], tipi: { rally: 1 }, scala: 1.1, rate: 1.2, testo: 'Fiamma larga e a brandelli che sale, con grumi di fuoco e doccia di scintille: il turbo tenuto in pressione da un Gruppo B.' },
+  { id: 'drag', nome: 'Cambiata da drag', prezzo: 2200, w: [0.3, 0.2, 0.1, 0.4], tipi: { drag: 1 }, scala: 1.1, testo: 'Foglio lungo e sottile, blu alla radice e arancio in punta, coi diamanti: la fiammata di cambiata e di 2-step.' },
+  { id: 'ossidrica', nome: 'Ossidrica blu', prezzo: 1800, w: [0.8, 0, 0.08, 0.12], tipi: { torch: 0.55, drag: 0.45 }, scala: 1, testo: 'Getto sottile e dritto, blu col cuore bianco e i «diamanti». Secco al limitatore, una lama al rilascio.' },
+  { id: 'lancia', nome: 'Lanciafiamme', prezzo: 2600, w: [0, 0.5, 0, 0.5], len: 1.7, rate: 1.2, tipi: { drago: 0.75, race: 0.25 }, scala: 1, testo: 'Fuoco lunghissimo che ribolle e sale a grumi. Al rilascio sopra i 5.000 giri sembra un drago.' },
+  { id: 'mitraglia', nome: 'Mitraglia', prezzo: 1500, w: [0, 0.1, 0.9, 0], rate: 2.2, tipi: { mitraglia: 0.8, tuner: 0.2 }, scala: 1, testo: 'Poca fiamma e tanti botti a raffica, con le scintille. Al limitatore fa la mitragliatrice.' },
 ];
+// il colore vale per ogni tipo: pal = tavolozza di effetti2d.js (FLAME_PAL); naturale = quello del carattere (arancio, giallo, blu alla radice)
+const FIAMME_COLORI = [
+  { id: 'naturale', nome: 'Naturale', prezzo: 0, pal: null, testo: 'Quello vero: arancio e giallo, blu alla radice dove la miscela è magra.' },
+  { id: 'blu', nome: 'Blu', prezzo: 600, pal: 'blu', testo: 'Miscela magra, come l\'alcool o il metano.' },
+  { id: 'verde', nome: 'Verde', prezzo: 1400, pal: 'verde', testo: 'I sali di rame.' },
+  { id: 'viola', nome: 'Viola', prezzo: 1600, pal: 'viola', testo: 'Viola e rosa, con qualche lingua blu: si sposa col neon di Russian Kùstòm.' },
+  { id: 'rosa', nome: 'Rosa', prezzo: 1600, pal: 'rosa', testo: 'Rosa acceso con il cuore bianco.' },
+  { id: 'ghiaccio', nome: 'Ghiaccio', prezzo: 1200, pal: 'ciano', testo: 'Azzurro chiaro, quasi bianco.' },
+];
+// i vecchi kit colorati (v0.143): se qualcuno li aveva montati diventano «Fiammata media» col loro colore
+const FIAMME_VECCHI = { smeraldo: { kit: 'media', col: 'verde' }, neon: { kit: 'media', col: 'viola' } };
 const fiammeDi = (id) => FIAMME_KIT.find((k) => k.id === id) || null;
-// il kit montato sull'auto (null = «come viene»)
+const fiammeColDi = (id) => FIAMME_COLORI.find((k) => k.id === id) || null;
+// porta i salvataggi vecchi al nuovo modello (una volta, in silenzio)
+function fiammeMigra(s) {
+  const f = s && s.fiamme; if (!f || f.mig) return f;
+  f.own = f.own || {}; f.mont = f.mont || {}; f.col = f.col || {};
+  for (const id in FIAMME_VECCHI) {
+    const v = FIAMME_VECCHI[id];
+    if (f.own[id]) { f.own[v.kit] = true; f.own[v.col] = true; delete f.own[id]; }
+    for (const car in f.mont) if (f.mont[car] === id) { f.mont[car] = v.kit; f.col[car] = v.col; }
+  }
+  f.mig = 1; return f;
+}
+// il tipo montato sull'auto (null = «come viene»)
 function fiammeKit(s, car) {
-  const f = s && s.fiamme, id = f && f.mont && f.mont[car], k = fiammeDi(id);
+  const f = fiammeMigra(s), id = f && f.mont && f.mont[car], k = fiammeDi(id);
   return k && k.id !== 'serie' ? k : null;
 }
-// compra (se non è tuo) e monta. gratis = partita libera. Dice { ok, why, spesa }
+// il colore montato sull'auto: il nome della tavolozza (null = naturale)
+function fiammeColore(s, car) {
+  const f = fiammeMigra(s), id = f && f.col && f.col[car], c = fiammeColDi(id);
+  return c && c.pal ? c.pal : null;
+}
+// compra (se non è tuo) e monta un tipo. gratis = partita libera. Dice { ok, why, spesa }
 function fiammeMonta(s, car, id, gratis) {
   const k = fiammeDi(id); if (!k || !s) return { ok: false, why: 'Kit sconosciuto' };
-  const f = s.fiamme || (s.fiamme = { own: {}, mont: {} }); f.own = f.own || {}; f.mont = f.mont || {};
+  const f = fiammeMigra(s) || (s.fiamme = { own: {}, mont: {}, col: {}, mig: 1 });
   const mio = k.prezzo === 0 || f.own[id];
   if (!mio && !gratis && (s.money || 0) < k.prezzo) return { ok: false, why: `Mancano € ${Math.ceil(k.prezzo - (s.money || 0)).toLocaleString('it-IT')}` };
   const spesa = mio || gratis ? 0 : k.prezzo;
@@ -101,7 +136,18 @@ function fiammeMonta(s, car, id, gratis) {
   if (id === 'serie') delete f.mont[car]; else f.mont[car] = id;
   return { ok: true, spesa };
 }
-// che fiammata esce col kit: come flameStyle, ma coi pesi del kit (al rilascio sopra i 5.000 giri la grossa conta il doppio)
+// lo stesso per il colore
+function fiammeColoreMonta(s, car, id, gratis) {
+  const c = fiammeColDi(id); if (!c || !s) return { ok: false, why: 'Colore sconosciuto' };
+  const f = fiammeMigra(s) || (s.fiamme = { own: {}, mont: {}, col: {}, mig: 1 });
+  const mio = c.prezzo === 0 || f.own[id];
+  if (!mio && !gratis && (s.money || 0) < c.prezzo) return { ok: false, why: `Mancano € ${Math.ceil(c.prezzo - (s.money || 0)).toLocaleString('it-IT')}` };
+  const spesa = mio || gratis ? 0 : c.prezzo;
+  s.money = (s.money || 0) - spesa; if (c.prezzo) f.own[id] = true;
+  if (id === 'naturale') delete f.col[car]; else f.col[car] = id;
+  return { ok: true, spesa };
+}
+// che fiammata esce col vecchio disegno (Street2D.fiammeVecchie): come flameStyle, ma coi pesi del kit (al rilascio sopra i 5.000 giri la grossa conta il doppio)
 function fiammeScegli(kit, tier, kind, r) {
   if (!kit || !kit.w) return flameStyle(tier, kind, 0.6, r);
   const w = kit.w.slice();
@@ -113,12 +159,12 @@ function fiammeScegli(kit, tier, kind, r) {
   if ((x -= w[2]) < 0) return 'bang';
   return 'big';
 }
-// il colore della fiamma col kit (null = quello di sempre)
-function fiammePal(kit, r) {
+// il colore della fiamma: prima quello scelto nella sezione Colore, poi quello del kit (nessuno, adesso), poi il solito (null = quello di sempre)
+function fiammePal(kit, r, colore) {
+  if (colore) return colore;
   if (!kit || !kit.pal) return null;
   return Array.isArray(kit.pal) ? kit.pal[Math.min(kit.pal.length - 1, Math.floor(r * kit.pal.length))] : kit.pal;
 }
-
 // ---------------------------------------------------------------- i caratteri delle fiamme (v0.169)
 // Prima ogni fiammata era la stessa lingua dritta, cambiava solo il colore. Ora ogni fiammata è una SCENA che dura qualche
 // decimo di secondo e cambia forma mentre vive (nasce alla bocca, si gonfia, si stacca dal tubo e se ne va, si sfrangia),
@@ -156,8 +202,8 @@ function fiammaTipo(tier, kind, kit, ctx, r) {
   return nomi[nomi.length - 1];
 }
 // colore naturale del carattere (il kit, se ce l'ha, comanda)
-function fiammaPalTipo(tipo, kit, r) {
-  const k = fiammePal(kit, r); if (k) return k;
+function fiammaPalTipo(tipo, kit, r, colore) {
+  const k = fiammePal(kit, r, colore); if (k) return k;
   if (tipo === 'drag') return 'blu';
   if (tipo === 'burble') return r < 0.55 ? 'blu' : 'arancio';
   if (tipo === 'tuner') return r < 0.5 ? 'gialla' : r < 0.85 ? 'arancio' : 'blu';
@@ -169,8 +215,9 @@ const FIAMMA_POP = { t: 0, d: 0.15, len: 20, th: 3, ang: 0, dy: 0, ph0: 0, bulb:
 // la scena: { tipo, v (la variante), dur, cool (secondi prima della prossima), pops: [...] }. rn() = numeri a caso in [0,1) (nei test, un generatore con seme).
 // Ogni carattere ha più varianti (v0.170): la stessa preparazione non rifà due volte di fila la stessa fiammata.
 const FIAMMA_SCALA = { len: 1.25, th: 1.2 };                                      // misura generale: le fiamme della v0.169 erano troppo piccole sull'auto
-function fiammaCopione(tipo, tier, rn) {
-  const pop = (t, o) => { const q = Object.assign({}, FIAMMA_POP, { t }, o); q.len *= FIAMMA_SCALA.len; q.th *= FIAMMA_SCALA.th; return q; };
+function fiammaCopione(tipo, tier, rn, scala) {
+  const sk = scala || 1;                                                         // la misura del tipo scelto (kit.scala: media 1, grossa 1,3...)
+  const pop = (t, o) => { const q = Object.assign({}, FIAMMA_POP, { t }, o); q.len *= FIAMMA_SCALA.len * sk; q.th *= FIAMMA_SCALA.th * (0.5 + 0.5 * sk); return q; };
   const pops = []; let cool = 0.2, t = 0, v = '';
   const fine = () => pops.reduce((m, p) => Math.max(m, p.t + p.d), 0);
   const pick = (a) => a[Math.min(a.length - 1, Math.floor(rn() * a.length))];
@@ -256,4 +303,4 @@ function fiammaCopione(tipo, tier, rn) {
 }
 // generatore con seme (mulberry32): per le prove e per riprodurre una scena
 function fiammaRnd(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa, FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal, FIAMME_TIPI, fiammaTipo, fiammaPalTipo, fiammaCopione, fiammaRnd });
+if (typeof window !== 'undefined') Object.assign(window, { flameTier, flameStyle, flameVariant, flamePalFor, FLAME_TIERS, FLAME_BIG_RPM, MARMITTA, marmittaPasso, marmittaRossa, FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal, FIAMME_COLORI, fiammeColore, fiammeColoreMonta, fiammeMigra, FIAMME_TIPI, fiammaTipo, fiammaPalTipo, fiammaCopione, fiammaRnd });

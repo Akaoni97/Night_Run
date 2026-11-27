@@ -102,39 +102,67 @@ test('marmitta: sotto gli ultimi 1.500 giri, senza gas o a motore spento non si 
   assert.equal(M.marmittaRossa(h, 2), 0, 'dopo altri 10 s è fredda');
 });
 
-// ---------------------------------------------------------------- i kit delle fiamme di Luca Tuning (v0.143)
-const K = new Function(src + ';return { FIAMME_KIT, fiammeKit, fiammeMonta, fiammeScegli, fiammePal };')();
+// ---------------------------------------------------------------- i tipi di fiammata e i colori di Luca Tuning (v0.143, rifatti v0.174)
+const K = new Function(src + ';return { FIAMME_KIT, FIAMME_COLORI, fiammeKit, fiammeColore, fiammeMonta, fiammeColoreMonta, fiammeMigra, fiammeScegli, fiammePal, FIAMME_TIPI };')();
 const quoteKit = (kit, kind) => { const q = { torch: 0, free: 0, bang: 0, big: 0 }, N = 2000; for (let i = 0; i < N; i++) q[K.fiammeScegli(kit, 0, kind, (i + 0.5) / N)]++; for (const k in q) q[k] /= N; return q; };
 const kitDi = (id) => K.FIAMME_KIT.find((k) => k.id === id);
 
-test('fiamme: cinque kit più «come viene», ognuno col suo nome, prezzo e testo', () => {
+test('fiamme: i tipi di fiammata (botto, media, grossa, spinta...) hanno nome, prezzo, testo e misura; i colori sono a parte', () => {
   assert.equal(K.FIAMME_KIT[0].id, 'serie'); assert.equal(K.FIAMME_KIT[0].prezzo, 0);
-  const kit = K.FIAMME_KIT.slice(1); assert.equal(kit.length, 5);
+  const kit = K.FIAMME_KIT.slice(1);
+  for (const id of ['botto', 'media', 'grossa', 'spinta', 'borbottio', 'rally', 'drag', 'ossidrica', 'lancia', 'mitraglia']) assert.ok(kitDi(id), id);
   assert.equal(new Set(K.FIAMME_KIT.map((k) => k.id)).size, K.FIAMME_KIT.length, 'id diversi');
-  for (const k of kit) { assert.ok(k.prezzo > 0 && k.nome && k.testo.length > 30 && k.w.length === 4 && k.pal, k.id); }
+  for (const k of kit) {
+    assert.ok(k.prezzo > 0 && k.nome && k.testo.length > 30 && k.w.length === 4 && k.scala > 0, k.id);
+    assert.ok(!k.pal, `${k.id}: il colore non sta più nel tipo`);
+    for (const t of Object.keys(k.tipi)) assert.ok(K.FIAMME_TIPI.includes(t), `${k.id}: carattere ${t}`);
+  }
+  assert.ok(kitDi('grossa').scala > kitDi('media').scala && kitDi('media').scala >= kitDi('botto').scala, 'la misura sale da botto a grossa');
+  assert.equal(K.FIAMME_COLORI[0].id, 'naturale'); assert.equal(K.FIAMME_COLORI[0].prezzo, 0); assert.equal(K.FIAMME_COLORI[0].pal, null);
+  assert.ok(K.FIAMME_COLORI.length >= 5 && K.FIAMME_COLORI.slice(1).every((c) => c.prezzo > 0 && c.pal && c.nome && c.testo));
+  assert.equal(new Set(K.FIAMME_COLORI.map((c) => c.id).concat(K.FIAMME_KIT.map((k) => k.id))).size, K.FIAMME_COLORI.length + K.FIAMME_KIT.length, 'nessun id uguale tra tipi e colori');
 });
 
-test('fiamme: si compra una volta, si monta auto per auto, «come viene» toglie il kit', () => {
+test('fiamme: si compra una volta, si monta auto per auto, «come viene» toglie il tipo', () => {
   const s = { money: 2000 };
   assert.equal(K.fiammeMonta(s, 'v40', 'lancia').ok, false, 'non bastano i soldi');
   assert.equal(s.money, 2000);
   const r = K.fiammeMonta(s, 'v40', 'ossidrica'); assert.ok(r.ok); assert.equal(r.spesa, 1800); assert.equal(s.money, 200);
   assert.equal(K.fiammeKit(s, 'v40').id, 'ossidrica'); assert.equal(K.fiammeKit(s, 'panda141'), null, 'sulle altre auto no');
-  assert.equal(K.fiammeMonta(s, 'panda141', 'ossidrica').spesa, 0, 'già tuo: rimontarlo è gratis'); assert.equal(s.money, 200);
+  assert.equal(K.fiammeMonta(s, 'panda141', 'ossidrica').spesa, 0, 'già tua: rimontarla è gratis'); assert.equal(s.money, 200);
   K.fiammeMonta(s, 'v40', 'serie'); assert.equal(K.fiammeKit(s, 'v40'), null);
-  assert.equal(K.fiammeMonta(s, 'v40', 'ossidrica').spesa, 0, 'resta tuo anche smontato');
-  assert.equal(K.fiammeMonta({ money: 0 }, 'v40', 'neon', true).ok, true, 'partita libera: gratis');
+  assert.equal(K.fiammeMonta(s, 'v40', 'ossidrica').spesa, 0, 'resta tua anche smontata');
+  assert.equal(K.fiammeMonta({ money: 0 }, 'v40', 'spinta', true).ok, true, 'partita libera: gratis');
 });
 
-test('fiamme: ogni kit ha il suo carattere', () => {
+test('fiamme: il colore è una scelta a parte e vale per qualunque tipo', () => {
+  const s = { money: 1500 };
+  assert.equal(K.fiammeColore(s, 'v40'), null, 'di partenza naturale');
+  assert.equal(K.fiammeColoreMonta(s, 'v40', 'viola').ok, false, 'non bastano i soldi'); assert.equal(s.money, 1500);
+  const r = K.fiammeColoreMonta(s, 'v40', 'verde'); assert.ok(r.ok); assert.equal(r.spesa, 1400); assert.equal(s.money, 100);
+  assert.equal(K.fiammeColore(s, 'v40'), 'verde'); assert.equal(K.fiammeColore(s, 'panda141'), null, 'colore auto per auto');
+  K.fiammeMonta({ money: 5000, fiamme: s.fiamme }, 'v40', 'rally'); assert.equal(K.fiammeColore(s, 'v40'), 'verde', 'cambiare tipo non cambia il colore');
+  assert.equal(K.fiammeColoreMonta(s, 'panda141', 'verde').spesa, 0, 'già tuo');
+  K.fiammeColoreMonta(s, 'v40', 'naturale'); assert.equal(K.fiammeColore(s, 'v40'), null);
+  assert.equal(K.fiammePal(null, 0.3, 'rosa'), 'rosa', 'il colore scelto comanda'); assert.equal(K.fiammePal(null, 0.3), null);
+});
+
+test('fiamme: i salvataggi con i vecchi kit colorati diventano Fiammata media col loro colore', () => {
+  const s = { fiamme: { own: { smeraldo: true, neon: true, lancia: true }, mont: { v40: 'smeraldo', e36: 'neon', supra: 'lancia' } } };
+  assert.equal(K.fiammeKit(s, 'v40').id, 'media'); assert.equal(K.fiammeColore(s, 'v40'), 'verde');
+  assert.equal(K.fiammeKit(s, 'e36').id, 'media'); assert.equal(K.fiammeColore(s, 'e36'), 'viola');
+  assert.equal(K.fiammeKit(s, 'supra').id, 'lancia'); assert.equal(K.fiammeColore(s, 'supra'), null);
+  assert.ok(s.fiamme.own.media && s.fiamme.own.verde && s.fiamme.own.viola && !s.fiamme.own.smeraldo, 'quello che avevano pagato resta loro');
+  const prima = JSON.stringify(s); K.fiammeMigra(s); assert.equal(JSON.stringify(s), prima, 'la migrazione si fa una volta sola');
+});
+
+test('fiamme: ogni tipo ha il suo carattere', () => {
   assert.ok(quoteKit(kitDi('ossidrica'), 'limiter').torch > 0.7, 'ossidrica: getto blu');
   const l = quoteKit(kitDi('lancia'), 'liftHigh'); assert.ok(l.big > 0.6 && l.bang === 0, 'lanciafiamme: grosse al rilascio alto');
   assert.ok(quoteKit(kitDi('mitraglia'), 'limiter').bang > 0.85, 'mitraglia: botti');
-  for (const id of ['smeraldo', 'neon']) { const q = quoteKit(kitDi(id), 'lift'); assert.ok(q.free > 0.6 && q.torch === 0, id); }
-  assert.equal(K.fiammePal(kitDi('smeraldo'), 0.5), 'verde');
-  assert.equal(K.fiammePal(kitDi('neon'), 0.1), 'viola'); assert.equal(K.fiammePal(kitDi('neon'), 0.99), 'blu');
-  assert.ok(['arancio', 'gialla'].includes(K.fiammePal(kitDi('lancia'), 0.7)));
-  assert.equal(K.fiammePal(null, 0.5), null, 'senza kit il colore di sempre');
+  assert.ok(quoteKit(kitDi('botto'), 'lift').bang > 0.8, 'botto: botti');
+  assert.ok(quoteKit(kitDi('grossa'), 'liftHigh').big > 0.7, 'grossa: la grossa');
+  assert.ok(['arancio', 'gialla'].includes(K.fiammePal({ pal: ['arancio', 'gialla'] }, 0.7)), 'compatibile coi kit col colore dentro');
 });
 
 // ---------------------------------------------------------------- i caratteri delle fiamme (v0.169)
@@ -186,7 +214,7 @@ test('fiamme: i kit di Luca scelgono il loro carattere e il loro colore', () => 
   assert.ok(qTipo(0, 'liftHigh', kit('lancia'), {}).drago > 0.7, 'lanciafiamme');
   assert.ok(qTipo(0, 'limiter', kit('mitraglia'), {}).mitraglia > 0.7, 'mitraglia');
   const o = qTipo(0, 'limiter', kit('ossidrica'), {}); assert.ok(o.torch > 0.5 && o.drag > 0.3, 'ossidrica: getto e foglio blu');
-  assert.equal(C.fiammaPalTipo('rally', kit('smeraldo'), 0.4), 'verde', 'il kit comanda sul colore');
+  assert.equal(C.fiammaPalTipo('rally', null, 0.4, 'verde'), 'verde', 'il colore scelto comanda'); assert.equal(C.fiammaPalTipo('rally', kit('lancia'), 0.4, 'rosa'), 'rosa');
   assert.equal(C.fiammaPalTipo('drag', null, 0.4), 'blu'); assert.ok(['arancio', 'gialla'].includes(C.fiammaPalTipo('rally', null, 0.4)));
 });
 
@@ -197,4 +225,11 @@ test('fiamme: ogni carattere ha più varianti e la stessa preparazione non rifà
   }
   const lunghezze = new Set(); for (let i = 0; i < 40; i++) lunghezze.add(Math.round(C.fiammaCopione('rally', 2, C.fiammaRnd(i + 1)).pops[0].len));
   assert.ok(lunghezze.size > 15, 'le lunghezze cambiano a ogni scena');
+});
+
+test('fiamme: la misura del tipo scelto cambia davvero la fiamma (grossa > media > botto)', () => {
+  const lun = (sc) => { let t = 0; for (let i = 0; i < 40; i++) { const c = C.fiammaCopione('rally', 1, C.fiammaRnd(i + 1), sc); t += Math.max(...c.pops.map((p) => p.len)); } return t / 40; };
+  assert.ok(lun(1.3) > lun(1) * 1.2 && lun(1) > lun(0.95) && lun(0.95) > lun(0.7), 'più grande col tipo più grosso');
+  const th = (sc) => C.fiammaCopione('drag', 1, C.fiammaRnd(3), sc).pops[0].th;
+  assert.ok(th(1.3) > th(1), 'anche lo spessore');
 });
