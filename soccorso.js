@@ -24,7 +24,14 @@ const SOC = {
   spot: { hood: 3.1, wheelF: 1.4, wheelR: -1.5, flap: -2.0 },   // dove lavora, in m dal centro dell'auto
   soglia: { oil: 0.85, plugs: 0.85, pads: 0.85 },               // sotto questo livello la manutenzione serve
   traino: { base: 60, perKm: 12, v: 13, dur: 5, danni: 0.6 },   // € di base e al km fino all'officina; m/s e secondi di strada col carro; danni da cui serve
+  // il pianale del carro attrezzi (v0.175, come nel video di Nico): misure in pixel del disegno HD del carro (img/carro_hd.png,
+  // 945 = 10,8 m), tempi in secondi. Scivola indietro di `slide` e si inclina di `sl` finché la punta tocca terra; il verricello
+  // tira su l'auto fino a `posto` m dalla coda del pianale; poi il pianale torna giù e si blocca.
+  pianale: { front: 715, top: 175, ground: 308.2, rampa: 160, rampaDY: 47, coda: 15, slide: 160, sl: 0.099, y0: 168,
+    invito: 0.6, posto: 3.3, leve: 2.3, porta: 3.4,
+    t: { leva: 3, aggancia: 2, verricello: 6.5, abbassa: 3 } },
 };
+const SOC_PM = 10.8 / 945;   // metri per pixel del disegno HD del carro attrezzi
 const SOC_NOMI = { fuel: 'Rifornimento', body: 'Carrozzeria', tyres: 'Gonfia e ripara le gomme', newtyres: 'Gomme nuove', maint: 'Manutenzione', traino: 'Traino' };
 // l'aspetto di Nico, il meccanico del furgone (lo stesso dell'interno dell'Officina Nico, LOOK.nico in interni_hd.js)
 const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', testaCol: 2, sopra: 'felpa', sopraCol: 1, barba: 'corta', occhiali: 'sole', x: { canotta: true, tatuaggi: true, catena: true } };
@@ -108,7 +115,7 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
   };
   P.socAnnulla = function (testo) {
     const S = this.soc; if (!S) return;
-    if (S.van) { S.van.soc = false; S.van.still = false; S.van.hazard = false; S.van.vBase = S.van.vT = Math.max(S.van.v || 0, 12); }
+    if (S.van) { S.van.soc = false; S.van.still = false; S.van.hazard = false; S.van.dietro = false; if (S.van.vt === 'carro_telaio') S.van.vt = 'carro'; S.van.vBase = S.van.vT = Math.max(S.van.v || 0, 12); }
     this.soc = null; this.ap = null; if (testo) this.say(testo, 'bad');
   };
 
@@ -125,14 +132,25 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
 
   // il copione del meccanico: scende, va ai punti di lavoro nell'ordine che costa meno strada, saluta, torna
   P.socPlan = function () {
-    const S = this.soc, d = this.s.dist, SP = {}, door = S.tx + 0.55, segs = [];
+    const S = this.soc, d = this.s.dist, SP = {}, segs = [];
+    const carro = S.van && S.van.vt === 'carro' && S.sv.some((s) => s.id === 'traino'), B = SOC.pianale;
+    const door = carro ? S.tx + B.porta : S.tx + 0.55;
     for (const k of Object.keys(SOC.spot)) SP[k] = d + SOC.spot[k];                    // metri assoluti sulla strada
     let t = 0, pos = door;
     const walk = (to) => { const dur = Math.max(0.3, Math.abs(to - pos) / SOC.walkV); segs.push({ k: 'walk', t0: t, t1: t + dur, from: pos, to }); t += dur; pos = to; };
     const work = (id, at, dur, p0, p1, kind) => { if (Math.abs(pos - at) > 0.05) walk(at); segs.push({ k: 'work', id, kind: kind || id, at, t0: t, t1: t + dur, p0, p1 }); t += dur; };
     segs.push({ k: 'out', t0: 0, t1: 0.9, at: door }); t = 0.9;
     const by = (id) => S.sv.find((s) => s.id === id);
-    if (by('traino')) work('traino', SP.hood, 3, 0, 1);
+    if (by('traino') && carro) {
+      // il carro attrezzi vero: leve dietro la cabina, il pianale scende, la catena al muso, il verricello tira su, il pianale torna giù
+      const rear0 = S.tx - S.van.len / 2, leve = rear0 + B.leve, T = B.t;
+      S.d0 = d; S.rear0 = rear0; S.ddT = S.tx - (rear0 + B.posto); S.bedU = 0;
+      S.van.vt = 'carro_telaio'; S.van.dietro = true;                                    // il pianale lo disegna soccorso.js (socDietro), sotto la nostra auto
+      work('traino', leve, T.leva, 0, 0.15, 'leva');
+      work('traino', SP.hood, T.aggancia, 0.15, 0.25, 'aggancia');
+      work('traino', leve, T.verricello, 0.25, 0.75, 'verricello');
+      work('traino', leve, T.abbassa, 0.75, 1, 'abbassa');
+    } else if (by('traino')) work('traino', SP.hood, 3, 0, 1);
     if (by('body')) work('body', SP.hood, 5.5, 0, 1);
     if (by('maint')) work('maint', SP.hood, 4.5, 0, 1);
     if (by('tyres')) { work('tyres', SP.wheelF, 2.2, 0, 0.5); work('tyres', SP.wheelR, 2.2, 0.5, 1); }
@@ -142,6 +160,25 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
     walk(door);
     segs.push({ k: 'in', t0: t, t1: t + 0.6, at: door }); t += 0.6;
     S.seq = { segs, end: t }; S.mt = 0; S.ph = 'work';
+  };
+
+  // a che punto è il carico sul carro attrezzi: u = pianale inclinato (0 giù, 1 a terra), cv = verricello (0..1)
+  P.socCarico = function () {
+    const S = this.soc; if (!S || !S.seq) return { u: S && S.bedU || 0, cv: 0, gancio: 0 };
+    const seg = (kind) => S.seq.segs.find((g) => g.k === 'work' && g.kind === kind);
+    const pr = (g) => (g ? cl((S.mt - g.t0) / (g.t1 - g.t0)) : 0);
+    return { u: ez(pr(seg('leva'))) - ez(pr(seg('abbassa'))), cv: ez(pr(seg('verricello'))), gancio: pr(seg('aggancia')) };
+  };
+  // altezza (m) del pianale sotto un punto della strada (x in m): 0 per terra; la rampa d'invito davanti alla punta
+  P.socAltezza = function (x) {
+    const S = this.soc, e = S && S.van; if (!e) return 0;
+    const B = SOC.pianale, M = SOC_PM, u = S.bedU || 0;
+    const rear = e.x - e.len / 2 - B.slide * M * u, xb = (x - rear) / M;
+    if (xb > B.front) return 0;
+    const xc = Math.max(xb, B.coda), deck = xc >= B.rampa ? B.top : B.top + (B.rampa - xc) * B.rampaDY / (B.rampa - B.coda);
+    const h = Math.max(0, (B.ground - deck - B.sl * u * (B.front - xc)) * M);
+    if (xb >= B.coda) return h;
+    const dx = (B.coda - xb) * M; return dx < B.invito ? h * (1 - dx / B.invito) : 0;
   };
 
   // aggiorna lo stato vero dell'auto a seconda dell'avanzamento di un servizio (0..1)
@@ -193,12 +230,18 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
       }
     } else if (S.ph === 'work') {
       S.mt += dt;
+      if (S.rear0 != null) {                                                            // il carico sul pianale: l'auto la muove il verricello, poi il pianale
+        const C = this.socCarico(), B = SOC.pianale, slideM = B.slide * SOC_PM;
+        S.bedU = C.u; S.cavo = C.gancio > 0.6; S.salita = S.salita || C.cv > 0;
+        const c1 = S.rear0 - slideM + B.posto, x = S.d0 + (c1 - S.d0) * C.cv + (C.cv >= 1 ? slideM * (1 - C.u) : 0);
+        this.s.dist = x; this.s.far = Math.max(this.s.far || 0, x);
+      }
       for (const sv of S.sv) {
         let p = 0;
         for (const g of S.seq.segs) if (g.k === 'work' && g.id === sv.id && S.mt >= g.t0) p = Math.max(p, g.p0 + (g.p1 - g.p0) * cl((S.mt - g.t0) / (g.t1 - g.t0)));
         sv.p = p; this.socApplica(sv, p); if (p >= 1 && sv.id !== 'traino') this.socPaga(sv);
       }
-      if (S.mt >= S.seq.end && S.sv.some((s) => s.id === 'traino')) { S.ph = 'tow'; S.t = 0; S.dark = 0; if (this.diaAdd) this.diaAdd('soc', 'Il furgone ti aggancia e ti porta via', true); }
+      if (S.mt >= S.seq.end && S.sv.some((s) => s.id === 'traino')) { S.ph = 'tow'; S.t = 0; S.dark = 0; if (this.diaAdd) this.diaAdd('soc', S.rear0 != null ? 'Nico ti carica sul pianale e ti porta via' : 'Il furgone ti aggancia e ti porta via', true); }
       else if (S.mt >= S.seq.end) {
         S.ph = 'leave'; S.t = 0;
         const u = career(this) ? SOC.uscita : 0; this.s.money -= u; S.spent += u;
@@ -208,12 +251,13 @@ const SOC_LOOK = { pelle: 2, capelli: 'corti', capCol: 0, testa: 'cappellino', t
       }
     } else if (S.ph === 'tow') {                                                          // si va insieme (l'auto viene trainata), poi buio e si arriva
       const e = S.van, tw = SOC.traino, v = tw.v * Math.min(1, S.t / 1.2);
-      e.v = v; this.s.dist += v * dt; e.x = this.s.dist + (S.dd || SOC.dist); S.dark = cl((S.t - tw.dur) / 0.7);
+      e.v = v; this.s.dist += v * dt; e.x = this.s.dist + (S.ddT ?? S.dd ?? SOC.dist); S.dark = cl((S.t - tw.dur) / 0.7);
       if (S.t >= tw.dur + 0.7) {
         const sv = S.sv.find((x) => x.id === 'traino'), tgt = sv.st.x - 22;
         this.socPaga(sv);
         this.s.dist = tgt; this.s.far = Math.max(this.s.far || 0, tgt); this.nextTraffic = 0;
         this.ents = this.ents.filter((x) => x === e); e.x = tgt + (S.dd || SOC.dist); e.v = 0;
+        if (S.rear0 != null) { S.salita = false; S.cavo = false; S.bedU = 0; S.ddT = null; e.vt = 'carro'; e.dietro = false; }   // nel buio Nico ti ha già scaricato: l'auto è a terra dietro il carro
         this.say('Nico ti ha lasciato davanti all\'officina: premi U per entrare', 'info');
         if (this.diaAdd) this.diaAdd('soc', 'Col carro attrezzi di Nico fino all\'Officina Nico', true);
         S.ph = 'arrivo'; S.t = 0;
@@ -258,7 +302,9 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
     const S = game && game.soc; this._soc = S || null; this._socG = game || null;
     // inquadratura: l'auto si sposta a sinistra per far stare tutto il furgone nello schermo (come davanti a un locale)
     let hold = false;
-    if (S && S.ph !== 'brake' && !this.camHold) { const prev = this.st.cam; this.camHold = (cam) => { const b = prev ?? cam; return b + (0.31 - b) * Math.min(1, dt * 1.6); }; hold = true; }
+    // col carro attrezzi l'inquadratura tiene dentro carro e auto: il carro verso destra, l'auto che gli sale sopra al centro
+    const carro = S && S.van && /^carro/.test(S.van.vt) && game.s && S.van.x > game.s.dist;   // da quando il carro ci ha superato
+    if (S && S.ph !== 'brake' && !this.camHold) { const prev = this.st.cam; this.camHold = (cam, dist, W) => { const b = prev ?? cam, cv = carro ? Math.max(0.14, Math.min(0.5, 0.66 - (S.van.x - game.s.dist) * 30 / (W || 640))) : 0.31; return b + (cv - b) * Math.min(1, dt * 1.6); }; hold = true; }
     try { return up.call(this, dt, s, game); } finally { if (hold) this.camHold = null; }
   };
   const pr = P.present;
@@ -270,6 +316,31 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
   };
 
   const ink = '#10121c';
+  // il pianale del carro attrezzi, staccato dal disegno (strumenti/carro_pianale.py): lo si inclina e lo si fa scorrere qui
+  const PIA = { img: new Image(), hd: new Image() };
+  PIA.img.src = 'img/carro_pianale.png'; PIA.hd.src = 'img/carro_pianale_hd.png';
+  // l'altezza del pianale sotto l'auto, per street2d.js: solo da quando il verricello la tira su a quando arriva in officina
+  P.towPose = function (game) { const S = game.soc; return S && S.salita && game.socAltezza ? (x) => game.socAltezza(x) : null; };
+  // disegnato dopo il carro (che col pianale staccato è `carro_telaio` ed `e.dietro`) e prima della nostra auto
+  P.socDietro = function (g, S) {
+    const e = S.van, sc = e && e._scr; if (!e || e.vt !== 'carro_telaio' || !sc) return;
+    const hd = this.SS > 1 && PIA.hd.width, im = hd ? PIA.hd : PIA.img; if (!im.width) return;
+    const B = SOC.pianale, k = sc.k, u = S.bedU || 0, sl = B.sl * u, m = hd ? 2 : 1;
+    g.save(); g.imageSmoothingEnabled = false;
+    g.translate(sc.left - B.slide / 2 * k * u, sc.sy + sl * B.front / 2 * k);
+    g.transform(1, -sl, 0, 1, 0, 0);                                              // inclinato tagliando in verticale, come la cassa delle auto
+    g.drawImage(im, 0, B.y0 / 2 * k, im.width / m * k, im.height / m * k);
+    g.restore();
+  };
+  // il cavo del verricello, dal gancio sul carro al muso della nostra auto
+  function cavo(g, S, sc, cp) {
+    const ax = sc.left + 296 * sc.k, ay = sc.sy + 86 * sc.k;
+    const bx = cp.x + (cp.w || 120) / 2 - 3 * cp.k, by = cp.y + 12 * cp.k - (cp.towF || 0);
+    const n = Math.max(6, Math.round(Math.abs(bx - ax) / 3)), sag = S.salita ? 1 : 5;
+    for (let i = 0; i <= n; i++) { const u = i / n, X = Math.round(ax + (bx - ax) * u), Y = Math.round(ay + (by - ay) * u + Math.sin(u * Math.PI) * sag);
+      g.fillStyle = ink; g.fillRect(X - 1, Y - 1, 3, 3); g.fillStyle = i % 2 ? '#b8bfcc' : '#6a7080'; g.fillRect(X, Y, 1, 1); }
+    g.fillStyle = '#ffc21a'; g.fillRect(Math.round(bx) - 2, Math.round(by) - 1, 3, 3);   // il gancio giallo
+  }
   // dove sta il meccanico adesso: { x (m), pose, a, dir, kneel, seg }
   function man(S) {
     if (S.ph !== 'work' || !S.seq) return null;
@@ -279,7 +350,7 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
     if (g.k === 'out') return { x: g.at, a: u, dir: -1, walk: false, seg: g, u };
     if (g.k === 'in') return { x: g.at, a: 1 - u, dir: 1, walk: false, seg: g, u };
     if (g.k === 'walk') { const e = u * u * (3 - 2 * u), f = g.from + (g.to - g.from) * e; return { x: f, a: 1, dir: Math.sign(g.to - g.from) || 1, walk: true, ph: Math.abs(g.to - g.from) * e / 1.1, seg: g, u }; }
-    return { x: g.at, a: 1, dir: g.k === 'wave' ? 1 : -1, walk: false, pose: g.k === 'wave' ? 'wave' : 'idle', kneel: g.k === 'work' && (g.kind === 'tyres' || g.kind === 'newtyres'), seg: g, u };
+    return { x: g.at, a: 1, dir: g.k === 'wave' ? 1 : -1, walk: false, pose: g.k === 'wave' ? 'wave' : 'idle', kneel: g.k === 'work' && (g.kind === 'tyres' || g.kind === 'newtyres' || g.kind === 'aggancia'), seg: g, u };
   }
 
   P.socDraw = function (g, S, game) {
@@ -287,17 +358,18 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
     const e = S.van, sc0 = e && e._scr;
     // il furgone: lampeggiante sul tetto e la scritta sulla fiancata
     if (e && sc0 && e.x - dist > -40 && e.x - dist < 40) {
-      const ph = Math.floor(t * 6) % 2, bx = Math.round(sc0.left + sc0.w * 0.46), by = sc0.sy + 1;
+      const cr = /^carro/.test(e.vt), ph = Math.floor(t * 6) % 2, bx = Math.round(sc0.left + sc0.w * (cr ? 0.755 : 0.46)), by = Math.round(sc0.sy + (cr ? 4 * sc0.k : 1));   // il carro ha il lampeggiante sul tetto della cabina
       g.fillStyle = ink; g.fillRect(bx - 7, by, 15, 3);
       g.fillStyle = ph ? '#ffb020' : '#7a4a08'; g.fillRect(bx - 6, by - 2, 6, 3);
       g.fillStyle = ph ? '#7a4a08' : '#ffb020'; g.fillRect(bx + 1, by - 2, 6, 3);
       this.light(g, bx + (ph ? -3 : 4), by, 46, 22, '#ffa020', 0.22, 3); this.light(g, bx + (ph ? -3 : 4), by + 14, 90, 8, '#ffa020', 0.08, 3);
       if (this.lightAdd) this.lightAdd(bx, by, 130, 50, '255,170,40', ph ? 0.5 : 0.3);
       const tx = Math.round(sc0.left + sc0.w * 0.13), ty = Math.round(sc0.sy + sc0.h * 0.5);
-      this.text(g, 'SOCCORSO', tx + 1, ty + 1, ink, 1); this.text(g, 'SOCCORSO', tx, ty, '#ff9f1a', 1);
+      if (!/^carro/.test(e.vt)) { this.text(g, 'SOCCORSO', tx + 1, ty + 1, ink, 1); this.text(g, 'SOCCORSO', tx, ty, '#ff9f1a', 1); }   // sul carro attrezzi starebbe sopra il pianale
     }
     const tw = S.sv && S.sv.some((x) => x.id === 'traino');
-    if (tw && e && sc0 && (S.ph === 'tow' || (S.ph === 'work' && S.seq && S.mt > 1.5))) {      // la catena dal muso dell'auto alla coda del furgone
+    if (tw && e && sc0 && e.vt === 'carro_telaio' && S.cavo) cavo(g, S, sc0, cp);
+    else if (tw && e && sc0 && e.vt !== 'carro_telaio' && S.rear0 == null && (S.ph === 'tow' || (S.ph === 'work' && S.seq && S.mt > 1.5))) {      // la catena dal muso dell'auto alla coda del furgone
       const ax = Math.round(sc0.left + 3), ay = Math.round(sc0.y - 12 * (sc0.k || 1)), bx = SX(dist + 2.25), by = Math.round(this.laneY(this.st.lz) - 11);
       for (let i = 0; i <= 22; i++) { const u = i / 22, X = Math.round(ax + (bx - ax) * u), Y = Math.round(ay + (by - ay) * u + Math.sin(u * Math.PI) * 4);
         g.fillStyle = ink; g.fillRect(X - 1, Y - 1, 4, 3); g.fillStyle = i % 2 ? '#9aa3b8' : '#5a6070'; g.fillRect(X, Y, 2, 1); }
@@ -309,7 +381,18 @@ if (typeof window !== 'undefined') Object.assign(window, { SOC, SOC_NOMI, SOC_LO
     // effetti del lavoro
     if (work) {
       const hx = px + m.dir * 11, hyy = py - 20 + bob, T6 = t * 6;
-      if (seg.kind === 'body') {
+      if (seg.kind === 'leva' || seg.kind === 'abbassa' || seg.kind === 'verricello') {   // alle leve del carro: idraulica e verricello
+        const lx = px + m.dir * 7, ly = py - 22;
+        g.fillStyle = ink; g.fillRect(lx - 1, ly - 1, 3, 10); g.fillStyle = '#d23a2a'; g.fillRect(lx, ly + (Math.floor(t * 2) % 2), 1, 3);
+        const fine = seg.kind === 'abbassa' && m.u > 0.92, b = Math.floor(t / (seg.kind === 'verricello' ? 1.4 : 1.1));
+        if (this._socB !== b || (fine && this._socB !== 'clac')) {
+          this._socB = fine ? 'clac' : b;
+          const sx2 = e && e._scr ? e._scr.left + (seg.kind === 'verricello' ? 300 : 200) * e._scr.k : px, sy2 = e && e._scr ? e._scr.sy + 60 * e._scr.k : py - 40;
+          this.comic(fine ? 'CLAC!' : seg.kind === 'verricello' ? 'RRRRRR' : 'PSSHHH', sx2, sy2, fine ? '#ffd23f' : '#e8f0ff', 2);
+        }
+      } else if (seg.kind === 'aggancia') {
+        const b = Math.floor(t / 0.8); if (this._socB !== b) { this._socB = b; this.comic('CLINK!', px + m.dir * 12, py - 28, '#ffd23f', 2); }
+      } else if (seg.kind === 'body') {
         for (let i = 0; i < 7; i++) { const ph = (t * 5 + i * 0.29) % 1; g.fillStyle = i % 2 ? '#ffd23f' : '#fff3b0'; g.fillRect(Math.round(hx + m.dir * (ph * 12 + i % 3)), Math.round(hyy - 2 + ph * ph * 16 - (1 - ph) * 6), 1, 1); }
         this.light(g, hx, hyy, 22, 12, '#ffcf5a', Math.floor(t * 9) % 2 ? 0.2 : 0.06, 3);
         const b = Math.floor(t / 0.9); if (this._socB !== b) { this._socB = b; this.comic(b % 2 ? 'CLANG!' : 'TOC TOC', hx, hyy - 18, '#ffd23f', 2); }

@@ -411,6 +411,10 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
     const S = st(this), d = this.s.dist, kmh = this.kmh;
     this.polT = (this.polT || 0) + dt;
     for (const o of this.ents) if ((o.kind === 'velox' || o.kind === 'tutor') && o.flashT > 0) o.flashT -= dt;
+    // un salto di strada in un fotogramma (traino del carro attrezzi fino all'officina, «Vai a»): non si guidava, niente
+    // autovelox né Tutor in mezzo (prima il Tutor saltato dava una media di migliaia di km/h e una multa)
+    const salto = d0 !== undefined && d - d0 > 150;
+    if (salto) for (const c of S.ctl) if (c.k === 'tutor' && c.x2 > d0 && c.x < d) c.t0 = undefined;
     for (const c of S.ctl) {
       // cartello, autovelox e portali sulla strada quando si avvicinano (la strada butta via quello che è troppo lontano)
       if (!c.ents && c.x - d < 1300) {
@@ -419,13 +423,13 @@ const POL_SOBRIO = ['Mi sta passando. La testa torna al suo posto.', 'Ok, adesso
         this.ents.push({ id: this.id++, kind: c.k === 'tutor' ? 'tutor' : 'velox', lane: 0, x: c.x, v: 0, ctl: c, keep: true });
       }
       if (c.k === 'tutor' && c.ents && !c.ents2 && c.x2 - d < 1300) { c.ents2 = true; this.ents.push({ id: this.id++, kind: 'tutor', lane: 0, x: c.x2, v: 0, end: true, ctl: c, keep: true }); }
-      if (d0 < c.x && d >= c.x && !POL.off) {
+      if (!salto && d0 < c.x && d >= c.x && !POL.off) {
         if (c.k === 'velox') {
           const sf = speedFine(kmh), cam = this.ents.find((o) => o.ctl === c && o.kind === 'velox');
           if (sf) { if (cam) cam.flashT = 0.35; this.fx.push({ k: 'velox' }); this.polVerbale(sf, Math.round(kmh), 'autovelox'); }
         } else { c.t0 = this.polT; this.say(`Inizio Tutor: ${fmt((c.x2 - c.x) / 1000)} km di velocità media controllata`, 'info'); }
       }
-      if (c.k === 'tutor' && c.t0 !== undefined && d0 < c.x2 && d >= c.x2 && !POL.off) {
+      if (!salto && c.k === 'tutor' && c.t0 !== undefined && d0 < c.x2 && d >= c.x2 && !POL.off) {
         const avg = (c.x2 - c.x) / Math.max(1, this.polT - c.t0) * 3.6, sf = speedFine(avg); c.t0 = undefined;
         this.say(`Fine Tutor: media ${Math.round(avg)} km/h`, sf ? 'police' : 'info');
         if (sf) { const cam = this.ents.find((o) => o.ctl === c && o.kind === 'tutor' && o.end); if (cam) cam.flashT = 0.35; this.polVerbale(sf, Math.round(avg), 'Tutor (media)'); }

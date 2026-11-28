@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.174**
+**Versione attuale: v0.175**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -198,3 +198,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.172 · 27/11/2026 · proprietario · **Il duo diventa Duo Maniacs Studio**: marchio nuovo viola e oro (stemma esagonale col monogramma DM e la gemma viola, niente più turbine), anche nella sigla prima della schermata iniziale
 - v0.173 · 28/11/2026 · proprietario · **Marchio Duo Maniacs Studio scelto**: due anelli intrecciati (grigio acciaio e rosso cupo) su nero e grigio antracite, scritte spaziate; nuovo anche nella sigla del gioco
 - v0.174 · 28/11/2026 · proprietario · **Schermata iniziale viva**: dietro il nottolino Roma di notte disegnata dal gioco in tempo reale (via del Corso, la cupola, passanti e traffico), con la tua auto che passa piano
+- v0.175 · 28/11/2026 · proprietario · **Traino col carro attrezzi, come nel video**: il pianale si inclina, Nico aggancia la catena, il verricello tira su l'auto, il pianale si abbassa e si blocca; niente più multa del Tutor saltato dal traino

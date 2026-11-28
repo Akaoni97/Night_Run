@@ -103,6 +103,30 @@ test('carro attrezzi di Nico: auto distrutta = all\'Officina Nico; si arriva dav
   const b = trip2(); b.sim.damage = 0.1; assert.ok(!b.game.socServizi().find((s) => s.id === 'traino').ok, 'l\'auto cammina: niente traino');
 });
 
+test('carro attrezzi (v0.175): il pianale scende, il verricello tira su l\'auto, il pianale torna giù con l\'auto sopra e si parte', () => {
+  const { sim, game } = trip2(); sim.damage = 0.9;
+  assert.ok(game.socCall(['traino']).ok);
+  assert.ok(giro(game, 60, () => game.soc && game.soc.seq), 'Nico è arrivato e ha il suo copione');
+  const S = game.soc, d0 = game.s.dist, e = S.van;
+  assert.equal(e.vt, 'carro_telaio', 'pianale staccato dal disegno'); assert.ok(e.dietro, 'il carro si disegna sotto la nostra auto');
+  assert.deepEqual(S.seq.segs.filter((g) => g.k === 'work').map((g) => g.kind), ['leva', 'aggancia', 'verricello', 'abbassa']);
+  const M = 10.8 / 945, B = SOC.pianale;
+  assert.ok(Math.abs(game.socAltezza(e.x - 2) - (B.ground - B.top) * M) < 0.01, 'pianale giù: il piano è a 1,5 m');
+  let uMax = 0, hTip = 9, salita = false, hMax = 0;
+  assert.ok(giro(game, 60, () => {
+    uMax = Math.max(uMax, S.bedU || 0);
+    if (S.bedU > 0.99) hTip = Math.min(hTip, game.socAltezza(e.x - e.len / 2 - B.slide * M + B.coda * M));
+    if (S.salita) { salita = true; hMax = Math.max(hMax, game.socAltezza(game.s.dist)); }
+    return S.ph === 'tow';
+  }), 'arriva alla partenza');
+  assert.ok(uMax > 0.99, 'il pianale si è inclinato tutto'); assert.ok(hTip < 0.3, `la punta tocca quasi terra (${hTip.toFixed(2)} m)`);
+  assert.ok(salita && hMax > 1.4, 'l\'auto è salita sul piano');
+  assert.ok(game.s.dist - d0 > 6, 'il verricello ha tirato l\'auto in avanti');
+  assert.ok(Math.abs(e.x - game.s.dist - S.ddT) < 0.05, 'ferma sul pianale, nel suo posto'); assert.ok(S.bedU < 0.01, 'pianale di nuovo giù');
+  assert.ok(Math.abs(game.socAltezza(game.s.dist) - (B.ground - B.top) * M) < 0.01, 'sul piano');
+  assert.ok(giro(game, 30, () => S.ph === 'arrivo')); assert.equal(e.vt, 'carro', 'in officina l\'auto è a terra e il carro torna intero'); assert.ok(!S.salita && !e.dietro);
+});
+
 test('traino: se salteresti la consegna non si può', () => {
   const { sim, game } = trip2(); sim.damage = 0.9;
   const x = game.socServizi().find((s) => s.id === 'traino').st.x; game.vgGoal = () => ({ x: x - 100 }); assert.ok(game.socServizi().find((s) => s.id === 'traino').ok, 'senza consegna in corso si può'); game.s.trunk.push({ kind: 'missione', kg: 1 });

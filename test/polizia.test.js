@@ -157,6 +157,10 @@ test('polizia: gli autovelox sono pochi (a volte tratti liberi di 7-12 km), il T
   assert.equal(u.s.money, mu - 173, 'multa alla fine del tratto'); assert.equal(u.polState().verb.length, 0);
   assert.ok(u.ents.some((o) => o.kind === 'tutor' && o.end && o.flashT !== undefined), 'la telecamera di fine tratto ha lampeggiato');
   assert.ok(t.polPins(t.s.dist - 5000, t.s.dist + 5000).length >= 0);
+  // un salto di strada (traino del carro attrezzi fino all'officina, «Vai a») non passa da autovelox né Tutor (v0.175)
+  const { game: w } = trip(); w.polState().nextKm = 1e9; w.polState().ctl = [{ k: 'tutor', x: w.s.dist + 10, x2: w.s.dist + 1010 }, { k: 'velox', x: w.s.dist + 2000 }];
+  const mw = w.s.money; w.sim.v = 160 / 3.6; w.s.dist += 5000; w.polCams(1 / 30, w.s.dist - 5000);
+  assert.equal(w.s.money, mw, 'saltati senza multe'); assert.equal(w.polState().verb.length, 0);
 });
 
 test('polizia: il posto di controllo non ti ferma e non ti insegue: passi e ti multano (documenti e velocità); da ricercato niente multa, ti inseguono', () => {

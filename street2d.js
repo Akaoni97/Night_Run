@@ -2299,7 +2299,8 @@ class Street2D {
     };
     const myZ = st.lz;
     const myY = this.laneY(myZ);
-    for (const e of items) if (e._y < myY - 0.01) drawEnt(e); else front.push(e);   // dietro di noi chi è più lontano, davanti chi è più vicino
+    for (const e of items) if (e._y < myY - 0.01 || e.dietro) drawEnt(e); else front.push(e);   // dietro di noi chi è più lontano, davanti chi è più vicino (e chi è `dietro`: il carro attrezzi che ci carica)
+    if (this.socDietro && game && game.soc) this.socDietro(g, game.soc, game, wx);   // il pianale del carro attrezzi, sotto la nostra auto (soccorso.js)
 
     // ---- la Supra
     const IN = game && game.inside && !game.rulliVista ? game.inside : null;   // sui rulli dal vivo (banco.js) l'auto si vede in strada, davanti al negozio
@@ -2309,13 +2310,18 @@ class Street2D {
     const entLift = EP ? EP.lift : IN ? (IN.id === 'fuel' ? 12 : 30) * entE : 0;
     const entA = EP ? EP.a : IN && IN.id !== 'fuel' ? 1 - Math.max(0, (entE - 0.5) / 0.5) : 1;
     const entDX = EP ? EP.dx : IN ? Math.round((wx(IN.x) - carX) * Math.min(1, entE * 1.6)) : 0;
-    const y0 = Math.round(this.laneY(myZ) - entLift), k = kq(y0), sc = k;
+    // sul pianale del carro attrezzi (soccorso.js, `towPose`: altezza in metri del piano sotto un punto della strada):
+    // la ruota dietro sale all'altezza del piano, quella davanti segue la rampa e la cassa si inclina
+    let towR = 0, towF = 0;
+    const towH = this.towPose && game ? this.towPose(game) : null;
+    if (towH) { const k0 = kq(this.laneY(myZ)), G0 = this.geo(), half = this.carSprite(k0).width / 2; towR = towH(dist + (G0.ax[0] * k0 - half) / 30) * 30; towF = towH(dist + (G0.ax[1] * k0 - half) / 30) * 30 - towR; }
+    const y0 = Math.round(this.laneY(myZ) - entLift - towR), k = kq(y0 + towR), sc = k;
     const spr0 = this.carSprite(k), spr = (s.damage || 0) > 0.01 ? this.damaged(spr0, s.damage, this.geo()) : spr0, SW = spr.width, left = Math.round(carX + entDX - SW / 2);
     if (cambio) this.cgCamera = { x: carX - 7 * k, y: y0 - 48 * k, z: Math.max(1, Math.min(1.68, W / (SW + 68))) };
     const hlK = (s.damage || 0) > 0.35 ? (Math.sin(st.t * 37) + Math.sin(st.t * 13.7) > 0.3 ? 0.45 : 0.12) : 1;   // faro rotto: debole e tremolante
     if (game && game.s && game.s.vg && game.s.vg.trailerOn && this.drawTrailer && !(typeof VG_CARGO !== 'undefined' && VG_CARGO[game.car])) this.drawTrailer(g, left, y0, k, s, st);
     g.globalAlpha = entA;
-    this.carPos = { x: left + SW / 2, y: y0 - 22 * k, k };
+    this.carPos = { x: left + SW / 2, y: y0 - 22 * k, k, w: SW, towF };
     const GE0 = this.geo();
     if (s.ign) this.light(g, left + SW + (s.high ? 110 : 60) * k, y0 - 2, s.high ? 150 : 80, s.high ? 9 : 7, '#fff2c4', s.high ? 0.1 : 0.08, 4);   // pozza dei fari (più lunga con gli abbaglianti)
     if (this.lightAdd) {
@@ -2367,8 +2373,9 @@ class Street2D {
     const asse = anteriore ? 1 : 0;
     const lift = cambio?.lift ? wr * 0.46 * cambio.lift : 0;
     const jackSlope = lift ? -lift / ((GE.ax[asse] - GE.ax[1 - asse]) * k) : 0;
-    const pendenza = skew + skW + jackSlope, altezza = 1 - squash;
-    const origineY = top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0) - jackSlope * GE.ax[1 - asse] * k;
+    const towSl = towF ? -towF / ((GE.ax[1] - GE.ax[0]) * k) : 0;               // muso su sulla rampa del carro attrezzi
+    const pendenza = skew + skW + jackSlope + towSl, altezza = 1 - squash;
+    const origineY = top - skew * SW / 2 - skW * whX0 - (spr.img ? k : 0) - jackSlope * GE.ax[1 - asse] * k - towSl * GE.ax[0] * k;
     const cgCar = cambio && { left, ground: y0, scale: k, radius: wr,
       rear: left + GE.ax[0] * k, front: left + GE.ax[1] * k, door: left + (GE.hx ?? 108) * k,
       wheel: left + GE.ax[asse] * k,
@@ -2432,7 +2439,7 @@ class Street2D {
       const fwd = !!s.fwd, spinV = Math.abs(s.ww * 0.322), rollV = Math.abs(s.v);
       for (let q = 0; q < 2; q++) {
         const motrice = fwd ? q === 1 : q === 0;
-        const x = left + GE.ax[q] * k, y = y0 - wr - Math.max(0, (q === 1 ? bF : bR) * 0.4) - (q === 1 ? whF : 0) - (q === asse ? lift : 0);
+        const x = left + GE.ax[q] * k, y = y0 - wr - Math.max(0, (q === 1 ? bF : bR) * 0.4) - (q === 1 ? whF + towF : 0) - (q === asse ? lift : 0);
         if (q === asse && cambio?.lato === 'vicino' && cambio.smontata) this.brake(g, x, y, k * 0.86, 0, q === 0);
         else wfn(g, x, y, k, motrice ? st.spin : st.front, motrice ? spinV : rollV, q === 0);
       }
