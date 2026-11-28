@@ -16,9 +16,12 @@ test('prologo: parte solo a inizio di un Viaggio nuovo', () => {
   assert.equal(proShould(null), false);
 });
 
-test('prologo: sei auto, tutte si possono scegliere, ognuna una sola volta', () => {
-  assert.equal(PRO_AUTO.length, 6);
-  assert.equal(PRO_AUTO.filter((a) => a.ok).length, 6); assert.equal(new Set(PRO_AUTO.map((a) => a.id)).size, 6); assert.ok(PRO_AUTO.some((a) => a.id === 'v40'));
+test('prologo: le sei auto dell’eredità sono le utilitarie di prima generazione e le due familiari', () => {
+  assert.deepEqual(PRO_AUTO.map(({ id }) => id), ['panda141', 'ax', 'twingo', 'punto1', 'a80', 'v40']);
+  for (const { id, ok } of PRO_AUTO) {
+    assert.equal(ok, true, `${id} selezionabile`);
+    assert.ok(readFileSync(new URL(`../img/${id}.png`, import.meta.url)).length > 0, `${id} ha una carrozzeria`);
+  }
 });
 
 test('prologo: lettera e colloquio hanno testo', () => {
