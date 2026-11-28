@@ -368,21 +368,27 @@
     const SS = this.SS, rain = !!this.rainOn, RW = Math.ceil(W / 2), RH = 53;
     const rf = this._rfHD || (this._rfHD = document.createElement('canvas'));
     if (rf.width !== RW || rf.height !== RH) { rf.width = RW; rf.height = RH; }
-    const rg = rf.getContext('2d'); rg.imageSmoothingEnabled = true; rg.imageSmoothingQuality = 'medium'; rg.clearRect(0, 0, RW, RH);
-    rg.drawImage(this.lo, 0, 110 * SS, W * SS, 106 * SS, 0, 0, RW, RH);
     const st = 1 / SS;
     // (prestazioni, 23/11/2026) prima 180 copie a strisce, ognuna capovolta e sfumata da sola; ora il riflesso si capovolge
     // e si sfuma (1 − r/95) tutto insieme in una tela, e si copiano solo i tratti di righe con lo stesso spostamento
     // (sull'asciutto quasi tutte): stesso disegno, molte meno copie
-    const fl = this._rfFl || (this._rfFl = document.createElement('canvas'));
-    if (fl.width !== W * SS || fl.height !== 90 * SS) { fl.width = W * SS; fl.height = 90 * SS; }
-    const fx = fl.getContext('2d');
-    fx.save(); fx.globalCompositeOperation = 'copy'; fx.imageSmoothingEnabled = true; fx.imageSmoothingQuality = 'medium';
-    fx.setTransform(SS, 0, 0, -SS, 0, 105 * 0.85 * SS);            // riga r della tela = riga (105 − r/0,85)/2 del riflesso
-    fx.drawImage(rf, 0, 0, RW, RH, 0, 0, W, 106 * 0.85);
-    fx.setTransform(SS, 0, 0, SS, 0, 0); fx.globalCompositeOperation = 'destination-in';
-    const fade = fx.createLinearGradient(0, 0, 0, 95); fade.addColorStop(0, 'rgba(0,0,0,1)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
-    fx.fillStyle = fade; fx.fillRect(0, 0, W, 90); fx.restore();
+    // (prestazioni, 28/11/2026) la tela capovolta sta alla risoluzione del riflesso (mezza unità: è già sfocato, una tela
+    // più fitta conteneva solo pixel ingranditi) e sull'asciutto, dove si vede appena, si rifà un fotogramma sì e uno no
+    const FK = 0.5, fl = this._rfFl || (this._rfFl = document.createElement('canvas'));
+    const nuovo = fl.width !== RW || fl.height !== 45;
+    if (nuovo) { fl.width = RW; fl.height = 45; }
+    this._rfN = (this._rfN || 0) + 1;
+    if (nuovo || rain || this._rfN % 2 === 0) {
+      const rg = rf.getContext('2d'); rg.imageSmoothingEnabled = true; rg.imageSmoothingQuality = 'medium'; rg.clearRect(0, 0, RW, RH);
+      rg.drawImage(this.lo, 0, 110 * SS, W * SS, 106 * SS, 0, 0, RW, RH);
+      const fx = fl.getContext('2d');
+      fx.save(); fx.globalCompositeOperation = 'copy'; fx.imageSmoothingEnabled = true; fx.imageSmoothingQuality = 'medium';
+      fx.setTransform(FK, 0, 0, -FK, 0, 105 * 0.85 * FK);            // riga r della tela = riga (105 − r/0,85)/2 del riflesso
+      fx.drawImage(rf, 0, 0, RW, RH, 0, 0, W, 106 * 0.85);
+      fx.setTransform(FK, 0, 0, FK, 0, 0); fx.globalCompositeOperation = 'destination-in';
+      const fade = fx.createLinearGradient(0, 0, 0, 95); fade.addColorStop(0, 'rgba(0,0,0,1)'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+      fx.fillStyle = fade; fx.fillRect(0, 0, W, 90); fx.restore();
+    }
     g.save(); g.globalCompositeOperation = 'lighter'; g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'medium';
     g.globalAlpha = wetA * (rain ? 1 : 0.9);
     const amp0 = rain ? 1.6 : 0.35, ph = t * (rain ? 6 : 2.5), wobOf = (r) => Math.round(Math.sin(r * 0.55 + ph) * (1 + r * 0.03) * amp0 * SS) / SS;
@@ -392,7 +398,7 @@
       const end = r >= 90 || r > R1, w = end ? NaN : wobOf(r);
       if (end || w !== w0) {
         const h = Math.min(r, 90) - r0;
-        g.drawImage(fl, 0, Math.round(r0 * SS), W * SS, Math.round(h * SS), w0, 241 + r0, W, h);
+        g.drawImage(fl, 0, r0 * FK, RW, h * FK, w0, 241 + r0, W, h);
         if (end) break;
         r0 = r; w0 = w;
       }

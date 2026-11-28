@@ -86,4 +86,4 @@ console.log('| Parte | Carico sul fotogramma (PC medio) | Stima | Misurato qui |
 console.log('|---|---|---|---|');
 for (const r of righe) console.log(`| ${r.nome} | ${barra(r.pc / BUDGET * 100)} | ~${pct(r.pc / BUDGET * 100)} | ${r.ms.toFixed(2).replace('.', ',')} ms |`);
 console.log(`| **Totale** | ${barra(tot / BUDGET * 100)} | **~${pct(tot / BUDGET * 100)}** | ${righe.reduce((s, r) => s + r.ms, 0).toFixed(1).replace('.', ',')} ms |`);
-if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify({ data: oggi, pioggia: PIOGGIA, media, righe, tot, budget: BUDGET, conv: CONV, heap: D.heap, ls: D.ls }, null, 1));
+if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify({ data: oggi, pioggia: PIOGGIA, media, righe, tot, budget: BUDGET, conv: CONV, heap: D.heap, ls: D.ls, funzioni: Object.fromEntries(Object.keys(D.self).map((k) => [k, +perFr(k).toFixed(3)]).sort((a, b) => b[1] - a[1])) }, null, 1));

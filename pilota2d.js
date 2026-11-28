@@ -227,6 +227,9 @@
     }
     // riflessi della strada sul vetro: due lame chiare inclinate che scorrono all'indietro
     x.globalCompositeOperation = 'source-over';
+    // i riflessi diagonali sono tolti: la tela dei riflessi serve solo col finestrino abbassato (il bordo del cristallo);
+    // a finestrino chiuso tre passate su tutta la figura non disegnavano niente (prestazioni, 28/11/2026)
+    if ((s.win || 0) > 0.01 && B) {
     const R = this._drvR || (this._drvR = document.createElement('canvas'));
     if (R.width !== L.width || R.height !== L.height) { R.width = L.width; R.height = L.height; }
     const rx = R.getContext('2d'); rx.globalCompositeOperation = 'source-over'; rx.clearRect(0, 0, R.width, R.height);
@@ -245,10 +248,15 @@
     }
     rx.globalCompositeOperation = 'destination-in'; rx.drawImage(M.glass, 0, 0);
     x.drawImage(R, 0, 0);
-    // sullo sprite: stessa trasformazione della carrozzeria
-    g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-    g.drawImage(L, 0, 0, w * F, h * F, 0, 0, spr.width, spr.height);
-    g.restore();
+    }
+    // sullo sprite: stessa trasformazione della carrozzeria. La figura grande (4 px per unità) si rimpicciolisce una volta
+    // sola, alla misura che avrà sullo schermo (_drvD, prestazioni 28/11/2026): nei fotogrammi in mezzo si copia quella
+    const SSd = this.SS || 1, Dw = Math.max(1, Math.round(spr.width * SSd)), Dh = Math.max(1, Math.round(spr.height * SSd));
+    const D = this._drvD || (this._drvD = document.createElement('canvas'));
+    if (D.width !== Dw || D.height !== Dh) { D.width = Dw; D.height = Dh; }
+    const dx = D.getContext('2d'); dx.clearRect(0, 0, Dw, Dh); dx.imageSmoothingEnabled = true; dx.imageSmoothingQuality = 'high';
+    dx.drawImage(L, 0, 0, w * F, h * F, 0, 0, Dw, Dh);
+    g.save(); g.imageSmoothingEnabled = true; g.drawImage(D, 0, 0, spr.width, spr.height); g.restore();
   };
 
   // contorno scuro attorno all'auto del giocatore (sotto la carrozzeria, mezza unità di spessore)
@@ -276,11 +284,8 @@
   S.drawDriver = function (g, spr, G, st, s, k) {
     const t = this.st.t || 0, c = this._drvC, L = this._drv;
     if (c && L && c.spr === spr && t >= c.t && t - c.t < 1 / DRV_HZ && this.drvLive !== true) {
-      const hd = spr.hd || spr;
       if (c.head) this._drvHead = { ax: c.head.ax, ay: c.head.ay, m: g.getTransform() };
-      g.save(); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-      g.drawImage(L, 0, 0, hd.width * F, hd.height * F, 0, 0, spr.width, spr.height);
-      g.restore();
+      g.save(); g.imageSmoothingEnabled = true; g.drawImage(this._drvD || L, 0, 0, spr.width, spr.height); g.restore();   // la figura già alla sua misura
       return;
     }
     dd0.call(this, g, spr, G, st, s, k);

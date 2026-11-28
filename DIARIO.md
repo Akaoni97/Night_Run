@@ -1,3 +1,7 @@
+## 28/11/2026 · proprietario (Nico) · v0.177 (**prestazioni: recupero, stessa grafica**)
+- Nico: «recupera». Asfalto a specchio (`wetHD`, `nitido2d.js`): la tela capovolta alla risoluzione del riflesso (prima 4 volte più grande) e sull'asciutto un aggiornamento ogni due fotogrammi: 9,9 → 3 ms in cloud. Pilota (`pilota2d.js`): figura rimpicciolita una volta per ridisegno e poi copiata; a finestrino chiuso niente tela dei riflessi (non disegnava niente): 2,4 → 1,7 ms.
+- Misura: città di notte da ~60 % a ~53-55 % del fotogramma sul PC medio (stima), con la pioggia da ~64 % a ~57 %. Foto prima e dopo identiche (asciutto e pioggia). La foschia non costa davvero (spenta il gioco non va più veloce). `strumenti/carico.js` salva anche i tempi per funzione nel JSON. Dettagli in `SFRUTTAMENTO.md`.
+
 ## 28/11/2026 · proprietario (Nico) · **sfruttamento del motore rifatto, avvisi letti**
 - Nico ha letto i due avvisi di Luca del 23/11 (sfruttamento del motore e risposte sulle capitali): tolti da `AVVISI.md`.
 - Misura nuova (`strumenti/carico.js`, ora conta anche le scene delle fiamme di `fiamme2d.js`): città di notte ~60 % del fotogramma sul PC medio (stima), ~64 % con la pioggia; il 23/11 era ~66 %. Sul PC di Nico i 58-60 fps veri del 24/11 restano il numero che conta. Dettagli e storico in `SFRUTTAMENTO.md`.
