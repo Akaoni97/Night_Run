@@ -423,7 +423,9 @@ function genParamsBase(c) {
         intake: inn.dsp, scream: 0, lope: (vo.lope || 0) + (cm ? cm.dsp.lope : 0), rattle: volanoRattle(g('flywheel'), cl), spark: ecu.sim.spark ? 1 : 0, cabin: wt.sim.cabin,
         voice: vo,
       },
-      look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, scarico: ex.id, badge: (tb.look || {}).badge || '' },
+      // come la V40: intercooler frontale dietro il paraurti (non quello di serie) e scritta TURBO coi due turbo più grossi (estetica2d.js)
+      look: { low: su.low, susp: su.susp.pitch, exhaust: (ex.look || {}).tip || 0, scarico: ex.id, badge: (tb.look || {}).badge || '',
+        fmic: hasT && ic.id !== c.tuning.intercooler.items[0].id, turbo2: hasT && c.tuning.turbo.items.indexOf(tb) >= Math.max(2, c.tuning.turbo.items.length - 2) },
     };
   };
 }
@@ -714,6 +716,24 @@ const CARS = {
 };
 CARS.supra.tuning = TUNING_SUPRA; CARS.supra.presets = SUPRA_PRESETS; CARS.supra.params = supraParams;
 for (const c of GEN_CARS) CARS[c.id] = genCar(c);
+// estetica come la V40 per tutte le auto da disegno (v0.176): cerchi in lega, kit leggero (labbro, minigonne, diffusore) e spoiler,
+// disegnati sulla sagoma di ogni auto da estetica2d.js. Il kit completo del disegno tuning resta dov'era.
+const GEN_ESTETICA_NO_SPOILER = ['bus', 'ambulanza'];
+for (const c of GEN_CARS) {
+  const C = CARS[c.id], tuning = C.body.kit && C.body.kit.items.find((it) => it.id === 'tuning');
+  C.body = Object.assign({}, C.body, {
+    wheels: { label: 'Cerchi', items: [
+      { id: 'none', name: 'Cerchi di serie', price: 0 },
+      { id: 'a5', name: 'Lega 5 razze', price: 550 },
+      { id: 'mesh', name: 'Lega a raggi', price: 900 } ] },
+    kit: { label: 'Kit carrozzeria', items: [
+      { id: 'none', name: 'Di serie', price: 0 },
+      { id: 'kit', name: 'Labbro, minigonne e diffusore', price: 1200 } ].concat(tuning ? [tuning] : []) },
+  });
+  if (!GEN_ESTETICA_NO_SPOILER.includes(c.id)) C.body.spoiler = { label: 'Spoiler', items: [
+    { id: 'none', name: 'Nessuno', price: 0 },
+    { id: 'roof', name: 'Spoiler posteriore', price: 350 } ] };
+}
 const CAR_IDS = Object.keys(CARS);
 // i mezzi pesanti del traffico (camion e carro attrezzi), dai disegni del proprietario: strumenti/camion_hd.py li compone
 // (motrice + rimorchio) e fa le due misure come le auto (_hd). Non si guidano: servono a street2d.js (trafficSprite) e a GAME_TRAFFIC.

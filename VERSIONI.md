@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.175**
+**Versione attuale: v0.176**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -199,3 +199,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.173 · 28/11/2026 · proprietario · **Marchio Duo Maniacs Studio scelto**: due anelli intrecciati (grigio acciaio e rosso cupo) su nero e grigio antracite, scritte spaziate; nuovo anche nella sigla del gioco
 - v0.174 · 28/11/2026 · proprietario · **Schermata iniziale viva**: dietro il nottolino Roma di notte disegnata dal gioco in tempo reale (via del Corso, la cupola, passanti e traffico), con la tua auto che passa piano
 - v0.175 · 28/11/2026 · proprietario · **Traino col carro attrezzi, come nel video**: il pianale si inclina, Nico aggancia la catena, il verricello tira su l'auto, il pianale si abbassa e si blocca; niente più multa del Tutor saltato dal traino
+- v0.176 · 28/11/2026 · proprietario · **Estetica della V40 per tutte le auto**: cerchi in lega (5 razze e a raggi), kit leggero (labbro, minigonne, diffusore), spoiler (sul tetto o alettone sul baule), intercooler frontale e scritta TURBO dai pezzi del motore, misurati sulla sagoma di ogni auto
