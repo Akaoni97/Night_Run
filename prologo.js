@@ -36,11 +36,11 @@ const PRO_NOTAIO = [
   'Una sola potrà portarsela via stasera. Le altre aspetteranno.',
   'Scelga con calma. Ma non troppa: suo zio diceva che di notte la strada si fa più lunga.',
 ];
-// le sei auto del garage (le più vecchie ed economiche del gioco, disegni del proprietario): il giocatore ne sceglie una,
+// quattro utilitarie di prima generazione e due familiari usate, tutte dai disegni del proprietario. Il giocatore ne sceglie una,
 // che diventa la sua auto del Viaggio (malconcia: è ferma da anni). Le altre restano nel garage.
 const PRO_AUTO = [
-  { id: 'panda', nome: 'Fiat Panda', ok: true }, { id: 'a80', nome: 'Audi 80 Avant', ok: true }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
-  { id: 'punto', nome: 'Fiat Grande Punto', ok: true }, { id: 'corsa', nome: 'Opel Corsa', ok: true }, { id: 'polo', nome: 'Volkswagen Polo', ok: true },
+  { id: 'panda141', nome: 'Fiat Panda 1000 Fire', ok: true }, { id: 'ax', nome: 'Citroën AX 1.1', ok: true }, { id: 'twingo', nome: 'Renault Twingo 1.2', ok: true },
+  { id: 'punto1', nome: 'Fiat Punto 75', ok: true }, { id: 'a80', nome: 'Audi 80 Avant', ok: true }, { id: 'v40', nome: 'Volvo V40 SW', ok: true },
 ];
 // si gioca il prologo solo all'inizio di un Viaggio nuovo (km 0, mai visto)
 const proShould = (s) => !!(s && s.vg && s.vg.on && !s.vg.prologo && (s.dist || 0) < 50);

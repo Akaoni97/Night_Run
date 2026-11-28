@@ -12,7 +12,7 @@ const VG_STOP0 = 1800, VG_STEP = 3200;                     // prima tappa al km 
 // l'auto ereditata dallo zio (scelta nel prologo) nei testi della storia: {Auto} e {auto} diventano «La Panda» / «la Panda»,
 // {tipo} «un'utilitaria» / «una station wagon». Si ricorda in game.s.vg.eredita (senza: la Volvo).
 const VG_AUTO_NOME = { v40: ['la', 'Volvo', 'una station wagon'], a80: ["l'", 'Audi', 'una station wagon'], panda: ['la', 'Panda', "un'utilitaria"],
-  punto: ['la', 'Punto', "un'utilitaria"], corsa: ['la', 'Corsa', "un'utilitaria"], polo: ['la', 'Polo', "un'utilitaria"], panda141: ['la', 'Panda', "un'utilitaria"], ax: ["l'", 'AX', "un'utilitaria"], twingo: ['la', 'Twingo', "un'utilitaria"], sandero: ['la', 'Sandero', "un'utilitaria"], aygo: ["l'", 'Aygo', "un'utilitaria"] };
+  punto: ['la', 'Punto', "un'utilitaria"], punto1: ['la', 'Punto', "un'utilitaria"], corsa: ['la', 'Corsa', "un'utilitaria"], polo: ['la', 'Polo', "un'utilitaria"], panda141: ['la', 'Panda', "un'utilitaria"], ax: ["l'", 'AX', "un'utilitaria"], twingo: ['la', 'Twingo', "un'utilitaria"], sandero: ['la', 'Sandero', "un'utilitaria"], aygo: ["l'", 'Aygo', "un'utilitaria"] };
 function vgTesto(game, text) {
   if (typeof text !== 'string' || text.indexOf('{') < 0) return text;
   const id = (game && game.s && game.s.vg && game.s.vg.eredita) || 'v40', c = typeof CARS !== 'undefined' && CARS[id];
