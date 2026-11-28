@@ -792,6 +792,7 @@ class Street2D {
         }
         x.putImageData(d, 0, 0);
       }
+      if (Street2D.passaruota) try { Street2D.passaruota(base, m, D); } catch (e) { /* senza vano ruota */ }   // il vano dentro il passaruota (estetica2d.js)
       return (this.spr[bk] = base);
     };
     const base = mkBase(1);

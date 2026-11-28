@@ -40,3 +40,11 @@ test('estetica2d.js si carica dopo gomme2d.js e si aggancia a genBase e genWheel
   const js = fs.readFileSync(path.join(R, 'estetica2d.js'), 'utf8');
   assert.match(js, /S\.genBase = function/); assert.match(js, /S\.genWheel = function/);
 });
+
+test('vano ruota (v0.178): il passaruota trasparente si riempie per l\'auto del giocatore e per il traffico', () => {
+  const js = fs.readFileSync(path.join(R, 'estetica2d.js'), 'utf8'), st = fs.readFileSync(path.join(R, 'street2d.js'), 'utf8');
+  assert.match(js, /Street2D\.passaruota = function/);
+  assert.match(js, /Street2D\.passaruota\(c, m, this\.genDef\(\)\)/, 'auto del giocatore (genBase)');
+  assert.match(st, /Street2D\.passaruota\(base, m, D\)/, 'traffico e camion (trafficSprite)');
+  assert.match(js, /destination-over/, 'riempie solo i pixel trasparenti');
+});

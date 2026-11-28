@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.177**
+**Versione attuale: v0.178**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -201,3 +201,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.175 · 28/11/2026 · proprietario · **Traino col carro attrezzi, come nel video**: il pianale si inclina, Nico aggancia la catena, il verricello tira su l'auto, il pianale si abbassa e si blocca; niente più multa del Tutor saltato dal traino
 - v0.176 · 28/11/2026 · proprietario · **Estetica della V40 per tutte le auto**: cerchi in lega (5 razze e a raggi), kit leggero (labbro, minigonne, diffusore), spoiler (sul tetto o alettone sul baule), intercooler frontale e scritta TURBO dai pezzi del motore, misurati sulla sagoma di ogni auto
 - v0.177 · 28/11/2026 · proprietario · **Prestazioni, recupero**: asfalto a specchio e pilota fanno lo stesso disegno con meno lavoro; il motore passa da ~60 % a ~53-55 % del fotogramma (pioggia da ~64 % a ~57 %)
+- v0.178 · 28/11/2026 · proprietario · **Vano ruota**: tra gomma e passaruota non si vede più la strada; c'è il vano con rivestimento, ammortizzatore, molla e braccio della sospensione, e il piatto del mozzo dietro le razze (tutte le auto da disegno, traffico e camion)

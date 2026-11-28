@@ -112,11 +112,63 @@
     x.restore();
   }
 
+  // ---- il vano ruota (v0.178): nei disegni delle auto il passaruota è un buco trasparente e la ruota si disegna a parte;
+  // dove la gomma è più piccola del buco, o tra le razze, si vedeva la strada. Qui il buco (dal bordo dell'arco fino alla
+  // linea della fiancata: sotto resta la strada, come sotto un'auto vera) prende il vano: rivestimento scuro con le
+  // nervature, ammortizzatore con la molla, braccio della sospensione verso il centro dell'auto. Solo pixel trasparenti:
+  // il disegno non cambia. D = sprite (ax, wy, wr, w), m = densità della tela (1 o 2). Anche per traffico e camion.
+  const VANO = { fondo: '#0a0b0f', bordo: '#050507', nervo: 'rgba(255,255,255,.045)', molla: ['#8a919e', '#3a3e47'], stelo: '#4a505b', braccio: '#262a32' };
+  Street2D.passaruota = function (c, m, D) {
+    if (!c || !c.width || !D || !D.ax || c._vano) return; c._vano = true;
+    const W = c.width, H = c.height, x = c.getContext('2d', { willReadFrequently: true }), img = x.getImageData(0, 0, W, H), d = img.data;
+    const pieno = (px, py) => px >= 0 && py >= 0 && px < W && py < H && d[(py * W + px) * 4 + 3] > 100;
+    const mask = new Uint8Array(W * H); let tot = 0;
+    const R = D.wr * m;
+    for (const ax of D.ax) {
+      const A = Math.round(ax * m), Y = Math.round(D.wy * m), lim = Math.round(R * 1.9);
+      let dentro = false;
+      for (let py = Math.max(0, Y - Math.round(R * 1.6)); py < Math.min(H, Y + R); py++) {
+        if (pieno(A, py)) { if (dentro) break; continue; }          // sopra l'arco: carrozzeria
+        let xl = A, xr = A;
+        while (xl > A - lim && !pieno(xl - 1, py)) xl--;
+        while (xr < A + lim && !pieno(xr + 1, py)) xr++;
+        if (xl <= A - lim || xr >= A + lim || !pieno(xl - 1, py) || !pieno(xr + 1, py)) { if (dentro) break; continue; }   // sotto la fiancata: si apre
+        dentro = true;
+        for (let px = xl; px <= xr; px++) { mask[py * W + px] = 1; tot++; }
+      }
+    }
+    if (!tot) return;
+    const L = document.createElement('canvas'); L.width = W; L.height = H;
+    const g = L.getContext('2d'); g.setTransform(m, 0, 0, m, 0, 0);
+    const u = 1 / m, r = D.wr, mezzo = (D.w || W / m) / 2;
+    for (const ax of D.ax) {
+      const cy = D.wy, verso = ax < mezzo ? 1 : -1;
+      const gr = g.createRadialGradient(ax, cy, r * 0.2, ax, cy, r * 1.5);
+      gr.addColorStop(0, '#15171d'); gr.addColorStop(0.7, VANO.fondo); gr.addColorStop(1, VANO.bordo);
+      g.fillStyle = gr; g.fillRect(ax - r * 2, cy - r * 1.7, r * 4, r * 2.8);
+      g.fillStyle = VANO.nervo; for (let q = -r * 1.8; q < r * 1.8; q += 2) g.fillRect(ax + q, cy - r * 1.7, u, r * 2.8);   // nervature del rivestimento
+      // braccio della sospensione, dal mozzo verso il centro dell'auto
+      g.strokeStyle = VANO.braccio; g.lineWidth = 2; g.beginPath(); g.moveTo(ax, cy + r * 0.1); g.lineTo(ax + verso * r * 1.6, cy + r * 0.35); g.stroke();
+      // ammortizzatore con la molla, dalla cupola in alto al mozzo
+      const sx = ax + verso * r * 0.18, top = cy - r * 1.55, bw = Math.max(1.5, r * 0.18), mw = Math.max(3, r * 0.5);
+      g.fillStyle = VANO.stelo; g.fillRect(sx - bw / 2, top, bw, cy - top);
+      g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(sx - bw / 2, top, u, cy - top);
+      for (let yy = top + 1; yy < cy - r * 0.35; yy += 2.2) {              // spire della molla
+        g.fillStyle = VANO.molla[1]; g.fillRect(sx - mw / 2, yy + u, mw, 1);
+        g.fillStyle = VANO.molla[0]; g.fillRect(sx - mw / 2, yy, mw, Math.max(u, 0.6));
+      }
+    }
+    const ld = g.getImageData(0, 0, W, H); for (let i = 0; i < mask.length; i++) if (!mask[i]) ld.data[i * 4 + 3] = 0;
+    g.putImageData(ld, 0, 0);
+    x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'destination-over'; x.drawImage(L, 0, 0); x.restore();
+  };
+
   const gb = S.genBase;
   S.genBase = function (m = 1) {
     const c = gb.call(this, m);
     if (c && !c._est && c.width && this.genImgs().ready) {
       c._est = true;
+      try { Street2D.passaruota(c, m, this.genDef()); } catch (e) { /* senza vano ruota */ }
       try { strati(this, c.getContext('2d', { willReadFrequently: true }), m); } catch (e) { /* senza estetica in più */ }
     }
     return c;
@@ -146,6 +198,11 @@
   const gw = S.genWheel;
   S.genWheel = function (g, cx, cy, k, ang, speed = 0, rear = false) {
     const style = (this.cos || {}).wheels, D = this.genDef();
+    if (D && (!style || style === 'none')) {
+      // dietro le razze: il piatto scuro del mozzo, fino al bordo del cerchio (i vuoti tra le razze sono trasparenti per far
+      // vedere il disco del freno, ma il disco non arriva al cerchio e fuori si vedeva la strada; v0.178)
+      g.save(); g.fillStyle = '#0c0d11'; g.beginPath(); g.arc(Math.round(cx), Math.round(cy), Street2D.raggioGrafico(D) * k * 0.7, 0, Math.PI * 2); g.fill(); g.restore();
+    }
     if (!D || !style || style === 'none') return gw.call(this, g, cx, cy, k, ang, speed, rear);
     const R = Street2D.raggioGrafico(D) * k;
     cerchio(this, g, cx, cy, R, ang, speed, rear, style);
