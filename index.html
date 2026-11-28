@@ -2814,6 +2814,10 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
       renderServices();
       { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Ripara la gomma forata (€ 25)'; b.addEventListener('click', () => { const r = game.repairTyre(); if (!r.ok) flash(r.why, 2); renderTrunk(); renderPlaceCash(); }); body.appendChild(b);
         const b2 = document.createElement('button'); b2.type = 'button'; b2.className = 'kbtn'; b2.textContent = 'Controllo pressione gomme'; b2.addEventListener('click', () => { const T = game.tyres(); for (let i = 0; i < 4; i++) { T.leak[i] = 0; T.p[i] = 2.3; } flash('Nico: «Valvole nuove e 2,3 bar. Vai tranquillo.»', 2.2); }); body.appendChild(b2); }
+    } else if (I.id === 'fuel' && window.NightPompa) {               // la pompa in mano (pompa.js): tieni premuto per erogare
+      NightPompa.panel(body, { flash, save: () => { renderPlaceCash(); saveGame(); } });
+      { const b = document.createElement('button'); b.type = 'button'; b.className = 'kbtn'; b.textContent = 'Gonfia le gomme (gratis)'; b.addEventListener('click', () => { game.inflate(); flash('Gomme a 2,3 bar', 1.6); }); body.appendChild(b); }
+      move($('shop')); renderTrunk();
     } else if (I.id === 'fuel') {
       const f = document.createElement('div'); f.className = 'fuelbox'; f.id = 'fuelBox';
       f.innerHTML = '<div><b id="fuelL">—</b> <span class="hint" id="fuelSt"></span></div><div class="fuelgauge"><i id="fuelBar"></i></div>'
@@ -3851,6 +3855,7 @@ html.game .road { box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 10px 30px
 <script src="lucagarage.js"></script>
 <script src="soccorso.js"></script>
 <script src="cambiogomma.js"></script>   <!-- il cambio gomma con la scorta: scendi e la cambi tu -->
+<script src="pompa.js"></script>   <!-- la pompa del benzinaio: tieni premuta la pistola -->
 <script src="documenti.js"></script>
 <script src="polizia.js"></script>
 <script src="notte.js"></script>

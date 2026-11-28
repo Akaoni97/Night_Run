@@ -1,6 +1,6 @@
 # Versioni di Night Run
 
-**Versione attuale: v0.179**
+**Versione attuale: v0.180**
 
 ## Come si conta
 Ogni **intervento** (una sessione con Claude, Codex, Kimi o chiunque, oppure un pacchetto di modifiche fatte insieme) fa salire la
@@ -203,3 +203,4 @@ non ha lasciato una voce. Dalla v0.51 il conto è esatto.
 - v0.177 · 28/11/2026 · proprietario · **Prestazioni, recupero**: asfalto a specchio e pilota fanno lo stesso disegno con meno lavoro; il motore passa da ~60 % a ~53-55 % del fotogramma (pioggia da ~64 % a ~57 %)
 - v0.178 · 28/11/2026 · proprietario · **Vano ruota**: tra gomma e passaruota non si vede più la strada; c'è il vano con rivestimento, ammortizzatore, molla e braccio della sospensione, e il piatto del mozzo dietro le razze (tutte le auto da disegno, traffico e camion)
 - v0.179 · 28/11/2026 · cognato · **Le auto di zio Claudio**: Panda 1000 Fire, Citroën AX, Twingo e Punto 75 prima serie entrano nel garage dell'eredità con Audi 80 Avant e Volvo V40 SW.
+- v0.180 · 28/11/2026 · proprietario · **La pompa del benzinaio**: la pistola si tiene premuta (Spazio o pulsante), il grilletto si stringe e il flusso cresce, display con euro e litri, prepagato, CLAC a serbatoio pieno, si paga riagganciando, cifra tonda abbonata

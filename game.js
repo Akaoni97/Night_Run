@@ -356,7 +356,8 @@ class StreetGame {
   }
   exitPlace() {
     const I = this.inside; if (!I || I.phase !== 'shop') return;
-    if (I.fill && I.fill.got > 0.05) {       // pistola staccata a metà: si paga quello che è entrato
+    if (I.fill && I.fill.manual && this.pompaPaga) this.pompaPaga();   // si esce con la pistola in mano: si riaggancia e si paga (pompa.js)
+    else if (I.fill && I.fill.got > 0.05) {       // pistola staccata a metà: si paga quello che è entrato
       const c = Math.round(I.fill.cost * 100) / 100; if (this.mode === 'career') this.s.money -= c;
       this.say(`Rifornimento interrotto: ${I.fill.got.toFixed(1).replace('.', ',')} litri, − € ${c.toFixed(2).replace('.', ',')}`, 'fuel');
     }
@@ -734,7 +735,7 @@ class StreetGame {
       I.t += dt;
       if (I.phase === 'in' && I.t > (I.dur || GAME_ENT_IN)) { I.phase = 'shop'; I.t = 0; }
       if (I.phase === 'out' && I.t > (I.durOut || GAME_ENT_OUT)) { this.inside = null; this.ap = null; this.lane = 3; this.laneZ = GAME_LANE_Z[3]; this.manualT = 4; }
-      if (I.fill) {
+      if (I.fill && !I.fill.manual) {                     // la pistola in mano (pompa.js) va da sé
         const F = I.fill, step = Math.min(F.liters - F.got, dt * 8);
         F.got += step; sim.fuel = Math.min(1, sim.fuel + step / sim.P.tank); sim.dry = false;
         F.cost = F.got * GAME_FUEL_PRICE;
