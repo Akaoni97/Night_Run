@@ -14,34 +14,37 @@ lì i millesimi sono veri. La colonna «Stima» li converte per un **PC di gamma
 o RTX 3060): il codice ~2,2 volte più veloce, gli effetti a tutto schermo ~7 volte (li fa la scheda video). È una stima:
 ±30-50 %. Per un numero vero serve misurare sul PC di casa (contatore in Sviluppatori: da fare).
 
-## Ultima misura · 23/11/2026 · v0.130 · città di notte, densità doppia
+## Ultima misura · 28/11/2026 · v0.176 · città di notte, densità doppia
 
-Misurato in cloud: 40,5 ms a fotogramma (25 al secondo). Stima sul PC medio: **~66 % del fotogramma**.
+Misurato in cloud: 46,8 ms a fotogramma (21 al secondo). Stima sul PC medio: **~60 % del fotogramma** (con la pioggia **~64 %**).
+**Dato vero**: il 24/11 (v0.137) Nico ha misurato **58-60 fps sul suo PC**: il gioco ci sta, il margine c'è.
 
 | Parte | Carico sul fotogramma (PC medio) | Stima | Misurato in cloud |
 |---|---|---|---|
-| Pilota in auto (la figura a pixel della v0.119) | `█▏░░░░░░░░` | ~12 % | 4,4 ms |
-| Logica, traffico, quadro, polizia | `█▏░░░░░░░░` | ~12 % | 4,3 ms |
-| Ingrandimento allo schermo | `▋░░░░░░░░░` | ~7 % | 8,6 ms |
-| Asfalto bagnato e riflessi | `▋░░░░░░░░░` | ~7 % | 8,3 ms |
-| Foschia sulle auto | `▋░░░░░░░░░` | ~7 % | 8,1 ms |
-| Fisica (motore, gomme, turbo) | `▌░░░░░░░░░` | ~6 % | 2,1 ms |
-| Luci notturne e bagliore | `▎░░░░░░░░░` | ~4 % | 4,3 ms |
-| Città, palazzi, cielo | `▎░░░░░░░░░` | ~3 % | 1,2 ms |
-| Passanti | `▏░░░░░░░░░` | ~2 % | 0,9 ms |
-| Fumo, gomme, fiamme, marmitta | `▏░░░░░░░░░` | ~2 % | 0,8 ms |
-| Vita (stormi, foglie, falene) | `▏░░░░░░░░░` | ~2 % | 0,7 ms |
-| Scritte, radar, specchietto | `░░░░░░░░░░` | ~1 % | 0,3 ms |
-| Altro disegno 2D | `░░░░░░░░░░` | ~0,5 % | 0,2 ms |
-| **Totale** | `██████▌░░░` | **~66 %** | 44 ms |
+| Ingrandimento allo schermo | `█▎░░░░░░░░` | ~13 % | 15,7 ms |
+| Pilota in auto | `▊░░░░░░░░░` | ~9 % | 3,2 ms |
+| Asfalto bagnato e riflessi | `▊░░░░░░░░░` | ~8 % | 9,8 ms |
+| Logica, traffico, quadro, polizia | `▊░░░░░░░░░` | ~8 % | 3,0 ms |
+| Luci notturne e bagliore | `▋░░░░░░░░░` | ~7 % | 7,9 ms |
+| Foschia sulle auto | `▍░░░░░░░░░` | ~5 % | 5,4 ms |
+| Fisica (motore, gomme, turbo) | `▎░░░░░░░░░` | ~3 % | 1,0 ms |
+| Città, palazzi, cielo | `▏░░░░░░░░░` | ~2 % | 0,8 ms |
+| Fumo, gomme, fiamme, marmitta | `▏░░░░░░░░░` | ~1,6 % | 0,6 ms |
+| Passanti | `░░░░░░░░░░` | ~1,2 % | 0,4 ms |
+| Vita (stormi, foglie, falene) | `░░░░░░░░░░` | ~1,1 % | 0,4 ms |
+| Scritte, radar, specchietto | `░░░░░░░░░░` | ~0,9 % | 0,3 ms |
+| Altro disegno 2D | `░░░░░░░░░░` | ~0,7 % | 0,2 ms |
+| **Totale** | `██████░░░░` | **~60 %** | 48,8 ms |
+
+Con la pioggia: ingrandimento ~14 %, pilota ~10 %, foschia ~6 %, fiamme e fumo ~2 %, totale ~64 % (50,4 ms in cloud).
 
 Le altre risorse (tetti diversi dal fotogramma):
 
 | Risorsa | Carico | Stima |
 |---|---|---|
 | Suono del motore (va su un processore a parte; 10 s di audio fatti in 2,2 s in cloud) | `█░░░░░░░░░` | ~10 % di un core |
-| Memoria del gioco (28 MB) | `▎░░░░░░░░░` | ~3 % |
-| Salvataggi, partita nuova (24 KB sui ~5 MB del browser) | `░░░░░░░░░░` | ~0,5 % |
+| Memoria del gioco (28-40 MB) | `▍░░░░░░░░░` | ~4 % |
+| Salvataggi, partita nuova (19 KB sui ~5 MB del browser) | `░░░░░░░░░░` | ~0,5 % |
 | Salvataggi a fine gioco (3 partite e 40 foto del diario ciascuna) | `███▌░░░░░░` | ~35 % (stima) |
 | Complessità del codice (giudizio, non una misura: 89 file, `index.html` di 3.700 righe, disegno dell'auto in 5-6 file) | `███████▌░░` | ~75 % |
 
@@ -51,11 +54,12 @@ Le altre risorse (tetti diversi dal fotogramma):
 - **Costa**: tutto quello che si disegna in più a ogni fotogramma su tutto lo schermo (passanti, luci, meteo, riflessi).
 - **Da recuperare** (stessa grafica, meno lavoro): il pilota viene ridisegnato da capo a ogni fotogramma (le sue pose si
   possono preparare una volta e copiare: ~8-10 %); foschia e asfalto bagnato girano anche quando non piove (~5-10 %).
-- **Attenzione**: Luca dice che sul suo PC vede **11-24 fotogrammi al secondo** (lavoro in corso del 23/11 in
-  `INCORSO.md`): molto peggio della stima. O il suo PC/browser non usa la scheda video per il disegno, o la stima è
-  ottimista. Finché non c'è il contatore sul PC vero, i numeri veri sono i suoi.
+- **Il PC vero**: il 23/11 Luca vedeva 11-24 fotogrammi al secondo; dopo i tre giri sulle prestazioni (v0.131-v0.137) Nico ne misura **58-60** sul suo PC (24/11). Il numero vero vale più della stima: oggi il gioco ci sta.
+- **Cosa è cambiato dal 23/11**: i pezzi fatti di codice sono scesi (pilota 12 → 9 %, logica 12 → 8 %, fisica 6 → 3 %) grazie alla pagina leggera e alle figure al posto dei pixel (v0.132-v0.138); è salito l'ingrandimento (7 → 13 %), perché dalla v0.134 la tela dello schermo è un multiplo intero della scena: in cloud, senza scheda video, costa; sul PC lo fa la scheda video. Le novità di questi giorni (fiamme nuove, estetica di tutte le auto, traino) pesano poco: fiamme e fumo ~1,6 %, i pezzi estetici si disegnano una volta e restano in memoria.
 
 ## Storico
 | Data | Versione | Scena | Cloud (ms) | Stima PC medio | Note |
 |---|---|---|---|---|---|
 | 23/11/2026 | v0.130 | città di notte | 40,5 | ~66 % | prima misura; pilota e logica i pezzi più pesanti |
+| 24/11/2026 | v0.137 | PC di Nico | — | 58-60 fps veri | misura sul PC vero dopo i tre giri sulle prestazioni (prima 11-24 fps sul PC di Luca) |
+| 28/11/2026 | v0.176 | città di notte | 46,8 | ~60 % | codice più leggero (pilota, logica, fisica), ingrandimento più caro in cloud; con la pioggia 50,4 ms, ~64 % |

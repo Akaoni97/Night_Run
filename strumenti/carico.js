@@ -30,7 +30,7 @@ const PARTI = [
   ['Fisica (motore, gomme, turbo)', ['sim.update']],
   ['Città, palazzi, cielo', ['drawCity', 'building', 'tileHD', 'districtAt', 'districtInfo', 'districtMix', 'skyHD', 'drawSky', 'drawTrain', 'span', 'drawScenery', 'walkHD', 'curbHD', 'lampHD', 'landmark', 'kindExtra', 'drawNearSide']],
   ['Passanti', ['districtPeople', 'pedSprite', 'cityProps']],
-  ['Fumo, gomme, fiamme, marmitta', ['puffSprite', 'fxParts', 'fxCar', 'fxFlame', 'fxFlameV', 'fxTorch', 'fxBang', 'fxMarmitta', 'fxShadow', 'tireFx', 'wheelDraw', 'v40Wheel', 'genWheel', 'supraWheel', 'body', 'bodyHD']],
+  ['Fumo, gomme, fiamme, marmitta', ['puffSprite', 'fxParts', 'fxCar', 'fxFlame', 'fxFlameV', 'fxTorch', 'fxBang', 'fxMarmitta', 'fxShadow', 'tireFx', 'wheelDraw', 'v40Wheel', 'genWheel', 'supraWheel', 'body', 'bodyHD', 'scenaTick', 'scenaNuova', '_scenaCorpo', '_scenaSpara', '_fireBlob']],
   ['Vita (stormi, foglie, falene)', ['vitaSky', 'vitaRoad', 'vitaFront']],
   ['Scritte, radar, specchietto', ['text', 'drawLaneRadar', 'drawMirror', 'paintMirror', 'drawComics', 'comic', 'comicEv', 'reaDraw', 'districtBanner']],
 ];
